@@ -71,7 +71,7 @@ describe('Learner Playlist Modal Component', function() {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     component.activityId = '0';
     component.activityTitle = 'Title';
-    //component.activityType = 'exploration';
+    // A component . activityType = 'exploration';.
     component.removeFromLearnerPlaylistUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
     fixture.detectChanges();

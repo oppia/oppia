@@ -77,6 +77,10 @@ interface AddMessagePayload {
   'text': string;
 }
 
+interface MessageSummaryList {
+  'message_summary_list': FeedbackMessageSummaryBackendDict[]
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -153,9 +157,9 @@ export class LearnerDashboardBackendApiService {
   async onClickThreadAsync(
       threadDataUrl: string): Promise<FeedbackMessageSummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this.http.get<FeedbackMessageSummaryBackendDict[]>(
+      this.http.get<MessageSummaryList>(
         threadDataUrl).toPromise().then(response => {
-        resolve(response['message_summary_list']);
+        resolve(response.message_summary_list);
       }, errorResponse => {
         reject(errorResponse.error.error);
       });

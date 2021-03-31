@@ -124,18 +124,18 @@ export class LearnerPlaylistBackendApiService {
   // in Learner Dashboard Page.
   removeActivityModal(
       sectionNameI18nId: string, subsectionName: string,
-      activityId: string, activityTitle: string): Promise<void>{
-  const modelRef = this.ngbModal.open(
-    RemoveActivityModalComponent, {backdrop: true});
-  modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
-  modelRef.componentInstance.subsectionName = subsectionName;
-  modelRef.componentInstance.activityId = activityId;
-  modelRef.componentInstance.activityTitle = activityTitle;
-  return Promise((resolve, reject) => {
-    modelRef.result.then((playlistUrl) => {
+      activityId: string, activityTitle: string): Promise<void> {
+    const modelRef = this.ngbModal.open(
+      RemoveActivityModalComponent, {backdrop: true});
+    modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
+    modelRef.componentInstance.subsectionName = subsectionName;
+    modelRef.componentInstance.activityId = activityId;
+    modelRef.componentInstance.activityTitle = activityTitle;
+    return Promise((resolve, reject) => {
+      modelRef.result.then((playlistUrl) => {
       // eslint-disable-next-line dot-notation
-      resolve(this.http.delete<void>(playlistUrl).toPromise());
-      },() => {
+        resolve(this.http.delete<void>(playlistUrl).toPromise());
+      }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.

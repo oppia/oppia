@@ -17,12 +17,11 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SafeResourceUrl } from '@angular/platform-browser';
 
-import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
@@ -67,12 +66,12 @@ import { UserService } from 'services/user.service';
   //     }
   //   };
   // });
-  // encapsulation: ViewEncapsulation.None
+  // encapsulation: ViewEncapsulation.None.
 })
 export class LearnerDashboardPageComponent implements OnInit {
   threadIndex: number;
 
-  // constant.
+
   EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
   SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -97,13 +96,13 @@ export class LearnerDashboardPageComponent implements OnInit {
   startCompletedExpIndex: number;
   startIncompleteCollectionIndex: number;
   startCompletedCollectionIndex: number;
-  //list.
+
   completedExplorationsList: LearnerExplorationSummary[];
   completedCollectionsList: CollectionSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   incompleteCollectionsList: CollectionSummary[];
   subscriptionsList: ProfileSummary[];
-  //number.
+
   numberNonexistentIncompleteExplorations: number;
   numberNonexistentIncompleteCollections: number;
   numberNonexistentCompletedExplorations: number;
@@ -124,7 +123,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   removeIconIsActive: boolean[];
   noActivity: boolean;
   messageSendingInProgress: boolean;
-  profilePictureDataUrl: any
+  profilePictureDataUrl: string | SafeResourceUrl;
   newMessage: {
     'text': string
   };
@@ -150,13 +149,14 @@ export class LearnerDashboardPageComponent implements OnInit {
       LearnerPlaylistBackendApiService,
     private userService: UserService,
     private ngbModal: NgbModal,
-    private pngSanitizerService : PngSanitizerService 
-    ) {}
+    private pngSanitizerService: PngSanitizerService
+  ) {}
 
-  ngOnInit(){
+  ngOnInit(): void {
     this.userService.getProfileImageDataUrlAsync().then(
       dataUrl => {
-        this.profilePictureDataUrl = this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl);
+        this.profilePictureDataUrl =
+          this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl);
       });
 
     this.loaderService.showLoadingScreen('Loading');
@@ -173,12 +173,15 @@ export class LearnerDashboardPageComponent implements OnInit {
         this.isCurrentExpSortDescending = true;
         this.isCurrentSubscriptionSortDescending = true;
         this.isCurrentFeedbackSortDescending = true;
-        this.currentExpSortType = (LearnerDashboardPageConstants
-          .EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key);
-        this.currentSubscribersSortType = (LearnerDashboardPageConstants
-          .SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.USERNAME.key);
-        this.currentFeedbackThreadsSortType = (LearnerDashboardPageConstants
-          .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
+        this.currentExpSortType = (
+          LearnerDashboardPageConstants
+            .EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key);
+        this.currentSubscribersSortType = (
+          LearnerDashboardPageConstants
+            .SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.USERNAME.key);
+        this.currentFeedbackThreadsSortType = (
+          LearnerDashboardPageConstants
+            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
         this.startIncompleteExpIndex = 0;
         this.startCompletedExpIndex = 0;
         this.startIncompleteCollectionIndex = 0;
@@ -212,10 +215,12 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.numberOfUnreadThreads;
         this.explorationPlaylist = responseData.explorationPlaylist;
         this.collectionPlaylist = responseData.collectionPlaylist;
-        this.activeSection = (LearnerDashboardPageConstants
-          .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE);
-        this.activeSubsection = (LearnerDashboardPageConstants
-          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
+        this.activeSection = (
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE);
+        this.activeSubsection = (
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
         this.feedbackThreadActive = false;
 
         this.noExplorationActivity = (
@@ -229,14 +234,14 @@ export class LearnerDashboardPageComponent implements OnInit {
           (this.explorationPlaylist.length === 0) &&
           (this.collectionPlaylist.length === 0));
       }, errorResponse => {
-        if (AppConstants
-            .FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
           this.alertsService.addWarning(
             'Failed to get learner dashboard data');
         }
       }
     );
-  
+
 
     Promise.all([userInfoPromise, dashboardDataPromise]).then(() => {
       this.loaderService.hideLoadingScreen();
@@ -246,47 +251,48 @@ export class LearnerDashboardPageComponent implements OnInit {
 
     this.newMessage = {
       text: ''
-    }
+    };
   }
-    
-  getStaticImageUrl(imagePath) {
+
+  getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
-  
-  setActiveSection(newActiveSectionName) {
+
+  setActiveSection(newActiveSectionName: string): void {
     this.activeSection = newActiveSectionName;
     if (this.activeSection ===
       LearnerDashboardPageConstants
-      .LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
       this.feedbackThreadActive === true) {
       this.feedbackThreadActive = false;
     }
   }
 
-  setActiveSubsection(newActiveSubsectionName) {
+  setActiveSubsection(newActiveSubsectionName: string): void {
     this.activeSubsection = newActiveSubsectionName;
   }
 
-  getExplorationUrl(explorationId) {
+  getExplorationUrl(explorationId: string): string {
     return '/explore/' + explorationId;
   }
 
-  getCollectionUrl(collectionId) {
+  getCollectionUrl(collectionId: string): string {
     return '/collection/' + collectionId;
   }
 
-  checkMobileView() {
+  checkMobileView(): boolean {
     return this.deviceInfoService.isMobileDevice();
   }
 
-  getVisibleExplorationList(startCompletedExpIndex) {
+  getVisibleExplorationList(
+      startCompletedExpIndex: number): LearnerExplorationSummary[] {
     return this.completedExplorationsList.slice(
       startCompletedExpIndex, Math.min(
         startCompletedExpIndex + this.PAGE_SIZE,
         this.completedExplorationsList.length));
   }
 
-  showUsernamePopover(subscriberUsername) {
+  showUsernamePopover(subscriberUsername: string): string {
     // The popover on the subscription card is only shown if the length
     // of the subscriber username is greater than 10 and the user hovers
     // over the truncated username.
@@ -297,44 +303,53 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  goToPreviousPage(section, subsection) {
-    if (section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+  goToPreviousPage(section: string, subsection: string): void {
+    if (section === LearnerDashboardPageConstants
+      .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
       if (subsection === (
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        LearnerDashboardPageConstants
+          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
         this.startIncompleteExpIndex = Math.max(
           this.startIncompleteExpIndex - this.PAGE_SIZE, 0);
       } else if (
         subsection === (
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
         this.startIncompleteCollectionIndex = Math.max(
           this.startIncompleteCollectionIndex - this.PAGE_SIZE, 0);
       }
     } else if (
-      section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
+      section === LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
       if (subsection === (
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        LearnerDashboardPageConstants
+          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
         this.startCompletedExpIndex = Math.max(
           this.startCompletedExpIndex - this.PAGE_SIZE, 0);
       } else if (
         subsection === (
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
         this.startCompletedCollectionIndex = Math.max(
           this.startCompletedCollectionIndex - this.PAGE_SIZE, 0);
       }
     }
   }
 
-  goToNextPage(section, subsection) {
-    if (section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+  goToNextPage(section: string, subsection: string): void {
+    if (section === LearnerDashboardPageConstants
+      .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
       if (subsection === (
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        LearnerDashboardPageConstants
+          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
         if (this.startIncompleteExpIndex +
           this.PAGE_SIZE <= this.incompleteExplorationsList.length) {
           this.startIncompleteExpIndex += this.PAGE_SIZE;
         }
       } else if (
         subsection === (
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
         if (this.startIncompleteCollectionIndex +
           this.PAGE_SIZE <=
             this.incompleteCollectionsList.length) {
@@ -342,16 +357,19 @@ export class LearnerDashboardPageComponent implements OnInit {
         }
       }
     } else if (
-      section === LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
+      section === LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
       if (subsection === (
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+        LearnerDashboardPageConstants
+          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
         if (this.startCompletedExpIndex +
           this.PAGE_SIZE <= this.completedExplorationsList.length) {
           this.startCompletedExpIndex += this.PAGE_SIZE;
         }
       } else if (
         subsection === (
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
         if (this.startCompletedCollectionIndex +
           this.PAGE_SIZE <= this.completedCollectionsList.length) {
           this.startCompletedCollectionIndex += this.PAGE_SIZE;
@@ -360,7 +378,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  setExplorationsSortingOptions(sortType: string) {
+  setExplorationsSortingOptions(sortType: string): void {
     if (sortType === this.currentExpSortType) {
       this.isCurrentExpSortDescending =
         !this.isCurrentExpSortDescending;
@@ -369,7 +387,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  setSubscriptionSortingOptions(sortType) {
+  setSubscriptionSortingOptions(sortType: string): void {
     if (sortType === this.currentSubscribersSortType) {
       this.isCurrentSubscriptionSortDescending = (
         !this.isCurrentSubscriptionSortDescending);
@@ -378,7 +396,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  setFeedbackSortingOptions(sortType) {
+  setFeedbackSortingOptions(sortType: string): void {
     if (sortType === this.currentFeedbackThreadsSortType) {
       this.isCurrentFeedbackSortDescending = (
         !this.isCurrentFeedbackSortDescending);
@@ -387,26 +405,27 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  getValueOfExplorationSortKey() {
+  getValueOfExplorationSortKey(): string {
     // 'Last Played' is the default sorting operation
-    // so we will return 'default' to SortByPipe when Last Played 
+    // so we will return 'default' to SortByPipe when Last Played
     // option is selected in the drop down menu.
     if (this.currentExpSortType ===
-      LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
+      LearnerDashboardPageConstants
+        .EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
       return 'default';
     } else {
       return this.currentExpSortType;
     }
   }
 
-  getValueOfSubscriptionSortKey() {
+  getValueOfSubscriptionSortKey(): string {
     // 'Username' is the default sorting operation
     // so we will return 'username' to SortByPipe when Username
     // option is selected in the drop down menu.
     return this.currentSubscribersSortType;
   }
 
-  getValueOfFeedbackThreadSortKey(){
+  getValueOfFeedbackThreadSortKey(): string {
     // 'Last Updated' is the default sorting operation
     // so we will return 'lastUpdatedMsecs' to SortByPipe when Last Updated
     // option is selected in the drop down menu.
@@ -414,7 +433,8 @@ export class LearnerDashboardPageComponent implements OnInit {
   }
 
   onClickThread(
-      threadStatus, explorationId, threadId, explorationTitle) {
+      threadStatus: string, explorationId: string,
+      threadId: string, explorationTitle: string): void {
     this.loadingFeedbacks = true;
     let threadDataUrl = this.urlInterpolationService.interpolateUrl(
       '/learnerdashboardthreadhandler/<threadId>', {
@@ -437,24 +457,25 @@ export class LearnerDashboardPageComponent implements OnInit {
       }
     }
 
-    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl).then((message_summary_list) => {
-      let messageSummaryDicts = message_summary_list;
-      this.messageSummaries = [];
-      for (let index = 0; index < messageSummaryDicts.length; index++) {
-        this.messageSummaries.push(
-          FeedbackMessageSummary.createFromBackendDict(
-            messageSummaryDicts[index]));
-      }
-      this.loadingFeedbacks = false;
-    });
+    this.learnerDashboardBackendApiService.onClickThreadAsync(threadDataUrl)
+      .then((messageSummaryList) => {
+        let messageSummaryDicts = messageSummaryList;
+        this.messageSummaries = [];
+        for (let index = 0; index < messageSummaryDicts.length; index++) {
+          this.messageSummaries.push(
+            FeedbackMessageSummary.createFromBackendDict(
+              messageSummaryDicts[index]));
+        }
+        this.loadingFeedbacks = false;
+      });
   }
 
-  showAllThreads() {
+  showAllThreads(): void {
     this.feedbackThreadActive = false;
     this.threadIndex = null;
   }
 
-  addNewMessage(threadId, newMessage) {
+  addNewMessage(threadId: string, newMessage: string): void {
     let url = this.urlInterpolationService.interpolateUrl(
       '/threadhandler/<threadId>', {
         threadId: threadId
@@ -465,22 +486,23 @@ export class LearnerDashboardPageComponent implements OnInit {
       text: newMessage
     };
     this.messageSendingInProgress = true;
-    this.learnerDashboardBackendApiService.addNewMessageAsync(url, payload).then(() => {
-      this.threadSummary = this.threadSummaries[this.threadIndex];
-      this.threadSummary.appendNewMessage(
-        newMessage, this.username);
-      this.messageSendingInProgress = false;
-      this.newMessage.text = null;
-      let newMessageSummary = (
-        FeedbackMessageSummary.createNewMessage(
-          this.threadSummary.totalMessageCount, newMessage,
-          this.username, this.profilePictureDataUrl));
-      this.messageSummaries.push(newMessageSummary);
-    });
+    this.learnerDashboardBackendApiService
+      .addNewMessageAsync(url, payload).then(() => {
+        this.threadSummary = this.threadSummaries[this.threadIndex];
+        this.threadSummary.appendNewMessage(
+          newMessage, this.username);
+        this.messageSendingInProgress = false;
+        this.newMessage.text = null;
+        let newMessageSummary = (
+          FeedbackMessageSummary.createNewMessage(
+            this.threadSummary.totalMessageCount, newMessage,
+            this.username, this.profilePictureDataUrl));
+        this.messageSummaries.push(newMessageSummary);
+      });
   }
 
   showSuggestionModal(
-      newContent, oldContent, description) {
+      newContent: string, oldContent: string, description: string): void {
     this.suggestionModalForLearnerDashboardService.showSuggestionModal(
       'edit_exploration_state_content',
       {
@@ -492,58 +514,65 @@ export class LearnerDashboardPageComponent implements OnInit {
   }
 
   openRemoveActivityModal(
-      sectionNameI18nId, subsectionName, activity: LearnerExplorationSummary): void {
+      sectionNameI18nId: string, subsectionName: string,
+      activity: LearnerExplorationSummary): void {
     this.learnerPlaylistBackendApiService.removeActivityModal(
-        sectionNameI18nId, subsectionName,
-        activity.id, activity.title)
-    .then(() => {
-      if (sectionNameI18nId ===
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-        if (subsectionName ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-          let index = this.incompleteExplorationsList.findIndex(
-            exp => exp.id === activity.id);
-          if (index !== -1) {
-            this.incompleteExplorationsList.splice(index, 1);
+      sectionNameI18nId, subsectionName,
+      activity.id, activity.title)
+      .then(() => {
+        if (sectionNameI18nId ===
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+          if (subsectionName ===
+            LearnerDashboardPageConstants
+              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            let index = this.incompleteExplorationsList.findIndex(
+              exp => exp.id === activity.id);
+            if (index !== -1) {
+              this.incompleteExplorationsList.splice(index, 1);
+            }
+          } else if (subsectionName ===
+            LearnerDashboardPageConstants
+              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+            let index = this.incompleteCollectionsList.findIndex(
+              collection => collection.id === activity.id);
+            if (index !== -1) {
+              this.incompleteCollectionsList.splice(index, 1);
+            }
           }
-        } else if (subsectionName ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-          let index = this.incompleteCollectionsList.findIndex(
-            collection => collection.id === activity.id);
-          if (index !== -1) {
-            this.incompleteCollectionsList.splice(index, 1);
+        } else if (sectionNameI18nId ===
+          LearnerDashboardPageConstants
+            .LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+          if (subsectionName ===
+            LearnerDashboardPageConstants
+              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            let index = this.explorationPlaylist.findIndex(
+              exp => exp.id === activity.id);
+            if (index !== -1) {
+              this.explorationPlaylist.splice(index, 1);
+            }
+          } else if (subsectionName ===
+            LearnerDashboardPageConstants
+              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+            let index = this.collectionPlaylist.findIndex(
+              collection => collection.id === activity.id);
+            if (index !== -1) {
+              this.collectionPlaylist.splice(index, 1);
+            }
           }
         }
-      } else if (sectionNameI18nId ===
-        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-        if (subsectionName ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-          let index = this.explorationPlaylist.findIndex(
-            exp => exp.id === activity.id);
-          if (index !== -1) {
-            this.explorationPlaylist.splice(index, 1);
-          }
-        } else if (subsectionName ===
-          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-          let index = this.collectionPlaylist.findIndex(
-            collection => collection.id === activity.id);
-          if (index !== -1) {
-            this.collectionPlaylist.splice(index, 1);
-          }
-        }
-      }
-    });
+      });
   }
 
-  getLabelClass(status) {
+  getLabelClass(status: string): string {
     return this.threadStatusDisplayService.getLabelClass(status);
   }
 
-  getHumanReadableStatus(status) {
+  getHumanReadableStatus(status: string): string {
     return this.threadStatusDisplayService.getHumanReadableStatus(status);
   }
 
-  getLocaleAbbreviatedDatetimeString(millisSinceEpoch) {
+  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
   }
@@ -556,4 +585,4 @@ export class LearnerDashboardPageComponent implements OnInit {
 angular.module('oppia').directive(
   'learnerDashboardPage', downgradeComponent(
     {component: LearnerDashboardPageComponent}));
-// dont forget animations
+// Dont forget animations.
