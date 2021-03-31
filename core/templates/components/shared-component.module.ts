@@ -100,7 +100,7 @@ import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/
 import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
-  overrides = <unknown>{
+  overrides = {
     swipe: { direction: hammer.DIRECTION_HORIZONTAL },
     pinch: { enable: false },
     rotate: { enable: false }
