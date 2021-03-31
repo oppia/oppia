@@ -763,7 +763,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
-            device_country_locale_code=(
+            android_device_country_locale_code=(
                 self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,

@@ -110,7 +110,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # The user's country locale represented as a ISO-3166 code; the locale is
     # determined by the user's Android device settings.
     android_device_country_locale_code = datastore_services.StringProperty(
-        required=True, indexed=True)
+        required=False, indexed=True)
     # The Android device model used to submit the report.
     android_device_model = datastore_services.StringProperty(
         required=False, indexed=True)
@@ -137,11 +137,12 @@ class AppFeedbackReportModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, platform, submitted_on, report_type, category,
-            platform_version, device_country_locale_code, android_sdk_version,
-            android_device_model, entry_point, entry_point_topic_id,
-            entry_point_story_id, entry_point_exploration_id,
-            entry_point_subtopic_id, text_language_code, audio_language_code,
-            android_report_info, web_report_info):
+            platform_version, android_device_country_locale_code,
+            android_sdk_version, android_device_model, entry_point,
+            entry_point_topic_id, entry_point_story_id,
+            entry_point_exploration_id, entry_point_subtopic_id,
+            text_language_code, audio_language_code, android_report_info,
+            web_report_info):
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
@@ -152,8 +153,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
             category: str. The category the report is providing feedback on.
             platform_version: str. The version of Oppia that the report was
                 submitted on.
-            device_country_locale_code: str. The ISO-3166 code for the user's
-                country locale.
+            android_device_country_locale_code: str|None. The ISO-3166 code for
+                the user's country locale or None if its a web report.
             android_sdk_version: int|None. The SDK version running when on the
                 device or None if its a web report.
             android_device_model: str|None. The device model of the Android
@@ -194,7 +195,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
             id=entity_id, platform=platform, submitted_on=submitted_on,
             report_type=report_type, category=category,
             platform_version=platform_version,
-            device_country_locale_code=device_country_locale_code,
+            android_device_country_locale_code=(
+                android_device_country_locale_code),
             android_sdk_version=android_sdk_version,
             android_device_model=android_device_model, entry_point=entry_point,
             entry_point_topic_id=entry_point_topic_id,
@@ -257,7 +259,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'report_type': base_models.EXPORT_POLICY.EXPORTED,
             'category': base_models.EXPORT_POLICY.EXPORTED,
             'platform_version': base_models.EXPORT_POLICY.EXPORTED,
-            'device_country_locale_code': (
+            'android_device_country_locale_code': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'android_device_model': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'android_sdk_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,

@@ -506,29 +506,36 @@ def _generate_entity_to_pseudonymized_ids_mapping(entity_ids):
     }
 
 
-def _generate_entities_to_same_pseudonymized_id_mapping(
-        entity_ids, pseudonymized_id):
+def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
+        pending_deletion_request, entity_category, entity_ids):
     """Generate mapping from entity IDs to a single pseudonymized user ID.
 
     Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to which to save the entity mappings.
+        entity_category: models.NAMES. The category of the models that
+            contain the entity IDs.
         entity_ids: list(str). List of entity IDs for which to generate new
             pseudonymous user IDs. The IDs are of entities (e.g. models in
             config, collection, skill, or suggestion) that were modified
             in some way by the user who is currently being deleted.
-        pseudonymized_id: str. The pseudonymized ID to map each of the entities
-            to.
 
     Returns:
         dict(str, str). Mapping between the entity IDs and pseudonymous user
         ID.
     """
-    return {
-        entity_id: pseudonymized_id
-        for entity_id in entity_ids
-    }
+    if (
+            entity_category not in
+            pending_deletion_request.pseudonymizable_entity_mappings):
+        pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            entity_category] = {
+                entity_id: pseudonymized_id for entity_id in entity_ids
+            }
+        save_pending_deletion_requests([pending_deletion_request])
 
 
-def _save_pseudonymizable_entity_mappings(
+def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, entity_category, entity_ids):
     """Save the entity mappings for some entity category into the pending
     deletion request.
@@ -639,7 +646,7 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
             )
     model_ids = snapshot_metadata_ids | commit_log_ids
 
-    _save_pseudonymizable_entity_mappings(
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, activity_category, list(model_ids))
 
     return (snapshot_metadata_models, commit_log_models)
@@ -1051,20 +1058,12 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     report_ids = set([model.id for model in feedback_report_models])
 
     # Fill in any missing keys in the category's
-    # pseudonymizable_entity_mappings; this is the same as
-    # _save_pseudonymizable_entity_mappings(), but using the same
-    # pseudonym for each entity so that a user will have the same pseudonymized
-    # ID for each entity referencing them.
+    # pseudonymizable_entity_mappings; using the same pseudonym for each entity
+    # so that a user will have the same pseudonymized ID for each entity
+    # referencing them.
     entity_category = models.NAMES.app_feedback_report
-    if (
-            entity_category not in
-            pending_deletion_request.pseudonymizable_entity_mappings):
-        pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
-        pending_deletion_request.pseudonymizable_entity_mappings[
-            entity_category] = (
-                _generate_entities_to_same_pseudonymized_id_mapping(
-                    report_ids, pseudonymized_id))
-        save_pending_deletion_requests([pending_deletion_request])
+    _save_pseudonymizable_entity_mappings_to_same_pseudonym(
+        pending_deletion_request, entity_category, report_ids)
 
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(feedback_report_models):
@@ -1133,7 +1132,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         )).fetch()
     feedback_ids |= set([model.id for model in general_suggestion_models])
 
-    _save_pseudonymizable_entity_mappings(
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.feedback, feedback_ids)
 
     @transaction_services.run_in_transaction_wrapper
@@ -1225,7 +1224,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         )).fetch()
     suggestion_ids = set([model.id for model in voiceover_application_models])
 
-    _save_pseudonymizable_entity_mappings(
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.suggestion, suggestion_ids)
 
     @transaction_services.run_in_transaction_wrapper
