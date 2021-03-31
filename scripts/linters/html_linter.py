@@ -243,7 +243,17 @@ class CustomHTMLParser(html.parser.HTMLParser):
                         and rendered_text[end] in [' ', '=']):
                     attr_positions.append(start)
             attr_pos_mapping[attr] = attr_positions
-        attr_pos = attr_pos_mapping[attr].pop(0)
+        try:
+            attr_pos = attr_pos_mapping[attr].pop(0)
+        except Exception as e:
+            error_message = (
+                    '%s --> Attribute %s for tag %s on line '
+                    '%s failed while popping' % (
+                        self.filepath, attr, tag, line_number))
+            self.failed = True
+            self.error_messages.append(error_message)
+            return
+
         rendered_attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
         attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
         expected_attr_assignment = attr_val_structure.format(
