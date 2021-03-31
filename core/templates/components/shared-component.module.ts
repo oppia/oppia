@@ -35,6 +35,9 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import { SkillSelectorComponent } from
+  './skill-selector/skill-selector.component';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -76,6 +79,7 @@ import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.directive';
 import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { BaseContentComponent } from '../base-components/base-content.component';
+import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -122,6 +126,7 @@ const toastrConfig = {
   imports: [
     CommonModule,
     BrowserModule,
+    MaterialModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
@@ -146,6 +151,7 @@ const toastrConfig = {
     BaseContentComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    FilterForMatchingSubstringPipe,
     FocusOnDirective,
     OppiaFooterDirective,
     KeyboardShortcutHelpModalComponent,
@@ -155,9 +161,11 @@ const toastrConfig = {
     LoadingMessageComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
-    SharingLinksComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
+    OnScreenKeyboardComponent,
+    SharingLinksComponent,
+    SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
@@ -184,8 +192,11 @@ const toastrConfig = {
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, LoadingMessageComponent,
     SocialButtonsComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -215,6 +226,7 @@ const toastrConfig = {
     BackgroundBannerComponent,
     BaseContentComponent,
     ExplorationSummaryTileDirective,
+    FilterForMatchingSubstringPipe,
     FocusOnDirective,
     OppiaFooterDirective,
     LimiToPipe,
@@ -222,6 +234,8 @@ const toastrConfig = {
     SharingLinksComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
+    OnScreenKeyboardComponent,
+    SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
