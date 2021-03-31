@@ -20,6 +20,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { LearnerPlaylistModalComponent } from './modal-templates/learner-playlist-modal.component';
 import { AppConstants } from 'app.constants';
@@ -37,6 +38,7 @@ import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { UserService } from 'services/user.service';
 
 @Component({
@@ -120,7 +122,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   removeIconIsActive: boolean[];
   noActivity: boolean;
   messageSendingInProgress: boolean;
-  profilePictureDataUrl: string;
+  profilePictureDataUrl: any
   newMessage: {
     'text': string
   };
@@ -144,12 +146,13 @@ export class LearnerDashboardPageComponent implements OnInit {
     private loaderService: LoaderService,
     private userService: UserService,
     private ngbModal: NgbModal,
-    ){}
+    private sanitizer: DomSanitizer
+    ) {}
 
   ngOnInit(){
     this.userService.getProfileImageDataUrlAsync().then(
       dataUrl => {
-        this.profilePictureDataUrl = dataUrl;
+        this.profilePictureDataUrl = this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
       });
 
     this.loaderService.showLoadingScreen('Loading');
@@ -353,7 +356,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  setExplorationsSortingOptions(sortType) {
+  setExplorationsSortingOptions(sortType: string) {
     if (sortType === this.currentExpSortType) {
       this.isCurrentExpSortDescending =
         !this.isCurrentExpSortDescending;
@@ -380,10 +383,10 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  getValueOfExplorationSortKey(exploration) {
-    // This  is passed as a custom comparator  to
-    // `orderBy`, so that special cases can be handled while sorting
-    // explorations.
+  getValueOfExplorationSortKey() {
+    // 'Last Played' is the default sorting operation
+    // so we will return 'default' to SortByPipe when Last Played 
+    // option is selected in the drop down menu.
     if (this.currentExpSortType ===
       LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
       return 'default';
@@ -392,16 +395,18 @@ export class LearnerDashboardPageComponent implements OnInit {
     }
   }
 
-  getValueOfSubscriptionSortKey(subscription) {
-    // This  is passed as a custom comparator  to
-    // `orderBy`, so that special cases can be handled while sorting
-    // subscriptions.
-    let value = subscription[this.currentSubscribersSortType];
-    if (this.currentSubscribersSortType ===
-      LearnerDashboardPageConstants.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.IMPACT.key) {
-      value = (value || 0);
-    }
-    return value;
+  getValueOfSubscriptionSortKey() {
+    // 'Username' is the default sorting operation
+    // so we will return 'username' to SortByPipe when Username
+    // option is selected in the drop down menu.
+    return this.currentSubscribersSortType;
+  }
+
+  getValueOfFeedbackThreadSortKey(){
+    // 'Last Updated' is the default sorting operation
+    // so we will return 'lastUpdatedMsecs' to SortByPipe when Last Updated
+    // option is selected in the drop down menu.
+    return this.currentFeedbackThreadsSortType;
   }
 
   onClickThread(
@@ -543,6 +548,10 @@ export class LearnerDashboardPageComponent implements OnInit {
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch) {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
+  }
+
+  getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
   }
 }
 

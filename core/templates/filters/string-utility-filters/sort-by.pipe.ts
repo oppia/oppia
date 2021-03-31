@@ -6,7 +6,6 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 })
 export class SortByPipe implements PipeTransform {
   transform(value: any[], isDescending: boolean, sortKey?: string): any {
-    console.log(value)
     if (!value || sortKey === 'default'){
       return value;
     }
