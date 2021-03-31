@@ -19,7 +19,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SafeResourceUrl } from '@angular/platform-browser';
 
 import { AppConstants } from 'app.constants';
@@ -123,7 +122,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   removeIconIsActive: boolean[];
   noActivity: boolean;
   messageSendingInProgress: boolean;
-  profilePictureDataUrl: string | SafeResourceUrl;
+  profilePictureDataUrl: string;
   newMessage: {
     'text': string
   };
@@ -148,7 +147,6 @@ export class LearnerDashboardPageComponent implements OnInit {
     private learnerPlaylistBackendApiService:
       LearnerPlaylistBackendApiService,
     private userService: UserService,
-    private ngbModal: NgbModal,
     private pngSanitizerService: PngSanitizerService
   ) {}
 
@@ -156,7 +154,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.userService.getProfileImageDataUrlAsync().then(
       dataUrl => {
         this.profilePictureDataUrl =
-          this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl);
+          JSON.stringify(this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl));
       });
 
     this.loaderService.showLoadingScreen('Loading');
