@@ -93,29 +93,24 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         self.job_class = (
             app_feedback_report_jobs_one_off.ScrubAppFeedbackReportsOneOffJob)
 
+    def test_job_reduce_passes_with_no_op(self):
+        self.assertIsNone(self.job_class.reduce('key', 'values'))
+
     def test_job_on_current_and_expired_reports_only_scrubs_expired(self):
         self._add_current_reports()
-        self._add_expiring_reports()
+        self._add_expiring_android_report()
         self._run_one_off_job()
 
-        scrubbed_android_model = (
+        scrubbed_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
-        self._verify_report_is_scrubbed(
-            scrubbed_android_model, feconf.REPORT_SCRUBBER_BOT_ID)
-
-        scrubbed_web_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.WEB_REPORT_ID_OVER_MAX_DAYS))
-        self._verify_report_is_scrubbed(
-            scrubbed_web_model, feconf.REPORT_SCRUBBER_BOT_ID)
-
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.REPORT_ID_AT_MAX_DAYS))
-        self._verify_report_is_not_scrubbed(current_model)
 
-        self.assertIsNone(self.job_class.reduce('key', 'values'))
+        self._verify_report_is_scrubbed(
+            scrubbed_model, feconf.REPORT_SCRUBBER_BOT_ID)
+        self._verify_report_is_not_scrubbed(current_model)
 
     def test_job_with_no_reports_in_storage_does_not_scrub_storage(self):
         current_models_query = (
@@ -139,7 +134,8 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         self._verify_report_is_not_scrubbed(current_model)
 
     def test_job_on_all_expired_models_updates_all_models(self):
-        self._add_expiring_reports()
+        self._add_expiring_android_report()
+        self._add_expiring_web_report()
         self._run_one_off_job()
 
         android_model = (
@@ -163,6 +159,27 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
                 self.SCRUBBED_REPORT_ID))
 
         self._verify_report_is_scrubbed(scrubbed_model, 'scrubber_user')
+
+    def test_job_runs_again_scrubs_newly_added_expired_models(self):
+        self._add_expiring_android_report()
+        self._run_one_off_job()
+        scrubbed_android_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
+        self._verify_report_is_scrubbed(
+            scrubbed_android_model, feconf.REPORT_SCRUBBER_BOT_ID)
+
+        self._add_expiring_web_report()
+        self._run_one_off_job()
+
+        scrubbed_web_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.WEB_REPORT_ID_OVER_MAX_DAYS))
+        self._verify_report_is_scrubbed(
+            scrubbed_web_model, feconf.REPORT_SCRUBBER_BOT_ID)
+        # Check that the originally-scrubbed model is still valid.
+        self._verify_report_is_scrubbed(
+            scrubbed_android_model, feconf.REPORT_SCRUBBER_BOT_ID)
 
     def _run_one_off_job(self):
         # Helper function to create, enqueue, and process a new job instance.
@@ -208,7 +225,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         current_feedback_report_model.created_on = self.TIMESTAMP_AT_MAX_DAYS
         current_feedback_report_model.put()
 
-    def _add_expiring_reports(self):
+    def _add_expiring_android_report(self):
         """Adds reports to the model that should be scrubbed."""
         expiring_android_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
@@ -234,6 +251,7 @@ class ScrubAppFeedbackReportsOneOffJobTests(test_utils.GenericTestBase):
         expiring_android_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_android_report_model.put()
 
+    def _add_expiring_web_report(self):
         expiring_web_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
                 id=self.WEB_REPORT_ID_OVER_MAX_DAYS,
