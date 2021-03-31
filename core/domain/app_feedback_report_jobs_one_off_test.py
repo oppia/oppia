@@ -159,7 +159,7 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
         expiring_web_report_model.created_on = self.TIMESTAMP_OVER_90_DAYS
         expiring_web_report_model.put()
 
-    def test_scrubs_all_model(self):
+    def test_scrubs_no_models(self):
         self._add_current_reports()
 
         job_id = (
@@ -177,6 +177,32 @@ class ScrubReportsOneOffJobTests(test_utils.GenericTestBase):
                 self.REPORT_ID_AT_90_DAYS))
         self.assertFalse(current_model is None)
         self.assertTrue(current_model.scrubbed_by is None)
+
+    def test_scrubs_all_models(self):
+        self._add_expiring_reports()
+
+        job_id = (
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.create_new())
+        app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            app_feedback_report_jobs_one_off.ScrubReportsOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
+        android_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.ANDROID_REPORT_ID_OVER_90_DAYS))
+        self.assertFalse(android_model is None)
+        self.assertEqual(
+            android_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
+    
+        web_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.WEB_REPORT_ID_OVER_90_DAYS))
+        self.assertFalse(web_model is None)
+        self.assertTrue(web_model.scrubbed_by, feconf.REPORT_SCRUBBER_BOT_ID)
 
     def test_standard_operation(self):
         self._add_current_reports()
