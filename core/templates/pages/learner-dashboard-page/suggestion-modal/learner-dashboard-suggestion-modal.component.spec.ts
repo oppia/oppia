@@ -30,16 +30,15 @@ class MockTranslatePipe {
   }
 }
 
-// eslint-disable-next-line func-style
-function MockAngularHtmlBindWrapperDirective(
-  options: Component): Directive {
+let MockAngularHtmlBindWrapperDirective = function(
+    options: Component): Directive {
   const metadata: Directive = {
     selector: options.selector,
     inputs: options.inputs,
     outputs: options.outputs
   };
   return <undefined>Directive(metadata)(class _ { });
-}
+};
 
 class MockActiveModal {
   close(): void {
