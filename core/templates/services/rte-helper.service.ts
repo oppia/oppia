@@ -46,7 +46,6 @@ angular.module('oppia').factory('RteHelperService', [
         id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
-        isLessonRelated: RTE_COMPONENT_SPECS[componentId].is_lesson_related,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip

@@ -643,10 +643,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.publish_exploration(self.user_id_admin, '1')
         self.publish_exploration(self.user_id_admin, '2')
 
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('0'))
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('1'))
+        self.assertIsNone(self.get_story_id_linked_to_exploration('0'))
+        self.assertIsNone(self.get_story_id_linked_to_exploration('1'))
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -666,9 +664,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID)
+            self.get_story_id_linked_to_exploration('0'), self.STORY_ID)
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
+            self.get_story_id_linked_to_exploration('1'), self.STORY_ID)
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -694,12 +692,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         })]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('0'))
+        self.assertIsNone(self.get_story_id_linked_to_exploration('0'))
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
+            self.get_story_id_linked_to_exploration('1'), self.STORY_ID)
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('2'), self.STORY_ID)
+            self.get_story_id_linked_to_exploration('2'), self.STORY_ID)
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -740,19 +737,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID)
+            self.get_story_id_linked_to_exploration('0'), self.STORY_ID)
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('2'))
+            self.get_story_id_linked_to_exploration('1'), self.STORY_ID)
+        self.assertIsNone(self.get_story_id_linked_to_exploration('2'))
 
         story_services.delete_story(self.USER_ID, self.STORY_ID)
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('0'))
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('1'))
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('2'))
+        self.assertIsNone(self.get_story_id_linked_to_exploration('0'))
+        self.assertIsNone(self.get_story_id_linked_to_exploration('1'))
+        self.assertIsNone(self.get_story_id_linked_to_exploration('2'))
 
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
@@ -851,11 +844,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, 'story_id_2', change_list, 'Updated story node.')
 
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('0'), 'story_id_2')
+            self.get_story_id_linked_to_exploration('0'), 'story_id_2')
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('1'), 'story_id_2')
-        self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('2'))
+            self.get_story_id_linked_to_exploration('1'), 'story_id_2')
+        self.assertIsNone(self.get_story_id_linked_to_exploration('2'))
 
     def test_exploration_story_link_collision(self):
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)

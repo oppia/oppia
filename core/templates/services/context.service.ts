@@ -33,10 +33,8 @@ export class ContextService {
     private urlService: UrlService) {}
 
   pageContext = null;
-  explorationIsLinkedToStory = false;
   explorationId = null;
   questionPlayerIsManuallySet = false;
-  contributorDashboardQuestionEditorIsOpen = false;
   questionId = null;
   editorContext = null;
   customEntityContext = null;
@@ -130,39 +128,6 @@ export class ContextService {
 
   getQuestionPlayerIsManuallySet(): boolean {
     return this.questionPlayerIsManuallySet;
-  }
-
-  setContributorDashboardQuestionEditorIsOpen(): void {
-    this.contributorDashboardQuestionEditorIsOpen = true;
-  }
-
-  clearContributorDashboardQuestionEditorIsOpen(): void {
-    this.contributorDashboardQuestionEditorIsOpen = false;
-  }
-
-  getContributorDashboardQuestionEditorIsOpen(): boolean {
-    return this.contributorDashboardQuestionEditorIsOpen;
-  }
-
-  canEntityReferToSkills(): boolean {
-    return (
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
-      (
-        this.getPageContext() === (
-          ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD) &&
-          this.getContributorDashboardQuestionEditorIsOpen()
-      ) ||
-      (
-        this.getPageContext() === (
-          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
-        this.explorationIsLinkedToStory
-      )
-    );
-  }
-
-  setExplorationIsLinkedToStory(): void {
-    this.explorationIsLinkedToStory = true;
   }
 
   isInExplorationContext(): boolean {

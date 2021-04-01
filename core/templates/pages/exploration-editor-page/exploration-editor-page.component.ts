@@ -241,10 +241,6 @@ angular.module('oppia').component('explorationEditorPage', {
             ContextService.getExplorationId()),
           ThreadDataBackendApiService.getOpenThreadsCountAsync()
         ]).then(async([explorationData, featuresData, openThreadsCount]) => {
-          if (explorationData.exploration_is_linked_to_story) {
-            ContextService.setExplorationIsLinkedToStory();
-          }
-
           ExplorationFeaturesService.init(explorationData, featuresData);
 
           ExplorationStatesService.init(explorationData.states);

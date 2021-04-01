@@ -2639,6 +2639,23 @@ title: Title
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
+    def get_story_id_linked_to_exploration(self, exp_id):
+        """Returns the ID of the story that the exploration is a part of, or
+        None if the exploration is not part of a story.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+
+        Returns:
+            str|None. The ID of the story if the exploration is linked to some
+            story, otherwise None.
+        """
+        exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
+            exp_id)
+        if exploration_context_model is not None:
+            return exploration_context_model.story_id
+        return None
+
     def save_new_story(
             self, story_id, owner_id, corresponding_topic_id,
             title='Title', description='Description', notes='Notes',
