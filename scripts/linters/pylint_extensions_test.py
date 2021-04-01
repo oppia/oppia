@@ -3272,3 +3272,35 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
+
+
+class MetaclassCheckerTests(unittest.TestCase):
+
+    def test_finds_backslash_continuation(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.MetaclassChecker)
+        checker_test_object.setup_method()
+
+        metaclass_node = astroid.extract_node(
+                """
+                class FakeClass(python_utils.OBJECT):
+                    def __init__(self, fake_arg):
+                        self.fake_arg = fake_arg
+
+                    def fake_method(self, name):
+                        yield (name, name)
+
+                class MyObject: #@
+                    __metaclass__ = FakeClass
+
+                    def __init__(self, fake_arg):
+                        self.fake_arg = fake_arg
+        """)
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='metaclass',
+                node=metaclass_node
+            ),
+        ):
+            checker_test_object.checker.visit_classdef(metaclass_node)
