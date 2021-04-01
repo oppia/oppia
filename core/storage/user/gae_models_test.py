@@ -103,12 +103,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             pin=self.GENERIC_PIN
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.UserSettingsModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
@@ -296,12 +290,6 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.CompletedActivitiesModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CompletedActivitiesModel.get_deletion_policy(),
@@ -372,12 +360,6 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.IncompleteActivitiesModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -470,12 +452,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             last_played_state_name=self.STATE_NAME_2,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.ExpUserLastPlaythroughModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -596,12 +572,6 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.LearnerPlaylistModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1438,12 +1408,6 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.CollectionProgressModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CollectionProgressModel.get_deletion_policy(),
@@ -1552,12 +1516,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             completed_node_ids=self.COMPLETED_NODE_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.StoryProgressModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1877,12 +1835,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             degree_of_mastery=self.DEGREE_OF_MASTERY,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.UserSkillMasteryModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
