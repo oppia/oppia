@@ -313,6 +313,10 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
     var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
+    await action.click('Skill Review Material Field', skillReviewMaterialInput);
+    var rteToolbar = element(by.id('cke_editor1'));
+    await waitFor.visibilityOf(
+      rteToolbar, 'RTE toolbar taking too long to show up.');
     await action.sendKeys(
       'Skill Review Material Field', skillReviewMaterialInput, reviewMaterial);
 
