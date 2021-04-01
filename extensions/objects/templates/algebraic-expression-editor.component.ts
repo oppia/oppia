@@ -32,7 +32,7 @@ import { MathInteractionsService } from 'services/math-interactions.service';
   selector: 'algebraic-expression-editor',
   templateUrl: './algebraic-expression-editor.component.html'
 })
-export class AlgebraicExpressionEditor implements OnInit {
+export class AlgebraicExpressionEditorComponent implements OnInit {
   @Input() value;
   @Output() valueChanged: EventEmitter<string> = new EventEmitter<string>();
   warningText: string = '';
@@ -61,35 +61,37 @@ export class AlgebraicExpressionEditor implements OnInit {
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
-    // We need the 'focus' event while using the on screen keyboard (only
-    // for touch-based devices) to capture input from user and the 'change'
-    // event while using the normal keyboard.
-    Guppy.event(eventType, (focusObj) => {
-      if (!focusObj.focused) {
-        this.isCurrentAnswerValid();
-      }
-      const activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
-      if (activeGuppyObject !== undefined) {
-        this.hasBeenTouched = true;
-        this.currentValue = activeGuppyObject.guppyInstance.asciimath();
-        if (eventType === 'change') {
-          // Need to manually trigger the digest cycle to make any
-          // 'watchers' aware of changes in answer.
+    if (eventType === 'focus') {
+      // We need the 'focus' event while using the on screen keyboard (only
+      // for touch-based devices) to capture input from user and the 'change'
+      // event while using the normal keyboard.
+      Guppy.event('focus', (focusObj) => {
+        if (!focusObj.focused) {
+          this.isCurrentAnswerValid();
+        }
+        const activeGuppyObject = (
+          this.guppyInitializationService.findActiveGuppyObject());
+        if (activeGuppyObject !== undefined) {
+          this.hasBeenTouched = true;
+          this.currentValue = activeGuppyObject.guppyInstance.asciimath();
+        }
+      });
+    } else {
+      // We need the 'focus' event while using the on screen keyboard (only
+      // for touch-based devices) to capture input from user and the 'change'
+      // event while using the normal keyboard.
+      Guppy.event('change', (focusObj) => {
+        if (!focusObj.focused) {
+          this.isCurrentAnswerValid();
+        }
+        const activeGuppyObject = (
+          this.guppyInitializationService.findActiveGuppyObject());
+        if (activeGuppyObject !== undefined) {
+          this.hasBeenTouched = true;
           this.currentValue = activeGuppyObject.guppyInstance.asciimath();
           this.isCurrentAnswerValid();
         }
-      }
-    });
-    Guppy.event('change', () => {
-      const activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
-      if (activeGuppyObject) {
-        this.currentValue = activeGuppyObject.guppyInstance.asciimath();
-        this.isCurrentAnswerValid();
-      }
-    });
-    if (eventType !== 'focus') {
+      });
       Guppy.event('focus', (focusObj) => {
         if (!focusObj.focused) {
           this.isCurrentAnswerValid();
@@ -138,5 +140,5 @@ export class AlgebraicExpressionEditor implements OnInit {
 
 angular.module('oppia').directive(
   'algebraicExpressionEditor', downgradeComponent({
-    component: AlgebraicExpressionEditor
+    component: AlgebraicExpressionEditorComponent
   }) as angular.IDirectiveFactory);

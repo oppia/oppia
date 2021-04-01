@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AlgebraicExpressionEditor } from 'objects/templates/algebraic-expression-editor.component';
+import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service';
@@ -80,20 +80,20 @@ describe('GuppyConfigurationService', () => {
   });
 
   describe('Components calling the service', () => {
-    let component: AlgebraicExpressionEditor;
-    let fixture: ComponentFixture<AlgebraicExpressionEditor>;
+    let component: AlgebraicExpressionEditorComponent;
+    let fixture: ComponentFixture<AlgebraicExpressionEditorComponent>;
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule(
         {
           imports: [HttpClientTestingModule],
-          declarations: [AlgebraicExpressionEditor],
+          declarations: [AlgebraicExpressionEditorComponent],
         }
       ).compileComponents();
     }));
     beforeEach(() => {
       fixture = TestBed.createComponent(
-        AlgebraicExpressionEditor);
+        AlgebraicExpressionEditorComponent);
       component = fixture.componentInstance;
       component.currentValue = '';
     });

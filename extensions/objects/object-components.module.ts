@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { AlgebraicExpressionEditor } from './templates/algebraic-expression-editor.component';
+import { AlgebraicExpressionEditorComponent } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
 import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.component';
@@ -35,19 +35,19 @@ import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.com
     LeafletModule
   ],
   declarations: [
-    AlgebraicExpressionEditor,
+    AlgebraicExpressionEditorComponent,
     BooleanEditorComponent,
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent
   ],
   entryComponents: [
-    AlgebraicExpressionEditor,
+    AlgebraicExpressionEditorComponent,
     BooleanEditorComponent,
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent
   ],
   exports: [
-    AlgebraicExpressionEditor,
+    AlgebraicExpressionEditorComponent,
     BooleanEditorComponent,
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent
