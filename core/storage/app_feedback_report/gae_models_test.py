@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import types
 
-from core.domain import app_feedback_report_services as report_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -210,8 +209,11 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         report_id = '%s.%s.%s' % (
             self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
             'randomInteger123')
-        report_services.scrub_report(
-            report_id, 'scrubber_user')
+        model_entity = model_class.get(report_id)
+        model_entity.scrubbed_by = 'scrubber_user'
+        model_entity.update_timestamps()
+        model_entity.put()
+
         self.assertTrue(model_class.has_reference_to_user_id('scrubber_user'))
         self.assertFalse(model_class.has_reference_to_user_id('id_x'))
 
