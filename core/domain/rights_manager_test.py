@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -838,6 +839,74 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_b, collection_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, collection_rights))
+
+    def test_owner_cannot_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        with self.assertRaisesRegexp(Exception, 'This user already owns this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_a,
+                rights_domain.ROLE_OWNER)
+
+    def test_editor_cannot_be_reassigned_as_editor(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can edit this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_EDITOR)
+
+    def test_voice_artist_cannot_be_reassigned_as_voice_artist(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can voiceover this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_VOICE_ARTIST)
+
+    def test_viewer_cannot_be_reassigned_as_viewer(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can view this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_VIEWER)
+
+    def test_public_collection_cannot_be_assigned_role_viewer(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Public collections can be viewed by anyone.'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_VIEWER)
 
     def test_inviting_collaborator_to_collection(self):
         self.save_new_valid_collection(

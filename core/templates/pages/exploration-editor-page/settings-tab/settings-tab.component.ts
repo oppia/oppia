@@ -157,12 +157,12 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.saveRoleChanges(
             username, newRole);
+          ctrl.closeRolesForm();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is
           // clicked. No further action is needed.
         });
-        ctrl.closeRolesForm();
       };
 
       ctrl.refreshSettingsTab = function() {
@@ -283,11 +283,11 @@ angular.module('oppia').component('settingsTab', {
       };
 
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
-        ctrl.closeRolesForm();
         if (!ExplorationRightsService.checkUserAlreadyHasRoles(
           newMemberUsername)) {
           ExplorationRightsService.saveRoleChanges(
             newMemberUsername, newMemberRole);
+          ctrl.closeRolesForm();
           return;
         }
         let oldRole = ExplorationRightsService.getOldRole(
@@ -311,12 +311,12 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.removeRoleAsync(
             memberUsername);
+          ctrl.closeRolesForm();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is
           // clicked. No further action is needed.
         });
-        ctrl.closeRolesForm();
       };
 
       ctrl.toggleViewabilityIfPrivate = function() {
