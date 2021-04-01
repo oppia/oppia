@@ -52,8 +52,8 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
 // When manual navigation is enabled, the function will explicitly redirect the
 // browser to the login page. If disabled, then the function will assume that
 // the browser is already on the login page.
-var login = async function(email, manualNavigation = true) {
-  if (manualNavigation) {
+var login = async function(email, useManualNavigation = true) {
+  if (useManualNavigation) {
     await browser.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
@@ -68,6 +68,9 @@ var login = async function(email, manualNavigation = true) {
 
 var logout = async function() {
   await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+  // Wait for logout page to load.
+  await waitFor.pageToFullyLoad();
+  // Wait for redirection to occur.
   await waitFor.pageToFullyLoad();
 };
 
@@ -86,9 +89,9 @@ var _completeSignup = async function(username) {
 };
 
 var createAndLoginUser = async function(
-    email, username, manualNavigation = true) {
+    email, username, useManualNavigation = true) {
   await _createFirebaseAccount(email);
-  await login(email, manualNavigation);
+  await login(email, useManualNavigation);
   await _completeSignup(username);
 };
 

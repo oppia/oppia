@@ -168,9 +168,9 @@ describe('Topic and Story viewer functionality', function() {
     // exploration.
     const loginButton = element(by.css('.protractor-test-login-button'));
     await action.click('Login button', loginButton);
-    const manualNavigation = false;
+    const useManualNavigation = false;
     await users.createAndLoginUser(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer', manualNavigation);
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', useManualNavigation);
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
