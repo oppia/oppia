@@ -31,9 +31,6 @@ import feconf
     models.NAMES.base_model, models.NAMES.app_feedback_report
 ])
 
-# Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
-EARLIEST_VALID_DATETIME = datetime.datetime.fromtimestamp(1614556800)
-
 
 class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating AppFeedbackReportModel."""
@@ -108,7 +105,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                 'Entity id %s: The submitted_on field has a value %s which is '
                 'greater than the time when the job was run' % (
                     item.id, item.submitted_on))
-        if item.submitted_on < EARLIEST_VALID_DATETIME:
+        if item.submitted_on < feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME:
             cls._add_error(
                 'submitted_on %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -235,7 +232,8 @@ class AppFeedbackReportTicketModelValidator(
                 'Entity id %s: The newest_report_timestamp field has a value %s'
                 ' which is greater than the time when the job was run' % (
                     item.id, item.newest_report_timestamp))
-        if item.newest_report_timestamp < EARLIEST_VALID_DATETIME:
+        if item.newest_report_timestamp < (
+            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME):
             cls._add_error(
                 'newest_report_timestamp %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -352,7 +350,8 @@ class AppFeedbackReportStatsModelValidator(
                 'Entity id %s: The stats_tracking_date field has a value %s '
                 'which is greater than the time when the job was run' % (
                     item.id, item.stats_tracking_date))
-        if item.stats_tracking_date < EARLIEST_VALID_DATETIME.date():
+        if item.stats_tracking_date < (
+            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.date()):
             cls._add_error(
                 'stats_tracking_date %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),

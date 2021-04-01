@@ -584,6 +584,11 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
+# Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC for the earliest
+# datetime that a report could be received.
+EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
+    1614556800)
+
 # We generate images for existing math rich text components in batches. This
 # gives the maximum size for a batch of Math SVGs in bytes.
 MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024

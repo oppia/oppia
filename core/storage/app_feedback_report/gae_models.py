@@ -36,6 +36,10 @@ PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 REPORT_INFO_TO_REDACT = (
     'user_feedback_other_text_input', 'event_logs', 'logcat_logs')
 
+REPORT_ID_DELIMITER = '.'
+TICKET_ID_DELIMITER = '.'
+STATS_ID_DELIMITER = ':'
+
 
 class AppFeedbackReportModel(base_models.BaseModel):
     """Model for storing feedback reports sent from learners.

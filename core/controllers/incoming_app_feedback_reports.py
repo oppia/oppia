@@ -35,19 +35,14 @@ class IncomingAndroidFeedbackReportsHandler(base.BaseHandler):
         Verifies the incoming message based on the request header and stores
         the feedback report.
         """
-        if not self._validate_incoming_request(self.request.headers):
+        if not self._validate_incoming_request(self.payload.headers):
             pass
 
-        request_body = json.loads(self.request.body)
-        self.values.update({
-            'feedback_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)]),
-            'suggestion_thread_dicts': (
-                [t.to_dict() for t in feedback_services.get_all_threads(
-                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
-        })
-        self.render_json(self.values)
+        report_dict = self.payload.get('report')
+        # Create report domain object
+        # check schema version and migrate
+        # create report stats domain object
+        app_feedback_report_services.save_incoming_report(report, report_stats)
 
     def _validate_incoming_request(self, headers):
         api_key = headers['api_key']

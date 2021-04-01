@@ -30,11 +30,42 @@ import utils
 transaction_services = models.Registry.import_transaction_services()
 
 
-def save_report():
-    """Called by the controller to save a new report in both the
-    FeedbackReportModel and  FeedbackReportingStatsModel so that aggregate
-    statistics are accurate
+def save_incoming_report(report, report_stats):
+    """Saves an incoming report and updates the aggregate report stats with the
+    new report's data.
+
+    Args:
+        report: AppFeedbackReport. AppFeedbackReport domain object.
+        report_stats: AppFeedbackReportStats. AppFeedbackReportStats domain
+            object.
     """
+    _save_report_instance(report)
+    _save_report_stats_instance(report_stats)
+
+
+def _save_report_instance(report)
+    """Creates and stores a new AppFeedbackReportModel instance.
+
+    Args:
+        report: AppFeedbackReport. AppFeedbackReport domain object.
+    """
+    report.validate()
+    model_entity_id = app_feedback_report_models.AppFeedbackReportModel.create(
+
+    )
+
+
+def _save_report_stats_instance(report_stats)
+    """Creates and stores a new AppFeedbackReportModel instance.
+
+    Args:
+        report: AppFeedbackReport. AppFeedbackReport domain object.
+    """
+    report_stats.validate()
+    stats_entity_id = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+
+    ))
 
 
 def get_report_from_model(report_model)
@@ -54,6 +85,7 @@ def get_report_from_model(report_model)
         return _get_android_report_from_model(report_model)
     else:
         return  _get_web_report_from_model(report_model)
+
 
 def _get_android_report_from_model(android_report_model):
     if android_report_model.android_report_info_schema_version < (
@@ -101,6 +133,7 @@ def _get_web_report_from_model(web_report_model):
     raise NotImplementedError(
         'Web app feedback report domain objects must be defined.')
 
+
 def _get_entry_point(
         entry_point_name, topic_id, story_id, exploration_id, subtopic_id):
     if entry_point_name == (
@@ -121,10 +154,7 @@ def _get_entry_point(
             "Received unexpected entry point type.")
 
 
-def create_report_(report_dict)
-    """Create and return a domain object AppFeedbackReport from an incoming
-    request JSON.
-    """
+def is_ex
 
 
 // Called when an admin triages reports; updates the assigned ticket in the

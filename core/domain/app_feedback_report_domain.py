@@ -20,11 +20,12 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+
 import feconf
 import python_utils
 import utils
 
-(app_feedback_reportmodels,) = models.Registry.import_models(
+(app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
 
 
@@ -48,7 +49,7 @@ ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
     ENTRY_POINT.revision_card, ENTRY_POINT.crash]
 
-ALLOWED_REPORT_TYPE = [
+ALLOWED_REPORT_TYPES = [
     REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
 ALLOWED_CATEGORIES = [
     CATEGORY.suggestion_new_feature, CATEGORY.suggestion_new_language,
@@ -58,6 +59,14 @@ ALLOWED_CATEGORIES = [
     CATEGORY.crash_lesson_player, CATEGORY.crash_practice_questions,
     CATEGORY.crash_options_page, CATEGORY.crash_profile_page,
     CATEGORY.crash_other]
+ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
+    CATEGORY.suggestion_other, CATEGORY.issue_other,
+    CATEGORY.crash_lesson_player, CATEGORY.crash_practice_questions,
+    CATEGORY.crash_options_page, CATEGORY.crash_profile_page,
+    CATEGORY.crash_other]
+ALLOWED_SELECTION_ITEMS_CATEGORIES = [
+    CATEGORY.issue_language_audio, CATEGORY.issue_language_text,
+    CATEGORY.issue_topics, CATEGORY.issue_profile, CATEGORY.issue_other]
 ALLLOWED_ANDROID_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.all_submitted_reports,
     STATS_PARAMETER_NAMES.report_type,
@@ -122,6 +131,96 @@ class AppFeedbackReport(python_utils.OBJECT):
             'app_context': self.app_context.to_dict()
         }
 
+    def validate(self):
+        """Validates all properties of this report and its constituents.
+
+        Raises:
+            ValidationError. One or more attributes of the AppFeedbackReport are
+                not valid.
+        """
+        self.require_valid_platform(self.platform)
+
+        if self.scrubbed_by is not None:
+            self.require_valid_scrubber_id(self.scrubbed_by)
+
+        if self.ticket_id is not None:
+            self.require_valid_ticket_id(self.ticket_id)
+
+        self.require_valid_submission_datetime(self.report_submitted_timestamp)
+        self.user_supplied_feedback.validate()
+        self.device_system_context.validate()
+        self.app_context.validate()
+
+    @classmethod
+    def require_valid_platform(cls, platform):
+        """Checks whether the platform is valid.
+
+        Args:
+            platform: str. The platform to validate.
+
+        Raises:
+            ValidationError. No platform supplied.
+            ValidationError. The platform is not supported.
+        """
+        if platform is None:
+            raise utils.ValidationError('No platform supplied.')
+        if platform not in app_feedback_report_models.PLATFORM_CHOICES:
+            raise utils.ValidationError(
+                'Report platform should be \'web\' or \'android\', received: '
+                '%s' % platform)
+
+    @classmethod
+    def require_valid_scrubber_id(scrubber_id):
+        """Checks whether the scrubbed_by user is valid.
+
+        Args:
+            scrubber_id: str. The user id to validate.
+
+        Raises:
+            ValidationError. The user id is not a string.
+            ValidationError. The user id is not a valid id format.
+        """
+        if not isinstance(scrubber_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'The scrubbed_by user must be a string, but got %r' % (
+                    scrubber_id))
+        if not utils.is_user_id_valid(scrubber_id):
+            raise utils.ValidationError(
+                'The scrubber_by user id %r is invalid.' % scrubber_id)
+
+    @classmethod
+    def require_valid_ticket_id(cls, ticket_id):
+        """Checks whether the ticket id is a valid one.
+
+        Args:
+            ticket_id: str. The ticket id to validate.
+
+        Raises:
+            ValidationError. The id is an invalid format.
+        """
+        if not isinstance(ticket_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Report\'s ticket id should be a string, received: %s' % (
+                    ticket_id))
+        if len(ticket_id.split(
+            app_feedback_report_models.TICKET_ID_DELIMITER)) != 3:
+            raise utils.ValidationError('The ticket_id %s is invalid' % (
+                ticket_id))
+
+    @classmethod
+    def require_valid_submission_datetime(cls, submission_datetime):
+        """Checks whether the report submission datetime is a valid one.
+
+        Args:
+            submission_datetime: datetime.datetime. The datetime of that the
+                report was submitted by the user.
+        """
+        if submission_datetime < feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME:
+            raise utils.ValidationError(
+                'Report submission timestamp %s should be later than '
+                '%s' % submission_datetime.isoformat(), (
+                    feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.isoformat()))
+
 
 class UserSuppliedFeedback(python_utils.OBJECT):
     """Domain object for the user-supplied information in feedback reports."""
@@ -162,6 +261,165 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             'user_feedback_other_text_input': (
                 self.user_feedback_other_text_input)
         }
+
+    def validate():
+        """Validates this UserSuppliedFeedback domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the UserSuppliedFeedback
+                are not valid.
+        """
+        self.require_valid_report_type(self.report_type)
+        self.require_valid_category(self.category)
+        self.require_valid_user_feedback_items_for_category(
+            self.category, self.user_feedback_selected_items,
+            self.user_feedback_selected_items)
+
+    @classmethod
+    def require_valid_report_type(cls, report_type):
+        """Checks whether the report_type is valid.
+
+        Args:
+            report_type: str. The report type to validate.
+
+        Raises:
+            ValidationError. No report_type supplied.
+            ValidationError. The report_type is not supported.
+        """
+        if report_type is None:
+            raise utils.ValidationError('No report_type supplied.')
+        if report_type not in ALLOWED_REPORT_TYPES:
+            raise utils.ValidationError(
+                'Invalid report type %s, must be one of %s.' % (
+                    report_type, ALLOWED_REPORT_TYPES))
+
+    @classmethod
+    def require_valid_category(cls, category):
+        """Checks whether the category is valid.
+
+        Args:
+            category: str. The category to validate.
+
+        Raises:
+            ValidationError. No category supplied.
+            ValidationError. The category is not supported.
+        """
+        if category is None:
+            raise utils.ValidationError('No category supplied.')
+        if category not in ALLOWED_CATEGORIES:
+            raise utils.ValidationError(
+                'Invalid category %s, must be one of %s.' % (
+                    category, ALLOWED_CATEGORIES))
+
+    @classmethod
+    def require_valid_user_feedback_items_for_category(
+            cls, category, selected_items, other_text_input):
+        """Checks whether the user_feedback_selected_items and 
+        user_feedback_selected_items are valid for the given cateory and
+        selected items.
+
+        Args:
+            category: str. The category selected for this report.
+            selected_items: list(str). The user feedback selected items to
+                validate, chosen by the user in the report..
+            other_text_input: str. The user feedback other text input to
+                validate, provided by the user in the report.
+
+        Raises:
+            ValidationError. The given seleciton items and text input for the
+            category are not valid.
+        """
+        if category in ALLOWED_SELECTION_ITEMS_CATEGORIES:
+            # If the report category enables users to select checkbox options,
+            # validate the options selected by the user.
+            self.require_valid_selected_items_for_category(
+                category, selected_items)
+            if self._selected_items_include_other(selected_items)):
+                # If the user selects an 'other' option in their list of
+                # selection options, validate the input text.
+                self.require_valid_other_text_input_for_category(
+                    category, other_text_input)
+            else:
+                # Report cannot have any input text in this report.
+                if other_text_input is not None:
+                    raise utils.ValidationError(
+                        'Report cannot have other input text %r for '
+                        'category %r.' % other_text_input, category)
+
+        # If the report category only allows users to provide input text,
+        # validate that the user_feedback_selected_items is None and that
+        # there is a user_feedback_other_text_input.
+        if category in ALLOWED_ONLY_INPUT_TEXT_CATEGORIES:
+            if selected_items is not None:
+                raise utils.ValidationError(
+                    'Report cannot have selection options for category %r.' % (
+                        category))
+            if other_text_input is None:
+                raise utils.ValidationError(
+                    'Category %r with \'other\' selected requires an text input'
+                    ' provided by the user.' % category)
+            self.require_valid_other_text_input_for_category(
+                category, other_text_input)
+
+    @classmethod
+    def require_valid_selected_items_for_category(cls, category, selected_items):
+        """Checks whether the user_feedback_selected_items are valid.
+
+        Args:
+            category: str. The report's category that allows for selection
+                items.
+            user_feedback_selected_items: list(str). The items selected by the
+                user to validate.
+
+        Raises:
+            ValidationError. The item is not a valid selection option.
+        """
+        if selected_items is None:
+            raise utils.ValidationError(
+                'Category %s requires selection options in the report.' % (
+                    category))
+        for item in selected_items:
+            if not isinstance(item, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Invalid option %s selected by user.' % item)
+
+
+    @classmethod
+    def require_valid_other_text_input_for_category(cls, category, other_input):
+        """Checks whether the user_feedback_other_text_input is valid.
+
+        Args:
+            other_input: str. The text inputted by the user
+
+        Raises:
+            ValidationError. The item is not a string.
+        """
+        if other_input is None:
+            raise utils.ValidationError(
+                'Category %s requires text input in the report.' % category)
+        if not isinstance(other_input, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Invalid input text must be a string, received: %r.' % item)
+
+
+    @classmethod
+    def _selected_items_include_other(cls, selected_items):
+        """Checks whether the user_feedback_selected_items include an 'other'
+        option. Unless the category is one of ALLOWED_INPUT_TEXT_CATEGORIES, an
+        'other' option must be selected for the user to add input text to the
+        report.
+
+        Args:
+            selected_items: list(str). The list of checkbox options selected
+                by the user.
+
+        Raises:
+            bool. Whether an 'other' option is included in the selected items.
+        """
+        for item in selected_items:
+            if item.lower().contains('other'):
+                return true
+        return False
 
 
 class DeviceSystemContext(python_utils.OBJECT):
