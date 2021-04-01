@@ -20,11 +20,15 @@
 
 import { CollectionNodeObjectFactory } from
   'domain/collection/CollectionNodeObjectFactory';
-// ddescribe is not allowed to use.
+// Use of ddescribe is not allowed.
 ddescribe('Collection node object factory', () => {
   var collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
 });
 // Use of fdescribe is not allowed.
 fdescribe('Collection node object factory', () => {
+  var collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
+});
+// Use of xdescribe is not allowed.
+xdescribe('Collection node object factory', () => {
   var collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
 });

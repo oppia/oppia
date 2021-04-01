@@ -57,8 +57,8 @@ INVALID_PAUSE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_pause.js')
 INVALID_WAIT_FOR_ANGULAR_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_wait_for_angular.js')
 INVALID_FDESCRIBE_DDESCRIBE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_ddescribe_fdescribe.ts')
-INVALID_IIT_FIT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iit_fit.ts')
+    LINTER_TESTS_DIR, 'invalid_ddescribe_fdescribe_xdescribe.ts')
+INVALID_IIT_FIT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iit_fit_xit.ts')
 INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
 INVALID_INNER_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_innerhtml.ts')
@@ -202,10 +202,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
             'Line 24: In tests, please use \'describe\' instead of '
-            '\'ddescribe\'or \'fdescribe\''], lint_task_report.trimmed_messages)
+            '\'ddescribe\' or \'fdescribe\' or \'xdescribe\''], lint_task_report.trimmed_messages)
         self.assert_same_list_elements([
             'Line 28: In tests, please use \'describe\' instead of '
-            '\'ddescribe\'or \'fdescribe\''], lint_task_report.trimmed_messages)
+            '\'ddescribe\' or \'fdescribe\' or \'xdescribe\''], lint_task_report.trimmed_messages)
+        self.assert_same_list_elements([
+            'Line 32: In tests, please use \'describe\' instead of '
+            '\'ddescribe\' or \'fdescribe\' or \'xdescribe\''], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -215,10 +218,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
             'Line 40: In tests, please use \'it\' instead of \'iit\' or '
-            '\'fit\''], lint_task_report.trimmed_messages)
+            '\'fit\' or \'xit\''], lint_task_report.trimmed_messages)
         self.assert_same_list_elements([
             'Line 64: In tests, please use \'it\' instead of \'iit\' or '
-            '\'fit\''], lint_task_report.trimmed_messages)
+            '\'fit\' or \'xit\''], lint_task_report.trimmed_messages)
+        self.assert_same_list_elements([
+            'Line 73: In tests, please use \'it\' instead of \'iit\' or '
+            '\'fit\' or \'xit\''], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

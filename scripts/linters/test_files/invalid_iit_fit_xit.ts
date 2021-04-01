@@ -69,4 +69,13 @@ describe('Collection node object factory', () => {
       expect(collectionNode.doesExplorationExist()).toBe(false);
     }
   );
+// xit is not allowed to use.
+  xit('should be able to create a new collection node by exploration ID',
+    () => {
+      var collectionNode = collectionNodeObjectFactory.createFromExplorationId(
+        'exp_id0');
+      expect(collectionNode.getExplorationId()).toEqual('exp_id0');
+      expect(collectionNode.doesExplorationExist()).toBe(false);
+    }
+  );
 });
