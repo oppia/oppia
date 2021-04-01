@@ -33,14 +33,16 @@ class VoiceartistAssignmentHandler(base.BaseHandler):
     @acl_decorators.can_assign_voiceartist
     def post(self, entity_type, entity_id):
         """  todo add docstring """
-        exploartion = exp_fetchers.get_exploration_by_id(entity_id)
+        if (entity_type != feconf.ENTITY_TYPE_EXPLORATION):
+            raise self.InvalidInputException(
+                'Invalid entity type.')
 
         voice_artist = self.payload.get('username')
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
         if voice_artist_id is None:
             raise self.InvalidInputException(
-                'Invalid voice artist name')
+                'Invalid voice artist username.')
         rights_manager.assign_role_for_exploration(
             self.user, entity_id, voice_artist_id, rights_domain.ROLE_VOICE_ARTIST)
 
