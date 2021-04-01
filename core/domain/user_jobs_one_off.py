@@ -1127,7 +1127,7 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class DeleteNonExistentExpsFromUserModelsOneOffJob(
+class DeleteNonExistentExpsFromUserModelsJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that removes explorations that do not exist or that are private from
     completed and incomplete activities models and from user
@@ -1137,7 +1137,7 @@ class DeleteNonExistentExpsFromUserModelsOneOffJob(
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(
-            DeleteNonExistentExpsFromUserModelsOneOffJob, cls
+            DeleteNonExistentExpsFromUserModelsJob, cls
         ).enqueue(job_id, shard_count=16)
 
     @classmethod
@@ -1172,7 +1172,8 @@ class DeleteNonExistentExpsFromUserModelsOneOffJob(
             public_exploration_ids = [
                 exp_id for exp_id, exp_rights_model
                 in python_utils.ZIP(exploration_ids, exp_rights_models)
-                if exp_rights_model.status == constants.ACTIVITY_STATUS_PUBLIC
+                if exp_rights_model is not None and
+                exp_rights_model.status == constants.ACTIVITY_STATUS_PUBLIC
             ]
 
             if len(public_exploration_ids) < len(existing_exploration_ids):
@@ -1194,7 +1195,7 @@ class DeleteNonExistentExpsFromUserModelsOneOffJob(
         yield (key, len(values))
 
 
-class DeleteNonExistentExpUserDataOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class DeleteNonExistentExpUserDataJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes exploration user data models that do not have
     existing exploration.
     """
@@ -1202,7 +1203,7 @@ class DeleteNonExistentExpUserDataOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(
-            DeleteNonExistentExpUserDataOneOffJob, cls
+            DeleteNonExistentExpUserDataJob, cls
         ).enqueue(job_id, shard_count=32)
 
     @classmethod
@@ -1229,7 +1230,7 @@ class DeleteNonExistentExpUserDataOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
-class DeleteNonExistentExpUserContributionsOneOffJob(
+class DeleteNonExistentExpUserContributionsJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that removes deleted explorations form user contributions models
     fields.
@@ -1238,7 +1239,7 @@ class DeleteNonExistentExpUserContributionsOneOffJob(
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(
-            DeleteNonExistentExpUserContributionsOneOffJob, cls
+            DeleteNonExistentExpUserContributionsJob, cls
         ).enqueue(job_id, shard_count=32)
 
     @classmethod

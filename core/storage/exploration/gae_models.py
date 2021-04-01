@@ -674,14 +674,14 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             ExplorationCommitLogEntryModel instances which matches the given
             exp_id and exp_versions.
         """
-        instance_ids = [cls._get_instance_id(exp_id, exp_version)
+        instance_ids = [cls.get_instance_id(exp_id, exp_version)
                         for exp_version in exp_versions]
 
         return super(ExplorationCommitLogEntryModel, cls).get_multi(
             instance_ids)
 
     @classmethod
-    def _get_instance_id(cls, exp_id, exp_version):
+    def get_instance_id(cls, exp_id, exp_version):
         """Returns ID of the exploration commit log entry model.
 
         Args:

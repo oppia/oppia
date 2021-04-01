@@ -819,6 +819,38 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
                 self.EXP_1_ID))
 
+    def test_activities_of_deleted_explorations_are_deleted(self):
+        """Test that opportunity summary for deleted explorations are correctly
+        deleted.
+        """
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        user_models.CompletedActivitiesModel(
+            id=self.editor_id,
+            exploration_ids=[self.EXP_0_ID],
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        user_models.IncompleteActivitiesModel(
+            id=self.owner_id,
+            exploration_ids=[self.EXP_1_ID],
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get(
+                self.editor_id, strict=False
+            ).exploration_ids,
+            []
+        )
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get(
+                self.owner_id, strict=False
+            ).exploration_ids,
+            []
+        )
+
     def test_user_data_of_deleted_explorations_are_deleted(self):
         """Test that user data for deleted explorations are deleted."""
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)

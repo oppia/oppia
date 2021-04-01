@@ -32,6 +32,46 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     pass
 
 
+class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to subtopic pages.
+
+    A new instance of this model is created and saved every time a commit to
+    SubtopicPageModel occurs.
+
+    The id for this model is of the form
+    'subtopicpage-[subtopic_page_id]-[version]'.
+    """
+
+    # The id of the subtopic page being edited.
+    subtopic_page_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+    @classmethod
+    def _get_instance_id(cls, subtopic_page_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            subtopic_page_id: str. The id of the subtopic page being edited.
+            version: int. The version number of the subtopic page after the
+                commit.
+
+        Returns:
+            str. The commit id with the subtopic page id and version number.
+        """
+        return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
 
@@ -49,6 +89,7 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = SubtopicPageCommitLogEntryModel
     ALLOW_REVERT = False
 
     # The topic id that this subtopic is a part of.
@@ -106,44 +147,4 @@ class SubtopicPageModel(base_models.VersionedModel):
             'page_contents_schema_version':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-
-class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to subtopic pages.
-
-    A new instance of this model is created and saved every time a commit to
-    SubtopicPageModel occurs.
-
-    The id for this model is of the form
-    'subtopicpage-[subtopic_page_id]-[version]'.
-    """
-
-    # The id of the subtopic page being edited.
-    subtopic_page_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
-
-    @classmethod
-    def _get_instance_id(cls, subtopic_page_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
-
-        Args:
-            subtopic_page_id: str. The id of the subtopic page being edited.
-            version: int. The version number of the subtopic page after the
-                commit.
-
-        Returns:
-            str. The commit id with the subtopic page id and version number.
-        """
-        return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

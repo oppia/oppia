@@ -1641,7 +1641,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                 base_models.BaseCommitLogEntryModel):
 
             @classmethod
-            def _get_instance_id(cls, exp_id, exp_version):
+            def get_instance_id(cls, exp_id, exp_version):
                 return 'exploration-%s-%s' % (exp_id, exp_version)
 
             def put(self):

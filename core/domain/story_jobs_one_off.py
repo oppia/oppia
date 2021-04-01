@@ -152,7 +152,7 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class DeleteStoryCommitLogEntriesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class DeleteStoryCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to delete unneeded story commit logs."""
 
     @classmethod
@@ -161,12 +161,11 @@ class DeleteStoryCommitLogEntriesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model):
-        if story_fetchers.get_story_by_id(model.story_id, strict=False) is None:
-            story_services.delete_story(
-                feconf.SYSTEM_COMMITTER_ID, model.story_id)
-            yield ('SUCCESS DELETED STORY', model.story_id)
+        if story_models.StoryModel.get(model.story_id, strict=False) is None:
+            model.delete()
+            yield ('SUCCESS_DELETED', model.story_id)
         else:
-            yield ('SUCCESS NO ACTION', model.story_id)
+            yield ('SUCCESS_NO_ACTION', model.story_id)
 
     @staticmethod
     def reduce(key, values):

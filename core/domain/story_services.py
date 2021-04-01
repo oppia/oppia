@@ -654,26 +654,20 @@ def delete_story(committer_id, story_id, force_deletion=False):
             one.
     """
 
-    @transaction_services.run_in_transaction_wrapper
-    def delete_story_model_transactional(
-            story_id, committer_id, force_deletion):
-        """Inner function that is to be done in a transaction."""
-        story_model = story_models.StoryModel.get(story_id, strict=False)
-        if story_model is not None:
-            story = story_fetchers.get_story_from_model(story_model)
-            exp_ids = story.story_contents.get_all_linked_exp_ids()
-            story_models.StoryModel.delete(
-                story_id,
-                committer_id,
-                feconf.COMMIT_MESSAGE_STORY_DELETED,
-                force_deletion=force_deletion
-            )
-            # Reject the suggestions related to the exploration used in
-            # the story.
-            suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
-                exp_ids)
+    story_model = story_models.StoryModel.get(story_id, strict=False)
+    if story_model is not None:
+        story = story_fetchers.get_story_from_model(story_model)
+        exp_ids = story.story_contents.get_all_linked_exp_ids()
+        story_model.delete(
+            committer_id,
+            feconf.COMMIT_MESSAGE_STORY_DELETED,
+            force_deletion=force_deletion
+        )
+        # Reject the suggestions related to the exploration used in
+        # the story.
+        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+            exp_ids)
 
-    delete_story_model_transactional(story_id, committer_id, force_deletion)
     exploration_context_models = (
         exp_models.ExplorationContextModel.get_all().filter(
             exp_models.ExplorationContextModel.story_id == story_id
