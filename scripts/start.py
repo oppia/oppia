@@ -98,7 +98,7 @@ def cleanup():
     common.print_each_string_after_two_new_lines([
         'INFORMATION',
         'Cleaning up the servers.'])
-    while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
+    while common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
     build.set_constants_to_default()
     common.stop_redis_server()
@@ -112,7 +112,7 @@ def main(args=None):
     atexit.register(cleanup)
 
     # Check that there isn't a server already running.
-    if common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
+    if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
             'WARNING',
             'Could not start new server. There is already an existing server',
@@ -169,8 +169,8 @@ def main(args=None):
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.
-        common.wait_for_port_to_be_open(PORT_NUMBER_FOR_GAE_SERVER)
-        common.wait_for_port_to_be_open(feconf.ES_LOCALHOST_PORT)
+        common.wait_for_port_to_be_in_use(PORT_NUMBER_FOR_GAE_SERVER)
+        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
 
         # Launch a browser window.
         if common.is_linux_os() and not parsed_args.no_browser:
