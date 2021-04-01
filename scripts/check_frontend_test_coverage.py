@@ -124,7 +124,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'hint-editor.directive.ts',
     'html-editor.directive.ts',
     'html-escaper.service.ts',
-    'html-select.directive.ts',
+    'html-select.component.ts',
     'I18nFooter.ts',
     'image-uploader.directive.ts',
     'image-with-regions-editor.directive.ts',

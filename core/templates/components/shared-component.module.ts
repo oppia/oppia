@@ -64,6 +64,7 @@ import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
+import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
 import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -109,6 +110,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    HtmlSelectComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -133,6 +135,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   entryComponents: [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    HtmlSelectComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
@@ -164,6 +167,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    HtmlSelectComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
