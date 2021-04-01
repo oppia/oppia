@@ -37,7 +37,7 @@ import { BaseContentComponent } from './base-content.component';
 import { LoadingMessageComponent } from './loading-message.component';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
-fdescribe('Base Content Component', () => {
+describe('Base Content Component', () => {
   let fixture: ComponentFixture<BaseContentComponent>;
   let componentInstance: BaseContentComponent;
   let isIframed: boolean = false;
