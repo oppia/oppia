@@ -22,7 +22,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'limitTo'
 })
 export class LimiToPipe implements PipeTransform {
-  transform(value: string, limit: number): string {
-    return value.length > limit ? value.slice(0, limit - 1) : value;
+  transform<T>(value: T[], limit: number): T[] {
+    return value.length > limit ? value.slice(0, limit) : value;
   }
 }

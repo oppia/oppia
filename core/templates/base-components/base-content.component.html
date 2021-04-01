@@ -32,7 +32,6 @@
     <div class="oppia-base-container"
          [ngClass]="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
          (swipeleft)="closeSidebarOnSwipe()">
-         <!-- ng-swipe-left="$ctrl.closeSidebarOnSwipe()" ng-swipe-disable-mouse="false"> -->
       <div class="oppia-content-container protractor-test-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
@@ -46,7 +45,6 @@
                 </top-navigation-bar>
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
                   <ng-content select="navbar-breadcrumb" class="mr-auto"></ng-content>
-
                   <ng-content select="nav-options"></ng-content>
                 </div>
               </div>
