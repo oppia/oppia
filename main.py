@@ -36,6 +36,7 @@ from core.controllers import email_dashboard
 from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
+from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
 from core.controllers import learner_playlist
 from core.controllers import library
@@ -848,6 +849,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+
+    get_redirect_route(
+        r'%s' % feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
+        incoming_app_feedback_report.IncomingAppFeedbackReportsHandler),
 ]
 
 # Adding redirects for topic landing pages.
