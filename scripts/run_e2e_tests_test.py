@@ -220,7 +220,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.ELASTICSEARCH_SERVER_PORT,)])
         with swap_kill_process, subprocess_swap, swap_is_windows:
             with swap_set_constants_to_default:
                 with swap_wait_for_port_to_not_be_in_use:
@@ -253,7 +254,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.ELASTICSEARCH_SERVER_PORT,)])
         with subprocess_swap, swap_kill_process, swap_set_constants_to_default:
             with swap_wait_for_port_to_not_be_in_use:
                 run_e2e_tests.cleanup()
