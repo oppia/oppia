@@ -36,6 +36,22 @@ export class AboutPageComponent implements OnInit {
   classroomUrlFragment: string;
   classroomUrl: string;
   userIsLoggedIn: boolean;
+  features = [{
+    i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
+    imageFilename: '/about/cc.svg',
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_LESSON_FEATURE',
+    imageFilename: '/about/lesson_icon.svg'
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_MOBILE_FEATURE',
+    imageFilename: '/about/mobile_alt_solid.svg'
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_WIFI_FEATURE',
+    imageFilename: '/about/wifi_solid.svg'
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
+    imageFilename: '/about/language_icon.svg'
+  }];
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
