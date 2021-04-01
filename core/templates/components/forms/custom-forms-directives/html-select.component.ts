@@ -16,49 +16,13 @@
  * @fileoverview Component for the selection dropdown with HTML content.
  */
 
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static'
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('directives/angular-html-bind.directive.ts');
-
-// require('domain/utilities/url-interpolation.service.ts');
-
-// This directive allows user to put html into select's options.
-// 'options' should be an array of objects containing attributes 'id' and 'val'
-// Attribute 'val' is presented to the user. After user selection, the
-// corresponding attribute 'id' is assigned to 'selection'.
-
-// angular.module('oppia').directive('htmlSelect', [
-//   'UrlInterpolationService', function(UrlInterpolationService) {
-//     return {
-//       restrict: 'E',
-//       scope: {
-//         options: '=',
-//         selection: '='
-//       },
-//       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-//         '/components/forms/custom-forms-directives/html-select.directive.html'),
-//       controller: ['$scope', function($scope) {
-//         $scope.select = function(id) {
-//           $scope.selection = id;
-//         };
-
-//         $scope.getSelectionIndex = function() {
-//           for (var index = 0; index < $scope.options.length; index++) {
-//             if ($scope.options[index].id === $scope.selection) {
-//               return index;
-//             }
-//           }
-//         };
-//       }]
-//     };
-//   }
-// ]);
-
-// interface Option {
-//   id: any,
-//   val: any
-// }
+interface Option {
+  id: string,
+  val: string
+}
 
 @Component({
   selector: 'html-select',
@@ -66,27 +30,17 @@ require('directives/angular-html-bind.directive.ts');
   styleUrls: []
 })
 
-export class HtmlSelectComponent implements OnInit, OnDestroy {
-  @Input() options: Array<any>;
-  @Input() selection: any;
+export class HtmlSelectComponent {
+  @Input() options: Option[];
+  @Input() selection: string;
 
-  constructor () {
+  constructor() { }
 
-  }
-
-  ngOnInit(): void {
-
-  }
-
-  ngOnDestroy(): void {
-
-  }
-
-  select(id) {
+  select(id: string): void {
     this.selection = id;
   }
 
-  getSelectionIndex() {
+  getSelectionIndex(): number {
     for (var index = 0; index < this.options.length; index++) {
       if (this.options[index].id === this.selection) {
         return index;
