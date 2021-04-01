@@ -45,7 +45,7 @@ class MockUrlInterpolationService {
   }
 }
 
-fdescribe('Learner Playlist Modal Component', function() {
+describe('Learner Playlist Modal Component', function() {
   let component: LearnerPlaylistModalComponent;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
