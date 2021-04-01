@@ -19,6 +19,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,6 +34,7 @@ export class UtilsService {
   ): boolean {
     return typeof value !== 'undefined' && value !== null;
   }
+
   // The function here is to check whether the argument is empty or not. So, we
   // cannot have any specific type defined for the argument and the argument
   // is given a generic type of Object.
@@ -48,6 +50,7 @@ export class UtilsService {
     }
     return true;
   }
+
   // The function here is to check whether the argument is a string. So, we
   // cannot have any specific type defined for the argument and the argument
   // is given a generic type of Object.
@@ -58,6 +61,7 @@ export class UtilsService {
   isString(input: Object): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
+
   // The function here is to check whether the two arguments are equivalent or
   // not empty or not. So, we cannot have any specific type defined for the
   // arguments and the arguments are given a generic type of Object.
@@ -95,6 +99,7 @@ export class UtilsService {
     }
     return true;
   }
+
   // Determines if the provided value is an Error.
   // Loosely based on https://www.npmjs.com/package/iserror
   /**
@@ -109,6 +114,7 @@ export class UtilsService {
       default: return value instanceof Error;
     }
   }
+
   isOverflowing(element: HTMLElement): boolean {
     if (!element) {
       return false;
@@ -119,6 +125,7 @@ export class UtilsService {
     }
   }
 }
+
 angular.module('oppia').factory(
   'UtilsService',
   downgradeInjectable(UtilsService));
