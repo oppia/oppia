@@ -17,7 +17,7 @@
  */
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,12 +27,27 @@ import { MatInputModule } from '@angular/material/input';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
+import firebase from 'firebase/app';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LoginPageComponent } from 'pages/login-page/login-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+
+class FirebaseErrorHandler extends ErrorHandler {
+  handleError(error: firebase.auth.Error): void {
+    // Firebase throws duplicate exceptions when a user is disabled. The
+    // LoginPageComponent catches one of them, but the other isn't published by
+    // the Firebase SDK and ends up raising regardless (because it's thrown by a
+    // setTimeout() function). To prevent these errors from interfering with
+    // end-to-end tests and from polluting the server, we ignore them here.
+    if (error.code === 'auth/user-disabled') {
+      return;
+    }
+    super.handleError(error);
+  }
+}
 
 @NgModule({
   imports: [
@@ -59,6 +74,10 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
       multi: true,
+    },
+    {
+      provide: ErrorHandler,
+      useClass: FirebaseErrorHandler,
     },
     {
       provide: APP_INITIALIZER,
