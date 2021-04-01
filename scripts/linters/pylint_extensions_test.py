@@ -3283,20 +3283,18 @@ class MetaclassCheckerTests(unittest.TestCase):
         checker_test_object.setup_method()
 
         metaclass_node = astroid.extract_node(
-                """
-                class FakeClass(python_utils.OBJECT):
-                    def __init__(self, fake_arg):
-                        self.fake_arg = fake_arg
+            """
+            class FakeClass(python_utils.OBJECT):
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+                def fake_method(self, name):
+                    yield (name, name)
+            class MyObject: #@
+                __metaclass__ = FakeClass
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+            """)
 
-                    def fake_method(self, name):
-                        yield (name, name)
-
-                class MyObject: #@
-                    __metaclass__ = FakeClass
-
-                    def __init__(self, fake_arg):
-                        self.fake_arg = fake_arg
-        """)
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='metaclass',
