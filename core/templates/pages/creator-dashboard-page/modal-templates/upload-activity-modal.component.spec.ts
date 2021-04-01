@@ -111,4 +111,10 @@ describe('Upload Activity Modal Component', () => {
       'Empty file detected.');
     expect(dismissSpy).not.toHaveBeenCalled();
   }));
+
+  it('should dismiss modal', () => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    component.cancel();
+    expect(dismissSpy).toHaveBeenCalled();
+  });
 });
