@@ -33,12 +33,12 @@ require('services/site-analytics.service.ts');
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
-  'SiteAnalyticsService', 'TranslateTextService','TranslationLanguageService',
+  'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
   'TRANSLATION_TIPS', 'opportunity', 'ENTITY_TYPE',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
-      SiteAnalyticsService, TranslateTextService,TranslationLanguageService,
+      SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
       TRANSLATION_TIPS, opportunity, ENTITY_TYPE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
