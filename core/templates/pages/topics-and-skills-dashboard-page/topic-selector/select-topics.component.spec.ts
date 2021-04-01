@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the select topics component
+ * @fileoverview Unit tests for the select topics component.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
