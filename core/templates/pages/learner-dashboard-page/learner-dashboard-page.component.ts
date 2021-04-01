@@ -271,11 +271,11 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.activeSubsection = newActiveSubsectionName;
   }
 
-  getExplorationUrl(explorationId: string): string {
+  getExplorationUrl(explorationId?: string): string {
     return '/explore/' + explorationId;
   }
 
-  getCollectionUrl(collectionId: string): string {
+  getCollectionUrl(collectionId?: string): string {
     return '/collection/' + collectionId;
   }
 
