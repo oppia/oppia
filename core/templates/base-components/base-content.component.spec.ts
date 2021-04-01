@@ -164,7 +164,6 @@ describe('Base Content Component', () => {
       'https://oppiatestserver.appspot.com' +
       pathname + search + hash
     );
-    expect(loaderService.onLoadingMessageChange.subscribe).toHaveBeenCalled();
   });
 
   it('should toggle sidebar', () => {
@@ -210,7 +209,11 @@ describe('Base Content Component', () => {
     spyOn(document, 'getElementById').and.returnValue(dummyElement);
     componentInstance.skipToMainContent();
     expect(dummyElement.tabIndex).toEqual(-1);
-    document.getElementById.and.returnValue(null);
+  });
+
+  it('should throw error when their no main content', () => {
+    let document = TestBed.inject(DOCUMENT);
+    spyOn(document, 'getElementById').and.returnValue(null);
     expect(componentInstance.skipToMainContent).toThrowError();
   });
 });
