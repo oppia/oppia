@@ -41,4 +41,4 @@ sudo apt-get install python-yaml
 sudo apt-get install python-matplotlib
 # TODO(#11547): Pip 21 doesn't support Python 2, so we need to stay on pip 20
 # until we migrate to Python 3.
-sudo pip install --upgrade pip==20.2.4
+sudo pip install --upgrade pip==20.3.4
