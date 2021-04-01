@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Service methods for typed instances."""
+"""Registry for typed objects."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -35,7 +35,7 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def _refresh_registry(cls):
-        """Refreshes the registry by adding new object instances to the
+        """Refreshes the registry by adding new object classes to the
         registry.
         """
         cls.objects_dict.clear()
@@ -43,7 +43,7 @@ class Registry(python_utils.OBJECT):
         # Add new object instances to the registry.
         for name, clazz in inspect.getmembers(
                 objects, predicate=inspect.isclass):
-            if name.endswith('_test') or name == 'BaseObject':
+            if name == 'BaseObject':
                 continue
 
             ancestor_names = [
