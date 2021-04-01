@@ -54,7 +54,7 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(ADMIN_URL, { waitUntil: networkIdle});
+    await page.goto(ADMIN_URL, {waitUntil: networkIdle});
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
