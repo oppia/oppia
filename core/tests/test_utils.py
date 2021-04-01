@@ -2650,8 +2650,8 @@ title: Title
             str|None. The ID of the story if the exploration is linked to some
             story, otherwise None.
         """
-        exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
-            exp_id)
+        exploration_context_model = (
+            exp_models.ExplorationContextModel.get_by_id(exp_id))
         if exploration_context_model is not None:
             return exploration_context_model.story_id
         return None
