@@ -57,7 +57,8 @@ class testClass(test_utils.GenericTestBase):
             self.private_exp_id_2, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
-
+        user_services.update_user_role(
+            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_voiceover_admin_can_assign_voiceartist(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)

@@ -249,10 +249,20 @@ angular.module('oppia').component('settingsTab', {
         ctrl.newMemberRole = ctrl.ROLES[0];
       };
 
+      ctrl.openVoiceoverRolesForm = () => {
+        ctrl.isVoiceoverFormOpen = true;
+        ctrl.newVoiceartistUsername = '';
+      };
+
       ctrl.closeEditRolesForm = function() {
         ctrl.newMemberUsername = '';
         ctrl.newMemberRole = ctrl.ROLES[0];
         ctrl.closeRolesForm();
+      };
+
+      ctrl.closeVoiceoverForm = () => {
+        ctrl.newVoiceartistUsername = '';
+        ctrl.isVoiceoverFormOpen = false;
       };
 
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
@@ -445,6 +455,7 @@ angular.module('oppia').component('settingsTab', {
           });
         }
         ctrl.isRolesFormOpen = false;
+        ctrl.isVoiceoverFormOpen = false;
         ctrl.basicSettingIsShown = !WindowDimensionsService.isWindowNarrow();
         ctrl.advancedFeaturesIsShown = (
           !WindowDimensionsService.isWindowNarrow());

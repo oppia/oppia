@@ -25,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
+import feconf
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on explorations work as expected."""
@@ -72,6 +73,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_voiceover_admin)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
+        user_services.update_user_role(
+            self.user_id_voiceover_admin, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -127,9 +130,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             rights_manager.check_can_assign_voiceartist_in_activity(
                 self.user_voiceover_admin, exp_rights))
-        # self.assertFalse(
-        #     rights_manager.check_can_assign_voiceartist_in_activity(
-        #         self.user_admin, exp_rights))
+        self.assertFalse(
+            rights_manager.check_can_assign_voiceartist_in_activity(
+                self.user_a, exp_rights))
+        self.assertTrue(
+            rights_manager.check_can_assign_voiceartist_in_activity(
+                self.user_admin, exp_rights))
 
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo

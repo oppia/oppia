@@ -636,7 +636,7 @@ def check_can_delete_activity(user, activity_rights):
     return False
 
 
-def check_can_modify_activity_roles(user, activity_rights):
+def check_can_modify_activity_roles(user, activity_rights, role=None):
     """Checks whether the user can modify roles for given activity.
 
     Args:
@@ -644,6 +644,7 @@ def check_can_modify_activity_roles(user, activity_rights):
             given user.
         activity_rights: ActivityRights or None. Rights object for the given
             activity.
+        role: str. Role of the user.
 
     Returns:
         bool. Whether the user can modify roles for given activity.
@@ -662,6 +663,9 @@ def check_can_modify_activity_roles(user, activity_rights):
             user.actions):
         if activity_rights.is_owner(user.user_id):
             return True
+    if  role == feconf.ROLE_VOICE_ARTIST and (
+        role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
+        return True
     return False
 
 
@@ -774,7 +778,8 @@ def _assign_role(
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    if not check_can_modify_activity_roles(
+            committer, activity_rights, new_role):
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (

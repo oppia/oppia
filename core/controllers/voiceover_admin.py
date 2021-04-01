@@ -23,6 +23,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_fetchers
 from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import user_services
 import feconf
 

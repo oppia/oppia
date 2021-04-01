@@ -294,14 +294,6 @@
             </ul>
           </div>
 
-          <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
-            <strong>Voice Artists</strong>
-            <ul>
-              <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
-                <[voiceArtistName]>
-              </li>
-            </ul>
-          </div>
 
           <div ng-show="$ctrl.ExplorationRightsService.viewerNames.length > 0">
             <strong>Playtesters</strong>
@@ -332,6 +324,65 @@
 
                 <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.isTitlePresent()">
                 <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeEditRolesForm()" ng-show="$ctrl.isRolesFormOpen">
+                  Cancel
+                </button>
+                <p ng-show="!$ctrl.isTitlePresent()" class="text-danger protractor-test-title-warning">Please provide a title before inviting.</p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </md-card>
+
+    <md-card class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
+    <div ng-if="$ctrl.ExplorationRightsService.ownerNames.length > 0 && !$ctrl.ExplorationRightsService.isCloned()">
+      <div class="oppia-roles-container">
+        <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('roles')">
+          <h3>Voice Artists</h3>
+          <i class="fa fa-caret-down"
+             ng-if="!$ctrl.rolesCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             ng-if="$ctrl.rolesCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
+          <p ng-if="!$ctrl.ExplorationRightsService.voiceArtistNames.length">
+            No voice artists are assigned to this exploration.
+          </p>
+          <div ng-if="$ctrl.canModifyRoles" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
+            <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-roles">
+              EDIT
+            </span>
+          </div>
+
+          <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
+            <ul>
+              <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
+                <[voiceArtistName]>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-if="$ctrl.canModifyRoles" ng-show="$ctrl.isVoiceoverFormOpen">
+            <div class="form-group">
+              <form ng-submit="$ctrl.editRole($ctrl.newVoiceartistUsername, 'voice artist')">
+                <label for="$ctrl.newVoiceartistUsername">Username: </label>
+                <div>
+                  <input type="text" id="$ctrl.newVoiceartistUsername" class="form-control protractor-test-role-username" ng-model="$ctrl.newVoiceartistUsername" placeholder="username">
+                </div>
+                <br>
+                <div>
+                  <span class="form-text">
+                    <p></p>
+                  </span>
+                </div>
+
+                <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save" ng-disabled="!$ctrl.isTitlePresent()">
+                <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeVoiceoverForm()" ng-show="$ctrl.isVoiceoverFormOpen">
                   Cancel
                 </button>
                 <p ng-show="!$ctrl.isTitlePresent()" class="text-danger protractor-test-title-warning">Please provide a title before inviting.</p>
