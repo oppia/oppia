@@ -18,30 +18,30 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import interaction_registry
-from core.domain import obj_services
+from core.domain import object_registry
 from core.tests import test_utils
 from extensions.objects.models import objects
 
 
 class ObjectRegistryUnitTests(test_utils.GenericTestBase):
-    """Test the Registry class in obj_services."""
+    """Test the Registry class in object_registry."""
 
     def test_get_object_class_by_type_method(self):
         """Tests the normal behavior of get_object_class_by_type()."""
         self.assertEqual(
-            obj_services.Registry.get_object_class_by_type('Int').__name__,
+            object_registry.Registry.get_object_class_by_type('Int').__name__,
             'Int')
 
     def test_fake_class_is_not_gettable(self):
         """Tests that trying to retrieve a fake class raises an error."""
         with self.assertRaisesRegexp(TypeError, 'not a valid object class'):
-            obj_services.Registry.get_object_class_by_type('FakeClass')
+            object_registry.Registry.get_object_class_by_type('FakeClass')
 
     def test_base_object_is_not_gettable(self):
         """Tests that BaseObject exists and cannot be set as an obj_type."""
         assert getattr(objects, 'BaseObject')
         with self.assertRaisesRegexp(TypeError, 'not a valid object class'):
-            obj_services.Registry.get_object_class_by_type('BaseObject')
+            object_registry.Registry.get_object_class_by_type('BaseObject')
 
 
 class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
@@ -56,7 +56,7 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
         is provided in get_default_values().
         """
         interactions = interaction_registry.Registry.get_all_interactions()
-        object_default_vals = obj_services.get_default_object_values()
+        object_default_vals = object_registry.get_default_object_values()
 
         for interaction in interactions:
             for rule_name in interaction.rules_dict:
@@ -77,8 +77,8 @@ class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
         """Checks that the default values provided by get_default_values()
         correspond to the ones defined in objects.py.
         """
-        object_default_vals = obj_services.get_default_object_values()
-        all_object_classes = obj_services.Registry.get_all_object_classes()
+        object_default_vals = object_registry.get_default_object_values()
+        all_object_classes = object_registry.Registry.get_all_object_classes()
         for (obj_type, default_value) in object_default_vals.items():
             self.assertIn(obj_type, all_object_classes)
             self.assertEqual(
