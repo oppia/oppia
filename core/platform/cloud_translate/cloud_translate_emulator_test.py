@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for cloud_translate_services."""
+"""Tests for cloud_translate_emulator."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -24,7 +24,7 @@ from core.tests import test_utils
 
 
 class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
-    """Tests for cloud_translate_services."""
+    """Tests for cloud_translate_emulator."""
 
     def setUp(self):
         super(CloudTranslateEmulatorUnitTests, self).setUp()

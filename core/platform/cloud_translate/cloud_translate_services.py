@@ -21,6 +21,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import utils
 
+# To use cloud translate in a local dev environment, either use
+# cloud_translate_emulator, or follow the setup instructions here:
+# https://cloud.google.com/translate/docs/setup#python
+# Once you have completed the "Using the service account key file in your
+# environment" instructions, google.cloud.translate_v2 can be used by the local
+# server with no further setup.
 from google.cloud import translate_v2 as translate
 
 CLIENT = translate.Client()
@@ -38,9 +44,9 @@ def translate_text(text, source_language, target_language):
         str. The translated text.
     """
     if not utils.is_valid_language_code(source_language):
-        raise ValueError('invalid language code: %s' % source_language)
+        raise ValueError('Invalid language code: %s' % source_language)
     if not utils.is_valid_language_code(target_language):
-        raise ValueError('invalid language code: %s' % target_language)
+        raise ValueError('Invalid language code: %s' % target_language)
 
     result = CLIENT.translate(
         text, target_language=target_language, source_language=source_language)

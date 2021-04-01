@@ -27,8 +27,9 @@ import utils
 
 class TranslateEmulator(python_utils.OBJECT):
     """The emulator mocks the translate_text function from the Cloud Translate
-    API. Expected responses must be passed in before using this emulator for
-    testing.
+    API. This emulator can be used in backend testing, or a local dev
+    environment without access to the Cloud Translate API. Expected responses
+    must be passed in before using this emulator for testing.
     """
 
     def __init__(self):
