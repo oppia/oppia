@@ -34,9 +34,9 @@ import re
 
 from core.domain import cron_services
 from core.platform import models
+import feconf
 from jobs import base_model_validator_errors as errors
 from jobs import jobs_utils
-import feconf
 import python_utils
 import utils
 
@@ -44,7 +44,6 @@ import apache_beam as beam
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
-datastore_services = models.Registry.import_datastore_services()
 
 
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
@@ -247,17 +246,18 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
     """
 
     def process(
-        self, item, get_model_domain_object, get_domain_object_validation_type):
+            self, item, get_model_domain_object,
+            get_domain_object_validation_type):
         """Function that defines how to process each element in a pipeline of
         models.
 
         Args:
             item: datastore_services.Model. A domain object to
-            validate.
+                validate.
             get_model_domain_object: function. A function to fetch
-            domain object.
+                domain object.
             get_domain_object_validation_type: function. A function to fetch
-            the validation type of the domain object.
+                the validation type of the domain object.
 
         Yields:
             ModelDomainObjectValidateError. Error for domain object validation.
@@ -266,7 +266,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
             domain_object = get_model_domain_object(item)
             validation_type = get_domain_object_validation_type(item)
             if domain_object is None:
-                pass
+                return
             if validation_type == VALIDATION_MODE_NEUTRAL:
                 domain_object.validate()
             elif validation_type == VALIDATION_MODE_STRICT:
@@ -286,7 +286,20 @@ class ValidateIdsInModelFields(beam.DoFn):
     """
 
     def process(self, item, get_external_id_relationships):
-        for external_model_fetcher_details in (get_external_id_relationships(item)):
+        """Function that defines how to process each element in a pipeline of
+        models.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+            get_external_id_relationships: function. A function to fetch
+                external id relationships.
+
+        Yields:
+            IdsInModelFieldValidationError. Error for ids in model field
+            validation.
+        """
+        for external_model_fetcher_details in (
+                get_external_id_relationships(item)):
             for error in external_model_fetcher_details.model_id_errors:
                 yield errors.IdsInModelFieldValidationError(item, error)
 
@@ -295,32 +308,40 @@ class FetchFieldNameToExternalIdRelationships(beam.DoFn):
     """DoFn to fetch external models based on _get_external_id_relationships.
     """
 
-    def process(self, item, get_external_id_relationships_fn):
+    def process(self, item, get_external_id_relationships):
         """Function that defines how to process each element in a pipeline of
         models.
 
         Args:
             item: datastore_services.Model. Entity to validate.
-            get_external_id_relationships_fn: function. The function to fetch 
+            get_external_id_relationships: function. The function to fetch
                 external id relationships for the model.
-        
-        yields:
-            tuple(datastore_services.Model, str, ExternalModelReference).
-                A tuple that consists of the model to be validated, the field
-                name and the ExternalModelReference.
+
+        Yields:
+            tuple(datastore_services.Model, str, ExternalModelReference). A
+            tuple that consists of the model to be validated, the field
+            name and the ExternalModelReference.
         """
+        def mock_datastore_fetch(ids_and_models):
+            all_models_grouped_by_model_type = []
+            for (_, entity_ids) in ids_and_models:
+                all_models_grouped_by_model_type.append(
+                    [None for _ in python_utils.RANGE(len(entity_ids))])
+            return all_models_grouped_by_model_type
+
         multiple_models_ids_to_fetch = {}
 
         for external_model_fetcher_details in (
-                get_external_id_relationships_fn(item)):
+                get_external_id_relationships(item)):
             multiple_models_ids_to_fetch[
                 external_model_fetcher_details.field_name] = (
                     external_model_fetcher_details.model_class,
                     external_model_fetcher_details.model_ids)
 
-        fetched_model_instances_for_all_ids = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                list(multiple_models_ids_to_fetch.values())))
+        # Currently using the mock datastore fetch. Once the models
+        # can be fetched, we can replace it.
+        fetched_model_instances_for_all_ids = mock_datastore_fetch(
+            list(multiple_models_ids_to_fetch.values()))
 
         for index, field_name in enumerate(multiple_models_ids_to_fetch):
             (model_class, model_ids) = (
@@ -331,7 +352,9 @@ class FetchFieldNameToExternalIdRelationships(beam.DoFn):
             external_model_references = []
             for (model_id, model_instance) in python_utils.ZIP(
                     model_ids, fetched_model_instances):
-                external_model_references.append(ExternalModelReference(model_class, model_id, model_instance))
+                external_model_references.append(
+                    ExternalModelReference(
+                        model_class, model_id, model_instance))
             yield (item, field_name, external_model_references)
 
 
@@ -345,23 +368,24 @@ class ValidateExternalIdRelationships(beam.DoFn):
         models.
 
         Args:
-            model_and_field_name_and_external_model_references: 
+            model_and_field_name_and_external_model_references:
                 tuple(datastore_services.Model, str, ExternalModelReference).
                 A tuple that consists of the model to be validated, the field
                 name and the ExternalModelReference.
 
         Yields:
+            ModelFieldCheckValidateError. Error for external id relationships.
         """
         item, field_name, external_model_references = (
             model_and_field_name_and_external_model_references)
         for external_model_reference in external_model_references:
-                model = external_model_reference.model_instance
+            model = external_model_reference.model_instance
 
-                if model is None or model.deleted:
-                    model_class = external_model_reference.model_class
-                    model_id = external_model_reference.model_id        
-                    yield errors.ModelFieldCheckValidateError(
-                        item, field_name, model_id, model_class)
+            if model is None or model.deleted:
+                model_class = external_model_reference.model_class
+                model_id = external_model_reference.model_id
+                yield errors.ModelFieldCheckValidateError(
+                    item, field_name, model_id, model_class)
 
 
 class BaseModelValidator(beam.PTransform):
@@ -374,7 +398,6 @@ class BaseModelValidator(beam.PTransform):
     # model for which the external model is being fetched. Each value consists
     # of a list of ExternalModelReference objects.
     field_name_to_external_model_references = collections.defaultdict(list)
-
 
     def expand(self, model_pipe):
         """Function that takes in a beam.PCollection of datastore models and
@@ -412,8 +435,9 @@ class BaseModelValidator(beam.PTransform):
 
         model_and_field_name_and_external_model_references = (
             not_deleted
-            | beam.ParDo(FetchFieldNameToExternalIdRelationships(),
-            self._get_external_id_relationships))
+            | beam.ParDo(
+                FetchFieldNameToExternalIdRelationships(),
+                self._get_external_id_relationships))
 
         external_id_relationships_validation_errors = (
             model_and_field_name_and_external_model_references
@@ -477,7 +501,7 @@ class BaseModelValidator(beam.PTransform):
             str. The type of validation mode: neutral, strict or non strict.
         """
         return VALIDATION_MODE_NEUTRAL
-    
+
     def _get_external_id_relationships(self, item):
         """Returns a mapping of external id to model class.
 

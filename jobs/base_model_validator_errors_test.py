@@ -162,3 +162,64 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
             % (model.id, days))
 
         self.assertEqual(error.message, msg)
+
+
+class ModelDomainObjectValidateErrorTests(ValidatorErrorTestBase):
+    def test_model_domain_object_validate_error(self):
+        model = MockModel(
+            id='123',
+            deleted=True,
+            created_on=self.year_ago,
+            last_updated=self.year_ago)
+        error_message = 'Invalid validation type for domain object: Invalid'
+
+        error = errors.ModelDomainObjectValidateError(
+            model, error_message)
+
+        msg = (
+            'Entity id %s: Entity fails domain validation with the '
+            'error: %s' % (model.id, error_message))
+
+        self.assertEqual(error.message, msg)
+
+
+class IdsInModelFieldValidationErrorTests(ValidatorErrorTestBase):
+    def test_model_ids_in_field_validate_error(self):
+        model = MockModel(
+            id='123',
+            deleted=True,
+            created_on=self.year_ago,
+            last_updated=self.year_ago)
+        error_message = 'The field \'user_id\' should not contain system IDs'
+
+        error = errors.IdsInModelFieldValidationError(
+            model, error_message)
+
+        msg = (
+            'Entity id %s: Entity fails validation of ids in fields with the '
+            'error: %s' % (model.id, error_message))
+
+        self.assertEqual(error.message, msg)
+
+
+class ModelFieldCheckValidateErrorTests(ValidatorErrorTestBase):
+    def test_model_field_check_validate_error(self):
+        model = MockModel(
+            id='123',
+            deleted=True,
+            created_on=self.year_ago,
+            last_updated=self.year_ago)
+        field_name = 'user_id'
+        fetched_model_id = 'uid_aa'
+
+        error = errors.ModelFieldCheckValidateError(
+            model, field_name, fetched_model_id, user_models.UserSettingsModel)
+
+        msg = (
+            'Entity id %s: based on field %s having'
+            ' value %s, expected model %s with id %s but it '
+            'doesn\'t exist' % (
+                model.id, field_name, fetched_model_id,
+                'UserSettingsModel', fetched_model_id))
+
+        self.assertEqual(error.message, msg)

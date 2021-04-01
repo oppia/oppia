@@ -23,9 +23,9 @@ import datetime
 import unittest
 
 from core.platform import models
+import feconf
 from jobs import base_model_validator
 from jobs import base_model_validator_errors as errors
-import feconf
 
 import apache_beam as beam
 from apache_beam.runners.direct import direct_runner
@@ -42,28 +42,27 @@ class MockModel(base_models.BaseModel):
     pass
 
 
-class MockDomainObject():
-    pass
+class MockDomainObject(base_models.BaseModel):
+
+    def validate(self, strict=True):
+        """Mock validate function."""
+        pass
 
 
 class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     pass
 
 
-class MockModelValidatorWithInvalidValidationType(
-        base_model_validator.BaseModelValidator):
+class MockModelValidator(base_model_validator.BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return []
 
-    @classmethod
-    def _get_model_domain_object_instance(cls, unused_item):
-        return MockModel()
 
-    @classmethod
-    def _get_domain_object_validation_type(cls, unused_item):
-        return 'Invalid'
+class MockBaseModelValidator(
+        base_model_validator.BaseModelValidator):
+    pass
 
 
 class BaseModelValidatorTests(unittest.TestCase):
@@ -73,43 +72,117 @@ class BaseModelValidatorTests(unittest.TestCase):
         self.year_ago = self.now - datetime.timedelta(weeks=52)
         self.year_later = self.now + datetime.timedelta(weeks=52)
 
-    # def test_base_model_validator_ptransform(self):
-    #     with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-    #         invalid_id = MockModel(
-    #             id='123@?!*',
-    #             deleted=False,
-    #             created_on=self.year_ago,
-    #             last_updated=self.now)
-    #         invalid_timestamp = MockModel(
-    #             id='124',
-    #             deleted=False,
-    #             created_on=self.now,
-    #             last_updated=self.year_later)
-    #         expired_model = MockModel(
-    #             id='125',
-    #             deleted=True,
-    #             created_on=self.year_ago,
-    #             last_updated=self.year_ago)
-    #         valid_model = MockModel(
-    #             id='126',
-    #             deleted=False,
-    #             created_on=self.year_ago,
-    #             last_updated=self.now)
-    #         pcoll = (
-    #             p
-    #             | beam.Create([
-    #                 invalid_id, invalid_timestamp, expired_model, valid_model
-    #             ]))
+    def test_base_model_validator_ptransform(self):
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            invalid_id = MockModel(
+                id='123@?!*',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now)
+            invalid_timestamp = MockModel(
+                id='124',
+                deleted=False,
+                created_on=self.now,
+                last_updated=self.year_later)
+            expired_model = MockModel(
+                id='125',
+                deleted=True,
+                created_on=self.year_ago,
+                last_updated=self.year_ago)
+            valid_model = MockModel(
+                id='126',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now)
+            pcoll = (
+                p
+                | beam.Create([
+                    invalid_id, invalid_timestamp, expired_model, valid_model
+                ]))
 
-    #         output = pcoll | base_model_validator.BaseModelValidator()
+            output = pcoll | MockModelValidator()
 
-    #         beam_testing_util.assert_that(
-    #             output,
-    #             beam_testing_util.equal_to([
-    #                 errors.ModelInvalidIdError(invalid_id),
-    #                 errors.ModelMutatedDuringJobError(invalid_timestamp),
-    #                 errors.ModelExpiredError(expired_model)
-    #             ]))
+            beam_testing_util.assert_that(
+                output,
+                beam_testing_util.equal_to([
+                    errors.ModelInvalidIdError(invalid_id),
+                    errors.ModelMutatedDuringJobError(invalid_timestamp),
+                    errors.ModelExpiredError(expired_model)
+                ]))
+
+    def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_external_id_relationships\(\) method is missing from'
+            ' the derived class. It should be implemented in the derived'
+            ' class.'):
+            MockBaseModelValidator()._get_external_id_relationships(None) # pylint: disable=protected-access
+
+
+class BaseValidatorTests(unittest.TestCase):
+
+    USER_ID = 'uid_%s' % ('a' * 32)
+    PSEUDONYMOUS_ID = 'pid_%s' % ('a' * 32)
+
+    def test_external_model_fetcher_with_user_settings_raise_error(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'When fetching instances of UserSettingsModel, please use ' +
+            'UserSettingsModelFetcherDetails instead of ' +
+            'ExternalModelFetcherDetails'):
+            base_model_validator.ExternalModelFetcherDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [
+                    feconf.MIGRATION_BOT_USER_ID, self.USER_ID,
+                    self.PSEUDONYMOUS_ID
+                ]
+            )
+
+    def test_external_model_fetcher_with_invalid_id(self):
+        external_model = base_model_validator.ExternalModelFetcherDetails(
+            'mock_field', MockModel, ['', 'user-1']
+        )
+        self.assertItemsEqual(external_model.model_ids, ['user-1'])
+        self.assertItemsEqual(
+            external_model.model_id_errors,
+            ['A model id in the field \'mock_field\' is empty'])
+
+    def test_user_setting_model_fetcher_with_invalid_id(self):
+        user_settings_model = (
+            base_model_validator.UserSettingsModelFetcherDetails(
+                'mock_field', ['User-1', self.USER_ID],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            ))
+        self.assertItemsEqual(user_settings_model.model_ids, [self.USER_ID])
+        self.assertItemsEqual(
+            user_settings_model.model_id_errors,
+            ['The user id User-1 in the field \'mock_field\' is invalid'])
+
+    def test_user_setting_model_fetcher_with_system_id(self):
+        user_settings_model = (
+            base_model_validator.UserSettingsModelFetcherDetails(
+                'committer_ids', [
+                    feconf.MIGRATION_BOT_USER_ID, self.USER_ID],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            ))
+        self.assertItemsEqual(user_settings_model.model_ids, [self.USER_ID])
+        self.assertItemsEqual(
+            user_settings_model.model_id_errors,
+            ['The field \'committer_ids\' should not contain system IDs'])
+
+    def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
+        user_settings_model = (
+            base_model_validator.UserSettingsModelFetcherDetails(
+                'committer_ids', [self.PSEUDONYMOUS_ID, self.USER_ID],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            ))
+        self.assertItemsEqual(user_settings_model.model_ids, [self.USER_ID])
+        self.assertItemsEqual(
+            user_settings_model.model_id_errors,
+            ['The field \'committer_ids\' should not contain pseudonymous IDs'])
 
 
 class ValidateDeletedTests(BaseModelValidatorTests):
@@ -197,14 +270,17 @@ class ValidateModelIdTests(BaseModelValidatorTests):
 
 
 class ValidateModelDomainObjectInstancesTests(BaseModelValidatorTests):
-    def test_error_is_raised_with_invalid_validation_type_for_domain_objects(self):
-        def _get_model_domain_object(item):
+    def test_error_is_raised_with_neutral_validation_type_for_domain_object(
+            self):
+        def mock_get_model_domain_object(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object."""
             return MockDomainObject()
 
-        def _get_domain_object_validation_type(item):
-            return 'Invalid'
-        
-        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:            
+        def mock_get_domain_object_neutral_validation_type(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object type."""
+            return 'neutral'
+
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             model = MockModel(
                 id='mock-123',
                 deleted=False,
@@ -216,8 +292,92 @@ class ValidateModelDomainObjectInstancesTests(BaseModelValidatorTests):
                 pcoll
                 | beam.ParDo(
                     base_model_validator.ValidateModelDomainObjectInstances(),
-                    _get_model_domain_object,
-                    _get_domain_object_validation_type))
+                    mock_get_model_domain_object,
+                    mock_get_domain_object_neutral_validation_type))
+
+            beam_testing_util.assert_that(
+                output, beam_testing_util.equal_to([]))
+
+    def test_error_is_raised_with_strict_validation_type_for_domain_object(
+            self):
+        def mock_get_model_domain_object(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object."""
+            return MockDomainObject()
+
+        def mock_get_domain_object_strict_validation_type(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object type."""
+            return 'strict'
+
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            model = MockModel(
+                id='mock-123',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now)
+            pcoll = p | beam.Create([model])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateModelDomainObjectInstances(),
+                    mock_get_model_domain_object,
+                    mock_get_domain_object_strict_validation_type))
+
+            beam_testing_util.assert_that(
+                output, beam_testing_util.equal_to([]))
+
+    def test_error_is_raised_with_non_strict_validation_type_for_domain_object(
+            self):
+        def mock_get_model_domain_object(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object."""
+            return MockDomainObject()
+
+        def mock_get_domain_object_non_strict_validation_type(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object type."""
+            return 'non-strict'
+
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            model = MockModel(
+                id='mock-123',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now)
+            pcoll = p | beam.Create([model])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateModelDomainObjectInstances(),
+                    mock_get_model_domain_object,
+                    mock_get_domain_object_non_strict_validation_type))
+
+            beam_testing_util.assert_that(
+                output, beam_testing_util.equal_to([]))
+
+    def test_error_is_raised_with_invalid_validation_type_for_domain_object(
+            self):
+        def mock_get_model_domain_object(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object."""
+            return MockDomainObject()
+
+        def mock_get_domain_object_invalid_validation_type(item): # pylint: disable=unused-argument
+            """Mock helper function to get the domain object type."""
+            return 'Invalid'
+
+        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
+            model = MockModel(
+                id='mock-123',
+                deleted=False,
+                created_on=self.year_ago,
+                last_updated=self.now)
+            pcoll = p | beam.Create([model])
+
+            output = (
+                pcoll
+                | beam.ParDo(
+                    base_model_validator.ValidateModelDomainObjectInstances(),
+                    mock_get_model_domain_object,
+                    mock_get_domain_object_invalid_validation_type))
 
             beam_testing_util.assert_that(
                 output,
@@ -232,6 +392,7 @@ class ValidateIdsInModelFieldsTests(BaseModelValidatorTests):
     def test_error_raised_when_fetching_external_model_with_system_ids(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             def _get_external_id_relationships(item):
+                """Mock helper function to get external id relationships."""
                 return [
                     base_model_validator.UserSettingsModelFetcherDetails(
                         'user_id', [item.user_id],
@@ -245,7 +406,7 @@ class ValidateIdsInModelFieldsTests(BaseModelValidatorTests):
                 created_on=self.year_ago,
                 last_updated=self.now,
                 commit_cmds=[],
-                post_commit_status="public",
+                post_commit_status='public',
                 commit_type='create')
             pcoll = p | beam.Create([model])
 
@@ -272,6 +433,7 @@ class ValidateExternalIdRelationshipsTests(BaseModelValidatorTests):
     def test_error_raised_when_external_model_does_not_exists(self):
         with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
             def _get_external_id_relationships(item):
+                """Mock helper function to get external id relationships."""
                 return [
                     base_model_validator.UserSettingsModelFetcherDetails(
                         'user_id', [item.user_id],
@@ -285,14 +447,14 @@ class ValidateExternalIdRelationshipsTests(BaseModelValidatorTests):
                 created_on=self.year_ago,
                 last_updated=self.now,
                 commit_cmds=[],
-                post_commit_status="public",
+                post_commit_status='public',
                 commit_type='create')
             pcoll = p | beam.Create([model])
 
             model_and_field_name_and_external_model_references = (
                 pcoll
                 | beam.ParDo(
-                    base_model_validator.FetchFieldNameToExternalIdRelationships(),
+                    base_model_validator.FetchFieldNameToExternalIdRelationships(), # pylint: disable=line-too-long
                     _get_external_id_relationships))
 
             output = (
