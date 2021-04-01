@@ -21,7 +21,7 @@ import { AlertMessageComponent } from 'components/common-layout-directives/commo
 import { LimiToPipe } from 'filters/limit-to.pipe';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
-fdescribe('Warnings and Alert Component', () => {
+describe('Warnings and Alert Component', () => {
   let fixture: ComponentFixture<WarningsAndAlertsComponent>;
   let componentInstance: WarningsAndAlertsComponent;
 
