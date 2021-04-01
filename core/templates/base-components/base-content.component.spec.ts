@@ -25,6 +25,7 @@ import { TopNavigationBarComponent } from 'components/common-layout-directives/n
 import { LimiToPipe } from 'filters/limit-to.pipe';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
+import { Observable, of } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -71,6 +72,10 @@ describe('Base Content Component', () => {
     };
   }
 
+  class MockLoaderService {
+    onLoadingMessageChange: Observable<string> = of('Test Message');
+  }
+
   class MockPageTitleService {
     getPageTitleForMobileView(): string {
       return 'Page Title';
@@ -107,7 +112,10 @@ describe('Base Content Component', () => {
         BackgroundMaskService,
         BottomNavbarStatusService,
         KeyboardShortcutService,
-        LoaderService,
+        {
+          provide: LoaderService,
+          useClass: MockLoaderService
+        },
         {
           provide: PageTitleService,
           useClass: MockPageTitleService
@@ -143,10 +151,6 @@ describe('Base Content Component', () => {
   });
 
   it('should initiaize', () => {
-    spyOn(loaderService.onLoadingMessageChange, 'subscribe').and.
-      callFake((calb: (message: string) => void) => {
-        calb('Test Message');
-      });
     spyOn(keyboardShortcutService, 'bindNavigationShortcuts');
     windowRef.nativeWindow.location.hostname = 'oppiaserver.appspot.com';
     componentInstance.ngOnInit();
