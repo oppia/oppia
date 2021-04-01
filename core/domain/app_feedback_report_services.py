@@ -19,7 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import app_feedback_report_domain
+from core.model import app_feedback_report_models
 from core.platform import models
+
+import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -32,10 +36,96 @@ def save_report():
     statistics are accurate
     """
 
-def create_report(report_dict)
-    """Create and return a domain object feedback report from an incoming
+
+def get_report_from_model(report_model)
+    """Create and return a domain object AppFeedbackReport given a model loaded
+    from the the dasta.
+
+    Args:
+        report_model: AppFeedbackReportModel. The model loaded from the
+            datastore.
+
+    Returns:
+        AppFeedbackReport. An AppFeedbackReport domain object corresponding to
+        the given model.
+    """
+    if report_model.platform == (
+        app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
+        return _get_android_report_from_model(report_model)
+    else:
+        return  _get_web_report_from_model(report_model)
+
+def _get_android_report_from_model(android_report_model):
+    if android_report_model.android_report_info_schema_version < (
+        feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
+        raise NotImplementedError(
+            'Android app feedback report migrations must be added for new '
+            'report schemas implemented.')
+    report_info_dict = android_report_model.android_report_info
+    user_supplied_feedback = app_feedback_report_domain.UserSuppliedFeedback(
+        android_report_model.report_type, android_report_model.category,
+        report_info_dict['user_feedback_selected_items'],
+        report_info_dict['user_feedback_other_text_input']
+    )
+    device_system_context = (
+        app_feedback_report_domain.AndroidDeviceSystemContext(
+            android_report_model.version_name,
+            report_info_dict['package_version_code'],
+            android_report_model.android_device_country_locale_code,
+            report_info_dict['android_device_language_locale_code'],
+            report_info_dict['device_model'],
+            android_report_model.android_sdk_version,
+            report_info_dict['build_fingerprint'],
+            report_info_dict['network_type']))
+    entry_point = _get_entry_point(android_report_model.entry_point)
+    app_context = app_feedback_report_domain.AndroidAppContext(
+        entry_point, android_report_model.text_language_code,
+        android_report_model.audio_language_code, report_info_dict['text_size'],
+        report_info_dict['only_allows_wifi_download_and_update'],
+        report_info_dict['automatically_update_topics'],
+        report_info_dict['account_is_profile_admin'],
+        report_info_dict['event_logs'], report_info_dict['logcat_logs'])
+    return app_feedback_report_domain.AppFeedbackReport(
+        android_report_model.id, android_report_model.platform,
+        android_report_model.report_submitted_timestamp,
+        android_report_model.ticket_id, android_report_model.scrubbed_by,
+        user_supplied_feedback, device_system_context, app_context)
+
+
+def _get_web_report_from_model(web_report_model):
+    if web_report_model.android_report_info_schema_version < (
+        feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
+        raise NotImplementedError(
+            'Web app feedback report migrations must be added for new '
+            'report schemas implemented.')
+    raise NotImplementedError(
+        'Web app feedback report domain objects must be defined.')
+
+def _get_entry_point(
+        entry_point_name, topic_id, story_id, exploration_id, subtopic_id):
+    if entry_point_name == (
+        app_feedback_report_domain.ENTRY_POINT.navigation_drawer):
+        return app_feedback_report_domain.NavigationDrawerEntryPoint()
+    elif entry_point_name == (
+        app_feedback_report_domain.ENTRY_POINT.lesson_player):
+        return app_feedback_report_domain.LessonPlayerEntryPoint(
+            topic_id, story_id, exploration_id)
+    elif entry_point_name == (
+        app_feedback_report_domain.ENTRY_POINT.revision_card):
+        return app_feedback_report_domain.LessonPlayerEntryPoint(
+            topic_id, subtopic_id)
+    elif entry_point_name == app_feedback_report_domain.ENTRY_POINT.crash:
+        return app_feedback_report_domain.CrashEntryPoint()
+    else:
+        raise utils.InvalidInputException(
+            "Received unexpected entry point type.")
+
+
+def create_report_(report_dict)
+    """Create and return a domain object AppFeedbackReport from an incoming
     request JSON.
     """
+
 
 // Called when an admin triages reports; updates the assigned ticket in the
 // AppFeedbackReportModel and modifies the AppFeedbackReportStatsModel so that

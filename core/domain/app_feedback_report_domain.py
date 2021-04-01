@@ -169,17 +169,17 @@ class DeviceSystemContext(python_utils.OBJECT):
     to submit the report.
     """
     
-    def __init__(self, version_name, country_locale_code):
+    def __init__(self, version_name, device_country_locale_code):
         """Constructs a DeviceSystemContext domain object.
 
         Args:
             version_name: str. The specific version of the app being used to
                 submit the report.
-            country_locale_code: str. The user's country locale represented as
+            device_country_locale_code: str. The user's country locale represented as
                 an ISO-3166 code.
         """
         self.version_name = version_name
-        self.country_locale_code = country_locale_code
+        self.device_country_locale_code = device_country_locale_code
 
     def to_dict():
         """Returns a dict representing this DeviceSystemContext domain object.
@@ -191,7 +191,7 @@ class DeviceSystemContext(python_utils.OBJECT):
         """
         return {
             'version_name': self.version_name,
-            'country_locale_code': self.country_locale_code
+            'device_country_locale_code': self.device_country_locale_code
         }
 
 
@@ -201,19 +201,22 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
     """
 
     def __init__(
-            self, version_name, country_locale_code, language_locale_code,
+            self, version_name, package_version_code,
+            device_country_locale_code, device_language_locale_code,
             device_model, sdk_version, build_fingerprint, network_type):
         """Constructs a AndroidDeviceSystemContext domain object.
         
         Args:
             version_name: str. The specific version of the app being used to
                 submit the report.
-            country_locale_code: str. The user's country locale represented as
-                an ISO-3166 code.
             package_version_code: int. The Oppia Android package version on the
                 device.
-            language_locale_code: str. The device's language locale code as an
-                ISO-639 code, as determined in the Android device's settings.
+            device_country_locale_code: str. The device's country locale code
+                as an ISO-639 code, as determined in the Android device's
+                settings.
+            device_language_locale_code: str. The device's language locale code
+                as an ISO-639 code, as determined in the Android device's
+                settings.
             device_model: str. The Android device model used to send the report
             sdk_version: int. The Android SDK version running on the device
             build_fingerprint: str. The unique build fingerprint of this app
@@ -221,9 +224,9 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             network_type: str. The network type the device is connected to.
         """
         super(AndroidDeviceSystemContext, self).__init__(
-            version_name, country_locale_code)
+            version_name, device_country_locale_code)
         self.package_version_code = package_version_code
-        self.language_locale_code = language_locale_code
+        self.device_language_locale_code = device_language_locale_code
         self.device_model = device_model
         self.sdk_version = sdk_version
         self.build_fingerprint = build_fingerprint
@@ -239,9 +242,9 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """
         return {
             'version_name': self.version_name,
-            'country_locale_code': self.country_locale_code,
             'package_version_code': self.package_version_code,
-            'language_locale_code': self.language_locale_code,
+            'device_country_locale_code': self.device_country_locale_code,
+            'device_language_locale_code': self.device_language_locale_code,
             'device_model': self.device_model,
             'sdk_version': self.sdk_version,
             'build_fingerprint': self.build_fingerprint,

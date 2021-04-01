@@ -25,8 +25,8 @@ from core.domain import app_feedback_report_services
 import feconf
 
 
-class IncomingAppFeedbackReportsHandler(base.BaseHandler):
-    """Handles incoming feedback reports."""
+class IncomingAndroidFeedbackReportsHandler(base.BaseHandler):
+    """Handles incoming feedback reports from the Android app."""
 
     @acl_decorators.open_access
     def post(self):
@@ -36,8 +36,9 @@ class IncomingAppFeedbackReportsHandler(base.BaseHandler):
         the feedback report.
         """
         if not self._validate_incoming_request(self.request.headers):
+            pass
 
-        payload = json.loads(self.request.body)
+        request_body = json.loads(self.request.body)
         self.values.update({
             'feedback_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(
@@ -49,6 +50,14 @@ class IncomingAppFeedbackReportsHandler(base.BaseHandler):
         self.render_json(self.values)
 
     def _validate_incoming_request(self, headers):
-        if headers['api_key'] != 
-        return False
+        api_key = headers['api_key']
+        app_package_name = headers['app_package_name']
+        app_version_name = headers['app_version_name']
+        app_version_code = headers['app_version_code']
+        if api_key != feconf.ANDROID_API_KEY or (
+            app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or (
+                app_version_name != feconf.ANDROID_APP_PACKAGE_NAME or (
+                    app_version_code != feconf.ANDROID_APP_VERSION_CODE))):
+            return False
+        return True
 
