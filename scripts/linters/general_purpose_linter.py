@@ -151,7 +151,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': re.compile(r'\b(iit|fit|xit)\('),
         'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\''
-                    ' or \'xit\'',
+                   ' or \'xit\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
