@@ -22,7 +22,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AlertsService } from 'services/alerts.service';
 import { AlertMessageComponent } from './alert-message.component';
 
-fdescribe('Warnings and Alert Component', () => {
+describe('Warnings and Alert Component', () => {
   let fixture: ComponentFixture<AlertMessageComponent>;
   let componentInstance: AlertMessageComponent;
   let numOfCalls: number = 0;
