@@ -142,15 +142,16 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
-        'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
+        'regexp': re.compile(r'\b(ddescribe|fdescribe|xdescribe)\('),
         'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
-                   'or \'fdescribe\'',
+                   ' or \'fdescribe\' or \'xdescribe\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\b(iit|fit)\('),
-        'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\'',
+        'regexp': re.compile(r'\b(iit|fit|xit)\('),
+        'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\''
+                    ' or \'xit\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
