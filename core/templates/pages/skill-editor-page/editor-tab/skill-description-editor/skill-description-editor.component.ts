@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,79 +13,78 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the skill description editor.
+ * @fileoverview Component for the skill description editor.
  */
 
-require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/skill-update.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-
-require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
-
 import { Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { SkillRights } from 'domain/skill/skill-rights.model';
 
-angular.module('oppia').directive('skillDescriptionEditor', [
-  'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
-  'UrlInterpolationService', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
-  function(
-      SkillEditorStateService, SkillObjectFactory, SkillUpdateService,
-      UrlInterpolationService, MAX_CHARS_IN_SKILL_DESCRIPTION) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/editor-tab/skill-description-editor/' +
-        'skill-description-editor.directive.html'),
-      controller: [
-        '$scope',
-        function($scope) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
-            MAX_CHARS_IN_SKILL_DESCRIPTION);
-          $scope.canEditSkillDescription = function() {
-            return $scope.skillRights.canEditSkillDescription();
-          };
+@Component({
+  selector: 'oppia-skill-description-editor',
+  templateUrl: './skill-description-editor.component.html'
+})
+export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
+  errorMsg: string = '';
+  directiveSubscriptions = new Subscription();
+  MAX_CHARS_IN_SKILL_DESCRIPTION = (
+    AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
+  skillRights: SkillRights;
+  skill: Skill;
+  skillDescriptionEditorIsShown: boolean;
+  tmpSkillDescription: string;
+  constructor(
+    private skillUpdateService: SkillUpdateService,
+    private skillEditorStateService: SkillEditorStateService,
+    private skillObjectFactory: SkillObjectFactory
+  ) {}
 
-          $scope.resetErrorMsg = function() {
-            $scope.errorMsg = '';
-          };
-
-          $scope.saveSkillDescription = function(newSkillDescription) {
-            if (newSkillDescription === $scope.skill.getDescription()) {
-              return;
-            }
-            if (SkillObjectFactory.hasValidDescription(
-              newSkillDescription)) {
-              $scope.skillDescriptionEditorIsShown = false;
-              SkillUpdateService.setSkillDescription(
-                $scope.skill,
-                newSkillDescription);
-            } else {
-              $scope.errorMsg = (
-                'Please use a non-empty description consisting of ' +
-                'alphanumeric characters, spaces and/or hyphens.');
-            }
-          };
-
-          ctrl.$onInit = function() {
-            $scope.skill = SkillEditorStateService.getSkill();
-            $scope.tmpSkillDescription = $scope.skill.getDescription();
-            $scope.skillRights = SkillEditorStateService.getSkillRights();
-            $scope.errorMsg = '';
-            ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.onSkillChange.subscribe(
-                () => $scope.tmpSkillDescription = $scope.skill.getDescription()
-              )
-            );
-          };
-
-          $scope.$on('$destroy', function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          });
-        }
-      ]
-    };
+  canEditSkillDescription(): boolean {
+    return this.skillRights.canEditSkillDescription();
   }
-]);
+
+  resetErrorMsg(): void {
+    this.errorMsg = '';
+  }
+
+  saveSkillDescription(newSkillDescription: string): void {
+    if (newSkillDescription === this.skill.getDescription()) {
+      return;
+    }
+    if (this.skillObjectFactory.hasValidDescription(
+      newSkillDescription)) {
+      this.skillDescriptionEditorIsShown = false;
+      this.skillUpdateService.setSkillDescription(
+        this.skill,
+        newSkillDescription);
+    } else {
+      this.errorMsg = (
+        'Please use a non-empty description consisting of ' +
+        'alphanumeric characters, spaces and/or hyphens.');
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  ngOnInit(): void {
+    this.skill = this.skillEditorStateService.getSkill();
+    this.tmpSkillDescription = this.skill.getDescription();
+    this.skillRights = this.skillEditorStateService.getSkillRights();
+    this.errorMsg = '';
+    this.directiveSubscriptions.add(
+      this.skillEditorStateService.onSkillChange.subscribe(
+        () => this.tmpSkillDescription = this.skill.getDescription()
+      )
+    );
+  }
+}
+angular.module('oppia').directive(
+  'oppiaSkillDescriptionEditor', downgradeComponent(
+    {component: SkillDescriptionEditorComponent}));
