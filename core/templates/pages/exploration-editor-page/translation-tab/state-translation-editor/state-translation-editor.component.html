@@ -16,16 +16,24 @@
       <div class="oppia-translated-content-display oppia-transition-200"
            ng-class="{'oppia-prevent-selection': isEditable()}"
            title="Translated Content">
-        <span  class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.translation === ''">
+        <span class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.translation === ''">
           This section has not been translated yet. <span ng-if="isEditable()">Click to add a translation!</span>
         </span>
         <span ng-if="activeWrittenTranslation">
           <angular-html-bind ng-if="activeWrittenTranslation.isHtml()"
-                             html-data="activeWrittenTranslation.getHtml()"
+                             html-data="activeWrittenTranslation.getTranslation()"
                              class="oppia-rte-editor protractor-test-translation-display">
           </angular-html-bind>
           <p ng-if="activeWrittenTranslation.isUnicode()">
-            {{activeWrittenTranslation.getUnicode()}}
+            {{activeWrittenTranslation.getTranslation()}}
+          </p>
+          <ul ng-if="activeWrittenTranslation.isSetOfStrings()">
+            <li ng-repeat="item in activeWrittenTranslation.translation track by $index">
+              {{item}}
+            </li>
+          </ul>
+          <p ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+            <strong>ERROR:</strong> Unsupported translation data format.
           </p>
         </span>
       </div>
@@ -46,6 +54,14 @@
       <schema-based-editor schema="UNICODE_SCHEMA"
                            local-value="activeWrittenTranslation.translation">
       </schema-based-editor>
+    </div>
+    <div ng-if="activeWrittenTranslation.isSetOfStrings()">
+      <schema-based-editor schema="SET_OF_STRINGS_SCHEMA"
+                           local-value="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+      <strong>ERROR:</strong> Unsupported translation data format.
     </div>
 
     <div class="oppia-save-item-button-container">

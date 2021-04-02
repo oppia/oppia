@@ -117,7 +117,23 @@ describe('State translation component', function() {
           }
         },
         answer_groups: [{
-          rule_specs: [],
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_4',
+                normalizedStrSet: ['input1']
+              }
+            }
+          }, {
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_5',
+                normalizedStrSet: ['input2']
+              }
+            }
+          }],
           outcome: {
             dest: 'unused',
             feedback: {
@@ -177,7 +193,9 @@ describe('State translation component', function() {
               needs_update: false
             }
           },
-          ca_placeholder: {}
+          ca_placeholder: {},
+          rule_input_4: {},
+          rule_input_5: {}
         }
       }
     }
@@ -362,7 +380,9 @@ describe('State translation component', function() {
       solution: {},
       solution_1: {},
       ca_placeholder: {},
-      ca_fakePlaceholder: {}
+      ca_fakePlaceholder: {},
+      rule_input_4: {},
+      rule_input_5: {}
     }
   };
 
@@ -436,6 +456,7 @@ describe('State translation component', function() {
   afterEach(function() {
     ctrl.$onDestroy();
   });
+
 
   describe('when translation tab is not busy and voiceover mode is' +
     ' active', function() {
@@ -618,6 +639,38 @@ describe('State translation component', function() {
       expect($scope.contentIdStatusColorStyle('solution_1')).toEqual({
         'border-left': '3px solid #D14836'
       });
+    });
+
+    it('should activate rule inputs tab when clicking on tab', function() {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.onTabClick('rule_input');
+
+      expect($scope.isActive('rule_input')).toBe(true);
+      expect($scope.isDisabled('rule_input')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('rule_input_4', 'set_of_normalized_string');
+    });
+
+    it('should change active rule content index', function() {
+      $scope.onTabClick('rule_input');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.changeActiveRuleContentIndex(1);
+
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith(
+          'rule_input_5', 'TranslatableSetOfNormalizedString');
+    });
+
+    it('should not change active rule content index if it is equal to the ' +
+       'current one', function() {
+      $scope.onTabClick('rule_input');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.changeActiveRuleContentIndex(0);
+
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
     });
 
     it('should change active hint index', function() {
@@ -828,6 +881,17 @@ describe('State translation component', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('solution');
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when trying to change' +
+      ' active rule content index', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.changeActiveRuleContentIndex(1);
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
       expect(translationTabActiveContentIdService.setActiveContent).not

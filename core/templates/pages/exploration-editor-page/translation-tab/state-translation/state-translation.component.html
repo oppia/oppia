@@ -18,6 +18,13 @@
           </span>Interaction
         </a>
       </li>
+      <li ng-if="!isVoiceoverModeActive()" ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_RULE_INPUTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_RULE_INPUTS)}" class="" aria-label="Rule Inputs" role="button">
+        <a ng-click="onTabClick(TAB_ID_RULE_INPUTS)" ng-style="tabStatusColorStyle(TAB_ID_RULE_INPUTS)" href="" class="oppia-translation-tabs-text">
+          <span ng-show="tabNeedUpdatesStatus(TAB_ID_RULE_INPUTS)" class="oppia-tab-needs-update"
+                uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
+          </span>Rules
+        </a>
+      </li>
       <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="protractor-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
         <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="tabStatusColorStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text protractor-test-translation-feedback-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" class="oppia-tab-needs-update"
@@ -102,6 +109,31 @@
           </div>
         </li>
       </ul>
+    </div>
+    <div ng-if="isActive(TAB_ID_RULE_INPUTS)" class="translation-state-content">
+      <div>
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+          <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-feedback mt-0"
+              ng-repeat="ruleContent in interactionRuleTranslatableContents track by $index"
+              ng-class="{'active': activeRuleContentIndex === $index}">
+            <a class="oppia-rule-tab protractor-test-feedback-<[$index]>"
+               ng-click="changeActiveRuleContentIndex($index)"
+               ng-class="{'oppia-rule-tab-active': activeRuleContentIndex === $index}"
+               ng-style="contentIdStatusColorStyle(ruleContent.contentId)">
+               <[ruleContent.rule | parameterizeRuleDescription:stateInteractionId:answerChoices]>
+            </a>
+            <div ng-if="activeRuleContentIndex === $index">
+              <div class="oppia-editor-card-section">
+                <div class="oppia-rule-body-container">
+                  <span>
+                    <[ruleContent.rule.inputs[ruleContent.inputName] | formatBaseTranslatableObjectValues:ruleContent.rule.inputTypes[ruleContent.inputName]]>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
     <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>

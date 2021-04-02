@@ -22,6 +22,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('services/external-save.service.ts');
+require('filters/format-base-translatable-object-values.filter.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -145,8 +146,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
-              WrittenTranslationObjectFactory
-                .createNew($scope.dataFormat, ''));
+              WrittenTranslationObjectFactory.createNew($scope.dataFormat));
           }
         }
       };
@@ -179,6 +179,16 @@ angular.module('oppia').component('stateTranslationEditor', {
 
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
+        };
+
+        $scope.SET_OF_STRINGS_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          validators: [{
+            id: 'is_uniquified'
+          }]
         };
 
         ctrl.directiveSubscriptions.add(
