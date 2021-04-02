@@ -48,6 +48,7 @@ ANDROID_TEXT_SIZE = utils.create_enum('small', 'medium', 'large', 'extra_large')
 ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
     ENTRY_POINT.revision_card, ENTRY_POINT.crash]
+ANDROID_VERSION_NAME_DELIMITER = '.'
 
 ALLOWED_REPORT_TYPES = [
     REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
@@ -147,8 +148,22 @@ class AppFeedbackReport(python_utils.OBJECT):
             self.require_valid_ticket_id(self.ticket_id)
 
         self.require_valid_submission_datetime(self.report_submitted_timestamp)
+
         self.user_supplied_feedback.validate()
+
+        if platform == app_feedback_report_models.PLATFORM_ANDROID and (
+            not isinstance(
+                self.user_supplied_feedback, AndroidDeviceSystemContext)):
+                raise utils.ValidationError(
+                    'Expected device and system context to be of type '
+                    'AndroidDeviceSystemContext for platform %s, '
+                    'received: %r' % self.platform, self.device_system_context)
+        else if platform == app_feedback_report_models.PLATFORM_WEB:
+            raise NotImplementedError(
+                'Subclasses of DeviceSystemContext for web systems should '
+                'implement domain validation.')
         self.device_system_context.validate()
+
         self.app_context.validate()
 
     @classmethod
@@ -326,7 +341,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 validate, provided by the user in the report.
 
         Raises:
-            ValidationError. The given seleciton items and text input for the
+            ValidationError. The given selection items and text input for the
             category are not valid.
         """
         if category in ALLOWED_SELECTION_ITEMS_CATEGORIES:
@@ -383,7 +398,6 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Invalid option %s selected by user.' % item)
 
-
     @classmethod
     def require_valid_other_text_input_for_category(cls, category, other_input):
         """Checks whether the user_feedback_other_text_input is valid.
@@ -399,8 +413,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 'Category %s requires text input in the report.' % category)
         if not isinstance(other_input, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid input text must be a string, received: %r.' % item)
-
+                'Invalid input text must be a string, received: %r.' % (
+                    other_input))
 
     @classmethod
     def _selected_items_include_other(cls, selected_items):
@@ -451,6 +465,17 @@ class DeviceSystemContext(python_utils.OBJECT):
             'version_name': self.version_name,
             'device_country_locale_code': self.device_country_locale_code
         }
+
+    def validate():
+        """Validates this DeviceSystemContext domain object.
+
+        Raises:
+            NotImplementedError. The derived child classes must implement the
+                necessary logic as described above.
+        """
+        raise NotImplementedError(
+            'Subclasses of DeviceSystemContext should implement domain '
+            'validation.')
 
 
 class AndroidDeviceSystemContext(DeviceSystemContext):
@@ -508,6 +533,113 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             'build_fingerprint': self.build_fingerprint,
             'network_type': self.network_type
         }
+
+    def validate():
+        """Validates this AndroidDeviceSystemContext domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                AndroidDeviceSystemContext are not valid.
+        """
+        self.require_valid_version_name(self.version_name)
+        self.require_valid_package_version_code(self.package_version_code)
+        self.require_valid_country_locale_code(self.device_country_locale_code)
+        self.require_valid_language_locale_code(self.device_language_locale_code)
+        self.require_valid_device_model(self.device_model)
+        self.require_valid_sdk_version(self.sdk_version)
+        self.require_valid_build_fingerprint(self.build_fingerprint)
+        self.require_valid_network_type(self.network_type)
+        
+    @classmethod
+    def require_valid_version_name(cls, version_name):
+        """Checks whether the version name is a valid string app version for
+        Oppia Android.
+
+        Args:
+            version_name: str. The version name for this report.
+
+        Raises:
+            ValidationError. The given app version name is not valid.
+        """
+        if version_name is None:
+            raise utils.ValidationError('No version name supplied.')
+        if not isinstance(version_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Version name must be a string, received: %r.' % version_name)
+        if len(version_name.split(ANDROID_VERSION_NAME_DELIMITER)) != 3:
+            raise utils.ValidationError('The version name.')
+        
+    @classmethod
+    def require_valid_package_version_code(cls, package_version_code):
+        """Checks whether the package version code is a valid string code for
+        Oppia Android.
+
+        Args:
+            package_version_code: int. The package version code for this report.
+
+        Raises:
+            ValidationError. The given code is not valid.
+        """
+        if package_version_code is None:
+            raise utils.ValidationError('No package version code supplied.')
+        if not isinstance(package_version_code, int):
+            raise utils.ValidationError(
+                'Package verion code must be an int, received: %r.' % (
+                    package_version_code))
+        if package_version_code < feconf.MIN_ANDROID_PACKAGE_VERSION_CODE or (
+            package_version_code > feconf.MAX_ANDROID_PACKAGE_VERSION_CODE):
+            raise utils.ValidationError(
+                'Package version code is not a valid int, received: %d. The '
+                'maximum supported version is %d and the minimum supported '
+                'version is %d.' % (
+                    package_version_code,
+                    feconf.MAX_ANDROID_PACKAGE_VERSION_CODE,
+                    feconf.MIN_ANDROID_PACKAGE_VERSION_CODE))
+
+    @classmethod
+    def require_valid_country_locale_code(cls, country_locale_code):
+        """Checks whether the country locale code is a valid  code.
+
+        Args:
+            country_locale_code: str. The device's country locale code
+                that sent the report.
+
+        Raises:
+            ValidationError. The given code is not valid.
+        """
+    
+    @classmethod
+    def require_valid_language_locale_code(cls, language_locale_code):
+        """Checks whether the language locale code is a valid  code.
+
+        Args:
+            language_locale_code: str. The device's country locale code
+                that sent the report.
+
+        Raises:
+            ValidationError. The given code is not valid.
+        """
+    
+    @classmethod
+    def require_valid_device_model(cls, device_model):
+        """Checks whether the device model is a valid string.
+
+        Args:
+            device_model: str. The device's country locale code
+                that sent the report.
+
+        Raises:
+            ValidationError. The given code is not valid.
+        """
+    
+    @classmethod
+    def require_valid_sdk_version(cls, sdk_version)
+    
+    @classmethod
+    def require_valid_build_fingerprint(cls, build_fingerprint)
+     
+    @classmethod
+    def require_valid_network_type(cls, network_type)
 
 
 class EntryPoint(python_utils.OBJECT):

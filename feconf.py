@@ -589,6 +589,10 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
     1614556800)
 
+# The minimum and maximum package version codes for Oppia Android.
+MIN_ANDROID_PACKAGE_VERSION_CODE = 1
+MAX_ANDROID_PACKAGE_VERSION_CODE = 1
+
 # We generate images for existing math rich text components in batches. This
 # gives the maximum size for a batch of Math SVGs in bytes.
 MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
