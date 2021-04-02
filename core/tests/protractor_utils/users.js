@@ -26,6 +26,10 @@ var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
+  // The Firebase Admin SDK stores all emails in lower case. To ensure that the
+  // developer email used to sign in is consistent with these accounts, we
+  // manually change them to lower case.
+  email = email.toLowerCase();
   var user = await FirebaseAdmin.auth().createUser({
     email: email,
     emailVerified: true,

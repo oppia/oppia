@@ -148,6 +148,10 @@ export class AuthService {
     if (!AuthService.firebaseEmulatorIsEnabled) {
       throw new Error('signInWithEmail can only be called in emulator mode');
     }
+    // The Firebase Admin SDK, used by our end-to-end tests, stores all emails
+    // in lower case. To ensure that the developer email used to sign in is
+    // consistent with these accounts, we manually change them to lower case.
+    email = email.toLowerCase();
     // We've configured the Firebase emulator to use email/password for user
     // authentication. To save developers and end-to-end test authors the
     // trouble of providing passwords, we always use the md5 hash of the email
