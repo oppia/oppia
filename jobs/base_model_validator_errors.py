@@ -176,7 +176,7 @@ class ModelFieldCheckValidateError(ModelValidationErrorBase):
 
 
 class ModelExpiredError(ModelValidationErrorBase):
-    """Error class for stale deletion validation errors."""
+    """Error class for expired models."""
 
     def __init__(self, model):
         super(ModelExpiredError, self).__init__(model)
