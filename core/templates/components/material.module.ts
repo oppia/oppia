@@ -43,6 +43,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatCardModule,
     MatCheckboxModule,
     MatListModule,
+    develop
     MatProgressSpinnerModule,
     MatRadioModule
   ]
