@@ -42,6 +42,8 @@ angular.module('oppia').component('pieChart', {
       google.charts.setOnLoadCallback(function() {
         if (!chart) {
           chart = new google.visualization.PieChart($element[0]);
+          redrawChart();
+          $scope.$applyAsync();
         }
       });
       var redrawChart = function() {
