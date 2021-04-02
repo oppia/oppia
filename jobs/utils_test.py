@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import unittest
 
 from core.platform import models
-from jobs import jobs_utils
+from jobs import utils
 
 base_models, user_models = (
     models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
@@ -40,7 +40,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_model(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = jobs_utils.clone_model(model)
+        clone = utils.clone_model(model)
 
         self.assertEqual(model.id, clone.id)
         self.assertEqual(model, clone)
@@ -49,7 +49,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_with_changes(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = jobs_utils.clone_model(model, deleted=False)
+        clone = utils.clone_model(model, deleted=False)
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -59,7 +59,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_with_changes_to_id(self):
         model = base_models.BaseModel(id='123')
-        clone = jobs_utils.clone_model(model, id='124')
+        clone = utils.clone_model(model, id='124')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -69,7 +69,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_sub_class(self):
         model = FooModel(id='123', prop='original')
-        clone = jobs_utils.clone_model(model)
+        clone = utils.clone_model(model)
 
         self.assertEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -79,7 +79,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_sub_class_with_changes(self):
         model = FooModel(id='123', prop='original')
-        clone = jobs_utils.clone_model(model, prop='updated')
+        clone = utils.clone_model(model, prop='updated')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)

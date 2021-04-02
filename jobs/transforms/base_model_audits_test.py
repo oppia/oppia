@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for BaseModelValidator."""
+"""Unit tests for base_model_audits."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -22,9 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.platform import models
-from jobs import base_model_validator
-from jobs import base_model_validator_errors as errors
-from jobs import jobs_test_utils
+from jobs.transforms import base_model_audits
+from jobs.types import audit_errors
+from jobs import test_utils
 
 import apache_beam as beam
 
@@ -34,59 +34,15 @@ base_models, user_models = (
 datastore_services = models.Registry.import_datastore_services()
 
 
-class BaseModelValidatorTestBase(jobs_test_utils.BeamTestBase):
-    """Test base for base_model_validator jobs with helpful constants."""
+class BaseModelAuditsTestBase(test_utils.BeamTestBase):
+    """Test base for base_model_audits jobs with helpful constants."""
 
     NOW = datetime.datetime.utcnow()
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
 
-class BaseModelValidatorTests(BaseModelValidatorTestBase):
-
-    def test_base_model_validator_ptransform(self):
-        model_with_invalid_id = base_models.BaseModel(
-            id='123@?!*',
-            deleted=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        model_with_invalid_timestamp = base_models.BaseModel(
-            id='124',
-            deleted=False,
-            created_on=self.NOW,
-            last_updated=self.YEAR_LATER)
-        expired_model = base_models.BaseModel(
-            id='125',
-            deleted=True,
-            created_on=self.YEAR_AGO,
-            last_updated=self.YEAR_AGO)
-        valid_model = base_models.BaseModel(
-            id='126',
-            deleted=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-
-        output = (
-            self.pipeline
-            | beam.Create([
-                model_with_invalid_id,
-                model_with_invalid_timestamp,
-                expired_model,
-                valid_model,
-            ])
-            | base_model_validator.BaseModelValidator()
-        )
-
-        self.assert_pcoll_equal(output, [
-            errors.InvalidIdError(
-                model_with_invalid_id,
-                base_model_validator.DEFAULT_ID_REGEX_STRING),
-            errors.ModelMutatedDuringJobError(model_with_invalid_timestamp),
-            errors.ModelExpiredError(expired_model),
-        ])
-
-
-class ValidateDeletedTests(BaseModelValidatorTestBase):
+class ValidateDeletedTests(BaseModelAuditsTestBase):
 
     def test_process_reports_error_for_old_deleted_model(self):
         expired_model = base_models.BaseModel(
@@ -98,15 +54,15 @@ class ValidateDeletedTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([expired_model])
-            | beam.ParDo(base_model_validator.ValidateDeletedModel())
+            | beam.ParDo(base_model_audits.ValidateDeletedModel())
         )
 
         self.assert_pcoll_equal(output, [
-            errors.ModelExpiredError(expired_model),
+            audit_errors.ModelExpiredError(expired_model),
         ])
 
 
-class ValidateModelTimeFieldTests(BaseModelValidatorTestBase):
+class ValidateModelTimeFieldTests(BaseModelAuditsTestBase):
 
     def test_process_reports_model_timestamp_relationship_error(self):
         invalid_timestamp = base_models.BaseModel(
@@ -117,11 +73,11 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_model_validator.ValidateModelTimestamps())
+            | beam.ParDo(base_model_audits.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [
-            errors.InconsistentTimestampsError(invalid_timestamp),
+            audit_errors.InconsistentTimestampsError(invalid_timestamp),
         ])
 
     def test_process_reports_model_mutated_during_job_error(self):
@@ -133,15 +89,15 @@ class ValidateModelTimeFieldTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_model_validator.ValidateModelTimestamps())
+            | beam.ParDo(base_model_audits.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [
-            errors.ModelMutatedDuringJobError(invalid_timestamp),
+            audit_errors.ModelMutatedDuringJobError(invalid_timestamp),
         ])
 
 
-class ValidateModelIdTests(BaseModelValidatorTestBase):
+class ValidateModelIdTests(BaseModelAuditsTestBase):
 
     def test_validate_model_id(self):
         invalid_id_model = base_models.BaseModel(
@@ -152,18 +108,15 @@ class ValidateModelIdTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_id_model])
-            | beam.ParDo(
-                base_model_validator.ValidateModelIdWithRegex(),
-                base_model_validator.DEFAULT_ID_REGEX_STRING)
+            | beam.ParDo(base_model_audits.ValidateBaseModelId())
         )
 
         self.assert_pcoll_equal(output, [
-            errors.InvalidIdError(
-                invalid_id_model, base_model_validator.DEFAULT_ID_REGEX_STRING),
+            audit_errors.InvalidBaseModelIdError(invalid_id_model),
         ])
 
 
-class ValidatePostCommitIsPrivateTests(BaseModelValidatorTestBase):
+class ValidatePostCommitIsPrivateTests(BaseModelAuditsTestBase):
 
     def test_validate_post_commit_is_private_when_status_is_public(self):
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
@@ -179,11 +132,11 @@ class ValidatePostCommitIsPrivateTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_model_validator.ValidatePostCommitIsPrivate())
+            | beam.ParDo(base_model_audits.ValidatePostCommitIsPrivate())
         )
 
         self.assert_pcoll_equal(output, [
-            errors.InvalidCommitStatusError(invalid_commit_status),
+            audit_errors.InvalidCommitStatusError(invalid_commit_status),
         ])
 
     def test_validate_post_commit_is_private_when_status_is_private(self):
@@ -200,9 +153,9 @@ class ValidatePostCommitIsPrivateTests(BaseModelValidatorTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_model_validator.ValidatePostCommitIsPrivate())
+            | beam.ParDo(base_model_audits.ValidatePostCommitIsPrivate())
         )
 
         self.assert_pcoll_equal(output, [
-            errors.InvalidCommitStatusError(invalid_commit_status),
+            audit_errors.InvalidCommitStatusError(invalid_commit_status),
         ])
