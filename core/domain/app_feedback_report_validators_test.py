@@ -381,8 +381,10 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     REPORT_SUBMITTED_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP)
-    REPORT_IDS_LIST = ['%s.%s.%s' % (
-        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_MSEC, 'randomInteger123')]
+    REPORT_ID = '%s.%s.%s' % (
+        PLATFORM_ANDROID, int(REPORT_SUBMITTED_TIMESTAMP_MSEC),
+        'randomInteger123')
+    REPORT_IDS_LIST = [REPORT_ID]
     TICKET_NAME = 'example ticket name'
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
@@ -422,9 +424,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                 newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
                 report_ids=self.REPORT_IDS_LIST))
         app_feedback_report_models.AppFeedbackReportModel(
-            id='%s.%s.%s' % (
-                self.PLATFORM_ANDROID,
-                self.REPORT_SUBMITTED_TIMESTAMP_MSEC, 'randomInteger123'),
+            id=self.REPORT_ID,
             platform=self.PLATFORM_ANDROID,
             ticket_id=self.ticket_id,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
@@ -538,7 +538,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP)
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP_MSEC,
+        'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
     STATS_DATE = datetime.date.fromtimestamp(1616173836)
@@ -556,7 +556,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     REPORT_SUBMITTED_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
         REPORT_SUBMITTED_TIMESTAMP)
     REPORT_ID = '%s.%s.%s' % (
-        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_MSEC,
+        PLATFORM_ANDROID, int(REPORT_SUBMITTED_TIMESTAMP_MSEC),
         'randomInteger123')
 
     def setUp(self):

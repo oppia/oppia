@@ -204,15 +204,13 @@ class AppFeedbackReportTicketModelValidator(
     """Class for validating AppFeedbackReportTicketModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
+    def _get_model_id_regex(cls, unused_item):
         # Valid id:
         # [ticket_creation_datetime_msec]:[hash(ticket_name)]:[random hash]
-        # We can only validate the timestamp is an expected string since the
-        # id generation timestamp and the entity creation timestamp may differ.
-        created_on_msec = utils.get_time_in_millisecs(item.created_on)
+        # We can only validate the timestamp is an int since the id generation
+        # timestamp and the entity creation timestamp differ slightly.
         regex_string = (
-            '^[0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
-                len(int(created_on_msec)),
+            '^\\d+\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
                 base_models.ID_LENGTH, base_models.ID_LENGTH))
         return regex_string
 
