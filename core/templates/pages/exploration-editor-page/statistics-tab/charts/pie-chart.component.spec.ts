@@ -18,7 +18,7 @@
 
 import { of } from 'rxjs';
 
-fdescribe('Pie Chart component', function() {
+describe('Pie Chart component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
   var $scope = null;
