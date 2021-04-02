@@ -118,14 +118,14 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # The Android SDK version on the user's device.
     android_sdk_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
-    # The report info collected for Android; None if the platform is 'web'.
+    # The feedback collected for Android reports; None if the platform is 'web'.
     android_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info; None if the platform is
     # 'web'.
     android_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
-    # The report info collected for Web; None if the platform is 'android'.
+    # The feedback collected for Web reports; None if the platform is 'android'.
     web_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info; None if the platform is
@@ -354,8 +354,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     github_issue_number = datastore_services.IntegerProperty(
         required=False, indexed=True)
     # Whether this ticket has been archived.
-    archived = datastore_services.BooleanProperty(
-        required=True, indexed=True)
+    archived = datastore_services.BooleanProperty(required=True, indexed=True)
     # The datetime in UTC that the newest report in this ticket was created on,
     # to help with sorting tickets.
     newest_report_timestamp = datastore_services.DateTimeProperty(
@@ -528,7 +527,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             total_reports_submitted=total_reports_submitted,
             daily_param_stats=daily_param_stats,
             daily_param_stats_schema_version=(
-                feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION))
+                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
         stats_entity.update_timestamps()
         stats_entity.put()
         return entity_id

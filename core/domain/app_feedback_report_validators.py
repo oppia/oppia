@@ -28,7 +28,7 @@ import feconf
 (
     base_models, app_feedback_report_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.app_feedback_report
+    models.NAMES.base_model, _validate_schema_versions
 ])
 
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
@@ -59,7 +59,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _validate_schema_versions(cls, item):
         """Validate that schema versions of the reports are not greater than the
-        current report schema.
+        current report schema or less than the minimum supported version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
@@ -318,21 +318,21 @@ class AppFeedbackReportStatsModelValidator(
     @classmethod
     def _validate_schema_version(cls, item):
         """Validate that the schema version of the stats is not greater than the
-        current stats schema.
+        current stats schema or lower than the minimum supported version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
         if item.daily_param_stats_schema_version > (
-                feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION):
+                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                 'Entity id %s: daily stats schema version %s is greater than '
                 'current version %s' % (
                     item.id, item.daily_param_stats_schema_version,
-                    feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION))
+                    feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
         elif item.daily_param_stats_schema_version < (
                 feconf.MIN_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(

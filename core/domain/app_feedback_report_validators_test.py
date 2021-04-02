@@ -588,7 +588,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
             daily_param_stats=self.DAILY_STATS,
             daily_param_stats_schema_version=(
-                feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION)
+                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)
         ).put()
         self.expected_output.append(
             (
@@ -616,7 +616,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'than current version %s\']]') % (
                     model_entity.id,
                     model_entity.daily_param_stats_schema_version,
-                    feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION)]
+                    feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
@@ -637,7 +637,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'than the minimum version %s\']]') % (
                     model_entity.id,
                     model_entity.daily_param_stats_schema_version,
-                    feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION)]
+                    feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
