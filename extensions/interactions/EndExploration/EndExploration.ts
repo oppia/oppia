@@ -27,7 +27,7 @@ require(
   'oppia-interactive-end-exploration.component.ts');
 require(
   'interactions/EndExploration/directives/' +
-  'oppia-response-end-exploration.directive.ts');
+  'oppia-response-end-exploration.component.ts');
 require(
   'interactions/EndExploration/directives/' +
-  'oppia-short-response-end-exploration.directive.ts');
+  'oppia-short-response-end-exploration.component.ts');
