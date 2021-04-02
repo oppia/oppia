@@ -57,22 +57,14 @@ var checkForAddTitleWarning = async function() {
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
-  var testExplorationTitleInput = element(
-    by.css('.protractor-test-exploration-title-input'));
-  await action.click('Test Exploration Title Input', testExplorationTitleInput);
-  var testExplorationObjectiveInput = element(
-    by.css('.protractor-test-exploration-objective-input'));
-  await action.click(
-    'Test Exploration Objective Input', testExplorationObjectiveInput);
+  await element(by.css('.protractor-test-exploration-title-input')).click();
+  await element(by.css('.protractor-test-exploration-objective-input')).click();
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
-  var testEditRoles = element(by.css('.protractor-test-edit-roles'));
-  await action.click('Test Edit Roles', testEditRoles);
-  await action.sendKeys(
-    'Username input',
-    element(by.css('.protractor-test-role-username')),
+  await element(by.css('.protractor-test-edit-roles')).click();
+  await element(by.css('.protractor-test-role-username')).sendKeys(
     'Chuck Norris');
 };
 
@@ -144,21 +136,19 @@ var publishExploration = async function() {
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-publish-exploration')));
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
-  var testPublishExploration = element(
-    by.css('.protractor-test-publish-exploration'));
-  await action.click('Test Publish Exploration', testPublishExploration);
+  await element(by.css('.protractor-test-publish-exploration')).click();
   await waitFor.elementToBeClickable(element(by.css(
     '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   await prePublicationButtonElem.isPresent();
-  await action.click('PrePublication Button Element', prePublicationButtonElem);
+  await prePublicationButtonElem.click();
 
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  var testConfirmPublish = element(by.css('.protractor-test-confirm-publish'));
-  await action.click('Test Confirm Publish', testConfirmPublish);
+  await element(by.css('.protractor-test-confirm-publish')).click();
+
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
   var closePublishModalButton = element(
@@ -167,7 +157,7 @@ var publishExploration = async function() {
     sharePublishModal, 'Share Publish Modal takes too long to appear');
   await waitFor.elementToBeClickable(
     closePublishModalButton, 'Close Publish Modal button is not clickable');
-  await action.click('Close Publish Modal Button', closePublishModalButton);
+  await closePublishModalButton.click();
 };
 
 // Creates and publishes a minimal exploration.
@@ -323,20 +313,20 @@ var uploadImage = async function(
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
-  await action.click('Image Clickable Element', imageClickableElement);
+  await imageClickableElement.click();
 
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
     await waitFor.elementToBeClickable(
       thumbnailResetButton,
       'Topic thumbnail reset button taking too long to appear.');
-    await action.click('Thumbnail Reset Button', thumbnailResetButton);
+    await thumbnailResetButton.click();
   } else {
     expect(await thumbnailResetButton.isPresent()).toBe(false);
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  return await action.sendKeys(imageUploadInput, absPath);
+  return await imageUploadInput.sendKeys(absPath);
 };
 
 var submitImage = async function(
@@ -347,7 +337,7 @@ var submitImage = async function(
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
-  await action.click('Image Submit Button', imageSubmitButton);
+  await imageSubmitButton.click();
   await waitFor.invisibilityOf(
     imageUploadInput,
     'Image uploader is taking too long to disappear');
