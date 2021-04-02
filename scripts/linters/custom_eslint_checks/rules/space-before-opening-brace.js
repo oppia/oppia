@@ -19,38 +19,38 @@
 'use strict';
 
 module.exports = {
-   meta: {
+  meta: {
     type: 'layout',
-    docs: {
+      docs: {
         description:
         'disallow more than one brace before opening brace of function',
-        category: 'Stylistic Issues',
+      category: 'Stylistic Issues',
         recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-        OnlyOneSpacebeforebrace:
+      OnlyOneSpacebeforebrace:
          'There should be only one space before opening brace of function'
     }
-   },
-   create: function(context) {
-       const sourcecode = context.getSourceCode();
-       return {
-           FunctionDeclaration: function(node) {
-               const lines= sourcecode.getText(node);
-               for (var i = 0; i < lines.length; i++) {
-                   if (lines[i] === ')') {
-                       if (lines[i+1] !== ' ' || lines[i + 2] !== '{') {
-                           context.report({
-                               node: node,
-                               messageId: 'OnlyOneSpacebeforebrace',
-                             });
-                       }
-                       break;
-                   }
-               }
-           }
-       }
-   }
+  },
+  create: function(context) {
+    const sourcecode = context.getSourceCode();
+    return {
+      FunctionDeclaration: function(node) {
+        const lines= sourcecode.getText(node);
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i] === ')') {
+            if (lines[i + 1] !== ' ' || lines[i + 2] !== '{') {
+              context.report({
+                node: node,
+                messageId: 'OnlyOneSpacebeforebrace',
+              });
+            }
+            break;
+          }
+        }
+      }
+    };
+  }
 };

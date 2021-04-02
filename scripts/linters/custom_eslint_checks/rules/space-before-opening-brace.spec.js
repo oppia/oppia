@@ -29,10 +29,10 @@ ruleTester.run('space-before-opening-brace', rule, {
     function A() {
         console.log('test function');
     }`,
-   `var a= 's';
+    `var a= 's';
     function A () {console.log('test function');
     }`
-   ],
+  ],
 
   invalid: [
     {
@@ -47,27 +47,27 @@ ruleTester.run('space-before-opening-brace', rule, {
       }]
     },
     {
-     code:
+      code:
      `function A()  {
        console.log('test function');
   }`,
-     errors: [{
-       message:
+      errors: [{
+        message:
        'There should be only one space before opening brace of function',
-       type: null
-     }]
-   },
-   {
-     code:
+        type: null
+      }]
+    },
+    {
+      code:
      `function A()
      {
       console.log('test function');
   }`,
-     errors: [{
-       message:
+      errors: [{
+        message:
        'There should be only one space before opening brace of function',
-       type: null
-     }]
-   },
+        type: null
+      }]
+    },
   ]
 });
