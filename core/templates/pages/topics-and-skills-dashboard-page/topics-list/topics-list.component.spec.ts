@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the Topic List Component.
  */
 
+import { CommonModule } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { MatCardModule } from '@angular/material/card';
+import { NgbModalModule, NgbModalOptions, NgbModalRef, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
-import { TopicsAndSkillsDashboardPageModule } from '../topics-and-skills-dashboard-page.module';
+import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.component';
 import { TopicsListComponent } from './topics-list.component';
 
 describe('Topics List Component', () => {
@@ -30,21 +33,6 @@ describe('Topics List Component', () => {
   let componentInstance: TopicsListComponent;
   let urlInterpolationService: UrlInterpolationService;
   let alertsService: AlertsService;
-
-  class MockNgbModal {
-    open(content: object, options?: NgbModalOptions): object {
-      return {
-        result: {
-          then: (
-              successCallback: () => void,
-              cancelCallback: () => void
-          ) => {
-            successCallback();
-          }
-        }
-      };
-    }
-  }
 
   class MockEditabeleBackendApiService {
     deleteTopic(topicId: string): object {
@@ -61,22 +49,25 @@ describe('Topics List Component', () => {
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     onTopicsAndSkillsDashboardReinitialized = {
-      emit(): void {
-        emitted = true;
-      }
+      emit(): void {}
     };
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        TopicsAndSkillsDashboardPageModule
+        NgbModalModule,
+        NgbTooltipModule,
+        HttpClientTestingModule,
+        CommonModule,
+        MatCardModule
+      ],
+      declarations: [
+        TopicsListComponent,
+        DeleteTopicModalComponent
       ],
       providers: [
-        {
-          provide: NgbModalRef,
-          useClass: MockNgbModal
-        },
+        NgbModalRef,
         AlertsService,
         {
           provide: EditableTopicBackendApiService,
@@ -145,12 +136,5 @@ describe('Topics List Component', () => {
     (pageNumber * itemsPerPage);
     expect(componentInstance.getSerialNumberForTopic(topicIndex))
       .toEqual(expectedSerialNumber);
-  });
-
-  it('should delete topic', () => {
-    let topicId: string = 'testId';
-    let topicName: string = 'test_name';
-    componentInstance.deleteTopic(topicId, topicName);
-    expect(componentInstance.selectedIndex).toBeNull();
   });
 });

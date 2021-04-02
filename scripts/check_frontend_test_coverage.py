@@ -342,6 +342,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-summary-tile.directive.ts',
     'TopicObjectFactory.ts',
     'topics-and-skills-dashboard-backend-api.service.ts',
+    'topics-list.component.ts',
     'translatable-html-content-id.component.ts',
     'translate-text.service.ts',
     'translation-file-hash-loader-backend-api.service.ts',

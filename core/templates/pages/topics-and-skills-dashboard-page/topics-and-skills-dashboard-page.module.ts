@@ -58,9 +58,9 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     }
   ]
 })
-export class TopicsAndSkillsDashboardPageModule {
+class TopicsAndSkillsDashboardPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap(): void {}
+  ngDoBootstrap() {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
