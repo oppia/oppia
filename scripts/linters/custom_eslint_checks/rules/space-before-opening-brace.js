@@ -21,11 +21,11 @@
 module.exports = {
   meta: {
     type: 'layout',
-      docs: {
-        description:
+    docs: {
+      description:
         'disallow more than one brace before opening brace of function',
       category: 'Stylistic Issues',
-        recommended: true,
+      recommended: true,
     },
     fixable: null,
     schema: [],
@@ -38,7 +38,7 @@ module.exports = {
     const sourcecode = context.getSourceCode();
     return {
       FunctionDeclaration: function(node) {
-        const lines= sourcecode.getText(node);
+        const lines = sourcecode.getText(node);
         for (var i = 0; i < lines.length; i++) {
           if (lines[i] === ')') {
             if (lines[i + 1] !== ' ' || lines[i + 2] !== '{') {
