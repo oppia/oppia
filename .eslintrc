@@ -104,6 +104,7 @@
     "oppia/no-multiline-disable": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
+    "oppia/space-before-opening-brace": "error",
     "angular/di": [
       "error",
       "array"
