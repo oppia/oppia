@@ -21,7 +21,7 @@ import { ImageLocalStorageService } from './image-local-storage.service';
 import { ImageUploadHelperService } from './image-upload-helper.service';
 import { AlertsService } from './alerts.service';
 
-fdescribe('ImageLocalStorageService', () => {
+describe('ImageLocalStorageService', () => {
   let alertsService: AlertsService;
   let imageLocalStorageService: ImageLocalStorageService;
   let sampleImageData = 'dis:issue is:open ata:image/png;base64,xyz';
