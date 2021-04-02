@@ -227,13 +227,15 @@ class AppFeedbackReportModel(base_models.BaseModel):
             submitted_on_sec, and a random string, of the form
             '[platform].[submitted_on_msec].[random hash]'.
         """
+        submitted_datetime_in_msec = utils.get_time_in_millisecs(
+            submitted_on_datetime)
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                platform, utils.get_time_in_millisecs(submitted_on_datetime),
+                platform, int(submitted_datetime_in_msec),
                 random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
@@ -414,6 +416,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             ticket_name, and a random string, of the form
             '[creation_datetime_msec]:[hash(ticket_name)]:[random hash]'.
         """
+        current_datetime_in_msec = utils.get_time_in_millisecs(
+            datetime.datetime.utcnow())
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
                 ticket_name, base_models.ID_LENGTH)
@@ -422,8 +426,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                utils.get_time_in_millisecs(datetime.datetime.utcnow()),
-                name_hash, random_hash)
+                int(current_datetime_in_msec), name_hash, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -552,10 +555,11 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         """
         stats_date_in_datetime = utils.convert_date_to_datetime(
             stats_tracking_date)
+        stats_datetime_in_msec = utils.get_time_in_millisecs(stats_date_in_datetime)
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (
                 platform, ticket_id,
-                utils.get_time_in_millisecs(stats_date_in_datetime))
+                int(stats_datetime_in_msec))
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(

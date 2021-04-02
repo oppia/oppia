@@ -231,7 +231,7 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
             '/subjects/Lightbulb.svg')
 
-    def test_convert_date_to_datetime(self):
+    def test_date_conversion_to_datetime_returns_midnight_datetime(self):
         date = datetime.date(year=2020, month=2, day=11)
         datetime_without_hours = datetime.datetime(
             year=2020, month=2, day=11)
