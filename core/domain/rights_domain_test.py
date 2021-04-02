@@ -34,10 +34,10 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         super(ActivityRightsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.viewer = user_services.UserActionsInfo(self.viewer_id)
+        self.viewer = user_services.get_user_actions_info(self.viewer_id)
 
         self.exp_id = 'exp_id'
         self.save_new_valid_exploration(self.exp_id, self.owner_id)

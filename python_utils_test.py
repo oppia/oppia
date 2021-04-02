@@ -228,6 +228,11 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 self.assertEqual(type(k), unicode)
                 self.assertEqual(type(v), bytes)
 
+    def test_is_string(self):
+        self.assertTrue(python_utils.is_string('abc'))
+        self.assertFalse(python_utils.is_string(123))
+        self.assertFalse(python_utils.is_string(['a', 'b', 'c']))
+
 
 @unittest.skipUnless(
     sys.version[0] == '2', 'Test cases for ensuring Python 2 behavior only')

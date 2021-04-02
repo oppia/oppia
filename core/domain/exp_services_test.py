@@ -99,10 +99,10 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.user_id_admin)
+        self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
 
 class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
@@ -3572,8 +3572,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-        self.albert = user_services.UserActionsInfo(self.albert_id)
-        self.bob = user_services.UserActionsInfo(self.bob_id)
+        self.albert = user_services.get_user_actions_info(self.albert_id)
+        self.bob = user_services.get_user_actions_info(self.bob_id)
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
@@ -4013,8 +4013,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-        self.albert = user_services.UserActionsInfo(self.albert_id)
-        self.bob = user_services.UserActionsInfo(self.bob_id)
+        self.albert = user_services.get_user_actions_info(self.albert_id)
+        self.bob = user_services.get_user_actions_info(self.bob_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
@@ -4643,7 +4643,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.set_admins([self.ADMIN_USERNAME])
         # Create explorations.
         exploration = self.save_new_valid_exploration(

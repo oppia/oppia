@@ -32,7 +32,6 @@ import collections
 import datetime
 import re
 
-from core.domain import cron_services
 from core.platform import models
 import feconf
 from jobs import base_model_validator_errors as errors
@@ -42,10 +41,11 @@ import utils
 
 import apache_beam as beam
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+base_models, user_models = (
+    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
 
 
+DEFAULT_ID_REGEX_STRING = '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 VALIDATION_MODE_NEUTRAL = 'neutral'
@@ -182,16 +182,39 @@ class ValidateModelIdWithRegex(beam.DoFn):
             regex_string: str. Regex pattern for valid ids to match.
 
         Yields:
-            ModelInvalidIdError. An error class for models with invalid IDs.
+            InvalidIdError. An error class for models with invalid IDs.
         """
-        regex = re.compile(regex_string)
         model = jobs_utils.clone_model(input_model)
 
-        if not regex.match(model.id):
-            yield errors.ModelInvalidIdError(model)
+        if not re.match(regex_string, model.id):
+            yield errors.InvalidIdError(model, regex_string)
 
 
-class ValidateDeleted(beam.DoFn):
+class ValidatePostCommitIsPrivate(beam.DoFn):
+    """DoFn to check if post_commmit_status is private when
+    post_commit_is_private is true and vice-versa.
+    """
+
+    def process(self, input_model):
+        """Function validates that post_commit_is_private is true iff
+        post_commit_status is private
+
+        Args:
+            input_model: base_models.BaseCommitLogEntryModel.
+                Entity to validate.
+
+        Yields:
+            ModelInvalidCommitStatus. Error for commit_type validation.
+        """
+        model = jobs_utils.clone_model(input_model)
+
+        expected_post_commit_is_private = (
+            model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
+        if model.post_commit_is_private != expected_post_commit_is_private:
+            yield errors.InvalidCommitStatusError(model)
+
+
+class ValidateDeletedModel(beam.DoFn):
     """DoFn to check whether models marked for deletion are stale."""
 
     def process(self, input_model):
@@ -205,17 +228,16 @@ class ValidateDeleted(beam.DoFn):
             ModelExpiredError. An error class for expired models.
         """
         model = jobs_utils.clone_model(input_model)
-        date_now = datetime.datetime.utcnow()
 
         expiration_date = (
-            date_now -
-            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+            datetime.datetime.utcnow() -
+            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
         if model.last_updated < expiration_date:
             yield errors.ModelExpiredError(model)
 
 
-class ValidateModelTimeFields(beam.DoFn):
+class ValidateModelTimestamps(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are
     valid.
     """
@@ -228,12 +250,13 @@ class ValidateModelTimeFields(beam.DoFn):
             input_model: datastore_services.Model. Entity to validate.
 
         Yields:
-            ModelMutatedDuringJobError. Error for timestamp validation.
-            ModelTimestampRelationshipError. Error for timestamp validation.
+            ModelMutatedDuringJobError. Error for models mutated during the job.
+            InconsistentTimestampsError. Error for models with inconsistent
+            timestamps.
         """
         model = jobs_utils.clone_model(input_model)
         if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
-            yield errors.ModelTimestampRelationshipError(model)
+            yield errors.InconsistentTimestampsError(model)
 
         current_datetime = datetime.datetime.utcnow()
         if (model.last_updated - MAX_CLOCK_SKEW_SECS) > current_datetime:
@@ -389,52 +412,55 @@ class ValidateExternalIdRelationships(beam.DoFn):
 
 
 class BaseModelValidator(beam.PTransform):
-    """Composite beam Transform which returns a pipeline of validation
-    errors.
-    """
+    """Composite PTransform which returns a pipeline of validation errors."""
 
-    # field_name_to_external_model_references is keyed by field name.
-    # The field name represents a unique identifier provided by the storage
-    # model for which the external model is being fetched. Each value consists
-    # of a list of ExternalModelReference objects.
-    field_name_to_external_model_references = collections.defaultdict(list)
+    @classmethod
+    def get_model_id_regex(cls):
+        """Returns a regex for model id.
 
-    def expand(self, model_pipe):
-        """Function that takes in a beam.PCollection of datastore models and
-        returns a beam.PCollection of validation errors.
+        Returns:
+            str. A regex pattern to be followed by the model id.
+        """
+        return DEFAULT_ID_REGEX_STRING
+
+    def expand(self, input_models):
+        """Transforms a PCollection of models into validation errors.
 
         Args:
-            model_pipe: beam.PCollection. A collection of models.
+            input_models: beam.PCollection. A collection of models.
 
         Returns:
             beam.PCollection. A collection of errors represented as
             key-value pairs.
         """
-        not_deleted, deleted = (
-            model_pipe
-            | 'SplitByDeleted' >> beam.Partition(lambda m, _: int(m.deleted), 2)
+        existing_models, deleted_models = (
+            input_models
+            | 'Split by deleted' >> beam.Partition(
+                lambda model, unused_num_partitions: int(model.deleted), 2)
         )
-
-        deletion_errors = deleted | beam.ParDo(ValidateDeleted())
-
-        time_field_validation_errors = (
-            not_deleted | beam.ParDo(ValidateModelTimeFields()))
-
-        model_id_validation_errors = (
-            not_deleted
-            | beam.ParDo(
-                ValidateModelIdWithRegex(), self._get_model_id_regex())
+        deletion_errors = (
+            deleted_models
+            | 'Validate deleted models' >> beam.ParDo(ValidateDeletedModel())
+        )
+        timestamp_errors = (
+            existing_models
+            | 'Validate timestamps' >> beam.ParDo(ValidateModelTimestamps())
+        )
+        id_errors = (
+            existing_models
+            | 'Validate id' >> beam.ParDo(
+                ValidateModelIdWithRegex(), self.get_model_id_regex())
         )
 
         ids_in_field_validation_error = (
-            not_deleted
+            existing_models
             | beam.ParDo(
                 ValidateIdsInModelFields(),
                 self._get_external_id_relationships)
         )
 
         model_and_field_name_and_external_model_references = (
-            not_deleted
+            existing_models
             | beam.ParDo(
                 FetchFieldNameToExternalIdRelationships(),
                 self._get_external_id_relationships))
@@ -445,30 +471,19 @@ class BaseModelValidator(beam.PTransform):
         )
 
         model_domain_object_validation_errors = (
-            not_deleted
+            existing_models
             | beam.ParDo(
                 ValidateModelDomainObjectInstances(),
                 self._get_model_domain_object_instance,
                 self._get_domain_object_validation_type)
         )
 
-        return (
-            (
-                deletion_errors,
-                time_field_validation_errors,
-                model_id_validation_errors,
-                ids_in_field_validation_error,
-                model_domain_object_validation_errors,
-                external_id_relationships_validation_errors)
-            | beam.Flatten())
-
-    def _get_model_id_regex(self):
-        """Returns a regex for model id.
-
-        Returns:
-            str. A regex pattern to be followed by the model id.
-        """
-        return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
+        error_pcolls = (
+            deletion_errors, timestamp_errors, id_errors,
+            ids_in_field_validation_error,
+            model_domain_object_validation_errors,
+            external_id_relationships_validation_errors)
+        return error_pcolls | beam.Flatten()
 
     def _get_model_domain_object_instance(self, unused_item):
         """Returns a domain object instance created from the model.
