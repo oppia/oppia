@@ -850,6 +850,126 @@ class CollectionRightsTests(test_utils.GenericTestBase):
                 self.user_a, self.COLLECTION_ID, self.user_id_a,
                 rights_domain.ROLE_OWNER)
 
+    def test_editor_can_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_editor(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        self.assertTrue(collection_rights.is_owner(self.user_id_b))
+        self.assertFalse(collection_rights.is_editor(self.user_id_b))
+
+    def test_voiceartist_can_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        self.assertTrue(collection_rights.is_owner(self.user_id_b))
+        self.assertFalse(collection_rights.is_voice_artist(self.user_id_b))
+
+    def test_viewer_can_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_viewer(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        self.assertTrue(collection_rights.is_owner(self.user_id_b))
+        self.assertFalse(collection_rights.is_viewer(self.user_id_b))
+
+    def test_viewer_can_be_reassigned_as_editor(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_viewer(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+
+        self.assertTrue(collection_rights.is_editor(self.user_id_b))
+        self.assertFalse(collection_rights.is_viewer(self.user_id_b))
+
+    def test_voiceartist_can_be_reassigned_as_editor(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+
+        self.assertTrue(collection_rights.is_editor(self.user_id_b))
+        self.assertFalse(collection_rights.is_voice_artist(self.user_id_b))
+
+    def test_viewer_can_be_reassigned_as_voiceartist(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_viewer(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        self.assertTrue(collection_rights.is_voice_artist(self.user_id_b))
+        self.assertFalse(collection_rights.is_viewer(self.user_id_b))
+
     def test_editor_cannot_be_reassigned_as_editor(self):
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
