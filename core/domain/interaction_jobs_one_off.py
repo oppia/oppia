@@ -154,11 +154,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class MultipleItemInteractionLtOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of (exploration ID, length) pairs
-    that use multiple choice interaction or item selection interaction
-    and a list of (exploration ID, (exploration, length)) pairs
-    that use multiple choice interaction or item selection
-    interaction whose choices length is greater than 30.
+    """Audit job that flags MultipleItemInteractions with too many choices.
     """
 
     @classmethod
