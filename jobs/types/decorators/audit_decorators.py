@@ -14,13 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for BaseModelValidator."""
+"""Decorators for assigning DoFn classes to specific storage models."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import functools
 import inspect
 
 from core.platform import models
@@ -66,6 +65,8 @@ class AuditsExisting(python_utils.OBJECT):
         Raises:
             TypeError. When a non-model type is provided.
         """
+        if not model_cls_args:
+            raise ValueError('Must provide at least one model')
         self._model_classes = set()
         for cls in model_cls_args:
             if cls in _MODEL_CLASSES_BY_BASE_CLASS:
@@ -74,9 +75,7 @@ class AuditsExisting(python_utils.OBJECT):
                 self._model_classes.add(cls)
             else:
                 raise TypeError(
-                    '%r is not registered in core.platform.models' % cls)
-
-        self._model_kinds = {cls.__name__ for cls in self._model_classes}
+                    '%r is not a model registered in core.platform' % cls)
 
     def __call__(self, do_fn):
         """Decorator which registers the given DoFn to the targeted models.
@@ -100,11 +99,15 @@ class AuditsExisting(python_utils.OBJECT):
         # the class is derived from, including itself, in the order they are
         # searched for methods and attributes.
         # To learn more see: https://stackoverflow.com/a/2010732/4859885.
-        do_fn_derived_classes = set(inspect.getmro(do_fn))
+        base_classes_of_do_fn = set(inspect.getmro(do_fn))
 
-        for model_kind in self._model_kinds:
-            self._DO_FNS_BY_MODEL_KIND[model_kind] -= do_fn_derived_classes
-            self._DO_FNS_BY_MODEL_KIND[model_kind].add(do_fn)
+        for cls in self._model_classes:
+            registered_do_fns = self._DO_FNS_BY_MODEL_KIND[cls.__name__]
+            if any(issubclass(r, do_fn) for r in registered_do_fns):
+                # Always keep the most-derived DoFn.
+                continue
+            registered_do_fns -= base_classes_of_do_fn
+            registered_do_fns.add(do_fn)
 
         # Decorate the DoFn with type constraints that raise an error when
         # arguments or return values have the wrong type.
@@ -115,4 +118,12 @@ class AuditsExisting(python_utils.OBJECT):
 
     @classmethod
     def get_do_fns_for_model_kind(cls, model_kind):
+        """Returns the list of DoFns registered to the given model kind.
+
+        Args:
+            model_kind: str. The kind/name of the model.
+
+        Returns:
+            list(DoFn). The DoFns registered to the model kind.
+        """
         return list(cls._DO_FNS_BY_MODEL_KIND[model_kind])

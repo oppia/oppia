@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core.tests import test_utils as core_test_utils
 
 from apache_beam.runners.direct import direct_runner
@@ -28,6 +30,11 @@ from apache_beam.testing import util as beam_testing_util
 
 class BeamTestBase(core_test_utils.TestBase):
     """Base class that sets up a testing pipeline for subclasses to use."""
+
+    # Helpful constants used to create models for testing.
+    NOW = datetime.datetime.utcnow()
+    YEAR_AGO = NOW - datetime.timedelta(weeks=52)
+    YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
     def __init__(self, *args, **kwargs):
         super(BeamTestBase, self).__init__(*args, **kwargs)

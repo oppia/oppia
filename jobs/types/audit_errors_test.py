@@ -29,8 +29,7 @@ from jobs import utils
 from jobs.types import audit_errors
 import python_utils
 
-base_models, user_models = (
-    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
+base_models, = models.Registry.import_models([models.NAMES.base_model])
 
 
 class FooError(audit_errors.BaseAuditError):
@@ -49,7 +48,7 @@ class BarError(audit_errors.BaseAuditError):
         self.message = 'bar'
 
 
-class ModelValidatorErrorTestBase(core_test_utils.TestBase):
+class AuditErrorsTestBase(core_test_utils.TestBase):
     """Base class for validator error tests."""
 
     NOW = datetime.datetime.utcnow()
@@ -57,7 +56,7 @@ class ModelValidatorErrorTestBase(core_test_utils.TestBase):
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
 
-class BaseAuditErrorTests(ModelValidatorErrorTestBase):
+class BaseAuditErrorTests(AuditErrorsTestBase):
 
     def setUp(self):
         super(BaseAuditErrorTests, self).setUp()
@@ -177,7 +176,7 @@ class BaseAuditErrorTests(ModelValidatorErrorTestBase):
         self.assertNotEqual(unpickled_foo_error, unpickled_bar_error)
 
 
-class InconsistentTimestampsErrorTests(ModelValidatorErrorTestBase):
+class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
@@ -192,7 +191,7 @@ class InconsistentTimestampsErrorTests(ModelValidatorErrorTestBase):
             'is later than last_updated=%r' % (self.NOW, self.YEAR_AGO))
 
 
-class InvalidCommitStatusErrorTests(ModelValidatorErrorTestBase):
+class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
 
     def test_message_for_private_post_commit_status(self):
         model = base_models.BaseCommitLogEntryModel(
@@ -229,7 +228,7 @@ class InvalidCommitStatusErrorTests(ModelValidatorErrorTestBase):
             'post_commit_status="public" but post_commit_is_private=True')
 
 
-class ModelMutatedDuringJobErrorTests(ModelValidatorErrorTestBase):
+class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
@@ -245,22 +244,22 @@ class ModelMutatedDuringJobErrorTests(ModelValidatorErrorTestBase):
                 model.last_updated))
 
 
-class InvalidBaseModelIdErrorTests(ModelValidatorErrorTestBase):
+class ModelIdRegexErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
             id='?!"',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW)
-        error = audit_errors.InvalidBaseModelIdError(model)
+        error = audit_errors.ModelIdRegexError(model, '[abc]{3}')
 
         self.assertEqual(
             error.message,
-            r'InvalidBaseModelIdError in BaseModel(id="?!\""): id does not '
-            r'match the expected regex="^[A-Za-z0-9-_]{1,12}$"')
+            r'ModelIdRegexError in BaseModel(id="?!\""): id does not '
+            r'match the expected regex="[abc]{3}"')
 
 
-class ModelExpiredErrorTests(ModelValidatorErrorTestBase):
+class ModelExpiredErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(

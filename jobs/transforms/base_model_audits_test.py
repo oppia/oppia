@@ -19,30 +19,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from core.platform import models
+from jobs import test_utils
 from jobs.transforms import base_model_audits
 from jobs.types import audit_errors
-from jobs import test_utils
 
 import apache_beam as beam
 
-base_models, user_models = (
-    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
-
-datastore_services = models.Registry.import_datastore_services()
+base_models, = models.Registry.import_models([models.NAMES.base_model])
 
 
-class BaseModelAuditsTestBase(test_utils.BeamTestBase):
-    """Test base for base_model_audits jobs with helpful constants."""
-
-    NOW = datetime.datetime.utcnow()
-    YEAR_AGO = NOW - datetime.timedelta(weeks=52)
-    YEAR_LATER = NOW + datetime.timedelta(weeks=52)
-
-
-class ValidateDeletedTests(BaseModelAuditsTestBase):
+class ValidateDeletedTests(test_utils.BeamTestBase):
 
     def test_process_reports_error_for_old_deleted_model(self):
         expired_model = base_models.BaseModel(
@@ -62,7 +49,7 @@ class ValidateDeletedTests(BaseModelAuditsTestBase):
         ])
 
 
-class ValidateModelTimeFieldTests(BaseModelAuditsTestBase):
+class ValidateModelTimeFieldTests(test_utils.BeamTestBase):
 
     def test_process_reports_model_timestamp_relationship_error(self):
         invalid_timestamp = base_models.BaseModel(
@@ -97,7 +84,7 @@ class ValidateModelTimeFieldTests(BaseModelAuditsTestBase):
         ])
 
 
-class ValidateModelIdTests(BaseModelAuditsTestBase):
+class ValidateModelIdTests(test_utils.BeamTestBase):
 
     def test_validate_model_id(self):
         invalid_id_model = base_models.BaseModel(
@@ -112,11 +99,13 @@ class ValidateModelIdTests(BaseModelAuditsTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InvalidBaseModelIdError(invalid_id_model),
+            audit_errors.ModelIdRegexError(
+                invalid_id_model,
+                base_model_audits.ValidateBaseModelId.MODEL_ID_REGEX.pattern),
         ])
 
 
-class ValidatePostCommitIsPrivateTests(BaseModelAuditsTestBase):
+class ValidatePostCommitIsPrivateTests(test_utils.BeamTestBase):
 
     def test_validate_post_commit_is_private_when_status_is_public(self):
         invalid_commit_status = base_models.BaseCommitLogEntryModel(

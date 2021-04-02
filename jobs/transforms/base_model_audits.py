@@ -29,6 +29,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import re
 
 from core.platform import models
 import feconf
@@ -38,8 +39,7 @@ from jobs.types.decorators import audit_decorators
 
 import apache_beam as beam
 
-base_models, user_models = (
-    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
+base_models, = models.Registry.import_models([models.NAMES.base_model])
 
 
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
@@ -76,8 +76,11 @@ class ValidateBaseModelId(beam.DoFn):
     """DoFn to validate model ids.
 
     Models with special ID checks should derive from this class and override the
-    process() method, then decorate it to target the appropriate model.
+    MODEL_ID_REGEX attribute or the entire process() method, then decorate it to
+    target the appropriate model(s).
     """
+
+    MODEL_ID_REGEX = re.compile('^[A-Za-z0-9-_]{1,%s}$')
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
@@ -85,15 +88,15 @@ class ValidateBaseModelId(beam.DoFn):
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
-            regex_string: str. Regex pattern for valid ids to match.
 
         Yields:
-            InvalidBaseModelIdError. An error class for models with invalid IDs.
+            ModelIdRegexError. An error class for models with invalid IDs.
         """
         model = utils.clone_model(input_model)
+        regex = self.MODEL_ID_REGEX
 
-        if not audit_errors.BASE_MODEL_ID_REGEX.match(model.id):
-            yield audit_errors.InvalidBaseModelIdError(model)
+        if not regex.match(model.id):
+            yield audit_errors.ModelIdRegexError(model, regex.pattern)
 
 
 @audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)

@@ -22,14 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 import feconf
 import python_utils
-import re
-
-from core.platform import models
-
-base_models, = models.Registry.import_models([models.NAMES.base_model])
-
-BASE_MODEL_ID_REGEX = (
-    re.compile('^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH))
 
 
 class BaseAuditError(python_utils.OBJECT):
@@ -140,12 +132,12 @@ class ModelMutatedDuringJobError(BaseAuditError):
                 model.last_updated))
 
 
-class InvalidBaseModelIdError(BaseAuditError):
-    """Error class for models with invalid ids."""
+class ModelIdRegexError(BaseAuditError):
+    """Error class for models with ids that fail to match a regex pattern."""
 
-    def __init__(self, model):
-        super(InvalidBaseModelIdError, self).__init__(model)
-        quoted_regex = json.dumps(BASE_MODEL_ID_REGEX.pattern)
+    def __init__(self, model, regex_string):
+        super(ModelIdRegexError, self).__init__(model)
+        quoted_regex = json.dumps(regex_string)
         self.message = 'id does not match the expected regex=%s' % quoted_regex
 
 
