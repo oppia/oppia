@@ -299,6 +299,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
@@ -475,6 +476,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ImageClickInputValidationService', ImageClickInputValidationService],
   ['ImagePreloaderService', ImagePreloaderService],
   ['ImageUploadHelperService', ImageUploadHelperService],
+  ['ImageLocalStorageService', ImageLocalStorageService],
   ['ImprovementsService', ImprovementsService],
   ['InteractionAttributesExtractorService',
     InteractionAttributesExtractorService],
