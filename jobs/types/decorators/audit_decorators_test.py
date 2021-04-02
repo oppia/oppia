@@ -41,12 +41,12 @@ class AuditsExisting(audit_decorators.AuditsExisting):
 
     @classmethod
     def clear(cls):
-        """Test-only helper method for clearning the decorator."""
+        """Test-only helper method for clearing the decorator."""
         cls._DO_FNS_BY_MODEL_KIND.clear()
 
     @classmethod
     def get_all(cls):
-        """Test-only helper method for getting the entire dict of DoFns.
+        """Test-only helper method for getting all registered DoFns.
 
         Returns:
             dict(str: set(DoFn)). The full mapping of DoFn assignments.
@@ -55,6 +55,14 @@ class AuditsExisting(audit_decorators.AuditsExisting):
 
 
 class DoFn(beam.DoFn):
+    """Simple DoFn that does nothing."""
+
+    def process(self, unused_item):
+        """Does nothing."""
+        pass
+
+
+class UnrelatedDoFn(beam.DoFn):
     """Simple DoFn that does nothing."""
 
     def process(self, unused_item):
@@ -91,8 +99,7 @@ class AuditsExistingTests(core_test_utils.TestBase):
         AuditsExisting.clear()
 
     def test_has_no_do_fns_by_default(self):
-        self.assertEqual(
-            AuditsExisting.get_do_fns_for_model_kind('BaseModel'), [])
+        self.assertEqual(AuditsExisting.get_all(), {})
 
     def test_raises_value_error_when_given_no_args(self):
         self.assertRaisesRegexp(
@@ -109,7 +116,7 @@ class AuditsExistingTests(core_test_utils.TestBase):
             TypeError, '%r is not a subclass of DoFn' % NotDoFn,
             lambda: AuditsExisting(base_models.BaseModel)(NotDoFn))
 
-    def test_targets_every_model_when_base_model_is_used(self):
+    def test_targets_every_subclass_when_a_base_model_is_targeted(self):
         self.assertIs(AuditsExisting(base_models.BaseModel)(DoFn), DoFn)
 
         self.assertItemsEqual(AuditsExisting.get_all().items(), [
@@ -117,37 +124,43 @@ class AuditsExistingTests(core_test_utils.TestBase):
                 models.Registry.get_all_storage_model_classes())
         ])
 
-    def test_overrides_base_do_fn_when_derived_do_fn_is_added_later(self):
+    def test_replaces_base_do_fn_when_derived_do_fn_is_added_later(self):
         AuditsExisting(base_models.BaseModel)(DoFn)
+        AuditsExisting(base_models.BaseModel)(UnrelatedDoFn)
         self.assertItemsEqual(
-            AuditsExisting.get_do_fns_for_model_kind('BaseModel'), [DoFn])
+            AuditsExisting.get_do_fns_for_model_kind('BaseModel'),
+            [DoFn, UnrelatedDoFn])
         self.assertItemsEqual(
             AuditsExisting.get_do_fns_for_model_kind('ExplorationModel'),
+            [DoFn, UnrelatedDoFn])
+
+        AuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
+        self.assertItemsEqual(
+            AuditsExisting.get_do_fns_for_model_kind('BaseModel'),
+            [DoFn, UnrelatedDoFn])
+        self.assertItemsEqual(
+            AuditsExisting.get_do_fns_for_model_kind('ExplorationModel'),
+            [DerivedDoFn, UnrelatedDoFn])
+
+    def test_keeps_derived_do_fn_when_base_do_fn_is_added_later(self):
+        AuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
+        AuditsExisting(exp_models.ExplorationModel)(UnrelatedDoFn)
+        self.assertItemsEqual(
+            AuditsExisting.get_do_fns_for_model_kind('BaseModel'),
+            [])
+        self.assertItemsEqual(
+            AuditsExisting.get_do_fns_for_model_kind('ExplorationModel'),
+            [DerivedDoFn, UnrelatedDoFn])
+
+        AuditsExisting(base_models.BaseModel)(DoFn)
+        self.assertItemsEqual(
+            AuditsExisting.get_do_fns_for_model_kind('BaseModel'),
             [DoFn])
-
-        AuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
-        self.assertItemsEqual(
-            AuditsExisting.get_do_fns_for_model_kind('BaseModel'), [DoFn])
         self.assertItemsEqual(
             AuditsExisting.get_do_fns_for_model_kind('ExplorationModel'),
-            [DerivedDoFn])
+            [DerivedDoFn, UnrelatedDoFn])
 
-    def test_derived_do_fn_is_not_overwritten_by_base_do_fn(self):
-        AuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
-        self.assertItemsEqual(
-            AuditsExisting.get_do_fns_for_model_kind('BaseModel'), [])
-        self.assertItemsEqual(
-            AuditsExisting.get_do_fns_for_model_kind('ExplorationModel'),
-            [DerivedDoFn])
-
-        AuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(
-            AuditsExisting.get_do_fns_for_model_kind('BaseModel'), [DoFn])
-        self.assertItemsEqual(
-            AuditsExisting.get_do_fns_for_model_kind('ExplorationModel'),
-            [DerivedDoFn])
-
-    def test_using_do_fn_twice_does_not_register_duplicate(self):
+    def test_does_not_register_duplicate_do_fns(self):
         AuditsExisting(base_models.BaseModel)(DoFn)
         self.assertItemsEqual(
             AuditsExisting.get_do_fns_for_model_kind('BaseModel'), [DoFn])
