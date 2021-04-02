@@ -37,15 +37,6 @@ angular.module('oppia').component('pieChart', {
       var options = ctrl.options();
       var chart = null;
 
-      // Need to wait for load statement in editor template to finish.
-      // https://stackoverflow.com/questions/42714876/
-      google.charts.setOnLoadCallback(function() {
-        if (!chart) {
-          chart = new google.visualization.PieChart($element[0]);
-          redrawChart();
-          $scope.$applyAsync();
-        }
-      });
       var redrawChart = function() {
         if (chart !== null) {
           chart.draw(google.visualization.arrayToDataTable(ctrl.data()), {
@@ -69,6 +60,16 @@ angular.module('oppia').component('pieChart', {
           });
         }
       };
+
+      // Need to wait for load statement in editor template to finish.
+      // https://stackoverflow.com/questions/42714876/
+      google.charts.setOnLoadCallback(function() {
+        if (!chart) {
+          chart = new google.visualization.PieChart($element[0]);
+          redrawChart();
+          $scope.$applyAsync();
+        }
+      });
 
       $scope.$watch('data()', redrawChart);
 
