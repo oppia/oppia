@@ -30,7 +30,6 @@ describe('Topics List Component', () => {
   let componentInstance: TopicsListComponent;
   let urlInterpolationService: UrlInterpolationService;
   let alertsService: AlertsService;
-  let emitted: boolean = false;
 
   class MockNgbModal {
     open(content: object, options?: NgbModalOptions): object {
