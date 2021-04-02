@@ -56,7 +56,7 @@ export class QuestionBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _fetchQuestions(
+  private _fetchQuestionsAsync(
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean,
       successCallback: (value: QuestionBackendDict[]) => void,
@@ -85,7 +85,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchTotalQuestionCountForSkillIds(
+  private _fetchTotalQuestionCountForSkillIdsAsync(
       skillIds: string[],
       successCallback: (value: number) => void,
       errorCallback: (reason: string) => void): void {
@@ -105,7 +105,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchQuestionSummaries(
+  private _fetchQuestionSummariesAsync(
       skillId: string, cursor: string,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
@@ -185,16 +185,15 @@ export class QuestionBackendApiService {
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestions(
+      this._fetchQuestionsAsync(
         skillIds, questionCount, questionsSortedByDifficulty,
         resolve, reject);
     });
   }
 
-  async fetchTotalQuestionCountForSkillIdsAsync(
-      skillIds: string[]): Promise<number> {
+  fetchTotalQuestionCountForSkillIdsAsync(skillIds: string[]): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._fetchTotalQuestionCountForSkillIds(skillIds, resolve, reject);
+      this._fetchTotalQuestionCountForSkillIdsAsync(skillIds, resolve, reject);
     });
   }
 
@@ -202,7 +201,7 @@ export class QuestionBackendApiService {
       skillId: string,
       cursor: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestionSummaries(skillId, cursor, resolve, reject);
+      this._fetchQuestionSummariesAsync(skillId, cursor, resolve, reject);
     });
   }
 }
