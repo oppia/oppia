@@ -35,10 +35,14 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicsListComponent,
+    DeleteTopicModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicsListComponent,
+    DeleteTopicModalComponent
   ],
   providers: [
     {
@@ -54,13 +58,15 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     }
   ]
 })
-class TopicsAndSkillsDashboardPageModule {
+export class TopicsAndSkillsDashboardPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+  ngDoBootstrap(): void {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { TopicsListComponent } from './topics-list/topics-list.component';
+import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
