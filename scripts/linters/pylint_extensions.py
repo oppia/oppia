@@ -619,6 +619,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
             self.add_message('newline-below-class-docstring', node=node)
         elif second_line_after_doc == b'':
             self.add_message('newline-below-class-docstring', node=node)
+        self.check_docstring_structure(node)
 
     def visit_classdef(self, node):
         """Visit each class definition and check if there is a
