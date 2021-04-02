@@ -182,7 +182,7 @@ describe('EndExplorationValidationService', function() {
     });
   });
 
-  describe('Testing if conditions', function() {
+  describe('Data should not be fetched from backend ', function() {
     const explorationIds = ['0', '1'];
 
     beforeEach(angular.mock.module('oppia', function($provide) {
