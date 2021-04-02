@@ -1187,9 +1187,9 @@ describe('Admin backend api service', () => {
   it('should grant super admin privileges to user', fakeAsync(() => {
     abas.grantSuperAdminPrivilegesAsync('abc')
       .then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/admingrantsuperadminhandler?username=abc');
-    expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne('/adminsuperadminhandler');
+    expect(req.request.body).toEqual({username: 'abc'});
+    expect(req.request.method).toEqual('PUT');
     req.flush(200);
     flushMicrotasks();
 
@@ -1202,8 +1202,8 @@ describe('Admin backend api service', () => {
     abas.revokeSuperAdminPrivilegesAsync('abc')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/adminrevokesuperadminhandler?username=abc');
-    expect(req.request.method).toEqual('GET');
+      '/adminsuperadminhandler?username=abc');
+    expect(req.request.method).toEqual('DELETE');
     req.flush(200);
     flushMicrotasks();
 

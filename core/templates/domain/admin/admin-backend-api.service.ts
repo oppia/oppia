@@ -489,17 +489,15 @@ export class AdminBackendApiService {
   }
 
   async grantSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http.get<void>(
-      AdminPageConstants.ADMIN_GRANT_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
-        params: {username: username},
-      }
+    return this.http.put<void>(
+      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {username}
     ).toPromise();
   }
 
   async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http.get<void>(
-      AdminPageConstants.ADMIN_REVOKE_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
-        params: {username: username},
+    return this.http['delete']<void>(
+      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
+        params: {username},
       }
     ).toPromise();
   }

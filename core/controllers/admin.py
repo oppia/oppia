@@ -730,18 +730,19 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
+class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
     """Handler for granting a user super admin privileges."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def put(self):
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
 
-        username = self.request.get('username', None)
+        username = self.payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
 
@@ -752,14 +753,8 @@ class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
         auth_services.grant_super_admin_privileges(user_id)
         self.render_json(self.values)
 
-
-class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
-    """Handler for revoking a user's super admin privileges."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def delete(self):
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')

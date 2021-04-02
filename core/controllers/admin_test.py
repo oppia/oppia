@@ -1042,9 +1042,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             firebase_auth_services, 'grant_super_admin_privileges')
 
         with grant_super_admin_privileges_stub as call_counter:
-            response = self.get_json(
-                '/admingrantsuperadminhandler',
-                params={'username': self.ADMIN_USERNAME},
+            response = self.put_json(
+                '/adminsuperadminhandler',
+                {'username': self.ADMIN_USERNAME},
+                csrf_token=self.get_new_csrf_token(),
                 expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -1057,9 +1058,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             firebase_auth_services, 'grant_super_admin_privileges')
 
         with grant_super_admin_privileges_stub as call_counter:
-            response = self.get_json(
-                '/admingrantsuperadminhandler',
-                params={'username': self.ADMIN_USERNAME},
+            response = self.put_json(
+                '/adminsuperadminhandler',
+                {'username': self.ADMIN_USERNAME},
+                csrf_token=self.get_new_csrf_token(),
                 expected_status_int=401)
 
         self.assertEqual(call_counter.times_called, 0)
@@ -1070,17 +1072,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges_fails_without_username(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        response = self.get_json(
-            '/admingrantsuperadminhandler', params={}, expected_status_int=400)
+        response = self.put_json(
+            '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
+            expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')
 
     def test_grant_super_admin_privileges_fails_with_invalid_username(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        response = self.get_json(
-            '/admingrantsuperadminhandler', params={'username': 'fakeusername'},
-            expected_status_int=400)
+        response = self.put_json(
+            '/adminsuperadminhandler', {'username': 'fakeusername'},
+            csrf_token=self.get_new_csrf_token(), expected_status_int=400)
 
         self.assertEqual(response['error'], 'No such user exists')
 
@@ -1091,8 +1094,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             firebase_auth_services, 'revoke_super_admin_privileges')
 
         with revoke_super_admin_privileges_stub as call_counter:
-            response = self.get_json(
-                '/adminrevokesuperadminhandler',
+            response = self.delete_json(
+                '/adminsuperadminhandler',
                 params={'username': self.ADMIN_USERNAME},
                 expected_status_int=200)
 
@@ -1106,8 +1109,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             firebase_auth_services, 'revoke_super_admin_privileges')
 
         with revoke_super_admin_privileges_stub as call_counter:
-            response = self.get_json(
-                '/adminrevokesuperadminhandler',
+            response = self.delete_json(
+                '/adminsuperadminhandler',
                 params={'username': self.ADMIN_USERNAME},
                 expected_status_int=401)
 
@@ -1119,16 +1122,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_without_username(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        response = self.get_json(
-            '/adminrevokesuperadminhandler', params={}, expected_status_int=400)
+        response = self.delete_json(
+            '/adminsuperadminhandler', params={}, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')
 
     def test_revoke_super_admin_privileges_fails_with_invalid_username(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        response = self.get_json(
-            '/adminrevokesuperadminhandler',
+        response = self.delete_json(
+            '/adminsuperadminhandler',
             params={'username': 'fakeusername'}, expected_status_int=400)
 
         self.assertEqual(response['error'], 'No such user exists')
@@ -1136,8 +1139,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_for_default_admin(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        response = self.get_json(
-            '/adminrevokesuperadminhandler', params={'username': 'testsuper'},
+        response = self.delete_json(
+            '/adminsuperadminhandler', params={'username': 'testsuper'},
             expected_status_int=400)
 
         self.assertEqual(
