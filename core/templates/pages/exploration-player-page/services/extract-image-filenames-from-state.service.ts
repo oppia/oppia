@@ -62,6 +62,9 @@ export class ExtractImageFilenamesFromStateService {
     _getStateContentHtml(state: State): string {
       let languageCode = (
         this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      console.log("[extra-image-filenames-from-state]");
+      console.log("Getting translated HTML from:");
+      console.log(state.content);
       return this.contentTranslationManagerService.getTranslatedHtml(
         state.writtenTranslations, languageCode, state.content);
     }
@@ -155,9 +158,9 @@ export class ExtractImageFilenamesFromStateService {
         _allHtmlInTheState.push(customizationArgsHtml);
       }
 
-      _allHtmlInTheState.push(this._getOutcomesHtml(state));
+      // _allHtmlInTheState.push(this._getOutcomesHtml(state));
 
-      _allHtmlInTheState.push(this._getHintsHtml(state));
+      // _allHtmlInTheState.push(this._getHintsHtml(state));
 
       if (state.interaction.solution !== null) {
         _allHtmlInTheState.push(this._getSolutionHtml(state));
@@ -173,6 +176,8 @@ export class ExtractImageFilenamesFromStateService {
      */
     _extractFilepathValueFromOppiaNonInteractiveImageTag(
         htmlString: string): string[] {
+      console.log("[extra-image-filenames-from-state]");
+      console.log("Extracting filepaths from HTML string");
       let filenames = [];
       let unescapedHtmlString = (
         this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
@@ -234,6 +239,9 @@ export class ExtractImageFilenamesFromStateService {
         filenamesInState.push(filename);
       }
       let allHtmlOfState = this._getAllHtmlOfState(state);
+      console.log("[extract-image-filenames-from-state]");
+      console.log("Got entire HTML of state:");
+      console.log(allHtmlOfState[0]);
       allHtmlOfState.forEach((htmlStr) => {
         filenamesInState = filenamesInState.concat(
           this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));

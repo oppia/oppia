@@ -46,8 +46,11 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.$onInit = function() {
+          console.log("[oppia-noninteractive-image]");
+          console.log($attrs.filepathWithValue);
           ctrl.filepath = HtmlEscaperService.escapedJsonToObj(
             $attrs.filepathWithValue);
+          console.log(ctrl.filepath);
           ctrl.imageUrl = '';
           ctrl.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
             LOADING_INDICATOR_URL);

@@ -81,6 +81,8 @@ export class ImagePreloaderService {
    *                                   preloader should start.
    */
   kickOffImagePreloader(sourceStateName: string): void {
+    console.log("[image-preloader]");
+    console.log("Kicking off image preloader");
     this.filenamesOfImageToBeDownloaded = (
       this.getImageFilenamesInBfsOrder(sourceStateName));
     const imageFilesInGivenState = (
@@ -96,6 +98,7 @@ export class ImagePreloaderService {
       this.filenamesOfImageCurrentlyDownloading.push(imageFilename);
       this.loadImage(imageFilename);
     }
+    console.log("Done with image preloader");
   }
 
   /**

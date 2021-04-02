@@ -36,10 +36,14 @@ angular.module('oppia').directive('oppiaNoninteractiveCollapsible', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.$onInit = function() {
+          console.log("[oppia-noninteractive-collapsible]");
           ctrl.heading = HtmlEscaperService.escapedJsonToObj(
             $attrs.headingWithValue);
+          console.log(ctrl.heading);
+          console.log("[oppia-noninteractive-collapsible]");
           ctrl.content = HtmlEscaperService.escapedJsonToObj(
             $attrs.contentWithValue);
+          console.log(ctrl.content);
         };
       }]
     };
