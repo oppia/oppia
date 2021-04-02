@@ -1097,6 +1097,39 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
+    def swap_with_call_counter(
+            self, obj, attr, raises=None, returns=None, call_through=False):
+        """Swap obj.attr with a CallCounter instance.
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            raises: Exception|None. The exception raised by the swapped
+                function. If None, then no exception is raised.
+            returns: *. The return value of the swapped function.
+            call_through: bool. Whether to call through to the real function,
+                rather than use a stub implementation. If True, the `raises` and
+                `returns` arguments will be ignored.
+
+        Yields:
+            CallCounter. A CallCounter instance that's installed as obj.attr's
+            implementation while within the context manager returned.
+        """
+        if call_through:
+            impl = obj.attr
+        else:
+            def impl(*_, **__):
+                """Behaves according to the given values."""
+                if raises is not None:
+                    # Pylint thinks we're trying to raise `None` even though
+                    # we've explicitly checked for it above.
+                    raise raises # pylint: disable=raising-bad-type
+                return returns
+        call_counter = CallCounter(impl)
+        with self.swap(obj, attr, call_counter):
+            yield call_counter
+
+    @contextlib.contextmanager
     def swap_with_checks(
             self, obj, attr, new_value, expected_args=None,
             expected_kwargs=None, called=True):
@@ -1308,6 +1341,8 @@ class AppEngineTestBase(TestBase):
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
     def tearDown(self):
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
         super(AppEngineTestBase, self).tearDown()
 
@@ -1464,7 +1499,7 @@ class GenericTestBase(AppEngineTestBase):
     TODO(#12135): Split this enormous test base into smaller, focused pieces.
     """
 
-    # NOTE: For tests that do not/can not use the default super-admin, authors
+    # NOTE: For tests that do not/can not use the default super admin, authors
     # can override the following class-level constant.
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
 
@@ -1820,11 +1855,6 @@ title: Title
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
-
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        super(GenericTestBase, self).tearDown()
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.

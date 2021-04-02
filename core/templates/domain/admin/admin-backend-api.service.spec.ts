@@ -1184,6 +1184,34 @@ describe('Admin backend api service', () => {
   }
   ));
 
+  it('should grant super admin privileges to user', fakeAsync(() => {
+    abas.grantSuperAdminPrivilegesAsync('abc')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/adminsuperadminhandler');
+    expect(req.request.body).toEqual({username: 'abc'});
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should revoke super admin privileges to user', fakeAsync(() => {
+    abas.revokeSuperAdminPrivilegesAsync('abc')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/adminsuperadminhandler?username=abc');
+    expect(req.request.method).toEqual('DELETE');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
   it('should fail to get the data of number of pending deleter requests' +
   'when calling getNumberOfPendingDeletionRequestAsync', fakeAsync(() => {
     abas.getNumberOfPendingDeletionRequestAsync()

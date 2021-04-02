@@ -186,6 +186,28 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+- url: /login
+  static_files: webpack_bundles/login-page.mainpage.html
+  upload: webpack_bundles/login-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /logout
+  static_files: webpack_bundles/logout-page.mainpage.html
+  upload: webpack_bundles/logout-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
 - url: /creator-guidelines
   static_files: webpack_bundles/playbook.mainpage.html
   upload: webpack_bundles/playbook.mainpage.html
@@ -273,6 +295,10 @@ env_variables:
 # redirects to these instructions to disable URL fetch:
 # https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
   GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
+# FIREBASE_AUTH_EMULATOR_HOST is needed to allow the Firebase SDK to connect
+# with the Firebase emulator. THIS MUST NOT BE DEPLOYED TO PRODUCTION. We
+# protect against this in the build script.
+  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
 
 skip_files:
 # .pyc and .pyo files

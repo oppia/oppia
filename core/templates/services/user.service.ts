@@ -41,21 +41,14 @@ export class UserService {
     private returnUrl = '';
 
     async getUserInfoAsync(): Promise<UserInfo> {
-      if (this.urlService.getPathname() === '/signup') {
-        return new Promise((resolve, reject) => {
-          resolve(UserInfo.createDefault());
-        });
+      const pathname = this.urlService.getPathname();
+      if (['/login', '/logout', '/signup'].includes(pathname)) {
+        return UserInfo.createDefault();
       }
-      if (this.userInfo) {
-        return new Promise((resolve, reject) => {
-          resolve(this.userInfo);
-        });
+      if (!this.userInfo) {
+        this.userInfo = await this.userBackendApiService.getUserInfoAsync();
       }
-      return this.userBackendApiService.getUserInfoAsync().then(
-        (userInfo) => {
-          this.userInfo = userInfo;
-          return this.userInfo;
-        });
+      return this.userInfo;
     }
 
     async getProfileImageDataUrlAsync(): Promise<string> {

@@ -269,7 +269,7 @@
         <hr class="oppia-top-right-menu-item-separator">
         <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event);$ctrl.onLogoutButtonClicked()" ng-href="<[$ctrl.logoutUrl]>"
-             class="dropdown-item nav-link"
+             class="dropdown-item nav-link protractor-test-logout-link"
              ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {tab: $ctrl.ACTION_CLOSE})">
             <span translate="I18N_TOPNAV_LOGOUT"></span>
           </a>

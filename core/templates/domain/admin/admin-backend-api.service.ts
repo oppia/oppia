@@ -488,6 +488,20 @@ export class AdminBackendApiService {
     });
   }
 
+  async grantSuperAdminPrivilegesAsync(username: string): Promise<void> {
+    return this.http.put<void>(
+      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {username}
+    ).toPromise();
+  }
+
+  async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
+    return this.http['delete']<void>(
+      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
+        params: {username},
+      }
+    ).toPromise();
+  }
+
   async getModelsRelatedToUserAsync(userId: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.http.get<ModelsRelatedToUserBackendResponse>(

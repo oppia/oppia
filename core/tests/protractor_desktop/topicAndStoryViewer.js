@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the story viewer.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -163,8 +164,14 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
 
-    await topicAndStoryViewerPage.login(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer');
+    // Signing up with the login button should redirect the user back to the
+    // exploration.
+    const loginButton = element(by.css('.protractor-test-login-button'));
+    await action.click('Login button', loginButton);
+    const useManualNavigation = false;
+    await users.createAndLoginUser(
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', useManualNavigation);
+
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');

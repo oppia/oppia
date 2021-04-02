@@ -925,6 +925,7 @@ def managed_firebase_auth_emulator():
     emulator_args = [
         FIREBASE_PATH, 'emulators:start', '--only', 'auth',
         '--project', feconf.OPPIA_PROJECT_ID,
+        '--config', feconf.FIREBASE_EMULATOR_CONFIG_PATH,
     ]
     with contextlib2.ExitStack() as stack:
         # OK to use shell=True here because we are passing string literals and
