@@ -159,13 +159,14 @@ var publishExploration = async function() {
     'prePublicationButtonElem taking too long to disappear while publishing');
   var testConfirmPublish = element(by.css('.protractor-test-confirm-publish'));
   await action.click('Test Confirm Publish', testConfirmPublish);
-
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
   var closePublishModalButton = element(
     by.css('.protractor-test-share-publish-close'));
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
+  await waitFor.elementToBeClickable(
+    closePublishModalButton, 'Close Publish Modal button is not clickable');
   await action.click('Close Publish Modal Button', closePublishModalButton);
 };
 
@@ -319,6 +320,9 @@ var getImageSource = async function(customImageElement) {
 
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
+  await waitFor.visibilityOf(
+    imageClickableElement,
+    'Image element is taking too long to appear.');
   await action.click('Image Clickable Element', imageClickableElement);
 
   if (resetExistingImage) {
@@ -332,12 +336,14 @@ var uploadImage = async function(
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  // Return await imageUploadInput.sendKeys(absPath);
   return await action.sendKeys(imageUploadInput, absPath);
 };
 
 var submitImage = async function(
     imageClickableElement, imageContainer, imgPath, resetExistingImage) {
+  await waitFor.visibilityOf(
+    imageClickableElement,
+    'Image element is taking too long to appear.');
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
