@@ -99,6 +99,9 @@ export class ContentTranslationManagerService {
   ): string {
     const writtenTranslation = writtenTranslations.translationsMapping[
       content.contentId][languageCode];
+    if (!writtenTranslation) {
+      return content.html;
+    }
     const translationText = writtenTranslation.getTranslation();
 
     // The isString() check is needed for the TypeScript compiler to narrow the

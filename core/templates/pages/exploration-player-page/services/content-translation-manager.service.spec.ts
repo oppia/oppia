@@ -320,6 +320,24 @@ describe('Content translation manager service', () => {
     expect(translatedHtml).toEqual('<p>en content</p>');
   });
 
+  it('should return default content HTML if translation is nonexistent', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, 'pt', content);
+    expect(translatedHtml).toEqual('<p>en content</p>');
+  });
+
   it('should return valid translated content HTML', () => {
     let writtenTranslations = wtof.createFromBackendDict({
       translations_mapping: {
