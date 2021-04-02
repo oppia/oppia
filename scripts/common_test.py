@@ -918,7 +918,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_kill_signal: bool. Whether the manager
                 should have sent a kill signal to the process.
         """
-        proc_pattern = r'Process\((name=\'[a-z]+\', )?pid=%d\)' % (pid,)
+        proc_pattern = r'Process\((name=\'[A-Za-z]+\', )?pid=%d\)' % (pid,)
 
         expected_patterns = []
         if manager_should_have_sent_terminate_signal:
