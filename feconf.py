@@ -228,6 +228,9 @@ CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
 # The current version of the app feedback report daily stats blob schema.
 CURRENT_REPORT_STATS_SCHEMA_VERSION = 1
 
+# The minimum version of the app feedback report daily stats blob schema.
+MIN_REPORT_STATS_SCHEMA_VERSION = 1
+
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
 # this version number must be changed.

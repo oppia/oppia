@@ -40,7 +40,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform].[submission_timestamp_in_sec_int].[random_hash]
+        # Valid id: [platform].[submission_timestamp_in_isoformat].[random_hash]
         regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
             item.platform, item.submitted_on.isoformat(), base_models.ID_LENGTH)
         return regex_string
@@ -93,14 +93,14 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                     ' current version %s' % (
                         item.id, item.web_report_info_schema_version,
                         feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
-            elif item.android_report_info_schema_version < (
+            elif item.web_report_info_schema_version < (
                     feconf.MIN_WEB_REPORT_SCHEMA_VERSION):
                     cls._add_error(
                         'report schema %s' % (
                             base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                        'Entity id %s: web report schema version %s is greater '
-                        'than current version %s' % (
-                            item.id, item.android_report_info_schema_version,
+                        'Entity id %s: web report schema version %s is less '
+                        'than the minimum version %s' % (
+                            item.id, item.web_report_info_schema_version,
                             feconf.MIN_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
@@ -202,10 +202,12 @@ class AppFeedbackReportTicketModelValidator(
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id:
-        #   [ticket_creation_datetime_in_sec]:[hash(ticket_name)]:[random hash]
+        # [ticket_creation_datetime_isoformat]:[hash(ticket_name)]:[random hash]
+        # We can only validate the timestamp is an expected string since the
+        # id generation timestamp and the entity creation timestamp may differ.
         regex_string = (
-            '^%s\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
-                item.created_on.isoformat(), base_models.ID_LENGTH,
+            '^[T0-9-:.]{1,%s}\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
+                len(item.created_on.isoformat()), base_models.ID_LENGTH,
                 base_models.ID_LENGTH))
         return regex_string
 
@@ -322,15 +324,24 @@ class AppFeedbackReportStatsModelValidator(
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
-        if item.daily_ticket_stats_schema_version > (
+        if item.daily_param_stats_schema_version > (
                 feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                 'Entity id %s: daily stats schema version %s is greater than '
                 'current version %s' % (
-                    item.id, item.daily_ticket_stats_schema_version,
+                    item.id, item.daily_param_stats_schema_version,
                     feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION))
+        elif item.daily_param_stats_schema_version < (
+                feconf.MIN_REPORT_STATS_SCHEMA_VERSION):
+            cls._add_error(
+                'report stats schema %s' % (
+                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                'Entity id %s: daily stats schema version %s is less than the '
+                'minimum version %s' % (
+                    item.id, item.daily_param_stats_schema_version,
+                    feconf.MIN_REPORT_STATS_SCHEMA_VERSION))
 
     @classmethod
     def _validate_stats_tracking_date(cls, item):

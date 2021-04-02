@@ -117,7 +117,8 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.put()
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id=self.TICKET_ID, ticket_name='example ticket',
-            github_issue_number=None, archived=False,
+            github_issue_repo_name=None, github_issue_number=None,
+            archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
             report_ids=[self.report_id]).put()
 
@@ -191,6 +192,27 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
 
+    def test_model_with_android_schema_version_less_than_current_schema(
+            self):
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.report_id))
+        model_entity.android_report_info_schema_version = 0
+        model_entity.update_timestamps()
+        model_entity.put()
+        output = [
+            (
+                u'[u\'failed validation check for report schema version check '
+                'of AppFeedbackReportModel\', '
+                '[u\'Entity id %s: android report schema version %s is less '
+                'than the minimum version %s\']]') % (
+                    model_entity.id,
+                    model_entity.android_report_info_schema_version,
+                    feconf.MIN_ANDROID_REPORT_SCHEMA_VERSION)]
+
+        self.run_job_and_check_output(
+            output, sort=False, literal_eval=False)
+
     def test_model_with_web_schema_version_greater_than_current_schema(self):
         web_report_id = (
             app_feedback_report_models.AppFeedbackReportModel.create(
@@ -222,6 +244,38 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             ' current version %s\']]') % (
                 web_entity.id, web_entity.web_report_info_schema_version,
                 feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+
+    def test_model_with_web_schema_version_less_than_current_schema(self):
+        web_report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.create(
+                platform=self.PLATFORM_WEB,
+                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+                report_type=self.REPORT_TYPE_SUGGESTION,
+                category=self.CATEGORY_OTHER,
+                platform_version=self.PLATFORM_VERSION,
+                android_device_country_locale_code=None,
+                android_device_model=self.ANDROID_DEVICE_MODEL,
+                android_sdk_version=self.ANDROID_SDK_VERSION,
+                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+                entry_point_topic_id=None, entry_point_story_id=None,
+                entry_point_exploration_id=None, entry_point_subtopic_id=None,
+                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+                android_report_info=None,
+                web_report_info={}))
+        web_entity = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                web_report_id))
+        web_entity.web_report_info_schema_version = 0
+        web_entity.update_timestamps()
+        web_entity.put()
+        self.expected_output.append((
+            u'[u\'failed validation check for report schema version check of '
+            'AppFeedbackReportModel\', '
+            '[u\'Entity id %s: web report schema version %s is less than'
+            ' the minimum version %s\']]') % (
+                web_entity.id, web_entity.web_report_info_schema_version,
+                feconf.MIN_WEB_REPORT_SCHEMA_VERSION))
 
         self.run_job_and_check_output(
             self.expected_output, sort=True, literal_eval=False)
@@ -358,7 +412,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                ticket_name=self.TICKET_NAME,
+                ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
                 github_issue_number=None,
                 newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
                 report_ids=self.REPORT_IDS_LIST))
@@ -396,7 +450,8 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_validation_fails_with_invalid_id(self):
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id='invalid_entity_id', ticket_name=self.TICKET_NAME,
-            github_issue_number=None, archived=False,
+            github_issue_repo_name=None, github_issue_number=None,
+            archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
             report_ids=self.REPORT_IDS_LIST
         ).put()
@@ -482,10 +537,9 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
     STATS_DATE_TIMESTAMP = datetime.date.fromtimestamp(1616173836)
     DAILY_STATS = {
-        'daily_param_stats': {
-            'report_type': {
-                'suggestion': 1, 'issue': 1, 'crash': 1}},
-        'daily_total_report_submitted': 3}
+        'report_type': {
+            'suggestion': 1, 'issue': 1, 'crash': 1}}
+    TOTAL_REPORTS_SUBMITTED = 3
     STATS_ID = '%s:%s:%s' % (
         PLATFORM_ANDROID, TICKET_ID, STATS_DATE_TIMESTAMP.isoformat())
 
@@ -506,11 +560,13 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=self.TICKET_ID,
                 stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                daily_ticket_stats=self.DAILY_STATS
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                daily_param_stats=self.DAILY_STATS
             ))
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id=self.TICKET_ID, ticket_name='example ticket',
-            github_issue_number=None, archived=False,
+            github_issue_repo_name=None, github_issue_number=None,
+            archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
             report_ids=[self.REPORT_ID]).put()
 
@@ -529,8 +585,9 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             ticket_id=self.TICKET_ID,
             platform=self.PLATFORM_ANDROID,
             stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-            daily_ticket_stats=self.DAILY_STATS,
-            daily_ticket_stats_schema_version=(
+            total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+            daily_param_stats=self.DAILY_STATS,
+            daily_param_stats_schema_version=(
                 feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION)
         ).put()
         self.expected_output.append(
@@ -548,7 +605,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 self.entity_id))
-        model_entity.daily_ticket_stats_schema_version = 2
+        model_entity.daily_param_stats_schema_version = 2
         model_entity.update_timestamps()
         model_entity.put()
         output = [
@@ -558,8 +615,29 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u\'Entity id %s: daily stats schema version %s is greater '
                 'than current version %s\']]') % (
                     model_entity.id,
-                    model_entity.daily_ticket_stats_schema_version,
-                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)]
+                    model_entity.daily_param_stats_schema_version,
+                    feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION)]
+
+        self.run_job_and_check_output(
+            output, sort=False, literal_eval=False)
+
+    def test_model_fails_with_stats_schema_version_less_than_current_schema(
+            self):
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                self.entity_id))
+        model_entity.daily_param_stats_schema_version = 0
+        model_entity.update_timestamps()
+        model_entity.put()
+        output = [
+            (
+                u'[u\'failed validation check for report stats schema version '
+                'check of AppFeedbackReportStatsModel\', '
+                '[u\'Entity id %s: daily stats schema version %s is less '
+                'than the minimum version %s\']]') % (
+                    model_entity.id,
+                    model_entity.daily_param_stats_schema_version,
+                    feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
@@ -573,7 +651,8 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=self.TICKET_ID,
                 stats_tracking_date=tracking_datetime.date(),
-                daily_ticket_stats=self.DAILY_STATS))
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                daily_param_stats=self.DAILY_STATS))
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
@@ -597,7 +676,8 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=self.TICKET_ID,
                 stats_tracking_date=tracking_datetime.date(),
-                daily_ticket_stats=self.DAILY_STATS))
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                daily_param_stats=self.DAILY_STATS))
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
@@ -618,7 +698,8 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 platform=self.PLATFORM_ANDROID,
                 ticket_id='invalid_ticket_id',
                 stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                daily_ticket_stats=self.DAILY_STATS))
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                daily_param_stats=self.DAILY_STATS))
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))

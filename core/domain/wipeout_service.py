@@ -1058,7 +1058,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     report_ids = set([model.id for model in feedback_report_models])
 
     # Fill in any missing keys in the category's
-    # pseudonymizable_entity_mappings; using the same pseudonym for each entity
+    # pseudonymizable_entity_mappings, using the same pseudonym for each entity
     # so that a user will have the same pseudonymized ID for each entity
     # referencing them.
     entity_category = models.NAMES.app_feedback_report

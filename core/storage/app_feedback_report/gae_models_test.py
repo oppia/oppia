@@ -243,7 +243,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     def test_create_and_get_ticket_model(self):
         ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                ticket_name=self.TICKET_NAME,
+                ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
                 github_issue_number=None,
                 newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
                 report_ids=self.REPORT_IDS))
@@ -272,7 +272,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     app_feedback_report_models.AppFeedbackReportTicketModel)):
                 app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                    ticket_name=self.TICKET_NAME,
+                    ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
                     github_issue_number=None,
                     newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
                     report_ids=self.REPORT_IDS)
@@ -300,10 +300,9 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
     STATS_DATE_TIMESTAMP = datetime.date.fromtimestamp(1616173836)
     DAILY_STATS = {
-        'daily_param_stats': {
-            'report_type': {
-                'suggestion': 1, 'issue': 1, 'crash': 1}},
-        'daily_total_report_submitted': 3}
+        'report_type': {
+            'suggestion': 1, 'issue': 1, 'crash': 1}}
+    TOTAL_REPORTS_SUBMITTED=3
 
     def test_create_and_get_stats_model(self):
         entity_id = (
@@ -311,7 +310,8 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
                 platform='android',
                 ticket_id=self.TICKET_ID,
                 stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                daily_ticket_stats=self.DAILY_STATS))
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                daily_param_stats=self.DAILY_STATS))
 
         stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get(
@@ -322,7 +322,9 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         self.assertEqual(stats_model.platform, 'android')
         self.assertEqual(
             stats_model.stats_tracking_date, self.STATS_DATE_TIMESTAMP)
-        self.assertEqual(stats_model.daily_ticket_stats, self.DAILY_STATS)
+        self.assertEqual(
+            stats_model.total_reports_submitted, self.TOTAL_REPORTS_SUBMITTED)
+        self.assertEqual(stats_model.daily_param_stats, self.DAILY_STATS)
 
     def test_create_raises_exception_by_mocking_collision(self):
         # Test Exception for AppFeedbackReportStatsModel.
@@ -340,16 +342,18 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
                 app_feedback_report_models.AppFeedbackReportStatsModel.create(
                     platform='android',
                     ticket_id=self.TICKET_ID,
+                    total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
                     stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                    daily_ticket_stats=self.DAILY_STATS)
+                    daily_param_stats=self.DAILY_STATS)
 
     def test_get_stats_for_ticket(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform='android',
                 ticket_id=self.TICKET_ID,
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
                 stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                daily_ticket_stats=self.DAILY_STATS))
+                daily_param_stats=self.DAILY_STATS))
         expected_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get(
                 entity_id))
