@@ -16,56 +16,58 @@
  * @fileoverview Tests for the no-multiline-disable.js file.
  */
 
- 'use strict';
+'use strict';
 
- var rule = require('./space-before-opening-brace');
- var RuleTester = require('eslint').RuleTester;
- 
- var ruleTester = new RuleTester();
- ruleTester.run('space-before-opening-brace', rule, {
-   valid: [
-     `
-     var a= 's';
-     function A() {
-         console.log('test function');
-     }`,
-     `var a= 's';
-     function A () {console.log('test function');
-     }`
-    ],
+var rule = require('./space-before-opening-brace');
+var RuleTester = require('eslint').RuleTester;
 
-   invalid: [
-     {
-       code:
-       `function A(){
+var ruleTester = new RuleTester();
+ruleTester.run('space-before-opening-brace', rule, {
+  valid: [
+    `
+    var a= 's';
+    function A() {
         console.log('test function');
     }`,
-       errors: [{
-         message: 'There should be only one space before opening brace of function',
-         type: null
-       }]
-     },
-     {
+   `var a= 's';
+    function A () {console.log('test function');
+    }`
+   ],
+
+  invalid: [
+    {
       code:
-      `function A()  {
-        console.log('test function');
+      `function A(){
+       console.log('test function');
    }`,
       errors: [{
-        message: 'There should be only one space before opening brace of function',
+        message:
+        'There should be only one space before opening brace of function',
         type: null
       }]
     },
     {
-      code:
-      `function A()
-      {
+     code:
+     `function A()  {
        console.log('test function');
-   }`,
-      errors: [{
-        message: 'There should be only one space before opening brace of function',
-        type: null
-      }]
-    },
-   ]
- });
- 
+  }`,
+     errors: [{
+       message:
+       'There should be only one space before opening brace of function',
+       type: null
+     }]
+   },
+   {
+     code:
+     `function A()
+     {
+      console.log('test function');
+  }`,
+     errors: [{
+       message:
+       'There should be only one space before opening brace of function',
+       type: null
+     }]
+   },
+  ]
+});
