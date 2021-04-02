@@ -131,13 +131,14 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      saveModeratorChangeToBackend: function(emailBody) {
+      saveModeratorChangeToBackendAsync: async function(
+          emailBody) {
         var that = this;
         var explorationModeratorRightsUrl = (
           '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
 
-        $http.put(explorationModeratorRightsUrl, {
+        return $http.put(explorationModeratorRightsUrl, {
           email_body: emailBody,
           version: ExplorationDataService.data.version
         }).then(function(response) {
