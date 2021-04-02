@@ -85,26 +85,4 @@ describe('Feature Gating Flow', function() {
     expect(await dummy.isPresent()).toBe(true);
     await users.logout();
   });
-
-  // TODO(#12297): Re-enable once we've found an alternative session ID that can
-  // persist across disjoint user sessions.
-  xit('should show indicators after enabling dummy_feature', async() => {
-    await users.createAndLoginAdminUser(
-      'admin4@featureGatingFlow.com', 'featuregating4');
-    await adminPage.getFeaturesTab();
-    const dummy = await adminPage.getDummyFeatureElement();
-    await adminPage.enableFeatureForDev(dummy);
-
-    await users.logout();
-
-    await users.createAndLoginAdminUser(
-      'admin5@featureGatingFlow.com', 'featuregating5');
-    await adminPage.getFeaturesTab();
-
-    expect(await agDummyFeatureIndicator.isPresent()).toBe(true);
-    expect(await agDummyHandlerIndicator.isPresent()).toBe(true);
-    expect(await ajsDummyFeatureIndicator.isPresent()).toBe(true);
-
-    await users.logout();
-  });
 });
