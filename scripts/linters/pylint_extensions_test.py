@@ -387,7 +387,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                                 a = 1 + 2
                     """
         node_inline_comment_after_class_docstring = astroid.extract_node(
-                                                            test_code)
+            test_code)
 
         module_inline_comment_after_class_docstring = (
             node_inline_comment_after_class_docstring.root())
@@ -448,7 +448,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                             a = 1 + 2
                     """
         node_multiline_class_argument_with_correct_style = astroid.extract_node(
-                                                                    test_code)
+            test_code)
 
         module_multiline_class_argument_with_correct_style = (
             node_multiline_class_argument_with_correct_style.root())
@@ -474,7 +474,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                             a = 1 + 2
                     """
         node_single_newline_below_class_docstring = astroid.extract_node(
-                                                            test_code)
+            test_code)
 
         module_single_newline_below_class_docstring = (
             node_single_newline_below_class_docstring.root())
@@ -515,26 +515,27 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             temp_file.close()
 
     def test_newline_before_docstring_with_correct_style(self):
-        node_newline_before_docstring_with_correct_style = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
+        test_code = u"""
+                        class ClassName(dummy_class):
+
+                            \"\"\"This is a multiline docstring.\"\"\"
+
+                            a = 1 + 2
+                    """
+        node_newline_before_docstring_with_correct_style = astroid.extract_node(
+            test_code)
+        module_newline_before_docstring_with_correct_style = (
+            node_newline_before_docstring_with_correct_style.root())
+
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
         with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
+            tmp.write(test_code)
+        module_newline_before_docstring_with_correct_style.file = filename
+        module_newline_before_docstring_with_correct_style.path = filename
 
-                        \"\"\"This is a multiline docstring.\"\"\"
-
-                        a = 1 + 2
-                """)
-        node_newline_before_docstring_with_correct_style.file = filename
-        node_newline_before_docstring_with_correct_style.path = filename
-
-        self.checker_test_object.checker.visit_module(
+        self.checker_test_object.checker.visit_classdef(
             node_newline_before_docstring_with_correct_style)
 
         with self.checker_test_object.assertNoMessages():

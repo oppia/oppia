@@ -589,15 +589,15 @@ class DocstringParameterChecker(checkers.BaseChecker):
     DOCSTRING_SECTION_YIELDS = 'yields'
     DOCSTRING_SECTION_RAISES = 'raises'
 
-    def visit_module(self, node):
-        """Visit each module and check if there is a
-        single new line below each class docstring.
+    def visit_classdef(self, node):
+        """Visit each class definition and check if there is a
+        period at the end for each class docstring.
 
         Args:
-            node: astroid.nodes.Module. Node for a Module
+            node: astroid.nodes.Classdef. Node for a class definition
                 in the AST.
         """
-        # Check if the given node has docstring.
+
         if node.doc is None:
             return
         line_number = node.fromlineno
@@ -619,16 +619,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             self.add_message('newline-below-class-docstring', node=node)
         elif second_line_after_doc == b'':
             self.add_message('newline-below-class-docstring', node=node)
-        self.check_docstring_structure(node)
-
-    def visit_classdef(self, node):
-        """Visit each class definition and check if there is a
-        period at the end for each class docstring.
-
-        Args:
-            node: astroid.nodes.Classdef. Node for a class definition
-                in the AST.
-        """
         self.check_docstring_structure(node)
 
     def visit_functiondef(self, node):
