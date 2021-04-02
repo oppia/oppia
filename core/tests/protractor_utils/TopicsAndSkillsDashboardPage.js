@@ -301,7 +301,6 @@ var TopicsAndSkillsDashboardPage = function() {
       await action.click('Create Skill button', createSkillButtonSecondary);
     }
 
-    await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       skillNameField,
       'Create Skill modal takes too long to appear.');
@@ -313,7 +312,8 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
     var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
-    await action.click('Skill Review Material Field', skillReviewMaterialInput);
+    await action.click(
+      'Skill Review Material Input', skillReviewMaterialInput);
     var rteToolbar = element(by.id('cke_editor1'));
     await waitFor.visibilityOf(
       rteToolbar, 'RTE toolbar taking too long to show up.');

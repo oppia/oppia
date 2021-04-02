@@ -70,8 +70,6 @@ var select2 = async function(selectorName, selectorElement, optionToSelect) {
 
 var sendKeys = async function(
     inputName, inputElement, keys, clickInputElement = true) {
-  await waitFor.visibilityOf(
-    inputElement, inputName + ' takes too long to appear');
   if (clickInputElement) {
     await click(inputName, inputElement);
   }
