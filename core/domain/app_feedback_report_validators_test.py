@@ -47,7 +47,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.timestamp(),
+        'random_hash', TICKET_CREATION_TIMESTAMP.isoformat(),
         '16CharString1234')
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
@@ -322,7 +322,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
     # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     REPORT_IDS_LIST = ['%s.%s.%s' % (
-        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.timestamp(),
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.isoformat(),
         'randomInteger123')]
     TICKET_NAME = 'example ticket name'
     REPORT_TYPE_SUGGESTION = 'suggestion'
@@ -365,7 +365,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         app_feedback_report_models.AppFeedbackReportModel(
             id='%s.%s.%s' % (
                 self.PLATFORM_ANDROID,
-                self.REPORT_SUBMITTED_TIMESTAMP.timestamp(),
+                self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
                 'randomInteger123'),
             platform=self.PLATFORM_ANDROID,
             ticket_id=self.ticket_id,
@@ -477,7 +477,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.timestamp(),
+        'random_hash', TICKET_CREATION_TIMESTAMP.isoformat(),
         '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
     STATS_DATE_TIMESTAMP = datetime.date.fromtimestamp(1616173836)
@@ -492,7 +492,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     REPORT_ID = '%s.%s.%s' % (
-        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.timestamp(),
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.isoformat(),
         'randomInteger123')
 
     def setUp(self):

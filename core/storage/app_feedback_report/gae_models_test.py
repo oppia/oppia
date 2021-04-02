@@ -40,7 +40,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+        'random_hash', TICKET_CREATION_TIMESTAMP.isoformat(),
+        '16CharString1234')
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
@@ -79,12 +80,12 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel(
                 id='%s.%s.%s' % (
                     self.PLATFORM_ANDROID,
-                    self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+                    self.REPORT_SUBMITTED_TIMESTAMP_1.isoformat(),
                     'randomInteger123'),
                 platform=self.PLATFORM_ANDROID,
                 scrubbed_by=self.USER_ID,
                 ticket_id='%s.%s.%s' % (
-                    'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                    'random_hash', self.TICKET_CREATION_TIMESTAMP.isoformat(),
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
                 report_type=self.REPORT_TYPE_SUGGESTION,
@@ -183,7 +184,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 self.USER_ID))
 
         report_id = '%s.%s.%s' % (
-            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+            self.PLATFORM_ANDROID,
+            self.REPORT_SUBMITTED_TIMESTAMP_1.isoformat(),
             'randomInteger123')
         expected_data = {
             report_id: {
@@ -207,7 +209,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # The only user references will be those who have scrubbed a report.
         report_id = '%s.%s.%s' % (
-            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+            self.PLATFORM_ANDROID,
+            self.REPORT_SUBMITTED_TIMESTAMP_1.isoformat(),
             'randomInteger123')
         model_entity = model_class.get(report_id)
         model_entity.scrubbed_by = 'scrubber_user'
@@ -232,9 +235,10 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     TICKET_NAME = 'example ticket name'
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+        'random_hash', TICKET_CREATION_TIMESTAMP.isoformat(),
+        '16CharString1234')
     REPORT_IDS = ['%s.%s.%s' % (
-        PLATFORM, REPORT_SUBMITTED_TIMESTAMP.second, 'randomInteger123')]
+        PLATFORM, REPORT_SUBMITTED_TIMESTAMP.isoformat(), 'randomInteger123')]
 
     def test_create_and_get_ticket_model(self):
         ticket_id = (
@@ -291,7 +295,8 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+        'random_hash', TICKET_CREATION_TIMESTAMP.isoformat(),
+        '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
     STATS_DATE_TIMESTAMP = datetime.date.fromtimestamp(1616173836)
     DAILY_STATS = {

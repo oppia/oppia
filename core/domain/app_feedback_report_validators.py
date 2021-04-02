@@ -42,15 +42,8 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     def _get_model_id_regex(cls, item):
         # Valid id: [platform].[submission_timestamp_in_sec_int].[random_hash]
         regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
-            item.platform, item.submitted_on.timestamp(), base_models.ID_LENGTH)
+            item.platform, item.submitted_on.isoformat(), base_models.ID_LENGTH)
         return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer. Below assert function is to pass linter checks ("item
-        # is not used")
-        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -81,15 +74,34 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                     'than current version %s' % (
                         item.id, item.android_report_info_schema_version,
                         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION))
-        elif item.web_report_info_schema_version > (
+            elif item.android_report_info_schema_version < (
+                    feconf.MIN_ANDROID_REPORT_SCHEMA_VERSION):
+                cls._add_error(
+                    'report schema %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: android report schema version %s is less '
+                    'than the minimum version %s' % (
+                        item.id, item.android_report_info_schema_version,
+                        feconf.MIN_ANDROID_REPORT_SCHEMA_VERSION))
+        else:
+            if item.web_report_info_schema_version > (
                 feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
-            cls._add_error(
-                'report schema %s' % (
-                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                'Entity id %s: web report schema version %s is greater than '
-                'current version %s' % (
-                    item.id, item.web_report_info_schema_version,
-                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+                cls._add_error(
+                    'report schema %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: web report schema version %s is greater than'
+                    ' current version %s' % (
+                        item.id, item.web_report_info_schema_version,
+                        feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+            elif item.android_report_info_schema_version < (
+                    feconf.MIN_WEB_REPORT_SCHEMA_VERSION):
+                    cls._add_error(
+                        'report schema %s' % (
+                            base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                        'Entity id %s: web report schema version %s is greater '
+                        'than current version %s' % (
+                            item.id, item.android_report_info_schema_version,
+                            feconf.MIN_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
     def _validate_submitted_on_datetime(cls, item):
@@ -193,16 +205,9 @@ class AppFeedbackReportTicketModelValidator(
         #   [ticket_creation_datetime_in_sec]:[hash(ticket_name)]:[random hash]
         regex_string = (
             '^%s\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
-                item.created_on.timestamp(), base_models.ID_LENGTH,
+                item.created_on.isoformat(), base_models.ID_LENGTH,
                 base_models.ID_LENGTH))
         return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, unused_item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer. Below assert function is to pass linter checks ("item
-        # is not used")
-        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -293,13 +298,6 @@ class AppFeedbackReportStatsModelValidator(
         regex_string = '^%s\\:%s\\:%s' % (
             item.platform, item.ticket_id, item.stats_tracking_date.isoformat())
         return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer. Below assert function is to pass linter checks ("item
-        # is not used")
-        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):

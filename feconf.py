@@ -213,8 +213,14 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
+# The minimum version of the Android feedback report info blob schema.
+MIN_ANDROID_REPORT_SCHEMA_VERSION = 1
+
 # The current version of the Android feedback report info blob schema.
 CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+MIN_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the web feedback report info blob schema.
 CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
