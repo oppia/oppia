@@ -28,7 +28,7 @@ import { AlertsService } from 'services/alerts.service';
 import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.component';
 
 @Component({
-  selector: 'topics-list',
+  selector: 'oppia-topics-list',
   templateUrl: './topics-list.component.html'
 })
 export class TopicsListComponent {
@@ -127,5 +127,5 @@ export class TopicsListComponent {
   }
 }
 
-angular.module('oppia').directive('topicsList',
+angular.module('oppia').directive('oppiaTopicsList',
   downgradeComponent({ component: TopicsListComponent }));

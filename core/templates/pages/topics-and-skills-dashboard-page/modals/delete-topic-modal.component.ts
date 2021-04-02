@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'delete-topic-modal',
+  selector: 'oppia-delete-topic-modal',
   templateUrl: './delete-topic-modal.component.html'
 })
 export class DeleteTopicModalComponent extends ConfirmOrCancelModal {
