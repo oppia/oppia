@@ -182,7 +182,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        entity_id = cls._generate_id(platform, submitted_on.second)
+        entity_id = cls._generate_id(platform, submitted_on.timestamp())
         android_schema_version = None
         web_schema_version = None
         if platform == PLATFORM_CHOICE_ANDROID:
@@ -413,7 +413,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                datetime.datetime.utcnow().second, name_hash, random_hash)
+                datetime.datetime.utcnow().timestamp(), name_hash, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -537,7 +537,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity of the form
-            '[platform]:[ticket_id]:[date.seconds]'.
+            '[platform]:[ticket_id]:[stats_date_in_isoformat]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (

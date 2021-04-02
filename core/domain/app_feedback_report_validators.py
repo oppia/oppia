@@ -42,7 +42,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     def _get_model_id_regex(cls, item):
         # Valid id: [platform].[submission_timestamp_in_sec_int].[random_hash]
         regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
-            item.platform, item.submitted_on.second, base_models.ID_LENGTH)
+            item.platform, item.submitted_on.timestamp(), base_models.ID_LENGTH)
         return regex_string
 
     @classmethod
@@ -193,12 +193,12 @@ class AppFeedbackReportTicketModelValidator(
         #   [ticket_creation_datetime_in_sec]:[hash(ticket_name)]:[random hash]
         regex_string = (
             '^%s\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
-                item.created_on.second, base_models.ID_LENGTH,
+                item.created_on.timestamp(), base_models.ID_LENGTH,
                 base_models.ID_LENGTH))
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instance(cls, item):
+    def _get_model_domain_object_instance(cls, unused_item):
         # TODO(Oppia-Android#3016): Create domain object when implementing
         # domain layer. Below assert function is to pass linter checks ("item
         # is not used")
