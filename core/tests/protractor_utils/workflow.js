@@ -327,9 +327,6 @@ var uploadImage = async function(
 
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
-    await waitFor.elementToBeClickable(
-      thumbnailResetButton,
-      'Topic thumbnail reset button taking too long to appear.');
     await action.click('Thumbnail Reset Button', thumbnailResetButton);
   } else {
     expect(await thumbnailResetButton.isPresent()).toBe(false);
