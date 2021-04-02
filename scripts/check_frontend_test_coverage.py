@@ -34,8 +34,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
-    'admin-dev-mode-activities-tab.directive.ts',
-    'admin-jobs-tab.directive.ts',
     'admin-misc-tab.directive.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
@@ -77,7 +75,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection.model.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
-    'context.service.ts',
     'continue-button.directive.ts',
     'contribution-and-review.service.ts',
     'contribution-opportunities-backend-api.service.ts',
@@ -291,7 +288,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-questions-tab.directive.ts',
     'skill-rubrics-editor.directive.ts',
     'skill-selector-editor.directive.ts',
-    'skill-selector.directive.ts',
+    'skill-selector.component.ts',
     'SkillObjectFactory.ts',
     'skills-list.directive.ts',
     'skills-mastery-list.directive.ts',

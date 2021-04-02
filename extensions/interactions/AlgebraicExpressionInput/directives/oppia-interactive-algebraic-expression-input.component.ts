@@ -42,6 +42,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   hasBeenTouched = false;
   warningText: string = '';
   @Input() customOskLettersWithValue: string = '';
+  @Input() savedSolution: string;
 
   constructor(
     private algebraicExpressionInputRulesService:
@@ -93,7 +94,9 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     );
     this.guppyInitializationService.init(
       'guppy-div-learner',
-      constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
+      constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput,
+      this.savedSolution !== undefined ? JSON.parse(this.savedSolution) : ''
+    );
     const eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
