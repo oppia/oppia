@@ -24,11 +24,12 @@ import datetime
 from core.domain import base_model_validators
 from core.platform import models
 import feconf
+import utils
 
 (
     base_models, app_feedback_report_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model,
+    models.NAMES.base_model, models.NAMES.app_feedback_report
 ])
 
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
@@ -40,9 +41,10 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform].[submission_timestamp_in_isoformat].[random_hash]
+        # Valid id: [platform].[submission_timestamp_msec].[random_hash]
         regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
-            item.platform, item.submitted_on.isoformat(), base_models.ID_LENGTH)
+            item.platform, utils.get_time_in_millisecs(item.submitted_on),
+            base_models.ID_LENGTH)
         return regex_string
 
     @classmethod
@@ -146,7 +148,8 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                 'Entity id %s: based on entity created_on date %s, expected '
                 'model %s to have field scrubbed_by but it doesn\'t'
                 ' exist' % (
-                    item.id, item.created_on.isoformat(), model_class.__name__))
+                    item.id, utils.get_time_in_millisecs(item.created_on),
+                    model_class.__name__))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -202,13 +205,13 @@ class AppFeedbackReportTicketModelValidator(
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id:
-        # [ticket_creation_datetime_isoformat]:[hash(ticket_name)]:[random hash]
+        # [ticket_creation_datetime_msec]:[hash(ticket_name)]:[random hash]
         # We can only validate the timestamp is an expected string since the
         # id generation timestamp and the entity creation timestamp may differ.
         regex_string = (
             '^[T0-9-:.]{1,%s}\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
-                len(item.created_on.isoformat()), base_models.ID_LENGTH,
-                base_models.ID_LENGTH))
+                len(utils.get_time_in_millisecs(item.created_on),
+                base_models.ID_LENGTH, base_models.ID_LENGTH)))
         return regex_string
 
     @classmethod
@@ -296,9 +299,12 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform]:[ticket_id]:[date_in_isoformat]
+        # Valid id: [platform]:[ticket_id]:[date_in_msec]
+        stats_date_in_datetime = utils.convert_date_to_datetime(
+            item.stats_tracking_date)
         regex_string = '^%s\\:%s\\:%s' % (
-            item.platform, item.ticket_id, item.stats_tracking_date.isoformat())
+            item.platform, item.ticket_id,
+            utils.get_time_in_millisecs(stats_date_in_datetime))
         return regex_string
 
     @classmethod

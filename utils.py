@@ -452,6 +452,20 @@ def get_time_in_millisecs(datetime_obj):
     return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
+def convert_date_to_datetime(date_obj):
+    """Returns a datetime representing the date object.
+
+    Args:
+        date_obj: date. An object of type datetime.date.
+
+    Returns:
+        datetime.datetime. The datetime representing the given date at
+        00:00:00 UTC.
+    """
+    return datetime.datetime(
+        year=date_obj.year, month=date_obj.month, day=date_obj.day)
+
+
 def convert_naive_datetime_to_string(datetime_obj):
     """Returns a human-readable string representing the naive datetime object.
 

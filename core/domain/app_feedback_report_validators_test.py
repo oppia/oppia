@@ -25,6 +25,7 @@ from core.domain import prod_validation_jobs_one_off as prod_validation_jobs
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -43,11 +44,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+        TICKET_CREATION_TIMESTAMP)
 
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.isoformat(),
+        'random_hash', TICKET_CREATION_TIMESTAMP_MSEC,
         '16CharString1234')
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
@@ -363,7 +366,8 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on entity created_on date %s, expected'
                 ' model AppFeedbackReportModel to have field scrubbed_by but it'
                 ' doesn\'t exist"]]') % (
-                    model_entity.id, model_entity.created_on.isoformat())]
+                    model_entity.id,
+                    utils.get_time_in_millisecs(model_entity.created_on))]
 
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
@@ -375,9 +379,10 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
     PLATFORM_ANDROID = 'android'
     # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    REPORT_SUBMITTED_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+        REPORT_SUBMITTED_TIMESTAMP)
     REPORT_IDS_LIST = ['%s.%s.%s' % (
-        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.isoformat(),
-        'randomInteger123')]
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_MSEC, 'randomInteger123')]
     TICKET_NAME = 'example ticket name'
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
@@ -419,8 +424,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         app_feedback_report_models.AppFeedbackReportModel(
             id='%s.%s.%s' % (
                 self.PLATFORM_ANDROID,
-                self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
-                'randomInteger123'),
+                self.REPORT_SUBMITTED_TIMESTAMP_MSEC, 'randomInteger123'),
             platform=self.PLATFORM_ANDROID,
             ticket_id=self.ticket_id,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
@@ -531,22 +535,28 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
     PLATFORM_ANDROID = 'android'
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+        TICKET_CREATION_TIMESTAMP)
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.isoformat(),
+        'random_hash', TICKET_CREATION_TIMESTAMP_MSEC,
         '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
-    STATS_DATE_TIMESTAMP = datetime.date.fromtimestamp(1616173836)
+    STATS_DATE = datetime.date.fromtimestamp(1616173836)
+    STATS_DATE_TIMESTAMP = utils.convert_date_to_datetime(STATS_DATE)
     DAILY_STATS = {
         'report_type': {
             'suggestion': 1, 'issue': 1, 'crash': 1}}
     TOTAL_REPORTS_SUBMITTED = 3
     STATS_ID = '%s:%s:%s' % (
-        PLATFORM_ANDROID, TICKET_ID, STATS_DATE_TIMESTAMP.isoformat())
+        PLATFORM_ANDROID, TICKET_ID,
+        utils.get_time_in_millisecs(STATS_DATE_TIMESTAMP))
 
     # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    REPORT_SUBMITTED_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+        REPORT_SUBMITTED_TIMESTAMP)
     REPORT_ID = '%s.%s.%s' % (
-        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_MSEC,
         'randomInteger123')
 
     def setUp(self):
@@ -559,7 +569,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=self.TICKET_ID,
-                stats_tracking_date=self.STATS_DATE_TIMESTAMP,
+                stats_tracking_date=self.STATS_DATE,
                 total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
                 daily_param_stats=self.DAILY_STATS
             ))
@@ -584,7 +594,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             id='invalid_entity_id',
             ticket_id=self.TICKET_ID,
             platform=self.PLATFORM_ANDROID,
-            stats_tracking_date=self.STATS_DATE_TIMESTAMP,
+            stats_tracking_date=self.STATS_DATE,
             total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
             daily_param_stats=self.DAILY_STATS,
             daily_param_stats_schema_version=(

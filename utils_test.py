@@ -231,6 +231,18 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
             '/subjects/Lightbulb.svg')
 
+    def test_convert_date_to_datetime(self):
+        date = datetime.date(year=2020, month=2, day=11)
+        datetime_without_hours = datetime.datetime(
+            year=2020, month=2, day=11)
+        expected_datetime_with_hours = datetime.datetime(
+            year=2020, month=2, day=11, hour=8)
+
+        self.assertEqual(
+            utils.convert_date_to_datetime(date), datetime_without_hours)
+        self.assertNotEqual(
+            utils.convert_date_to_datetime(date), expected_datetime_with_hours)
+
     def test_are_datetimes_close(self):
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
         with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):

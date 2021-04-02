@@ -181,7 +181,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        entity_id = cls._generate_id(platform, submitted_on.isoformat())
+        entity_id = cls._generate_id(platform, submitted_on)
         android_schema_version = None
         web_schema_version = None
         if platform == PLATFORM_CHOICE_ANDROID:
@@ -213,19 +213,19 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def _generate_id(cls, platform, submitted_on_isoformat):
+    def _generate_id(cls, platform, submitted_on_datetime):
         """Generates key for the instance of AppFeedbackReportModel class in the
         required format with the arguments provided.
 
         Args:
             platform: str. The platform the user is the report from.
-            submitted_on_isoformat: str. The timestamp that the report was
-                submitted on in UTC, in isoformat.
+            submitted_on_datetime: datetime.datetime. The datetime that the
+                report was submitted on in UTC.
 
         Returns:
             str. The generated ID for this entity using platform,
             submitted_on_sec, and a random string, of the form
-            '[platform].[submitted_on_isoformat].[random hash]'.
+            '[platform].[submitted_on_msec].[random hash]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
@@ -233,7 +233,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                platform, submitted_on_isoformat, random_hash)
+                platform, utils.get_time_in_millisecs(submitted_on_datetime),
+                random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -291,17 +292,19 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
-
         user_data = dict()
         report_models = cls.get_all().filter(
             cls.scrubbed_by == user_id).fetch()
 
         for report_model in report_models:
+            submitted_on_msec = utils.get_time_in_millisecs(
+                report_model.submitted_on)
             user_data[report_model.id] = {
                 'scrubbed_by': report_model.scrubbed_by,
                 'platform': report_model.platform,
                 'ticket_id': report_model.ticket_id,
-                'submitted_on': report_model.submitted_on.isoformat(),
+                'submitted_on': utils.get_human_readable_time_string(
+                    submitted_on_msec),
                 'report_type': report_model.report_type,
                 'category': report_model.category,
                 'platform_version': report_model.platform_version
@@ -409,7 +412,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             str. The generated ID for this entity using the current datetime in
             isoformat (as the entity's creation timestamp), a SHA1 hash of the
             ticket_name, and a random string, of the form
-            '[creation_datetime]:[hash(ticket_name)]:[random hash]'.
+            '[creation_datetime_msec]:[hash(ticket_name)]:[random hash]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
@@ -419,7 +422,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                datetime.datetime.utcnow().isoformat(), name_hash, random_hash)
+                utils.get_time_in_millisecs(datetime.datetime.utcnow()),
+                name_hash, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -544,11 +548,14 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity of the form
-            '[platform]:[ticket_id]:[stats_date_in_isoformat]'.
+            '[platform]:[ticket_id]:[stats_date_msec]'.
         """
+        stats_date_in_datetime = utils.convert_date_to_datetime(
+            stats_tracking_date)
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (
-                platform, ticket_id, stats_tracking_date.isoformat())
+                platform, ticket_id,
+                utils.get_time_in_millisecs(stats_date_in_datetime))
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
