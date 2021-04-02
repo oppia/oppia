@@ -302,7 +302,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     DAILY_STATS = {
         'report_type': {
             'suggestion': 1, 'issue': 1, 'crash': 1}}
-    TOTAL_REPORTS_SUBMITTED=3
+    TOTAL_REPORTS_SUBMITTED = 3
 
     def test_create_and_get_stats_model(self):
         entity_id = (

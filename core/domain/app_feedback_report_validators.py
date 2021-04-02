@@ -28,7 +28,7 @@ import feconf
 (
     base_models, app_feedback_report_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, _validate_schema_versions
+    models.NAMES.base_model,
 ])
 
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
@@ -325,7 +325,7 @@ class AppFeedbackReportStatsModelValidator(
                 validate.
         """
         if item.daily_param_stats_schema_version > (
-                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
+            feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
@@ -334,7 +334,7 @@ class AppFeedbackReportStatsModelValidator(
                     item.id, item.daily_param_stats_schema_version,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
         elif item.daily_param_stats_schema_version < (
-                feconf.MIN_REPORT_STATS_SCHEMA_VERSION):
+            feconf.MIN_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
