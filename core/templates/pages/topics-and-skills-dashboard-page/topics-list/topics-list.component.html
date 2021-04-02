@@ -56,10 +56,9 @@
         <p class="list-summary text-center">
           <span> {{topic.totalSkillCount}} </span>
           <span [hidden]="!topic.uncategorized_skill_count"
-               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
-               ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{topic.uncategorizedSkillCount > 1 ? 's' : ''}}."
-               placement="bottom"
-               style="display: block">
+                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color tooltip"
+                ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{topic.uncategorizedSkillCount > 1 ? 's' : ''}}."
+                placement="bottom">
             <span class="oppia-editor-warnings-count">
               &nbsp;!
             </span>
@@ -295,6 +294,10 @@
     line-height: normal;
     vertical-align: middle;
     word-break: break-word;
+  }
+
+  .tooltip {
+    display: block;
   }
 
   @media (max-width: 768px) {
