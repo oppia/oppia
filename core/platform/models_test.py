@@ -244,10 +244,10 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_auth_services(self):
         """Tests import auth services function."""
-        from core.platform.auth import gae_auth_services
+        from core.platform.auth import firebase_auth_services
         self.assertIs(
             self.registry_instance.import_auth_services(),
-            gae_auth_services)
+            firebase_auth_services)
 
     def test_import_app_identity_services(self):
         """Tests import app identity services function."""
