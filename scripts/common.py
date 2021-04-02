@@ -121,6 +121,8 @@ REDIS_SERVER_PATH = os.path.join(
 REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
+CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
+    os.path.join(CURR_DIR, '.config', 'gcloud', 'emulators', 'datastore'))
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -949,4 +951,29 @@ def managed_elasticsearch_dev_server():
     # Override the default path to ElasticSearch config files.
     es_env = {'ES_PATH_CONF': ES_PATH_CONFIG_DIR}
     with managed_process(es_args, env=es_env, shell=True) as proc:
+        yield proc
+
+
+@contextlib.contextmanager
+def managed_cloud_datastore_emulator():
+    """Returns a context manager to manage the Cloud Datastore emulator.
+
+    Yields:
+        psutil.Process. The emulator process.
+    """
+    if not os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR):
+        os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+
+    emulator_args = [
+        GCLOUD_PATH, 'beta', 'emulators', 'datastore', 'start',
+        '--project', feconf.OPPIA_PROJECT_ID,
+        '--data-dir', CLOUD_DATASTORE_EMULATOR_DATA_DIR,
+        '--host-port', '%s:%d' % (
+            feconf.CLOUD_DATASTORE_EMULATOR_HOST,
+            feconf.CLOUD_DATASTORE_EMULATOR_PORT),
+        '--no-store-on-disk', '--consistency=1.0', '--quiet',
+    ]
+
+    with managed_process(emulator_args, shell=True) as proc:
+        wait_for_port_to_be_in_use(feconf.CLOUD_DATASTORE_EMULATOR_PORT)
         yield proc

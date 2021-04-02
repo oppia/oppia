@@ -1138,6 +1138,18 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertIn('firebase', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 
+    def test_managed_cloud_datastore_emulator(self):
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+            stack.enter_context(self.swap_to_always_return(
+                common, 'wait_for_port_to_be_in_use'))
+
+            stack.enter_context(common.managed_cloud_datastore_emulator())
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn('datastore', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
     def test_managed_dev_appserver(self):
         with contextlib2.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())

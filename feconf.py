@@ -1113,6 +1113,9 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+CLOUD_DATASTORE_EMULATOR_PORT = 8089
+
 # The name of the cookie Oppia will place the session cookie into. The name is
 # arbitrary. If it is changed later on, then the cookie will live-on in the
 # users' browsers as garbage (although it would expire eventually, see MAX_AGE).
