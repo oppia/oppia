@@ -555,7 +555,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         """
         stats_date_in_datetime = utils.convert_date_to_datetime(
             stats_tracking_date)
-        stats_datetime_in_msec = utils.get_time_in_millisecs(stats_date_in_datetime)
+        stats_datetime_in_msec = utils.get_time_in_millisecs(
+            stats_date_in_datetime)
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (
                 platform, ticket_id,

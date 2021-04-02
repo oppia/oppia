@@ -202,7 +202,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 'platform': self.PLATFORM_ANDROID,
                 'ticket_id': self.TICKET_ID,
                 'submitted_on': utils.get_human_readable_time_string(
-                        self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
+                    self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
                 'report_type': self.REPORT_TYPE_SUGGESTION,
                 'category': self.CATEGORY_OTHER,
                 'platform_version': self.PLATFORM_VERSION

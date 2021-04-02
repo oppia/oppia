@@ -88,7 +88,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                         feconf.MIN_ANDROID_REPORT_SCHEMA_VERSION))
         else:
             if item.web_report_info_schema_version > (
-                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
+                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
@@ -98,13 +98,13 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                         feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
             elif item.web_report_info_schema_version < (
                     feconf.MIN_WEB_REPORT_SCHEMA_VERSION):
-                    cls._add_error(
-                        'report schema %s' % (
-                            base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                        'Entity id %s: web report schema version %s is less '
-                        'than the minimum version %s' % (
-                            item.id, item.web_report_info_schema_version,
-                            feconf.MIN_WEB_REPORT_SCHEMA_VERSION))
+                cls._add_error(
+                    'report schema %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: web report schema version %s is less '
+                    'than the minimum version %s' % (
+                        item.id, item.web_report_info_schema_version,
+                        feconf.MIN_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
     def _validate_submitted_on_datetime(cls, item):
@@ -333,7 +333,7 @@ class AppFeedbackReportStatsModelValidator(
                 validate.
         """
         if item.daily_param_stats_schema_version > (
-            feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
+                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
@@ -342,7 +342,7 @@ class AppFeedbackReportStatsModelValidator(
                     item.id, item.daily_param_stats_schema_version,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
         elif item.daily_param_stats_schema_version < (
-            feconf.MIN_REPORT_STATS_SCHEMA_VERSION):
+                feconf.MIN_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
