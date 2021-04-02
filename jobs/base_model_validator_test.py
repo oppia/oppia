@@ -42,6 +42,7 @@ class BaseModelValidatorTestBase(jobs_test_utils.BeamTestBase):
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
+
 class MockDomainObject(base_models.BaseModel):
 
     def validate(self, strict=True):
@@ -107,7 +108,7 @@ class BaseModelValidatorTests(BaseModelValidatorTestBase):
             errors.ModelMutatedDuringJobError(model_with_invalid_timestamp),
             errors.ModelExpiredError(expired_model),
         ])
-    
+
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
@@ -304,6 +305,7 @@ class ValidatePostCommitIsPrivateTests(BaseModelValidatorTestBase):
             errors.InvalidCommitStatusError(invalid_commit_status),
         ])
 
+
 class ValidateModelDomainObjectInstancesTests(BaseModelValidatorTests):
 
     def test_error_is_raised_with_neutral_validation_type_for_domain_object(
@@ -488,4 +490,3 @@ class ValidateExternalIdRelationshipsTests(BaseModelValidatorTests):
             errors.ModelFieldCheckValidateError(
                 model, 'user_id', self.USER_ID, user_models.UserSettingsModel)
         ])
-
