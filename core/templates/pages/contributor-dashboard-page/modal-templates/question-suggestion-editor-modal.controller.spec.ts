@@ -266,9 +266,9 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $scope.getDifficultyString(0.6);
       expect($scope.skillDifficultyString).toBe('Medium');
       $scope.getDifficultyString(0.9);
-      expect($scope.skillDifficultyString).toBe('Easy');
-      $scope.getDifficultyString(0.3);
       expect($scope.skillDifficultyString).toBe('Hard');
+      $scope.getDifficultyString(0.3);
+      expect($scope.skillDifficultyString).toBe('Easy');
     });
 
     it('should dismiss modal if cancel button is clicked', function() {
