@@ -586,6 +586,52 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
 
+        # Test state name swaps.
+        exploration.add_states(['New state 5', 'New state 6'])
+        exploration.version += 1
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state 5'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state 6'
+        })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            exp_versions_diff, None)
+        stats_services.create_stats_model(exploration_stats)
+
+        exploration.rename_state('New state 5', 'New state 7')
+        exploration.rename_state('New state 6', 'New state 5')
+        exploration.rename_state('New state 7', 'New state 6')
+        exploration.version += 1
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 5',
+            'new_state_name': 'New state 7'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 6',
+            'new_state_name': 'New state 5'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 7',
+            'new_state_name': 'New state 6'
+        })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            exp_versions_diff, None)
+        stats_services.create_stats_model(exploration_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exploration.id, exploration.version)
+        self.assertEqual(exploration_stats.exp_version, 10)
+        self.assertEqual(
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['End', 'Home', 'New state 6', 'New state 5', 'Renamed state']))
+
     def test_get_exploration_stats_from_model(self):
         """Test the get_exploration_stats_from_model method."""
         model = stats_models.ExplorationStatsModel.get(self.stats_model_id)
