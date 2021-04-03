@@ -411,6 +411,35 @@ def accept_suggestion(
         # updated the domain object.
         _update_user_proficiency(user_proficiency)
 
+def update_suggestion(suggestion_id, translation_html):
+    """Updates a suggestion with the given suggestion_id and change.
+
+    Args:
+        suggestion_id: str. The id of the suggestion to be accepted.
+        translation_html: str. The new translation html.
+
+    Raises:
+        Exception. The suggestion is already handled.
+        Exception. The suggestion is not valid.
+    """
+
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    if suggestion is None:
+        raise Exception(
+            'You cannot change the suggestion with id %s because it does '
+            'not exist.' % (suggestion_id)
+        )
+    if suggestion.is_handled:
+        raise Exception(
+            'The suggestion with id %s has already been accepted/'
+            'rejected.' % (suggestion_id)
+        )
+
+    suggestion.change.translation_html = translation_html
+
+    return _update_suggestion(suggestion)
+
 
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
     """Rejects the suggestion with the given suggestion_id.

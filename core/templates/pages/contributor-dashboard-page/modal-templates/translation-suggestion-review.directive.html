@@ -21,8 +21,17 @@
     <div class="oppia-suggestion-review-panel-container float-right">
       <strong> Translation:</strong>
       <div class="oppia-suggestion-review-panel">
-        <angular-html-bind html-data="translationHtml">
-        </angular-html-bind>
+        <div>
+          <angular-html-bind html-data="translationHtml" ng-if="!isEditing">
+          </angular-html-bind>
+          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent.html" ng-if="isEditing">
+          </schema-based-editor>
+        </div>
+        <div class="oppia-translation-review-edit-buttons">
+          <button class="btn btn-secondary" ng-if="isEditing" ng-click="cancelEdit()">Cancel</button>
+          <button class="btn btn-success" ng-if="isEditing" ng-click="updateTranslate()">Update</button>
+          <button class="btn btn-secondary" ng-if="!isEditing" ng-click="editTranslate()">Edit</button>
+        </div>
       </div>
     </div>
   </section>
@@ -61,5 +70,8 @@
   }
   .oppia-suggestion-resolve-button {
     min-width: 165px;
+  }
+  .oppia-translation-review-edit-buttons {
+    margin-top: 10px;
   }
 </style>

@@ -1579,6 +1579,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
+    def test_translation_update(self):
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+
+        suggestion_services.update_suggestion(suggestions[0].suggestion_id, '<p>Test Translation</p>')
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(suggestions[0].suggestion_id)
+        self.assertEqual(
+            updated_suggestion.change.translation_html, '<p>Test Translation</p>')
+
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 

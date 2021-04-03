@@ -43,6 +43,35 @@ angular.module('oppia').controller(
       $scope.activeSuggestion = suggestionIdToSuggestion[
         $scope.activeSuggestionId];
       $scope.subheading = subheading;
+      $scope.isEditing = false;
+      $scope.HTML_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          hide_complex_extensions: 'true'
+        }
+      };
+      $scope.editedContent = {
+        html: ''
+      }
+
+      $scope.updateTranslate = function() {
+        console.log($scope.editedContent.html);
+        const updatedTranslation = $scope.editedContent.html;
+        ContributionAndReviewService.updateTranslation(
+          $scope.activeSuggestion.suggestion_id,
+          updatedTranslation,
+           (success) => {
+            $scope.activeSuggestion = suggestionIdToSuggestion[
+              $scope.activeSuggestionId];
+           },
+           (error) => {
+            $scope.rejectAndReviewNext('Invalid Suggestion');
+            AlertsService.clearWarnings();
+            AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
+          });
+          $scope.isEditing = false;
+      }
+      
       delete suggestionIdToSuggestion[initialSuggestionId];
       var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 
@@ -81,6 +110,7 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.change.translation_html);
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
+          $scope.editedContent.html = $scope.translationHtml;
         $scope.reviewMessage = '';
         if (!reviewable) {
           $scope.suggestionIsRejected = (
@@ -136,6 +166,15 @@ angular.module('oppia').controller(
           ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
           generateCommitMessage(), $scope.showNextItemToReview);
       };
+
+      $scope.editTranslate = function() {
+        $scope.isEditing = true;
+      }
+
+      $scope.cancelEdit = function() {
+        $scope.isEditing = false;
+        $scope.editedContent.html = $scope.translationHtml;
+      }
 
       $scope.cancel = function() {
         $uibModalInstance.close(resolvedSuggestionIds);

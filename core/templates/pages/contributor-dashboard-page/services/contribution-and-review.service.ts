@@ -119,6 +119,21 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         }).then(function() {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));
+      },
+      updateTranslation: function(
+        suggestionId, translationHtml,
+          onSuccess, onFailure) {
+        //const url = '/updatesuggestionhandler/';
+        var url = UrlInterpolationService.interpolateUrl(
+          '/suggestionhandler/translation/', {
+            suggestion_id: suggestionId
+          });
+        const putData = {
+          translation_html: translationHtml
+        };
+        return $http.put(url, putData).then(function() {
+          onSuccess(suggestionId);
+        }, () => onFailure && onFailure(suggestionId));
       }
     };
   }

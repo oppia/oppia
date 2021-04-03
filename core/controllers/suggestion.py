@@ -148,6 +148,14 @@ class SuggestionHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
+    @acl_decorators.can_suggest_changes
+    def put(self, suggestion_id):
+        try:
+            suggestion = suggestion_services.update_suggestion(suggestion_id, self.payload.get('translation_html'))
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+        self.render_json(self.values)
+      
 
 class SuggestionToExplorationActionHandler(base.BaseHandler):
     """Handles actions performed on suggestions to explorations."""
