@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,14 +23,14 @@ module.exports = {
     type: 'layout',
     docs: {
       description:
-        'disallow more than one brace before opening brace of function',
+        'Enforce a single space before opening braces of a function start',
       category: 'Stylistic Issues',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      OnlyOneSpacebeforebrace:
+      spaceBeforeBrace:
          'There should be only one space before opening brace of function'
     }
   },
@@ -39,16 +39,14 @@ module.exports = {
     return {
       FunctionDeclaration: function(node) {
         const lines = sourcecode.getText(node);
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i] === ')') {
-            if (lines[i + 1] !== ' ' || lines[i + 2] !== '{') {
-              context.report({
-                node: node,
-                messageId: 'OnlyOneSpacebeforebrace',
-              });
-            }
-            break;
-          }
+        var OpeningBraceIndex = lines.indexOf('{');
+        if (
+          lines[OpeningBraceIndex - 1] !== ' ' ||
+          lines[OpeningBraceIndex - 2] !== ')') {
+          context.report({
+            node: node,
+            messageId: 'spaceBeforeBrace',
+          });
         }
       }
     };
