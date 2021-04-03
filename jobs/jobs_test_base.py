@@ -21,14 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.tests import test_utils as core_test_utils
+from core.tests import test_utils
 
 from apache_beam.runners.direct import direct_runner
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
 
 
-class BeamTestBase(core_test_utils.TestBase):
+class JobsTestBase(test_utils.TestBase):
     """Base class that sets up a testing pipeline for subclasses to use."""
 
     # Helpful constants used to create models for testing.
@@ -37,7 +37,7 @@ class BeamTestBase(core_test_utils.TestBase):
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 
     def __init__(self, *args, **kwargs):
-        super(BeamTestBase, self).__init__(*args, **kwargs)
+        super(JobsTestBase, self).__init__(*args, **kwargs)
         self.pipeline = None
 
     def run(self, result=None):
@@ -54,7 +54,7 @@ class BeamTestBase(core_test_utils.TestBase):
         options = test_pipeline.PipelineOptions(runtime_type_check=True)
         with test_pipeline.TestPipeline(runner=runner, options=options) as p:
             self.pipeline = p
-            super(BeamTestBase, self).run(result=result)
+            super(JobsTestBase, self).run(result=result)
 
     def assert_pcoll_equal(self, actual, expected):
         """Asserts that the given PCollections are equal."""

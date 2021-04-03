@@ -26,7 +26,7 @@ import feconf
 from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
 
-user_models, = models.Registry.import_models([models.NAMES.user])
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 @audit_decorators.AuditsExisting(user_models.UserSettingsModel)

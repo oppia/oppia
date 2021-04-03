@@ -22,9 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import unittest
 
 from core.platform import models
-from jobs import utils
+from jobs import jobs_utils
 
-base_models, = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -39,7 +39,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_model(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = utils.clone_model(model)
+        clone = jobs_utils.clone_model(model)
 
         self.assertEqual(model.id, clone.id)
         self.assertEqual(model, clone)
@@ -48,7 +48,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_with_changes(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = utils.clone_model(model, deleted=False)
+        clone = jobs_utils.clone_model(model, deleted=False)
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -58,7 +58,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_with_changes_to_id(self):
         model = base_models.BaseModel(id='123')
-        clone = utils.clone_model(model, id='124')
+        clone = jobs_utils.clone_model(model, id='124')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -68,7 +68,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_sub_class(self):
         model = FooModel(id='123', prop='original')
-        clone = utils.clone_model(model)
+        clone = jobs_utils.clone_model(model)
 
         self.assertEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -78,7 +78,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_sub_class_with_changes(self):
         model = FooModel(id='123', prop='original')
-        clone = utils.clone_model(model, prop='updated')
+        clone = jobs_utils.clone_model(model, prop='updated')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
