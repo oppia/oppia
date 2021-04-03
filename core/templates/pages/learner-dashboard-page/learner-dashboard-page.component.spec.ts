@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,42 +21,35 @@ import { Collection, CollectionBackendDict } from 'domain/collection/collection.
 import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
 
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, discardPeriodicTasks, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { MaterialModule } from 'components/material.module';
+import { FormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 
+import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
-import { UserService } from 'services/user.service';
-import { AlertsService } from 'services/alerts.service';
-import { UserInfo } from 'os';
-import { MaterialModule } from 'components/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { PngSanitizerService } from 'services/png-sanitizer.service';
-import { PromoBar } from 'domain/promo_bar/promo-bar.model';
-import { JsonpClientBackend } from '@angular/common/http';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
+import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { UserService } from 'services/user.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-
-@Pipe({name: 'sortBy'})
-class MockSortByPipe {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
@@ -76,6 +69,14 @@ class MockTrunctePipe {
   }
 }
 
+class MockLearnerPlaylistBackendApiService {
+  removeActivityModal(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      resolve();
+    });
+  }
+}
+
 @Component({selector: 'background-banner', template: ''})
 class BackgroundBannerComponentStub {
 }
@@ -92,68 +93,28 @@ class CollectionSummaryTileComponentStub {
 class LoadingDotsComponentStub {
 }
 
-fdescribe('Learner dashboard page', () => {
-
+describe('Learner dashboard page', () => {
   let component: LearnerDashboardPageComponent;
   let fixture: ComponentFixture<LearnerDashboardPageComponent>;
-  
-  // let component = null;
-  // let $httpBackend = null;
-  // let Promise = null;
-  // let $rootScope = null;
-  // let $scope = null;
-  // let $timeout = null;
-  // let $window = null;
-
   let alertsService: AlertsService = null;
   let csrfTokenService: CsrfTokenService = null;
   let dateTimeFormatService: DateTimeFormatService = null;
   let explorationObjectFactory: ExplorationObjectFactory = null;
+  let focusManagerService: FocusManagerService;
   let learnerDashboardBackendApiService:
     LearnerDashboardBackendApiService = null;
   let suggestionModalForLearnerDashboardService:
     SuggestionModalForLearnerDashboardService = null;
   let userService: UserService = null;
-  let focusManagerService: FocusManagerService = null;
-  let $flushPendingTasks = null;
+
   let profilePictureDataUrl = 'profile-picture-url';
-  let pngSanitizerService: PngSanitizerService
+  let pngSanitizerService: PngSanitizerService = null;
+  let windowRef: WindowRef = null;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
     language_code: 'en',
     states: {},
-    // states: {
-    //   Introduction: {
-    //     param_changes: [],
-    //     content: {
-    //       html: '',
-    //       audio_translations: {}
-    //     },
-    //     recorded_voiceovers: {
-    //       voiceovers_mapping: {}
-    //     },
-    //     written_translations: {
-    //       translations_mapping: {}
-    //     },
-    //     unresolved_answers: {},
-    //     interaction: {
-    //       customization_args: {},
-    //       answer_groups: [],
-    //       default_outcome: {
-    //         param_changes: [],
-    //         dest: 'Introduction',
-    //         feedback: {
-    //           html: '',
-    //           audio_translations: {}
-    //         }
-    //       },
-    //       hints: [],
-    //       confirmed_unclassified_answers: [],
-    //       id: null
-    //     }
-    //   }
-    // },
     param_changes: [],
     param_specs: {},
     is_version_of_draft_valid: true,
@@ -163,6 +124,97 @@ fdescribe('Learner dashboard page', () => {
     title: 'Test Exploration',
 
   };
+
+  let titleList = [
+    'World War III', 'Quantum Mechanics', 'Algebra',
+    'Nouns', 'Counting Stars', 'Hip Hop', 'Consiousness',
+    'Database Management', 'Plant Cell', 'Zebra'
+  ];
+
+  let categoryList = [
+    'Social', 'Science', 'Mathematics', 'English',
+    'French', 'Arts', 'Pyschology',
+    'Computer Science', 'Biology', 'Zoo'
+  ];
+
+  let threadSummaryList = [{
+    status: 'open',
+    original_author_id: '1',
+    last_updated_msecs: 1000,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Biology',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '2',
+    last_updated_msecs: 1001,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Algebra',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '3',
+    last_updated_msecs: 1002,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Three Balls',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '4',
+    last_updated_msecs: 1003,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Zebra',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  }
+  ];
+
+  let subscriptionsList = [{
+    creator_impact: 0,
+    creator_picture_data_url: 'creatorA-url',
+    creator_username: 'Bucky',
+  },
+  {
+    creator_impact: 1,
+    creator_picture_data_url: 'creatorB-url',
+    creator_username: 'Arrow',
+  },
+  {
+    creator_impact: 3,
+    creator_picture_data_url: 'creatorD-url',
+    creator_username: 'Deadpool',
+  },
+  {
+    creator_impact: 2,
+    creator_picture_data_url: 'creatorC-url',
+    creator_username: 'Captain America',
+  }];
 
   let collectionDict: CollectionBackendDict = {
     id: 'sample_collection_id',
@@ -179,21 +231,13 @@ fdescribe('Learner dashboard page', () => {
       completed_exploration_ids: ['expId2']
     }
   };
-  
+
   let learnerDashboardData = {
     completed_explorations_list: [],
     completed_collections_list: [],
     incomplete_explorations_list: [],
     incomplete_collections_list: [],
-    subscription_list: [{
-      creator_impact: null,
-      creator_picture_data_url: 'creator1-url',
-      creator_username: 'username1',
-    }, {
-      creator_impact: null,
-      creator_picture_data_url: 'creator1-url',
-      creator_username: 'username2',
-    }],
+    subscription_list: subscriptionsList,
     number_of_nonexistent_activities: {
       incomplete_explorations: 0,
       incomplete_collections: 0,
@@ -203,20 +247,7 @@ fdescribe('Learner dashboard page', () => {
       collection_playlist: 0
     },
     completed_to_incomplete_collections: [],
-    thread_summaries: [{
-      status: 'open',
-      original_author_id: '1',
-      last_updated_msecs: 1000,
-      last_message_text: 'Last Message',
-      total_message_count: 5,
-      last_message_is_read: false,
-      second_last_message_is_read: true,
-      author_last_message: '2',
-      author_second_last_message: 'Last Message',
-      exploration_title: 'Exploration Title',
-      exploration_id: 'exp1',
-      thread_id: 'thread_1'
-    }],
+    thread_summaries: threadSummaryList,
     number_of_unread_threads: 10,
     exploration_playlist: [],
     collection_playlist: []
@@ -232,7 +263,7 @@ fdescribe('Learner dashboard page', () => {
     _username: 'username1',
     _email: 'tester@example.org',
     _isLoggedIn: true,
-    isModerator: () =>  true,
+    isModerator: () => true,
     isAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
@@ -243,28 +274,7 @@ fdescribe('Learner dashboard page', () => {
     isLoggedIn: () => true
   };
 
-  // let userInfo = {
-  //   isModerator: () =>  true,
-  //   isAdmin: () => false,
-  //   isSuperAdmin: () => false,
-  //   isTopicManager: () => false,
-  //   canCreateCollections: () => true,
-  //   getPreferredSiteLanguageCode: () =>'en',
-  //   getUsername: () => 'username1',
-  //   getEmail: () => 'tester@example.org',
-  //   isLoggedIn: () => true
-  // };
-  // let learnerDashboardData = null;
-  // importAllAngularServices();
-  // beforeEach(angular.mock.module('oppia', ($provide) {
-  //   let ugs = new UpgradedServices();
-  //   for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-  //     $provide.value(key, value);
-  //   }
-  // }));
-
   describe('when succesfully fetching learner dashboard data', () => {
-
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
@@ -275,14 +285,13 @@ fdescribe('Learner dashboard page', () => {
         declarations: [
           LearnerDashboardPageComponent,
           MockTranslatePipe,
-          MockSortByPipe,
+          SortByPipe,
           MockSlicePipe,
           MockTrunctePipe,
           BackgroundBannerComponentStub,
           ExplorationSummaryTileComponentStub,
           CollectionSummaryTileComponentStub,
           LoadingDotsComponentStub,
-          
         ],
         providers: [
           AlertsService,
@@ -290,19 +299,20 @@ fdescribe('Learner dashboard page', () => {
           ExplorationObjectFactory,
           FocusManagerService,
           LearnerDashboardBackendApiService,
+          {
+            provide: LearnerPlaylistBackendApiService,
+            useClass: MockLearnerPlaylistBackendApiService
+          },
           SuggestionModalForLearnerDashboardService,
           PngSanitizerService,
+          UrlInterpolationService,
           UserService,
           WindowRef,
-          // {
-          //   provide: PromoBarBackendApiService,
-          //   useClass: MockPromoBarBackendApiService
-          // }
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
     }));
-  
+
     beforeEach(fakeAsync(() => {
       fixture = TestBed.createComponent(LearnerDashboardPageComponent);
       component = fixture.componentInstance;
@@ -311,26 +321,27 @@ fdescribe('Learner dashboard page', () => {
       csrfTokenService = TestBed.inject(CsrfTokenService);
       dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+      focusManagerService = TestBed.inject(FocusManagerService);
       learnerDashboardBackendApiService =
         TestBed.inject(LearnerDashboardBackendApiService);
-      suggestionModalForLearnerDashboardService =
-        TestBed.inject(SuggestionModalForLearnerDashboardService);
       pngSanitizerService =
         TestBed.inject(PngSanitizerService);
+      suggestionModalForLearnerDashboardService =
+        TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
+      windowRef = TestBed.inject(WindowRef);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
         return Promise.resolve('sample-csrf-token');
       });
-
       // Generate completed explorations and exploration playlist.
       for (let i = 0; i < 10; i++) {
         learnerDashboardData.completed_explorations_list[i] = (
           explorationObjectFactory.createFromBackendDict(
             Object.assign(explorationDict, {
-              exploration_id: i + 1,
-              title: 'Exploration Title ' + (i + 1),
-              category: 'Astronomy'
+              id: i + 1,
+              title: titleList[i],
+              category: categoryList[i]
             })
           ));
         learnerDashboardData.exploration_playlist[i] = ({
@@ -338,16 +349,16 @@ fdescribe('Learner dashboard page', () => {
         });
       }
 
-      // Generate incomplete explorations.
+      // Generate incomplete explorations and incomplete exploration playlist.
       for (let i = 0; i < 12; i++) {
         learnerDashboardData.incomplete_explorations_list[i] = (
           explorationObjectFactory.createFromBackendDict(
             Object.assign(explorationDict, {
-              // Create ids from 10 to 22.
+              // Create ids from 11 to 22.
               // (1 to 10 is the complete explorations).
-              exploration_id: i + 11,
-              title: 'Exploration Title ' + (i + 11),
-              category: 'Astronomy'
+              id: Number(i + 11).toString(),
+              title: titleList[i],
+              category: categoryList[i]
             })
           ));
       }
@@ -358,8 +369,8 @@ fdescribe('Learner dashboard page', () => {
           // TODO(#10875): Fix type mismatch.
           Collection.create(
             Object.assign(collectionDict, {
-              id: i + 1,
-              title: 'Collection Title ' + (i + 1),
+              title: titleList[i],
+              category: categoryList[i]
             }) as unknown as CollectionBackendDict
           ));
         learnerDashboardData.collection_playlist[i] = ({
@@ -373,9 +384,9 @@ fdescribe('Learner dashboard page', () => {
           // TODO(#10875): Fix type mismatch.
           Collection.create(
             Object.assign(collectionDict, {
-              // Create ids from 9 to 17.
-              // (0 to 8 is the complete collections).
-              id: i + 10,
+              // Create ids from 9 to 16.
+              // (1 to 8 is the complete collections).
+              id: Number(i + 9).toString(),
               title: 'Collection Title ' + (i + 7),
             }) as unknown as CollectionBackendDict
           ));
@@ -441,107 +452,48 @@ fdescribe('Learner dashboard page', () => {
       fixture.detectChanges();
     }));
 
-    // beforeEach(angular.mock.inject(($injector, $componentController) {
-    //   $httpBackend = $injector.get('$httpBackend');
-    //   Promise = $injector.get('Promise');
-    //   $window = $injector.get('$window');
-    //   $timeout = $injector.get('$timeout');
-    //   let $rootScope = $injector.get('$rootScope');
-    //   $uibModal = $injector.get('$uibModal');
-    //   $flushPendingTasks = $injector.get('$flushPendingTasks');
-    //   focusManagerService = $injector.get('FocusManagerService');
-    //   csrfTokenService = TestBed.inject(CsrfTokenService);
-    //   DateTimeFormatService = $injector.get('DateTimeFormatService');
-    //   ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
-    //   LearnerDashboardBackendApiService = $injector.get(
-    //     'LearnerDashboardBackendApiService');
-    //   SuggestionModalForLearnerDashboardService = $injector.get(
-    //     'SuggestionModalForLearnerDashboardService');
-    //   UserService = $injector.get('UserService');
-
-      
-
-    //   $scope = $rootScope.$new();
-    //   component = $componentController('learnerDashboardPage', {
-    //     $rootScope: $scope
-    //   });
-    //   component.$onInit();
-    //   fixture.detectChanges();
-    // }));
-
     it('should initialize correctly component properties after its' +
     ' initialization and get data from backend', fakeAsync(() => {
-      expect(component.profilePictureDataUrl).toBe(
-        JSON.stringify(profilePictureDataUrl));
+      expect(component.profilePictureDataUrl).toBe(profilePictureDataUrl);
       expect(component.username).toBe(userInfo.getUsername());
 
       expect(component.noExplorationActivity).toBe(false);
       expect(component.noCollectionActivity).toBe(false);
       expect(component.noActivity).toBe(false);
+
+      expect(component.incompleteExplorationsList.length).toBe(12);
+      expect(component.incompleteCollectionsList.length).toBe(8);
+
+      expect(component.explorationPlaylist.length).toBe(10);
+      expect(component.explorationPlaylist.length).toBe(10);
     }));
 
-    // it('should set focus on browse lesson btn', () => {
-    //   let spy = spyOn(component, 'addFocusWithoutScroll');
-    //   $flushPendingTasks();
-    //   expect(spy).toHaveBeenCalledWith('ourLessonsBtn');
-    // });
 
-    // it('should scroll back to top of window after focusing', () => {
-    //   let focusSpy = spyOn(focusManagerService, 'setFocus');
-    //   let windowSpy = spyOn($window, 'scrollTo');
-    //   component.addFocusWithoutScroll('ourLessonsBtn');
-    //   $timeout.flush();
-    //   expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-    //   expect(windowSpy).toHaveBeenCalled();
-    // });
+    fit('should set focus on browse lesson btn', () => {
+      const focusSpy = spyOn(component, 'addFocusWithoutScroll');
+      tick(15000);
+      fixture.detectChanges();
+
+      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
+    });
+
+    fit('should scroll back to top of window after focusing', () => {
+      let focusSpy = spyOn(focusManagerService, 'setFocus');
+      let windowSpy = spyOn(windowRef.nativeWindow, 'scrollTo');
+      component.addFocusWithoutScroll('ourLessonsBtn');
+      
+      tick(15000);
+      fixture.detectChanges();
+
+      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
+      expect(windowSpy).toHaveBeenCalled();
+    });
 
     it('should get static image url', () => {
       let imagePath = '/path/to/image.png';
       expect(component.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
     });
-
-    // it('should set a new section as active when fetching message summary' +
-    //   ' list from backend', () => {
-    //   let threadStatus = 'open';
-    //   let explorationId = 'exp1';
-    //   let threadId = 'thread_1';
-    //   let explorationTitle = 'Exploration Title';
-    //   let threadMessages = [{
-    //     message_id: '1',
-    //     text: 'Feedback 1',
-    //     updated_status: 'open',
-    //     suggestion_html: 'An instead of a',
-    //     current_content_html: 'A orange',
-    //     description: 'Suggestion for english grammar',
-    //     author_username: 'username2',
-    //     author_picture_data_url: 'foo',
-    //     created_on_msecs: 1200
-    //   }];
-
-    //   expect(component.numberOfUnreadThreads).toBe(10);
-
-    //   $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-    //     .respond({
-    //       message_summary_list: threadMessages
-    //     });
-    //   component.onClickThread(
-    //     threadStatus, explorationId, threadId, explorationTitle);
-    //   $httpBackend.flush();
-    //   expect(component.feedbackThreadActive).toBe(true);
-
-    //   let newActiveSectionName = 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION';
-    //   component.setActiveSection(newActiveSectionName);
-
-    //   expect(component.activeSection).toBe(newActiveSectionName);
-    //   expect(component.feedbackThreadActive).toBe(false);
-
-    //   let newActiveSectionName2 = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-    //   component.setActiveSection(newActiveSectionName2);
-
-    //   expect(component.activeSection).toBe(newActiveSectionName2);
-    //   expect(component.feedbackThreadActive).toBe(false);
-    // });
 
     it('should toggle active subsection type when changing subsection type',
       () => {
@@ -621,17 +573,20 @@ fdescribe('Learner dashboard page', () => {
               expSummary));
 
         expect(component.startCompletedExpIndex).toBe(0);
-        expect(component.getVisibleExplorationList(component.startCompletedExpIndex))
+        expect(component.getVisibleExplorationList(
+          component.startCompletedExpIndex))
           .toEqual(completedExplorations.slice(0, 8));
 
         component.goToNextPage(section, subsection);
         expect(component.startCompletedExpIndex).toBe(8);
-        expect(component.getVisibleExplorationList(component.startCompletedExpIndex))
+        expect(component.getVisibleExplorationList(
+          component.startCompletedExpIndex))
           .toEqual(completedExplorations.slice(8));
 
         component.goToPreviousPage(section, subsection);
         expect(component.startCompletedExpIndex).toBe(0);
-        expect(component.getVisibleExplorationList(component.startCompletedExpIndex))
+        expect(component.getVisibleExplorationList(
+          component.startCompletedExpIndex))
           .toEqual(completedExplorations.slice(0, 8));
       });
 
@@ -694,152 +649,1034 @@ fdescribe('Learner dashboard page', () => {
       expect(component.isCurrentFeedbackSortDescending).toBe(true);
     });
 
-    it('should evaluate value of exploration sort key property as default when' +
-      ' sorting option is last played', () => {
-      // The default sort option is exploration last played.
+    it('should sort explorations given sorting property' +
+      ' as last played in ascending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
       expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
 
       // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a ng-repeat directive.
-      component.completedExplorationsList.forEach((exploration) => {
-        expect(component.getValueOfExplorationSortKey()).toBe('default');
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
       });
-    });
+    }));
 
-    it('should evaluate value of exploration sort key property as string' +
-      ' when sorting option is title', () => {
+    it('should sort explorations given sorting property' +
+      ' as last played in descending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('last_played');
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+      expect(component.isCurrentExpSortDescending).toBeFalse;
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+      });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as category in ascending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('category');
+      expect(component.getValueOfExplorationSortKey()).toBe('category');
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Quantum Nechanics');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+      });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as category in descending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('category');
+      expect(component.getValueOfExplorationSortKey()).toBe('category');
+
+      component.setExplorationsSortingOptions('category');
+      expect(component.isCurrentExpSortDescending).toBeFalse;
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Quantum Nechanics');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+      });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as title in ascending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
       component.setExplorationsSortingOptions('title');
-      expect(component.currentExpSortType).toBe('title');
-      component.completedExplorationsList.forEach((exploration, index) => {
-        expect(component.getValueOfExplorationSortKey()).toBe(
-          'Exploration Title ' + (index + 1));
-      });
-    });
+      expect(component.getValueOfExplorationSortKey()).toBe('title');
 
-    it('should evaluate value of subscription sort key property as string' +
-      ' when sorting option is username', () => {
-      // The default sort option is exploration last played.
-      expect(component.currentSubscribersSortType).toBe('username');
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
 
       // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a ng-repeat directive.
-      component.subscriptionsList.forEach((subscription) => {
-        expect(component.getValueOfSubscriptionSortKey()).toBe(
-          'username1');
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
       });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as title in descending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('title');
+      expect(component.getValueOfExplorationSortKey()).toBe('title');
+
+      component.setExplorationsSortingOptions('title');
+      expect(component.isCurrentExpSortDescending).toBeFalse;
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+      });
+    }));
+
+    it('should sort subscriptions given sorting property as username' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('username');
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(0);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(3);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+      });
+    }));
+
+    it('should sort subscriptions given sorting property as username' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
+
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('username');
+
+      component.setSubscriptionSortingOptions('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(0);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(1);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+      });
+    }));
+
+    it('should sort subscriptions given sorting property as impact' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
 
       component.setSubscriptionSortingOptions('impact');
       expect(component.currentSubscribersSortType).toBe('impact');
-      component.subscriptionsList.forEach((subscription) => {
-        expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(0);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(3);
+        }
       });
-    });
 
-    // it('should get messages in the thread from the backend when a thread is' +
-    //   ' selected', () => {
-    //   let threadStatus = 'open';
-    //   let explorationId = 'exp1';
-    //   let threadId = 'thread_1';
-    //   let explorationTitle = 'Exploration Title';
-    //   let threadMessages = [{
-    //     message_id: '1',
-    //     text: 'Feedback 1',
-    //     updated_status: 'open',
-    //     suggestion_html: 'An instead of a',
-    //     current_content_html: 'A orange',
-    //     description: 'Suggestion for english grammar',
-    //     author_username: 'username2',
-    //     author_picture_data_url: 'foo',
-    //     created_on_msecs: 1200
-    //   }];
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+      });
+    }));
 
-    //   expect(component.numberOfUnreadThreads).toBe(10);
+    it('should sort subscriptions given sorting property as impact' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
 
-    //   $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-    //     .respond({
-    //       message_summary_list: threadMessages
-    //     });
-    //   component.onClickThread(
-    //     threadStatus, explorationId, threadId, explorationTitle);
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
 
-    //   expect(component.loadingFeedbacks).toBe(true);
-    //   expect(component.feedbackThreadActive).toBe(true);
-    //   expect(component.numberOfUnreadThreads).toBe(9);
-    //   $httpBackend.flush();
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
 
-    //   expect(component.messageSummaries.length).toBe(1);
-    // });
+      tick();
+      fixture.detectChanges();
 
-    // it('should show all threads when a thread is not selected', () => {
-    //   let threadStatus = 'open';
-    //   let explorationId = 'exp1';
-    //   let threadId = 'thread_1';
-    //   let explorationTitle = 'Exploration Title';
-    //   let threadMessages = [{
-    //     message_id: '1',
-    //     text: 'Feedback 1',
-    //     updated_status: 'open',
-    //     suggestion_html: 'An instead of a',
-    //     current_content_html: 'A orange',
-    //     description: 'Suggestion for english grammar',
-    //     author_username: 'username2',
-    //     author_picture_data_url: 'foo',
-    //     created_on_msecs: 1200
-    //   }];
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
 
-    //   expect(component.numberOfUnreadThreads).toBe(10);
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
 
-    //   $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-    //     .respond({
-    //       message_summary_list: threadMessages
-    //     });
-    //   component.onClickThread(
-    //     threadStatus, explorationId, threadId, explorationTitle);
-    //   $httpBackend.flush();
-    //   expect(component.feedbackThreadActive).toBe(true);
 
-    //   component.showAllThreads();
-    //   expect(component.feedbackThreadActive).toBe(false);
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(0);
+        }
+      });
 
-    //   expect(component.numberOfUnreadThreads).toBe(9);
-    // });
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+      });
+    }));
+    it('should sort subscriptions given sorting property as impact' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
 
-    // it('should add a new message in a thread when there is a thread selected',
-    //   () => {
-    //     let threadStatus = 'open';
-    //     let explorationId = 'exp1';
-    //     let threadId = 'thread_1';
-    //     let explorationTitle = 'Exploration Title';
-    //     let threadMessages = [{
-    //       message_id: '1',
-    //       text: 'Feedback 1',
-    //       updated_status: 'open',
-    //       suggestion_html: 'An instead of a',
-    //       current_content_html: 'A orange',
-    //       description: 'Suggestion for english grammar',
-    //       author_username: 'username2',
-    //       author_picture_data_url: 'foo',
-    //       created_on_msecs: 1200
-    //     }];
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
 
-    //     $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-    //       .respond({
-    //         message_summary_list: threadMessages
-    //       });
-    //     component.onClickThread(
-    //       threadStatus, explorationId, threadId, explorationTitle);
-    //     $httpBackend.flush();
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
 
-    //     let threadId = 'thread_1';
-    //     let message = 'This is a new message';
-    //     $httpBackend.expect('POST', '/threadhandler/' + threadId).respond(200);
-    //     component.addNewMessage(threadId, message);
+      tick();
+      fixture.detectChanges();
 
-    //     expect(component.messageSendingInProgress).toBe(true);
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
 
-    //     $httpBackend.flush();
-    //     expect(component.messageSendingInProgress).toBe(false);
-    //   });
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(0);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+      });
+    }));
+    it('should sort subscriptions given sorting property as impact' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(0);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as last updated' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as last updated' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      component.setFeedbackSortingOptions('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as exploration' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      component.setFeedbackSortingOptions('explorationTitle');
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('explorationTitle');
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('explorationTitle');
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as exploration' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      component.setFeedbackSortingOptions('explorationTitle');
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('explorationTitle');
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('explorationTitle');
+
+      component.setFeedbackSortingOptions('explorationTitle');
+      expect(component.isCurrentFeedbackSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+      });
+    }));
+
+    it('should get messages in the thread from the backend when a thread is' +
+      ' selected', fakeAsync(() => {
+      let threadStatus = 'open';
+      let explorationId = 'exp1';
+      let threadId = 'thread_1';
+      let explorationTitle = 'Exploration Title';
+      let threadMessages = [{
+        message_id: 1,
+        text: 'Feedback 1',
+        updated_status: 'open',
+        suggestion_html: 'An instead of a',
+        current_content_html: 'A orange',
+        description: 'Suggestion for english grammar',
+        author_username: 'username2',
+        author_picture_data_url: 'foo',
+        created_on_msecs: 1200
+      }];
+      const threadSpy = spyOn(
+        learnerDashboardBackendApiService, 'onClickThreadAsync')
+        .and.returnValue(Promise.resolve(threadMessages));
+
+      expect(component.numberOfUnreadThreads).toBe(10);
+      expect(component.loadingFeedbacks).toBe(false);
+
+      component.onClickThread(
+        threadStatus, explorationId, threadId, explorationTitle);
+      expect(component.loadingFeedbacks).toBe(true);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.feedbackThreadActive).toBe(true);
+      expect(component.numberOfUnreadThreads).toBe(6);
+      expect(component.messageSummaries.length).toBe(1);
+      expect(threadSpy).toHaveBeenCalled();
+    }));
+
+    it('should set a new section as active when fetching message summary' +
+      ' list from backend', fakeAsync(() => {
+      let threadStatus = 'open';
+      let explorationId = 'exp1';
+      let threadId = 'thread_1';
+      let explorationTitle = 'Exploration Title';
+      let threadMessages = [{
+        message_id: 1,
+        text: 'Feedback 1',
+        updated_status: 'open',
+        suggestion_html: 'An instead of a',
+        current_content_html: 'A orange',
+        description: 'Suggestion for english grammar',
+        author_username: 'username2',
+        author_picture_data_url: 'foo',
+        created_on_msecs: 1200
+      }];
+      const threadSpy = spyOn(
+        learnerDashboardBackendApiService, 'onClickThreadAsync')
+        .and.returnValue(Promise.resolve(threadMessages));
+
+      expect(component.numberOfUnreadThreads).toBe(10);
+      expect(component.loadingFeedbacks).toBe(false);
+
+      component.onClickThread(
+        threadStatus, explorationId, threadId, explorationTitle);
+      expect(component.loadingFeedbacks).toBe(true);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.feedbackThreadActive).toBe(true);
+      expect(component.numberOfUnreadThreads).toBe(6);
+      expect(component.messageSummaries.length).toBe(1);
+      expect(threadSpy).toHaveBeenCalled();
+
+      let newActiveSectionName = 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION';
+      component.setActiveSection(newActiveSectionName);
+
+      expect(component.activeSection).toBe(newActiveSectionName);
+      expect(component.feedbackThreadActive).toBe(false);
+
+      let newActiveSectionName2 = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      component.setActiveSection(newActiveSectionName2);
+
+      expect(component.activeSection).toBe(newActiveSectionName2);
+      expect(component.feedbackThreadActive).toBe(false);
+    }));
+
+    it('should show all threads when a thread is not selected',
+      fakeAsync(() => {
+        let threadStatus = 'open';
+        let explorationId = 'exp1';
+        let threadId = 'thread_1';
+        let explorationTitle = 'Exploration Title';
+        let threadMessages = [{
+          message_id: 1,
+          text: 'Feedback 1',
+          updated_status: 'open',
+          suggestion_html: 'An instead of a',
+          current_content_html: 'A orange',
+          description: 'Suggestion for english grammar',
+          author_username: 'username2',
+          author_picture_data_url: 'foo',
+          created_on_msecs: 1200
+        }];
+
+        const threadSpy =
+          spyOn(learnerDashboardBackendApiService, 'onClickThreadAsync')
+            .and.returnValue(Promise.resolve(threadMessages));
+
+        expect(component.numberOfUnreadThreads).toBe(10);
+        expect(component.loadingFeedbacks).toBe(false);
+
+        component.onClickThread(
+          threadStatus, explorationId, threadId, explorationTitle);
+        expect(component.loadingFeedbacks).toBe(true);
+
+        tick();
+        fixture.detectChanges();
+
+        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.feedbackThreadActive).toBe(true);
+        expect(component.numberOfUnreadThreads).toBe(6);
+        expect(component.messageSummaries.length).toBe(1);
+        expect(threadSpy).toHaveBeenCalled();
+
+        component.showAllThreads();
+        expect(component.feedbackThreadActive).toBe(false);
+
+        expect(component.numberOfUnreadThreads).toBe(6);
+      }));
+
+    it('should add a new message in a thread when there is a thread selected',
+      fakeAsync(() => {
+        let threadStatus = 'open';
+        let explorationId = 'exp1';
+        let threadId = 'thread_1';
+        let explorationTitle = 'Exploration Title';
+        let message = 'This is a new message';
+        let threadMessages = [{
+          message_id: 1,
+          text: 'Feedback 1',
+          updated_status: 'open',
+          suggestion_html: 'An instead of a',
+          current_content_html: 'A orange',
+          description: 'Suggestion for english grammar',
+          author_username: 'username2',
+          author_picture_data_url: 'foo',
+          created_on_msecs: 1200
+        }];
+
+        const threadSpy = spyOn(
+          learnerDashboardBackendApiService, 'onClickThreadAsync')
+          .and.returnValue(Promise.resolve(threadMessages));
+
+        const addMessageSpy = spyOn(
+          learnerDashboardBackendApiService, 'addNewMessageAsync')
+          .and.returnValue(Promise.resolve());
+
+        expect(component.numberOfUnreadThreads).toBe(10);
+        expect(component.loadingFeedbacks).toBe(false);
+
+        component.onClickThread(
+          threadStatus, explorationId, threadId, explorationTitle);
+        expect(component.loadingFeedbacks).toBe(true);
+
+        tick();
+        fixture.detectChanges();
+
+        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.feedbackThreadActive).toBe(true);
+        expect(component.numberOfUnreadThreads).toBe(6);
+        expect(component.messageSummaries.length).toBe(1);
+        expect(threadSpy).toHaveBeenCalled();
+
+        component.addNewMessage(threadId, message);
+        expect(component.messageSendingInProgress).toBe(true);
+
+        tick();
+        fixture.detectChanges();
+
+        expect(component.messageSendingInProgress).toBe(false);
+        expect(addMessageSpy).toHaveBeenCalled();
+      }));
 
     it('should show new and old content when opening suggestion modal',
       () => {
@@ -858,121 +1695,174 @@ fdescribe('Learner dashboard page', () => {
           });
       });
 
-    // it('should open remove activity modal when removing activity', () => {
-    //   spyOn($uibModal, 'open').and.callThrough();
+    it('should open remove activity modal when removing activity', () => {
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      let activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.exploration_playlist[1]);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+    });
 
-    //   let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-    //   let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-    //   let activity = {};
-    //   component.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
+    it('should not remove an incomplete exploration if it is not present',
+      fakeAsync(() => {
+        expect(component.incompleteExplorationsList.length).toBe(12);
 
-    //   expect($uibModal.open).toHaveBeenCalled();
-    // });
+        let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+        // Get exploration with id 100.
+        let activity = LearnerExplorationSummary.createFromBackendDict(
+          // TODO(#10875): Fix type mismatch.
+          {
+            id: '100'
+          } as unknown as LearnerExplorationSummaryBackendDict);
+        component.openRemoveActivityModal(
+          sectionNameI18nId, subsectionName, activity);
 
-    // it('should remove an activity from incomplete exploration when closing' +
-    //   ' remove activity modal', () => {
-    //   spyOn($uibModal, 'open').and.returnValue({
-    //     result: Promise.resolve()
-    //   });
+        tick();
+        fixture.detectChanges();
 
-    //   expect(component.incompleteExplorationsList.length).toBe(12);
+        expect(component.incompleteExplorationsList.length).toBe(12);
+      }));
 
-    //   let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-    //   let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-    //   // Get exploration with id 13.
-    //   let activity = LearnerExplorationSummary.createFromBackendDict(
-    //     learnerDashboardData.incomplete_explorations_list[2]);
-    //   component.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-    //   fixture.detectChanges();
+    it('should not remove an exploration from exploration playlist' +
+      ' if it is not present', fakeAsync(() => {
+      expect(component.explorationPlaylist.length).toBe(10);
 
-    //   expect(component.incompleteExplorationsList.length).toBe(11);
-    // });
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      // Get exploration with id 100.
+      let activity = LearnerExplorationSummary.createFromBackendDict(
+        // TODO(#10875): Fix type mismatch.
+        {
+          id: '100'
+        } as unknown as LearnerExplorationSummaryBackendDict);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
 
-    // it('should not remove an activity if its not present', () => {
-    //   spyOn($uibModal, 'open').and.returnValue({
-    //     result: Promise.resolve()
-    //   });
+      tick();
+      fixture.detectChanges();
 
-    //   expect(component.incompleteExplorationsList.length).toBe(12);
+      expect(component.explorationPlaylist.length).toBe(10);
+    }));
 
-    //   let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-    //   let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-    //   // Get exploration with id 13.
-    //   let activity = LearnerExplorationSummary.createFromBackendDict(
-    //     // TODO(#10875): Fix type mismatch.
-    //     {
-    //       id: '100'
-    //     } as unknown as LearnerExplorationSummaryBackendDict);
-    //   component.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-    //   fixture.detectChanges();
+    it('should not remove a collection from collection playlist' +
+      ' if it is not present', fakeAsync(() => {
+      expect(component.collectionPlaylist.length).toBe(8);
 
-    //   expect(component.incompleteExplorationsList.length).toBe(12);
-    // });
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      // Get collection with id 100.
+      let activity = CollectionSummary.createFromBackendDict(
+        // TODO(#10875): Fix type mismatch.
+        {
+          id: '100'
+        } as unknown as CollectionSummaryBackendDict);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
 
-    // it('should remove an activity from incomplete collection when closing' +
-    // ' remove activity modal', () => {
-    //   spyOn($uibModal, 'open').and.returnValue({
-    //     result: Promise.resolve()
-    //   });
+      tick();
+      fixture.detectChanges();
 
-    //   expect(component.incompleteCollectionsList.length).toBe(8);
+      expect(component.collectionPlaylist.length).toBe(8);
+    }));
 
-    //   let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-    //   let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-    //   // Get collection with id 11.
+    it('should not remove a incomplete collection' +
+      ' if it is not present', fakeAsync(() => {
+      expect(component.incompleteCollectionsList.length).toBe(8);
 
-    //   let activity = CollectionSummary.createFromBackendDict(
-    //     learnerDashboardData.incomplete_collections_list[2]);
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      // Get collection with id 100.
+      let activity = CollectionSummary.createFromBackendDict(
+        // TODO(#10875): Fix type mismatch.
+        {
+          id: '100'
+        } as unknown as CollectionSummaryBackendDict);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
 
-    //   component.openRemoveActivityModal(
-    //     sectionNameI18nId, subsectionName, activity);
-    //   fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
 
-    //   expect(component.incompleteCollectionsList.length).toBe(7);
-    // });
+      expect(component.incompleteCollectionsList.length).toBe(8);
+    }));
 
-    // it('should remove an activity from exploration playlist when closing' +
-    //   ' remove activity modal', () => {
-    //   spyOn($uibModal, 'open').and.returnValue({
-    //     result: Promise.resolve()
-    //   });
+    it('should remove an activity from incomplete exploration when closing' +
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.incompleteExplorationsList.length).toBe(12);
 
-    //   expect(component.explorationPlaylist.length).toBe(10);
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      // Get exploration with id 13.
+      let activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.incomplete_explorations_list[2]);
 
-    //   let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-    //   let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
 
-    //   // Exploration with id 2.
-    //   let activity = LearnerExplorationSummary.createFromBackendDict(
-    //     learnerDashboardData.exploration_playlist[1]);
+      tick();
+      fixture.detectChanges();
 
-    //   component.openRemoveActivityModal(
-    //     sectionNameI18nId, subsectionName, activity);
-    //   fixture.detectChanges();
+      expect(component.incompleteExplorationsList.length).toBe(11);
+    }));
 
-    //   expect(component.explorationPlaylist.length).toBe(9);
-    // });
+    it('should remove an activity from incomplete collection when closing' +
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.incompleteCollectionsList.length).toBe(8);
 
-    // it('should remove an activity from collection playlist when closing' +
-    //   ' remove activity modal', () => {
-    //   spyOn($uibModal, 'open').and.returnValue({
-    //     result: Promise.resolve()
-    //   });
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
 
-    //   expect(component.collectionPlaylist.length).toBe(8);
+      // Get collection with id 11.
+      let activity = CollectionSummary.createFromBackendDict(
+        learnerDashboardData.incomplete_collections_list[2]);
 
-    //   let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-    //   let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-    //   // Get collection with id 2.
-    //   let activity = CollectionSummary.createFromBackendDict(
-    //     learnerDashboardData.collection_playlist[1]);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
 
-    //   component.openRemoveActivityModal(
-    //     sectionNameI18nId, subsectionName, activity);
-    //   fixture.detectChanges();
+      tick();
+      fixture.detectChanges();
 
-    //   expect(component.collectionPlaylist.length).toBe(7);
-    // });
+      expect(component.incompleteCollectionsList.length).toBe(7);
+    }));
+
+    it('should remove an exploration from exploration playlist when closing' +
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.explorationPlaylist.length).toBe(10);
+
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+
+      // Exploration with id 2.
+      let activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.exploration_playlist[1]);
+
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(component.explorationPlaylist.length).toBe(9);
+    }));
+
+    it('should remove an activity from collection playlist when closing' +
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.collectionPlaylist.length).toBe(8);
+
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      // Get collection with id 2.
+      let activity = CollectionSummary.createFromBackendDict(
+        learnerDashboardData.collection_playlist[1]);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+
+      tick();
+
+      expect(component.collectionPlaylist.length).toBe(7);
+    }));
 
     it('should get css classes based on status', () => {
       expect(component.getLabelClass('open')).toBe('badge badge-info');
@@ -989,86 +1879,82 @@ fdescribe('Learner dashboard page', () => {
 
     it('should get formatted date string from the timestamp in milliseconds',
       () => {
-        // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-        let NOW_MILLIS = 1416563100000;
+        // This corresponds to Fri, 2 Apr 2021 09:45:00 GMT.
+        let NOW_MILLIS = 1617393321345;
         spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-          .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
-        expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-          '11/21/2014');
+          .withArgs(NOW_MILLIS).and.returnValue('4/2/2021');
+        expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS))
+          .toBe('4/2/2021');
       });
+
+    it('should sanitize given png base64 data and generate url', () => {
+      component.getTrustedPngResourceUrl('base64Data');
+      expect(pngSanitizerService.getTrustedPngResourceUrl).toHaveBeenCalled();
+    });
   });
 
-  // describe('when fetching dashboard data fails', () => {
-  //   beforeEach(angular.mock.inject(($injector, $componentController) {
-  //     $httpBackend = $injector.get('$httpBackend');
-  //     Promise = $injector.get('Promise');
-  //     let $rootScope = $injector.get('$rootScope');
-  //     AlertsService = $injector.get('AlertsService');
-  //     CsrfTokenService = $injector.get('CsrfTokenService');
-  //     LearnerDashboardBackendApiService = $injector.get(
-  //       'LearnerDashboardBackendApiService');
-  //     UserService = $injector.get('UserService');
+  describe('when fetching dashboard data fails', () => {
+    beforeEach(async(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          MaterialModule,
+          FormsModule,
+          HttpClientTestingModule
+        ],
+        declarations: [
+          LearnerDashboardPageComponent,
+          MockTranslatePipe,
+          SortByPipe,
+          MockSlicePipe,
+          MockTrunctePipe,
+          BackgroundBannerComponentStub,
+          ExplorationSummaryTileComponentStub,
+          CollectionSummaryTileComponentStub,
+          LoadingDotsComponentStub,
+        ],
+        providers: [
+          AlertsService,
+          CsrfTokenService,
+          LearnerDashboardBackendApiService,
+          UserService
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
+      }).compileComponents();
+    }));
 
-  //     spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
-  //       Promise.resolve('sample-csrf-token'));
+    beforeEach(fakeAsync(() => {
+      fixture = TestBed.createComponent(LearnerDashboardPageComponent);
+      component = fixture.componentInstance;
+      alertsService = TestBed.inject(AlertsService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      learnerDashboardBackendApiService =
+        TestBed.inject(LearnerDashboardBackendApiService);
+      userService = TestBed.inject(UserService);
 
-  //     spyOn(userService, 'getProfileImageDataUrlAsync')
-  //       .and.returnValue(Promise.resolve(profilePictureDataUrl));
-  //     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-  //       Promise.resolve(userInfo));
-  //     spyOn(learnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
-  //       .and.returnValue(Promise.reject({
-  //         status: 404
-  //       }));
+      spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+        Promise.resolve('sample-csrf-token'));
 
-  //     $scope = $rootScope.$new();
-  //     component = $componentController('learnerDashboardPage', {
-  //       $rootScope: $scope
-  //     });
-  //     component.$onInit();
-  //   }));
+      spyOn(userService, 'getProfileImageDataUrlAsync')
+        .and.returnValue(Promise.resolve(profilePictureDataUrl));
 
-  //   it('should show an alert warning', () => {
-  //     spyOn(AlertsService, 'addWarning').and.callThrough();
-  //     fixture.detectChanges();
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo));
+    }));
 
-  //     expect(AlertsService.addWarning).toHaveBeenCalledWith(
-  //       'Failed to get learner dashboard data');
-  //   });
-  // });
+    it('should show an alert warning', fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
 
-  // describe('when triggering animation', () => {
-  //   let $$animateJs = null;
+      component.ngOnInit();
 
-  //   beforeEach(angular.mock.inject(($injector, $componentController) {
-  //     $$animateJs = $injector.get('$$animateJs');
-  //     $rootScope = $injector.get('$rootScope');
+      tick();
+      fixture.detectChanges();
 
-  //     $scope = $rootScope.$new();
-  //     component = $componentController('learnerDashboardPage', {
-  //       $rootScope: $scope
-  //     });
-  //   }));
-
-  //   it('should animate when adding and removing css classes', () => {
-  //     let element = angular.element(
-  //       '<div class="menu-sub-section"></div>');
-  //     let elementSlideUpSpy = spyOn(element, 'slideUp').and.callThrough();
-  //     let elementSlideDownSpy = spyOn(element, 'slideDown').and.callThrough();
-
-  //     // $$animateJs is a lower-level service which is used to simulate
-  //     // animation behavior.
-  //     // eslint-disable-next-line max-len
-  //     // Ref: https://stackoverflow.com/questions/33405666/nganimate-1-4-7-unit-test-not-calling-animation-s
-  //     $$animateJs(element, 'addClass', {
-  //       addClass: 'ng-hide'
-  //     }).start();
-  //     expect(elementSlideUpSpy).toHaveBeenCalled();
-
-  //     $$animateJs(element, 'removeClass', {
-  //       removeClass: 'ng-hide'
-  //     }).start();
-  //     expect(elementSlideDownSpy).toHaveBeenCalled();
-  //   });
-  // });
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard data');
+      expect(fetchDataSpy).toHaveBeenCalled();
+    }));
+  });
 });

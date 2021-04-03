@@ -28,7 +28,6 @@ import { UserService } from 'services/user.service';
 @Component({
   selector: 'collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
-  encapsulation: ViewEncapsulation.None
 })
 export class CollectionSummaryTileComponent implements OnInit {
   @Input() getCollectionId: string;

@@ -27,8 +27,12 @@ export class SortByPipe implements PipeTransform {
   transform(
       value: object[], isDescending: boolean,
       sortKey?: string): object[] {
-    if (!value || sortKey === 'default') {
+    if (!value) {
       return value;
+    }
+
+    if (sortKey === 'default'){
+      return value.reverse();
     }
 
     let numberArray = [];

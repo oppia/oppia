@@ -35,7 +35,6 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
-  encapsulation: ViewEncapsulation.None
 })
 export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() getCollectionId: string;

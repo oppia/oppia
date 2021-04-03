@@ -136,7 +136,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'learner-answer-info.service.ts',
     'learner-dashboard-backend-api.service.ts',
     'learner-dashboard-icons.component.ts',
-    'learner-dashboard-page.component.ts',
     'learner-local-nav.directive.ts',
     'learner-playlist-backend-api.service.ts',
     'learner-view-info.directive.ts',

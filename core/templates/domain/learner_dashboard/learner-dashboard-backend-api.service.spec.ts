@@ -187,7 +187,7 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
   var LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
-  var ERROR_STATUS_CODE = 500;
+  var ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -244,7 +244,6 @@ describe('Learner Dashboard Backend API Service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Error loading dashboard data.');
+      expect(failHandler).toHaveBeenCalledWith(400);
     }));
 });

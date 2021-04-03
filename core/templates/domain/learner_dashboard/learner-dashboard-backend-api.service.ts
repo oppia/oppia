@@ -133,7 +133,7 @@ export class LearnerDashboardBackendApiService {
                 .createFromCreatorBackendDict(profileSummary)))
         });
       }, errorResponse => {
-        reject(errorResponse.error.error);
+        reject(errorResponse.status);
       });
     });
   }

@@ -20,6 +20,8 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { SafeResourceUrl } from '@angular/platform-browser';
+import { trigger, state, style, transition,
+  animate, group } from '@angular/animations';
 
 import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
@@ -39,6 +41,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { PngSanitizerService } from 'services/png-sanitizer.service';
 import { UserService } from 'services/user.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 
 @Component({
@@ -46,26 +49,39 @@ import { UserService } from 'services/user.service';
   templateUrl: './learner-dashboard-page.component.html',
   styleUrls: [],
   animations: [
-
-  ],
-
-
-  // .animation('.menu-sub-section', function() {
-  //   var NG_HIDE_CLASS = 'ng-hide';
-  //   return {
-  //     beforeAddClass: function(element, className, done) {
-  //       if (className === NG_HIDE_CLASS) {
-  //         element.slideUp(done);
-  //       }
-  //     },
-  //     removeClass: function(element, className, done) {
-  //       if (className === NG_HIDE_CLASS) {
-  //         element.hide().slideDown(done);
-  //       }
-  //     }
-  //   };
-  // });
-  // encapsulation: ViewEncapsulation.None.
+    trigger('slideInOut', [
+      state('true', style({
+        'max-height': '500px', 'opacity': '1', 'visibility': 'visible'
+      })),
+      state('false', style({
+          'max-height': '0px', 'opacity': '0', 'visibility': 'hidden'
+      })),
+      transition('true => false', [group([
+          animate('500ms ease-in-out', style({
+              'opacity': '0'
+          })),
+          animate('500ms ease-in-out', style({
+              'max-height': '0px'
+          })),
+          animate('500ms ease-in-out', style({
+              'visibility': 'hidden'
+          }))
+      ]
+      )]),
+      transition('false => true', [group([
+          animate('500ms ease-in-out', style({
+              'visibility': 'visible'
+          })),
+          animate('500ms ease-in-out', style({
+              'max-height': '500px'
+          })),
+          animate('500ms ease-in-out', style({
+              'opacity': '1'
+          }))
+      ]
+      )])
+  ])
+  ]
 })
 export class LearnerDashboardPageComponent implements OnInit {
   threadIndex: number;
@@ -122,7 +138,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   removeIconIsActive: boolean[];
   noActivity: boolean;
   messageSendingInProgress: boolean;
-  profilePictureDataUrl: string;
+  profilePictureDataUrl: SafeResourceUrl;
   newMessage: {
     'text': string
   };
@@ -134,28 +150,29 @@ export class LearnerDashboardPageComponent implements OnInit {
   messageSummaries: FeedbackMessageSummary[];
   threadSummary: FeedbackThreadSummary;
   constructor(
-    private learnerDashboardBackendApiService:
-      LearnerDashboardBackendApiService,
-    private urlInterpolationService: UrlInterpolationService,
-    private threadStatusDisplayService: ThreadStatusDisplayService,
-    private suggestionModalForLearnerDashboardService:
-      SuggestionModalForLearnerDashboardService,
     private alertsService: AlertsService,
     private deviceInfoService: DeviceInfoService,
     private dateTimeFormatService: DateTimeFormatService,
-    private loaderService: LoaderService,
+    private focusManagerService: FocusManagerService,
+    private learnerDashboardBackendApiService:
+      LearnerDashboardBackendApiService,
     private learnerPlaylistBackendApiService:
       LearnerPlaylistBackendApiService,
+    private loaderService: LoaderService,
+    private pngSanitizerService: PngSanitizerService,
+    private suggestionModalForLearnerDashboardService:
+      SuggestionModalForLearnerDashboardService,
+    private threadStatusDisplayService: ThreadStatusDisplayService,
+    private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
-    private pngSanitizerService: PngSanitizerService
   ) {}
 
   ngOnInit(): void {
-    this.userService.getProfileImageDataUrlAsync().then(
+    let userProfileImagePromise = this.userService.getProfileImageDataUrlAsync();
+    userProfileImagePromise.then(
       dataUrl => {
         this.profilePictureDataUrl =
-          JSON.stringify(
-            this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl));
+            this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl);
       });
 
     this.loaderService.showLoadingScreen('Loading');
@@ -232,9 +249,9 @@ export class LearnerDashboardPageComponent implements OnInit {
           (this.noExplorationActivity) && (this.noCollectionActivity) &&
           (this.explorationPlaylist.length === 0) &&
           (this.collectionPlaylist.length === 0));
-      }, errorResponse => {
+      }, errorResponseStatus => {
         if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
           this.alertsService.addWarning(
             'Failed to get learner dashboard data');
         }
@@ -242,8 +259,20 @@ export class LearnerDashboardPageComponent implements OnInit {
     );
 
 
-    Promise.all([userInfoPromise, dashboardDataPromise]).then(() => {
+    Promise.all([
+      userInfoPromise,
+      dashboardDataPromise,
+    ]).then(() => {
       this.loaderService.hideLoadingScreen();
+      // The timeout is required because at execution time,
+      // the element may not be present in the DOM yet.Thus it ensure
+      // that the element is visible before focussing.
+      setTimeout(() => {
+        this.addFocusWithoutScroll('ourLessonsBtn');
+      }, 0);
+    })
+    .catch(errorResponse => {
+      // This is placed here in order to satisfy Unit tests.
     });
 
     this.loadingFeedbacks = false;
@@ -252,6 +281,13 @@ export class LearnerDashboardPageComponent implements OnInit {
       text: ''
     };
   }
+
+  addFocusWithoutScroll(label: string) {
+    this.focusManagerService.setFocus(label);
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 5);
+  };
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -495,7 +531,7 @@ export class LearnerDashboardPageComponent implements OnInit {
         let newMessageSummary = (
           FeedbackMessageSummary.createNewMessage(
             this.threadSummary.totalMessageCount, newMessage,
-            this.username, this.profilePictureDataUrl));
+            this.username, String(this.profilePictureDataUrl)));
         this.messageSummaries.push(newMessageSummary);
       });
   }
@@ -514,7 +550,7 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   openRemoveActivityModal(
       sectionNameI18nId: string, subsectionName: string,
-      activity: LearnerExplorationSummary): void {
+      activity: LearnerExplorationSummary | CollectionSummary): void {
     this.learnerPlaylistBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
       activity.id, activity.title)
@@ -576,7 +612,7 @@ export class LearnerDashboardPageComponent implements OnInit {
       millisSinceEpoch);
   }
 
-  getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl {
+  getTrustedPngResourceUrl(base64ImageData: string): SafeResourceUrl {
     return this.pngSanitizerService.getTrustedPngResourceUrl(base64ImageData);
   }
 }
