@@ -67,11 +67,7 @@ angular.module('oppia').controller(
             ContributionOpportunitiesService.
               reloadOpportunitiesEventEmitter.emit();
           },
-          (error) => {
-            $scope.rejectAndReviewNext('Invalid Suggestion');
-            AlertsService.clearWarnings();
-            AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
-          });
+          $scope.showError);
         $scope.isEditing = false;
       };
 
@@ -186,5 +182,11 @@ angular.module('oppia').controller(
       $scope.cancel = function() {
         $uibModalInstance.close(resolvedSuggestionIds);
       };
+
+      $scope.showError = function(error) {
+        $scope.rejectAndReviewNext('Invalid Suggestion');
+        AlertsService.clearWarnings();
+        AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
+      }
     }
   ]);

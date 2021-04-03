@@ -103,8 +103,25 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith('Translation');
     });
 
-    it('should accept suggestion in suggestion modal service when clicking on' +
-      ' accept and review next suggestion button', function() {
+    it('should notify user on failed suggestion activities', function() {
+      const error = {
+        data: {
+          error: 'Error'
+        }
+      }
+      spyOn(AlertsService, 'clearWarnings');
+      spyOn(AlertsService, 'addWarning');
+
+      $scope.showError(error);
+
+      expect(AlertsService.clearWarnings).toHaveBeenCalled();
+      expect(
+        AlertsService.addWarning).toHaveBeenCalledWith(
+          'Invalid Suggestion: Error');
+    });
+
+    it('should accept suggestion in suggestion modal service when clicking' +
+      ' on accept and review next suggestion button', function() {
       expect($scope.activeSuggestionId).toBe('suggestion_1');
       expect($scope.activeSuggestion).toEqual(suggestion1);
       expect($scope.reviewable).toBe(reviewable);
