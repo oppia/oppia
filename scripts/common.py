@@ -121,8 +121,8 @@ REDIS_SERVER_PATH = os.path.join(
 REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
-CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
-    os.path.join(CURR_DIR, '.config', 'gcloud', 'emulators', 'datastore'))
+CLOUD_DATASTORE_EMULATOR_DATA_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, '.config', 'gcloud', 'emulators', 'datastore')
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
