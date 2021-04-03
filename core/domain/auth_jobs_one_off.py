@@ -128,7 +128,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
             return
 
-        assoc_info_pairs = [ast.literal_eval(s) for s in values]
+        assoc_info_pairs = [ast.literal_eval(v) for v in values]
 
         if key == cls.EMPTY_AUTH_ID_KEY:
             for report in cls.report_assocs_missing(assoc_info_pairs):
@@ -222,7 +222,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             str. A debug string for the associations with collisions.
         """
         user_id_collisions = sorted(
-            '"%s"' % info[0] for assoc_key, info in assoc_info_pairs
+            '"%s"' % user_id for assoc_key, (user_id, _) in assoc_info_pairs
             if assoc_key == cls.ASSOC_BY_USER_ID_KEY)
 
         if len(user_id_collisions) > 1:

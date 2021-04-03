@@ -416,8 +416,6 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
 
     JOB_CLASS = auth_jobs.PopulateFirebaseAccountsOneOffJob
 
-    JOB_CLASS = auth_jobs.PopulateFirebaseAccountsOneOffJob
-
     def setUp(self):
         super(PopulateFirebaseAccountsOneOffJobTests, self).setUp()
         self._auth_id_generator = itertools.count()
