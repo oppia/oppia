@@ -788,8 +788,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('%s/translation/%s' % (
-            feconf.SUGGESTION_URL_PREFIX, suggestion.suggestion_id),
-            {'translation_html': '<p>Test Trans</p>'}, csrf_token)
+            feconf.SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'translation_html': '<p>Test Trans</p>'
+            }, csrf_token=csrf_token)
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
