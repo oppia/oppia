@@ -367,7 +367,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
 
-        if not skill_ids:
+        if (not skill_ids) or (total_question_count == 0):
             return []
 
         question_count_per_skill = int(

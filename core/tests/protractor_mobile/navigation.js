@@ -191,7 +191,7 @@ describe('Navigation features on mobile', function() {
       // We should not wait for angular here since
       // the login page is non-angular.
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/_ah/login?continue=http%3A//localhost%3A9001/signup%3Freturn_url%3Dhttp%253A%252F%252Flocalhost%253A9001%252Flibrary');
+        'http://localhost:9001/login?return_url=http%253A%252F%252Flocalhost%253A9001%252Flibrary');
       // As soon as this page loads up, we are again
       // setting browser.ignoreSynchronization = false
       // to prevent any flakiness.
