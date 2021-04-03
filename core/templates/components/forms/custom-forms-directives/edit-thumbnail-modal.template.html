@@ -15,9 +15,9 @@
             <li>Please ensure that the uploaded image is less than 100 KB.</li>
           </ul>
         </div>
-        <image-uploader on-file-changed="onFileChanged"
-                        allowed-image-formats="allowedImageFormats">
-        </image-uploader>
+        <oppia-image-uploader (file-changed)="onFileChanged($event)"
+                              [allowed-image-formats]="allowedImageFormats">
+        </oppia-image-uploader>
       </div>
       <div class="oppia-form-error" ng-if="invalidImageWarningIsShown">
         Please upload a valid SVG image.
