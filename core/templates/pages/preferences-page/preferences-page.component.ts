@@ -21,7 +21,7 @@ require('cropperjs/dist/cropper.min.css');
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');

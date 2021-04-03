@@ -17,7 +17,7 @@
  */
 
 // This directive can only be used in the context of an exploration.
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');

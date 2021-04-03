@@ -1,22 +1,22 @@
-<div class="image-uploader-drop-area" ng-class="{'image-uploader-is-active': backgroundWhileUploading}">
-  <div class="image-uploader-text" translate="I18N_DIRECTIVES_DRAG_IMAGE_HERE"></div>
-  <span ng-if="errorMessage"
+<div class="image-uploader-drop-area" [ngClass]="{'image-uploader-is-active': backgroundWhileUploading}" #dropArea>
+  <div class="image-uploader-text">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
+  <span *ngIf="errorMessage"
         class="image-uploader-error-message protractor-test-upload-error">
     <i class="material-icons">&#xE002;</i>
-    <[errorMessage]>
+    {{ errorMessage }}
   </span>
   <span class="image-uploader-license-warning">
     Before uploading images, please ensure that they are<br>
     compatible with the <a href="/about#license" target="_blank" rel="noopener">license terms</a> of the site.<br>
     Please do not upload watermarked images.
   </span>
-  <label for="image-file-input" translate="I18N_DIRECTIVES_UPLOAD_A_FILE" class="image-uploader-upload-label-button"></label>
+  <label for="image-file-input" class="image-uploader-upload-label-button">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
   <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
-  <input type="file" id="image-file-input" onclick="this.value = null"
+  <input type="file" id="image-file-input" (click)="this.value = null"
+         (change)="handleFile()"
          class="image-uploader-file-input protractor-test-photo-upload-input"
-         ng-class="fileInputClassName">
+         [ngClass]="fileInputClassName" #imageInput>
 </div>
-
 <style>
   .image-uploader-license-warning {
     background-color: rgba(225, 250, 89, 0.41);
