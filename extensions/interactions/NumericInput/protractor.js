@@ -18,7 +18,9 @@
  */
 
 var customizeInteraction = function() {
-  // There are no customizations.
+  await objects.UnicodeStringEditor(
+    elem.element(by.tagName('schema-based-unicode-editor'))
+  ).setValue(placeholderText);
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {
@@ -26,6 +28,9 @@ var expectInteractionDetailsToMatch = async function(elem) {
     await elem.element(by.tagName(
       'oppia-interactive-numeric-input')).isPresent()
   ).toBe(true);
+  await waitFor.presenceOf(
+    elem.element(by.tagName('oppia-interactive-numeric-input')),
+    'The numeric input editor took too long to load.');
 };
 
 var submitAnswer = async function(elem, answer) {
@@ -37,9 +42,9 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'Real';
 
 var testSuite = [{
-  interactionArguments: [],
+  interactionArguments: ['Type a number greater then zero.'],
   ruleArguments: ['IsWithinTolerance', 2, 143],
-  expectedInteractionDetails: [],
+  expectedInteractionDetails: ['Type a number greater then zero.'],
   wrongAnswers: [146, 130],
   correctAnswers: [142]
 }];
