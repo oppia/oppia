@@ -187,6 +187,6 @@ angular.module('oppia').controller(
         $scope.rejectAndReviewNext('Invalid Suggestion');
         AlertsService.clearWarnings();
         AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
-      }
+      };
     }
   ]);

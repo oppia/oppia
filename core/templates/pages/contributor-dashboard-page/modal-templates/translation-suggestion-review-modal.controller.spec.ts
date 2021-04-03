@@ -108,7 +108,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         data: {
           error: 'Error'
         }
-      }
+      };
       spyOn(AlertsService, 'clearWarnings');
       spyOn(AlertsService, 'addWarning');
 
@@ -117,7 +117,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect(AlertsService.clearWarnings).toHaveBeenCalled();
       expect(
         AlertsService.addWarning).toHaveBeenCalledWith(
-          'Invalid Suggestion: Error');
+        'Invalid Suggestion: Error');
     });
 
     it('should accept suggestion in suggestion modal service when clicking' +
