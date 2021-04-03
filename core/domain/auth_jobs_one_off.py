@@ -74,9 +74,9 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
 
     EMPTY_AUTH_ID_KEY = '<EMPTY_AUTH_ID_KEY>'
-    ASSOC_BY_AUTH_ID_KEY = 'assoc_by_auth_id'
-    ASSOC_BY_USER_ID_KEY = 'assoc_by_user_id'
-    FIREBASE_ACCOUNT_KEY = 'firebase_account'
+    ASSOC_BY_AUTH_ID_KEY = 'assoc_info_by_auth_id'
+    ASSOC_BY_USER_ID_KEY = 'assoc_info_by_user_id'
+    FIREBASE_ACCOUNT_KEY = 'firebase_account_info'
 
     ERROR_ASSOC_INCONSISTENCIES = (
         'ERROR: Found inconsistency in models and/or Firebase account')
@@ -149,7 +149,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             for report in reports:
                 yield (cls.ERROR_ASSOC_INCONSISTENCIES, report)
             return
-        # Else: assoc_by_auth_id and assoc_by_user_id are either:
+        # Else: assoc_info_by_auth_id and assoc_info_by_user_id are either:
         #   1. Both deleted.
         #   2. Both present and contain consistent values.
 
@@ -164,8 +164,8 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 firebase_auth.update_user(auth_id, disabled=True)
                 firebase_auth.delete_user(auth_id)
             return
-        # Else: assoc_by_auth_id and assoc_by_user_id are both present and have
-        # consistent values.
+        # Else: assoc_info_by_auth_id and assoc_info_by_user_id are both present
+        # and have consistent values.
 
         user_id, marked_as_deleted = assoc_info[assoc_key]
 
@@ -188,9 +188,9 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def report_assocs_missing(cls, assoc_info_pairs):
         """Yields debug information for each of the given associations.
 
-        NOTE: Since assoc_by_auth_id and Firebase accounts are keyed by auth_id,
-        the only kinds of associations that could ever hit this function are
-        UserAuthDetailsModel.
+        NOTE: Since assoc_info_by_auth_id and Firebase accounts are keyed by
+        auth_id, the only kinds of associations that could ever hit this
+        function are UserAuthDetailsModel.
 
         Args:
             assoc_info_pairs: list(tuple(str, (str, bool))). The list of
@@ -201,8 +201,8 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """
         for _, (user_id, _) in assoc_info_pairs:
             yield (
-                'UserAuthDetailsModel(id="%s") does not correspond to a unique '
-                'firebase_auth_id' % user_id)
+                'UserAuthDetailsModel(id="%s", firebase_auth_id=None) does not '
+                'correspond to a firebase_auth_id' % user_id)
 
     @classmethod
     def report_assoc_collisions(cls, auth_id, assoc_info_pairs):
@@ -226,8 +226,8 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def report_assoc_inconsistencies(
-            cls, auth_id, assoc_by_auth_id=None, assoc_by_user_id=None,
-            firebase_account=None):
+            cls, auth_id, assoc_info_by_auth_id=None,
+            assoc_info_by_user_id=None, firebase_account_info=None):
         """Reports inconsistencies between the given values.
 
         IMPORTANT: The names of the keyword arguments MUST match the values of
@@ -236,53 +236,66 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             auth_id: str. The auth_id of the user.
-            assoc_by_auth_id: tuple|None. The (user_id, deleted) properties from
-                the UserIdByFirebaseAuthIdModel corresponding to auth_id. NOTE:
-                UserIdByFirebaseAuthIdModel is keyed by auth_id,
-                so this argument will never use the default value of None.
-            assoc_by_user_id: tuple|None. The (user_id, deleted) properties from
-                the UserAuthDetailsModel corresponding to auth_id, or None if
-                one does not exist.
-            firebase_account: tuple|None. The (user_id, disabled) properties
-                from the Firebase account corresponding to auth_id, or None if
-                an account does not exist. NOTE: The user_id is always None.
+            assoc_info_by_auth_id: tuple. The (user_id, deleted) properties from
+                the UserIdByFirebaseAuthIdModel corresponding to auth_id.
+                NOTE: UserIdByFirebaseAuthIdModel is keyed by auth_id, so this
+                argument will never use the default value of None.
+            assoc_info_by_user_id: tuple|None. The (user_id, deleted) properties
+                from the UserAuthDetailsModel corresponding to auth_id, or None
+                if one does not exist.
+            firebase_account_info: tuple|None. The (user_id, disabled)
+                properties from the Firebase account corresponding to auth_id,
+                or None if an account does not exist.
+                NOTE: The user_id is always None.
 
         Yields:
             str. Debug information about a discovered inconsistency.
         """
-        if assoc_by_auth_id is None and assoc_by_user_id is None:
+        if assoc_info_by_auth_id is None and assoc_info_by_user_id is None:
             # User is deleted and will be managed by the reduce() logic.
             return
 
-        distinct_user_ids = {assoc_by_auth_id[0]}
-        distinct_deleted_bools = {assoc_by_auth_id[1]}
+        user_id_of_assoc_by_auth_id, deleted_bool_of_assoc_by_auth_id = (
+            assoc_info_by_auth_id)
 
-        if assoc_by_user_id is None:
+        if assoc_info_by_user_id is None:
             yield (
                 'UserIdByFirebaseAuthIdModel(id="%s") does not correspond to a '
                 'unique UserAuthDetailsModel' % auth_id)
+            user_id_of_assoc_by_user_id = deleted_bool_of_assoc_by_user_id = (
+                None)
         else:
-            distinct_user_ids.add(assoc_by_user_id[0])
-            distinct_deleted_bools.add(assoc_by_user_id[1])
+            user_id_of_assoc_by_user_id, deleted_bool_of_assoc_by_user_id = (
+                assoc_info_by_user_id)
 
-        if len(distinct_user_ids) == 2:
+        if (user_id_of_assoc_by_user_id is not None and
+                user_id_of_assoc_by_user_id != user_id_of_assoc_by_auth_id):
             yield (
                 'auth_id="%s" has inconsistent `user_id` assignments: '
                 'UserIdByFirebaseAuthIdModel(user_id="%s") does not match '
                 'UserAuthDetailsModel(id="%s")' % (
-                    auth_id, assoc_by_auth_id[0], assoc_by_user_id[0]))
+                    auth_id,
+                    user_id_of_assoc_by_auth_id,
+                    user_id_of_assoc_by_user_id))
 
-        if len(distinct_deleted_bools) == 2:
+        if (deleted_bool_of_assoc_by_user_id is not None and
+                deleted_bool_of_assoc_by_user_id !=
+                deleted_bool_of_assoc_by_auth_id):
             yield (
                 'auth_id="%s" has inconsistent `deleted` assignments: '
                 'UserIdByFirebaseAuthIdModel(user_id="%s", deleted=%r) does '
                 'not match UserAuthDetailsModel(id="%s", deleted=%r)' % (
-                    auth_id, assoc_by_auth_id[0], assoc_by_auth_id[1],
-                    assoc_by_user_id[0], assoc_by_user_id[1]))
+                    auth_id,
+                    user_id_of_assoc_by_auth_id,
+                    deleted_bool_of_assoc_by_auth_id,
+                    user_id_of_assoc_by_user_id,
+                    deleted_bool_of_assoc_by_user_id))
 
-        if firebase_account is not None:
-            _, firebase_account_is_disabled = firebase_account
-            if firebase_account_is_disabled and not any(distinct_deleted_bools):
+        if firebase_account_info is not None:
+            _, firebase_account_is_disabled = firebase_account_info
+            if (firebase_account_is_disabled
+                    and not deleted_bool_of_assoc_by_auth_id
+                    and not deleted_bool_of_assoc_by_user_id):
                 yield (
                     'Firebase account with auth_id="%s" is disabled, but the '
                     'user is not marked for deletion on Oppia' % auth_id)

@@ -372,8 +372,8 @@ class SyncFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['ERROR: Found inconsistency in models and/or Firebase account',
-             'UserAuthDetailsModel(id="%s") does not correspond to a unique '
-             'firebase_auth_id' % self.USER_ID],
+             'UserAuthDetailsModel(id="%s", firebase_auth_id=None) does not '
+             'correspond to a firebase_auth_id' % self.USER_ID],
         ])
 
     def test_reports_mismatched_user_ids(self):
