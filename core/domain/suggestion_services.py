@@ -412,7 +412,7 @@ def accept_suggestion(
         _update_user_proficiency(user_proficiency)
 
 def update_suggestion(suggestion_id, translation_html):
-    """Updates a suggestion with the given suggestion_id and change.
+    """Updates a suggestion with the given suggestion_id and translation_html.
 
     Args:
         suggestion_id: str. The id of the suggestion to be accepted.
@@ -421,6 +421,9 @@ def update_suggestion(suggestion_id, translation_html):
     Raises:
         Exception. The suggestion is already handled.
         Exception. The suggestion is not valid.
+
+    Returns:
+        _update_suggestion(suggestion). Updates the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)

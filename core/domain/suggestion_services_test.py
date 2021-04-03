@@ -1585,11 +1585,14 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])
 
-        suggestion_services.update_suggestion(suggestions[0].suggestion_id, '<p>Test Translation</p>')
+        suggestion_services.update_suggestion(
+            suggestions[0].suggestion_id, '<p>Test Translation</p>')
 
-        updated_suggestion = suggestion_services.get_suggestion_by_id(suggestions[0].suggestion_id)
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestions[0].suggestion_id)
         self.assertEqual(
-            updated_suggestion.change.translation_html, '<p>Test Translation</p>')
+            updated_suggestion.change.translation_html,
+            '<p>Test Translation</p>')
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):

@@ -124,9 +124,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         }, () => onFailure && onFailure(suggestionId));
       },
       updateTranslation: function(
-        suggestionId, translationHtml,
+          suggestionId, translationHtml,
           onSuccess, onFailure) {
-        //const url = '/updatesuggestionhandler/';
         var url = UrlInterpolationService.interpolateUrl(
           _UPDATE_TRANSLATION_HANDLER_URL, {
             suggestion_id: suggestionId

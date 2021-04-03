@@ -132,11 +132,10 @@ angular.module('oppia').component('contributionsAndReview', {
       var getTranslationContributionsSummary = function(
           suggestionIdToSuggestions) {
         var translationContributionsSummaryList = [];
-        console.log(suggestionIdToSuggestions);
         Object.keys(suggestionIdToSuggestions).forEach(function(key) {
           var suggestion = suggestionIdToSuggestions[key].suggestion;
-          if(!suggestion.change.translation_html) {
-            return
+          if (!suggestion.change.translation_html) {
+            return;
           }
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';

@@ -26,15 +26,15 @@ require('services/suggestion-modal.service.ts');
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService',
-    'ContributionAndReviewService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'ContributionOpportunitiesService',
+    'ContributionAndReviewService', 'ContributionOpportunitiesService',
+    'SiteAnalyticsService', 'UrlInterpolationService',
     'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION',
     function(
         $http, $scope, $uibModalInstance, AlertsService,
-        ContributionAndReviewService, SiteAnalyticsService,
-        UrlInterpolationService, ContributionOpportunitiesService,
+        ContributionAndReviewService, ContributionOpportunitiesService,
+        SiteAnalyticsService, UrlInterpolationService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
@@ -53,7 +53,7 @@ angular.module('oppia').controller(
       };
       $scope.editedContent = {
         html: ''
-      }
+      };
 
       $scope.updateTranslate = function() {
         const updatedTranslation = $scope.editedContent.html;
@@ -61,19 +61,20 @@ angular.module('oppia').controller(
         ContributionAndReviewService.updateTranslation(
           suggestionId,
           updatedTranslation,
-           (success) => {
+          (success) => {
             $scope.translationHtml = updatedTranslation;
             $scope.isTranslationUpdated = true;
-            ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
-           },
-           (error) => {
+            ContributionOpportunitiesService.
+              reloadOpportunitiesEventEmitter.emit();
+          },
+          (error) => {
             $scope.rejectAndReviewNext('Invalid Suggestion');
             AlertsService.clearWarnings();
             AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
           });
-          $scope.isEditing = false;
-      }
-      
+        $scope.isEditing = false;
+      };
+
       delete suggestionIdToSuggestion[initialSuggestionId];
       var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 
@@ -112,7 +113,7 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.change.translation_html);
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
-          $scope.editedContent.html = $scope.translationHtml;
+        $scope.editedContent.html = $scope.translationHtml;
         $scope.reviewMessage = '';
         if (!reviewable) {
           $scope.suggestionIsRejected = (
@@ -144,8 +145,8 @@ angular.module('oppia').controller(
 
       $scope.acceptAndReviewNext = function() {
         $scope.finalCommitMessage = generateCommitMessage();
-        if($scope.isTranslationUpdated) {
-          $scope.finalCommitMessage = $scope.finalCommitMessage + '-With Edits'
+        if( $scope.isTranslationUpdated) {
+          $scope.finalCommitMessage = $scope.finalCommitMessage + '-With Edits';
         }
         $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
@@ -175,12 +176,12 @@ angular.module('oppia').controller(
 
       $scope.editTranslate = function() {
         $scope.isEditing = true;
-      }
+      };
 
       $scope.cancelEdit = function() {
         $scope.isEditing = false;
         $scope.editedContent.html = $scope.translationHtml;
-      }
+      };
 
       $scope.cancel = function() {
         $uibModalInstance.close(resolvedSuggestionIds);
