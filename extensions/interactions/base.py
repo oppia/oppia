@@ -40,7 +40,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import json
 
-from core.domain import obj_services
+from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
@@ -172,7 +172,7 @@ class BaseInteraction(python_utils.OBJECT):
         if self.answer_type is None:
             return None
         else:
-            return obj_services.Registry.get_object_class_by_type(
+            return object_registry.Registry.get_object_class_by_type(
                 self.answer_type).normalize(answer)
 
     @property
