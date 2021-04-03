@@ -208,17 +208,34 @@ angular.module('oppia').component('stateTranslation', {
             activeDataFormat = TRANSLATION_DATA_FORMAT_UNICODE;
           }
         } else if (tabId === $scope.TAB_ID_RULE_INPUTS) {
+          if ($scope.interactionRuleTranslatableContents.length === 0) {
+            throw new Error(
+              'Accessed rule input translation tab when there are no rules');
+          }
+
+          // Note that only 'TextInput' and 'SetInput' have translatable rule
+          // types. The rules tab is disabled for other interactions.
           const {
             rule, inputName, contentId
           } = $scope.interactionRuleTranslatableContents[0];
           activeContentId = contentId;
-          var inputType = rule.inputTypes[inputName];
+          const inputType = rule.inputTypes[inputName];
           activeDataFormat = RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
           $scope.activeRuleContentIndex = 0;
         }
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, activeDataFormat);
         $scope.activatedTabId = tabId;
+      };
+
+      $scope.getHumanReadableRuleInputValues = function(inputValue, inputType) {
+        if (inputType === 'TranslatableSetOfNormalizedString') {
+          return ('[' + inputValue.normalizedStrSet.join(', ') + ']');
+        } else if (inputType === 'TranslatableSetOfUnicodeString') {
+          return ('[' + inputValue.unicodeStrSet.join(', ') + ']');
+        } else {
+          throw new Error(`The ${inputType} type is not implemented.`);
+        }
       };
 
       $scope.summarizeDefaultOutcome = function(
@@ -352,7 +369,8 @@ angular.module('oppia').component('stateTranslation', {
           rule, inputName, contentId
         } = $scope.interactionRuleTranslatableContents[newIndex];
         const activeContentId = contentId;
-        const activeDataFormat = rule.inputTypes[inputName];
+        const inputType = rule.inputTypes[inputName];
+        const activeDataFormat = RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, activeDataFormat);
         $scope.activeRuleContentIndex = newIndex;

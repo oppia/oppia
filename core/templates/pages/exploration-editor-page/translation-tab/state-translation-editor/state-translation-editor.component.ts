@@ -22,7 +22,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('services/external-save.service.ts');
-require('filters/format-base-translatable-object-values.filter.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -173,6 +172,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         StateWrittenTranslationsService.restoreFromMemento();
         initEditor();
       };
+
       ctrl.$onInit = function() {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
