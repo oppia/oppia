@@ -1955,6 +1955,9 @@ class UserQueryModel(base_models.BaseModel):
             'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edited_fewer_than_n_exps':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_collection': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'used_logic_proof_interaction': 
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sent_email_model_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
