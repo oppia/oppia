@@ -210,7 +210,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Args:
             auth_id: str. The auth_id to check.
-            assoc_info_pairs: list(tuple(str, (str, bool)|bool)). The list of
+            assoc_info_pairs: list(tuple(str, (str, bool))). The list of
                 associations that do not correspond to any auth_id.
 
         Yields:
