@@ -450,6 +450,30 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._test.assertNotEqual(
             custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
+    def assert_is_disabled(self, uid):
+        """Asserts that the given ID is a disabled account.
+
+        NOTE: This method can only be called after the instance has been
+        installed to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self.assert_is_user(uid)
+        self._test.assertTrue(self.get_user(uid).disabled)
+
+    def assert_is_not_disabled(self, uid):
+        """Asserts that the given ID is not a disabled account.
+
+        NOTE: This method can only be called after the instance has been
+        installed to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self.assert_is_user(uid)
+        self._test.assertFalse(self.get_user(uid).disabled)
+
     def assert_is_user_multi(self, uids):
         """Asserts that every account with the given ids exist.
 
