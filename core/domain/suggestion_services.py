@@ -411,6 +411,7 @@ def accept_suggestion(
         # updated the domain object.
         _update_user_proficiency(user_proficiency)
 
+
 def update_suggestion(suggestion_id, translation_html):
     """Updates a suggestion with the given suggestion_id and translation_html.
 

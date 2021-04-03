@@ -145,7 +145,7 @@ angular.module('oppia').controller(
 
       $scope.acceptAndReviewNext = function() {
         $scope.finalCommitMessage = generateCommitMessage();
-        if( $scope.isTranslationUpdated) {
+        if ($scope.isTranslationUpdated) {
           $scope.finalCommitMessage = $scope.finalCommitMessage + '-With Edits';
         }
         $scope.resolvingSuggestion = true;

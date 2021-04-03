@@ -772,7 +772,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         # Test reviewer can accept successfully.
         self.login(self.REVIEWER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         change_dict = {
             'cmd': 'add_translation',
@@ -787,11 +786,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, self.translator_id, change_dict, 'description')
 
+        csrf_token = self.get_new_csrf_token()
         self.put_json('%s/translation/%s' % (
             feconf.SUGGESTION_URL_PREFIX, suggestion.suggestion_id),
-            {
-                'translation_html': '<p>Test Trans</p>'
-            }, csrf_token)
+            {'translation_html': '<p>Test Trans</p>'}, csrf_token)
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)

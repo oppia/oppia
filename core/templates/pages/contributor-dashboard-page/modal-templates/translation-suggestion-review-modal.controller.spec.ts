@@ -26,7 +26,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let $uibModalInstance = null;
   let SiteAnalyticsService = null;
   let contributionAndReviewService = null;
-  let contributionOpportunitiesService = null;
   let AlertsService = null;
 
   importAllAngularServices();
@@ -262,8 +261,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
         spyOn(contributionAndReviewService, 'updateTranslation')
           .and.callFake((
-            suggestionId, updatedTranslation,
-            successCallback, errorCallback) => {
+              suggestionId, updatedTranslation,
+              successCallback, errorCallback) => {
             successCallback();
           });
 
