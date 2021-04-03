@@ -30,7 +30,7 @@ import feconf
 import python_utils
 import utils
 
-import firebase_admin
+from firebase_admin import auth as firebase_auth
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -98,9 +98,8 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 item.id,
                 (cls.ASSOC_BY_AUTH_ID_KEY, (item.user_id, item.deleted)))
             yield (auth_id, assoc_info)
-            return
 
-        if isinstance(item, auth_models.UserAuthDetailsModel):
+        elif isinstance(item, auth_models.UserAuthDetailsModel):
             if item.gae_id == feconf.SYSTEM_COMMITTER_ID:
                 yield (cls.SYSTEM_COMMITTER_ACK, item.id)
                 return
@@ -108,12 +107,13 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 item.firebase_auth_id or cls.EMPTY_AUTH_ID_KEY,
                 (cls.ASSOC_BY_USER_ID_KEY, (item.id, item.deleted)))
             yield (auth_id, assoc_info)
-            return
 
-        for user in firebase_admin.auth.list_users().iterate_all():
-            auth_id, assoc_info = (
-                user.uid, (cls.FIREBASE_ACCOUNT_KEY, (None, user.disabled)))
-            yield (auth_id, assoc_info)
+        # The item must be an instance of auth_models.FirebaseSeedModel.
+        elif item.id == auth_models.ONLY_FIREBASE_SEED_MODEL_ID:
+            for user in firebase_auth.list_users().iterate_all():
+                auth_id, assoc_info = (
+                    user.uid, (cls.FIREBASE_ACCOUNT_KEY, (None, user.disabled)))
+                yield (auth_id, assoc_info)
 
     @staticmethod
     def reduce(key, values):
@@ -161,8 +161,8 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         if user_is_permanently_deleted:
             if firebase_account_exists:
-                firebase_admin.auth.update_user(auth_id, disabled=True)
-                firebase_admin.auth.delete_user(auth_id)
+                firebase_auth.update_user(auth_id, disabled=True)
+                firebase_auth.delete_user(auth_id)
             return
         # Else: assoc_by_auth_id and assoc_by_user_id are both present and have
         # consistent values.
@@ -171,18 +171,18 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         if not firebase_account_exists:
             user_settings = user_models.UserSettingsModel.get(user_id)
-            firebase_admin.auth.create_user(
+            firebase_auth.create_user(
                 uid=auth_id, email=user_settings.email,
                 # NOTE: Even though the user might be marked for deletion, it's
                 # important to create a disabled Firebase account anyway so that
-                # the same email can not be claimed while the deletion request
-                # is pending.
+                # the same email cannot be claimed while the deletion request is
+                # pending.
                 disabled=marked_as_deleted)
             return
 
         _, firebase_account_is_disabled = assoc_info[cls.FIREBASE_ACCOUNT_KEY]
         if marked_as_deleted != firebase_account_is_disabled:
-            firebase_admin.auth.update_user(auth_id, disabled=marked_as_deleted)
+            firebase_auth.update_user(auth_id, disabled=marked_as_deleted)
 
     @classmethod
     def report_assocs_missing(cls, assoc_info_pairs):
@@ -370,7 +370,7 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             ids_to_delete = [user.uid for user in users_to_delete]
             try:
-                result = firebase_admin.auth.delete_users(
+                result = firebase_auth.delete_users(
                     ids_to_delete, force_delete=True)
             except Exception as exception:
                 yield (cls.ERROR_BATCH_DELETE, len(ids_to_delete))
@@ -407,7 +407,7 @@ class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def yield_firebase_user_batches(cls):
         """Yields every single Firebase account in batches."""
         # 1000 is the maximum amount of users that can be deleted at once.
-        page = firebase_admin.auth.list_users(
+        page = firebase_auth.list_users(
             max_results=cls.MAX_USERS_FIREBASE_CAN_DELETE_PER_CALL)
         while page is not None:
             user_batch = page.users
@@ -555,7 +555,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # NOTE: This is only sorted to make unit testing easier.
         user_fields = sorted(ast.literal_eval(v) for v in values)
         user_records = [
-            firebase_admin.auth.ImportUserRecord(
+            firebase_auth.ImportUserRecord(
                 uid=auth_id, email=email, email_verified=True, custom_claims=(
                     '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
                     if user_is_super_admin else None))
@@ -598,7 +598,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Populates the Firebase server with the given user records.
 
         Args:
-            user_records: list(firebase_admin.auth.ImportUserRecord). Users to
+            user_records: list(firebase_auth.ImportUserRecord). Users to
                 store in Firebase.
 
         Returns:
@@ -607,7 +607,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             the values will be non-None.
         """
         try:
-            return (firebase_admin.auth.import_users(user_records), None)
+            return (firebase_auth.import_users(user_records), None)
         except Exception as exception:
             return (None, exception)
 
