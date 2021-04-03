@@ -33,13 +33,25 @@ describe('Auth Backend Api Service', () => {
 
   afterEach(() => httpTestingController.verify());
 
-  it('should return userInfo data', fakeAsync(async() => {
+  it('should call /session_begin', fakeAsync(async() => {
     const response = authBackendApiService.beginSessionAsync('TKN');
     flushMicrotasks();
 
     const ping = httpTestingController.expectOne('/session_begin');
     expect(ping.request.method).toEqual('GET');
     expect(ping.request.headers.get('Authorization')).toEqual('Bearer TKN');
+    ping.flush({});
+    flushMicrotasks();
+
+    await expectAsync(response).toBeResolved();
+  }));
+
+  it('should call /session_end', fakeAsync(async() => {
+    const response = authBackendApiService.endSessionAsync();
+    flushMicrotasks();
+
+    const ping = httpTestingController.expectOne('/session_end');
+    expect(ping.request.method).toEqual('GET');
     ping.flush({});
     flushMicrotasks();
 

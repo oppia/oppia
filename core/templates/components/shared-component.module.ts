@@ -46,6 +46,7 @@ import { KeyboardShortcutHelpModalComponent } from
   'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
+import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 import { StorySummaryTileDirective } from
   './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from
@@ -154,6 +155,7 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
     OppiaFooterDirective,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimiToPipe,
@@ -199,6 +201,7 @@ const toastrConfig = {
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
@@ -231,6 +234,8 @@ const toastrConfig = {
     OppiaFooterDirective,
     LimiToPipe,
     LoadingMessageComponent,
+    ImageUploaderComponent,
+    OnScreenKeyboardComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
