@@ -316,8 +316,6 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
     STATS_DATE = datetime.date.fromtimestamp(1616173836)
-    STATS_DATE_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
-        utils.convert_date_to_datetime(STATS_DATE))
     DAILY_STATS = {
         'report_type': {
             'suggestion': 1, 'issue': 1, 'crash': 1}}
@@ -337,8 +335,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
                 entity_id))
 
         self.assertEqual(stats_model.id, '%s:%s:%s' % (
-            'android', self.TICKET_ID,
-            int(self.STATS_DATE_TIMESTAMP_MSEC)))
+            'android', self.TICKET_ID, self.STATS_DATE.isoformat()))
         self.assertEqual(stats_model.platform, 'android')
         self.assertEqual(
             stats_model.stats_tracking_date, self.STATS_DATE)

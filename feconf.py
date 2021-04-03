@@ -214,13 +214,13 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The minimum version of the Android feedback report info blob schema.
-MIN_ANDROID_REPORT_SCHEMA_VERSION = 1
+MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the Android feedback report info blob schema.
 CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the web feedback report info blob schema.
-MIN_WEB_REPORT_SCHEMA_VERSION = 1
+MINIMUM_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the web feedback report info blob schema.
 CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
@@ -229,7 +229,7 @@ CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
 CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
 
 # The minimum version of the app feedback report daily stats blob schema.
-MIN_REPORT_STATS_SCHEMA_VERSION = 1
+MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,

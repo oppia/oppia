@@ -210,7 +210,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 'than the minimum version %s\']]') % (
                     model_entity.id,
                     model_entity.android_report_info_schema_version,
-                    feconf.MIN_ANDROID_REPORT_SCHEMA_VERSION)]
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
@@ -278,7 +278,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             '[u\'Entity id %s: web report schema version %s is less than'
             ' the minimum version %s\']]') % (
                 web_entity.id, web_entity.web_report_info_schema_version,
-                feconf.MIN_WEB_REPORT_SCHEMA_VERSION))
+                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION))
 
         self.run_job_and_check_output(
             self.expected_output, sort=True, literal_eval=False)
@@ -543,14 +543,12 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
     STATS_DATE = datetime.date.fromtimestamp(1616173836)
-    STATS_DATE_TIMESTAMP = utils.convert_date_to_datetime(STATS_DATE)
     DAILY_STATS = {
         'report_type': {
             'suggestion': 1, 'issue': 1, 'crash': 1}}
     TOTAL_REPORTS_SUBMITTED = 3
     STATS_ID = '%s:%s:%s' % (
-        PLATFORM_ANDROID, TICKET_ID,
-        utils.get_time_in_millisecs(STATS_DATE_TIMESTAMP))
+        PLATFORM_ANDROID, TICKET_ID, STATS_DATE.isoformat())
 
     # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
@@ -708,7 +706,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform=self.PLATFORM_ANDROID,
                 ticket_id='invalid_ticket_id',
-                stats_tracking_date=self.STATS_DATE_TIMESTAMP,
+                stats_tracking_date=self.STATS_DATE,
                 total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
                 daily_param_stats=self.DAILY_STATS))
         model_entity = (

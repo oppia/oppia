@@ -78,14 +78,14 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                         item.id, item.android_report_info_schema_version,
                         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION))
             elif item.android_report_info_schema_version < (
-                    feconf.MIN_ANDROID_REPORT_SCHEMA_VERSION):
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                     'Entity id %s: android report schema version %s is less '
                     'than the minimum version %s' % (
                         item.id, item.android_report_info_schema_version,
-                        feconf.MIN_ANDROID_REPORT_SCHEMA_VERSION))
+                        feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION))
         else:
             if item.web_report_info_schema_version > (
                     feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
@@ -97,14 +97,14 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                         item.id, item.web_report_info_schema_version,
                         feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
             elif item.web_report_info_schema_version < (
-                    feconf.MIN_WEB_REPORT_SCHEMA_VERSION):
+                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                     'Entity id %s: web report schema version %s is less '
                     'than the minimum version %s' % (
                         item.id, item.web_report_info_schema_version,
-                        feconf.MIN_WEB_REPORT_SCHEMA_VERSION))
+                        feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
     def _validate_submitted_on_datetime(cls, item):
@@ -299,12 +299,9 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform]:[ticket_id]:[date_in_msec]
-        stats_date_in_datetime = utils.convert_date_to_datetime(
-            item.stats_tracking_date)
-        stats_date_in_msec = utils.get_time_in_millisecs(stats_date_in_datetime)
+        # Valid id: [platform]:[ticket_id]:[stats_date in YYYY-MM-DD]
         regex_string = '^%s\\:%s\\:%s' % (
-            item.platform, item.ticket_id, int(stats_date_in_msec))
+            item.platform, item.ticket_id, item.stats_tracking_date.isoformat())
         return regex_string
 
     @classmethod
@@ -340,14 +337,14 @@ class AppFeedbackReportStatsModelValidator(
                     item.id, item.daily_param_stats_schema_version,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
         elif item.daily_param_stats_schema_version < (
-                feconf.MIN_REPORT_STATS_SCHEMA_VERSION):
+                feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                 'Entity id %s: daily stats schema version %s is less than the '
                 'minimum version %s' % (
                     item.id, item.daily_param_stats_schema_version,
-                    feconf.MIN_REPORT_STATS_SCHEMA_VERSION))
+                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
 
     @classmethod
     def _validate_stats_tracking_date(cls, item):

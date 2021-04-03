@@ -354,7 +354,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # The Github repository that has the associated issue for this ticket. The
     # possible values correspond to GITHUB_REPO_CHOICES.
     github_issue_repo_name = datastore_services.StringProperty(
-        required=False, indexed=True)
+        required=False, indexed=True, choices=GITHUB_REPO_CHOICES)
     # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
         required=False, indexed=True)
@@ -412,8 +412,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity using the current datetime in
-            isoformat (as the entity's creation timestamp), a SHA1 hash of the
-            ticket_name, and a random string, of the form
+            milliseconds (as the entity's creation timestamp), a SHA1 hash of
+            the ticket_name, and a random string, of the form
             '[creation_datetime_msec]:[hash(ticket_name)]:[random hash]'.
         """
         current_datetime_in_msec = utils.get_time_in_millisecs(
@@ -491,14 +491,14 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # specified in stats_tracking_date. The JSON will map each param_name
     # (defined by a domain const ALLOWED_STATS_PARAM_NAMES) to a dictionary of
     # all the possible param_values for that parameter and the number of reports
-    # submitted on that day that satisfy that param value":
+    # submitted on that day that satisfy that param value, similar to e.g.:
     #
-    #   daily_param_stats = { param_name1 : { param_value1 : report_count1,
-    #                                         param_value2 : report_count2,
-    #                                         param_value3 : report_count3 },
-    #                         param_name2 : { param_value1 : report_count1,
-    #                                         param_value2 : report_count2,
-    #                                         param_value3 : report_count3 } }.
+    #   param_name1 : { param_value1 : report_count1,
+    #                   param_value2 : report_count2,
+    #                   param_value3 : report_count3 },
+    #   param_name2 : { param_value1 : report_count1,
+    #                   param_value2 : report_count2,
+    #                   param_value3 : report_count3 } }.
     daily_param_stats = datastore_services.JsonProperty(
         required=True, indexed=False)
     # The schema version for parameter statistics in this entity.
@@ -551,16 +551,12 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity of the form
-            '[platform]:[ticket_id]:[stats_date_msec]'.
+            '[platform]:[ticket_id]:[stats_date in YYYY-MM-DD]'.
         """
-        stats_date_in_datetime = utils.convert_date_to_datetime(
-            stats_tracking_date)
-        stats_datetime_in_msec = utils.get_time_in_millisecs(
-            stats_date_in_datetime)
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (
                 platform, ticket_id,
-                int(stats_datetime_in_msec))
+                stats_tracking_date.isoformat())
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
