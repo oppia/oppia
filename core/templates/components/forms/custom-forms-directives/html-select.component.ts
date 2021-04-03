@@ -41,7 +41,7 @@ export class HtmlSelectComponent {
   }
 
   getSelectionIndex(): number {
-    for (var index = 0; index < this.options.length; index++) {
+    for (let index = 0; index < this.options.length; index++) {
       if (this.options[index].id === this.selection) {
         return index;
       }
@@ -50,5 +50,6 @@ export class HtmlSelectComponent {
 }
 
 angular.module('oppia').directive(
-  'htmlSelect', downgradeComponent(
-    {component: HtmlSelectComponent}));
+  'htmlSelect', downgradeComponent({
+    component: HtmlSelectComponent
+  }) as angular.IDirectiveFactory);
