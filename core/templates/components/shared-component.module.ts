@@ -44,8 +44,6 @@ import { ProfileLinkImageComponent } from 'components/profile-link-directives/pr
 import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
-
-
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
@@ -57,6 +55,7 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 
 // Directives.
 import { FocusOnDirective } from '../directives/focus-on.directive';
@@ -116,6 +115,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -158,6 +158,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -185,6 +186,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CollectionSummaryTileComponent,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    ImageUploaderComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
