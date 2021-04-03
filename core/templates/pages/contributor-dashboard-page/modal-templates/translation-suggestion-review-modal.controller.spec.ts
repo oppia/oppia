@@ -135,10 +135,11 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect(contributionAndReviewService.resolveSuggestionToExploration)
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'accept', 'Review message example',
-          'hint section of "StateName" card', $scope.showNextItemToReview,
+          'hint section of "StateName" card-WithEdits', $scope.showNextItemToReview,
           jasmine.any(Function));
 
       $scope.reviewMessage = 'Review message example 2';
+      $scope.isTranslationUpdated = false;
       $scope.acceptAndReviewNext();
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
