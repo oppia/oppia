@@ -29,7 +29,6 @@ import python_utils
 import apache_beam as beam
 from apache_beam import typehints
 
-
 _ALL_MODEL_CLASSES = frozenset(models.Registry.get_all_storage_model_classes())
 _ALL_BASE_MODEL_CLASSES = frozenset(
     models.Registry.get_storage_model_classes([models.NAMES.base_model]))

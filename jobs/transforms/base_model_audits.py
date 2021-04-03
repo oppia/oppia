@@ -41,7 +41,6 @@ import apache_beam as beam
 
 base_models, = models.Registry.import_models([models.NAMES.base_model])
 
-
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
