@@ -71,4 +71,91 @@ describe('Collection node model', () => {
       expect(collectionNode.doesExplorationExist()).toBe(false);
     }
   );
+
+  it('should be able to detect if exploration is private',
+    () => {
+      var explorationSummaryBackendObject = {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'private',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'exp title'
+      };
+      var collectionNodeBackendObject = {
+        exploration_id: 'exp_id0',
+        exploration_summary: explorationSummaryBackendObject
+      };
+
+      var collectionNode = CollectionNode.create(
+        collectionNodeBackendObject);
+
+      expect(collectionNode.isExplorationPrivate()).toBe(true);
+    }
+  );
+
+  it('should be able to set exploration summary object',
+    () => {
+      var explorationSummaryBackendObject = {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'exp title'
+      };
+      var collectionNodeBackendObject = {
+        exploration_id: 'exp_id0',
+        exploration_summary: null
+      };
+
+      var collectionNode = CollectionNode.create(
+        collectionNodeBackendObject);
+
+      var summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toBeNull();
+      expect(collectionNode.getExplorationTitle()).toBeNull();
+      expect(collectionNode.isExplorationPrivate()).toBeUndefined();
+
+      collectionNode.setExplorationSummaryObject(
+        explorationSummaryBackendObject);
+      summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toEqual(explorationSummaryBackendObject);
+      expect(collectionNode.getCapitalizedObjective()).toBe('Test Objective');
+    }
+  );
 });
