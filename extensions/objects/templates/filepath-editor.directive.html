@@ -32,8 +32,8 @@
   <div class="filepath-editor-image-container"
        ng-attr-style="<[$ctrl.getImageContainerDynamicStyles()]>">
     <div ng-if="$ctrl.isNoImageUploaded()">
-      <oppia-image-uploader (file-changed)="onFileChanged($event)"
-                            [allowed-image-formats]="allowedImageFormats">
+      <oppia-image-uploader (file-changed)="$ctrl.onFileChanged($event)"
+                            [allowed-image-formats]="$ctrl.allowedImageFormats">
       </oppia-image-uploader>
     </div>
     <div ng-if="$ctrl.isImageUploaded()"
@@ -93,6 +93,9 @@
   </div>
   <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" ng-if="$ctrl.invalidTagsAndAttributes.attrs.length">
     Unsupported SVG attributes found: <[$ctrl.invalidTagsAndAttributes.attrs]>
+  </div>
+  <div class="oppia-form-error oppia-processed-image-too-large-error" ng-if="$ctrl.processedImageIsTooLarge">
+    The processed image is too large to upload. Please try cropping or resizing the current image.
   </div>
 </div>
 
@@ -278,7 +281,8 @@
     margin-left: 6px;
   }
 
-  filepath-editor .oppia-unsupported-svg-tag-attribute-error {
+  filepath-editor .oppia-unsupported-svg-tag-attribute-error,
+  filepath-editor .oppia-processed-image-too-large-error {
     margin-top: 15px;
   }
 </style>
