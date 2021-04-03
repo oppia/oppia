@@ -115,6 +115,7 @@
     "oppia/no-multiline-disable": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
+    "oppia/no-test-blockers": "error",
     "angular/di": [
       "error",
       "array"

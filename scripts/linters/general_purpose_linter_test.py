@@ -196,32 +196,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_invalid_use_of_fdescribe_ddescribe(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_FDESCRIBE_DDESCRIBE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 24: In tests, please use \'describe\' instead of '
-            '\'ddescribe\'or \'fdescribe\''], lint_task_report.trimmed_messages)
-        self.assert_same_list_elements([
-            'Line 28: In tests, please use \'describe\' instead of '
-            '\'ddescribe\'or \'fdescribe\''], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_iit_fit(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_IIT_FIT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 40: In tests, please use \'it\' instead of \'iit\' or '
-            '\'fit\''], lint_task_report.trimmed_messages)
-        self.assert_same_list_elements([
-            'Line 64: In tests, please use \'it\' instead of \'iit\' or '
-            '\'fit\''], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
     def test_invalid_use_of_inject(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_INJECT_FILEPATH], FILE_CACHE)
