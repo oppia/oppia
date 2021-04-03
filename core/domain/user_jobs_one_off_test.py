@@ -2917,11 +2917,12 @@ class DeleteNonExistentExpsFromUserModelsOneOffJobTests(
             user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob
             .create_new()
         )
-        user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob.enqueue(job_id)
+        user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob.enqueue(
+            job_id)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob.get_output(
-                job_id)
+            user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob
+            .get_output(job_id)
         )
         eval_output = [
             ast.literal_eval(stringified_item)
@@ -3152,7 +3153,7 @@ class DeleteNonExistentExpUserDataOneOffJobTests(test_utils.GenericTestBase):
 
 
 class DeleteNonExistentExpUserContributionsOneOffJobTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
 
     EXP_USER_DATA_MODEL_ID = 'user_id.exp_id'
     USER_1_ID = 'user_1_id'
@@ -3198,8 +3199,10 @@ class DeleteNonExistentExpUserContributionsOneOffJobTests(
             user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
             .create_new()
         )
-        user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob.enqueue(
-            job_id)
+        (
+            user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
+            .enqueue(job_id)
+        )
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
