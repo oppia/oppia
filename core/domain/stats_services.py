@@ -307,7 +307,7 @@ def advance_version_of_exp_stats(
                     exp_versions_diff.new_to_old_state_names[new_state_name]],
                 exp_stats.state_stats_mapping[new_state_name]
             )
-            state_names_to_skip.push(
+            state_names_to_skip.append(
                 exp_versions_diff.new_to_old_state_names[new_state_name])
             continue
         exp_stats.state_stats_mapping[new_state_name] = (
