@@ -1127,17 +1127,21 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class DeleteNonExistentExpsFromUserModelsJob(
+class DeleteNonExistentExpsFromUserModelsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that removes explorations that do not exist or that are private from
     completed and incomplete activities models and from user
     subscriptions model.
+
+    This job will only be used in the April 2021 release to fix the errors on
+    the prod server. The errors exist because the activity models were not
+    properly updated when the explorations were deleted.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(
-            DeleteNonExistentExpsFromUserModelsJob, cls
+            DeleteNonExistentExpsFromUserModelsOneOffJob, cls
         ).enqueue(job_id, shard_count=16)
 
     @classmethod
@@ -1195,15 +1199,19 @@ class DeleteNonExistentExpsFromUserModelsJob(
         yield (key, len(values))
 
 
-class DeleteNonExistentExpUserDataJob(jobs.BaseMapReduceOneOffJobManager):
+class DeleteNonExistentExpUserDataOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes exploration user data models that do not have
-    existing exploration.
+    existing explorations.
+
+    This job will only be used in the April 2021 release to fix the errors on
+    the prod server. The errors exist because the exploration user data models
+    were not properly deleted when the explorations were deleted.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(
-            DeleteNonExistentExpUserDataJob, cls
+            DeleteNonExistentExpUserDataOneOffJob, cls
         ).enqueue(job_id, shard_count=32)
 
     @classmethod
@@ -1215,6 +1223,10 @@ class DeleteNonExistentExpUserDataJob(jobs.BaseMapReduceOneOffJobManager):
         exp_model = exp_models.ExplorationModel.get(
             model.exploration_id, strict=False)
         if exp_model is None:
+            # By using delete_exploration we combine a few things, we delete
+            # the ExplorationUserDataModels, also we delete any other models
+            # that still exist for the exploration ID, and finally we verify
+            # that the delete_exploration works correctly.
             exp_services.delete_exploration(
                 feconf.SYSTEM_COMMITTER_ID,
                 model.exploration_id,
@@ -1230,16 +1242,19 @@ class DeleteNonExistentExpUserDataJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
-class DeleteNonExistentExpUserContributionsJob(
+class DeleteNonExistentExpUserContributionsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """Job that removes deleted explorations form user contributions models
-    fields.
+    """Job that removes deleted explorations from UserContributionsModels.
+
+    This job will only be used in the April 2021 release to fix the errors on
+    the prod server. The errors exist because the contributions models were not
+    properly updated when the explorations were deleted.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(
-            DeleteNonExistentExpUserContributionsJob, cls
+            DeleteNonExistentExpUserContributionsOneOffJob, cls
         ).enqueue(job_id, shard_count=32)
 
     @classmethod

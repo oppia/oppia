@@ -2906,21 +2906,21 @@ class DeleteNonExistentExpsFromUserModelsOneOffJobTests(
         ).put()
 
     def _run_job_and_verify_output(self, expected_output):
-        """Runs the DiscardOldDraftsOneOffJob and verifies that the output
-        matches the expected output.
+        """Runs the DeleteNonExistentExpsFromUserModelsOneOffJob and verifies
+        that the output matches the expected output.
 
         Args:
             expected_output: list(str). The expected output from the one-off
                 job.
         """
         job_id = (
-            user_jobs_one_off.DeleteNonExistentExpsFromUserModelsJob
+            user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob
             .create_new()
         )
-        user_jobs_one_off.DeleteNonExistentExpsFromUserModelsJob.enqueue(job_id)
+        user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            user_jobs_one_off.DeleteNonExistentExpsFromUserModelsJob.get_output(
+            user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob.get_output(
                 job_id)
         )
         eval_output = [
@@ -2938,6 +2938,43 @@ class DeleteNonExistentExpsFromUserModelsOneOffJobTests(
             ['SUCCESS - IncompleteActivitiesModel', 2],
             ['SUCCESS - UserSubscriptionsModel', 3]
         ])
+
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get(
+                self.USER_1_ID
+            ).exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get(
+                self.USER_1_ID
+            ).exploration_ids,
+            [self.EXP_1_ID, self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get(
+                self.USER_2_ID
+            ).exploration_ids,
+            [self.EXP_1_ID, self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get(
+                self.USER_3_ID
+            ).exploration_ids,
+            [self.EXP_1_ID]
+        )
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get(
+                self.USER_3_ID
+            ).exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get(
+                self.USER_3_ID
+            ).exploration_ids,
+            [self.EXP_2_ID]
+        )
 
     def test_private_explorations_are_removed(self):
         rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
@@ -3024,7 +3061,7 @@ class DeleteNonExistentExpsFromUserModelsOneOffJobTests(
         )
 
 
-class DeleteNonExistentExpUserDataJobTests(test_utils.GenericTestBase):
+class DeleteNonExistentExpUserDataOneOffJobTests(test_utils.GenericTestBase):
 
     USER_1_ID = 'user_1_id'
     USER_2_ID = 'user_2_id'
@@ -3032,7 +3069,7 @@ class DeleteNonExistentExpUserDataJobTests(test_utils.GenericTestBase):
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(DeleteNonExistentExpUserDataJobTests, self).setUp()
+        super(DeleteNonExistentExpUserDataOneOffJobTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -3055,20 +3092,20 @@ class DeleteNonExistentExpUserDataJobTests(test_utils.GenericTestBase):
         ).put()
 
     def _run_job_and_verify_output(self, expected_output):
-        """Runs the DiscardOldDraftsOneOffJob and verifies that the output
-        matches the expected output.
+        """Runs the DeleteNonExistentExpUserDataOneOffJob and verifies that
+        the output matches the expected output.
 
         Args:
             expected_output: list(str). The expected output from the one-off
                 job.
         """
         job_id = (
-            user_jobs_one_off.DeleteNonExistentExpUserDataJob.create_new()
+            user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob.create_new()
         )
-        user_jobs_one_off.DeleteNonExistentExpUserDataJob.enqueue(job_id)
+        user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            user_jobs_one_off.DeleteNonExistentExpUserDataJob.get_output(
+            user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob.get_output(
                 job_id)
         )
         eval_output = [
@@ -3082,6 +3119,17 @@ class DeleteNonExistentExpUserDataJobTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.EXP_2_ID)
 
         self._run_job_and_verify_output([['SUCCESS_KEPT', 3]])
+
+        self.assertIsNotNone(
+            user_models.ExplorationUserDataModel.get(
+                self.USER_1_ID, self.EXP_1_ID
+            )
+        )
+        self.assertIsNotNone(
+            user_models.ExplorationUserDataModel.get(
+                self.USER_2_ID, self.EXP_1_ID
+            )
+        )
 
     def test_deleted_explorations_are_removed(self):
         exp_models.ExplorationModel.delete_by_id(self.EXP_1_ID)
@@ -3103,7 +3151,8 @@ class DeleteNonExistentExpUserDataJobTests(test_utils.GenericTestBase):
         )
 
 
-class DeleteNonExistentExpUserContributionsJobTests(test_utils.GenericTestBase):
+class DeleteNonExistentExpUserContributionsOneOffJobTests(
+    test_utils.GenericTestBase):
 
     EXP_USER_DATA_MODEL_ID = 'user_id.exp_id'
     USER_1_ID = 'user_1_id'
@@ -3114,7 +3163,7 @@ class DeleteNonExistentExpUserContributionsJobTests(test_utils.GenericTestBase):
     EXP_3_ID = 'exp_3_id'
 
     def setUp(self):
-        super(DeleteNonExistentExpUserContributionsJobTests, self).setUp()
+        super(DeleteNonExistentExpUserContributionsOneOffJobTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -3138,22 +3187,22 @@ class DeleteNonExistentExpUserContributionsJobTests(test_utils.GenericTestBase):
         ).put()
 
     def _run_job_and_verify_output(self, expected_output):
-        """Runs the DiscardOldDraftsOneOffJob and verifies that the output
-        matches the expected output.
+        """Runs the DeleteNonExistentExpUserContributionsOneOffJob and verifies
+        that the output matches the expected output.
 
         Args:
             expected_output: list(str). The expected output from the one-off
                 job.
         """
         job_id = (
-            user_jobs_one_off.DeleteNonExistentExpUserContributionsJob
+            user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
             .create_new()
         )
-        user_jobs_one_off.DeleteNonExistentExpUserContributionsJob.enqueue(
+        user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            user_jobs_one_off.DeleteNonExistentExpUserContributionsJob
+            user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
             .get_output(job_id)
         )
         eval_output = [
@@ -3164,6 +3213,31 @@ class DeleteNonExistentExpUserContributionsJobTests(test_utils.GenericTestBase):
 
     def test_not_deleted_explorations_not_removed(self):
         self._run_job_and_verify_output([['SUCCESS', 5]])
+
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                self.USER_1_ID
+            ).created_exploration_ids,
+            [self.EXP_1_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                self.USER_1_ID
+            ).edited_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                self.USER_2_ID
+            ).edited_exploration_ids,
+            [self.EXP_2_ID, self.EXP_3_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                self.USER_3_ID
+            ).created_exploration_ids,
+            [self.EXP_2_ID, self.EXP_3_ID]
+        )
 
     def test_deleted_explorations_are_removed(self):
         exp_services.delete_exploration(

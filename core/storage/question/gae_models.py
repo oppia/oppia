@@ -62,23 +62,23 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
-    def _get_instance_id(cls, question_id, question_version):
+    def get_instance_id(cls, question_id, question_version):
         """Returns ID of the question commit log entry model.
 
         Args:

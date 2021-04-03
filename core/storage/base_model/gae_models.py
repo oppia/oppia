@@ -625,7 +625,7 @@ class BaseCommitLogEntryModel(BaseModel):
                 classes.
         """
         raise NotImplementedError(
-            'The _get_instance_id() method is missing from the '
+            'The get_instance_id() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
     @classmethod
