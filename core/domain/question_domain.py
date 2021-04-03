@@ -1044,18 +1044,22 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] == 'NumericInput':
+        if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
             customization_args = question_state_dict[
                 'interaction']['customization_args']
             customization_args.update({
                 'placeholder': {
-                    'value': False
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': (
+                            'Type an expression here, using only numbers.')
+                    }
                 }
             })
-            """question_state_dict['written_translations']['translations_mapping'][
+            question_state_dict['written_translations']['translations_mapping'][
                 'ca_placeholder_0'] = {}
             question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
-                'ca_placeholder_0'] = {}"""
+                'ca_placeholder_0'] = {}
 
         return question_state_dict
 

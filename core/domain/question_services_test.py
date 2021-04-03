@@ -3037,7 +3037,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        """cust_args = question.question_state_data.interaction.customization_args
+        cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
             cust_args['placeholder'].value.unicode_str,
-            'Type a number here, greater than or equal to 0.')"""
+            'Type input greater than or equal to zero.')
