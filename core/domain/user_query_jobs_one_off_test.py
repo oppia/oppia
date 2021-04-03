@@ -286,42 +286,22 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_created_collection(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'created_collection': 'True'
+                'created_collection': True
             })
         self._run_one_off_job(user_query_id)
 
         query = user_models.UserQueryModel.get(user_query_id)
         self.assertItemsEqual(query.user_ids, [self.user_d_id])
 
-    def test_user_has_not_created_collection(self):
-        user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, {
-                'created_collection': 'False'
-            })
-        self._run_one_off_job(user_query_id)
-
-        query = user_models.UserQueryModel.get(user_query_id)
-        self.assertNotIn(self.user_d_id, query.user_ids)
-
     def test_user_has_used_logic_proof_interaction(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'used_logic_proof_interaction': 'True'
+                'used_logic_proof_interaction': True
             })
         self._run_one_off_job(user_query_id)
 
         query = user_models.UserQueryModel.get(user_query_id)
         self.assertItemsEqual(query.user_ids, [self.user_e_id])
-
-    def test_user_has_not_used_logic_proof_interaction(self):
-        user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, {
-                'used_logic_proof_interaction': 'False'
-            })
-        self._run_one_off_job(user_query_id)
-
-        query = user_models.UserQueryModel.get(user_query_id)
-        self.assertNotIn(self.user_e_id, query.user_ids)
 
     def test_combination_of_query_params(self):
         user_query_1_id = user_query_services.save_new_user_query(

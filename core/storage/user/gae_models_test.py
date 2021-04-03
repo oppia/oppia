@@ -1710,8 +1710,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_at_least_n_exps = 2
         edited_fewer_than_n_exps = 5
         has_not_logged_in_for_n_days = 10
-        created_collection = 'True'
-        used_logic_proof_interaction = 'True'
+        created_collection = True
+        used_logic_proof_interaction = True
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1751,8 +1751,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_at_least_n_exps = 2
         edited_fewer_than_n_exps = 5
         has_not_logged_in_for_n_days = 10
-        created_collection = 'True'
-        used_logic_proof_interaction = 'True'
+        created_collection = True
+        used_logic_proof_interaction = True
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1773,8 +1773,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_at_least_n_exps = 3
         edited_fewer_than_n_exps = 6
         has_not_logged_in_for_n_days = 11
-        created_collection = 'False'
-        used_logic_proof_interaction = 'False'
+        created_collection = False
+        used_logic_proof_interaction = False
         user_models.UserQueryModel(
             id=query_id,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1800,8 +1800,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
-        self.assertEqual(query_models[0].created_collection, 'False')
-        self.assertEqual(query_models[0].used_logic_proof_interaction, 'False')
+        self.assertEqual(query_models[0].created_collection, False)
+        self.assertEqual(query_models[0].used_logic_proof_interaction, False)
 
         # Fetch both entities.
         query_models, _, _ = user_models.UserQueryModel.fetch_page(
@@ -1816,8 +1816,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
-        self.assertEqual(query_models[0].created_collection, 'False')
-        self.assertEqual(query_models[0].used_logic_proof_interaction, 'False')
+        self.assertEqual(query_models[0].created_collection, False)
+        self.assertEqual(query_models[0].used_logic_proof_interaction, False)
 
         self.assertEqual(query_models[1].submitter_id, self.USER_ID_1)
         self.assertEqual(query_models[1].id, self.QUERY_1_ID)
@@ -1827,8 +1827,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[1].edited_at_least_n_exps, 2)
         self.assertEqual(query_models[1].edited_fewer_than_n_exps, 5)
         self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
-        self.assertEqual(query_models[1].created_collection, 'True')
-        self.assertEqual(query_models[1].used_logic_proof_interaction, 'True')
+        self.assertEqual(query_models[1].created_collection, True)
+        self.assertEqual(query_models[1].used_logic_proof_interaction, True)
 
 
 class UserBulkEmailsModelTests(test_utils.GenericTestBase):

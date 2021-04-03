@@ -41,7 +41,7 @@ angular.module('oppia').component('emailDashboardPage', {
 
       ctrl.areAllInputsEmpty = function() {
         return Object.values(ctrl.data).every(
-          value => value === null || value === 'None');
+          value => value === null || value === false);
       };
 
       ctrl.submitQueryAsync = async function() {

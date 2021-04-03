@@ -142,8 +142,8 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': 'None',
                     'edited_at_least_n_exps': None,
-                    'created_collection': 'True',
-                    'used_logic_proof_interaction': 'False',
+                    'created_collection': True,
+                    'used_logic_proof_interaction': False,
                     'fake_key': 2
                 }}, csrf_token=csrf_token, expected_status_int=400)
 

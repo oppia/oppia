@@ -122,24 +122,22 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _is_created_collection_query_satisfied(
-            user_settings_model, query_model):
+            user_settings_model, _):
         """Determines whether a user has created collections."""
-        condition = query_model.created_collection == 'True'
         user_id = user_settings_model.id
         collection = collection_models.CollectionRightsModel.query(
             collection_models.CollectionRightsModel.owner_ids == user_id
-        ).fetch(1)
-        if len(collection) > 0:
-            return True if condition else False
-        return False if condition else True
+        ).get()
+        if collection is not None:
+            return True
+        return False
 
     @staticmethod
     def _is_used_logic_proof_interaction_query_satisfied(
-            user_settings_model, query_model):
+            user_settings_model, _):
         """Determines whether a user has used logic proof
         interaction in any of the explorations created by the user.
         """
-        condition = query_model.used_logic_proof_interaction == 'True'
         user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)
         exploration_ids = user_contributions.created_exploration_ids
@@ -150,8 +148,8 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             exploration = exp_fetchers.get_exploration_from_model(item)
             for _, state in exploration.states.items():
                 if state.interaction.id == 'LogicProof':
-                    return True if condition else False
-        return False if condition else True
+                    return True
+        return False
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -179,7 +177,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         for predicate in predicates:
             value = getattr(query_model, predicate['backend_attr'])
-            if value is not None and value is not 'None':
+            if value is not None and value is not False:
                 query_criteria_satisfied = getattr(
                     job_class,
                     '_is_%s_query_satisfied' % predicate['backend_id'])(

@@ -103,7 +103,7 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.areAllInputsEmpty()).toBe(false);
 
     ctrl.resetForm();
-    ctrl.data.created_collection = 'True';
+    ctrl.data.created_collection = true;
     expect(ctrl.areAllInputsEmpty()).toBe(false);
   });
 
