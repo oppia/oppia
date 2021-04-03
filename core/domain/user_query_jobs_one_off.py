@@ -128,9 +128,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         collection = collection_models.CollectionRightsModel.query(
             collection_models.CollectionRightsModel.owner_ids == user_id
         ).get()
-        if collection is not None:
-            return True
-        return False
+        return collection is not None
 
     @staticmethod
     def _is_used_logic_proof_interaction_query_satisfied(
