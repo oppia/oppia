@@ -19,12 +19,9 @@
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-next-content-id-index.service');
+require('components/skill-selector/select-skill-modal.controller.ts');
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-skill.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'add-skill-modal.controller.ts');
+  'components/skill-selector/skill-selector.component.ts');
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
@@ -84,8 +81,7 @@ angular.module('oppia').directive('stateSkillEditor', [
             var skillsInSameTopicCount = 0;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
-                'modal-templates/add-skill-modal.template.html'),
+                '/components/skill-selector/select-skill-modal.template.html'),
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => skillSummaryData,
@@ -95,8 +91,8 @@ angular.module('oppia').directive('stateSkillEditor', [
               },
               keyboard: true,
               backdrop: 'static',
-              windowClass: 'add-skill-modal',
-              controller: 'AddSkillModalController',
+              windowClass: 'skill-select-modal',
+              controller: 'SelectSkillModalController',
               size: 'xl'
             }).result.then(function(result) {
               try {
