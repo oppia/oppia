@@ -255,6 +255,9 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # User is deleted and will be managed by the reduce() logic.
             return
 
+        # NOTE: assoc_info_by_auth_id is never None because such values are
+        # caught by report_assocs_missing(), which is called before this
+        # function.
         user_id_of_assoc_by_auth_id, deleted_bool_of_assoc_by_auth_id = (
             assoc_info_by_auth_id)
 
@@ -290,10 +293,14 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     deleted_bool_of_assoc_by_auth_id,
                     user_id_of_assoc_by_user_id,
                     deleted_bool_of_assoc_by_user_id))
+            return
 
         if firebase_account_info is not None:
             _, firebase_account_is_disabled = firebase_account_info
             if (firebase_account_is_disabled
+                    # NOTE: Important that deleted_bool_of_assoc_by_auth_id is
+                    # checked first because its value will never be None (hence,
+                    # its always meaningful).
                     and not deleted_bool_of_assoc_by_auth_id
                     and not deleted_bool_of_assoc_by_user_id):
                 yield (
