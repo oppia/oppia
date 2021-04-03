@@ -300,7 +300,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if (firebase_account_is_disabled
                     # NOTE: Important that deleted_bool_of_assoc_by_auth_id is
                     # checked first because its value will never be None (hence,
-                    # its always meaningful).
+                    # it's always meaningful).
                     and not deleted_bool_of_assoc_by_auth_id
                     and not deleted_bool_of_assoc_by_user_id):
                 yield (
