@@ -248,6 +248,9 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 web_entity.id, web_entity.web_report_info_schema_version,
                 feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
 
+        self.run_job_and_check_output(
+            self.expected_output, sort=True, literal_eval=False)
+
     def test_model_with_web_schema_version_less_than_min_schema_fails(self):
         web_report_id = (
             app_feedback_report_models.AppFeedbackReportModel.create(
