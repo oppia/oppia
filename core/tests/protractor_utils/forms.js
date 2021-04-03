@@ -180,11 +180,11 @@ var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
   await waitFor.elementToBeClickable(elem.all(by.css('.oppia-rte')).first());
   await (await elem.all(by.css('.oppia-rte')).first()).click();
-  var rteToolbar = await elem.element(by.id('cke_editor1'));
-  await waitFor.visibilityOf(
-    rteToolbar, 'RTE Toolbar taking too long to show up');
 
   var _appendContentText = async function(text) {
+    var rteToolbar = element(by.id('cke_editor1'));
+    await waitFor.visibilityOf(
+      rteToolbar, 'RTE Toolbar taking too long to show up');
     await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
