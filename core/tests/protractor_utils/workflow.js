@@ -336,7 +336,7 @@ var uploadImage = async function(
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  return await action.sendKeys(imageUploadInput, absPath);
+  return await action.sendKeys('Image Upload Input', imageUploadInput, absPath);
 };
 
 var submitImage = async function(
