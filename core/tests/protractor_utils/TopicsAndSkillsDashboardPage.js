@@ -314,11 +314,8 @@ var TopicsAndSkillsDashboardPage = function() {
     var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
     await action.click(
       'Skill Review Material Input', skillReviewMaterialInput);
-    var rteToolbar = element(by.id('cke_editor1'));
-    await waitFor.visibilityOf(
-      rteToolbar, 'RTE toolbar taking too long to show up.');
     await action.sendKeys(
-      'Skill Review Material Field', skillReviewMaterialInput, reviewMaterial);
+      'Skill Review Material Field', skillReviewMaterialInput, reviewMaterial, true);
 
     await action.click('Create Skill button', confirmSkillCreationButton);
 
