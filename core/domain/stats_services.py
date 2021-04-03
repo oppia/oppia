@@ -280,39 +280,28 @@ def advance_version_of_exp_stats(
 
     # If state names were swapped, both the new and old names will be present in
     # exp_stats.state_stats_mapping. When this occurs, the state stats should be
-    # swapped too. The exp_versions_diff.new_to_old_state_names would contain
-    # two references to the states i.e.
-    # If the swapped state names are 'card 1' and 'card 2',
-    # exp_versions_diff.new_to_old_state_names would look like this
-    # { 'card 1': 'card 2', 'card 2': 'card 1' }
-    # In this case, when 'card 1' is encountered, the stats for 'card 1' and
-    # 'card 2' can be swapped. The entry for 'card 2' should not be processed
-    # because it would swap the state stats back to the original state -- to
-    # prevent this, the second state name ('card 2') will be added to
-    # state_names_to_skip so it can be skipped when processing the keys in
-    # exp_versions_diff.new_to_old_state_names.
-    state_names_to_skip = []
+    # swapped too. The swapped_state_name_stats_mapping will contain tuples
+    # of the form (state_name, state_stats).
+    swapped_state_name_stats_mapping = []
     # Handling state renames.
     for new_state_name in exp_versions_diff.new_to_old_state_names:
-        if new_state_name in state_names_to_skip:
-            continue
-        # Handling state names being swapped.
         if new_state_name in exp_stats.state_stats_mapping:
-            (
-                exp_stats.state_stats_mapping[new_state_name],
-                exp_stats.state_stats_mapping[
-                    exp_versions_diff.new_to_old_state_names[new_state_name]]
-            ) = (
-                exp_stats.state_stats_mapping[
-                    exp_versions_diff.new_to_old_state_names[new_state_name]],
-                exp_stats.state_stats_mapping[new_state_name]
+            swapped_state_name_stats_mapping.append(
+                (
+                    new_state_name,
+                    exp_stats.state_stats_mapping[
+                        exp_versions_diff.new_to_old_state_names[
+                            new_state_name]].clone()
+                )
             )
-            state_names_to_skip.append(
-                exp_versions_diff.new_to_old_state_names[new_state_name])
             continue
         exp_stats.state_stats_mapping[new_state_name] = (
             exp_stats.state_stats_mapping.pop(
                 exp_versions_diff.new_to_old_state_names[new_state_name]))
+
+    # Handling state names being swapped.
+    for (state_name, stats_stats) in swapped_state_name_stats_mapping:
+        exp_stats.state_stats_mapping[state_name] = stats_stats
 
     exp_stats.exp_version = exp_version
 
