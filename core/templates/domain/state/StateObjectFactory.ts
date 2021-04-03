@@ -53,12 +53,14 @@ export interface StateBackendDict {
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
   'written_translations': WrittenTranslationsBackendDict;
+  'linked_skill_id': string;
   'next_content_id_index': number;
 }
 
 export class State {
   name: string;
   classifierModelId: string;
+  linkedSkillId: string;
   content: SubtitledHtml;
   interaction: Interaction;
   paramChanges: ParamChange[];
@@ -67,12 +69,13 @@ export class State {
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
   constructor(
-      name: string, classifierModelId: string, content: SubtitledHtml,
+      name: string, classifierModelId: string, linkedSkillId: string, content: SubtitledHtml,
       interaction: Interaction, paramChanges: ParamChange[],
       recordedVoiceovers: RecordedVoiceovers, solicitAnswerDetails: boolean,
       writtenTranslations: WrittenTranslations, nextContentIdIndex: number) {
     this.name = name;
     this.classifierModelId = classifierModelId;
+    this.linkedSkillId = linkedSkillId;
     this.content = content;
     this.interaction = interaction;
     this.paramChanges = paramChanges;
@@ -89,6 +92,7 @@ export class State {
     return {
       content: this.content.toBackendDict(),
       classifier_model_id: this.classifierModelId,
+      linked_skill_id: this.linkedSkillId,
       interaction: this.interaction.toBackendDict(),
       param_changes: this.paramChanges.map((paramChange) => {
         return paramChange.toBackendDict();
@@ -168,6 +172,7 @@ export class StateObjectFactory {
     var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
+      linked_skill_id: newStateTemplate.linked_skill_id,
       content: newStateTemplate.content,
       interaction: newStateTemplate.interaction,
       param_changes: newStateTemplate.param_changes,
@@ -185,6 +190,7 @@ export class StateObjectFactory {
     return new State(
       stateName,
       stateDict.classifier_model_id,
+      stateDict.linked_skill_id,
       this.subtitledHtmlObject.createFromBackendDict(stateDict.content),
       this.interactionObject.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(

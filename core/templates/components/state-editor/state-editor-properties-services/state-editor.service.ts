@@ -75,6 +75,7 @@ export class StateEditorService {
   // interaction.
   interaction: Interaction = null;
   misconceptionsBySkill: {} = {};
+  linkedSkillId: string = null;
   explorationIsWhitelisted: boolean = false;
   solicitAnswerDetails: boolean = null;
   stateContentEditorInitialised: boolean = false;
@@ -163,6 +164,10 @@ export class StateEditorService {
 
   setInteractionId(newId: string): void {
     this.interaction.setId(newId);
+  }
+
+  setLinkedSkillId(newLinkedSkillId: string): void {
+    this.linkedSkillId = newLinkedSkillId
   }
 
   setInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {

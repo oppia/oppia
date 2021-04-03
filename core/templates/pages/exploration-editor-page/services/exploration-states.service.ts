@@ -125,6 +125,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
       recorded_voiceovers: ['recordedVoiceovers'],
+      linked_skill_id: ['linkedSkillId'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
@@ -339,6 +340,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(_states.getState(stateName));
         });
+      },
+      saveLinkedSkillId: function(stateName, newLinkedSkillId) {
+        saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
       },
       saveNextContentIdIndex: function(stateName, newNextContentIdIndex) {
         saveStateProperty(

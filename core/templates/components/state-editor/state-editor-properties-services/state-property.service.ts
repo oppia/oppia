@@ -88,6 +88,7 @@ export class StatePropertyService<StatePropertyType> {
   }
 
   saveDisplayedValue(): void {
+    console.log('Inside saveDisplayed()')
     if (this.setterMethodKey === null) {
       throw new Error('State property setter method key cannot be null.');
     }

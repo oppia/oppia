@@ -57,7 +57,10 @@
     </state-hints-editor>
   </div>
   <div>
-    <state-skill-editor>
+    <state-skill-editor on-save-state-content="onSaveStateContent"
+                        on-save-next-content-id-index="onSaveNextContentIdIndex"
+                        on-save-linked-skill-id="onSaveLinkedSkillId"
+                        show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
     </state-skill-editor>
   </div>
   <div ng-if="currentInteractionCanHaveSolution">

@@ -382,6 +382,7 @@ import { StateCardObjectFactory } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
+import {StateSkillService} from 'components/state-editor/state-editor-properties-services/state-skill.service'
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
@@ -706,6 +707,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateCardObjectFactory: StateCardObjectFactory;
   static stateClassifierMappingService: StateClassifierMappingService;
   static stateContentService: StateContentService;
+  static stateSkillService: StateSkillService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
   static stateEditorRefreshService: StateEditorRefreshService;
   static stateEditorService: StateEditorService;
@@ -996,6 +998,7 @@ private speechSynthesisChunkerService: SpeechSynthesisChunkerService,
 private stateCardObjectFactory: StateCardObjectFactory,
 private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
+private stateSkillService: StateSkillService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
 private stateEditorRefreshService: StateEditorRefreshService,
 private stateEditorService: StateEditorService,
@@ -1418,6 +1421,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateClassifierMappingService = (
       this.stateClassifierMappingService);
     OppiaAngularRootComponent.stateContentService = this.stateContentService;
+    OppiaAngularRootComponent.stateSkillService = this.stateSkillService;
     OppiaAngularRootComponent.stateCustomizationArgsService = (
       this.stateCustomizationArgsService);
     OppiaAngularRootComponent.stateEditorRefreshService = (

@@ -17,8 +17,14 @@
 */
 
 require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-skill.service.ts');
+require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'customize-skill-modal.controller.ts');
+  'add-skill-modal.controller.ts');
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
@@ -26,14 +32,20 @@ angular.module('oppia').directive('stateSkillEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {
+        onSaveLinkedSkillId: '=',
+        onSaveStateContent: '=',
+        onSaveNextContentIdIndex: '=',
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-skill-editor/' +
         'state-skill-editor.directive.html'),
       controller: [
-        '$http', '$scope', '$uibModal', 'AlertsService',
+        '$http', '$scope', '$uibModal', 'AlertsService', 'StateNextContentIdIndexService', 'StateSkillService',
         'WindowDimensionsService',
         function(
-            $http, $scope, $uibModal, AlertsService,
+            $http, $scope, $uibModal, AlertsService, StateNextContentIdIndexService, StateSkillService,
             WindowDimensionsService) {
           var ctrl = this;
           var categorizedSkills = null;
@@ -73,7 +85,7 @@ angular.module('oppia').directive('stateSkillEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
-                'modal-templates/customize-skill-modal.template.html'),
+                'modal-templates/add-skill-modal.template.html'),
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => skillSummaryData,
@@ -83,13 +95,17 @@ angular.module('oppia').directive('stateSkillEditor', [
               },
               keyboard: true,
               backdrop: 'static',
-              windowClass: 'customize-skill-modal',
-              controller: 'CustomizeSkillModalController',
+              windowClass: 'add-skill-modal',
+              controller: 'AddSkillModalController',
               size: 'xl'
-            }).result.then(function(summary) {
+            }).result.then(function(result) {
               try {
-                $scope.skillId = summary.id;
-                $scope.skillDescription = summary.description;
+                StateSkillService.displayed = result.id
+                StateSkillService.saveDisplayedValue()
+                $scope.onSaveLinkedSkillId(result.id)
+                StateNextContentIdIndexService.saveDisplayedValue();
+                $scope.onSaveNextContentIdIndex(
+                  StateNextContentIdIndexService.displayed);
               } catch (err) {
                 AlertsService.addInfoMessage(
                   'Given skill is already a prerequisite skill', 5000);
@@ -101,14 +117,6 @@ angular.module('oppia').directive('stateSkillEditor', [
             });
           };
 
-          $scope.getSkillEditorUrl = function() {
-            return '/skill_editor/' + $scope.skillId;
-          };
-
-          $scope.toggleSkillEditor = function() {
-            $scope.skillCardIsShown = !$scope.skillCardIsShown;
-          };
-
           $scope.deleteSkill = function() {
             AlertsService.clearWarnings();
             $uibModal.open({
@@ -118,14 +126,27 @@ angular.module('oppia').directive('stateSkillEditor', [
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
-              $scope.skillDescription = null;
-              $scope.skillId = null;
+                StateSkillService.displayed = null
+                StateSkillService.saveDisplayedValue()
+                $scope.onSaveLinkedSkillId(StateSkillService.displayed)
             }, function() {
               AlertsService.clearWarnings();
             });
           };
 
+          $scope.getSkillEditorUrl = function() {
+            if(StateSkillService.displayed){
+              return '/skill_editor/' + StateSkillService.displayed;
+            }
+          };
+
+          $scope.toggleSkillEditor = function() {
+            $scope.skillCardIsShown = !$scope.skillCardIsShown;
+          };
+
           ctrl.$onInit = function() {
+            $scope.StateSkillService = StateSkillService
+            console.log(StateSkillService.displayed)
             $scope.skillCardIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.skillDescription = null;

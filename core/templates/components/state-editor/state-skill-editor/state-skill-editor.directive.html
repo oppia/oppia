@@ -11,21 +11,21 @@
       </i>
     </div>
     <div class="oppia-add-skill-button-container" ng-if="skillCardIsShown">
-      <div ng-if="!skillDescription">
+      <div ng-if="!StateSkillService.displayed">
         <button type="button"
                 class="btn btn-secondary oppia-add-skill-button protractor-test-open-add-skill-modal"
                 ng-click="addSkillModal()">
           + ADD SKILL
         </button>
       </div>
-      <div ng-if="skillDescription">
+      <div ng-if="StateSkillService.displayed">
         <button type="button"
                 class="btn btn-secondary oppia-change-skill-button protractor-test-open-add-skill-modal"
                 ng-click="addSkillModal()">
           CHANGE SKILL
         </button>
-        <div class="skill-description-card" ng-if="skillDescription">
-          <a ng-href="<[getSkillEditorUrl()]>" target="_blank" rel="noopener" class="skill-link"><[skillDescription]></a>
+        <div class="skill-description-card" ng-if="StateSkillService.displayed">
+          <a ng-href="<[getSkillEditorUrl()]>" target="_blank" rel="noopener" class="skill-link"><[StateSkillService.displayed]></a>
           <span class="oppia-delete-response-button oppia-transition-200"
                 ng-click="deleteSkill()">
             <i class="material-icons md-18">&#xE5CD;</i>

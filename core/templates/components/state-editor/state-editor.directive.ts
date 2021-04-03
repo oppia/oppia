@@ -38,6 +38,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require('components/state-editor/state-editor-properties-services/state-skill.service')
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-name.service.ts');
@@ -61,6 +62,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service');
 
+import { state } from '@angular/animations';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateEditor', [
@@ -80,6 +82,7 @@ angular.module('oppia').directive('stateEditor', [
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
         onSaveInteractionId: '=',
+        onSaveLinkedSkillId: '=',
         onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         onSaveSolution: '=',
@@ -91,14 +94,14 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$scope', 'StateContentService',
+        '$scope', 'StateContentService', 'StateSkillService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
         'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $scope, StateContentService,
+            $scope, StateContentService, StateSkillService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,
@@ -154,6 +157,8 @@ angular.module('oppia').directive('stateEditor', [
                   StateEditorService.setInteraction(stateData.interaction);
                   StateContentService.init(
                     $scope.stateName, stateData.content);
+                  StateSkillService.init(
+                    $scope.stateName, stateData.linkedSkillId)
                   StateHintsService.init(
                     $scope.stateName, stateData.interaction.hints);
                   StateInteractionIdService.init(
