@@ -45,4 +45,13 @@ class MathEquationInput(base.BaseInteraction):
             'obj_type': 'CustomOskLetters',
         },
         'default_value': []
+    }, {
+        'name': 'useFractionForDivision',
+        'description': (
+            'Use fraction instead of the division symbol (÷) to represent '
+            'division.'),
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False
     }]
