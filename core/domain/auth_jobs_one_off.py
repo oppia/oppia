@@ -31,7 +31,6 @@ import python_utils
 import utils
 
 import firebase_admin
-from firebase_admin import auth as firebase_auth
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -68,10 +67,8 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
           UserIdByFirebaseAuthIdModel, and individual Firebase accounts; using
           firebase_auth_id as the key. The sole exception is:
               UserAuthDetailsModel(gae_id=feconf.SYSTEM_COMMITTER_ID)
-        - UserAuthDetailsModel.deleted,
-          UserIdByFirebaseAuthIdModel.deleted, and
-          firebase_admin.auth.ExportedUserRecord.disabled each have the same
-          respective boolean value.
+        - UserAuthDetailsModel.deleted, UserIdByFirebaseAuthIdModel.deleted, and
+          FirebaseAccount.disabled each have the same respective boolean value.
       """
 
     SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
@@ -79,7 +76,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     EMPTY_AUTH_ID_KEY = '<EMPTY_AUTH_ID_KEY>'
     ASSOC_BY_AUTH_ID_KEY = 'assoc_by_auth_id'
     ASSOC_BY_USER_ID_KEY = 'assoc_by_user_id'
-    FIREBASE_ACCOUNT_DISABLED_KEY = 'firebase_account_disabled'
+    FIREBASE_ACCOUNT_KEY = 'firebase_account'
 
     ERROR_ASSOC_INCONSISTENCIES = (
         'ERROR: Found inconsistency in models and/or Firebase account')
@@ -115,7 +112,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         for user in firebase_admin.auth.list_users().iterate_all():
             auth_id, assoc_info = (
-                user.uid, (cls.FIREBASE_ACCOUNT_DISABLED_KEY, user.disabled))
+                user.uid, (cls.FIREBASE_ACCOUNT_KEY, (None, user.disabled)))
             yield (auth_id, assoc_info)
 
     @staticmethod
@@ -160,8 +157,7 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         assoc_key = cls.ASSOC_BY_AUTH_ID_KEY
 
         user_is_permanently_deleted, firebase_account_exists = (
-            assoc_key not in assoc_info,
-            cls.FIREBASE_ACCOUNT_DISABLED_KEY in assoc_info)
+            assoc_key not in assoc_info, cls.FIREBASE_ACCOUNT_KEY in assoc_info)
 
         if user_is_permanently_deleted:
             if firebase_account_exists:
@@ -182,7 +178,10 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 # the same email can not be claimed while the deletion request
                 # is pending.
                 disabled=marked_as_deleted)
-        elif marked_as_deleted != assoc_info[cls.FIREBASE_ACCOUNT_DISABLED_KEY]:
+            return
+
+        _, firebase_account_is_disabled = assoc_info[cls.FIREBASE_ACCOUNT_KEY]
+        if marked_as_deleted != firebase_account_is_disabled:
             firebase_admin.auth.update_user(auth_id, disabled=marked_as_deleted)
 
     @classmethod
@@ -209,13 +208,9 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def report_assoc_collisions(cls, auth_id, assoc_info_pairs):
         """Yields debug information for associations mapped to the same auth_id.
 
-        NOTE: Since assoc_by_auth_id and Firebase accounts are keyed by auth_id,
-        and are therefore guaranteed to have no collisions, the associations
-        reported will always come from UserAuthDetailsModel.
-
         Args:
             auth_id: str. The auth_id to check.
-            assoc_info_pairs: list(tuple(str, (str, bool))). The list of
+            assoc_info_pairs: list(tuple(str, (str, bool)|bool)). The list of
                 associations that do not correspond to any auth_id.
 
         Yields:
@@ -232,12 +227,12 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def report_assoc_inconsistencies(
             cls, auth_id, assoc_by_auth_id=None, assoc_by_user_id=None,
-            firebase_account_disabled=None):
+            firebase_account=None):
         """Reports inconsistencies between the given values.
 
         IMPORTANT: The names of the keyword arguments MUST match the values of
         their corresponding class keys: ASSOC_BY_AUTH_ID_KEY,
-        ASSOC_BY_USER_ID_KEY, FIREBASE_ACCOUNT_DISABLED_KEY.
+        ASSOC_BY_USER_ID_KEY, FIREBASE_ACCOUNT_KEY.
 
         Args:
             auth_id: str. The auth_id of the user.
@@ -248,15 +243,15 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             assoc_by_user_id: tuple|None. The (user_id, deleted) properties from
                 the UserAuthDetailsModel corresponding to auth_id, or None if
                 one does not exist.
-            firebase_account_disabled: bool|None. Whether the Firebase account
-                corresponding to auth_id is disabled, or None if an account does
-                not exist.
+            firebase_account: tuple|None. The (user_id, disabled) properties
+                from the Firebase account corresponding to auth_id, or None if
+                an account does not exist. NOTE: The user_id is always None.
 
         Yields:
             str. Debug information about a discovered inconsistency.
         """
         if assoc_by_auth_id is None and assoc_by_user_id is None:
-            # User is deleted and will be managed by resolve_user_conflicts().
+            # User is deleted and will be managed by the reduce() logic.
             return
 
         distinct_user_ids = {assoc_by_auth_id[0]}
@@ -285,10 +280,14 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     auth_id, assoc_by_auth_id[0], assoc_by_auth_id[1],
                     assoc_by_user_id[0], assoc_by_user_id[1]))
 
-        elif firebase_account_disabled and not any(distinct_deleted_bools):
-            yield (
-                'Firebase account with auth_id="%s" is disabled, but the user '
-                'is not marked for deletion on Oppia' % auth_id)
+        if firebase_account is not None:
+            _, firebase_account_is_disabled = firebase_account
+            if firebase_account_is_disabled and not any(distinct_deleted_bools):
+                yield (
+                    'Firebase account with auth_id="%s" is disabled, but the '
+                    'user is not marked for deletion on Oppia' % auth_id)
+            # Else: Firebase account needs to be updated and will be resolved by
+            # the reduce() logic.
 
 
 class SeedFirebaseOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -556,7 +555,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # NOTE: This is only sorted to make unit testing easier.
         user_fields = sorted(ast.literal_eval(v) for v in values)
         user_records = [
-            firebase_auth.ImportUserRecord(
+            firebase_admin.auth.ImportUserRecord(
                 uid=auth_id, email=email, email_verified=True, custom_claims=(
                     '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
                     if user_is_super_admin else None))
@@ -608,7 +607,7 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             the values will be non-None.
         """
         try:
-            return (firebase_auth.import_users(user_records), None)
+            return (firebase_admin.auth.import_users(user_records), None)
         except Exception as exception:
             return (None, exception)
 

@@ -453,8 +453,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_disabled(self, uid):
         """Asserts that the given ID is a disabled account.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -465,8 +465,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_not_disabled(self, uid):
         """Asserts that the given ID is not a disabled account.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
