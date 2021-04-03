@@ -24,7 +24,7 @@ import re
 
 from core.platform import models
 from core.tests import test_utils as core_test_utils
-from jobs.types.decorators import audit_decorators
+from jobs.decorators import audit_decorators
 import python_utils
 
 import apache_beam as beam

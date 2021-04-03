@@ -34,8 +34,8 @@ import re
 from core.platform import models
 import feconf
 from jobs import utils
+from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
-from jobs.types.decorators import audit_decorators
 
 import apache_beam as beam
 

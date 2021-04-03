@@ -23,8 +23,8 @@ import re
 
 from core.platform import models
 import feconf
+from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
-from jobs.types.decorators import audit_decorators
 
 user_models, = models.Registry.import_models([models.NAMES.user])
 
