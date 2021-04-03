@@ -27,14 +27,14 @@ angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService',
     'ContributionAndReviewService', 'SiteAnalyticsService',
-    'UrlInterpolationService',
+    'UrlInterpolationService', 'ContributionOpportunitiesService',
     'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION',
     function(
         $http, $scope, $uibModalInstance, AlertsService,
         ContributionAndReviewService, SiteAnalyticsService,
-        UrlInterpolationService,
+        UrlInterpolationService, ContributionOpportunitiesService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
@@ -44,6 +44,7 @@ angular.module('oppia').controller(
         $scope.activeSuggestionId];
       $scope.subheading = subheading;
       $scope.isEditing = false;
+      $scope.isTranslationUpdated = false;
       $scope.HTML_SCHEMA = {
         type: 'html',
         ui_config: {
@@ -55,14 +56,15 @@ angular.module('oppia').controller(
       }
 
       $scope.updateTranslate = function() {
-        console.log($scope.editedContent.html);
         const updatedTranslation = $scope.editedContent.html;
+        const suggestionId = $scope.activeSuggestion.suggestion_id;
         ContributionAndReviewService.updateTranslation(
-          $scope.activeSuggestion.suggestion_id,
+          suggestionId,
           updatedTranslation,
            (success) => {
-            $scope.activeSuggestion = suggestionIdToSuggestion[
-              $scope.activeSuggestionId];
+            $scope.translationHtml = updatedTranslation;
+            $scope.isTranslationUpdated = true;
+            ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
            },
            (error) => {
             $scope.rejectAndReviewNext('Invalid Suggestion');
@@ -141,6 +143,10 @@ angular.module('oppia').controller(
       };
 
       $scope.acceptAndReviewNext = function() {
+        $scope.finalCommitMessage = generateCommitMessage();
+        if($scope.isTranslationUpdated) {
+          $scope.finalCommitMessage = $scope.finalCommitMessage + '-With Edits'
+        }
         $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
           'Translation');
@@ -148,7 +154,7 @@ angular.module('oppia').controller(
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           ACTION_ACCEPT_SUGGESTION,
-          $scope.reviewMessage, generateCommitMessage(),
+          $scope.reviewMessage, $scope.finalCommitMessage,
           $scope.showNextItemToReview, (error) => {
             $scope.rejectAndReviewNext('Invalid Suggestion');
             AlertsService.clearWarnings();
