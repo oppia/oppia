@@ -46,6 +46,10 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
       }
     };
   }
+
+  getSchema(): object {
+    return this.OUTCOME_FEEDBACK_SCHEMA;
+  }
 }
 angular.module('oppia').directive(
   'oppiaOutcomeFeedbackEditor', downgradeComponent(
