@@ -74,6 +74,7 @@ import { DynamicContentModule } from './angular-html-bind/dynamic-content.module
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { StoryViewerNavbarBreadcrumbComponent } from 'pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
 import { StoryViewerNavbarPreLogoActionComponent } from 'pages/story-viewer-page/navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
+import { StoryViewerPageComponent } from 'pages/story-viewer-page/story-viewer-page.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -127,6 +128,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
+    StoryViewerPageComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
@@ -155,6 +157,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
+    StoryViewerPageComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
@@ -171,6 +174,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     // Components, directives, and pipes.
+    AttributionGuideComponent,
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
@@ -184,6 +188,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     StorySummaryTileDirective,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
+    StoryViewerPageComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
