@@ -134,7 +134,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     };
 
     return {
-      initAsync(): Promise<void> {
+      async initAsync(): Promise<void> {
         if (!initializationHasStarted) {
           initializationHasStarted = true;
           doInitAsync().then(resolveInitPromise, rejectInitPromise);

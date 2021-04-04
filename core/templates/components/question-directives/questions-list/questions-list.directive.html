@@ -137,9 +137,9 @@
         <div class="list-header create-question-header">
           <h3>Create a new question</h3>
         </div>
-        <button class="btn add-question-btn protractor-test-create-question-button"
+        <button class="btn add-question-btn protractor-test-create-question-button oppia-autofocus"
                 ng-disabled="$ctrl.selectSkillModalIsShown() && !$ctrl.getSelectedSkillId()"
-                ng-click="$ctrl.createQuestion()">
+                ng-click="$ctrl.createQuestion()" focus-on="newQuestionBtn">
           + ADD QUESTION
         </button>
       </div>
@@ -147,6 +147,10 @@
   </div>
 </div>
 <style>
+  md-card.oppia-autofocus:focus {
+    outline: #000;
+    outline-width: 4px;
+  }
   questions-list .oppia-editor-publish-button {
     margin-top: 2%;
   }
@@ -208,7 +212,7 @@
   }
   questions-list .add-question-btn {
     background-color: #008098;
-    color: #FFFFFF;
+    color: #FFF;
     font-weight: bold;
     text-align: center;
   }
@@ -281,7 +285,7 @@
     padding-top: 20px;
   }
   questions-list .oppia-cross-icon {
-    color: #FF0000;
+    color: #F00;
   }
   questions-list .linked-skills-container {
     margin-top: 40px;
