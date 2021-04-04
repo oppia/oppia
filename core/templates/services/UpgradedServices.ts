@@ -134,9 +134,6 @@ import { EndExplorationRulesService } from
   'interactions/EndExploration/directives/end-exploration-rules.service';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
-import { ExplorationCreationBackendApiService } from
-  // eslint-disable-next-line max-len
-  'components/entity-creation-services/exploration-creation-backend-api.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -709,9 +706,6 @@ export class UpgradedServices {
     upgradedServices['EndExplorationValidationService'] =
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['ExplorationCreationBackendApiService'] =
-      new ExplorationCreationBackendApiService(
-        upgradedServices['HttpClient']);
     upgradedServices['ExplorationCreationService'] =
       new ExplorationCreationService(
         upgradedServices['CsrfTokenService'],

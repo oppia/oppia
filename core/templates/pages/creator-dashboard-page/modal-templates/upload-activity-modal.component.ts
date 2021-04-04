@@ -17,7 +17,6 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 
@@ -49,6 +48,3 @@ export class UploadActivityModalComponent {
     this.activeModal.dismiss();
   }
 }
-angular.module('oppia').directive(
-  'uploadActivityModal', downgradeComponent(
-    {component: UploadActivityModalComponent}));

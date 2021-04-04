@@ -17,7 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
@@ -61,6 +60,3 @@ export class CreateActivityModalComponent implements OnInit {
     this.activeModal.dismiss();
   }
 }
-angular.module('oppia').directive(
-  'createActivityModal', downgradeComponent(
-    {component: CreateActivityModalComponent}));

@@ -45,6 +45,7 @@ export class CreateActivityButtonComponent implements OnInit {
      private ngbModal: NgbModal,
      private windowRef: WindowRef
    ) {}
+
    onRedirectToLogin(destinationUrl: string): boolean {
      this.siteAnalyticsService.registerStartLoginEvent(
        'createActivityButton');
