@@ -109,11 +109,6 @@ export class StatsReportingService {
     if (StatsReportingService.explorationIsComplete) {
       return;
     }
-    let stateStatsMapping = (
-      StatsReportingService.aggregatedStats.state_stats_mapping);
-    if (stateStatsMapping.hasOwnProperty(undefined)) {
-      throw new Error('Aggregated stats contains an undefined state name');
-    }
 
     this.statsReportingBackendApiService.postsStats(
       StatsReportingService.aggregatedStats,

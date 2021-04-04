@@ -269,40 +269,31 @@ def advance_version_of_exp_stats(
 
         return exp_stats
 
+    state_name_stats_mapping = {}
+    old_state_names = utils.compute_list_difference(
+        exp_stats.state_stats_mapping,
+        exp_versions_diff.deleted_state_names)
+
     # Handling state deletions.
-    for state_name in exp_versions_diff.deleted_state_names:
-        exp_stats.state_stats_mapping.pop(state_name)
+    for state_name in old_state_names:
+        state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[state_name].clone())
+
+    # Handling state renames.
+    for new_state_name in exp_versions_diff.new_to_old_state_names:
+        old_state_name = exp_versions_diff.new_to_old_state_names[
+            new_state_name]
+        state_name_stats_mapping[new_state_name] = (
+            exp_stats.state_stats_mapping[old_state_name].clone())
+        if old_state_name not in exp_versions_diff.new_to_old_state_names:
+            state_name_stats_mapping.pop(old_state_name, None)
 
     # Handling state additions.
     for state_name in exp_versions_diff.added_state_names:
-        exp_stats.state_stats_mapping[state_name] = (
+        state_name_stats_mapping[state_name] = (
             stats_domain.StateStats.create_default())
 
-    # If state names were swapped, both the new and old names will be present in
-    # exp_stats.state_stats_mapping. When this occurs, the state stats should be
-    # swapped too. The swapped_state_name_stats_mapping will contain tuples
-    # of the form (state_name, state_stats).
-    swapped_state_name_stats_mapping = []
-    # Handling state renames.
-    for new_state_name in exp_versions_diff.new_to_old_state_names:
-        if new_state_name in exp_stats.state_stats_mapping:
-            swapped_state_name_stats_mapping.append(
-                (
-                    new_state_name,
-                    exp_stats.state_stats_mapping[
-                        exp_versions_diff.new_to_old_state_names[
-                            new_state_name]].clone()
-                )
-            )
-            continue
-        exp_stats.state_stats_mapping[new_state_name] = (
-            exp_stats.state_stats_mapping.pop(
-                exp_versions_diff.new_to_old_state_names[new_state_name]))
-
-    # Handling state names being swapped.
-    for (state_name, stats_stats) in swapped_state_name_stats_mapping:
-        exp_stats.state_stats_mapping[state_name] = stats_stats
-
+    exp_stats.state_stats_mapping = state_name_stats_mapping
     exp_stats.exp_version = exp_version
 
     return exp_stats
