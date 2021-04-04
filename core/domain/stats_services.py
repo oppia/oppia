@@ -270,12 +270,13 @@ def advance_version_of_exp_stats(
         return exp_stats
 
     state_name_stats_mapping = {}
-    old_state_names = utils.compute_list_difference(
+    old_state_names_that_carry_over = utils.compute_list_difference(
         exp_stats.state_stats_mapping,
         exp_versions_diff.deleted_state_names)
 
-    # Handling state deletions.
-    for state_name in old_state_names:
+    # Copy state names from the previous exploration version that
+    # aren't deleted.
+    for state_name in old_state_names_that_carry_over:
         state_name_stats_mapping[state_name] = (
             exp_stats.state_stats_mapping[state_name].clone())
 
