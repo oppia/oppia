@@ -852,10 +852,12 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
         output = self._run_one_off_job()
+        # eslint-disable
         self.assertEqual(
             [[u'SUCCESS', 1],
              [u'LONGER_THAN_30', [u"('exp_id0', 45)", u"('exp_id0', 45)"]]],
             output)
+        # eslint-enable
         state3.update_interaction_id('ItemSelectionInput')
         state3.update_interaction_customization_args(customization_args_dict1)
         state3.update_next_content_id_index(3)
@@ -866,10 +868,12 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Item Selection Input.
         output = self._run_one_off_job()
+        # eslint-disable
         self.assertEqual(
             [[u'SUCCESS', 1],
              [u'LONGER_THAN_30', [u"('exp_id0', 45)", u"('exp_id0', 45)"]]],
             output)
+        # eslint-enable
         state4.update_interaction_id('ItemSelectionInput')
         state4.update_interaction_customization_args(customization_args_dict2)
         state4.update_next_content_id_index(4)
@@ -880,14 +884,14 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Item Selection Input.
         output = self._run_one_off_job()
-        /* eslint-disable */
+        # eslint-disable 
         self.assertEqual(
             [[u'SUCCESS', 1],
              [u'LONGER_THAN_30',
               [u"('exp_id0', 45)", u"('exp_id0', 45)",
                u"('exp_id0', 45)", u"('exp_id0', 45)"]]],
             output)
-        /* eslint-enable */
+        # eslint-enable 
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations
