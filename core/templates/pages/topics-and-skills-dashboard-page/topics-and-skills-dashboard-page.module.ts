@@ -27,6 +27,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 
 @NgModule({
   imports: [
@@ -44,7 +45,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     OppiaAngularRootComponent,
     SkillsListComponent,
     DeleteSkillModalComponent,
-    UnassignSkillFromTopicsModalComponent
+    UnassignSkillFromTopicsModalComponent,
+    SelectTopicsComponent
   ],
   providers: [
     {
