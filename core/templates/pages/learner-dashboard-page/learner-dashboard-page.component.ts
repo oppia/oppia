@@ -268,7 +268,10 @@ export class LearnerDashboardPageComponent implements OnInit {
       // the element may not be present in the DOM yet.Thus it ensure
       // that the element is visible before focussing.
       setTimeout(() => {
-        this.addFocusWithoutScroll('ourLessonsBtn');
+        this.focusManagerService.setFocus('ourLessonsBtn');
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 5);
       }, 0);
     })
     .catch(errorResponse => {
@@ -281,13 +284,6 @@ export class LearnerDashboardPageComponent implements OnInit {
       text: ''
     };
   }
-
-  addFocusWithoutScroll(label: string) {
-    this.focusManagerService.setFocus(label);
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 5);
-  };
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);

@@ -468,27 +468,6 @@ describe('Learner dashboard page', () => {
       expect(component.explorationPlaylist.length).toBe(10);
     }));
 
-
-    fit('should set focus on browse lesson btn', () => {
-      const focusSpy = spyOn(component, 'addFocusWithoutScroll');
-      tick(15000);
-      fixture.detectChanges();
-
-      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-    });
-
-    fit('should scroll back to top of window after focusing', () => {
-      let focusSpy = spyOn(focusManagerService, 'setFocus');
-      let windowSpy = spyOn(windowRef.nativeWindow, 'scrollTo');
-      component.addFocusWithoutScroll('ourLessonsBtn');
-      
-      tick(15000);
-      fixture.detectChanges();
-
-      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-      expect(windowSpy).toHaveBeenCalled();
-    });
-
     it('should get static image url', () => {
       let imagePath = '/path/to/image.png';
       expect(component.getStaticImageUrl(imagePath)).toBe(
