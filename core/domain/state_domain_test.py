@@ -1478,6 +1478,41 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': '<p>The default outcome.</p>'
             })
 
+    def test_get_translated_text_and_ids_works_correctly(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>Hint translation</p>',
+                        'needs_update': False
+                    }
+                },
+                'default_outcome': {},
+                'solution': {},
+                'feedback_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        init_state.update_written_translations(written_translations)
+
+        self.assertEqual(
+            init_state.get_translated_text_and_ids('hi'),
+                [('content', '<p>hello!</p>'),
+                ('hint_1', '<p>Hint translation</p>')])
+
+
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]

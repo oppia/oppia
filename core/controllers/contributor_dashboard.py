@@ -260,7 +260,7 @@ class TranslatableTextHandler(base.BaseHandler):
             s.change.content_id == content_id for s in suggestions)
 
 
-class TranslatedTextHandler(base.BaseHandler):
+class CompletedTranslationsHandler(base.BaseHandler):
     """Provides translated content for lessons in a given language which
     can be used as a reference while translating.
     """
@@ -282,14 +282,15 @@ class TranslatedTextHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
         exp = exp_fetchers.get_exploration_by_id(exp_id)
-        translated_text_and_content = exp.get_translated_text_and_content(language_code)
+        translated_text_and_content = exp.get_completed_translations(language_code)
         
         self.values = {
-            'content_list' : translated_text_and_content['content'],
-            'translations_list': translated_text_and_content['translations']
+            'content_list' : translated_text_and_content.content,
+            'translations_list': translated_text_and_content.translations
         }
 
         self.render_json(self.values)
+
 
 class UserContributionRightsDataHandler(base.BaseHandler):
     """Provides contribution rights of the logged in user in translation,

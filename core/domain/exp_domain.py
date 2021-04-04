@@ -1396,7 +1396,7 @@ class Exploration(python_utils.OBJECT):
 
         return state_names_to_content_id_mapping
 
-    def get_translated_text_and_content(self, language_code):
+    def get_completed_translations(self, language_code):
         """Returns all the contents along with the corresponding
         translations for which the process of the process of translation in 
         the given language has been completed.
@@ -1418,9 +1418,13 @@ class Exploration(python_utils.OBJECT):
                 completed_translations_content.append(
                     self.get_content_html(state_name, id))
                 completed_translations.append(translated_text)
-        return {
-            'content': completed_translations_content, 
-            'translations': completed_translations}
+        translations_and_content = collections.namedtuple('translations_and_content',
+                                        ['content','translations'])
+        translations_and_content_to_send = translations_and_content(
+                                    content = completed_translations_content,
+                                    translations = completed_translations)
+
+        return translations_and_content_to_send
 
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration

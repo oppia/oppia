@@ -104,6 +104,8 @@ import { ContinueValidationService } from
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { TranslatedTextBackendApiService } from 
+  'pages/contributor-dashboard-page/services/translated-text-backend-api.service';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -1035,6 +1037,10 @@ export class UpgradedServices {
       new ContributionOpportunitiesBackendApiService(
         upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient']);
+    upgradedServices['TranslatedTextBackendApiService'] =
+        new TranslatedTextBackendApiService(
+          upgradedServices['HttpClient']);
+      
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],

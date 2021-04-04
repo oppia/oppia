@@ -3027,14 +3027,14 @@ class State(python_utils.OBJECT):
             as content id and second element as the translation content html.
         """
         translated_content_ids= (
-            self._get_translated_content_ids(language_code))
+            self.get_content_ids_that_are_correctly_translated(language_code))
         translations_and_ids = []
         for id in translated_content_ids:
             translations_and_ids.append(
-                self.get_translation_by_id_in_given_language(id, language_code))
+                self.get_translated_content_with_content_id(id, language_code))
         return translations_and_ids 
 
-    def _get_translated_content_ids(self, language_code):
+    def get_content_ids_that_are_correctly_translated(self, language_code):
         """returns a list of content_ids which have been translated
         in the given language.
         
@@ -3048,7 +3048,7 @@ class State(python_utils.OBJECT):
         return (self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
 
-    def get_translation_by_id_in_given_language(self, id, language_code):
+    def get_translated_content_with_content_id(self, id, language_code):
         """returns the translation corresponding to the given content id
         in the given language
 

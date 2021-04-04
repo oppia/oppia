@@ -25,6 +25,11 @@
     'translations_list': string[]
   }
 
+  interface temp {
+    'contentList' : string[],
+    'translationsList': string[]
+  }
+
   @Injectable({
     providedIn: 'root'
   })
@@ -37,9 +42,9 @@
     recievedContentList = [];
     
     getTranslationsAndContent(expId, 
-                              languageCode):Promise<void>{
+                              languageCode):Promise<any>{
       return this.http.get<ITranslationsAndContentDict>(
-        '/gettranslatedtexthandler', {
+        '/getcompletedtranslationshandler', {
         params: {
           exp_id: expId,
           language_code: languageCode
@@ -48,8 +53,12 @@
       }).toPromise().then((response) => {
         this.recievedTranslationsList = response.body.translations_list;
         this.recievedContentList = response.body.content_list;
+        return {
+          translations_list : this.recievedTranslationsList,
+          content_list : this.recievedContentList
+        }
       }, (errorResponse) => {
-        console.log(errorResponse);
+        throw new Error(errorResponse.error.error);
       });
     }
     getTranslationsAndContentLists(){

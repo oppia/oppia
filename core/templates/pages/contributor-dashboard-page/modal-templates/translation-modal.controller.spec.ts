@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for TranslationModalController.
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
-
-fdescribe('Translation Modal Controller', function() {
+import { UpgradedServices } from 'services/UpgradedServices';
+describe('Translation Modal Controller', function() {
   let $httpBackend = null;
   let $q = null;
   let $scope = null;
@@ -27,7 +27,7 @@ fdescribe('Translation Modal Controller', function() {
   let SiteAnalyticsService = null;
   let TranslateTextService = null;
   let TranslationLanguageService = null;
-
+  let TranslatedTextBackendApiService = null;
   const opportunity = {
     id: '1',
     subheading: 'Subheading',
@@ -37,7 +37,12 @@ fdescribe('Translation Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
@@ -46,6 +51,7 @@ fdescribe('Translation Modal Controller', function() {
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     TranslateTextService = $injector.get('TranslateTextService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
+    TranslatedTextBackendApiService = $injector.get('TranslatedTextBackendApiService');
     CkEditorCopyContentService = $injector.get('CkEditorCopyContentService');
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
