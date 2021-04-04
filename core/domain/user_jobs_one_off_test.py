@@ -458,7 +458,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
 
-        self.user_a = user_services.UserActionsInfo(self.user_a_id)
+        self.user_a = user_services.get_user_actions_info(self.user_a_id)
 
         with self.swap(
             subscription_services, 'subscribe_to_thread', self._null_fn
@@ -1104,11 +1104,11 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1361,7 +1361,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         self.signup('user@email', 'user')
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email('user@email')
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -1658,6 +1658,8 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
 
 class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     USER_ID_1 = 'user_id'
     USER_ID_2 = 'user_id_2'
     EMAIL_1 = 'test@email.com'
@@ -1670,17 +1672,6 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
     EXP_ID_ONE = 'exp_id_one'
     EXP_ID_TWO = 'exp_id_two'
     EXP_ID_THREE = 'exp_id_three'
-
-    def setUp(self):
-
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(FixUserSettingsCreatedOnOneOffJobTests, self).setUp()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -1971,6 +1962,8 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
 class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     USER_ID_1 = 'user_id'
     USER_ID_2 = 'user_id_2'
     EMAIL_1 = 'test@email.com'
@@ -1985,15 +1978,7 @@ class UserSettingsCreatedOnAuditOneOffJobTests(test_utils.GenericTestBase):
     EXP_ID_THREE = 'exp_id_three'
 
     def setUp(self):
-
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(UserSettingsCreatedOnAuditOneOffJobTests, self).setUp()
+        super(UserSettingsCreatedOnAuditOneOffJobTests, self).setUp()
 
         self.user_settings_model = (
             user_models.UserSettingsModel(
@@ -2209,7 +2194,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -2410,8 +2395,8 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email('user@email')
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.save_new_valid_exploration(
             'exp0', self.user_id, end_state_name='End')
@@ -2559,6 +2544,8 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
 
 class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.ProfilePictureAuditOneOffJob.create_new()
@@ -2574,14 +2561,7 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         return eval_output
 
     def setUp(self):
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(ProfilePictureAuditOneOffJobTests, self).setUp()
+        super(ProfilePictureAuditOneOffJobTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.generate_initial_profile_picture(self.owner_id)
@@ -2699,6 +2679,8 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
 class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
@@ -2718,16 +2700,6 @@ class UniqueHashedNormalizedUsernameAuditJobTests(test_utils.GenericTestBase):
             if item[0] == 'FAILURE':
                 item[1] = sorted(item[1])
         return eval_output
-
-    def setUp(self):
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(UniqueHashedNormalizedUsernameAuditJobTests, self).setUp()
 
     def test_audit_user_with_username_is_successful(self):
         model = user_models.UserSettingsModel(id='id', email='email@email.com')

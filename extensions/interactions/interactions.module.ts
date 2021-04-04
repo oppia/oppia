@@ -25,6 +25,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-interactions.module';
 import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
+import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 
 @NgModule({
   imports: [
@@ -32,14 +33,16 @@ import { FractionInputInteractionModule } from './FractionInput/fraction-input-i
     BrowserModule,
     AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule,
-    FractionInputInteractionModule
+    FractionInputInteractionModule,
+    GraphInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
   exports: [
     AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule,
-    FractionInputInteractionModule
+    FractionInputInteractionModule,
+    GraphInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }

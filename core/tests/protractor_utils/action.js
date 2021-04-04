@@ -55,7 +55,7 @@ var select = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var optionElement = selectorElement.element(
     by.cssContainingText('option', optionToSelect));
-  await optionElement.click();
+  await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
 var select2 = async function(selectorName, selectorElement, optionToSelect) {

@@ -40,6 +40,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() allowImproperFractionWithValue: string = '';
   @Input() allowNonzeroIntegerPartWithValue: string = '';
   @Input() customPlaceholderWithValue: string = '';
+  @Input() savedSolution: string;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
   allowImproperFraction: boolean = true;
@@ -121,6 +122,12 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.allowImproperFraction = allowImproperFraction.value;
     this.allowNonzeroIntegerPart = allowNonzeroIntegerPart.value;
     this.customPlaceholder = customPlaceholder.value.unicode;
+    if (this.savedSolution !== undefined) {
+      let savedSolution = JSON.parse(this.savedSolution);
+      savedSolution = this.fractionObjectFactory.fromDict(
+        savedSolution).toString();
+      this.answer = savedSolution;
+    }
     const submitAnswerFn = () => this.submitAnswer();
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(

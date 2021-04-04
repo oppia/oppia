@@ -30,7 +30,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, unusedParams: Object | undefined):string {
+  transform(value: string, _params: Object | undefined): string {
     return value;
   }
 }
@@ -58,7 +58,7 @@ class MockWindowRef {
 }
 
 class MockQuestionBackendApiService {
-  fetchTotalQuestionCountForSkillIds() {
+  fetchTotalQuestionCountForSkillIdsAsync() {
     return Promise.resolve(1);
   }
 }

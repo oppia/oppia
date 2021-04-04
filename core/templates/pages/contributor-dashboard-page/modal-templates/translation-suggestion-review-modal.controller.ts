@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for translation suggestion review modal.
  */
 
-require('domain/feedback_message/ThreadMessageObjectFactory.ts');
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
 require('services/alerts.service.ts');
 require('services/site-analytics.service.ts');
@@ -26,15 +27,14 @@ angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService',
     'ContributionAndReviewService', 'SiteAnalyticsService',
-    'ThreadMessageObjectFactory', 'UrlInterpolationService',
+    'UrlInterpolationService',
     'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION',
-
     function(
         $http, $scope, $uibModalInstance, AlertsService,
         ContributionAndReviewService, SiteAnalyticsService,
-        ThreadMessageObjectFactory, UrlInterpolationService,
+        UrlInterpolationService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
@@ -70,7 +70,7 @@ angular.module('oppia').controller(
         return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
           let threadMessageBackendDicts = response.data.messages;
           return threadMessageBackendDicts.map(
-            m => ThreadMessageObjectFactory.createFromBackendDict(m));
+            m => ThreadMessage.createFromBackendDict(m));
         });
       };
 

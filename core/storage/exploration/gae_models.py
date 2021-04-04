@@ -368,9 +368,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -404,9 +401,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # DEPRECATED in v2.8.3., so translator_ids are not exported.
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -477,10 +472,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             dict. The content of the model. Only valid fields and values are
             present.
         """
-        # The all_viewer_ids field was previously used in some versions of the
-        # model, we need to remove it.
-        if 'all_viewer_ids' in model_dict:
-            del model_dict['all_viewer_ids']
 
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
@@ -493,6 +484,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
             model_dict['translator_ids'] = []
+
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+        if 'translator_ids' in model_dict:
+            del model_dict['translator_ids']
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.

@@ -25,7 +25,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import prod_validation_jobs_one_off
-from core.domain import prod_validators
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -267,7 +266,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
                 'type exploration is not allowed\']]'
             ) % self.model_instance.id]
         with self.swap(
-            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
+            feedback_services, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 

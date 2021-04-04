@@ -44,6 +44,7 @@ require('objects/templates/number-with-units-editor.directive.ts');
 require('objects/templates/numeric-expression-editor.component.ts');
 require('objects/templates/parameter-name-editor.directive.ts');
 require('objects/templates/position-of-terms-editor.component.ts');
+require('objects/templates/positive-int-editor.component.ts');
 require('objects/templates/ratio-expression-editor.component.ts');
 require('objects/templates/real-editor.directive.ts');
 require('objects/templates/sanitized-url-editor.directive.ts');

@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the story viewer.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -54,12 +55,14 @@ describe('Topic and Story viewer functionality', function() {
       objective: 'The goal is to check story viewer functionality.',
       language: 'English'
     };
+
     for (var i = 1; i <= 3; i++) {
       await workflow.createAndPublishTwoCardExploration(
         `Exploration TASV1 - ${i}`,
         EXPLORATION.category,
         EXPLORATION.objective,
         EXPLORATION.language,
+        i === 1,
         true
       );
       dummyExplorationIds.push(await general.getExplorationIdFromEditor());
@@ -150,31 +153,38 @@ describe('Topic and Story viewer functionality', function() {
     }
     await storyEditorPage.saveStory('First save');
     await storyEditorPage.publishStory();
+    await users.logout();
   });
 
   it('should play through story and save progress on login.', async function() {
-    await users.logout();
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
-    await topicAndStoryViewerPage.login(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer');
+
+    // Signing up with the login button should redirect the user back to the
+    // exploration.
+    const loginButton = element(by.css('.protractor-test-login-button'));
+    await action.click('Login button', loginButton);
+    const useManualNavigation = false;
+    await users.createAndLoginUser(
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', useManualNavigation);
+
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
+    await users.logout();
   });
 
   it(
     'should check for topic description, stories and revision cards',
     async function() {
-      await users.logout();
-      await users.login(
-        'creator@storyViewer.com', true);
+      await users.createAndLoginAdminUser(
+        'creator1@storyViewer.com', 'creatorStoryViewer1');
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.expectTopicInformationToBe('Description');
       await topicViewerPage.expectStoryCountToBe(1);
@@ -198,6 +208,7 @@ describe('Topic and Story viewer functionality', function() {
       await topicViewerPage.expectMessageAfterCompletion(
         'Test complete. Well done!'
       );
+      await users.logout();
     });
 
   afterEach(async function() {

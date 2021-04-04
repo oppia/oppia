@@ -368,43 +368,43 @@ class CommonTests(test_utils.GenericTestBase):
             'ERROR: This script can only be run from the "test" branch.'):
             common.verify_current_branch_name('test')
 
-    def test_is_port_open(self):
-        self.assertFalse(common.is_port_open(4444))
+    def test_is_port_in_use(self):
+        self.assertFalse(common.is_port_in_use(4444))
 
         handler = http.server.SimpleHTTPRequestHandler
         httpd = socketserver.TCPServer(('', 4444), handler)
 
-        self.assertTrue(common.is_port_open(4444))
+        self.assertTrue(common.is_port_in_use(4444))
         httpd.server_close()
 
-    def test_wait_for_port_to_be_closed_port_never_closes(self):
+    def test_wait_for_port_to_not_be_in_use_port_never_closes(self):
         def mock_sleep(unused_seconds):
             return
-        def mock_is_port_open(unused_port_number):
+        def mock_is_port_in_use(unused_port_number):
             return True
 
         sleep_swap = self.swap_with_checks(
             time, 'sleep', mock_sleep, expected_args=[(1,)] * 60)
-        is_port_open_swap = self.swap(
-            common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
 
-        with sleep_swap, is_port_open_swap:
-            success = common.wait_for_port_to_be_closed(9999)
+        with sleep_swap, is_port_in_use_swap:
+            success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertFalse(success)
 
-    def test_wait_for_port_to_be_closed_port_closes(self):
+    def test_wait_for_port_to_not_be_in_use_port_closes(self):
         def mock_sleep(unused_seconds):
             raise AssertionError('mock_sleep should not be called.')
-        def mock_is_port_open(unused_port_number):
+        def mock_is_port_in_use(unused_port_number):
             return False
 
         sleep_swap = self.swap(
             time, 'sleep', mock_sleep)
-        is_port_open_swap = self.swap(
-            common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
 
-        with sleep_swap, is_port_open_swap:
-            success = common.wait_for_port_to_be_closed(9999)
+        with sleep_swap, is_port_in_use_swap:
+            success = common.wait_for_port_to_not_be_in_use(9999)
         self.assertTrue(success)
 
     def test_permissions_of_file(self):
@@ -814,14 +814,14 @@ class CommonTests(test_utils.GenericTestBase):
                     return '', ''
             return Ret()
 
-        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+        def mock_wait_for_port_to_be_in_use(port): # pylint: disable=unused-argument
             return
 
         swap_call = self.swap(subprocess, 'call', mock_call)
-        swap_wait_for_port_to_be_open = self.swap(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open)
-        with swap_call, swap_wait_for_port_to_be_open:
+        swap_wait_for_port_to_be_in_use = self.swap(
+            common, 'wait_for_port_to_be_in_use',
+            mock_wait_for_port_to_be_in_use)
+        with swap_call, swap_wait_for_port_to_be_in_use:
             common.start_redis_server()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -862,16 +862,16 @@ class CommonTests(test_utils.GenericTestBase):
                     return '', ''
             return Ret()
 
-        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+        def mock_wait_for_port_to_be_in_use(port): # pylint: disable=unused-argument
             return
 
         swap_call = self.swap(subprocess, 'call', mock_call)
-        swap_wait_for_port_to_be_open = self.swap(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open)
+        swap_wait_for_port_to_be_in_use = self.swap(
+            common, 'wait_for_port_to_be_in_use',
+            mock_wait_for_port_to_be_in_use)
         swap_os_remove = self.swap(os, 'remove', mock_os_remove_file)
         swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
-        with swap_call, swap_wait_for_port_to_be_open, swap_os_remove, (
+        with swap_call, swap_wait_for_port_to_be_in_use, swap_os_remove, (
             swap_os_path_exists):
             common.start_redis_server()
 
@@ -918,7 +918,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_kill_signal: bool. Whether the manager
                 should have sent a kill signal to the process.
         """
-        proc_pattern = r'Process\((name=\'[a-z]+\', )?pid=%d\)' % (pid,)
+        proc_pattern = r'Process\((name=\'[A-Za-z]+\', )?pid=%d\)' % (pid,)
 
         expected_patterns = []
         if manager_should_have_sent_terminate_signal:

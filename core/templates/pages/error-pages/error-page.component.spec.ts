@@ -27,7 +27,7 @@ import { TranslateService } from 'services/translate.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, unusedParams: Object | undefined):string {
+  transform(value: string, _params: Object | undefined): string {
     return value;
   }
 }

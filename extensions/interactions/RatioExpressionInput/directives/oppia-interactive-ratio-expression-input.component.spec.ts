@@ -38,79 +38,124 @@ describe('RatioExpressionInputInteractive', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('Ratio', Ratio);
-    $provide.value(
-      'CurrentInteractionService', mockCurrentInteractionService);
-    $provide.value(
-      'RatioExpressionInputRulesService', mockRatioExpressionInputRulesService);
-    $provide.value(
-      'InteractionAttributesExtractorService',
-      mockInteractionAttributesExtractorService);
-    $provide.value('$attrs', {
-      placeholder: {
-        unicode: 'Enter ratio here'
-      },
-      numberOfTerms: 3,
-      labelForFocusTarget: 'label'
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
-    ctrl.RatioExpressionInputForm = {
-      answer: {
-        $invalid: false,
-        $setValidity: function(unusedErrorType, valid) {
-          this.$invalid = !valid;
+  describe('without saved solution', function() {
+    beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('Ratio', Ratio);
+      $provide.value(
+        'CurrentInteractionService', mockCurrentInteractionService);
+      $provide.value(
+        'RatioExpressionInputRulesService',
+        mockRatioExpressionInputRulesService);
+      $provide.value(
+        'InteractionAttributesExtractorService',
+        mockInteractionAttributesExtractorService);
+      $provide.value('$attrs', {
+        placeholder: {
+          unicode: 'Enter ratio here'
+        },
+        numberOfTerms: 3,
+        labelForFocusTarget: 'label'
+      });
+    }));
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
+      ctrl.RatioExpressionInputForm = {
+        answer: {
+          $invalid: false,
+          $setValidity: function(_errorType, valid) {
+            this.$invalid = !valid;
+          }
         }
-      }
-    };
-  }));
+      };
+    }));
 
-  it('should init the component', function() {
-    spyOn(mockCurrentInteractionService, 'registerCurrentInteraction');
-    ctrl.$onInit();
-    expect(ctrl.answer).toEqual('');
-    expect(ctrl.labelForFocusTarget).toEqual('label');
-    expect(ctrl.placeholder).toEqual('Enter ratio here');
-    expect(ctrl.expectedNumberOfTerms).toEqual(3);
-    expect(ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA).toEqual({
-      type: 'unicode',
-      ui_config: {}
+    it('should init the component', function() {
+      spyOn(mockCurrentInteractionService, 'registerCurrentInteraction');
+      ctrl.$onInit();
+      expect(ctrl.answer).toEqual('');
+      expect(ctrl.labelForFocusTarget).toEqual('label');
+      expect(ctrl.placeholder).toEqual('Enter ratio here');
+      expect(ctrl.expectedNumberOfTerms).toEqual(3);
+      expect(ctrl.RATIO_EXPRESSION_INPUT_FORM_SCHEMA).toEqual({
+        type: 'unicode',
+        ui_config: {}
+      });
+      expect(ctrl.getWarningText()).toEqual('');
+      expect(
+        mockCurrentInteractionService.registerCurrentInteraction
+      ).toHaveBeenCalled();
     });
-    expect(ctrl.getWarningText()).toEqual('');
-    expect(
-      mockCurrentInteractionService.registerCurrentInteraction
-    ).toHaveBeenCalled();
+
+    it('should return valid answer before the form is initialized', function() {
+      ctrl.RatioExpressionInputForm = undefined;
+      expect(ctrl.isAnswerValid()).toBe(true);
+    });
+
+    it('should raise error if invalid answer is submitted', function() {
+      ctrl.$onInit();
+      ctrl.answer = '2:3';
+      ctrl.RatioExpressionInputForm.$invalid = false;
+      spyOn(mockCurrentInteractionService, 'onSubmit');
+      ctrl.submitAnswer(ctrl.answer);
+      expect(ctrl.getWarningText()).toEqual(
+        'The creator has specified the number of terms in the answer to be 3.');
+      expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+      expect(ctrl.isAnswerValid()).toBe(false);
+    });
+
+    it('should submit the answer if valid', function() {
+      ctrl.$onInit();
+      ctrl.answer = '2:3:4';
+      $scope.$apply();
+      spyOn(mockCurrentInteractionService, 'onSubmit');
+      ctrl.submitAnswer('2:3:4');
+      expect(
+        mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
+      expect(ctrl.isAnswerValid()).toBe(true);
+    });
   });
 
-  it('should return valid answer before the form is initialized', function() {
-    ctrl.RatioExpressionInputForm = undefined;
-    expect(ctrl.isAnswerValid()).toBe(true);
-  });
+  describe('with saved solution', function() {
+    beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value('Ratio', Ratio);
+      $provide.value(
+        'CurrentInteractionService', mockCurrentInteractionService);
+      $provide.value(
+        'RatioExpressionInputRulesService',
+        mockRatioExpressionInputRulesService);
+      $provide.value(
+        'InteractionAttributesExtractorService',
+        mockInteractionAttributesExtractorService);
+      $provide.value('$attrs', {
+        placeholder: {
+          unicode: 'Enter ratio here'
+        },
+        numberOfTerms: 3,
+        labelForFocusTarget: 'label',
+        savedSolution: '[1,2,3]'
+      });
+    }));
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
+      ctrl.RatioExpressionInputForm = {
+        answer: {
+          $invalid: false,
+          $setValidity: function(errorType, valid) {
+            this.$invalid = !valid;
+          }
+        }
+      };
+    }));
 
-  it('should raise error if invalid answer is submitted', function() {
-    ctrl.$onInit();
-    ctrl.RatioExpressionInputForm.$invalid = false;
-    spyOn(mockCurrentInteractionService, 'onSubmit');
-    ctrl.submitAnswer('2:3');
-    expect(ctrl.getWarningText()).toEqual(
-      'The creator has specified the number of terms in the answer to be 3.');
-    expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
-    expect(ctrl.isAnswerValid()).toBe(false);
-  });
-
-  it('should submit the answer if valid', function() {
-    ctrl.$onInit();
-    ctrl.answer = '2:3:4';
-    $scope.$apply();
-    spyOn(mockCurrentInteractionService, 'onSubmit');
-    ctrl.submitAnswer('2:3:4');
-    expect(
-      mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
-    expect(ctrl.isAnswerValid()).toBe(true);
+    it('should populate answer with solution if provided', function() {
+      ctrl.$onInit();
+      expect(ctrl.answer).toEqual('1:2:3');
+    });
   });
 });

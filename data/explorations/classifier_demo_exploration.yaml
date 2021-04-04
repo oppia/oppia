@@ -1,18 +1,20 @@
 author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Test
+correctness_feedback_enabled: false
 init_state_name: text
 language_code: en
 objective: To demonstrate the string classifier and trained responses in explorations.
 param_changes: []
 param_specs: {}
-schema_version: 17
+schema_version: 47
 states:
   final:
     classifier_model_id: null
     content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -23,57 +25,100 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
   text:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: <p>Give me an example of a happy word.</p>
     interaction:
       answer_groups:
-      - correct: false
-        outcome:
+      - outcome:
           dest: text
           feedback:
-          - <p>Happy is certainly a happy word. Can you be more creative than that?</p>
+            content_id: feedback_1
+            html: <p>Happy is certainly a happy word. Can you be more creative than
+              that?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: happy
+            x:
+              contentId: rule_input_4
+              normalizedStrSet:
+              - happy
           rule_type: Contains
-      - correct: false
-        outcome:
+        tagged_skill_misconception_id: null
+        training_data: []
+      - outcome:
           dest: text
           feedback:
-          - <p>That is definitely happy! Can you think of any more?</p>
+            content_id: feedback_2
+            html: <p>That is definitely happy! Can you think of any more?</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
-        rule_specs:
-        - inputs:
-            training_data:
-            - cheerful
-            - merry
-            - ecstatic
-            - glad
-            - overjoyed
-            - pleased
-            - thrilled
-            - smile
-          rule_type: FuzzyMatches
+          refresher_exploration_id: null
+        rule_specs: []
+        tagged_skill_misconception_id: null
+        training_data:
+        - cheerful
+        - merry
+        - ecstatic
+        - glad
+        - overjoyed
+        - pleased
+        - thrilled
+        - smile
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_3
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
         dest: final
         feedback:
-        - <p>Is {{answer}} actually happy? I'm not so sure. Let's move on!</p>
+          content_id: default_outcome
+          html: <p>Is {{answer}} actually happy? I'm not so sure. Let's move on!</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 5
     param_changes: []
-states_schema_version: 13
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        rule_input_4: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        rule_input_4: {}
+states_schema_version: 42
 tags: []
 title: Demonstrating string classifier

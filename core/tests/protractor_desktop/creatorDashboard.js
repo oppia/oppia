@@ -66,14 +66,18 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
-
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      false
+    );
+    await users.logout();
 
     await users.login('user2@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
@@ -133,14 +137,17 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
-
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_4,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      false
+    );
     await users.logout();
     await users.login('user6@creatorDashboard.com');
     await libraryPage.get();
@@ -195,14 +202,17 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_TITLE_5,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
-
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_6,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      false
+    );
     await users.logout();
     await users.login('user9@creatorDashboard.com');
     await libraryPage.get();

@@ -32,6 +32,8 @@ angular.module('oppia', [
   uiValidate
 ]);
 
+require('Polyfills.ts');
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/topic-editor-page/topic-editor-page.module.ts');

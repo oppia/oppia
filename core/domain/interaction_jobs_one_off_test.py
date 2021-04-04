@@ -91,7 +91,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -101,7 +101,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         """Checks output pairs are produced only for
         desired interactions.
         """
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -895,7 +895,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -906,7 +906,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         """Checks (exp, state) pairs are produced correctly for ItemSelection
         interactions.
         """
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1087,7 +1087,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         """Checks (exp, state) pairs are produced correctly for DragAndDropSort
         interactions.
         """
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 

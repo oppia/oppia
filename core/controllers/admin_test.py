@@ -48,6 +48,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -86,6 +87,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
         super(AdminIntegrationTest, self).setUp()
+        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -264,7 +266,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminhandler', {
                 'action': 'generate_dummy_new_structures_data'
             }, csrf_token=csrf_token)
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 2)
         for summary in topic_summaries:
             if summary.name == 'Dummy Topic 1':
@@ -383,6 +385,34 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         new_creation_time = all_opportunity_models[0].created_on
 
         self.assertLess(old_creation_time, new_creation_time)
+
+    def test_regenerate_missing_exploration_stats_action(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.save_new_default_exploration('ID', 'owner_id')
+
+        self.assertEqual(
+            exp_services.regenerate_missing_stats_for_exploration('ID'), (
+                [], [], 1, 1))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'regenerate_missing_exploration_stats',
+                'exp_id': 'ID'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'missing_exp_stats': [],
+                'missing_state_stats': [],
+                'num_valid_exp_stats': 1,
+                'num_valid_state_stats': 1
+            })
 
     def test_admin_topics_csv_download_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1005,6 +1035,118 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             feature.name)
         self.logout()
 
+    def test_grant_super_admin_privileges(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges')
+
+        with grant_super_admin_privileges_stub as call_counter:
+            response = self.put_json(
+                '/adminsuperadminhandler',
+                {'username': self.ADMIN_USERNAME},
+                csrf_token=self.get_new_csrf_token(),
+                expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertNotIn('error', response)
+
+    def test_grant_super_admin_privileges_requires_system_default_admin(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges')
+
+        with grant_super_admin_privileges_stub as call_counter:
+            response = self.put_json(
+                '/adminsuperadminhandler',
+                {'username': self.ADMIN_USERNAME},
+                csrf_token=self.get_new_csrf_token(),
+                expected_status_int=401)
+
+        self.assertEqual(call_counter.times_called, 0)
+        self.assertEqual(
+            response['error'],
+            'Only the default system admin can manage super admins')
+
+    def test_grant_super_admin_privileges_fails_without_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.put_json(
+            '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
+            expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
+    def test_grant_super_admin_privileges_fails_with_invalid_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.put_json(
+            '/adminsuperadminhandler', {'username': 'fakeusername'},
+            csrf_token=self.get_new_csrf_token(), expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
+
+    def test_revoke_super_admin_privileges(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges')
+
+        with revoke_super_admin_privileges_stub as call_counter:
+            response = self.delete_json(
+                '/adminsuperadminhandler',
+                params={'username': self.ADMIN_USERNAME},
+                expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertNotIn('error', response)
+
+    def test_revoke_super_admin_privileges_requires_system_default_admin(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges')
+
+        with revoke_super_admin_privileges_stub as call_counter:
+            response = self.delete_json(
+                '/adminsuperadminhandler',
+                params={'username': self.ADMIN_USERNAME},
+                expected_status_int=401)
+
+        self.assertEqual(call_counter.times_called, 0)
+        self.assertEqual(
+            response['error'],
+            'Only the default system admin can manage super admins')
+
+    def test_revoke_super_admin_privileges_fails_without_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.delete_json(
+            '/adminsuperadminhandler', params={}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
+    def test_revoke_super_admin_privileges_fails_with_invalid_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.delete_json(
+            '/adminsuperadminhandler',
+            params={'username': 'fakeusername'}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
+
+    def test_revoke_super_admin_privileges_fails_for_default_admin(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.delete_json(
+            '/adminsuperadminhandler', params={'username': 'testsuper'},
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Cannot revoke privileges from the default super admin account')
+
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy explorations."""
@@ -1231,7 +1373,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, username)
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, user_id, name='Name',
             abbreviated_name='abbrev', url_fragment='url-fragment',
@@ -2418,9 +2560,10 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         super(DeleteUserHandlerTest, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.admin_user_id = self.get_user_id_from_email(
+            feconf.SYSTEM_EMAIL_ADDRESS)
 
     def test_delete_without_user_id_raises_error(self):
         self.delete_json(

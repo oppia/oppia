@@ -67,7 +67,7 @@ import { AdminBackendApiService } from
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from
-  'pages/admin-page/services/admin-router.service.ts';
+  'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AlertsService } from 'services/alerts.service';
@@ -79,8 +79,6 @@ import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioTranslationLanguageService } from
@@ -102,7 +100,7 @@ import { BrowserCheckerService } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service.ts';
+  'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
@@ -185,7 +183,7 @@ import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
-import { ExternalSaveService } from 'services/external-save.service.ts';
+import { ExternalSaveService } from 'services/external-save.service';
 import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
@@ -282,7 +280,7 @@ import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
-import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PageTitleService } from 'services/page-title.service';
 import { ParamChangeObjectFactory } from
@@ -328,7 +326,7 @@ import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service.ts';
+  'domain/question/question-backend-api.service';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
@@ -344,7 +342,7 @@ import { RecordedVoiceoversObjectFactory } from
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
-  'pages/review-test-page/review-test-engine.service.ts';
+  'pages/review-test-page/review-test-engine.service';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -372,7 +370,7 @@ import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
-  'domain/skill/skill-rights-backend-api.service.ts';
+  'domain/skill/skill-rights-backend-api.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -447,13 +445,9 @@ import { TextInputRulesService } from
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
-import { ThreadMessageObjectFactory } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts';
+  'domain/topic/topic-creation-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
@@ -505,7 +499,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static angularNameService: AngularNameService;
   static answerClassificationService: AnswerClassificationService;
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
-  static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
   static audioBarStatusService: AudioBarStatusService;
   static audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -756,8 +749,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static textInputRulesService: TextInputRulesService;
   static textInputTokenizer: TextInputTokenizer;
   static textInputValidationService: TextInputValidationService;
-  static threadMessageObjectFactory: ThreadMessageObjectFactory;
-  static threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
   static threadStatusDisplayService: ThreadStatusDisplayService;
   static topicCreationBackendApiService: TopicCreationBackendApiService;
   static topicObjectFactory: TopicObjectFactory;
@@ -796,7 +787,6 @@ private algebraicExpressionInputValidationService:
 private angularNameService: AngularNameService,
 private answerClassificationService: AnswerClassificationService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
-private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
 private audioBarStatusService: AudioBarStatusService,
 private audioTranslationLanguageService: AudioTranslationLanguageService,
@@ -1049,8 +1039,6 @@ private textInputPredictionService: TextInputPredictionService,
 private textInputRulesService: TextInputRulesService,
 private textInputTokenizer: TextInputTokenizer,
 private textInputValidationService: TextInputValidationService,
-private threadMessageObjectFactory: ThreadMessageObjectFactory,
-private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory,
 private threadStatusDisplayService: ThreadStatusDisplayService,
 private topicCreationBackendApiService: TopicCreationBackendApiService,
 private topicObjectFactory: TopicObjectFactory,
@@ -1095,8 +1083,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.answerClassificationService);
     OppiaAngularRootComponent.answerGroupObjectFactory = (
       this.answerGroupObjectFactory);
-    OppiaAngularRootComponent.answerStatsObjectFactory = (
-      this.answerStatsObjectFactory);
     OppiaAngularRootComponent.appService = this.appService;
     OppiaAngularRootComponent.audioBarStatusService = (
       this.audioBarStatusService);
@@ -1506,10 +1492,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.textInputTokenizer);
     OppiaAngularRootComponent.textInputValidationService = (
       this.textInputValidationService);
-    OppiaAngularRootComponent.threadMessageObjectFactory = (
-      this.threadMessageObjectFactory);
-    OppiaAngularRootComponent.threadMessageSummaryObjectFactory = (
-      this.threadMessageSummaryObjectFactory);
     OppiaAngularRootComponent.threadStatusDisplayService = (
       this.threadStatusDisplayService);
     OppiaAngularRootComponent.topicCreationBackendApiService = (

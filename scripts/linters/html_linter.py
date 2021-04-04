@@ -345,24 +345,22 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         error_messages = []
         full_error_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
-        html_files_to_lint = self.html_filepaths
-        for filepath in html_files_to_lint:
-            proc_args = htmllint_cmd_args + [filepath]
-            proc = subprocess.Popen(
-                proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc_args = htmllint_cmd_args + self.html_filepaths
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            encoded_linter_stdout, _ = proc.communicate()
-            linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-            # This line splits the output of the linter and extracts digits
-            # from it. The digits are stored in a list. The second last
-            # digit in the list represents the number of errors in the file.
-            error_count = (
-                [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
-            if error_count:
-                failed = True
-                full_error_messages.append(linter_stdout)
-                error_messages.append(
-                    self._get_trimmed_error_output(linter_stdout))
+        encoded_linter_stdout, _ = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        # This line splits the output of the linter and extracts digits
+        # from it. The digits are stored in a list. The second last
+        # digit in the list represents the number of errors in the file.
+        error_count = (
+            [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
+        if error_count:
+            failed = True
+            full_error_messages.append(linter_stdout)
+            error_messages.append(
+                self._get_trimmed_error_output(linter_stdout))
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, full_error_messages)
