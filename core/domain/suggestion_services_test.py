@@ -1256,6 +1256,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
+
     EXP_ID = 'exp1'
     TOPIC_ID = 'topic1'
     STORY_ID = 'story1'
@@ -1618,7 +1619,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegexp(
-            utils.ValidationError,expected_exception_regexp):
+            utils.ValidationError, expected_exception_regexp):
             suggestion_services.update_suggestion(
                 'sug-1', '<p>Test Translation</p>')
 
