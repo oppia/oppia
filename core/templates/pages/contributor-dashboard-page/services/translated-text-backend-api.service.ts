@@ -55,7 +55,7 @@ export class TranslatedTextBackendApiService {
       throw new Error(errorResponse.error.error);
     });
   }
-  getTranslationsAndContentLists(): <any> {
+  getTranslationsAndContentLists() {
     return {
       translationsList : this.recievedTranslationsList,
       contentList : this.recievedContentList
@@ -64,5 +64,3 @@ export class TranslatedTextBackendApiService {
 }
 angular.module('oppia').factory('TranslatedTextBackendApiService', 
   downgradeInjectable(TranslatedTextBackendApiService));   
-
-  

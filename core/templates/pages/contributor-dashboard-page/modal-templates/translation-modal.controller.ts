@@ -22,7 +22,7 @@ require(
 
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
 require(
-  'pages/contributor-dashboard-page/services/' + 
+  'pages/contributor-dashboard-page/services/' +
   'translated-text-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
@@ -37,12 +37,12 @@ angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$rootScope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'TranslatedTextBackendApiService','ENTITY_TYPE',
+  'opportunity', 'TranslatedTextBackendApiService', 'ENTITY_TYPE',
   'TRANSLATION_TIPS', function(
       $controller, $scope, $rootScope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
-      opportunity, TranslatedTextBackendApiService, ENTITY_TYPE, 
+      opportunity, TranslatedTextBackendApiService, ENTITY_TYPE,
       TRANSLATION_TIPS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -100,7 +100,7 @@ angular.module('oppia').controller('TranslationModalController', [
           TranslatedTextBackendApiService.getTranslationsAndContentLists());
         $scope.translationsList = TranslatedTextAndContent.translationsList;
         $scope.contentList = TranslatedTextAndContent.contentList;
-        if ( $scope.translationsList.length > 0 ){
+        if ($scope.translationsList.length > 0) {
           $scope.noTranslationComplete = false;
         }
         $scope.loadingTranslatedText = false;

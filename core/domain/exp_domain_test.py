@@ -1513,7 +1513,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration.validate()
-
         exploration.init_state.interaction.default_outcome.dest = None
         with self.assertRaisesRegexp(
             Exception, 'Every outcome should have a destination.'):

@@ -1421,9 +1421,9 @@ class Exploration(python_utils.OBJECT):
                 completed_translations.append(translated_text)
         translations_and_content = collections.namedtuple(
             'translations_and_content', ['content', 'translations'])
-        translations_and_content_to_send=translations_and_content(
-                        content=completed_translations_content,
-                        translations=completed_translations)
+        translations_and_content_to_send = translations_and_content(
+            content=completed_translations_content,
+            translations=completed_translations)
 
         return translations_and_content_to_send
 

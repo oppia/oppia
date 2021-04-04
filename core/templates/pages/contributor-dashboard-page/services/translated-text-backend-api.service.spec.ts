@@ -65,7 +65,7 @@ describe('Translated Text Backend Api Service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      let requestUrl = '/getcompletedtranslationshandler?'+ 
+      let requestUrl = '/getcompletedtranslationshandler?' +
           'exp_id=12345&language_code=hi';
       translateTextBackendApiService.getTranslationsAndContent(
         expId, languageCode)
@@ -86,4 +86,3 @@ describe('Translated Text Backend Api Service', () => {
     })
   );
 });
-

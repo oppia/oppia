@@ -3041,9 +3041,9 @@ class State(python_utils.OBJECT):
         translated_content_ids = (
             self.get_content_ids_that_are_correctly_translated(language_code))
         translations_and_ids = []
-        for id in translated_content_ids:
+        for content_id in translated_content_ids:
             translations_and_ids.append(
-                self.get_translated_content_with_content_id(id, language_code))
+                self.get_translated_content_with_content_id(content_id, language_code))
         return translations_and_ids
 
     def get_content_ids_that_are_correctly_translated(self, language_code):
@@ -3059,17 +3059,16 @@ class State(python_utils.OBJECT):
         """
         return (
             self.written_translations
-                .get_content_ids_that_are_correctly_translated(language_code))
+            .get_content_ids_that_are_correctly_translated(language_code))
 
     def get_translated_content_with_content_id(self, content_id, language_code):
         """returns the translation corresponding to the given content id
-        in the given language
+        in the given language.
 
         Args:
             content_id: str. The content id of the completed translation in the
             given language.
             language_code: str. The abbreviated code of the language.
-        
         Returns:
             tuple(str, list(str)) A tuple containing two elements. The
             first element is the content id string and the second element
