@@ -105,7 +105,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
     'feedback-popup.directive.ts',
-    'feedback-thread-summary.model.ts',
     'filepath-editor.directive.ts',
     'focus-on.directive.ts',
     'format-timer.pipe.ts',
