@@ -27,6 +27,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { TopicsListComponent } from './topics-list/topics-list.component';
+import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 
 @NgModule({
   imports: [
@@ -65,8 +67,6 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { TopicsListComponent } from './topics-list/topics-list.component';
-import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
