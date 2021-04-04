@@ -21,6 +21,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface ITranslationsAndContentDict {
+  'contentList': string[],
+  'translationsList': string[]
+}
+
+interface ITranslationsAndContentResponse {
   'content_list': string[],
   'translations_list': string[]
 }
@@ -36,8 +41,8 @@ export class TranslatedTextBackendApiService {
   recievedTranslationsList = [];
   recievedContentList = [];
   getTranslationsAndContent(
-      expId: string, languageCode: string): Promise<any> {
-    return this.http.get<ITranslationsAndContentDict>(
+      expId: string, languageCode: string): Promise<ITranslationsAndContentDict> {
+    return this.http.get<ITranslationsAndContentResponse>(
       '/getcompletedtranslationshandler', {
         params: {
           exp_id: expId,
@@ -48,14 +53,14 @@ export class TranslatedTextBackendApiService {
       this.recievedTranslationsList = response.body.translations_list;
       this.recievedContentList = response.body.content_list;
       return {
-        translations_list: this.recievedTranslationsList,
-        content_list: this.recievedContentList
+        translationsList: this.recievedTranslationsList,
+        contentList: this.recievedContentList
       };
     }, (errorResponse) => {
       throw new Error(errorResponse.error.error);
     });
   }
-  getTranslationsAndContentLists() {
+  getTranslationsAndContentLists(): ITranslationsAndContentDict {
     return {
       translationsList : this.recievedTranslationsList,
       contentList : this.recievedContentList

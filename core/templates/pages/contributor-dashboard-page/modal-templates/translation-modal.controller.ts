@@ -38,7 +38,8 @@ angular.module('oppia').controller('TranslationModalController', [
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
   'opportunity', 'TranslatedTextBackendApiService', 'ENTITY_TYPE',
-  'TRANSLATION_TIPS', function(
+  'TRANSLATION_TIPS', 
+  function(
       $controller, $scope, $rootScope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
