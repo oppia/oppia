@@ -276,6 +276,7 @@ var _getExplorationRoles = async function(roleName) {
     itemName + ' in $ctrl.ExplorationRightsService.' + listName +
     ' track by $index'
   )).map(async function(elem) {
+    await waitFor.visibilityOf(elem);
     return await elem.getText();
   });
 };
