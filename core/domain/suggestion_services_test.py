@@ -1592,7 +1592,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_suggestion.change.translation_html,
             '<p>Test Translation</p>')
-    
+
     def test_translation_update_not_existing_exception(self):
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id)
@@ -1606,7 +1606,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'rejected.' % (suggestions[0].suggestion_id)
         )
 
-        with self.assertRaisesRegexp(utils.ValidationError, expected_exception_regexp):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_exception_regexp):
             suggestion_services.update_suggestion(
                 suggestions[0].suggestion_id, '<p>Test Translation</p>')
 
@@ -1615,8 +1616,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'You cannot change the suggestion with id %s because it does not '
             'exist.' % ('sug-1')
         )
-        
-        with self.assertRaisesRegexp(utils.ValidationError, expected_exception_regexp):
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,expected_exception_regexp):
             suggestion_services.update_suggestion(
                 'sug-1', '<p>Test Translation</p>')
 
