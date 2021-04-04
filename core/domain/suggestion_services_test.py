@@ -1254,8 +1254,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
 
-class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
+class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp1'
     TOPIC_ID = 'topic1'
