@@ -20,7 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
-from jobs import jobs_test_base
+from jobs import jobs_test_utils
 from jobs.transforms import base_model_audits
 from jobs.types import audit_errors
 
@@ -29,7 +29,7 @@ import apache_beam as beam
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-class ValidateDeletedTests(jobs_test_base.JobsTestBase):
+class ValidateDeletedTests(jobs_test_utils.PTransformTestBase):
 
     def test_process_reports_error_for_old_deleted_model(self):
         expired_model = base_models.BaseModel(
@@ -49,7 +49,7 @@ class ValidateDeletedTests(jobs_test_base.JobsTestBase):
         ])
 
 
-class ValidateModelTimeFieldTests(jobs_test_base.JobsTestBase):
+class ValidateModelTimeFieldTests(jobs_test_utils.PTransformTestBase):
 
     def test_process_reports_model_timestamp_relationship_error(self):
         invalid_timestamp = base_models.BaseModel(
@@ -84,7 +84,7 @@ class ValidateModelTimeFieldTests(jobs_test_base.JobsTestBase):
         ])
 
 
-class ValidateModelIdTests(jobs_test_base.JobsTestBase):
+class ValidateModelIdTests(jobs_test_utils.PTransformTestBase):
 
     def test_validate_model_id(self):
         invalid_id_model = base_models.BaseModel(
@@ -105,7 +105,7 @@ class ValidateModelIdTests(jobs_test_base.JobsTestBase):
         ])
 
 
-class ValidatePostCommitIsPrivateTests(jobs_test_base.JobsTestBase):
+class ValidatePostCommitIsPrivateTests(jobs_test_utils.PTransformTestBase):
 
     def test_validate_post_commit_is_private_when_status_is_public(self):
         invalid_commit_status = base_models.BaseCommitLogEntryModel(

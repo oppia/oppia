@@ -23,6 +23,7 @@ import collections
 import inspect
 
 from core.platform import models
+from jobs import jobs_utils
 from jobs.types import audit_errors
 import python_utils
 
@@ -34,9 +35,9 @@ _ALL_BASE_MODEL_CLASSES = frozenset(
     models.Registry.get_storage_model_classes([models.NAMES.base_model]))
 
 _MODEL_CLASSES_BY_BASE_CLASS = {
-    base_model_cls: frozenset({base_model_cls}).union(
-        cls for cls in _ALL_MODEL_CLASSES if issubclass(cls, base_model_cls))
-    for base_model_cls in _ALL_BASE_MODEL_CLASSES
+    base_class: frozenset({base_class}).union(
+        cls for cls in _ALL_MODEL_CLASSES if issubclass(cls, base_class))
+    for base_class in _ALL_BASE_MODEL_CLASSES
 }
 
 
@@ -51,23 +52,23 @@ class AuditsExisting(python_utils.OBJECT):
     and only if ValidateExplorationModelId inherits from ValidateModelId.
     """
 
-    _DO_FNS_BY_MODEL_KIND = collections.defaultdict(set)
+    _AUDITS_BY_KIND = collections.defaultdict(set)
 
-    def __init__(self, *model_cls_args):
+    def __init__(self, *model_classes):
         """Initializes the decorator to target the given models.
 
         Args:
-            *model_cls_args: tuple(class). The models the decorator will target.
+            *model_classes: tuple(class). The models the decorator will target.
                 If an argument is a base class, all of its subclasses will be
                 targeted as well.
 
         Raises:
             TypeError. When a non-model type is provided.
         """
-        if not model_cls_args:
-            raise ValueError('Must provide at least one model')
+        if not model_classes:
+            raise ValueError('Must target at least one model')
         self._model_classes = set()
-        for cls in model_cls_args:
+        for cls in model_classes:
             if cls in _MODEL_CLASSES_BY_BASE_CLASS:
                 self._model_classes.update(_MODEL_CLASSES_BY_BASE_CLASS[cls])
             elif cls in _ALL_MODEL_CLASSES:
@@ -76,53 +77,51 @@ class AuditsExisting(python_utils.OBJECT):
                 raise TypeError(
                     '%r is not a model registered in core.platform' % cls)
 
-    def __call__(self, do_fn):
+    def __call__(self, new_audit):
         """Decorator which registers the given DoFn to the targeted models.
 
         This decorator also installs type constraints on the DoFn to guard it
         from invalid argument types.
 
         Args:
-            do_fn: DoFn. The DoFn to decorate.
+            new_audit: DoFn. The DoFn to decorate.
 
         Returns:
-            do_fn. The decorated DoFn.
+            DoFn. The decorated DoFn.
 
         Raises:
             TypeError. When the input argument is not a DoFn.
         """
-        if not issubclass(do_fn, beam.DoFn):
-            raise TypeError('%r is not a subclass of DoFn' % do_fn)
+        if not issubclass(new_audit, beam.DoFn):
+            raise TypeError('%r is not a subclass of DoFn' % new_audit)
 
         # The "mro" (method resolution order) of a class is the list of types
         # the class is derived from, including itself, in the order they are
         # searched for methods and attributes.
-        # To learn more see: https://stackoverflow.com/a/2010732/4859885.
-        base_classes_of_do_fn = set(inspect.getmro(do_fn))
+        # To learn more, see: https://stackoverflow.com/a/2010732/4859885.
+        base_classes_of_new_audit = set(inspect.getmro(new_audit))
 
         for cls in self._model_classes:
-            registered_do_fns = self._DO_FNS_BY_MODEL_KIND[cls.__name__]
-            if any(issubclass(r, do_fn) for r in registered_do_fns):
-                # Always keep the most-derived DoFn.
+            kind = jobs_utils.get_model_kind(cls)
+            registered_audits = self._AUDITS_BY_KIND[kind]
+            if any(issubclass(a, new_audit) for a in registered_audits):
+                # Always keep the most-derived audit type.
                 continue
-            registered_do_fns -= base_classes_of_do_fn
-            registered_do_fns.add(do_fn)
+            registered_audits -= base_classes_of_new_audit
+            registered_audits.add(new_audit)
 
-        # Decorate the DoFn with type constraints that raise an error when
-        # arguments or return values have the wrong type.
+        # Decorate the DoFn with type constraints that raise an error when args
+        # or return values have the wrong type.
         with_input_types, with_output_types = (
             typehints.with_input_types(typehints.Union[self._model_classes]),
             typehints.with_output_types(audit_errors.BaseAuditError))
-        return with_input_types(with_output_types(do_fn))
+        return with_input_types(with_output_types(new_audit))
 
     @classmethod
-    def get_do_fns_for_model_kind(cls, model_kind):
-        """Returns the list of DoFns registered to the given model kind.
-
-        Args:
-            model_kind: str. The kind/name of the model.
+    def get_audits_by_kind(cls):
+        """Returns the sets of DoFns registered to each kind of model.
 
         Returns:
-            list(DoFn). The DoFns registered to the model kind.
+            dict(str: DoFn). The registered DoFns by their targeted model kind.
         """
-        return list(cls._DO_FNS_BY_MODEL_KIND[model_kind])
+        return dict(cls._AUDITS_BY_KIND)

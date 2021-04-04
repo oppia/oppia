@@ -19,10 +19,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import unittest
-
 from core.platform import models
+from core.tests import test_utils
 from jobs import jobs_utils
+
+from apache_beam.io.gcp.datastore.v1new import types as beam_datastore
+from google.cloud import datastore as cloud_datastore
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -35,7 +37,7 @@ class FooModel(base_models.BaseModel):
     prop = datastore_services.StringProperty()
 
 
-class CloneTests(unittest.TestCase):
+class CloneTests(test_utils.TestBase):
 
     def test_clone_model(self):
         model = base_models.BaseModel(id='123', deleted=True)
@@ -85,3 +87,29 @@ class CloneTests(unittest.TestCase):
         self.assertIsInstance(clone, FooModel)
         self.assertEqual(model.prop, 'original')
         self.assertEqual(clone.prop, 'updated')
+
+
+class GetModelKindTests(test_utils.TestBase):
+
+    def test_get_from_datastore_model(self):
+        model = base_models.BaseModel()
+        self.assertEqual(jobs_utils.get_model_kind(model), 'BaseModel')
+
+    def test_get_from_datastore_model_class(self):
+        self.assertEqual(
+            jobs_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
+
+    def test_get_from_cloud_datastore_entity(self):
+        entity = cloud_datastore.Entity(
+            key=cloud_datastore.Key('BaseModel', '123', project='foo'))
+        self.assertEqual(jobs_utils.get_model_kind(entity), 'BaseModel')
+
+    def test_get_from_beam_datastore_entity(self):
+        entity = beam_datastore.Entity(
+            beam_datastore.Key(('BaseModel', '123'), project='foo'))
+        self.assertEqual(jobs_utils.get_model_kind(entity), 'BaseModel')
+
+    def test_get_from_bad_value(self):
+        self.assertRaisesRegexp(
+            TypeError, 'not a model type',
+            lambda: jobs_utils.get_model_kind(123))

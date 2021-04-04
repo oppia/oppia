@@ -23,6 +23,13 @@ functions require all input to be immutable.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
+
+from apache_beam.io.gcp.datastore.v1new import types as beam_datastore
+from google.cloud import datastore as cloud_datastore
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
 
 def clone_model(model, **new_values):
     """Clones the entity, adding or overriding constructor attributes.
@@ -46,3 +53,27 @@ def clone_model(model, **new_values):
     props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
     props.update(new_values)
     return cls(id=model_id, **props)
+
+
+def get_model_kind(item):
+    """Returns the "kind", a globally unique identifier, of the given item.
+
+    Args:
+        item: base_models.Model|cloud_datastore.Entity|beam_datastore.Entity.
+            The item to inspect.
+
+    Returns:
+        str. The item's kind.
+
+    Raises:
+        TypeError. When the argument is not a model.
+    """
+    if (isinstance(item, base_models.BaseModel) or
+            isinstance(item, type) and issubclass(item, base_models.BaseModel)):
+        return item._get_kind() # pylint: disable=protected-access
+    elif isinstance(item, cloud_datastore.Entity):
+        return item.kind
+    elif isinstance(item, beam_datastore.Entity):
+        return item.to_client_entity().kind
+    else:
+        raise TypeError('%r is not a model type' % type(item).__name__)

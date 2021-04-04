@@ -23,7 +23,7 @@ import datetime
 
 from core.platform import models
 import feconf
-from jobs import jobs_test_base
+from jobs import jobs_test_utils
 from jobs.transforms import user_audits
 from jobs.types import audit_errors
 
@@ -32,7 +32,7 @@ import apache_beam as beam
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class ValidateUserModelIdTests(jobs_test_base.JobsTestBase):
+class ValidateUserModelIdTests(jobs_test_utils.PTransformTestBase):
 
     NOW = datetime.datetime.utcnow()
 

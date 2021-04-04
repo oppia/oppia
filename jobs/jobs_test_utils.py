@@ -1,0 +1,116 @@
+# coding: utf-8
+#
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Base test class for Apache Beam jobs."""
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import datetime
+
+from core.tests import test_utils
+from jobs import base_jobs
+from jobs import job_options
+from jobs.io import test_io
+
+from apache_beam import runners
+from apache_beam.testing import test_pipeline
+from apache_beam.testing import util as beam_testing_util
+
+
+class BeamTestBase(test_utils.TestBase):
+    """Base Apache Beam test class with helpful constants and assertions."""
+
+    NOW = datetime.datetime.utcnow()
+    YEAR_AGO = NOW - datetime.timedelta(weeks=52)
+    YEAR_LATER = NOW + datetime.timedelta(weeks=52)
+
+    def assert_pcoll_equal(self, actual, expected):
+        """Asserts that the given PCollections are equal."""
+        beam_testing_util.assert_that(
+            actual, beam_testing_util.equal_to(expected))
+
+    def assert_pcoll_empty(self, actual):
+        """Asserts that the given PCollection is empty."""
+        beam_testing_util.assert_that(
+            actual, beam_testing_util.is_empty())
+
+
+class PTransformTestBase(BeamTestBase):
+    """Base class that prepares a test pipeline for executing PTransforms."""
+
+    def __init__(self, *args, **kwargs):
+        super(PTransformTestBase, self).__init__(*args, **kwargs)
+        self.pipeline = test_pipeline.TestPipeline(
+            runner=runners.DirectRunner(),
+            options=test_pipeline.PipelineOptions(runtime_type_check=True))
+
+    def run(self, *args, **kwargs):
+        """Run the test within the context of a test pipeline."""
+        with self.pipeline:
+            super(PTransformTestBase, self).run(*args, **kwargs)
+
+
+class JobTestBase(BeamTestBase):
+    """Base class with helpful methods for testing Oppia's jobs.
+
+    Subclasses must add the class constant JOB_CLASS to use the helper methods.
+    """
+
+    JOB_CLASS = base_jobs.JobBase # NOTE: run() raises a NotImplementedError.
+
+    def __init__(self, *args, **kwargs):
+        super(JobTestBase, self).__init__(*args, **kwargs)
+        self.model_io_stub = test_io.ModelIoStub()
+
+    def tearDown(self):
+        self.model_io_stub.clear()
+        super(JobTestBase, self).tearDown()
+
+    def run_job(self, pipeline=None, runner=None, options=None):
+        """Runs a new instance of self.JOB_CLASS and returns its output.
+
+        Args:
+            pipeline: type(beam.Pipeline). The type of pipeline that will be
+                used to manage the job. Uses TestPipeline is not provided.
+            runner: type(PipelineRunner). The type of runner that will be used
+                to execute the pipeline. Uses DirectRunner if not provided.
+            options: JobOptions|None. A JobOptions instance used to configure
+                the pipeline and job. Uses options with runtime type checks and
+                stubbed model IO by default.
+
+        Returns:
+            PCollection. The output of the job.
+        """
+        if pipeline is None:
+            pipeline = test_pipeline.TestPipeline
+        if runner is None:
+            runner = runners.DirectRunner()
+        if options is None:
+            options = job_options.JobOptions(
+                runtime_type_check=True,
+                model_getter=self.model_io_stub.get_models)
+
+        job = self.JOB_CLASS(pipeline=pipeline, runner=runner, options=options)
+        return job.run()
+
+    def assert_job_output_is(self, expected):
+        """Asserts that the output of self.JOB_CLASS is the expected pcoll."""
+        self.assert_pcoll_equal(self.run_job(), expected)
+
+    def assert_job_output_is_empty(self):
+        """Asserts that the output of self.JOB_CLASS is an empty pcoll."""
+        self.assert_pcoll_empty(self.run_job())
