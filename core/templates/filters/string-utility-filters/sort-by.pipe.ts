@@ -31,7 +31,7 @@ export class SortByPipe implements PipeTransform {
       return value;
     }
 
-    if (sortKey === 'default'){
+    if (sortKey === 'default') {
       return value.reverse();
     }
 

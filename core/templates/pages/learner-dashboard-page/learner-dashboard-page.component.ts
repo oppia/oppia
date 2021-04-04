@@ -51,36 +51,36 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   animations: [
     trigger('slideInOut', [
       state('true', style({
-        'max-height': '500px', 'opacity': '1', 'visibility': 'visible'
+        'max-height': '500px', opacity: '1', visibility: 'visible'
       })),
       state('false', style({
-          'max-height': '0px', 'opacity': '0', 'visibility': 'hidden'
+        'max-height': '0px', opacity: '0', visibility: 'hidden'
       })),
       transition('true => false', [group([
-          animate('500ms ease-in-out', style({
-              'opacity': '0'
-          })),
-          animate('500ms ease-in-out', style({
-              'max-height': '0px'
-          })),
-          animate('500ms ease-in-out', style({
-              'visibility': 'hidden'
-          }))
+        animate('500ms ease-in-out', style({
+          opacity: '0'
+        })),
+        animate('500ms ease-in-out', style({
+          'max-height': '0px'
+        })),
+        animate('500ms ease-in-out', style({
+          visibility: 'hidden'
+        }))
       ]
       )]),
       transition('false => true', [group([
-          animate('500ms ease-in-out', style({
-              'visibility': 'visible'
-          })),
-          animate('500ms ease-in-out', style({
-              'max-height': '500px'
-          })),
-          animate('500ms ease-in-out', style({
-              'opacity': '1'
-          }))
+        animate('500ms ease-in-out', style({
+          visibility: 'visible'
+        })),
+        animate('500ms ease-in-out', style({
+          'max-height': '500px'
+        })),
+        animate('500ms ease-in-out', style({
+          opacity: '1'
+        }))
       ]
       )])
-  ])
+    ])
   ]
 })
 export class LearnerDashboardPageComponent implements OnInit {
@@ -168,7 +168,8 @@ export class LearnerDashboardPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    let userProfileImagePromise = this.userService.getProfileImageDataUrlAsync();
+    let userProfileImagePromise =
+      this.userService.getProfileImageDataUrlAsync();
     userProfileImagePromise.then(
       dataUrl => {
         this.profilePictureDataUrl =
@@ -270,8 +271,8 @@ export class LearnerDashboardPageComponent implements OnInit {
       setTimeout(() => {
         this.addFocusWithoutScroll('ourLessonsBtn');
       }, 0);
-    })
-    .catch(errorResponse => {
+    // eslint-disable-next-line dot-notation
+    }).catch(errorResponse => {
       // This is placed here in order to satisfy Unit tests.
     });
 
@@ -282,12 +283,12 @@ export class LearnerDashboardPageComponent implements OnInit {
     };
   }
 
-  addFocusWithoutScroll(label: string) {
+  addFocusWithoutScroll(label: string): void {
     this.focusManagerService.setFocus(label);
     setTimeout(() => {
       window.scrollTo(0, 0);
     }, 5);
-  };
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);

@@ -71,8 +71,7 @@
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST | translate"></span>
         </h4>
-        <div 
-             class="menu-sub-section"
+        <div class="menu-sub-section"
              [@slideInOut]="(activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
           <div class="oppia-learner-dashboard-submenu"
                [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
@@ -90,8 +89,7 @@
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE | translate"></span>
         </h4>
-        <div 
-             class="menu-sub-section"
+        <div class="menu-sub-section"
              [@slideInOut]="(activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE)">
           <div class="oppia-learner-dashboard-submenu protractor-test-incomplete-exp-section"
                [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
@@ -109,8 +107,7 @@
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED | translate"></span>
         </h4>
-        <div 
-             class="menu-sub-section"
+        <div class="menu-sub-section"
              [@slideInOut]="(activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED)">
           <div class="oppia-learner-dashboard-submenu protractor-test-completed-exp-section"
                [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
@@ -479,8 +476,7 @@
                uib-tooltip="Remove"
                tooltip-placement="top">
             </i>
-            <collection-summary-tile 
-                                     [getCollectionId]="tile.id"
+            <collection-summary-tile [getCollectionId]="tile.id"
                                      [getCollectionTitle]="tile.title"
                                      [getLastUpdatedMsec]="tile.lastUpdatedMsec"
                                      [getObjective]="tile.objective"

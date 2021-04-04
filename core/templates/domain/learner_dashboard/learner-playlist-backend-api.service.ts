@@ -134,7 +134,7 @@ export class LearnerPlaylistBackendApiService {
     return Promise((resolve, reject) => {
       modelRef.result.then((playlistUrl) => {
       // eslint-disable-next-line dot-notation
-      this.http.delete<void>(playlistUrl).toPromise();
+        this.http.delete<void>(playlistUrl).toPromise();
         resolve();
       }, () => {
       // Note to developers:

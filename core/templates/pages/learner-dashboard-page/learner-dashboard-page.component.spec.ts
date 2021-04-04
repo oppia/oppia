@@ -28,7 +28,7 @@ import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
-import { async, ComponentFixture, discardPeriodicTasks, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { MaterialModule } from 'components/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';

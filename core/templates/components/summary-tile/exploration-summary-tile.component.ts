@@ -16,7 +16,7 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';

@@ -16,7 +16,7 @@
  * @fileoverview Component for a collection summary tile.
  */
 
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
