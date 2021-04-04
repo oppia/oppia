@@ -35,6 +35,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -430,12 +431,12 @@ def update_suggestion(suggestion_id, translation_html):
     suggestion = get_suggestion_by_id(suggestion_id)
 
     if suggestion is None:
-        raise Exception(
+        raise utils.ValidationError(
             'You cannot change the suggestion with id %s because it does '
             'not exist.' % (suggestion_id)
         )
     if suggestion.is_handled:
-        raise Exception(
+        raise utils.ValidationError(
             'The suggestion with id %s has already been accepted/'
             'rejected.' % (suggestion_id)
         )

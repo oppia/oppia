@@ -1254,7 +1254,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
 
-
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp1'
@@ -1593,6 +1592,33 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_suggestion.change.translation_html,
             '<p>Test Translation</p>')
+    
+    def test_translation_update_not_existing_exception(self):
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+        suggestion_services.accept_suggestion(
+            suggestions[0].suggestion_id, self.reviewer_id, 'Done', 'Accepted'
+        )
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/'
+            'rejected.' % (suggestions[0].suggestion_id)
+        )
+
+        with self.assertRaisesRegexp(utils.ValidationError, expected_exception_regexp):
+            suggestion_services.update_suggestion(
+                suggestions[0].suggestion_id, '<p>Test Translation</p>')
+
+    def test_translation_update_already_hadled_exception(self):
+        expected_exception_regexp = (
+            'You cannot change the suggestion with id %s because it does not '
+            'exist.' % ('sug-1')
+        )
+        
+        with self.assertRaisesRegexp(utils.ValidationError, expected_exception_regexp):
+            suggestion_services.update_suggestion(
+                'sug-1', '<p>Test Translation</p>')
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
