@@ -16,12 +16,15 @@
  * @fileoverview Tests for collection-node.model.
  */
 
-import { CollectionNode } from
-  'domain/collection/collection-node.model';
+import { CollectionNode, CollectionNodeBackendDict}
+  from 'domain/collection/collection-node.model';
+import { LearnerExplorationSummaryBackendDict } from
+  'domain/summary/learner-exploration-summary.model';
 
 describe('Collection node model', () => {
   it('should provide an immutable exploration summary', () => {
-    var explorationSummaryBackendObject = {
+    var explorationSummaryBackendObject:
+    LearnerExplorationSummaryBackendDict = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
       objective: 'Test Objective',
@@ -45,17 +48,19 @@ describe('Collection node model', () => {
       category: 'Algebra',
       title: 'exp title'
     };
-    var collectionNodeBackendObject = {
+    var collectionNodeBackendObject:
+    CollectionNodeBackendDict = {
       exploration_id: 'exp_id0',
       exploration_summary: explorationSummaryBackendObject
     };
 
-    var collectionNode = CollectionNode.create(
+    var collectionNode: CollectionNode = CollectionNode.create(
       collectionNodeBackendObject);
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(collectionNode.getExplorationTitle()).toEqual('exp title');
 
-    var summaryObject = collectionNode.getExplorationSummaryObject();
+    var summaryObject: LearnerExplorationSummaryBackendDict =
+      collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
 
     delete summaryObject.category;
@@ -65,8 +70,8 @@ describe('Collection node model', () => {
 
   it('should be able to create a new collection node by exploration ID',
     () => {
-      var collectionNode = CollectionNode.createFromExplorationId(
-        'exp_id0');
+      var collectionNode: CollectionNode =
+        CollectionNode.createFromExplorationId('exp_id0');
       expect(collectionNode.getExplorationId()).toEqual('exp_id0');
       expect(collectionNode.doesExplorationExist()).toBe(false);
     }
@@ -74,7 +79,8 @@ describe('Collection node model', () => {
 
   it('should be able to detect if exploration is private',
     () => {
-      var explorationSummaryBackendObject = {
+      var explorationSummaryBackendObject:
+      LearnerExplorationSummaryBackendDict = {
         last_updated_msec: 1591296737470.528,
         community_owned: false,
         objective: 'Test Objective',
@@ -98,12 +104,13 @@ describe('Collection node model', () => {
         category: 'Algebra',
         title: 'exp title'
       };
-      var collectionNodeBackendObject = {
+      var collectionNodeBackendObject:
+      CollectionNodeBackendDict = {
         exploration_id: 'exp_id0',
         exploration_summary: explorationSummaryBackendObject
       };
 
-      var collectionNode = CollectionNode.create(
+      var collectionNode: CollectionNode = CollectionNode.create(
         collectionNodeBackendObject);
 
       expect(collectionNode.isExplorationPrivate()).toBe(true);
@@ -112,7 +119,8 @@ describe('Collection node model', () => {
 
   it('should be able to set exploration summary object',
     () => {
-      var explorationSummaryBackendObject = {
+      var explorationSummaryBackendObject:
+      LearnerExplorationSummaryBackendDict = {
         last_updated_msec: 1591296737470.528,
         community_owned: false,
         objective: 'test Objective',
@@ -136,12 +144,13 @@ describe('Collection node model', () => {
         category: 'Algebra',
         title: 'exp title'
       };
-      var collectionNodeBackendObject = {
+      var collectionNodeBackendObject:
+      CollectionNodeBackendDict = {
         exploration_id: 'exp_id0',
         exploration_summary: null
       };
 
-      var collectionNode = CollectionNode.create(
+      var collectionNode: CollectionNode = CollectionNode.create(
         collectionNodeBackendObject);
 
       var summaryObject = collectionNode.getExplorationSummaryObject();
