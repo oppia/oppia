@@ -10,8 +10,8 @@
             "<[$ctrl.ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
           </span>
           <span ng-if="$ctrl.ruleDescriptionChoices.length !== 1">
-            <html-select class="oppia-rule-description-choice" [options]="$ctrl.ruleDescriptionChoices" [selection]="$ctrl.rule.inputs[item.varName]">
-            </html-select>
+            <oppia-html-select class="oppia-rule-description-choice" [options]="$ctrl.ruleDescriptionChoices" [selection]="$ctrl.rule.inputs[item.varName]">
+            </oppia-html-select>
           </span>
         </span>
 

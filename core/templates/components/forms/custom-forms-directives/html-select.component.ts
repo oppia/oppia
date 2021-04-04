@@ -19,19 +19,19 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-interface Option {
+interface HtmlSelectOptions {
   id: string,
   val: string
 }
 
 @Component({
-  selector: 'html-select',
+  selector: 'oppia-html-select',
   templateUrl: './html-select.component.html',
   styleUrls: []
 })
 
 export class HtmlSelectComponent {
-  @Input() options: Option[];
+  @Input() options: HtmlSelectOptions[];
   @Input() selection: string;
 
   constructor() { }
@@ -50,6 +50,6 @@ export class HtmlSelectComponent {
 }
 
 angular.module('oppia').directive(
-  'htmlSelect', downgradeComponent({
+  'oppiaHtmlSelect', downgradeComponent({
     component: HtmlSelectComponent
   }) as angular.IDirectiveFactory);
