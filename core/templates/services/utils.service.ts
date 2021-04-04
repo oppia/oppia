@@ -25,10 +25,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class UtilsService {
   /**
-  * Determines if a variable is defined and not null.
-  * @param {Object, Array<Object>, string, string[], undefined, null}value
-  * @return {boolean} - true if object is defined, false otherwise.
-  */
+   * Determines if a variable is defined and not null.
+   * @param {Object, Array<Object>, string, string[], undefined, null}value
+   * @return {boolean} - true if object is defined, false otherwise.
+   */
   isDefined(
       value: Object | Object[] | string | string[] | undefined | null
   ): boolean {
@@ -39,9 +39,9 @@ export class UtilsService {
   // cannot have any specific type defined for the argument and the argument
   // is given a generic type of Object.
   /**
-  * @param {Object} obj - the object to be checked.
-  * @return {boolean} - true if object is empty, false otherwise.
-  */
+   * @param {Object} obj - the object to be checked.
+   * @return {boolean} - true if object is empty, false otherwise.
+   */
   isEmpty(obj: Object): boolean {
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
@@ -55,9 +55,9 @@ export class UtilsService {
   // cannot have any specific type defined for the argument and the argument
   // is given a generic type of Object.
   /**
-  * @param {Object} input - the object to be checked.
-  * @return {boolean} - true if input is string, false otherwise.
-  */
+   * @param {Object} input - the object to be checked.
+   * @return {boolean} - true if input is string, false otherwise.
+   */
   isString(input: Object): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
@@ -66,10 +66,10 @@ export class UtilsService {
   // not empty or not. So, we cannot have any specific type defined for the
   // arguments and the arguments are given a generic type of Object.
   /**
-  * @param {Object} a - the first object to be compared.
-  * @param {Object} b - the second object to be compared.
-  * @return {boolean} - true if a is equivalent to b, false otherwise.
-  */
+   * @param {Object} a - the first object to be compared.
+   * @param {Object} b - the second object to be compared.
+   * @return {boolean} - true if a is equivalent to b, false otherwise.
+   */
   isEquivalent(a: Object, b: Object): boolean {
     if (a === null || b === null) {
       return a === b;
@@ -86,6 +86,11 @@ export class UtilsService {
     if (aProps.length !== bProps.length) {
       return false;
     }
+    // In the indexing of an Object type by a string
+    // there is implicitly an 'any' type.
+    // Issue solved: https://github.com/microsoft/TypeScript/issues/35859
+    // Additionally a cast was added to the Record type in order not
+    // to modify the structure of the Object interface.
     for (var i = 0; i < aProps.length; i++) {
       var propName = aProps[i];
       const getKeyValue = (key: string) =>
