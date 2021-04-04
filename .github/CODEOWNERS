@@ -437,11 +437,7 @@
 
 
 # Infrastructure.
-/jobs/__init__.py @brianrodri
-/jobs/base_model_*.py @brianrodri
-/jobs/jobs_utils.py @brianrodri
-/jobs/jobs_test_utils.py @brianrodri
-/jobs/jobs_utils_test.py @brianrodri
+/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
