@@ -48,23 +48,25 @@
 
 
 # Angular Migration team
-/core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
-/core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
-/core/templates/components/material.module.ts @srijanreddy98 @darksun27
-/core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @darksun27
-/core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @darksun27
-/core/templates/base-components/oppia-root.directive.html @srijanreddy98 @darksun27
-/core/templates/filters/translate.pipe.ts @srijanreddy98 @darksun27
-/core/templates/services/angular-services.index.ts @srijanreddy98 @darksun27
-/core/templates/services/contextual/logger.service.ts @srijanreddy98 @darksun27
-/core/templates/services/contextual/logger.service.spec.ts @srijanreddy98 @darksun27
-/core/templates/services/i18n-language-code.service.ts @srijanreddy98 @darksun27
-/core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
-/core/templates/services/question-validation.service*.ts @srijanreddy98 @darksun27
-/core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
-/core/templates/services/translate.service.ts @srijanreddy98 @darksun27
-/core/templates/services/translations-backend-api.service.ts @srijanreddy98 @darksun27
-/core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
+# TODO(#12350): For the following 17 files,
+# replace @arpit1912 with @darksun27 after 2021-04-10.
+/core/templates/components/shared-component.module.ts @srijanreddy98 @arpit1912
+/core/templates/services/loader.service*.ts @srijanreddy98 @arpit1912
+/core/templates/components/material.module.ts @srijanreddy98 @arpit1912
+/core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @arpit1912
+/core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @arpit1912
+/core/templates/base-components/oppia-root.directive.html @srijanreddy98 @arpit1912
+/core/templates/filters/translate.pipe.ts @srijanreddy98 @arpit1912
+/core/templates/services/angular-services.index.ts @srijanreddy98 @arpit1912
+/core/templates/services/contextual/logger.service.ts @srijanreddy98 @arpit1912
+/core/templates/services/contextual/logger.service.spec.ts @srijanreddy98 @arpit1912
+/core/templates/services/i18n-language-code.service.ts @srijanreddy98 @arpit1912
+/core/templates/services/loader.service*.ts @srijanreddy98 @arpit1912
+/core/templates/services/question-validation.service*.ts @srijanreddy98 @arpit1912
+/core/templates/services/request-interceptor.service*.ts @srijanreddy98 @arpit1912
+/core/templates/services/translate.service.ts @srijanreddy98 @arpit1912
+/core/templates/services/translations-backend-api.service.ts @srijanreddy98 @arpit1912
+/core/templates/services/UpgradedServices.ts @srijanreddy98 @arpit1912
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek
 /tsconfig-strict.json @vojtechjelinek
@@ -289,8 +291,9 @@
 /core/domain/expression_parser*.py @iamprayush
 /core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
-/core/domain/obj_services*.py @iamprayush
+/core/domain/object_registry*.py @iamprayush
 /core/domain/rules_registry*.py @aks681
+/core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
@@ -437,6 +440,7 @@
 /jobs/__init__.py @brianrodri
 /jobs/base_model_*.py @brianrodri
 /jobs/jobs_utils.py @brianrodri
+/jobs/jobs_test_utils.py @brianrodri
 /jobs/jobs_utils_test.py @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
@@ -464,6 +468,8 @@
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
+/core/templates/pages/login-page/ @brianrodri
+/core/templates/pages/logout-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
 /core/templates/services/app.service*.ts @srijanreddy98
@@ -475,6 +481,7 @@
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
 /redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
+/.firebase.json @brianrodri
 
 
 # Miscellaneous.

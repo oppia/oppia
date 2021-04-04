@@ -178,6 +178,9 @@ IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
 MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -504,7 +507,7 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 3
+NUM_PRETEST_QUESTIONS = 0
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -1110,8 +1113,13 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+
+# TODO(#11462): Delete this after Firebase authentication has been deployed.
+ENABLE_USER_CREATION = True
+
 # The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live-on in the
+# arbitrary. If it is changed later on, then the cookie will live on in the
 # users' browsers as garbage (although it would expire eventually, see MAX_AGE).
 FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the

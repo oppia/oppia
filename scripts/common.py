@@ -214,7 +214,8 @@ def run_cmd(cmd_tokens):
     Returns:
         str. The output of the command.
     """
-    return subprocess.check_output(cmd_tokens).strip()
+    return subprocess.check_output(
+        cmd_tokens, stderr=subprocess.STDOUT).strip()
 
 
 def ensure_directory_exists(d):
@@ -386,7 +387,7 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
-def is_port_open(port):
+def is_port_in_use(port):
     """Checks if a process is listening to the port.
 
     Args:
@@ -635,27 +636,27 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         raise
 
 
-def wait_for_port_to_be_open(port_number):
-    """Wait until the port is open and exit if port isn't open after
+def wait_for_port_to_be_in_use(port_number):
+    """Wait until the port is in use and exit if port isn't open after
     MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
     Args:
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (not is_port_open(port_number)
+    while (not is_port_in_use(port_number)
            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
-            and not is_port_open(port_number)):
+            and not is_port_in_use(port_number)):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
 
 
-def wait_for_port_to_be_closed(port_number):
+def wait_for_port_to_not_be_in_use(port_number):
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
 
@@ -666,11 +667,11 @@ def wait_for_port_to_be_closed(port_number):
         bool. Whether the port closed in time.
     """
     waited_seconds = 0
-    while (is_port_open(port_number)
+    while (is_port_in_use(port_number)
            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
         time.sleep(1)
         waited_seconds += 1
-    return not is_port_open(port_number)
+    return not is_port_in_use(port_number)
 
 
 def start_redis_server():
@@ -697,7 +698,7 @@ def start_redis_server():
         REDIS_SERVER_PATH, REDIS_CONF_PATH,
         '--daemonize', 'yes'
     ])
-    wait_for_port_to_be_open(feconf.REDISPORT)
+    wait_for_port_to_be_in_use(feconf.REDISPORT)
 
 
 def stop_redis_server():
@@ -924,6 +925,7 @@ def managed_firebase_auth_emulator():
     emulator_args = [
         FIREBASE_PATH, 'emulators:start', '--only', 'auth',
         '--project', feconf.OPPIA_PROJECT_ID,
+        '--config', feconf.FIREBASE_EMULATOR_CONFIG_PATH,
     ]
     with contextlib2.ExitStack() as stack:
         # OK to use shell=True here because we are passing string literals and
