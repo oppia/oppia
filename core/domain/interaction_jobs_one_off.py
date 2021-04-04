@@ -169,10 +169,10 @@ class MultipleItemInteractionLtOneOffJob(
         exploration = exp_fetchers.get_exploration_from_model(item)
         interactions_to_check = ('MultipleChoiceInput', 'ItemSelectionInput')
         for state in exploration.states.items():
-            if state.interaction.id in interactions_to_check:
-                choices = state.interaction.customization_args['choices']
+            if state[1].interaction.id in interactions_to_check:
+                choices = state[1].interaction.customization_args['choices']
                 for choice in choices.value:
-                    choice_length = len(choice)
+                    choice_length = len(choice.html)
                     if choice_length > 30:
                         yield ('LONGER_THAN_30', (item.id, choice_length))
         yield ('SUCCESS', item.id)

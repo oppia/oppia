@@ -814,19 +814,21 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
                 'html': '<p>Oppia contribute</p>',
                 'content_id': 'ca_choices_1'
             }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1},
             'showChoicesInShuffledOrder': {'value': True}
         }
 
         state1.update_interaction_id('MultipleChoiceInput')
         state1.update_interaction_customization_args(customization_args_dict1)
-        state1.update_next_content_id_index(2)
+        state1.update_next_content_id_index(1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start MultipleItemInteractionLtOneOffJob job
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
         output = self._run_one_off_job()
-        self.assertEqual([['SUCCESS', 1]], output)
+        self.assertEqual([[u'SUCCESS', 1]], output)
 
         customization_args_dict2 = {
             'choices': {'value': [{
@@ -836,12 +838,13 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
                 'html': '<p>This is value2 for MultipleChoiceInput</p>',
                 'content_id': 'ca_choices_1'
             }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1},
             'showChoicesInShuffledOrder': {'value': True}
         }
-
         state2.update_interaction_id('MultipleChoiceInput')
         state2.update_interaction_customization_args(customization_args_dict2)
-        state2.update_next_content_id_index(4)
+        state2.update_next_content_id_index(2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -849,14 +852,14 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
         output = self._run_one_off_job()
-        fail = 'LONGER THAN 30'
         self.assertEqual(
-            [[fail, [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]],
+            [[u'SUCCESS', 1],
+            [u'LONGER_THAN_30', [u"('exp_id0', 45)", u"('exp_id0', 45)"]]],
             output)
-
+        
         state3.update_interaction_id('ItemSelectionInput')
         state3.update_interaction_customization_args(customization_args_dict1)
-        state3.update_next_content_id_index(6)
+        state3.update_next_content_id_index(3)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -864,11 +867,15 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Item Selection Input.
         output = self._run_one_off_job()
-        self.assertEqual([['SUCCESS', 1]], output)
+        self.assertEqual(
+            [[u'SUCCESS', 1],
+            [u'LONGER_THAN_30', [u"('exp_id0', 45)", u"('exp_id0', 45)"]]],
+            output)
+        
 
         state4.update_interaction_id('ItemSelectionInput')
         state4.update_interaction_customization_args(customization_args_dict2)
-        state4.update_next_content_id_index(8)
+        state4.update_next_content_id_index(4)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -877,8 +884,13 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # Item Selection Input.
         output = self._run_one_off_job()
         self.assertEqual(
-            [[fail, [[self.VALID_EXP_ID, 38], [self.VALID_EXP_ID, 38]]]],
+            [[u'SUCCESS', 1],
+            [u'LONGER_THAN_30', 
+            [u"('exp_id0', 45)", u"('exp_id0', 45)",
+            u"('exp_id0', 45)", u"('exp_id0', 45)"]]],
             output)
+
+
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations
@@ -904,6 +916,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
                 'html': '<p>This is value2 for MultipleChoiceInput</p>',
                 'content_id': 'ca_choices_1'
             }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1},
             'showChoicesInShuffledOrder': {'value': True}
         }
 
@@ -930,6 +944,8 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
                 'html': '<p>This is value2 for ItemSelectionInput</p>',
                 'content_id': 'ca_choices_1'
             }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1},
             'showChoicesInShuffledOrder': {'value': True}
         }
 
