@@ -30,7 +30,7 @@
         <div class="oppia-translation-review-edit-buttons">
           <button class="btn btn-secondary" ng-if="isEditing" ng-click="cancelEdit()">Cancel</button>
           <button class="btn btn-success" ng-if="isEditing" ng-click="updateTranslate()">Update</button>
-          <button class="btn btn-secondary" ng-if="!isEditing" ng-click="editTranslate()">Edit</button>
+          <button class="btn btn-secondary" ng-if="!isEditing && status !== 'accepted'" ng-click="editTranslate()">Edit</button>
         </div>
       </div>
     </div>

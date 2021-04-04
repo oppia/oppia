@@ -45,6 +45,7 @@ angular.module('oppia').controller(
       $scope.subheading = subheading;
       $scope.isEditing = false;
       $scope.isTranslationUpdated = false;
+      $scope.isAccpeted = false;
       $scope.HTML_SCHEMA = {
         type: 'html',
         ui_config: {
@@ -107,6 +108,7 @@ angular.module('oppia').controller(
         $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
+        $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
         $scope.editedContent.html = $scope.translationHtml;
