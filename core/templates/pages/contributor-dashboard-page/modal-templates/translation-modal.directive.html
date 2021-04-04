@@ -40,11 +40,10 @@
         </schema-based-editor>
       </div>
     </div>
-<<<<<<< HEAD
     <div class="oppia-view-completed-translations-section">
-      <div className="oppia-view-completed-translations-button-row">  
+      <div className="oppia-view-completed-translations-button-row">
         <button class="btn btn-primary oppia-view-completed-translations-button"
-                ng-click="toggleViewCompletedTranslationsModal()"> 
+                ng-click="toggleViewCompletedTranslationsModal()">
             <span ng-if="!viewCompletedTranslationsModalOpen">
               View Completed Translations
             </span>
@@ -52,7 +51,7 @@
               Hide Completed Translations
             </span>
         </button>
-      </div> 
+      </div>
       <div class="oppia-completed-translations-table"
            ng-if="viewCompletedTranslationsModalOpen">
         <div class="oppia-translations-and-content-row"
@@ -76,15 +75,12 @@
         <div ng-if="noTranslationComplete && loadingTranslatedText">
           <p>Loading...</p>
         </div>
-        
       </div>
-=======
     <div ng-if="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>
         <li ng-repeat="tip in TRANSLATION_TIPS[activeLanguageCode]"><[tip]>
         </li>
       </ul>
->>>>>>> upstream/develop
     </div>
   </div>
 </div>

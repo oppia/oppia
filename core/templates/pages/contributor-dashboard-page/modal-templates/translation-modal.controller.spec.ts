@@ -27,7 +27,6 @@ describe('Translation Modal Controller', function() {
   let SiteAnalyticsService = null;
   let TranslateTextService = null;
   let TranslationLanguageService = null;
-  let TranslatedTextBackendApiService = null;
   const opportunity = {
     id: '1',
     subheading: 'Subheading',
@@ -51,7 +50,6 @@ describe('Translation Modal Controller', function() {
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     TranslateTextService = $injector.get('TranslateTextService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
-    TranslatedTextBackendApiService = $injector.get('TranslatedTextBackendApiService');
     CkEditorCopyContentService = $injector.get('CkEditorCopyContentService');
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);

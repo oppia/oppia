@@ -104,7 +104,8 @@ import { ContinueValidationService } from
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { TranslatedTextBackendApiService } from 
+import { TranslatedTextBackendApiService } from
+  // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/translated-text-backend-api.service';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
@@ -1040,7 +1041,6 @@ export class UpgradedServices {
     upgradedServices['TranslatedTextBackendApiService'] =
         new TranslatedTextBackendApiService(
           upgradedServices['HttpClient']);
-      
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],

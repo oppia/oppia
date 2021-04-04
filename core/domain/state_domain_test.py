@@ -1510,8 +1510,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             init_state.get_translated_text_and_ids('hi'),
-                [('content', '<p>hello!</p>'),
-                ('hint_1', '<p>Hint translation</p>')])
+            [('content', '<p>hello!</p>'),
+            ('hint_1', '<p>Hint translation</p>')])
 
 
     def test_add_translation_works_correctly(self):

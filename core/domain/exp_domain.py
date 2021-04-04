@@ -1398,7 +1398,7 @@ class Exploration(python_utils.OBJECT):
 
     def get_completed_translations(self, language_code):
         """Returns all the contents along with the corresponding
-        translations for which the process of the process of translation in 
+        translations for which the process of the process of translation in
         the given language has been completed.
 
         Args:
@@ -1406,23 +1406,24 @@ class Exploration(python_utils.OBJECT):
                 required.
 
         Returns:
-            dict(str, list(str)). A dict where the key is type of data 
-            contained in the list i.e. translation or content and value 
+            dict(str, list(str)). A dict where the key is type of data
+            contained in the list i.e. translation or content and value
             is list of strings i.e. actual data.
         """
         completed_translations = []
         completed_translations_content = []
         for state_name, state in self.states.items():
-            translations_and_ids = state.get_translated_text_and_ids(language_code)
-            for id, translated_text in translations_and_ids:
+            translations_and_ids = state.get_translated_text_and_ids(
+                language_code)
+            for content_id, translated_text in translations_and_ids:
                 completed_translations_content.append(
-                    self.get_content_html(state_name, id))
+                    self.get_content_html(state_name, content_id))
                 completed_translations.append(translated_text)
-        translations_and_content = collections.namedtuple('translations_and_content',
-                                        ['content','translations'])
-        translations_and_content_to_send = translations_and_content(
-                                    content = completed_translations_content,
-                                    translations = completed_translations)
+        translations_and_content = collections.namedtuple(
+            'translations_and_content', ['content', 'translations'])
+        translations_and_content_to_send=translations_and_content(
+                        content=completed_translations_content,
+                        translations=completed_translations)
 
         return translations_and_content_to_send
 

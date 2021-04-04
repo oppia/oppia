@@ -21,7 +21,9 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
-require('pages/contributor-dashboard-page/services/translated-text-backend-api.service.ts');
+require(
+  'pages/contributor-dashboard-page/services/' + 
+  'translated-text-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
@@ -32,15 +34,15 @@ require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
-  '$controller', '$scope', '$scope', '$uibModalInstance', 'AlertsService',
+  '$controller', '$scope', '$rootScope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'ENTITY_TYPE', 'TranslatedTextBackendApiService','TRANSLATION_TIPS',
-  function(
+  'opportunity', 'TranslatedTextBackendApiService','ENTITY_TYPE',
+  'TRANSLATION_TIPS', function(
       $controller, $scope, $rootScope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
-      opportunity, ENTITY_TYPE, TranslatedTextBackendApiService, 
+      opportunity, TranslatedTextBackendApiService, ENTITY_TYPE, 
       TRANSLATION_TIPS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -73,10 +75,10 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.previousTranslationAvailable = false;
     $scope.textToTranslate = '';
     $scope.viewCompletedTranslationsModalOpen = false;
-    $scope.translationsList=[];
-    $scope.contentList=[];
+    $scope.translationsList = [];
+    $scope.contentList = [];
     $scope.loadingTranslatedText = true;
-    $scope.noTranslationComplete= true;
+    $scope.noTranslationComplete = true;
     $scope.TRANSLATION_TIPS = TRANSLATION_TIPS;
     $scope.languageDescription = (
       TranslationLanguageService.getActiveLanguageDescription());
@@ -98,14 +100,13 @@ angular.module('oppia').controller('TranslationModalController', [
           TranslatedTextBackendApiService.getTranslationsAndContentLists());
         $scope.translationsList = TranslatedTextAndContent.translationsList;
         $scope.contentList = TranslatedTextAndContent.contentList;
-        if($scope.translationsList.length > 0){
-          $scope.noTranslationComplete =  false;
+        if ( $scope.translationsList.length > 0 ){
+          $scope.noTranslationComplete = false;
         }
-        $scope.loadingTranslatedText = false;  
+        $scope.loadingTranslatedText = false;
         $rootScope.$applyAsync();
       }
-    )
-    
+    );
     $scope.onContentClick = function($event) {
       if ($scope.isCopyModeActive()) {
         $event.stopPropagation();
@@ -164,9 +165,9 @@ angular.module('oppia').controller('TranslationModalController', [
       }
     };
 
-    $scope.toggleViewCompletedTranslationsModal= function(){
+    $scope.toggleViewCompletedTranslationsModal = function() {
       $scope.viewCompletedTranslationsModalOpen =
         !$scope.viewCompletedTranslationsModalOpen;
-    }
+    };
   }
 ]);

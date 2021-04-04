@@ -14,61 +14,55 @@
 
 /**
  * @fileoverview A service for getting the completed translations from backend
- * 
+ *
  */
-  import { downgradeInjectable } from '@angular/upgrade/static';
-  import { Injectable } from '@angular/core';
-  import { HttpClient } from '@angular/common/http';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-  interface ITranslationsAndContentDict {
-    'content_list' : string[],
-    'translations_list': string[]
-  }
+interface ITranslationsAndContentDict {
+  'content_list': string[],
+  'translations_list': string[]
+}
 
-  interface temp {
-    'contentList' : string[],
-    'translationsList': string[]
-  }
+@Injectable({
+  providedIn: 'root'
+})
 
-  @Injectable({
-    providedIn: 'root'
-  })
-
-  export class TranslatedTextBackendApiService {
-    constructor(
-      private http: HttpClient
-    ){}
-    recievedTranslationsList = [];
-    recievedContentList = [];
-    
-    getTranslationsAndContent(expId, 
-                              languageCode):Promise<any>{
-      return this.http.get<ITranslationsAndContentDict>(
-        '/getcompletedtranslationshandler', {
+export class TranslatedTextBackendApiService {
+  constructor(
+    private http: HttpClient
+  ) {}
+  recievedTranslationsList = [];
+  recievedContentList = [];
+  getTranslationsAndContent(
+      expId: string, languageCode: string): Promise<any> {
+    return this.http.get<ITranslationsAndContentDict>(
+      '/getcompletedtranslationshandler', {
         params: {
           exp_id: expId,
           language_code: languageCode
         },
         observe: 'response'
       }).toPromise().then((response) => {
-        this.recievedTranslationsList = response.body.translations_list;
-        this.recievedContentList = response.body.content_list;
-        return {
-          translations_list : this.recievedTranslationsList,
-          content_list : this.recievedContentList
-        }
-      }, (errorResponse) => {
-        throw new Error(errorResponse.error.error);
-      });
-    }
-    getTranslationsAndContentLists(){
+      this.recievedTranslationsList = response.body.translations_list;
+      this.recievedContentList = response.body.content_list;
       return {
-        translationsList : this.recievedTranslationsList,
-        contentList : this.recievedContentList
-      }
+        translations_list: this.recievedTranslationsList,
+        content_list: this.recievedContentList
+      };
+    }, (errorResponse) => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+  getTranslationsAndContentLists(): <any> {
+    return {
+      translationsList : this.recievedTranslationsList,
+      contentList : this.recievedContentList
     }
   }
-  angular.module('oppia').factory('TranslatedTextBackendApiService', 
-    downgradeInjectable(TranslatedTextBackendApiService));   
+}
+angular.module('oppia').factory('TranslatedTextBackendApiService', 
+  downgradeInjectable(TranslatedTextBackendApiService));   
+
   
-    

@@ -3028,28 +3028,28 @@ class State(python_utils.OBJECT):
         return content_id_to_html
 
     def get_translated_text_and_ids(self, language_code):
-        """returns all the html that has been translated in a 
+        """returns all the html that has been translated in a
         a given language and their ids corresponding to translations
 
         Args:
             language_code: str. The abbreviated code of the language.
 
         Returns:
-            list(tuple(str, str)). A list of tuples with first element 
+            list(tuple(str, str)). A list of tuples with first element
             as content id and second element as the translation content html.
         """
-        translated_content_ids= (
+        translated_content_ids = (
             self.get_content_ids_that_are_correctly_translated(language_code))
         translations_and_ids = []
         for id in translated_content_ids:
             translations_and_ids.append(
                 self.get_translated_content_with_content_id(id, language_code))
-        return translations_and_ids 
+        return translations_and_ids
 
     def get_content_ids_that_are_correctly_translated(self, language_code):
         """returns a list of content_ids which have been translated
         in the given language.
-        
+
         Args:
             language_code: str. The abbreviated code of the language.
 
@@ -3057,15 +3057,16 @@ class State(python_utils.OBJECT):
             list(str). A list of strings of content ids that have been
             translated in the given language.
         """
-        return (self.written_translations
-            .get_content_ids_that_are_correctly_translated(language_code))
+        return (
+            self.written_translations
+                .get_content_ids_that_are_correctly_translated(language_code))
 
-    def get_translated_content_with_content_id(self, id, language_code):
+    def get_translated_content_with_content_id(self, content_id, language_code):
         """returns the translation corresponding to the given content id
         in the given language
 
         Args:
-            id: str. The content id of the completed translation in the 
+            content_id: str. The content id of the completed translation in the
             given language.
             language_code: str. The abbreviated code of the language.
         
@@ -3074,9 +3075,10 @@ class State(python_utils.OBJECT):
             first element is the content id string and the second element
             is the string containing the translated html.
         """
-        translation = (self.written_translations.
-            translations_mapping[id][language_code].translation)
-        return (id, translation)
+        translation = (
+            self.written_translations.
+            translations_mapping[content_id][language_code].translation)
+        return (content_id, translation)
 
     def to_dict(self):
         """Returns a dict representing this State domain object.
