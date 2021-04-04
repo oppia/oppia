@@ -115,7 +115,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
-    LoadingMessageComponent
+    LoadingMessageComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -170,6 +170,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    LoadingMessageComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
     SkillSelectorComponent,

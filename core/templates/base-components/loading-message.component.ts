@@ -18,7 +18,7 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
   @Component({
-  selector: 'loading-message',
+  selector: 'oppia-loading-message',
   templateUrl: './loading-message.component.html',
   styleUrls: []
 })
@@ -27,6 +27,6 @@ export class LoadingMessageComponent {
 } 
 
 angular.module('oppia').directive(
-  'loadingMessage', downgradeComponent(
+  'oppiaLoadingMessage', downgradeComponent(
     {component: LoadingMessageComponent}));
 
