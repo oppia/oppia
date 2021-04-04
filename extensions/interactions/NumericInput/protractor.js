@@ -17,7 +17,7 @@
  * interaction.
  */
 
-var customizeInteraction = function() {
+var customizeInteraction = async function(elem, placeholderText) {
   await objects.UnicodeStringEditor(
     elem.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(placeholderText);
