@@ -269,35 +269,30 @@ def advance_version_of_exp_stats(
 
         return exp_stats
 
-    state_name_stats_mapping = {}
-    old_state_names_that_carry_over = set(utils.compute_list_difference(
+    new_state_name_stats_mapping = {}
+
+    # Handle unchanged states.
+    unchanged_state_names = set(utils.compute_list_difference(
         exp_stats.state_stats_mapping,
-        exp_versions_diff.deleted_state_names))
+        exp_versions_diff.deleted_state_names +
+        exp_versions_diff.new_to_old_state_names.values()))
+    for state_name in unchanged_state_names:
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[state_name].clone())
 
-    if exp_versions_diff.new_to_old_state_names:
-        old_state_names_that_carry_over.update(
-            set(exp_versions_diff.new_to_old_state_names))
+    # Handle renamed states.
+    for state_name in exp_versions_diff.new_to_old_state_names:
+        old_state_name = exp_versions_diff.new_to_old_state_names[
+            state_name]
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[old_state_name].clone())
 
-    # Copy state names from the previous exploration version that
-    # aren't deleted or renamed.
-    for state_name in old_state_names_that_carry_over:
-        if state_name in exp_versions_diff.new_to_old_state_names:
-            old_state_name = exp_versions_diff.new_to_old_state_names[
-                state_name]
-            state_name_stats_mapping[state_name] = (
-                exp_stats.state_stats_mapping[old_state_name].clone())
-            if old_state_name not in exp_versions_diff.new_to_old_state_names:
-                state_name_stats_mapping.pop(old_state_name, None)
-        else:
-            state_name_stats_mapping[state_name] = (
-                exp_stats.state_stats_mapping[state_name].clone())
-
-    # Handling state additions.
+    # Handle newly-added states.
     for state_name in exp_versions_diff.added_state_names:
-        state_name_stats_mapping[state_name] = (
+        new_state_name_stats_mapping[state_name] = (
             stats_domain.StateStats.create_default())
 
-    exp_stats.state_stats_mapping = state_name_stats_mapping
+    exp_stats.state_stats_mapping = new_state_name_stats_mapping
     exp_stats.exp_version = exp_version
 
     return exp_stats
