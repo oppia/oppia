@@ -852,12 +852,12 @@ class MultipleItemInteractionLtOneOffJobTests(test_utils.GenericTestBase):
         # on sample exploration whose interaction is
         # Multiple Choice Input Interaction.
         output = self._run_one_off_job()
-        # eslint-disable
+        # pylint: disable-all
         self.assertEqual(
             [[u'SUCCESS', 1],
              [u'LONGER_THAN_30', [u"('exp_id0', 45)", u"('exp_id0', 45)"]]],
             output)
-        # eslint-enable
+        # pylint: enable-all
         state3.update_interaction_id('ItemSelectionInput')
         state3.update_interaction_customization_args(customization_args_dict1)
         state3.update_next_content_id_index(3)
