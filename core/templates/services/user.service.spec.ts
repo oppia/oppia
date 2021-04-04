@@ -119,6 +119,26 @@ describe('User Api Service', () => {
       });
     }));
 
+  it('should return new userInfo data when url path is logout',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/logout');
+      const sampleUserInfo = UserInfo.createDefault();
+
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+    }));
+
+  it('should return new userInfo data when url path is login',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/login');
+      const sampleUserInfo = UserInfo.createDefault();
+
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+    }));
+
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
