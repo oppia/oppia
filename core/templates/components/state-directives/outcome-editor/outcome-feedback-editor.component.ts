@@ -30,8 +30,8 @@ import { ContextService } from 'services/context.service';
   templateUrl: './outcome-feedback-editor.component.html',
 })
 export class OutcomeFeedbackEditorComponent implements OnInit {
-  @Input() outcome:string;
-  OUTCOME_FEEDBACK_SCHEMA:object;
+  @Input() outcome: string;
+  OUTCOME_FEEDBACK_SCHEMA: object;
   constructor(
     private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
