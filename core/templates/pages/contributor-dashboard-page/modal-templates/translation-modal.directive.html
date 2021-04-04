@@ -40,6 +40,7 @@
         </schema-based-editor>
       </div>
     </div>
+<<<<<<< HEAD
     <div class="oppia-view-completed-translations-section">
       <div className="oppia-view-completed-translations-button-row">  
         <button class="btn btn-primary oppia-view-completed-translations-button"
@@ -77,6 +78,13 @@
         </div>
         
       </div>
+=======
+    <div ng-if="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
+      <ul>
+        <li ng-repeat="tip in TRANSLATION_TIPS[activeLanguageCode]"><[tip]>
+        </li>
+      </ul>
+>>>>>>> upstream/develop
     </div>
   </div>
 </div>
@@ -134,6 +142,12 @@
   }
   .oppia-text-to-translate-container {
     border: 1px solid #ccc;
+    margin: 15px 0;
+    padding: 20px;
+  }
+  .oppia-translation-tips-container {
+    background-color: #EEE;
+    border: 1px solid #EEE;
     margin: 15px 0;
     padding: 20px;
   }

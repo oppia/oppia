@@ -31,6 +31,7 @@ from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import rules_registry
 from core.domain import state_domain
+from core.domain import translatable_object_registry
 from core.tests import test_utils
 import feconf
 import schema_utils
@@ -3372,7 +3373,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         written_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid translation'):
+            AssertionError, 'Expected unicode HTML string, received 30'):
             with self.swap(written_translation, 'translation', 30):
                 written_translation.validate()
 
@@ -4332,7 +4333,15 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
-    def test_from_and_to_dict_wroks_correctly(self):
+    def test_data_formats_are_correct_and_complete(self):
+        translatable_class_names_in_data_formats = sorted(
+            state_domain.WrittenTranslation.
+            DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
+        self.assertEqual(
+            translatable_class_names_in_data_formats,
+            translatable_object_registry.Registry.get_all_class_names())
+
+    def test_from_and_to_dict_works_correctly(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {
