@@ -1353,36 +1353,17 @@ class AppEngineTestBase(TestBase):
         https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
 
         AppEngineTestBase's override of run() wraps super().run() in "swap"
-        contexts which stub out the cache and taskqueue services.
+        contexts which stub out the platform taskqueue services.
 
         Args:
             result: TestResult | None. Holds onto the results of each test. If
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
-        memory_cache_services_stub = MemoryCacheServicesStub()
-        memory_cache_services_stub.flush_cache()
-
-        with contextlib2.ExitStack() as stack:
-            stack.enter_context(self.swap(
-                platform_taskqueue_services, 'create_http_task',
-                self._platform_taskqueue_services_stub.create_http_task))
-            stack.enter_context(self.swap(
-                memory_cache_services, 'flush_cache',
-                memory_cache_services_stub.flush_cache))
-            stack.enter_context(self.swap(
-                memory_cache_services, 'get_multi',
-                memory_cache_services_stub.get_multi))
-            stack.enter_context(self.swap(
-                memory_cache_services, 'set_multi',
-                memory_cache_services_stub.set_multi))
-            stack.enter_context(self.swap(
-                memory_cache_services, 'get_memory_cache_stats',
-                memory_cache_services_stub.get_memory_cache_stats))
-            stack.enter_context(self.swap(
-                memory_cache_services, 'delete_multi',
-                memory_cache_services_stub.delete_multi))
-
+        platform_taskqueue_services_swap = self.swap(
+            platform_taskqueue_services, 'create_http_task',
+            self._platform_taskqueue_services_stub.create_http_task)
+        with platform_taskqueue_services_swap:
             super(AppEngineTestBase, self).run(result=result)
 
     def _get_all_queue_names(self):
@@ -1819,11 +1800,16 @@ title: Title
         Reference URL:
         https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
 
+        GenericTestBase's override of run() wraps super().run() in swap
+        contexts to mock out the cache and taskqueue services.
+
         Args:
             result: TestResult | None. Holds onto the results of each test. If
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
+        memory_cache_services_stub = MemoryCacheServicesStub()
+        memory_cache_services_stub.flush_cache()
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
@@ -1847,6 +1833,21 @@ title: Title
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'search',
                 es_stub.mock_search))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'flush_cache',
+                memory_cache_services_stub.flush_cache))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'get_multi',
+                memory_cache_services_stub.get_multi))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'set_multi',
+                memory_cache_services_stub.set_multi))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'get_memory_cache_stats',
+                memory_cache_services_stub.get_memory_cache_stats))
+            stack.enter_context(self.swap(
+                memory_cache_services, 'delete_multi',
+                memory_cache_services_stub.delete_multi))
 
             super(GenericTestBase, self).run(result=result)
 
