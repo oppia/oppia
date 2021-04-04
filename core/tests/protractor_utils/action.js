@@ -73,7 +73,7 @@ var sendKeys = async function(
   if (clickInputElement) {
     await click(inputName, inputElement);
   }
-  if(isRte) {
+  if (isRte) {
     var rteToolbar = element(by.id('cke_editor1'));
     await waitFor.visibilityOf(
       rteToolbar, 'RTE toolbar taking too long to show up.');
