@@ -3043,7 +3043,9 @@ class State(python_utils.OBJECT):
         translations_and_ids = []
         for content_id in translated_content_ids:
             translations_and_ids.append(
-                self.get_translated_content_with_content_id(content_id, language_code))
+                self.get_translated_content_with_content_id(
+                    content_id, language_code))
+
         return translations_and_ids
 
     def get_content_ids_that_are_correctly_translated(self, language_code):
@@ -3053,10 +3055,11 @@ class State(python_utils.OBJECT):
         Args:
             language_code: str. The abbreviated code of the language.
 
-        Return:
+        Returns:
             list(str). A list of strings of content ids that have been
             translated in the given language.
         """
+
         return (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))

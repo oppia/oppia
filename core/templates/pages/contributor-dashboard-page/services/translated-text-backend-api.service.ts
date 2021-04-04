@@ -41,7 +41,8 @@ export class TranslatedTextBackendApiService {
   recievedTranslationsList = [];
   recievedContentList = [];
   getTranslationsAndContent(
-      expId: string, languageCode: string): Promise<ITranslationsAndContentDict> {
+      expId: string, languageCode: string):
+        Promise<ITranslationsAndContentDict> {
     return this.http.get<ITranslationsAndContentResponse>(
       '/getcompletedtranslationshandler', {
         params: {
@@ -62,10 +63,10 @@ export class TranslatedTextBackendApiService {
   }
   getTranslationsAndContentLists(): ITranslationsAndContentDict {
     return {
-      translationsList : this.recievedTranslationsList,
-      contentList : this.recievedContentList
+      translationsList: this.recievedTranslationsList,
+      contentList: this.recievedContentList
     }
-  }
+  };
 }
-angular.module('oppia').factory('TranslatedTextBackendApiService', 
-  downgradeInjectable(TranslatedTextBackendApiService));   
+angular.module('oppia').factory('TranslatedTextBackendApiService',
+  downgradeInjectable(TranslatedTextBackendApiService));
