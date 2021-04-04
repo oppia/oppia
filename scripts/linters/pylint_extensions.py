@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0034.
+presubmit checks. Next message id would be C0035.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -2118,16 +2118,26 @@ class StringConcatenationChecker(checkers.BaseChecker):
 
     __implements__ = interfaces.IAstroidChecker
 
-    name = 'string-concatenation'
+    name = 'no-string-concatenation'
     priority = -1
     msgs = {
         'C0034': (
             'at string %s, use string interpolation (\'string1%%s\' %% string2)'
             ' rather than string concatenation (\'string1\' + \'string2\').',
-            'string-concatenation',
+            'no-string-concatenation',
             'Enforce use of string interpolation over string concatenation.',
         ),
     }
+
+    def is_node_string_constant(self, node):
+        """Helper function for visit_binop. Called to check if any of the
+        operand is a string constant.
+        """
+        if (isinstance(node, astroid.nodes.Const) and
+                ('str' in node.pytype() or
+                 'unicode' in node.pytype())):
+            return True
+        return False
 
     def visit_binop(self, node):
         """Called for every '+' operator to prohibit usage of string
@@ -2137,16 +2147,15 @@ class StringConcatenationChecker(checkers.BaseChecker):
         Args:
             node: astroid.node.BinOp. Node to access module content.
         """
-        if node.op == b'+':
-            for operand in node.get_children():
-                if (isinstance(operand, astroid.nodes.Const) and
-                        ('str' in operand.pytype() or
-                         'unicode' in operand.pytype())):
-                    self.add_message(
-                        'string-concatenation',
-                        args=(operand.as_string()),
-                        node=node)
-                    break
+        if node.op != b'+':
+            return
+        for operand in node.get_children():
+            if self.is_node_string_constant(operand):
+                self.add_message(
+                    'no-string-concatenation',
+                    args=(operand.as_string()),
+                    node=node)
+                break
 
 
 def register(linter):

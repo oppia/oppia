@@ -3292,13 +3292,13 @@ class StringConcatenationCheckerTests(unittest.TestCase):
             """)
 
         str_str_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string1\''),
+            msg_id='no-string-concatenation', args=('\'string1\''),
             node=binop_node1)
         right_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string1\''),
+            msg_id='no-string-concatenation', args=('\'string1\''),
             node=binop_node2)
         left_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string2\''),
+            msg_id='no-string-concatenation', args=('\'string2\''),
             node=binop_node3)
 
         with self.checker_test_object.assertAddsMessages(str_str_message):
@@ -3338,10 +3338,10 @@ class StringConcatenationCheckerTests(unittest.TestCase):
 
         binop_node2 = binop_node1.left
         first_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string3\''),
+            msg_id='no-string-concatenation', args=('\'string3\''),
             node=binop_node1)
         sec_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string1\''),
+            msg_id='no-string-concatenation', args=('\'string1\''),
             node=binop_node2)
 
         with self.checker_test_object.assertAddsMessages(first_message):
@@ -3358,7 +3358,7 @@ class StringConcatenationCheckerTests(unittest.TestCase):
 
         plus_binop_node = mod_binop_node.right
         first_message = testutils.Message(
-            msg_id='string-concatenation', args=('\'string3\''),
+            msg_id='no-string-concatenation', args=('\'string3\''),
             node=plus_binop_node)
 
         with self.checker_test_object.assertNoMessages():
