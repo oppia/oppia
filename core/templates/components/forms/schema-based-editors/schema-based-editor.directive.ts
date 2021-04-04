@@ -16,7 +16,7 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
- require(
+require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
@@ -81,6 +81,7 @@ import { Schema } from 'services/schema-default-value.service';
 export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() schema: () => Schema;
   @Input() isDisabled: () => boolean;
+  @Input() localValue;
   @Output() localValueChange: EventEmitter<unknown> = new EventEmitter();
   @Input() labelForFocusTarget: () => string;
   @Input() onInputBlur: () => void;
