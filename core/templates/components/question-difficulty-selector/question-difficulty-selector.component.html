@@ -1,4 +1,3 @@
-<form>
 <mat-radio-group [(ngModel)]="skillWithDifficulty._difficulty"> 
     <mat-radio-button *ngFor="let rubric of skillIdToRubricsObject[skillWithDifficulty.getId()]; index as i"
                       *ngIf="rubric.getExplanations().length > 0"
@@ -19,7 +18,6 @@
     </mat-list>
   </mat-radio-button>
 </mat-radio-group>
-</form>
 
 <style>
   mat-radio-button .mat-container {
