@@ -269,7 +269,7 @@ class CompletedTranslationsHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        """Handles get requests. """
+        """Handles get requests."""
         language_code = self.request.get('language_code')
         exp_id = self.request.get('exp_id')
 
@@ -282,10 +282,10 @@ class CompletedTranslationsHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
         exp = exp_fetchers.get_exploration_by_id(exp_id)
-        translated_text_and_content = exp.get_completed_translations(language_code)
-        
+        translated_text_and_content = exp.get_completed_translations(
+            language_code)
         self.values = {
-            'content_list' : translated_text_and_content.content,
+            'content_list': translated_text_and_content.content,
             'translations_list': translated_text_and_content.translations
         }
 

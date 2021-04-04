@@ -486,8 +486,10 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         }
         self.assertEqual(output, expected_output)
 
+
 class CompletedTranslationsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the CompletedTranslationsHandler"""
+
     def setUp(self):
         super(CompletedTranslationsHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -495,9 +497,7 @@ class CompletedTranslationsHandlerTest(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
         self.set_admins([self.ADMIN_USERNAME])
-        
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,
@@ -631,6 +631,7 @@ class CompletedTranslationsHandlerTest(test_utils.GenericTestBase):
             'translations_list': []
         }
         self.assertEqual(output, expected_output)
+
 
 class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     """Test for the UserContributionRightsDataHandler."""
