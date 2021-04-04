@@ -37,7 +37,7 @@ require(
     'create-new-skill-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
-    'skills-list.directive.ts');
+    'skills-list.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
     'topics-list.directive.ts');

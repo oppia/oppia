@@ -35,10 +35,16 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SkillsListComponent,
+    DeleteSkillModalComponent,
+    UnassignSkillFromTopicsModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SkillsListComponent,
+    DeleteSkillModalComponent,
+    UnassignSkillFromTopicsModalComponent
   ],
   providers: [
     {
@@ -61,6 +67,9 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { SkillsListComponent } from './skills-list/skills-list.component';
+import { DeleteSkillModalComponent } from './modals/delete-skill-modal.component';
+import { UnassignSkillFromTopicsModalComponent } from './modals/unassign-skill-from-topics-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

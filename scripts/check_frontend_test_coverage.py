@@ -290,7 +290,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-selector-editor.directive.ts',
     'skill-selector.component.ts',
     'SkillObjectFactory.ts',
-    'skills-list.directive.ts',
+    'skills-list.component.ts',
     'skills-mastery-list.directive.ts',
     'social-buttons.component.ts',
     'solution-editor.directive.ts',
