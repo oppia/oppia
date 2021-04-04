@@ -86,9 +86,9 @@ export class UtilsService {
     if (aProps.length !== bProps.length) {
       return false;
     }
-    // In the indexing of an Object type by a string
-    // there is implicitly an 'any' type.
-    // Issue solved: https://github.com/microsoft/TypeScript/issues/35859
+    // The indexing of an Object with a string implicitly returns
+    // 'any' type. This issue is solved according to
+    // https://github.com/microsoft/TypeScript/issues/35859.
     // Additionally a cast was added to the Record type in order not
     // to modify the structure of the Object interface.
     for (var i = 0; i < aProps.length; i++) {
