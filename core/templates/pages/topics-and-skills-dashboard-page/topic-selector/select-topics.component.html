@@ -1,0 +1,10 @@
+<div class="list-group">
+  <a class="list-group-item protractor-test-topics-list-item"
+     *ngFor="let topicSummary of topicSummaries; index as idx"
+     (click)="selectOrDeselectTopic(topicSummary.id, idx)"
+     [ngClass]="{'list-group-item-success': topicSummary.isSelected}">
+    <label class="list-group-item-heading protractor-test-topic-name-in-topic-select-modal">{{topicSummary.name}}</label>
+    <p class="list-group-item-text">Uncategorized Skill Count: {{topicSummary.uncategorizedSkillCount}}</p>
+    <p class="list-group-item-text">Status: {{topicSummary.isPublished ? 'Published' : 'Not Published'}}</p>
+  </a>
+</div>
