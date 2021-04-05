@@ -124,6 +124,7 @@ jobs:
       - persist_to_workspace:
           root: /home/circleci/
           paths:
+            - oppia/extensions/classifiers/proto
             - oppia/proto/
             - oppia/node_modules/
             - oppia/third_party/

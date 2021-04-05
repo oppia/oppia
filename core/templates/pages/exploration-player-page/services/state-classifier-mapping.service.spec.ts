@@ -16,10 +16,11 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AppService } from 'services/app.service';
 import { Classifier } from 'domain/classifier/classifier.model';
+import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
@@ -30,6 +31,8 @@ describe('State classifier mapping service', () => {
       let mappingService: StateClassifierMappingService;
       let appService: AppService;
       let classifierFrozenModel = new TextClassifierFrozenModel();
+      let classifierDataBackendApiService: ClassifierDataBackendApiService;
+
       // The model_json attribute in TextClassifierFrozenModel class can't be
       // changed to camelcase since the class definition is automatically
       // compiled with the help of protoc.
@@ -80,9 +83,22 @@ describe('State classifier mapping service', () => {
 
         mappingService = TestBed.get(StateClassifierMappingService);
         appService = TestBed.get(AppService);
+        classifierDataBackendApiService = TestBed.inject(ClassifierDataBackendApiService);
         spyOn(appService, 'isMachineLearningClassificationEnabled')
           .and.returnValue(true);
       });
+
+      fit('should work', waitForAsync(() => {
+        spyOn(classifierDataBackendApiService, 'getClassifierData').and.callFake(() => {
+          return new Promise((resolve) => {
+            resolve(classifierData);
+          });
+        });
+        mappingService.init('0', 0);
+        var stateName = 'stateName1';
+        mappingService.initializeClassifierDataForState(stateName);
+        expect(mappingService.hasClassifierData(stateName)).toBe(true);
+      }));
 
       it('should return classifier data when it exists.', () => {
         mappingService.init('0', 0);

@@ -72,6 +72,7 @@ describe('Answer Classification Service', () => {
 
   describe('with string classifier disabled', () => {
     let stateDict;
+    let exp_id = '0';
 
     beforeEach(() => {
       spyOn(
@@ -79,7 +80,7 @@ describe('Answer Classification Service', () => {
       ).and.returnValue(false);
       spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(false);
-      stateClassifierMappingService.init('0', 0);
+      stateClassifierMappingService.init(exp_id, 0);
 
       stateDict = {
         content: {
@@ -290,6 +291,7 @@ describe('Answer Classification Service', () => {
 
   describe('with string classifier enabled', () => {
     let stateDict;
+    let exp_id = '0';
 
     beforeEach(() => {
       spyOn(appService, 'isMachineLearningClassificationEnabled')
@@ -329,7 +331,7 @@ describe('Answer Classification Service', () => {
       let testClassifier = new Classifier(
         'TestClassifier', textClassifierModel.serialize(), 1);
 
-      stateClassifierMappingService.init('0', 0);
+      stateClassifierMappingService.init(exp_id, 0);
       stateClassifierMappingService.testOnlySetClassifierData(
         stateName, testClassifier);
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
@@ -484,6 +486,7 @@ describe('Answer Classification Service', () => {
 
   describe('with training data classification', () => {
     let stateDict;
+    let exp_id = '0';
 
     beforeEach(() => {
       spyOn(
@@ -491,7 +494,7 @@ describe('Answer Classification Service', () => {
       ).and.returnValue(true);
       spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(true);
-      stateClassifierMappingService.init('0', 0);
+      stateClassifierMappingService.init(exp_id, 0);
 
       stateDict = {
         content: {

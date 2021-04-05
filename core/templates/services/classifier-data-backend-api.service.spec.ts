@@ -31,7 +31,7 @@ describe('Classifier Data Backend API Service', () => {
 
     const classifierMetaDataRequestUrl = '/ml/trainedclassifierhandler';
     const classifierDataRequestUrl = (
-      '/_ah/gcs/' + AppConstants.DEFAULT_GCS_RESOURCE_BUCKET_NAME +
+      '/_ah/gcs/' + AppConstants.GCS_RESOURCE_BUCKET_NAME +
       '/exploration/0/assets/classifier.pb.xz');
     const classifierBuffer = deflateSync(Buffer.alloc(10));
 

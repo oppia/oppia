@@ -67,9 +67,7 @@ export class ClassifierDataBackendApiService {
   }
 
   static get GCS_RESOURCE_BUCKET_NAME(): string {
-    return ClassifierDataBackendApiService.DEV_MODE ?
-      AppConstants.DEFAULT_GCS_RESOURCE_BUCKET_NAME :
-      AppConstants.GCS_RESOURCE_BUCKET_NAME;
+    return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
   private getDownloadUrl(
@@ -82,7 +80,7 @@ export class ClassifierDataBackendApiService {
       });
   }
 
-  private async getClassifierMetaData(
+  private async getClassifierMetadata(
       explorationId: string, explorationVersion: number,
       stateName: string): Promise<ClassifierMetaData> {
     return new Promise((resolve, reject) => {
@@ -110,7 +108,7 @@ export class ClassifierDataBackendApiService {
       explorationId: string, explorationVersion: number,
       stateName: string): Promise<Classifier> {
     return new Promise((resolve, reject) => {
-      this.getClassifierMetaData(
+      this.getClassifierMetadata(
         explorationId, explorationVersion, stateName).then(
         response => {
           let classifierMetaData = response;
@@ -125,11 +123,11 @@ export class ClassifierDataBackendApiService {
               unzipSync(Buffer.from(response)),
               classifierMetaData.algorithmVersion
             ));
-          }, errorResponse => {
-            reject(errorResponse);
+          }, classifierErrorResponse => {
+            reject(classifierErrorResponse);
           });
-        }, errorResponse => {
-          reject(errorResponse);
+        }, classifierMetadataErrorResponse => {
+          reject(classifierMetadataErrorResponse);
         });
     });
   }
