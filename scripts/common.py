@@ -121,8 +121,9 @@ REDIS_SERVER_PATH = os.path.join(
 REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
+# The directory used to store/retrieve the data/config for the emulator.
 CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
-    os.path.join(OPPIA_TOOLS_DIR, 'cloud_datastore_emulator_cache'))
+    os.path.join(CURR_DIR, 'cloud_datastore_emulator_cache'))
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -956,8 +957,12 @@ def managed_elasticsearch_dev_server():
 
 
 @contextlib.contextmanager
-def managed_cloud_datastore_emulator():
+def managed_cloud_datastore_emulator(clear_datastore=False):
     """Returns a context manager for the Cloud Datastore emulator.
+
+    Args:
+        clear_datastore: bool. Whether to delete the datastore's config and data
+            before starting the emulator.
 
     Yields:
         psutil.Process. The emulator process.
@@ -965,7 +970,12 @@ def managed_cloud_datastore_emulator():
     # TODO(#11549): Move this to top of the file.
     import contextlib2
 
-    if not os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR):
+    emulator_data_dir_exists = os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+    if clear_datastore and emulator_data_dir_exists:
+        # Replace it with an empty directory.
+        shutil.rmtree(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+        os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+    elif not emulator_data_dir_exists:
         os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
 
     emulator_hostport = '%s:%d' % (

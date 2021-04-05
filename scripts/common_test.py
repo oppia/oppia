@@ -1140,15 +1140,75 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_cloud_datastore_emulator(self):
         with contextlib2.ExitStack() as stack:
-            popen_calls = stack.enter_context(self._swap_popen())
+            stack.enter_context(self.swap_to_always_return(
+                shutil, 'rmtree'))
+            stack.enter_context(self.swap_to_always_return(
+                os, 'makedirs'))
             stack.enter_context(self.swap_to_always_return(
                 common, 'wait_for_port_to_be_in_use'))
+
+            popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(common.managed_cloud_datastore_emulator())
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertIn('datastore', popen_calls[0].program_args)
+        self.assertIn(
+            'beta emulators datastore start', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
+    def test_managed_cloud_datastore_emulator_creates_missing_data_dir(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self._swap_popen())
+            stack.enter_context(self.swap_to_always_return(
+                shutil, 'rmtree'))
+            stack.enter_context(self.swap_to_always_return(
+                common, 'wait_for_port_to_be_in_use'))
+
+            stack.enter_context(self.swap_to_always_return(
+                os.path, 'exists', value=False))
+            makedirs_counter = stack.enter_context(
+                self.swap_with_call_counter(os, 'makedirs'))
+
+            stack.enter_context(common.managed_cloud_datastore_emulator())
+
+        self.assertEqual(makedirs_counter.times_called, 1)
+
+    def test_managed_cloud_datastore_emulator_clears_data_dir(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self._swap_popen())
+            stack.enter_context(self.swap_to_always_return(
+                common, 'wait_for_port_to_be_in_use'))
+
+            stack.enter_context(self.swap_to_always_return(
+                os.path, 'exists', value=True))
+            rmtree_counter = stack.enter_context(self.swap_with_call_counter(
+                shutil, 'rmtree'))
+            makedirs_counter = stack.enter_context(self.swap_with_call_counter(
+                os, 'makedirs'))
+
+            stack.enter_context(
+                common.managed_cloud_datastore_emulator(clear_datastore=True))
+
+        self.assertEqual(rmtree_counter.times_called, 1)
+        self.assertEqual(makedirs_counter.times_called, 1)
+
+    def test_managed_cloud_datastore_emulator_acknowledges_data_dir(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self._swap_popen())
+            stack.enter_context(self.swap_to_always_return(
+                shutil, 'rmtree'))
+            stack.enter_context(self.swap_to_always_return(
+                common, 'wait_for_port_to_be_in_use'))
+
+            stack.enter_context(self.swap_to_always_return(
+                os.path, 'exists', value=True))
+            makedirs_counter = stack.enter_context(
+                self.swap_with_call_counter(os, 'makedirs'))
+
+            stack.enter_context(
+                common.managed_cloud_datastore_emulator(clear_datastore=False))
+
+        self.assertEqual(makedirs_counter.times_called, 0)
 
     def test_managed_dev_appserver(self):
         with contextlib2.ExitStack() as stack:
