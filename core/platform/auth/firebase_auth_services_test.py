@@ -399,8 +399,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_user(self, uid):
         """Asserts that an account with the given id exists.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -412,8 +412,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_not_user(self, uid):
         """Asserts that an account with the given id does not exist.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -425,8 +425,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_super_admin(self, uid):
         """Asserts that the given ID has super admin privileges.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -439,8 +439,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_not_super_admin(self, uid):
         """Asserts that the given ID does not have super admin privileges.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -450,11 +450,35 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._test.assertNotEqual(
             custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
+    def assert_is_disabled(self, uid):
+        """Asserts that the given ID is a disabled account.
+
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self.assert_is_user(uid)
+        self._test.assertTrue(self.get_user(uid).disabled)
+
+    def assert_is_not_disabled(self, uid):
+        """Asserts that the given ID is not a disabled account.
+
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self.assert_is_user(uid)
+        self._test.assertFalse(self.get_user(uid).disabled)
+
     def assert_is_user_multi(self, uids):
         """Asserts that every account with the given ids exist.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uids: list(str). The IDs of the users to confirm.
@@ -467,8 +491,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_not_user_multi(self, uids):
         """Asserts that every account with the given ids do not exist.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uids: list(str). The IDs of the users to confirm.
