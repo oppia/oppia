@@ -45,7 +45,7 @@ class MockAssetsBackendApiService {
   }
 }
 
-fdescribe('Story Viewer Page component', () => {
+describe('Story Viewer Page component', () => {
   let httpTestingController = null;
   let component: StoryViewerPageComponent;
   let fixture: ComponentFixture<StoryViewerPageComponent>;
@@ -56,9 +56,7 @@ fdescribe('Story Viewer Page component', () => {
   let userService: UserService = null;
   let pageTitleService: PageTitleService = null;
   let windowRef: WindowRef;
-
-  let topicUrlFragment = 'topic_1';
-  let storyUrlFragment = 'story_1';
+  let storyPlaythrough: StoryPlaythrough;
 
 
   beforeEach(fakeAsync(() => {
@@ -92,86 +90,11 @@ fdescribe('Story Viewer Page component', () => {
                 resolve(
                   StoryPlaythrough.createFromBackendDict({
                     story_id: 'id',
-                    story_nodes: [{
-                      id: 'node_1',
-                      title: 'Title 1',
-                      description: 'Description 1',
-                      destination_node_ids: [],
-                      prerequisite_skill_ids: ['skill_1'],
-                      acquired_skill_ids: ['skill_2'],
-                      outline: 'Outline',
-                      outline_is_finalized: false,
-                      exploration_id: null,
-                      exp_summary_dict: {
-                        category: 'Welcome',
-                        created_on_msec: 1564183471833.675,
-                        community_owned: true,
-                        thumbnail_bg_color: '#992a2b',
-                        title: 'Welcome to Oppia!',
-                        num_views: 14897,
-                        tags: [],
-                        last_updated_msec: 1571653541705.924,
-                        human_readable_contributors_summary: {},
-                        status: 'public',
-                        language_code: 'en',
-                        objective: "become familiar with Oppia's capabilities",
-                        thumbnail_icon_url: '/subjects/Welcome.svg',
-                        ratings: {
-                          1: 1,
-                          2: 1,
-                          3: 3,
-                          4: 24,
-                          5: 46
-                        },
-                        id: '0',
-                        activity_type: 'exploration'
-                      },
-                      completed: true,
-                      thumbnail_bg_color: '#fff',
-                      thumbnail_filename: 'story.svg'
-                    }, {
-                      id: 'node_2',
-                      title: 'Title 2',
-                      description: 'Description 2',
-                      destination_node_ids: [],
-                      prerequisite_skill_ids: ['skill_1'],
-                      acquired_skill_ids: ['skill_2'],
-                      outline: 'Outline',
-                      outline_is_finalized: false,
-                      exploration_id: null,
-                      exp_summary_dict: {
-                        category: 'Welcome',
-                        created_on_msec: 1564183471833.675,
-                        community_owned: true,
-                        thumbnail_bg_color: '#992a2b',
-                        title: 'Welcome to Oppia! 2',
-                        num_views: 14897,
-                        tags: [],
-                        last_updated_msec: 1571653541705.924,
-                        human_readable_contributors_summary: {},
-                        status: 'public',
-                        language_code: 'en',
-                        objective:
-                         "become familiar with Oppia's capabilities 2",
-                        thumbnail_icon_url: '/subjects/Welcome.svg',
-                        ratings: {
-                          1: 1,
-                          2: 1,
-                          3: 3,
-                          4: 24,
-                          5: 46
-                        },
-                        id: '0',
-                        activity_type: 'exploration'
-                      },
-                      completed: false,
-                      thumbnail_bg_color: '#000',
-                      thumbnail_filename: 'story.svg'
-                    }],
-                    story_title: 'Story Title 1',
-                    story_description: 'Story Description 1',
-                    topic_name: 'Topic 1',
-                    meta_tag_content: 'Story Meta Tag Content'
+                    story_nodes: [],
+                    story_title: 'title',
+                    story_description: 'description',
+                    topic_name: 'topic_1',
+                    meta_tag_content: 'this is a meta tag content'
                   }));
               })
             )
@@ -218,17 +141,91 @@ fdescribe('Story Viewer Page component', () => {
       user_is_logged_in: false
     };
 
+    storyPlaythrough = StoryPlaythrough.createFromBackendDict({
+      story_nodes: [{
+        id: 'node_1',
+        title: 'Title 1',
+        description: 'Description 1',
+        destination_node_ids: [],
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        outline: 'Outline',
+        outline_is_finalized: false,
+        exploration_id: null,
+        exp_summary_dict: {
+          category: 'Welcome',
+          created_on_msec: 1564183471833.675,
+          community_owned: true,
+          thumbnail_bg_color: '#992a2b',
+          title: 'Welcome to Oppia!',
+          num_views: 14897,
+          tags: [],
+          last_updated_msec: 1571653541705.924,
+          human_readable_contributors_summary: {},
+          status: 'public',
+          language_code: 'en',
+          objective: "become familiar with Oppia's capabilities",
+          thumbnail_icon_url: '/subjects/Welcome.svg',
+          ratings: {
+            1: 1,
+            2: 1,
+            3: 3,
+            4: 24,
+            5: 46
+          },
+          id: '0',
+          activity_type: 'exploration'
+        },
+        completed: true,
+        thumbnail_bg_color: '#fff',
+        thumbnail_filename: 'story.svg'
+      }, {
+        id: 'node_2',
+        title: 'Title 2',
+        description: 'Description 2',
+        destination_node_ids: [],
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        outline: 'Outline',
+        outline_is_finalized: false,
+        exploration_id: null,
+        exp_summary_dict: {
+          category: 'Welcome',
+          created_on_msec: 1564183471833.675,
+          community_owned: true,
+          thumbnail_bg_color: '#992a2b',
+          title: 'Welcome to Oppia! 2',
+          num_views: 14897,
+          tags: [],
+          last_updated_msec: 1571653541705.924,
+          human_readable_contributors_summary: {},
+          status: 'public',
+          language_code: 'en',
+          objective: "become familiar with Oppia's capabilities 2",
+          thumbnail_icon_url: '/subjects/Welcome.svg',
+          ratings: {
+            1: 1,
+            2: 1,
+            3: 3,
+            4: 24,
+            5: 46
+          },
+          id: '0',
+          activity_type: 'exploration'
+        },
+        completed: false,
+        thumbnail_bg_color: '#000',
+        thumbnail_filename: 'story.svg'
+      }],
+      story_title: 'Story Title 1',
+      story_description: 'Story Description 1',
+      topic_name: 'Topic 1',
+      meta_tag_content: 'Story Meta Tag Content'
+    } as StoryPlaythroughBackendDict);
+
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       UserInfo.createFromBackendDict(UserInfoObject))
     );
-
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicUrlFragment);
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('math');
-    spyOn(
-      urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
-      'story');
   });
 
   afterEach(() => {
@@ -236,12 +233,20 @@ fdescribe('Story Viewer Page component', () => {
   });
 
 
+
   it('should get complete exploration url when clicking on svg element',
     () => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('math');
+      spyOn(
+        urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        'story');
       let node = StoryNode.createFromIdAndTitle(
         '1', 'Story node title');
       expect(component.getExplorationUrl(node)).toBe(
-        '/explore/null?topic_url_fragment=topic_1&' +
+        '/explore/null?topic_url_fragment=topic&' +
          'classroom_url_fragment=math&story_url_fragment=story&' +
          'node_id=1');
     });
@@ -255,6 +260,13 @@ fdescribe('Story Viewer Page component', () => {
 
   it('should not show story\'s chapters when story has no chapters',
     () => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('math');
+      spyOn(
+        urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        'story');
       spyOn(
         storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         Promise.resolve(StoryPlaythrough.createFromBackendDict({
@@ -268,6 +280,24 @@ fdescribe('Story Viewer Page component', () => {
 
       expect(component.showChapters()).toBeFalse();
     });
+
+  // it('should show story\'s chapters when story has chapters',
+  //   () => {
+  //     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+  //       'topic');
+  //     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+  //       .and.returnValue('math');
+  //     spyOn(
+  //       urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+  //       'story');
+  //     spyOn(
+  //       storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+  //       Promise.resolve(storyPlaythrough));
+
+  //     component.ngOnInit();
+
+  //     expect(component.showChapters()).toBeTrue();
+  //   });
 
   it('should sign in correctly', fakeAsync(() => {
     spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/home');
@@ -287,124 +317,27 @@ fdescribe('Story Viewer Page component', () => {
     expect(reloadSpy).toHaveBeenCalled();
   }));
 
-  // it('should use reject handler when fetching subtopic data fails',
+  // it('should show warnings when fetching story data fails',
   //   fakeAsync(() => {
+  //     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+  //       'topic');
+  //     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+  //       .and.returnValue('math');
+  //     spyOn(
+  //       urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+  //       'story');
   //     spyOn(alertsService, 'addWarning').and.callThrough();
-
   //     component.ngOnInit();
+
   //     let req = httpTestingController.expectOne(
-  //       `/topic_data_handler/math/${topicUrlFragment}`);
+  //       '/learn/math/topic/story');
+
   //     let errorObject = { status: 404, statusText: 'Not Found' };
   //     req.flush({ error: errorObject }, errorObject);
-  //     flushMicrotasks();
 
+  //     flushMicrotasks();
   //     expect(alertsService.addWarning).toHaveBeenCalledWith(
   //       'Failed to get dashboard data');
+  //     expect(component.pathIconParameters).toEqual([]);
   //   }));
-
-  it('should show warnings when fetching story data fails',
-    fakeAsync(() => {
-      spyOn(alertsService, 'addWarning').and.callThrough();
-      component.ngOnInit();
-
-      let req = httpTestingController.expectOne(
-        `/story_data_handler/classroom_1/topic_1/${storyUrlFragment}`);
-      let errorObject = { status: 404, statusText: 'Not Found' };
-      req.flush({ error: errorObject }, errorObject);
-
-      flushMicrotasks();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to get dashboard data');
-      expect(component.pathIconParameters).toEqual([]);
-    }));
-
-  it('should show story\'s chapters when story has chapters', () => {
-    spyOn(
-      storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
-      Promise.resolve(StoryPlaythrough.createFromBackendDict({
-        story_id: 'id',
-        story_nodes: [{
-          id: 'node_1',
-          title: 'Title 1',
-          description: 'Description 1',
-          destination_node_ids: [],
-          prerequisite_skill_ids: ['skill_1'],
-          acquired_skill_ids: ['skill_2'],
-          outline: 'Outline',
-          outline_is_finalized: false,
-          exploration_id: null,
-          exp_summary_dict: {
-            category: 'Welcome',
-            created_on_msec: 1564183471833.675,
-            community_owned: true,
-            thumbnail_bg_color: '#992a2b',
-            title: 'Welcome to Oppia!',
-            num_views: 14897,
-            tags: [],
-            last_updated_msec: 1571653541705.924,
-            human_readable_contributors_summary: {},
-            status: 'public',
-            language_code: 'en',
-            objective: "become familiar with Oppia's capabilities",
-            thumbnail_icon_url: '/subjects/Welcome.svg',
-            ratings: {
-              1: 1,
-              2: 1,
-              3: 3,
-              4: 24,
-              5: 46
-            },
-            id: '0',
-            activity_type: 'exploration'
-          },
-          completed: true,
-          thumbnail_bg_color: '#fff',
-          thumbnail_filename: 'story.svg'
-        }, {
-          id: 'node_2',
-          title: 'Title 2',
-          description: 'Description 2',
-          destination_node_ids: [],
-          prerequisite_skill_ids: ['skill_1'],
-          acquired_skill_ids: ['skill_2'],
-          outline: 'Outline',
-          outline_is_finalized: false,
-          exploration_id: null,
-          exp_summary_dict: {
-            category: 'Welcome',
-            created_on_msec: 1564183471833.675,
-            community_owned: true,
-            thumbnail_bg_color: '#992a2b',
-            title: 'Welcome to Oppia! 2',
-            num_views: 14897,
-            tags: [],
-            last_updated_msec: 1571653541705.924,
-            human_readable_contributors_summary: {},
-            status: 'public',
-            language_code: 'en',
-            objective:
-                         "become familiar with Oppia's capabilities 2",
-            thumbnail_icon_url: '/subjects/Welcome.svg',
-            ratings: {
-              1: 1,
-              2: 1,
-              3: 3,
-              4: 24,
-              5: 46
-            },
-            id: '0',
-            activity_type: 'exploration'
-          },
-          completed: false,
-          thumbnail_bg_color: '#000',
-          thumbnail_filename: 'story.svg'
-        }],
-        story_title: 'Story Title 1',
-        story_description: 'Story Description 1',
-        topic_name: 'Topic 1',
-        meta_tag_content: 'Story Meta Tag Content'
-      })));
-    component.ngOnInit();
-    expect(component.showChapters()).toBeTrue();
-  });
 });
