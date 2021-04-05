@@ -42,8 +42,11 @@ class TranslateEmulator(python_utils.OBJECT):
 
         Args:
             text: str. The text to be translated.
-            source_language_code: str. A valid ISO 639-1 language code.
-            target_language_code: str. A valid ISO 639-1 language code.
+            source_language_code: str. A valid 2 letter ISO 639-1 language code.
+            target_language_code: str. A valid 2 letter ISO 639-1 language code.
+
+        For more information on ISO 639-1 see:
+        https://www.w3schools.com/tags/ref_language_codes.asp
 
         Returns:
             str. The translated text.
@@ -65,10 +68,13 @@ class TranslateEmulator(python_utils.OBJECT):
         """Adds an expected response for a given set of inputs.
 
         Args:
-            source_language_code: str. A valid ISO 639-1 language code.
-            target_language_code: str. A valid ISO 639-1 language code.
+            source_language_code: str. A valid 2 letter ISO 639-1 language code.
+            target_language_code: str. A valid 2 letter ISO 639-1 language code.
             source_text: str. The text to translate.
             response: str. The expected response for the given inputs.
+
+        For more information on ISO 639-1 see:
+        https://www.w3schools.com/tags/ref_language_codes.asp
         """
         inputs = (source_language_code, target_language_code, source_text)
         self.expected_responses.update({inputs: response})
