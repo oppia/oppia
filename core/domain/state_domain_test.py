@@ -4319,7 +4319,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'data_format': 'html',
                         'translation': 'Hey!',
                         'needs_update': False
-                    }
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
+                        'needs_update': False
+                    },
                 },
                 'feedback_1': {
                     'hi': {
@@ -4330,6 +4335,11 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'data_format': 'html',
                         'translation': 'hello!',
+                        'needs_update': False
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
                         'needs_update': False
                     }
                 }

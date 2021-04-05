@@ -20,23 +20,29 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
-export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
-
-export type WrittenTranslationDataFormat = (
-  typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
-  typeof WRITTEN_TRANSLATION_TYPE_HTML);
+export const TRANSLATION_DATA_FORMAT_HTML = 'html';
+export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
+export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING = (
+  'set_of_normalized_string');
+export const TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING = (
+  'set_of_unicode_string');
+export const DATA_FORMAT_TO_DEFAULT_VALUES = {
+  [TRANSLATION_DATA_FORMAT_HTML]: '',
+  [TRANSLATION_DATA_FORMAT_UNICODE]: '',
+  [TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING]: [],
+  [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
+};
 
 export interface TranslationBackendDict {
-  'data_format': WrittenTranslationDataFormat;
-  'translation': string;
+  'data_format': string;
+  'translation': string|string[];
   'needs_update': boolean;
 }
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: WrittenTranslationDataFormat,
-      public translation: string,
+      public dataFormat: string,
+      public translation: string|string[],
       public needsUpdate: boolean
   ) {}
 
@@ -49,32 +55,32 @@ export class WrittenTranslation {
   }
 
   isHtml(): boolean {
-    return this.dataFormat === WRITTEN_TRANSLATION_TYPE_HTML;
+    return this.dataFormat === TRANSLATION_DATA_FORMAT_HTML;
   }
 
   isUnicode(): boolean {
-    return this.dataFormat === WRITTEN_TRANSLATION_TYPE_UNICODE;
+    return this.dataFormat === TRANSLATION_DATA_FORMAT_UNICODE;
   }
 
-  getUnicode(): string {
-    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_UNICODE) {
-      throw new Error('This translation is not of data format unicode');
-    }
+  isSetOfStrings(): boolean {
+    return [
+      TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+      TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING
+    ].indexOf(this.dataFormat) !== -1;
+  }
+
+  getTranslation(): string|string[] {
     return this.translation;
   }
 
-  getHtml(): string {
-    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
-      throw new Error('This translation is not of data format html');
+  setTranslation(translation: string|string[]): void {
+    if (typeof translation !==
+        typeof DATA_FORMAT_TO_DEFAULT_VALUES[this.dataFormat]) {
+      throw new Error(
+        'This translation is not of the correct type for data format ' +
+        this.dataFormat);
     }
-    return this.translation;
-  }
-
-  setHtml(html: string): void {
-    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
-      throw new Error('This translation is not of data format html');
-    }
-    this.translation = html;
+    this.translation = translation;
   }
 
   toBackendDict(): TranslationBackendDict {
@@ -90,11 +96,13 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(
-      type: WrittenTranslationDataFormat,
-      html: string
-  ): WrittenTranslation {
-    return new WrittenTranslation(type, html, false);
+  createNew(dataFormat: string): WrittenTranslation {
+    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
+      throw new Error('Invalid translation data format: ' + dataFormat);
+    }
+
+    return new WrittenTranslation(
+      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat], false);
   }
 
   createFromBackendDict(
