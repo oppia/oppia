@@ -55,8 +55,8 @@ URLS = [
         r'/cron/mail/reviewers/contributor_dashboard_suggestions',
         cron.CronMailReviewersContributorDashboardSuggestionsHandler),
     main.get_redirect_route(
-        r'/cron/models/app_feedback_report/scrub_reports',
-        cron.CronScrubAppFeedbackReportsHandler),
+        r'/cron/app_feedback_report/scrub_expiring_reports',
+        cron.CronAppFeedbackReportsScrubberHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

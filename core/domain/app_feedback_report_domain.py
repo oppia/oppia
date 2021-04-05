@@ -158,7 +158,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                     'Expected device and system context to be of type '
                     'AndroidDeviceSystemContext for platform %s, '
                     'received: %r' % self.platform, self.device_system_context)
-        else if platform == app_feedback_report_models.PLATFORM_WEB:
+        elif platform == app_feedback_report_models.PLATFORM_WEB:
             raise NotImplementedError(
                 'Subclasses of DeviceSystemContext for web systems should '
                 'implement domain validation.')
@@ -349,7 +349,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             # validate the options selected by the user.
             self.require_valid_selected_items_for_category(
                 category, selected_items)
-            if self._selected_items_include_other(selected_items)):
+            if self._selected_items_include_other(selected_items):
                 # If the user selects an 'other' option in their list of
                 # selection options, validate the input text.
                 self.require_valid_other_text_input_for_category(
@@ -632,14 +632,14 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             ValidationError. The given code is not valid.
         """
     
-    @classmethod
-    def require_valid_sdk_version(cls, sdk_version)
+    # @classmethod
+    # def require_valid_sdk_version(cls, sdk_version):
     
-    @classmethod
-    def require_valid_build_fingerprint(cls, build_fingerprint)
+    # @classmethod
+    # def require_valid_build_fingerprint(cls, build_fingerprint):
      
-    @classmethod
-    def require_valid_network_type(cls, network_type)
+    # @classmethod
+    # def require_valid_network_type(cls, network_type):
 
 
 class EntryPoint(python_utils.OBJECT):
@@ -903,8 +903,8 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
     """
 
     def __init__(
-        self, id, platform, report_submitted_timestamp, ticket_id, scrubbed_by,
-        user_supplied_feedback, device_system_context, app_context):
+        self, id, platform, ticket_id, stats_tracking_date,
+        total_reports_submitted, daily_param_stats):
         """Constructs a AppFeedbackReportDailyStats domain object.
 
         Args:
@@ -913,16 +913,17 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
                 aggregating stats on.
             date: datetime.date. The date that this object is aggregating stats
                 on, in UTC.
-            counts_dict: dict. A dict representing the statistics on this date.
+            daily_param_stats: dict. A dict representing the statistics on this date.
                 Keys in this dict correpond to STATS_PARAMETER_NAMES enums,
                 while values are ReportStatsParameterValueCounts objects.
         """
         self.stats_id = stats_id
         self.ticket_id = ticket_id
-        self.date = date
-        self.counts_dict = counts_dict
+        self.platform = platform
+        self.stats_tracking_date = stats_tracking_date
+        self.daily_param_stats = daily_param_stats
 
-    def to_dict():
+    # def to_dict():
 
 
 class ReportStatsParameterValueCounts(python_utils.OBJECT):

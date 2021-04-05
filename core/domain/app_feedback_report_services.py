@@ -23,6 +23,7 @@ from core.domain import app_feedback_report_domain
 from core.model import app_feedback_report_models
 from core.platform import models
 
+import feconf
 import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
@@ -43,32 +44,32 @@ def save_incoming_report(report, report_stats):
     _save_report_stats_instance(report_stats)
 
 
-def _save_report_instance(report)
+def _save_report_instance(report):
     """Creates and stores a new AppFeedbackReportModel instance.
 
     Args:
         report: AppFeedbackReport. AppFeedbackReport domain object.
     """
-    report.validate()
-    model_entity_id = app_feedback_report_models.AppFeedbackReportModel.create(
+    # report.validate()
+    # model_entity_id = app_feedback_report_models.AppFeedbackReportModel.create(
 
-    )
+    # )
 
 
-def _save_report_stats_instance(report_stats)
+def _save_report_stats_instance(report_stats):
     """Creates and stores a new AppFeedbackReportModel instance.
 
     Args:
         report: AppFeedbackReport. AppFeedbackReport domain object.
     """
-    report_stats.validate()
-    stats_entity_id = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+    # report_stats.validate()
+    # stats_entity_id = (
+    #     app_feedback_report_models.AppFeedbackReportStatsModel.create(
 
-    ))
+    # ))
 
 
-def get_report_from_model(report_model)
+def get_report_from_model(report_model):
     """Create and return a domain object AppFeedbackReport given a model loaded
     from the the dasta.
 
@@ -154,42 +155,64 @@ def _get_entry_point(
             "Received unexpected entry point type.")
 
 
-def is_ex
+# def is_ex
 
 
-// Called when an admin triages reports; updates the assigned ticket in the
-// AppFeedbackReportModel and modifies the AppFeedbackReportStatsModel so that
-// aggregates are accurate (occurs in a transaction)
-def reassign_ticket(report_id, ticket_id)
+# // Called when an admin triages reports; updates the assigned ticket in the
+# // AppFeedbackReportModel and modifies the AppFeedbackReportStatsModel so that
+# // aggregates are accurate (occurs in a transaction)
+# def reassign_ticket(report_id, ticket_id)
 
-// Called when updates a ticket name. Updates the entity in the
-// AppFeedbackReportTicketModel and the relevant tickets in the
-// AppFeedbackReportModel (both occurs in a transaction)>
-def edit_ticket_name(ticket_id)
+# // Called when updates a ticket name. Updates the entity in the
+# // AppFeedbackReportTicketModel and the relevant tickets in the
+# // AppFeedbackReportModel (both occurs in a transaction)>
+# def edit_ticket_name(ticket_id)
 
-// Called when an maintainer needs to scrub a report or if the report is expiring
-// (occurs in a transaction)
-def scrub_report(report_id)
+# // Called when an maintainer needs to scrub a report or if the report is expiring
+# // (occurs in a transaction)
+# def scrub_report(report_id)
 
-// Fetches and processes the next batch of reports maintainers want to view and
-// returns a list of FeedbackReports.
-def get_next_batch_of_reports(active_filters, page_num, cursor):
-   list<FeedbackReport>
+# // Fetches and processes the next batch of reports maintainers want to view and
+# // returns a list of FeedbackReports.
+# def get_next_batch_of_reports(active_filters, page_num, cursor):
+#    list<FeedbackReport>
 
-// Fetches and processes the next batch of reports maintainers want to view.
-// Returns a list of FeedbackReportTickets
-def get_next_batch_of_tickets(active_filters, page_num, cursor):
-   list<FeedbackReportTicket>
+# // Fetches and processes the next batch of reports maintainers want to view.
+# // Returns a list of FeedbackReportTickets
+# def get_next_batch_of_tickets(active_filters, page_num, cursor):
+#    list<FeedbackReportTicket>
 
-// Fetches and processes a list of FeedbackReportDailyStats to display in the
-// dashboard
-def get_stats(ticket_id, splice_val): list<FeedbackReportDailyStats>
+# // Fetches and processes a list of FeedbackReportDailyStats to display in the
+# // dashboard
+# def get_stats(ticket_id, splice_val): list<FeedbackReportDailyStats>
 
-// Calculates all the possible filters values that can be applied to the current
-// set of reports based on the storage models. This will fetch from the
-// AndroidFeedbackReportModel based on the a constant
-// ALLOWED_ANDROID_REPORT_FILTERS
-def get_all_filter_options() : FeedbackReportFilter
+# // Calculates all the possible filters values that can be applied to the current
+# // set of reports based on the storage models. This will fetch from the
+# // AndroidFeedbackReportModel based on the a constant
+# // ALLOWED_ANDROID_REPORT_FILTERS
+# def get_all_filter_options() : FeedbackReportFilter
+
+def scrub_all_unscrubbed_expiring_reports():
+    """Fetches the reports that are expiring and must be scrubbed.
+
+    Returns:
+        list(str). The IDs for AppFeedbackReportModel entities that need to be
+        scrubbed.
+    """
+    models_to_scrub = get_all_expiring_reports_to_scrub()
+    for model_entity in models_to_scrub:
+        scrub_app_feedback_reports(
+            model_entity.id, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+
+def get_all_expiring_reports_to_scrub():
+    """Fetches the reports that are expiring and must be scrubbed.
+
+    Returns:
+        list(str). The IDs for AppFeedbackReportModel entities that need to be
+        scrubbed.
+    """
+    model_class = app_feedback_report_models.AppFeedbackReportModel
+    return model_class.get_all_unscrubbed_expiring_reports()
 
 def scrub_report(report_id, scrubbed_by):
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing

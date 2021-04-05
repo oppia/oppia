@@ -247,6 +247,22 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'The id generator for AppFeedbackReportModel is producing too '
             'many collisions.')
 
+    @classmethod
+    def get_all_unscrubbed_expiring_reports(cls):
+        """Fetches the reports that are at or past their 90-days in storage and
+        must be scrubbed.
+
+        Returns:
+            list(str). A list of IDs corresponding to
+            AppFeedbackReportModel entities that need to be scrubbed
+        """
+        datetime_now = datetime.datetime.utcnow()
+        datetime_before_which_to_scrub = (date_now - datetime.timedelta(
+            days=feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS))
+        return cls.query(
+            scrubbed_by is None,
+            cls.created_on < datetime_before_which_to_scrub).fetch()
+
     @staticmethod
     def get_deletion_policy():
         """Model stores the user ID of who has scrubbed this report for auditing
