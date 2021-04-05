@@ -53,39 +53,3 @@ export class MergeSkillModalComponent extends ConfirmOrCancelModal {
     this.selectedSkillId = skillId;
   }
 }
-
-// require(
-//   'components/common-layout-directives/common-elements/' +
-//   'confirm-or-cancel-modal.controller.ts');
-
-// angular.module('oppia').controller('MergeSkillModalController', [
-//   '$controller', '$scope', '$uibModalInstance', 'categorizedSkills', 'skill',
-//   'skillSummaries', 'untriagedSkillSummaries',
-//   function(
-//       $controller, $scope, $uibModalInstance, categorizedSkills, skill,
-//       skillSummaries, untriagedSkillSummaries) {
-//     $controller('ConfirmOrCancelModalController', {
-//       $scope: $scope,
-//       $uibModalInstance: $uibModalInstance
-//     });
-
-//     $scope.skillSummaries = skillSummaries;
-//     $scope.categorizedSkills = categorizedSkills;
-//     $scope.allowSkillsFromOtherTopics = true;
-//     $scope.untriagedSkillSummaries = untriagedSkillSummaries;
-//     $scope.selectedSkillId = null;
-//     $scope.confirm = function() {
-//       $uibModalInstance.close(
-//         {
-//           skill: skill,
-//           supersedingSkillId: $scope.selectedSkillId
-//         });
-//     };
-//     $scope.save = function() {
-//       $scope.confirm();
-//     };
-//     $scope.setSelectedSkillId = function(skillId: string) {
-//       $scope.selectedSkillId = skillId;
-//     };
-//   }
-// ]);
