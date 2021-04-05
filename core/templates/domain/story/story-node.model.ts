@@ -29,7 +29,7 @@ export interface StoryNodeBackendDict {
   'acquired_skill_ids': string[];
   'outline': string;
   'outline_is_finalized': boolean;
-  'exploration_id': string;
+  'exploration_id': string | null;
   'thumbnail_bg_color': string;
   'thumbnail_filename': string;
 }
@@ -43,15 +43,15 @@ export class StoryNode {
   _acquiredSkillIds: string[];
   _outline: string;
   _outlineIsFinalized: boolean;
-  _explorationId: string;
-  _thumbnailBgColor: string;
-  _thumbnailFilename: string;
+  _explorationId: string | null;
+  _thumbnailBgColor: string | null;
+  _thumbnailFilename: string | null;
   constructor(
       id: string, title: string, description: string,
       destinationNodeIds: string[], prerequisiteSkillIds: string[],
       acquiredSkillIds: string[], outline: string,
-      outlineIsFinalized: boolean, explorationId: string,
-      thumbnailBgColor: string, thumbnailFilename: string) {
+      outlineIsFinalized: boolean, explorationId: string | null,
+      thumbnailBgColor: string | null, thumbnailFilename: string | null) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -89,7 +89,7 @@ export class StoryNode {
     return this._description;
   }
 
-  getExplorationId(): string {
+  getExplorationId(): string | null{
     return this._explorationId;
   }
 
@@ -125,7 +125,7 @@ export class StoryNode {
     this._outlineIsFinalized = false;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null{
     return this._thumbnailFilename;
   }
 
@@ -133,7 +133,7 @@ export class StoryNode {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor(): string | null{
     return this._thumbnailBgColor;
   }
 
