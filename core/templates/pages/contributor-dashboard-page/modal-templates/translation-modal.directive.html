@@ -32,7 +32,7 @@
     </div>
     <div ng-if="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}" ng-click="onContentClick($event)"
-        html-data="textToTranslate" class="oppia-rte-editor">
+      html-data="textToTranslate" class="oppia-rte-editor">
       </angular-html-bind>
     </div>
     <div class="oppia-translation-editor-section">
@@ -45,7 +45,7 @@
     <div class="oppia-view-completed-translations-section">
       <div className="oppia-view-completed-translations-button-row">
         <button class="btn btn-primary oppia-view-completed-translations-button"
-          ng-click="toggleViewCompletedTranslationsModal()">
+        ng-click="toggleViewCompletedTranslationsModal()">
           <span ng-if="!viewCompletedTranslationsModalOpen">
             View Completed Translations
           </span>
@@ -60,7 +60,7 @@
           <div class="oppia-completed-translations-table-heading">Translated Content</div>
         </div>
         <div class="oppia-translations-and-content-row" ng-if="!noTranslationComplete && !loadingTranslatedText"
-          ng-repeat="content in contentList track by $index">
+        ng-repeat="content in contentList track by $index">
           <div class="oppia-translations-and-content-column-left">
             <angular-html-bind html-data="content"></angular-html-bind>
           </div>
@@ -88,11 +88,11 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success oppia-go-back-button" ng-disabled="!previousTranslationAvailable"
-    ng-click="returnToPreviousTranslation()">Go Back
+  ng-click="returnToPreviousTranslation()">Go Back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
-    ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
-    ng-click="suggestTranslatedText()">
+  ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
+  ng-click="suggestTranslatedText()">
     <i ng-show="uploadingTranslation" class="fa fa-spinner"></i>
     <span ng-show="!uploadingTranslation && !moreAvailable">Save and close</span>
     <span ng-show="!uploadingTranslation && moreAvailable">Save and translate another</span>
