@@ -96,7 +96,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                     feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
-    def _validate_submitted_on_datetime(cls, item):
+    def _validate_created_on_datetime(cls, item):
         """Validates that the submitted_on date of the model is less than the
         current time and greater than the earliest possible date of submissions
         (no earlier than March 2021).
@@ -105,20 +105,20 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
         current_datetime = datetime.datetime.utcnow()
-        if item.submitted_on > current_datetime:
+        if item.created_on > current_datetime:
             cls._add_error(
-                'submitted_on %s' % (
+                'created_on %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
-                'Entity id %s: The submitted_on field has a value %s which is '
+                'Entity id %s: The created_on field has a value %s which is '
                 'greater than the time when the job was run' % (
                     item.id, item.submitted_on))
-        if item.submitted_on < EARLIEST_VALID_DATETIME:
+        if item.created_on < EARLIEST_VALID_DATETIME:
             cls._add_error(
-                'submitted_on %s' % (
+                'created_on %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
-                'Entity id %s: The submitted_on field has a value %s which is '
+                'Entity id %s: The created_on field has a value %s which is '
                 'less than the earliest possible submission date' % (
-                    item.id, item.submitted_on))
+                    item.id, item.created_on))
 
     @classmethod
     def _validate_expired_reports_are_scrubbed(cls, item):
@@ -150,7 +150,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_schema_versions,
-            cls._validate_submitted_on_datetime,
+            cls._validate_created_on_datetime,
             cls._validate_expired_reports_are_scrubbed]
 
     @classmethod

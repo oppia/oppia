@@ -50,7 +50,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP_MSEC,
+        'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
@@ -130,14 +130,14 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             self.expected_validation_output, sort=False,
             literal_eval=False)
 
-    def test_model_validation_with_invalid_external_references_fails(self):
+    def test_model_validation_with_invalid_external_references_id_fails(self):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.report_id))
         model_entity.ticket_id = 'invalid_ticket_id'
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for ticket_id field check of '
                 'AppFeedbackReportModel\', '
@@ -147,7 +147,38 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.id)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_validation_with_deleted_external_references_fails(self):
+        app_feedback_report_models.AppFeedbackReportTicketModel(
+            id=self.TICKET_ID, ticket_name='example ticket',
+            github_issue_repo_name=None, github_issue_number=None,
+            archived=False,
+            newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_ids=[self.report_id]).put()
+        ticket_model_to_delete = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.TICKET_ID))
+        ticket_model_to_delete.delete()
+
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.report_id))
+        model_entity.ticket_id = self.TICKET_ID
+        model_entity.update_timestamps()
+        model_entity.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for ticket_id field check of '
+                'AppFeedbackReportModel\', '
+                '[u"Entity id %s: based on field ticket_id having value '
+                '%s, expected model AppFeedbackReportTicketModel'
+                ' with id %s but it doesn\'t exist"]]') % (
+                    model_entity.id, self.TICKET_ID, self.TICKET_ID)]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_with_invalid_id_fails(self):
         app_feedback_report_models.AppFeedbackReportModel(
@@ -185,7 +216,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.android_report_info_schema_version = 2
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for report schema version check '
                 'of AppFeedbackReportModel\', '
@@ -197,7 +228,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_android_schema_version_less_than_min_schema_fails(self):
         model_entity = (
@@ -206,7 +237,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.android_report_info_schema_version = 0
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for report schema version check '
                 'of AppFeedbackReportModel\', '
@@ -218,7 +249,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_web_schema_version_greater_than_current_schema_fails(
             self):
@@ -295,7 +326,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             self.expected_validation_output, sort=True,
             literal_eval=False)
 
-    def test_model_with_submitted_on_greater_than_current_datetime_fails(self):
+    def test_model_with_created_on_greater_than_current_datetime_fails(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportModel.create(
                 platform=self.PLATFORM_ANDROID,
@@ -320,17 +351,17 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 entity_id))
         self.expected_validation_output.append(
             (
-                u'[u\'failed validation check for submitted_on datetime check '
+                u'[u\'failed validation check for created_on datetime check '
                 'of AppFeedbackReportModel\', '
-                '[u\'Entity id %s: The submitted_on field has a value %s which '
+                '[u\'Entity id %s: The created_on field has a value %s which '
                 'is greater than the time when the job was run\']]') % (
-                    model_entity.id, model_entity.submitted_on))
+                    model_entity.id, model_entity.created_on))
 
         self.run_job_and_check_output(
             self.expected_validation_output, sort=True,
             literal_eval=False)
 
-    def test_model_with_submitted_on_equal_to_buffered_datetime_successful(
+    def test_model_with_created_on_equal_to_buffered_datetime_successful(
             self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportModel.create(
@@ -358,17 +389,17 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 entity_id))
         self.expected_validation_output.append(
             (
-                u'[u\'failed validation check for submitted_on datetime check '
+                u'[u\'failed validation check for created_on datetime check '
                 'of AppFeedbackReportModel\', [u\'Entity id %s: The '
-                'submitted_on field has a value %s which is less than the '
+                'created_on field has a value %s which is less than the '
                 'earliest possible submission date\']]') % (
-                    model_entity.id, model_entity.submitted_on))
+                    model_entity.id, model_entity.created_on))
 
         self.run_job_and_check_output(
             self.expected_validation_output, sort=True,
             literal_eval=False)
 
-    def test_model_with_submitted_on_less_buffered_datetime_fails(self):
+    def test_model_with_created_on_less_buffered_datetime_fails(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportModel.create(
                 platform=self.PLATFORM_ANDROID,
@@ -395,11 +426,11 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 entity_id))
         self.expected_validation_output.append(
             (
-                u'[u\'failed validation check for submitted_on datetime check '
+                u'[u\'failed validation check for created_on datetime check '
                 'of AppFeedbackReportModel\', [u\'Entity id %s: The '
-                'submitted_on field has a value %s which is less than the '
+                'created_on field has a value %s which is less than the '
                 'earliest possible submission date\']]') % (
-                    model_entity.id, model_entity.submitted_on))
+                    model_entity.id, model_entity.created_on))
 
         self.run_job_and_check_output(
             self.expected_validation_output, sort=True,
@@ -413,7 +444,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             datetime.datetime.utcnow() - datetime.timedelta(days=100))
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for scrubbed_by field check of '
                 'AppFeedbackReportModel\', '
@@ -424,7 +455,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     utils.get_time_in_millisecs(model_entity.created_on))]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
 
 class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -533,7 +564,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
             datetime.datetime.utcnow() + datetime.timedelta(days=2))
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for newest_report_timestamp '
                 'datetime check of AppFeedbackReportTicketModel\', '
@@ -543,7 +574,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.id, model_entity.newest_report_timestamp)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
     def test_with_newest_report_timestamp_less_than_earliest_datetime_fails(
             self):
@@ -554,7 +585,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
             EARLIEST_VALID_DATETIME - datetime.timedelta(days=2))
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for newest_report_timestamp '
                 'datetime check of AppFeedbackReportTicketModel\', [u\'Entity '
@@ -563,16 +594,16 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.id, model_entity.newest_report_timestamp)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
-    def test_model_validation_with_invalid_external_references_fails(self):
+    def test_model_validation_with_invalid_external_references_ids_fails(self):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 self.ticket_id))
         model_entity.report_ids = ['invalid_report_id']
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for report_ids field check of '
                 'AppFeedbackReportTicketModel\', '
@@ -582,7 +613,25 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.id)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_validation_with_deleted_external_references_fails(self):
+        report_model_to_delete = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID))
+        report_model_to_delete.delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for report_ids field check of '
+                'AppFeedbackReportTicketModel\', '
+                '[u"Entity id %s: based on field report_ids having value '
+                '%s, expected model AppFeedbackReportModel'
+                ' with id %s but it doesn\'t exist"]]') % (
+                    self.ticket_id, self.REPORT_ID, self.REPORT_ID)]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
 class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -674,7 +723,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.daily_param_stats_schema_version = 2
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for report stats schema version '
                 'check of AppFeedbackReportStatsModel\', '
@@ -686,7 +735,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_stats_schema_version_less_than_min_schema_fails(
             self):
@@ -696,7 +745,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.daily_param_stats_schema_version = 0
         model_entity.update_timestamps()
         model_entity.put()
-        output = [
+        expected_output = [
             (
                 u'[u\'failed validation check for report stats schema version '
                 'check of AppFeedbackReportStatsModel\', '
@@ -708,7 +757,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
-            output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_with_stats_tracking_date_greater_than_current_datetime_fails(
             self):
@@ -762,7 +811,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             self.expected_validation_output, sort=True,
             literal_eval=False)
 
-    def test_model_validation_with_invalid_external_references_fails(self):
+    def test_model_validation_with_invalid_external_references_ids_fails(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform=self.PLATFORM_ANDROID,
@@ -785,3 +834,23 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             self.expected_validation_output, sort=True,
             literal_eval=False)
+
+    def test_model_validation_with_deleted_external_references_fails(self):
+        ticket_model_to_delete = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.TICKET_ID))
+        ticket_model_to_delete.delete()
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                self.entity_id))
+        expected_output = [
+            (
+                u'[u\'failed validation check for ticket_id field check of '
+                'AppFeedbackReportStatsModel\', '
+                '[u"Entity id %s: based on field ticket_id having value '
+                '%s, expected model AppFeedbackReportTicketModel'
+                ' with id %s but it doesn\'t exist"]]') % (
+                    model_entity.id, self.TICKET_ID, self.TICKET_ID)]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
