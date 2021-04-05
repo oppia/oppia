@@ -32,6 +32,9 @@ describe('State classifier mapping service', () => {
       let appService: AppService;
       let classifierFrozenModel = new TextClassifierFrozenModel();
       let classifierDataBackendApiService: ClassifierDataBackendApiService;
+      const expId = '0';
+      const expVersion = 0;
+      const stateName = 'stateName1';
 
       // The model_json attribute in TextClassifierFrozenModel class can't be
       // changed to camelcase since the class definition is automatically
@@ -83,26 +86,41 @@ describe('State classifier mapping service', () => {
 
         mappingService = TestBed.get(StateClassifierMappingService);
         appService = TestBed.get(AppService);
-        classifierDataBackendApiService = TestBed.inject(ClassifierDataBackendApiService);
+        classifierDataBackendApiService = TestBed.inject(
+          ClassifierDataBackendApiService);
         spyOn(appService, 'isMachineLearningClassificationEnabled')
           .and.returnValue(true);
       });
 
-      fit('should work', waitForAsync(() => {
-        spyOn(classifierDataBackendApiService, 'getClassifierData').and.callFake(() => {
-          return new Promise((resolve) => {
+      it('should fetch classifier data correctly', waitForAsync(async() => {
+        spyOn(
+          classifierDataBackendApiService,
+          'getClassifierData').and.callFake(() => {
+          return new Promise((resolve, reject) => {
             resolve(classifierData);
           });
         });
-        mappingService.init('0', 0);
-        var stateName = 'stateName1';
-        mappingService.initializeClassifierDataForState(stateName);
+        mappingService.init(expId, expVersion);
+        await mappingService.initializeClassifierDataForState(stateName);
         expect(mappingService.hasClassifierData(stateName)).toBe(true);
       }));
 
+      it('should handle failure of fetching classifier data', waitForAsync(
+        async() => {
+          spyOn(
+            classifierDataBackendApiService,
+            'getClassifierData').and.callFake(() => {
+            return new Promise((resolve, reject) => {
+              reject('No classifier data found for exploration');
+            });
+          });
+          mappingService.init(expId, expVersion);
+          await mappingService.initializeClassifierDataForState(stateName);
+          expect(mappingService.hasClassifierData(stateName)).toBe(false);
+        }));
+
       it('should return classifier data when it exists.', () => {
-        mappingService.init('0', 0);
-        var stateName = 'stateName1';
+        mappingService.init(expId, expVersion);
 
         mappingService.testOnlySetClassifierData(stateName, classifierData);
         var retrievedClassifier = mappingService.getClassifier(stateName);
@@ -114,7 +132,7 @@ describe('State classifier mapping service', () => {
       });
 
       it('should return undefined when classifier data does not exist.', () => {
-        mappingService.init('0', 0);
+        mappingService.init(expId, expVersion);
         var stateNameNonexistent = 'stateName2';
         var nonExistentClassifier = mappingService.getClassifier(
           stateNameNonexistent);
@@ -122,14 +140,13 @@ describe('State classifier mapping service', () => {
       });
 
       it('should return true when it has classifier data.', () => {
-        mappingService.init('0', 0);
-        var stateName = 'stateName1';
+        mappingService.init(expId, expVersion);
         mappingService.testOnlySetClassifierData(stateName, classifierData);
         expect(mappingService.hasClassifierData(stateName)).toBe(true);
       });
 
       it('should return false when it does not have classifier data .', () => {
-        mappingService.init('0', 0);
+        mappingService.init(expId, expVersion);
         var stateNameNonexistent = 'stateName2';
         expect(mappingService.hasClassifierData(
           stateNameNonexistent)).toBe(false);
@@ -137,7 +154,6 @@ describe('State classifier mapping service', () => {
 
       it('should not return correct classifier details when init is not ' +
         'called', () => {
-        var stateName = 'stateName1';
         var retrievedClassifier = mappingService.getClassifier(stateName);
         expect(retrievedClassifier).toBe(undefined);
       });
@@ -147,6 +163,10 @@ describe('State classifier mapping service', () => {
     () => {
       let mappingService: StateClassifierMappingService;
       let appService: AppService;
+      const expId = '0';
+      const stateName = 'stateName1';
+      const expVersion = 0;
+
       beforeEach(() => {
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -160,8 +180,7 @@ describe('State classifier mapping service', () => {
       });
 
       it('should not return classifier data.', () => {
-        mappingService.init('0', 0);
-        var stateName = 'stateName1';
+        mappingService.init(expId, expVersion);
         expect(mappingService.hasClassifierData(stateName)).toBe(false);
         expect(mappingService.getClassifier(stateName)).toBe(undefined);
       });

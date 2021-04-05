@@ -295,7 +295,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'social-buttons.component.ts',
     'solution-editor.directive.ts',
     'solution-explanation-editor.directive.ts',
-    'state-classifier-mapping.service.ts',
     'state-content-editor.directive.ts',
     'state-editor.directive.ts',
     'state-editor.service.ts',
