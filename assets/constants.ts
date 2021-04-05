@@ -5221,6 +5221,58 @@ export default {
     "speechSynthesisCodeMobile": "en_US"
   }],
 
+  "TRANSLATION_TIPS": {
+    "zh": [
+      // eslint-disable-next-line max-len
+      "Write fractions or numbers as they are, unless they are written out in words. For instance, one-fifth would be (五分之一)",
+      // eslint-disable-next-line max-len
+      "When referring to Mr. Baker (or, in general, Mr./Ms. followed by an occupation), leave it as Baker先生, since in certain cases Baker is the last name.",
+      "Make sure to use the correct punctuation:",
+      "Period = 。",
+      "Comma for compound sentences or translation phrases = ，",
+      "Comma for list of numbers or objects = 、",
+      // eslint-disable-next-line max-len
+      "Preserve bolding. If the original content has bold text, make sure it is bold in Chinese as well.",
+      // eslint-disable-next-line max-len
+      "Make sure that you have selected the correct words (e.g. words such as 再 and 在 )."
+    ],
+    "hi": [
+      // eslint-disable-next-line max-len
+      "Prefer simple Hindi words that are used in daily communication Note that common English words (pen, paper, cake, etc.) can be written as transliterations (पेन, पेपर, केक). For harder words, include the English word in parentheses, e.g. अंश (Numerator), हर (Denominator), भिन्न (Fraction).",
+      // eslint-disable-next-line max-len
+      "Use respectful pronouns (like “आप” instead of “तुम/तू ”) and a corresponding respectful tone like “करिये, करेंगे”.",
+      // eslint-disable-next-line max-len
+      "Use the same voice (active or passive) as in the original English text.",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Hindi as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      // eslint-disable-next-line max-len
+      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
+    ],
+    "bn": [
+      // eslint-disable-next-line max-len
+      "Use simple Bangla words that are used in daily communication. Note that common English words (pencil, etc.) can be written as transliterations (e.g পেন্সিল ).",
+      "Use proper punctuation.",
+      "Full stop = |",
+      // eslint-disable-next-line max-len
+      "Use the same voice (active or passive) as in the original English text.",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Bangla as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
+    ],
+    "ar": [
+      // eslint-disable-next-line max-len
+      "In Oppia, we prefer to use simple words that can be easily understood by children. For example, we use “تابع قائلًا” instead of “أردف قائلًا”. Furthermore, the English words that are used in the Arab society regularly can be translated as follows; Arabic word (The regularly used English word). For example, we can translate the word cupcakes this way; كعك القوالب الصغيرة (cupcakes). ",
+      // eslint-disable-next-line max-len
+      "Use respectful ways and formal prefixes to address people. For example, use “سيدي” and “سيدتي”. ",
+      // eslint-disable-next-line max-len
+      "If the name has a meaning in Arabic, or in English, such as Baker or Crumb, always use words that indicate that they are names before writing the name itself. For example, you can use one of the following words depending on the context; “السيد، السيدة، العم، الجد، الجدة، الآنسة.”",
+      "Use the same voice (active or passive) as in the original English Text",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Arabic as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      // eslint-disable-next-line max-len
+      "Use the hyperlinks to different cards as shown in the original English Text."
+    ]
+  },
+
   // Types of view in creator dashboard page.
   "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
     "CARD": "card",
@@ -5474,21 +5526,22 @@ export default {
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
-  "FIREBASE_AUTH_ENABLED": false,
+  "FIREBASE_AUTH_ENABLED": true,
+
+  // TODO(#11462): Delete this after Firebase authentication has been deployed.
+  "ENABLE_LOGIN_PAGE": true,
 
   // Data required for Firebase authentication.
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
   // and change useEmulator to be false, before deploying to production.
   "FIREBASE_CONFIG_API_KEY": "fake-api-key",
-  "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_AUTH_DOMAIN": "",
-  "FIREBASE_CONFIG_DATABASE_URL": "",
-  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
-  "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",
   "FIREBASE_CONFIG_STORAGE_BUCKET": "",
-  "FIREBASE_EMULATOR_ENABLED": true,
+  "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
+  "FIREBASE_CONFIG_APP_ID": "",
+  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 

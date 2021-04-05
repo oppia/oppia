@@ -39,8 +39,11 @@ from scripts import install_third_party_libs
 MAX_RETRY_COUNT = 3
 RERUN_NON_FLAKY = True
 WEB_DRIVER_PORT = 4444
-GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
+GOOGLE_APP_ENGINE_PORT = 9001
+ELASTICSEARCH_SERVER_PORT = 9200
+PORTS_USED_BY_OPPIA_PROCESSES = [
+    OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT, ELASTICSEARCH_SERVER_PORT]
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 # Path relative to current working directory where portserver socket
@@ -202,7 +205,7 @@ def cleanup():
     build.set_constants_to_default()
     common.stop_redis_server()
 
-    for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
+    for port in PORTS_USED_BY_OPPIA_PROCESSES:
         if not common.wait_for_port_to_not_be_in_use(port):
             raise RuntimeError(
                 'Port {} failed to close within {} seconds.'.format(
@@ -216,7 +219,7 @@ def is_oppia_server_already_running():
     Returns:
         bool. Whether there is a running Oppia instance.
     """
-    for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
+    for port in PORTS_USED_BY_OPPIA_PROCESSES:
         if common.is_port_in_use(port):
             python_utils.PRINT(
                 'There is already a server running on localhost:%s.'
