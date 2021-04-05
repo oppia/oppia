@@ -88,6 +88,7 @@
 	"I18N_FOOTER_PRIVACY_POLICY": "Adatvédelmi irányelv",
 	"I18N_FOOTER_TEACH": "Oktatás az Oppiával",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "OKTATÁS/TANULÁS",
+	"I18N_FOOTER_TEACH_PAGE": "Szülőknek/Tanároknak",
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Felhasználási feltételek",
 	"I18N_FORMS_TYPE_NUMBER": "Írj be egy számot",
 	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Kérjük adj meg olyan számot, amely legalább <[minValue]>.",

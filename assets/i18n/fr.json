@@ -458,6 +458,7 @@
 	"I18N_PREFERENCES_CANCEL_BUTTON": "Annuler",
 	"I18N_PREFERENCES_CHANGE_PICTURE": "Modifier l’image du profil",
 	"I18N_PREFERENCES_EMAIL": "Courriel",
+	"I18N_PREFERENCES_EMAIL_CLARIFICATION": "Veuillez indiquer ci-dessous quand vous souhaitez recevoir des courriels depuis Oppia. Vous pouvez toujours modifier vos préférences sur cette page, ou bien en suivant les instructions de désabonnement contenues dans chacun de ces courriels.",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Seuls les modérateurs et les administrateurs du site peuvent voir votre adresse courriel.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "Recevoir des courriels quand quelqu’un vous accorde les droits de modification sur une exploration",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Recevoir des courriels quand quelqu’un vous envoie un commentaire sur une exploration",
