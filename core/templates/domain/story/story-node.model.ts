@@ -30,8 +30,8 @@ export interface StoryNodeBackendDict {
   'outline': string;
   'outline_is_finalized': boolean;
   'exploration_id': string | null;
-  'thumbnail_bg_color': string;
-  'thumbnail_filename': string;
+  'thumbnail_bg_color': string | null;
+  'thumbnail_filename': string | null;
 }
 
 export class StoryNode {
