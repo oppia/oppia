@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for drag and drop positive int editor.
+ * @fileoverview Component for drag and drop positive int editor.
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';

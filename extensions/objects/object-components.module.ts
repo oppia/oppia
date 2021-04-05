@@ -28,12 +28,15 @@ import { CodeStringEditorComponent } from './templates/code-string-editor.compon
 import { CoordTwoDimEditorComponent } from './templates/coord-two-dim-editor.component';
 import { CustomOskLettersEditorComponent } from './templates/custom-osk-letters-editor.component';
 import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop-positive-int-editor.component';
+import { FractionEditorComponent } from './templates/fraction-editor.component';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
+    FormsModule,
     LeafletModule
   ],
   declarations: [
@@ -42,7 +45,8 @@ import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent,
     CustomOskLettersEditorComponent,
-    DragAndDropPositiveIntEditorComponent
+    DragAndDropPositiveIntEditorComponent,
+    FractionEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditor,
@@ -50,7 +54,8 @@ import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent,
     CustomOskLettersEditorComponent,
-    DragAndDropPositiveIntEditorComponent
+    DragAndDropPositiveIntEditorComponent,
+    FractionEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditor,
@@ -58,7 +63,8 @@ import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop
     CodeStringEditorComponent,
     CoordTwoDimEditorComponent,
     CustomOskLettersEditorComponent,
-    DragAndDropPositiveIntEditorComponent
+    DragAndDropPositiveIntEditorComponent,
+    FractionEditorComponent
   ],
 })
 

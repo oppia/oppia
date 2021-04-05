@@ -1,0 +1,11 @@
+<input type="text" [(ngModel)]="fractionString" class="form-control" (change)="validateFraction()">
+
+<div class="oppia-form-error oppia-fraction-error">
+  {{ warningText }}
+</div>
+
+<style>
+  .oppia-fraction-error {
+    position: absolute;
+  }
+</style>
