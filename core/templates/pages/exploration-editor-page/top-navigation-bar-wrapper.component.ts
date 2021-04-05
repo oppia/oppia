@@ -17,7 +17,7 @@
  * directly in *mainpage.html files
  *
  * Note developers: This wrapper component can be removed after migration
- * is complete
+ * of top navigation bar directive is complete.
  */
 
 import { Component } from '@angular/core';

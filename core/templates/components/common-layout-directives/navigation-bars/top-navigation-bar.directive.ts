@@ -148,6 +148,10 @@ angular.module('oppia').directive('topNavigationBar', [
              * So, please remove my method of toggling the sidebar, instead call
              * this.sidebarStatusService.toggleSidebar() directly from here.
              * And remove toggleSidebar() from base content component
+             * Also remove TopNavigationBarWrapperComponent and
+             * SideNavigationBarWrapperComponent.
+             * Replace the usage of wrapper components with the original
+             * components.
              */
             $scope.toggle();
           };
