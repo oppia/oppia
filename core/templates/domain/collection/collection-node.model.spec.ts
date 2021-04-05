@@ -24,35 +24,35 @@ import { LearnerExplorationSummaryBackendDict } from
 describe('Collection node model', () => {
   it('should provide an immutable exploration summary', () => {
     var explorationSummaryBackendObject:
-    LearnerExplorationSummaryBackendDict = {
-      last_updated_msec: 1591296737470.528,
-      community_owned: false,
-      objective: 'Test Objective',
-      id: '44LKoKLlIbGe',
-      num_views: 0,
-      thumbnail_icon_url: '/subjects/Algebra.svg',
-      human_readable_contributors_summary: {},
-      language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
-      created_on_msec: 1591296635736.666,
-      ratings: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0
-      },
-      status: 'public',
-      tags: [],
-      activity_type: 'exploration',
-      category: 'Algebra',
-      title: 'exp title'
-    };
+      LearnerExplorationSummaryBackendDict = {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'exp title'
+      };
     var collectionNodeBackendObject:
-    CollectionNodeBackendDict = {
-      exploration_id: 'exp_id0',
-      exploration_summary: explorationSummaryBackendObject
-    };
+      CollectionNodeBackendDict = {
+        exploration_id: 'exp_id0',
+        exploration_summary: explorationSummaryBackendObject
+      };
 
     var collectionNode: CollectionNode = CollectionNode.create(
       collectionNodeBackendObject);
@@ -80,35 +80,35 @@ describe('Collection node model', () => {
   it('should be able to detect if exploration is private',
     () => {
       var explorationSummaryBackendObject:
-      LearnerExplorationSummaryBackendDict = {
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: 'private',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'exp title'
-      };
+        LearnerExplorationSummaryBackendDict = {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'private',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'exp title'
+        };
       var collectionNodeBackendObject:
-      CollectionNodeBackendDict = {
-        exploration_id: 'exp_id0',
-        exploration_summary: explorationSummaryBackendObject
-      };
+        CollectionNodeBackendDict = {
+          exploration_id: 'exp_id0',
+          exploration_summary: explorationSummaryBackendObject
+        };
 
       var collectionNode: CollectionNode = CollectionNode.create(
         collectionNodeBackendObject);
@@ -120,35 +120,35 @@ describe('Collection node model', () => {
   it('should be able to set exploration summary object',
     () => {
       var explorationSummaryBackendObject:
-      LearnerExplorationSummaryBackendDict = {
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cd672b',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'exp title'
-      };
+        LearnerExplorationSummaryBackendDict = {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'exp title'
+        };
       var collectionNodeBackendObject:
-      CollectionNodeBackendDict = {
-        exploration_id: 'exp_id0',
-        exploration_summary: null
-      };
+        CollectionNodeBackendDict = {
+          exploration_id: 'exp_id0',
+          exploration_summary: null
+        };
 
       var collectionNode: CollectionNode = CollectionNode.create(
         collectionNodeBackendObject);
