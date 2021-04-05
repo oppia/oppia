@@ -123,7 +123,7 @@ REDIS_CLI_PATH = os.path.join(
     'src', 'redis-cli')
 # The directory used to store/retrieve the data/config for the emulator.
 CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
-    os.path.join(CURR_DIR, 'cloud_datastore_emulator_cache'))
+    os.path.join(CURR_DIR, os.pardir, 'cloud_datastore_emulator_cache'))
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -970,14 +970,6 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
     # TODO(#11549): Move this to top of the file.
     import contextlib2
 
-    emulator_data_dir_exists = os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
-    if clear_datastore and emulator_data_dir_exists:
-        # Replace it with an empty directory.
-        shutil.rmtree(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
-        os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
-    elif not emulator_data_dir_exists:
-        os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
-
     emulator_hostport = '%s:%d' % (
         feconf.CLOUD_DATASTORE_EMULATOR_HOST,
         feconf.CLOUD_DATASTORE_EMULATOR_PORT)
@@ -990,6 +982,14 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
     ]
 
     with contextlib2.ExitStack() as stack:
+        data_dir_exists = os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+        if clear_datastore and data_dir_exists:
+            # Replace it with an empty directory.
+            shutil.rmtree(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+            os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+        elif not data_dir_exists:
+            os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+
         proc = stack.enter_context(managed_process(emulator_args, shell=True))
 
         # Environment variables required to communicate with the emulator.
