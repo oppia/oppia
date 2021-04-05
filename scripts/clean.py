@@ -25,8 +25,6 @@ import python_utils
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
-    os.path.join(OPPIA_TOOLS_DIR, 'cloud_datastore_emulator_cache'))
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -62,7 +60,6 @@ def main(args=None):
     unused_parsed_args = _PARSER.parse_args(args=args)
 
     delete_directory_tree(OPPIA_TOOLS_DIR)
-    delete_directory_tree(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
     delete_directory_tree('node_modules/')
     delete_directory_tree('third_party/')
     delete_directory_tree('build/')
