@@ -24,7 +24,8 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check to disallow usage of ddescribe, fdescribe, xdescribe, fit, xit'),
+        'Lint check to disallow usage of ddescribe, fdescribe,' +
+        'xdescribe, fit, xit'),
       category: 'Best Practices',
       recommended: true,
     },
