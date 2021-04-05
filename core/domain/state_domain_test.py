@@ -1513,6 +1513,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [('content', '<p>hello!</p>'),
              ('hint_1', '<p>Hint translation</p>')]
             )
+    
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
