@@ -25,11 +25,6 @@ interface ITranslationsAndContentDict {
   'translations': string[]
 }
 
-interface ITranslationsAndContentResponse {
-  'content_list': string[],
-  'translations': string[]
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -43,7 +38,7 @@ export class TranslatedTextBackendApiService {
   getTranslationsAndContent(
       expId: string, languageCode: string):
         Promise<ITranslationsAndContentDict> {
-    return this.http.get<ITranslationsAndContentResponse>(
+    return this.http.get<ITranslationsAndContentDict>(
       '/getcompletedtranslationshandler', {
         params: {
           exp_id: expId,
