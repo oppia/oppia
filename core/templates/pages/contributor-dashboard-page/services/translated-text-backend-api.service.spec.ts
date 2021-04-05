@@ -19,7 +19,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TranslatedTextBackendApiService } from './translated-text-backend-api.service';
-fdescribe('Translated Text Backend Api Service', () => {
+describe('Translated Text Backend Api Service', () => {
   let translateTextBackendApiService: TranslatedTextBackendApiService;
   let httpTestingController: HttpTestingController;
   const expId = '12345';
