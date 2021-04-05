@@ -32,7 +32,7 @@ class JobOptionsTests(test_utils.TestBase):
 
         self.assertIsNone(options.model_getter)
         self.assertEqual(options.project, feconf.OPPIA_PROJECT_ID)
-        self.assertEqual(options.region, feconf.GOOGLE_CLOUD_DATAFLOW_REGION)
+        self.assertEqual(options.region, feconf.GOOGLE_APP_ENGINE_REGION)
 
     def test_overwritten_values(self):
         model_io_stub = test_io.ModelIoStub()
