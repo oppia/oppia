@@ -19,6 +19,7 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
@@ -208,12 +209,41 @@ export class SkillsListComponent {
     let untriagedSkillSummaries = this.untriagedSkillSummaries;
     let allowSkillsFromOtherTopics: boolean = true;
 
-  //   let modalRef: NgbModalRef = this.ngbModal.open(SkillSelectorComponent, {
-  //     backdrop: 'static',
-  //     windowClass: 'skill-select-modal',
-  //     size: 'xl'
-  //   });
-  //  modalRef.componentInstance.skillSummaries
+    let modalRef: NgbModalRef = this.ngbModal.open(MergeSkillModalComponent, {
+      backdrop: 'static',
+      windowClass: 'skill-select-modal',
+      size: 'xl'
+    });
+    modalRef.componentInstance.skillSummaries = skillSummaries;
+    modalRef.componentInstance.skill = skill;
+    modalRef.componentInstance.categorizedSkills = categorizedSkills;
+    modalRef.componentInstance.allowSkillsFromOtherTopics =
+    allowSkillsFromOtherTopics;
+    modalRef.componentInstance.untriagedSkillSummaries =
+    untriagedSkillSummaries;
+
+    modalRef.result.then((result) => {
+      let skill = result.skill;
+      let supersedingSkillId = result.supersedingSkillId;
+      // Transfer questions from the old skill to the new skill.
+      this.topicsAndSkillsDashboardBackendApiService.mergeSkillsAsync(
+        skill.id, supersedingSkillId).then(() => {
+        // Broadcast will update the skills list in the dashboard so
+        // that the merged skills are not shown anymore.
+        setTimeout(() => {
+          this.topicsAndSkillsDashboardBackendApiService.
+            onTopicsAndSkillsDashboardReinitialized.emit();
+          let successToast: string = 'Merged Skills.';
+          this.alertsService.addSuccessMessage(successToast, 1000);
+        }, 100);
+      }, (errorResponse) => {
+        this.alertsService.addWarning(errorResponse.error.error);
+      });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   getSerialNumberForSkill(skillIndex: number): number {

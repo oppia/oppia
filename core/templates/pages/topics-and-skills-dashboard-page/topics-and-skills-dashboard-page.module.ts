@@ -44,7 +44,8 @@ import { UnassignSkillFromTopicsModalComponent } from './modals/unassign-skill-f
     DeleteSkillModalComponent,
     UnassignSkillFromTopicsModalComponent,
     SelectTopicsComponent,
-    AssignSkillToTopicModalComponent
+    AssignSkillToTopicModalComponent,
+    MergeSkillModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -52,7 +53,8 @@ import { UnassignSkillFromTopicsModalComponent } from './modals/unassign-skill-f
     DeleteSkillModalComponent,
     UnassignSkillFromTopicsModalComponent,
     SelectTopicsComponent,
-    AssignSkillToTopicModalComponent
+    AssignSkillToTopicModalComponent,
+    MergeSkillModalComponent
   ],
   providers: [
     {
@@ -76,6 +78,7 @@ class TopicsAndSkillsDashboardPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
+import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
