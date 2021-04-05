@@ -89,7 +89,7 @@ export class StoryNode {
     return this._description;
   }
 
-  getExplorationId(): string | null{
+  getExplorationId(): string | null {
     return this._explorationId;
   }
 
@@ -125,7 +125,7 @@ export class StoryNode {
     this._outlineIsFinalized = false;
   }
 
-  getThumbnailFilename(): string | null{
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
@@ -133,7 +133,7 @@ export class StoryNode {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string | null{
+  getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }
 
