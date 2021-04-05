@@ -592,7 +592,9 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
 class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         test_utils.GenericTestBase):
-    """Provides testing of the deletion part of wipeout service."""
+    """Tests that the wipeout services properly deletes references in any
+    AppFeedbackReportModels with references to users that have been deleted.
+    """
 
     USER_1_EMAIL = 'some@email.com'
     USER_1_USERNAME = 'username1'
@@ -730,6 +732,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 self.REPORT_ID_1))
         self.assertEqual(
             report_model.scrubbed_by, report_mappings[self.REPORT_ID_1])
+        self.assertNotEqual(report_model.scrubbed_by, self.user_1_id)
 
     def test_same_pseudonym_used_for_same_user(self):
         wipeout_service.delete_user(
@@ -750,6 +753,8 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_model_2.scrubbed_by, report_mappings[self.REPORT_ID_2])
         self.assertEqual(
             report_model_3.scrubbed_by, report_mappings[self.REPORT_ID_3])
+        self.assertNotEqual(report_model_2.scrubbed_by, self.user_2_id)
+        self.assertNotEqual(report_model_3.scrubbed_by, self.user_2_id)
 
         self.assertEqual(
             report_model_2.scrubbed_by, report_model_3.scrubbed_by)
@@ -788,7 +793,9 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
 
 class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
         test_utils.GenericTestBase):
-    """Provides testing of the verification part of wipeout service."""
+    """Tests that the wipeout services properly verify the status of deleted
+    users referenced in an AppFeedbackReportModel entity.
+    """
 
     USER_1_EMAIL = 'some@email.com'
     USER_1_USERNAME = 'username1'

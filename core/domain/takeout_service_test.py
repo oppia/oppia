@@ -749,13 +749,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
-        app_feedback_report_models.AppFeedbackReportModel(
-            id='%s.%s.%s' % (
+        report_id = '%s.%s.%s' % (
                 self.PLATFORM_ANDROID,
                 self.REPORT_SUBMITTED_TIMESTAMP.second,
-                'randomInteger123'),
+                'randomInteger123')
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=report_id,
             platform=self.PLATFORM_ANDROID,
-            scrubbed_by=self.USER_ID_1,
+            scrubbed_by=None,
             ticket_id='%s.%s.%s' % (
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
@@ -774,6 +775,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             android_report_info_schema_version=(
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
+        report_entity = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                )
+        report_entity.scrubbed_by = self.USER_ID_1
+        report_entity.update_timestamps()
+        report_entity.put()
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
