@@ -3069,15 +3069,14 @@ class State(python_utils.OBJECT):
 
         Args:
             content_id: str. The content id of the completed translation in the
-                    given language.
+                given language.
             language_code: str. The abbreviated code of the language.
-        
+
         Returns:
             tuple(str, list(str)) A tuple containing two elements. The
             first element is the content id string and the second element
             is the string containing the translated html.
         """
-        
         translation = (
             self.written_translations.
             translations_mapping[content_id][language_code].translation)
