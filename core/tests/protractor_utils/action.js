@@ -69,14 +69,9 @@ var select2 = async function(selectorName, selectorElement, optionToSelect) {
 };
 
 var sendKeys = async function(
-    inputName, inputElement, keys, isRte = false, clickInputElement = true) {
+    inputName, inputElement, keys, clickInputElement = true) {
   if (clickInputElement) {
     await click(inputName, inputElement);
-  }
-  if (isRte) {
-    var rteToolbar = element(by.id('cke_editor1'));
-    await waitFor.visibilityOf(
-      rteToolbar, 'RTE toolbar taking too long to show up.');
   }
   await inputElement.sendKeys(keys);
 };

@@ -313,7 +313,7 @@ var TopicsAndSkillsDashboardPage = function() {
       editor, 'Explanation Editor takes too long to appear');
     var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
     await action.sendKeys(
-      'Skill Review Input', skillReviewMaterialInput, reviewMaterial, true);
+      'Skill Review Input', skillReviewMaterialInput, reviewMaterial);
 
     await action.click('Create Skill button', confirmSkillCreationButton);
 
