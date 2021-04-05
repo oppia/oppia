@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import importlib
 import inspect
+import logging
 import os
 import re
 
@@ -225,6 +226,39 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_EVENTS),
             0)
+
+
+class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests related to the stats events handler."""
+
+    def test_stats_events_with_undefined_state_name_gets_logged(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        with logging_swap:
+            event_services.StatsEventsHandler.record(
+                'eid1', 1, {
+                    'num_starts': 1,
+                    'num_actual_starts': 0,
+                    'num_completions': 0,
+                    'state_stats_mapping': {
+                        'undefined': {}
+                    }
+                })
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(len(observed_log_messages), 1)
+        self.assertEqual(
+            observed_log_messages,
+            [
+                'Aggregated stats contains an undefined state name: [u\''
+                'undefined\']'
+            ]
+        )
 
 
 class EventHandlerNameTests(test_utils.GenericTestBase):

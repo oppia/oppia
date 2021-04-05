@@ -5302,3 +5302,50 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 ], 6, 5
             )
         )
+
+    def test_when_few_state_stats_models_are_missing_for_old_exps(self):
+        exp_id = 'ID1'
+        owner_id = 'owner_id'
+        self.save_new_valid_exploration(
+            exp_id, owner_id, title='title', category='Category 1',
+            end_state_name='END', correctness_feedback_enabled=True)
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 3'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 4'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 5'
+            })], 'Changed title.')
+        exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 2)
+        exp_stats.state_stats_mapping = {}
+        stats_services.save_stats_model(exp_stats)
+
+        self.assertItemsEqual(
+            exp_services.regenerate_missing_stats_for_exploration('ID1'),
+            (
+                [],
+                [
+                    'StateStats(exp_id=u\'ID1\', exp_version=2, '
+                    'state_name=u\'Introduction\')',
+                    'StateStats(exp_id=u\'ID1\', exp_version=2, '
+                    'state_name=u\'END\')',
+                ], 8, 5
+            )
+        )
