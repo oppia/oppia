@@ -324,13 +324,51 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             self.expected_output, sort=True, literal_eval=False)
 
-    def test_model_with_submitted_on_less_than_earliest_valid_datetime_fails(
+    def test_model_with_submitted_on_equal_to_buffered_datetime_successful(
             self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportModel.create(
                 platform=self.PLATFORM_ANDROID,
+                # There is a 2-day buffer for the earliest valid date, so we
+                # want to add more than 2 days before the earliest date.
                 submitted_on=(
                     EARLIEST_VALID_DATETIME - datetime.timedelta(days=2)),
+                report_type=self.REPORT_TYPE_SUGGESTION,
+                category=self.CATEGORY_OTHER,
+                platform_version=self.PLATFORM_VERSION,
+                android_device_country_locale_code=(
+                    self.COUNTRY_LOCALE_CODE_INDIA),
+                android_device_model=self.ANDROID_DEVICE_MODEL,
+                android_sdk_version=self.ANDROID_SDK_VERSION,
+                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+                entry_point_topic_id=None, entry_point_story_id=None,
+                entry_point_exploration_id=None, entry_point_subtopic_id=None,
+                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+                android_report_info={},
+                web_report_info=None))
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                entity_id))
+        self.expected_output.append(
+            (
+                u'[u\'failed validation check for submitted_on datetime check '
+                'of AppFeedbackReportModel\', [u\'Entity id %s: The '
+                'submitted_on field has a value %s which is less than the '
+                'earliest possible submission date\']]') % (
+                    model_entity.id, model_entity.submitted_on))
+
+        self.run_job_and_check_output(
+            self.expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_submitted_on_less_buffered_datetime_fails(self):
+        entity_id = (
+            app_feedback_report_models.AppFeedbackReportModel.create(
+                platform=self.PLATFORM_ANDROID,
+                # There is a 2-day buffer for the earliest valid date, so we
+                # want to add more than 2 days before the earliest date.
+                submitted_on=(
+                    EARLIEST_VALID_DATETIME - datetime.timedelta(days=4)),
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.PLATFORM_VERSION,

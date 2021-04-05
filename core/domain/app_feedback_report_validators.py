@@ -61,8 +61,9 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _validate_schema_versions(cls, item):
-        """Validate that schema versions of the reports are not greater than the
-        current report schema or less than the minimum supported version.
+        """Validates that the schema version of the report is not greater
+        than the current report schema or less than the minimum supported
+        version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
@@ -96,9 +97,9 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _validate_submitted_on_datetime(cls, item):
-        """Validate that submitted_on of model is less than current time and
-        greater than the earliest possible date of submissions (no earlier than
-        March 2021).
+        """Validates that the submitted_on date of the model is less than the
+        current time and greater than the earliest possible date of submissions
+        (no earlier than March 2021).
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
@@ -121,14 +122,19 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _validate_expired_reports_are_scrubbed(cls, item):
-        """Validate that if the submitted_on of model is less than 90 days
-        before the current date, then the scrubbed_by field is non-None.
+        """Validates that if the submitted_on of model is less than 92 days
+        before the current date, then the scrubbed_by field is non-None. This
+        gives a 2-day buffer time the maximum number of days a report can be
+        stored, in case there is a delay in the cron runtime.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
+        # The earliest creation date of reports that can be kept in storage with
+        # with a 2-day buffer time for the cron to run, in case the scrubbing is
+        # delayed.
         latest_datetime = datetime.datetime.utcnow() - (
-            datetime.timedelta(days=90))
+            feconf.APP_FEEDBACK_REPORT_MAX_DAYS + datetime.timedelta(days=2))
         if item.created_on < latest_datetime and not item.scrubbed_by:
             model_class = app_feedback_report_models.AppFeedbackReportModel
             cls._add_error(
@@ -150,7 +156,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _validate_external_ticket_id(
             cls, item, field_name_to_external_model_references):
-        """Validate that ticket_id is a valid AppFeedbackReportTicketModel.
+        """Validates that the ticket_id is a valid AppFeedbackReportTicketModel.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to
@@ -217,9 +223,9 @@ class AppFeedbackReportTicketModelValidator(
 
     @classmethod
     def _validate_newest_report_timestamp(cls, item):
-        """Validate that newest_report_timestamp is less than current time and
-        greater than the earliest possible date of submissions (no earlier than
-        March 2021).
+        """Validates that the newest_report_timestamp is less than current time
+        and greater than the earliest possible date of submissions (no earlier
+        than March 2021).
 
         Args:
             item: datastore_services.Model. AppFeedbackReportTicketModel to
@@ -248,7 +254,7 @@ class AppFeedbackReportTicketModelValidator(
     @classmethod
     def _validate_external_report_ids(
             cls, item, field_name_to_external_model_references):
-        """Validate that report_ids are valid AppFeedbackReportModels.
+        """Validates that the report_ids are valid AppFeedbackReportModels.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportTicketModel to
@@ -308,8 +314,8 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _validate_schema_version(cls, item):
-        """Validate that the schema version of the stats is not greater than the
-        current stats schema or lower than the minimum supported version.
+        """Validates that the schema version of the stats is not greater than
+        the current stats schema or lower than the minimum supported version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
@@ -330,9 +336,9 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _validate_stats_tracking_date(cls, item):
-        """Validate that stats_tracking_date of model is less than current time
-        and greater than the earliest possible date of submissions (no earlier
-        than March 2021).
+        """Validates that the stats_tracking_date of the model is less than
+        the current time and greater than the earliest possible date of
+        submissions (no earlier than March 2021).
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
@@ -361,7 +367,7 @@ class AppFeedbackReportStatsModelValidator(
     @classmethod
     def _validate_external_ticket_id(
             cls, item, field_name_to_external_model_references):
-        """Validate that the ticket_id is a valid AppFeedbackReportTicketModel.
+        """Validates that the ticket_id is a valid AppFeedbackReportTicketModel.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to

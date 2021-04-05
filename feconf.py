@@ -213,6 +213,10 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
+# The maximum number of days a feedback report can be saved in storage before it
+# must be scrubbed.
+APP_FEEDBACK_REPORT_MAX_DAYS = datetime.timedelta(days=90)
+
 # The minimum version of the Android feedback report info blob schema.
 MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
 
