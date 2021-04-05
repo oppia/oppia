@@ -104,6 +104,10 @@ angular.module('oppia').controller('TranslationModalController', [
         if ($scope.translationsList.length > 0) {
           $scope.noTranslationComplete = false;
         }
+        if($scope.translationsList.length > 10) {
+          $scope.translationsList.splice(10);
+          $scope.contentList.splice(10);
+        }
         $scope.loadingTranslatedText = false;
         $rootScope.$applyAsync();
       }
