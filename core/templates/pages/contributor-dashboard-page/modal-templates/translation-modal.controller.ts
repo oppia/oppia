@@ -99,8 +99,8 @@ angular.module('oppia').controller('TranslationModalController', [
       () => {
         var TranslatedTextAndContent = (
           TranslatedTextBackendApiService.getTranslationsAndContentLists());
-        $scope.translationsList = TranslatedTextAndContent.translationsList;
-        $scope.contentList = TranslatedTextAndContent.contentList;
+        $scope.translationsList = TranslatedTextAndContent.translations;
+        $scope.contentList = TranslatedTextAndContent.content;
         if ($scope.translationsList.length > 0) {
           $scope.noTranslationComplete = false;
         }

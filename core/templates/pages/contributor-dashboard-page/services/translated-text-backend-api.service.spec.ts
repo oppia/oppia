@@ -19,14 +19,14 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TranslatedTextBackendApiService } from './translated-text-backend-api.service';
-describe('Translated Text Backend Api Service', () => {
+fdescribe('Translated Text Backend Api Service', () => {
   let translateTextBackendApiService: TranslatedTextBackendApiService;
   let httpTestingController: HttpTestingController;
   const expId = '12345';
   const languageCode = 'hi';
   const sampleDataResults = {
-    translationsList: ['<p>Translation 1</p>', '<p>Translation 2</p>'],
-    contentList: ['<p>Content 1</p>', '<p>Content 2</p>']
+    translations: ['<p>Translation 1</p>', '<p>Translation 2</p>'],
+    content: ['<p>Content 1</p>', '<p>Content 2</p>']
   };
   beforeEach(()=>{
     TestBed.configureTestingModule({

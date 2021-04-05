@@ -21,13 +21,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface ITranslationsAndContentDict {
-  'contentList': string[],
-  'translationsList': string[]
+  'content': string[],
+  'translations': string[]
 }
 
 interface ITranslationsAndContentResponse {
   'content_list': string[],
-  'translations_list': string[]
+  'translations': string[]
 }
 
 @Injectable({
@@ -51,11 +51,11 @@ export class TranslatedTextBackendApiService {
         },
         observe: 'response'
       }).toPromise().then((response) => {
-      this.recievedTranslationsList = response.body.translations_list;
-      this.recievedContentList = response.body.content_list;
+      this.recievedTranslationsList = response.body.translations;
+      this.recievedContentList = response.body.content;
       return {
-        translationsList: this.recievedTranslationsList,
-        contentList: this.recievedContentList
+        translations: this.recievedTranslationsList,
+        content: this.recievedContentList
       };
     }, (errorResponse) => {
       throw new Error(errorResponse.error.error);
@@ -63,8 +63,8 @@ export class TranslatedTextBackendApiService {
   }
   getTranslationsAndContentLists(): ITranslationsAndContentDict {
     return {
-      translationsList: this.recievedTranslationsList,
-      contentList: this.recievedContentList
+      translations: this.recievedTranslationsList,
+      content: this.recievedContentList
     };
   }
 }

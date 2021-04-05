@@ -285,8 +285,8 @@ class CompletedTranslationsHandler(base.BaseHandler):
         translated_text_and_content = exp.get_completed_translations(
             language_code)
         self.values = {
-            'content_list': translated_text_and_content.content,
-            'translations_list': translated_text_and_content.translations
+            'content': translated_text_and_content.content,
+            'translations': translated_text_and_content.translations
         }
 
         self.render_json(self.values)
