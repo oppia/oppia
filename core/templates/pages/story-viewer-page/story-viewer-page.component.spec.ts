@@ -281,23 +281,55 @@ describe('Story Viewer Page component', () => {
       expect(component.showChapters()).toBeFalse();
     });
 
-  // it('should show story\'s chapters when story has chapters',
-  //   () => {
-  //     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-  //       'topic');
-  //     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-  //       .and.returnValue('math');
-  //     spyOn(
-  //       urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
-  //       'story');
-  //     spyOn(
-  //       storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
-  //       Promise.resolve(storyPlaythrough));
+  it('should show story\'s chapters when story has chapters',
+    () => {
+      component.storyPlaythroughObject = {
+        id: 'id',
+        nodes: [],
+        title: 'title',
+        description: 'description',
+        topicName: 'topicName',
+        metaTagContent: 'meta tag content',
+        getInitialNode() {
+          return null;
+        },
+        getStoryNodeCount(): number {
+          return null;
+        },
+        getStoryNodes() {
+          return null;
+        },
+        hasFinishedStory() {
+          return null;
+        },
+        getNextPendingNodeId() {
+          return null;
+        },
+        hasStartedStory() {
+          return null;
+        },
+        getStoryId() {
+          return null;
+        },
+        getMetaTagContent() {
+          return null;
+        }
+      };
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('math');
+      spyOn(
+        urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        'story');
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(storyPlaythrough));
 
-  //     component.ngOnInit();
+      component.ngOnInit();
 
-  //     expect(component.showChapters()).toBeTrue();
-  //   });
+      expect(component.showChapters()).toBeTrue();
+    });
 
   it('should sign in correctly', fakeAsync(() => {
     spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/home');
