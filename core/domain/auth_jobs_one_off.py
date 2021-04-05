@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import logging
 
 from core import jobs
 from core.domain import auth_domain
@@ -110,10 +111,19 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # The item must be an instance of auth_models.FirebaseSeedModel.
         elif item.id == auth_models.ONLY_FIREBASE_SEED_MODEL_ID:
-            for user in firebase_auth.list_users().iterate_all():
-                auth_id, assoc_info = (
-                    user.uid, (cls.FIREBASE_ACCOUNT_KEY, (None, user.disabled)))
-                yield (auth_id, assoc_info)
+            page = firebase_auth.list_users(max_results=1000)
+            user_batch = []
+            while page is not None:
+                user_batch[:] = page.users # NOTE: Avoids allocating a new list.
+                if not user_batch:
+                    break
+                for user in user_batch:
+                    auth_id, assoc_info = (
+                        user.uid,
+                        (cls.FIREBASE_ACCOUNT_KEY, (None, user.disabled)))
+                    yield (auth_id, assoc_info)
+                logging.info('Page processed: %d Firebase accounts')
+                page = page.get_next_page()
 
     @staticmethod
     def reduce(key, values):
