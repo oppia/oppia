@@ -68,43 +68,31 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
         if item.platform == app_feedback_report_models.PLATFORM_CHOICE_ANDROID:
-            if item.android_report_info_schema_version > (
-                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
+            if not (
+                feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION <=
+                item.android_report_info_schema_version <=
+                feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: android report schema version %s is greater '
-                    'than current version %s' % (
+                    'Entity id %s: android report schema version %s is outside '
+                    'the range of supported versions [%s, %s]' % (
                         item.id, item.android_report_info_schema_version,
+                        feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION,
                         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION))
-            elif item.android_report_info_schema_version < (
-                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION):
-                cls._add_error(
-                    'report schema %s' % (
-                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: android report schema version %s is less '
-                    'than the minimum version %s' % (
-                        item.id, item.android_report_info_schema_version,
-                        feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION))
         else:
-            if item.web_report_info_schema_version > (
-                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
+            if not (
+                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION <=
+                item.web_report_info_schema_version <= 
+                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: web report schema version %s is greater than'
-                    ' current version %s' % (
+                    'Entity id %s: web report schema version %s is outside the '
+                    'range of supported versions [%s, %s]' % (
                         item.id, item.web_report_info_schema_version,
-                        feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
-            elif item.web_report_info_schema_version < (
-                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION):
-                cls._add_error(
-                    'report schema %s' % (
-                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: web report schema version %s is less '
-                    'than the minimum version %s' % (
-                        item.id, item.web_report_info_schema_version,
-                        feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION))
+                        feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
+                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
     def _validate_submitted_on_datetime(cls, item):
@@ -327,24 +315,18 @@ class AppFeedbackReportStatsModelValidator(
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
-        if item.daily_param_stats_schema_version > (
-                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
+        if not (
+            feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION <=
+            item.daily_param_stats_schema_version <=
+            feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                'Entity id %s: daily stats schema version %s is greater than '
-                'current version %s' % (
+                'Entity id %s: daily stats schema version %s is outside the '
+                'range of supported versions [%s, %s]' % (
                     item.id, item.daily_param_stats_schema_version,
+                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
-        elif item.daily_param_stats_schema_version < (
-                feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
-            cls._add_error(
-                'report stats schema %s' % (
-                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                'Entity id %s: daily stats schema version %s is less than the '
-                'minimum version %s' % (
-                    item.id, item.daily_param_stats_schema_version,
-                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
 
     @classmethod
     def _validate_stats_tracking_date(cls, item):

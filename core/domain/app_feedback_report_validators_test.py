@@ -186,10 +186,11 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for report schema version check '
                 'of AppFeedbackReportModel\', '
-                '[u\'Entity id %s: android report schema version %s is greater '
-                'than current version %s\']]') % (
+                '[u\'Entity id %s: android report schema version %s is outside '
+                'the range of supported versions [%s, %s]\']]') % (
                     model_entity.id,
                     model_entity.android_report_info_schema_version,
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION,
                     feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
@@ -206,11 +207,12 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for report schema version check '
                 'of AppFeedbackReportModel\', '
-                '[u\'Entity id %s: android report schema version %s is less '
-                'than the minimum version %s\']]') % (
+                '[u\'Entity id %s: android report schema version %s is outside '
+                'the range of supported versions [%s, %s]\']]') % (
                     model_entity.id,
                     model_entity.android_report_info_schema_version,
-                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION)]
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION,
+                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
             output, sort=False, literal_eval=False)
@@ -243,9 +245,10 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         self.expected_output.append((
             u'[u\'failed validation check for report schema version check of '
             'AppFeedbackReportModel\', '
-            '[u\'Entity id %s: web report schema version %s is greater than'
-            ' current version %s\']]') % (
+            '[u\'Entity id %s: web report schema version %s is outside the '
+            'range of supported versions [%s, %s]\']]') % (
                 web_entity.id, web_entity.web_report_info_schema_version,
+                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
                 feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
 
         self.run_job_and_check_output(
@@ -278,10 +281,11 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         self.expected_output.append((
             u'[u\'failed validation check for report schema version check of '
             'AppFeedbackReportModel\', '
-            '[u\'Entity id %s: web report schema version %s is less than'
-            ' the minimum version %s\']]') % (
+            '[u\'Entity id %s: web report schema version %s is outside the '
+            'range of supported versions [%s, %s]\']]') % (
                 web_entity.id, web_entity.web_report_info_schema_version,
-                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION))
+                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
+                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
 
         self.run_job_and_check_output(
             self.expected_output, sort=True, literal_eval=False)
@@ -624,10 +628,11 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for report stats schema version '
                 'check of AppFeedbackReportStatsModel\', '
-                '[u\'Entity id %s: daily stats schema version %s is greater '
-                'than current version %s\']]') % (
+                '[u\'Entity id %s: daily stats schema version %s is outside the'
+                ' range of supported versions [%s, %s]\']]') % (
                     model_entity.id,
                     model_entity.daily_param_stats_schema_version,
+                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
@@ -645,10 +650,11 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for report stats schema version '
                 'check of AppFeedbackReportStatsModel\', '
-                '[u\'Entity id %s: daily stats schema version %s is less '
-                'than the minimum version %s\']]') % (
+                '[u\'Entity id %s: daily stats schema version %s is outside the'
+                ' range of supported versions [%s, %s]\']]') % (
                     model_entity.id,
                     model_entity.daily_param_stats_schema_version,
+                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
 
         self.run_job_and_check_output(
