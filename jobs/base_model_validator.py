@@ -139,6 +139,40 @@ class ValidateModelTimestamps(beam.DoFn):
             yield errors.ModelMutatedDuringJobError(model)
 
 
+class ValidateCommitCmdsSchema(beam.DoFn):
+    """DoFn to validate schema of commit commands in commit_cmds dict.
+    """
+
+    def process(cls, input_model, get_change_domain_class):
+        """Validates schema of commit commands in commit_cmds dict.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+            
+        Yields:
+            ModelMutatedDuringJobError. [subject to change]
+            InconsistentTimestampsError. [subject to change]            
+        """
+        model = jobs_utils.clone_model(input_model)
+        change_domain_object = get_change_domain_class(model)
+        if change_domain_object is None:
+            # This is for cases where id of the entity is invalid
+            # and no commit command domain object is found for the entity.
+            # For example, if a CollectionCommitLogEntryModel does
+            # not have id starting with collection/rights, there is
+            # no commit command domain object defined for this model.
+            yield errors.MissingCommitCommandDomainObjError(model)
+            return
+        for commit_cmd_dict in model.commit_cmds:
+            if not commit_cmd_dict:
+                continue
+            try:
+                change_domain_object(commit_cmd_dict)
+            except Exception as e:
+                cmd_name = commit_cmd_dict.get('cmd')
+                yield errors.CommitCommandValidationFailedError(cmd_name, model, commit_cmd_dict, e)
+
+
 class BaseModelValidator(beam.PTransform):
     """Composite PTransform which returns a pipeline of validation errors."""
 
@@ -181,4 +215,59 @@ class BaseModelValidator(beam.PTransform):
         )
 
         error_pcolls = (deletion_errors, timestamp_errors, id_errors)
+        return error_pcolls | beam.Flatten()
+
+class BaseSummaryModelValidator(BaseModelValidator):
+    pass
+
+
+class BaseSnapshotContentModelValidator(BaseModelValidator):
+    pass
+
+
+class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
+
+    @classmethod
+    def get_change_domain_class(cls, unused_item):
+        """Returns a Change domain class.
+
+        This should be implemented by subclasses.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            change_domain.BaseChange. A domain object class for the
+            changes made by commit commands of the model.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
+        """
+        raise NotImplementedError(
+            'The get_change_domain_class() method is missing from the derived '
+            'class. It should be implemented in the derived class.')
+    
+    def expand(self, input_models : Dict[str]) -> None:
+        """Transforms a PCollection of models into validation errors.
+
+        Args:
+            input_models: beam.PCollection. A collection of models.
+
+        Returns:
+            beam.PCollection. A collection of errors represented as
+            key-value pairs.
+        """
+        existing_models, deleted_models = (
+            input_models
+            | 'Split by deleted' >> beam.Partition(
+                lambda model, unused_num_partitions: int(model.deleted), 2)
+        )
+        commit_cmmds_erros = (
+            existing_models
+            | 'Validate commit command schemas' >> beam.ParDo(
+                ValidateCommitCmdsSchema(), self.get_change_domain_class())  
+            )
+        )
+
+        error_pcolls = (commit_cmmds_erros)
         return error_pcolls | beam.Flatten()
