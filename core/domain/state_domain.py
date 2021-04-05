@@ -3059,24 +3059,25 @@ class State(python_utils.OBJECT):
             list(str). A list of strings of content ids that have been
             translated in the given language.
         """
-
         return (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
 
     def get_translated_content_with_content_id(self, content_id, language_code):
-        """returns the translation corresponding to the given content id
-        in the given language.
+        """returns the translation corresponding to the given content_id
+        in the language.
 
         Args:
             content_id: str. The content id of the completed translation in the
-            given language.
+                    given language.
             language_code: str. The abbreviated code of the language.
+        
         Returns:
             tuple(str, list(str)) A tuple containing two elements. The
             first element is the content id string and the second element
             is the string containing the translated html.
         """
+        
         translation = (
             self.written_translations.
             translations_mapping[content_id][language_code].translation)
