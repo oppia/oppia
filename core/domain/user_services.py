@@ -2156,13 +2156,18 @@ def log_username_change(committer_id, old_username, new_username):
         new_username=new_username).put()
 
 
-def create_login_url(target_url):
+def create_login_url(return_url):
     """Creates a login url.
 
     Args:
-        target_url: str. The URL to redirect to after login.
+        return_url: str. The URL to redirect to after login.
 
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    return current_user_services.create_login_url(target_url)
+    # TODO(#11462): Delete this function. Pre-#11462, we needed this because we
+    # didn't control the page or URL responsible for user authentication.
+    # This is no longer the case. We've implemented our own user authentication
+    # flow on top of the Firebase SDK in "core/templates/pages/login-page", and
+    # this function will always redirect to its static location ("/login").
+    return '/login?%s' % python_utils.url_encode({'return_url': return_url})
