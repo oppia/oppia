@@ -125,9 +125,11 @@
           </div>
           <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
             <span class="oppia-collapsed-dashboard-language-container-label">Translate to</span>
-            <translation-language-selector class="oppia-collapsed-language-selector" [active-language-code]="$ctrl.languageCode"
-                                           (set-active-language-code)="$ctrl.onChangeLanguage($event)">
-            </translation-language-selector>
+            <button focus-on="selectLangDropDown" class="oppia-autofocus border-0 p-0">
+              <translation-language-selector class="oppia-collapsed-language-selector" [active-language-code]="$ctrl.languageCode"
+                                             (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+              </translation-language-selector>
+            </button>
           </div>
         </div>
       </div>
@@ -147,6 +149,9 @@
   </div>
 </div>
 <style>
+  button.oppia-autofocus:focus {
+    outline: 0;
+  }
   .oppia-dashboard-language-container-label {
     color: #4a4a4a;
     font-size: 18px;
@@ -212,7 +217,7 @@
     font-size: 120px;
   }
   .oppia-opportunities-tabs {
-    background-color: #ffffff;
+    background-color: #fff;
     padding-top: 5px;
     position: relative;
     z-index: 5;
