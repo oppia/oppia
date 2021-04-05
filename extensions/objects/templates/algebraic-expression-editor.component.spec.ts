@@ -99,7 +99,10 @@ describe('AlgebraicExpressionEditor', () => {
   });
 
   it('should initialize component.value with an empty string', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
     component.value = null;
+    MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
   });
