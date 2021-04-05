@@ -25,8 +25,8 @@ describe('Translated Text Backend Api Service', () => {
   const expId = '12345';
   const languageCode = 'hi';
   const sampleDataResults = {
-    translations_list: ['<p>Translation 1</p>', '<p>Translation 2</p>'],
-    content_list: ['<p>Content 1</p>', '<p>Content 2</p>']
+    translationsList: ['<p>Translation 1</p>', '<p>Translation 2</p>'],
+    contentList: ['<p>Content 1</p>', '<p>Content 2</p>']
   };
   beforeEach(()=>{
     TestBed.configureTestingModule({
@@ -79,10 +79,9 @@ describe('Translated Text Backend Api Service', () => {
         statusText: 'Error loading Translations'
       });
       flushMicrotasks();
-      expect(successHandler).not.toHaveBeenCalledWith();
+      expect(successHandler).not.toHaveBeenCalled();
 
-      expect(failHandler).toHaveBeenCalledWith({
-        error: 'Error loading the data'});
+      expect(failHandler).toHaveBeenCalled();
     })
   );
 });
