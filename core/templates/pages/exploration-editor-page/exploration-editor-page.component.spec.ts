@@ -101,6 +101,7 @@ describe('Exploration editor page component', function() {
 
   var explorationId = 'exp1';
   var explorationData = {
+    exploration_is_linked_to_story: true,
     states: {
       Introduction: {
         param_changes: [],
@@ -509,6 +510,14 @@ describe('Exploration editor page component', function() {
       autosaveIsInProgress.emit(true);
       $scope.$apply();
       ctrl.autosaveIsInProgress = true;
+    });
+
+    it('should link exploration to story when initing exploration page', () => {
+      spyOn(cs, 'setExplorationIsLinkedToStory').and.callThrough();
+      $scope.$apply();
+
+      expect(cs.setExplorationIsLinkedToStory)
+        .toHaveBeenCalled();
     });
 
     it('should have ctrl properties correspond to backend data', () => {

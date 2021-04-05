@@ -93,6 +93,12 @@ describe('Context service', () => {
       expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(false);
       expect(ecs.isInQuestionPlayerMode()).toEqual(false);
     });
+
+    it('should check if exploration is linked to a story', () => {
+      expect(ecs.isExplorationLinkedToStory()).toBe(false);
+      ecs.setExplorationIsLinkedToStory();
+      expect(ecs.isExplorationLinkedToStory()).toBe(true);
+    });
   });
 
   describe('behavior in the exploration learner embed view', () => {

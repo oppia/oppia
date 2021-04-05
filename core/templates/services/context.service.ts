@@ -34,6 +34,7 @@ export class ContextService {
 
   pageContext = null;
   explorationId = null;
+  explorationIsLinkedToStory = false;
   questionPlayerIsManuallySet = false;
   questionId = null;
   editorContext = null;
@@ -128,6 +129,14 @@ export class ContextService {
 
   getQuestionPlayerIsManuallySet(): boolean {
     return this.questionPlayerIsManuallySet;
+  }
+
+  setExplorationIsLinkedToStory(): void {
+    this.explorationIsLinkedToStory = true;
+  }
+
+  isExplorationLinkedToStory(): boolean {
+    return this.explorationIsLinkedToStory;
   }
 
   isInExplorationContext(): boolean {
