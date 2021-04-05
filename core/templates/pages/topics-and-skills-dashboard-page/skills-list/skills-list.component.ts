@@ -19,12 +19,15 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
+import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
 import { UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 
@@ -159,11 +162,58 @@ export class SkillsListComponent {
   }
 
   assignSkillToTopic(skill): void {
-    // Assign skill to topic here
+    let skillId: string = skill.id;
+    let modalRef: NgbModalRef = this.ngbModal
+      .open(AssignSkillToTopicModalComponent, {
+        backdrop: 'static',
+        windowClass: 'assign-skill-to-topic-modal'
+      });
+    modalRef.componentInstance.topicSummaries = this.editableTopicSummaries;
+    modalRef.result.then((topicIds: string[]) => {
+      let changeList = [{
+        cmd: 'add_uncategorized_skill_id',
+        new_uncategorized_skill_id: skillId
+      }];
+      let topicSummaries = this.editableTopicSummaries;
+      for (let i = 0; i < topicIds.length; i++) {
+        for (let j = 0; j < topicSummaries.length; j++) {
+          if (topicSummaries[j].id === topicIds[i]) {
+            this.editableTopicBackendApiService.updateTopic(
+              topicIds[i], topicSummaries[j].version,
+              'Added skill with id ' + skillId + ' to topic.',
+              changeList
+            ).then(() => {
+              setTimeout(() => {
+                this.topicsAndSkillsDashboardBackendApiService.
+                  onTopicsAndSkillsDashboardReinitialized.emit(true);
+              }, 100);
+            }).then(() => {
+              let successToast = (
+                'The skill has been assigned to the topic.');
+              this.alertsService.addSuccessMessage(successToast, 1000);
+            });
+          }
+        }
+      }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   mergeSkill(skill): void {
-    // Merge skill here
+    let skillSummaries = this.mergeableSkillSummaries;
+    let categorizedSkills = this.skillsCategorizedByTopics;
+    let untriagedSkillSummaries = this.untriagedSkillSummaries;
+    let allowSkillsFromOtherTopics: boolean = true;
+
+  //   let modalRef: NgbModalRef = this.ngbModal.open(SkillSelectorComponent, {
+  //     backdrop: 'static',
+  //     windowClass: 'skill-select-modal',
+  //     size: 'xl'
+  //   });
+  //  modalRef.componentInstance.skillSummaries
   }
 
   getSerialNumberForSkill(skillIndex: number): number {
@@ -382,27 +432,27 @@ angular.module('oppia').directive('oppiaSkillsList',
 //                 new_uncategorized_skill_id: skillId
 //               }];
 //               var topicSummaries = $scope.getEditableTopicSummaries();
-//               for (var i = 0; i < topicIds.length; i++) {
-//                 for (var j = 0; j < topicSummaries.length; j++) {
-//                   if (topicSummaries[j].id === topicIds[i]) {
-//                     EditableTopicBackendApiService.updateTopic(
-//                       topicIds[i], topicSummaries[j].version,
-//                       'Added skill with id ' + skillId + ' to topic.',
-//                       changeList
-//                     ).then(function() {
-//                       $timeout(function() {
-//                         TopicsAndSkillsDashboardBackendApiService.
-//                           onTopicsAndSkillsDashboardReinitialized.emit(true);
-//                       }, 100);
-//                     }).then(function() {
-//                       var successToast = (
-//                         'The skill has been assigned to the topic.');
-//                       AlertsService.addSuccessMessage(successToast, 1000);
-//                       $rootScope.$applyAsync();
-//                     });
-//                   }
-//                 }
-//               }
+// for (var i = 0; i < topicIds.length; i++) {
+//   for (var j = 0; j < topicSummaries.length; j++) {
+//     if (topicSummaries[j].id === topicIds[i]) {
+//       EditableTopicBackendApiService.updateTopic(
+//         topicIds[i], topicSummaries[j].version,
+//         'Added skill with id ' + skillId + ' to topic.',
+//         changeList
+//       ).then(function() {
+//         $timeout(function() {
+//           TopicsAndSkillsDashboardBackendApiService.
+//             onTopicsAndSkillsDashboardReinitialized.emit(true);
+//         }, 100);
+//       }).then(function() {
+//         var successToast = (
+//           'The skill has been assigned to the topic.');
+//         AlertsService.addSuccessMessage(successToast, 1000);
+//         $rootScope.$applyAsync();
+//       });
+//     }
+//   }
+// }
 //             }, function() {
 //               // Note to developers:
 //               // This callback is triggered when the Cancel button is clicked.
