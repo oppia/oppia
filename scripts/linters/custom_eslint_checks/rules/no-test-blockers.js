@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint to ensure that follow no-test-blockers
- * for writing test.
+ * @fileoverview Lint check to disallow usage of ddescribe
+ * fdescribe, xdescribe, fit, xit.
  */
 
 'use strict';
@@ -24,8 +24,8 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check to follow no test blockers for test'),
-      category: 'no test blockers',
+        'Lint check to disallow usage of ddescribe, fdescribe, xdescribe, fit, xit'),
+      category: 'Best Practices',
       recommended: true,
     },
     fixable: null,

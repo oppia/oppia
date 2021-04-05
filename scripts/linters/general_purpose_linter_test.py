@@ -56,9 +56,6 @@ INVALID_EXPLORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_explore.js')
 INVALID_PAUSE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_pause.js')
 INVALID_WAIT_FOR_ANGULAR_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_wait_for_angular.js')
-INVALID_FDESCRIBE_DDESCRIBE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_ddescribe_fdescribe.ts')
-INVALID_IIT_FIT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iit_fit.ts')
 INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
 INVALID_INNER_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_innerhtml.ts')
