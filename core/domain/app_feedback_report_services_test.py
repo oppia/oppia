@@ -49,14 +49,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION = 'suggestion'
-    REPORT_TYPE_ISSUE = 'issue'
-    CATEGORY_ISSUE_LANGUAGE_AUDIO = 'issue_language_audio'
     CATEGORY_OTHER = 'other'
-    ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
-    WEB_PLATFORM_VERSION = '3.0.8'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     DEVICE_COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
-    ANDROID_SDK_VERSION = 28
+    ANDROID_SDK_VERSION = 22
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
@@ -74,11 +71,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'automatically_update_topics': False,
         'is_admin': False
     }
-    WEB_REPORT_ISSUE_INFO = {
-        'user_feedback_selected_items': ['audio_too_loud', 'other'],
-        'user_feedback_other_text_input': 'French language'
-    }
-    WEB_REPORT_SUGGESTION_INFO = {
+    WEB_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin'
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
@@ -90,31 +83,24 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
         model_class = app_feedback_report_models.AppFeedbackReportModel
-        self.web_suggestion_report_id = model_class.create(
+        self.web_report_id = model_class.create(
             self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-            self.WEB_PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-            None, None, self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None,
-            None, self.TEXT_LANGUAGE_CODE_ENGLISH,
-            self.AUDIO_LANGUAGE_CODE_ENGLISH, None,
-            self.WEB_REPORT_SUGGESTION_INFO)
-        self.web_issue_report_id = model_class.create(
-            self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP,
-            self.REPORT_TYPE_ISSUE, self.CATEGORY_ISSUE_LANGUAGE_AUDIO,
-            self.WEB_PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-            None, None, self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None,
-            None, self.TEXT_LANGUAGE_CODE_ENGLISH,
-            self.AUDIO_LANGUAGE_CODE_ENGLISH, None, self.WEB_REPORT_ISSUE_INFO)
+            self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
+            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            None, self.WEB_REPORT_INFO)
         self.android_report_id = model_class.create(
             self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-            self.ANDROID_PLATFORM_VERSION,
-            self.DEVICE_COUNTRY_LOCALE_CODE_INDIA, self.ANDROID_SDK_VERSION,
-            self.ANDROID_DEVICE_MODEL, self.ENTRY_POINT_NAVIGATION_DRAWER, None,
-            None, None, None, self.TEXT_LANGUAGE_CODE_ENGLISH,
-            self.AUDIO_LANGUAGE_CODE_ENGLISH, self.ANDROID_REPORT_INFO, None)
+            self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
+            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            self.ANDROID_REPORT_INFO, None)
 
-    def test_scrub_android_report_removes_sensitive_fields(self):
+    def test_scrub_android_report(self):
         expected_report_dict = {
             'package_version_code': 1,
             'language_locale_code': 'en',
@@ -135,51 +121,20 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
         self.assertEqual(
             scrubbed_report_model.android_report_info, expected_report_dict)
-        self.assertNotIn(
-            'user_feedback_other_text_input',
-            scrubbed_report_model.android_report_info)
-        self.assertNotIn(
-            'event_logs', scrubbed_report_model.android_report_info)
-        self.assertNotIn(
-            'logcat_logs', scrubbed_report_model.android_report_info)
 
-    def test_scrub_web_report_removes_sensitive_fields_expects_nonempty_dict(
-            self):
+    def test_scrub_web_report(self):
         app_feedback_report_services.scrub_report(
-            self.web_issue_report_id, 'scrubber_user')
+            self.web_report_id, 'scrubber_user')
         scrubbed_report_model = (
             app_feedback_report_models.AppFeedbackReportModel.get(
-                self.web_issue_report_id))
-        expected_report_dict = {
-            'user_feedback_selected_items': ['audio_too_loud', 'other']
-        }
-
-        self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
-        self.assertEqual(
-            scrubbed_report_model.web_report_info, expected_report_dict)
-        self.assertNotIn(
-            'user_feedback_other_text_input',
-            scrubbed_report_model.web_report_info)
-
-    def test_scrub_web_report_removes_sensitive_fields_expects_empty_dict(self):
-        app_feedback_report_services.scrub_report(
-            self.web_suggestion_report_id, 'scrubber_user')
-        scrubbed_report_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get(
-                self.web_suggestion_report_id))
-        # The expected dict is empty since scrubbing removes the
-        # 'user_feedback_other_text_input' key from the dict, which is the only
-        # key in this test dict.
+                self.web_report_id))
         expected_report_dict = {}
 
         self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
         self.assertEqual(
             scrubbed_report_model.web_report_info, expected_report_dict)
-        self.assertNotIn(
-            'user_feedback_other_text_input',
-            scrubbed_report_model.web_report_info)
 
-    def test_scrub_nonexistent_report_raise_exception(self):
+    def test_scrubbing_nonexistent_report_raise_exception(self):
         fake_report_id = '%s.%s.%s' % (
             self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP.second,
             'randomInteger123')

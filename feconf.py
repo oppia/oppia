@@ -216,14 +216,23 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # The maximum number of days a feedback report can be kept in storage.
 APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS = 90
 
+# The minimum version of the Android feedback report info blob schema.
+MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
+
 # The current version of the Android feedback report info blob schema.
 CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+MINIMUM_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the web feedback report info blob schema.
 CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the app feedback report daily stats blob schema.
 CURRENT_APP_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
+# The minimum version of the app feedback report daily stats blob schema.
+MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
@@ -519,7 +528,7 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 3
+NUM_PRETEST_QUESTIONS = 0
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -586,6 +595,15 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
+
+# Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC for the earliest
+# datetime that a report could be received.
+EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
+    1614556800)
+
+# The minimum and maximum package version codes for Oppia Android.
+MIN_ANDROID_PACKAGE_VERSION_CODE = 1
+MAX_ANDROID_PACKAGE_VERSION_CODE = 1
 
 # We generate images for existing math rich text components in batches. This
 # gives the maximum size for a batch of Math SVGs in bytes.
@@ -791,6 +809,7 @@ FRACTIONS_LANDING_PAGE_URL = '/fractions'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
 IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
+INCOMING_APP_FEEDBACK_REPORT_URL = '/app_feedback_report/incoming_report'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
@@ -1129,8 +1148,13 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+
+# TODO(#11462): Delete this after Firebase authentication has been deployed.
+ENABLE_USER_CREATION = True
+
 # The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live-on in the
+# arbitrary. If it is changed later on, then the cookie will live on in the
 # users' browsers as garbage (although it would expire eventually, see MAX_AGE).
 FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the
@@ -1350,3 +1374,9 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
+
+# Constants used to authenticate Android messages.
+ANDROID_API_KEY = ""
+ANDROID_APP_PACKAGE_NAME = "org.oppia.android"
+ANDROID_APP_VERSION_NAME = "1.0"
+ANDROID_APP_VERSION_CODE = 1

@@ -24,6 +24,7 @@ import datetime
 from core.domain import base_model_validators
 from core.platform import models
 import feconf
+import utils
 
 (
     base_models, app_feedback_report_models
@@ -31,26 +32,18 @@ import feconf
     models.NAMES.base_model, models.NAMES.app_feedback_report
 ])
 
-# Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
-EARLIEST_VALID_DATETIME = datetime.datetime.fromtimestamp(1614556800)
-
 
 class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating AppFeedbackReportModel."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform].[submission_timestamp_in_sec_int].[random_hash]
+        # Valid id: [platform].[submission_timestamp_msec].[random_hash]
+        submitted_on_msec = utils.get_time_in_millisecs(item.submitted_on)
         regex_string = '^%s\\.%s\\.[A-Za-z0-9]{1,%s}$' % (
-            item.platform, item.submitted_on.second, base_models.ID_LENGTH)
+            item.platform, int(submitted_on_msec),
+            base_models.ID_LENGTH)
         return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer. Below assert function is to pass linter checks ("item
-        # is not used")
-        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -66,7 +59,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _validate_schema_versions(cls, item):
         """Validate that schema versions of the reports are not greater than the
-        current report schema.
+        current report schema or less than the minimum supported version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
@@ -81,15 +74,34 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                     'than current version %s' % (
                         item.id, item.android_report_info_schema_version,
                         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION))
-        elif item.web_report_info_schema_version > (
-                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
-            cls._add_error(
-                'report schema %s' % (
-                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                'Entity id %s: web report schema version %s is greater than '
-                'current version %s' % (
-                    item.id, item.web_report_info_schema_version,
-                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+            elif item.android_report_info_schema_version < (
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION):
+                cls._add_error(
+                    'report schema %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: android report schema version %s is less '
+                    'than the minimum version %s' % (
+                        item.id, item.android_report_info_schema_version,
+                        feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION))
+        else:
+            if item.web_report_info_schema_version > (
+                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
+                cls._add_error(
+                    'report schema %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: web report schema version %s is greater than'
+                    ' current version %s' % (
+                        item.id, item.web_report_info_schema_version,
+                        feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+            elif item.web_report_info_schema_version < (
+                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION):
+                cls._add_error(
+                    'report schema %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: web report schema version %s is less '
+                    'than the minimum version %s' % (
+                        item.id, item.web_report_info_schema_version,
+                        feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
     def _validate_submitted_on_datetime(cls, item):
@@ -108,7 +120,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                 'Entity id %s: The submitted_on field has a value %s which is '
                 'greater than the time when the job was run' % (
                     item.id, item.submitted_on))
-        if item.submitted_on < EARLIEST_VALID_DATETIME:
+        if item.submitted_on < feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME:
             cls._add_error(
                 'submitted_on %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -135,7 +147,8 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                 'Entity id %s: based on entity created_on date %s, expected '
                 'model %s to have field scrubbed_by but it doesn\'t'
                 ' exist' % (
-                    item.id, item.created_on.isoformat(), model_class.__name__))
+                    item.id, utils.get_time_in_millisecs(item.created_on),
+                    model_class.__name__))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -189,21 +202,15 @@ class AppFeedbackReportTicketModelValidator(
     """Class for validating AppFeedbackReportTicketModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
+    def _get_model_id_regex(cls, unused_item):
         # Valid id:
-        #   [ticket_creation_datetime_in_sec]:[hash(ticket_name)]:[random hash]
+        # [ticket_creation_datetime_msec]:[hash(ticket_name)]:[random hash]
+        # We can only validate the timestamp is an int since the id generation
+        # timestamp and the entity creation timestamp differ slightly.
         regex_string = (
-            '^%s\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
-                item.created_on.second, base_models.ID_LENGTH,
-                base_models.ID_LENGTH))
+            '^\\d+\\.[A-Za-z0-9]{1,%s}\\.[A-Za-z0-9]{1,%s}$' % (
+                base_models.ID_LENGTH, base_models.ID_LENGTH))
         return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer. Below assert function is to pass linter checks ("item
-        # is not used")
-        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -236,7 +243,8 @@ class AppFeedbackReportTicketModelValidator(
                 'Entity id %s: The newest_report_timestamp field has a value %s'
                 ' which is greater than the time when the job was run' % (
                     item.id, item.newest_report_timestamp))
-        if item.newest_report_timestamp < EARLIEST_VALID_DATETIME:
+        if item.newest_report_timestamp < (
+            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME):
             cls._add_error(
                 'newest_report_timestamp %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -290,17 +298,10 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [platform]:[ticket_id]:[date_in_isoformat]
+        # Valid id: [platform]:[ticket_id]:[stats_date in YYYY-MM-DD]
         regex_string = '^%s\\:%s\\:%s' % (
             item.platform, item.ticket_id, item.stats_tracking_date.isoformat())
         return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        # TODO(Oppia-Android#3016): Create domain object when implementing
-        # domain layer. Below assert function is to pass linter checks ("item
-        # is not used")
-        assert item
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -319,21 +320,30 @@ class AppFeedbackReportStatsModelValidator(
     @classmethod
     def _validate_schema_version(cls, item):
         """Validate that the schema version of the stats is not greater than the
-        current stats schema.
+        current stats schema or lower than the minimum supported version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
-        if item.daily_ticket_stats_schema_version > (
-                feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION):
+        if item.daily_param_stats_schema_version > (
+                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
                 'Entity id %s: daily stats schema version %s is greater than '
                 'current version %s' % (
-                    item.id, item.daily_ticket_stats_schema_version,
-                    feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION))
+                    item.id, item.daily_param_stats_schema_version,
+                    feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
+        elif item.daily_param_stats_schema_version < (
+                feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
+            cls._add_error(
+                'report stats schema %s' % (
+                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                'Entity id %s: daily stats schema version %s is less than the '
+                'minimum version %s' % (
+                    item.id, item.daily_param_stats_schema_version,
+                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
 
     @classmethod
     def _validate_stats_tracking_date(cls, item):
@@ -353,7 +363,8 @@ class AppFeedbackReportStatsModelValidator(
                 'Entity id %s: The stats_tracking_date field has a value %s '
                 'which is greater than the time when the job was run' % (
                     item.id, item.stats_tracking_date))
-        if item.stats_tracking_date < EARLIEST_VALID_DATETIME.date():
+        if item.stats_tracking_date < (
+            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.date()):
             cls._add_error(
                 'stats_tracking_date %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),

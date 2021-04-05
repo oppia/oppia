@@ -32,9 +32,14 @@ transaction_services = models.Registry.import_transaction_services()
 PLATFORM_CHOICE_ANDROID = 'android'
 PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
+GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 REPORT_INFO_TO_REDACT = (
     'user_feedback_other_text_input', 'event_logs', 'logcat_logs')
+
+REPORT_ID_DELIMITER = '.'
+TICKET_ID_DELIMITER = '.'
+STATS_ID_DELIMITER = ':'
 
 
 class AppFeedbackReportModel(base_models.BaseModel):
@@ -63,7 +68,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # AppFeedbackReportTicketModel for how this is constructed). This defaults
     # to None since initially, new reports received will not be assigned to a
     # ticket.
-    ticket_id = datastore_services.StringProperty(default=None, indexed=True)
+    ticket_id = datastore_services.StringProperty(required=False, indexed=True)
     # Datetime in UTC of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
@@ -117,22 +122,20 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # The Android SDK version on the user's device.
     android_sdk_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
-    # The rest of the report info collected on Android; None if the platform is
-    # 'web'.
+    # The feedback collected for Android reports; None if the platform is 'web'.
     android_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info; None if the platform is
     # 'web'.
     android_report_info_schema_version = datastore_services.IntegerProperty(
-        required=False, indexed=False)
-    # The rest of the web report info collected; None if the platform is
-    # 'android'.
+        required=False, indexed=True)
+    # The feedback collected for Web reports; None if the platform is 'android'.
     web_report_info = datastore_services.JsonProperty(
         required=False, indexed=False)
     # The schema version for the feedback report info; None if the platform is
     # 'android'.
     web_report_info_schema_version = datastore_services.IntegerProperty(
-        required=False, indexed=False)
+        required=False, indexed=True)
 
     @classmethod
     def create(
@@ -182,7 +185,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        entity_id = cls._generate_id(platform, submitted_on.second)
+        entity_id = cls._generate_id(platform, submitted_on)
         android_schema_version = None
         web_schema_version = None
         if platform == PLATFORM_CHOICE_ANDROID:
@@ -214,26 +217,30 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def _generate_id(cls, platform, submitted_on_sec):
+    def _generate_id(cls, platform, submitted_on_datetime):
         """Generates key for the instance of AppFeedbackReportModel class in the
         required format with the arguments provided.
 
         Args:
             platform: str. The platform the user is the report from.
-            submitted_on_sec: float. The timestamp that the report was submitted
-                on, in seconds since epoch (in UTC).
+            submitted_on_datetime: datetime.datetime. The datetime that the
+                report was submitted on in UTC.
 
         Returns:
             str. The generated ID for this entity using platform,
             submitted_on_sec, and a random string, of the form
-            '[platform].[submitted_on_sec].[random hash]'.
+            '[platform].[submitted_on_msec].[random hash]'.
         """
+        submitted_datetime_in_msec = utils.get_time_in_millisecs(
+            submitted_on_datetime)
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             random_hash = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
-            new_id = '%s.%s.%s' % (platform, submitted_on_sec, random_hash)
+            new_id = '%s.%s.%s' % (
+                platform, int(submitted_datetime_in_msec),
+                random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -291,17 +298,19 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
-
         user_data = dict()
         report_models = cls.get_all().filter(
             cls.scrubbed_by == user_id).fetch()
 
         for report_model in report_models:
+            submitted_on_msec = utils.get_time_in_millisecs(
+                report_model.submitted_on)
             user_data[report_model.id] = {
                 'scrubbed_by': report_model.scrubbed_by,
                 'platform': report_model.platform,
                 'ticket_id': report_model.ticket_id,
-                'submitted_on': report_model.submitted_on.isoformat(),
+                'submitted_on': utils.get_human_readable_time_string(
+                    submitted_on_msec),
                 'report_type': report_model.report_type,
                 'category': report_model.category,
                 'platform_version': report_model.platform_version
@@ -346,12 +355,15 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     # A name for the ticket given by the maintainer, limited to 100 characters.
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
+    # The Github repository that has the associated issue for this ticket. The
+    # possible values correspond to GITHUB_REPO_CHOICES.
+    github_issue_repo_name = datastore_services.StringProperty(
+        required=False, indexed=True, choices=GITHUB_REPO_CHOICES)
     # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
         required=False, indexed=True)
     # Whether this ticket has been archived.
-    archived = datastore_services.BooleanProperty(
-        required=True, indexed=False)
+    archived = datastore_services.BooleanProperty(required=True, indexed=True)
     # The datetime in UTC that the newest report in this ticket was created on,
     # to help with sorting tickets.
     newest_report_timestamp = datastore_services.DateTimeProperty(
@@ -361,13 +373,15 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, ticket_name, github_issue_number, newest_report_timestamp,
-            report_ids):
+            cls, ticket_name, github_issue_repo_name, github_issue_number,
+            newest_report_timestamp, report_ids):
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
         Args:
             ticket_name: str. The name assigned to the ticket by the moderator.
+            github_issue_repo_name: str. The name of the Github repo with the
+                associated Github issue for this ticket.
             github_issue_number: int|None. The Github issue number associated
                 with the ticket, if it has one.
             newest_report_timestamp: datetime.datetime. The date and time of the
@@ -382,6 +396,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
             id=ticket_id, ticket_name=ticket_name,
+            github_issue_repo_name=github_issue_repo_name,
             github_issue_number=github_issue_number, archived=False,
             newest_report_timestamp=newest_report_timestamp,
             report_ids=report_ids)
@@ -401,10 +416,12 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity using the current datetime in
-            seconds (as the entity's creation timestamp), a SHA1 hash of the
-            ticket_name, and a random string, of the form
-            '[creation_datetime]:[hash(ticket_name)]:[random hash]'.
+            milliseconds (as the entity's creation timestamp), a SHA1 hash of
+            the ticket_name, and a random string, of the form
+            '[creation_datetime_msec]:[hash(ticket_name)]:[random hash]'.
         """
+        current_datetime_in_msec = utils.get_time_in_millisecs(
+            datetime.datetime.utcnow())
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
                 ticket_name, base_models.ID_LENGTH)
@@ -413,7 +430,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                datetime.datetime.utcnow().second, name_hash, random_hash)
+                int(current_datetime_in_msec), name_hash, random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -432,6 +449,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'github_issue_repo_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'github_issue_number': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'archived': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'newest_report_timestamp': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -470,34 +488,31 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # to the creation date of the reports aggregated in this model.
     stats_tracking_date = datastore_services.DateProperty(
         required=True, indexed=True)
+    # The total number of reports submitted on this date.
+    total_reports_submitted = datastore_services.IntegerProperty(
+        required=True, indexed=True)
     # JSON struct that maps the daily statistics for this ticket on the date
-    # specified in stats_tracking_date. The JSON will contain two keys:
-    # daily_param_stats and daily_total_reports_submitted.
-    # The daily_param_stats will map each param_name (defined below
-    # by a domain const ALLOWED_STATS_PARAM_NAMES) to a dictionary of all the
-    # possible param_values for that parameter and the number of reports
-    # submitted on that day that satisfy that param value":
+    # specified in stats_tracking_date. The JSON will map each param_name
+    # (defined by a domain const ALLOWED_STATS_PARAM_NAMES) to a dictionary of
+    # all the possible param_values for that parameter and the number of reports
+    # submitted on that day that satisfy that param value, similar to e.g.:
     #
-    #   daily_param_stats : { param_name1 : { param_value1 : report_count1,
-    #                                         param_value2 : report_count2,
-    #                                         param_value3 : report_count3 },
-    #                         param_name2 : { param_value1 : report_count1,
-    #                                         param_value2 : report_count2,
-    #                                         param_value3 : report_count3 } }
-    #
-    # The second key in the JSON -- daily_total_reports_submitted -- simply has
-    # the total number of reports submitted on this date:
-    #
-    #   daily_total_reports_submitted : total_reports_count.
-    daily_ticket_stats = datastore_services.JsonProperty(
+    #   param_name1 : { param_value1 : report_count1,
+    #                   param_value2 : report_count2,
+    #                   param_value3 : report_count3 },
+    #   param_name2 : { param_value1 : report_count1,
+    #                   param_value2 : report_count2,
+    #                   param_value3 : report_count3 } }.
+    daily_param_stats = datastore_services.JsonProperty(
         required=True, indexed=False)
     # The schema version for parameter statistics in this entity.
-    daily_ticket_stats_schema_version = datastore_services.IntegerProperty(
+    daily_param_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
 
     @classmethod
     def create(
-            cls, platform, ticket_id, stats_tracking_date, daily_ticket_stats):
+            cls, platform, ticket_id, stats_tracking_date,
+            total_reports_submitted, daily_param_stats):
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 
@@ -506,7 +521,9 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             platform: str. The platform the stats are aggregating for.
             stats_tracking_date: datetime.date. The date in UTC that this entity
                 is tracking stats for.
-            daily_ticket_stats: dict. The daily stats for this entity, keyed
+            total_reports_submitted: int. The total number of reports submitted
+                on this date.
+            daily_param_stats: dict. The daily stats for this entity, keyed
                 by the parameter witch each value mapping a parameter value to
                 the number of reports that satisfy that parameter value.
 
@@ -518,9 +535,10 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         stats_entity = cls(
             id=entity_id, ticket_id=ticket_id, platform=platform,
             stats_tracking_date=stats_tracking_date,
-            daily_ticket_stats=daily_ticket_stats,
-            daily_ticket_stats_schema_version=(
-                feconf.CURRENT_REPORT_STATS_SCHEMA_VERSION))
+            total_reports_submitted=total_reports_submitted,
+            daily_param_stats=daily_param_stats,
+            daily_param_stats_schema_version=(
+                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
         stats_entity.update_timestamps()
         stats_entity.put()
         return entity_id
@@ -537,11 +555,12 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity of the form
-            '[platform]:[ticket_id]:[date.seconds]'.
+            '[platform]:[ticket_id]:[stats_date in YYYY-MM-DD]'.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s:%s:%s' % (
-                platform, ticket_id, stats_tracking_date.isoformat())
+                platform, ticket_id,
+                stats_tracking_date.isoformat())
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(
@@ -576,9 +595,10 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             'ticket_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'platform': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'stats_tracking_date': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'daily_ticket_stats_schema_version':
+            'total_reports_submitted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'daily_param_stats_schema_version':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'daily_ticket_stats': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'daily_param_stats': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @staticmethod

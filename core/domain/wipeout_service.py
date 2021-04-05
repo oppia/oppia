@@ -28,7 +28,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
@@ -275,11 +274,11 @@ def delete_user(pending_deletion_request):
 
     auth_services.delete_external_auth_associations(user_id)
 
-    _delete_models(user_id, user_role, models.NAMES.auth)
-    _delete_models(user_id, user_role, models.NAMES.user)
+    _delete_models(user_id, models.NAMES.auth)
+    _delete_models(user_id, models.NAMES.user)
     _pseudonymize_config_models(pending_deletion_request)
-    _delete_models(user_id, user_role, models.NAMES.feedback)
-    _delete_models(user_id, user_role, models.NAMES.improvements)
+    _delete_models(user_id, models.NAMES.feedback)
+    _delete_models(user_id, models.NAMES.improvements)
     if user_role != feconf.ROLE_ID_LEARNER:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
@@ -344,7 +343,7 @@ def delete_user(pending_deletion_request):
             'topic_id',
             feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
             ('manager_ids',))
-    _delete_models(user_id, user_role, models.NAMES.email)
+    _delete_models(user_id, models.NAMES.email)
 
 
 def verify_user_deleted(user_id, include_delete_at_end_models=False):
@@ -558,25 +557,16 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         save_pending_deletion_requests([pending_deletion_request])
 
 
-def _delete_models(user_id, user_role, module_name):
+def _delete_models(user_id, module_name):
     """Delete all the models from the given module, for a given user.
 
     Args:
         user_id: str. The id of the user to be deleted.
-        user_role: str. The role of the user to be deleted.
         module_name: models.NAMES. The name of the module containing the models
             that are being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes([module_name]):
         deletion_policy = model_class.get_deletion_policy()
-        lowest_role_for_class = model_class.get_lowest_supported_role()
-        if (
-                user_role != lowest_role_for_class and
-                role_services.check_if_path_exists_in_roles_graph(
-                    lowest_role_for_class, user_role) is False
-        ):
-            continue
-
         if deletion_policy == base_models.DELETION_POLICY.DELETE:
             model_class.apply_deletion_policy(user_id)
 
@@ -1058,7 +1048,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
     report_ids = set([model.id for model in feedback_report_models])
 
     # Fill in any missing keys in the category's
-    # pseudonymizable_entity_mappings; using the same pseudonym for each entity
+    # pseudonymizable_entity_mappings, using the same pseudonym for each entity
     # so that a user will have the same pseudonymized ID for each entity
     # referencing them.
     entity_category = models.NAMES.app_feedback_report
