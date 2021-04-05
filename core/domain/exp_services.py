@@ -1909,8 +1909,8 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
             try:
                 prev_interaction_id = (
-                    prev_exp.state_interaction_ids_dict[state_name]
-                    if state_name in prev_exp.state_interaction_ids_dict
+                    prev_exp.state_interaction_ids_dict[prev_state_name]
+                    if prev_state_name in prev_exp.state_interaction_ids_dict
                     else None)
                 current_interaction_id = (
                     exp.state_interaction_ids_dict[state_name])
