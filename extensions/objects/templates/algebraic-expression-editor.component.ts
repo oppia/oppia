@@ -23,6 +23,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
@@ -44,7 +45,8 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     private deviceInfoService: DeviceInfoService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
-    private mathInteractionsService: MathInteractionsService
+    private mathInteractionsService: MathInteractionsService,
+    private stateEditorService: StateEditorService
   ) {}
 
   ngOnInit(): void {
@@ -129,6 +131,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     if (!this.hasBeenTouched) {
       this.warningText = '';
     }
+    this.stateEditorService.onObjectFormValidityChange.emit(!answerIsValid);
     return answerIsValid;
   }
 
