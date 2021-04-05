@@ -438,7 +438,6 @@ REDISPORT = 6379
 # project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
-GOOGLE_CLOUD_DATAFLOW_REGION = 'us-central1'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.

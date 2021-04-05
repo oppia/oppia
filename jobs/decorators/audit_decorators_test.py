@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for audit_decorators."""
+"""Unit tests for jobs.decorators.audit_decorators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -40,11 +40,6 @@ class AuditsExisting(audit_decorators.AuditsExisting):
     _AUDITS_BY_KIND = collections.defaultdict(set)
 
     @classmethod
-    def clear(cls):
-        """Test-only helper method for clearing the decorator."""
-        cls._AUDITS_BY_KIND.clear()
-
-    @classmethod
     def get_audits(cls, kind):
         """Test-only helper method for getting a specific set of audits.
 
@@ -55,6 +50,11 @@ class AuditsExisting(audit_decorators.AuditsExisting):
             set(DoFn). The set of audits.
         """
         return list(cls._AUDITS_BY_KIND[kind])
+
+    @classmethod
+    def clear(cls):
+        """Test-only helper method for clearing the decorator."""
+        cls._AUDITS_BY_KIND.clear()
 
 
 class DoFn(beam.DoFn):

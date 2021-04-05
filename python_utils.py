@@ -387,7 +387,7 @@ def divide(number1, number2):
 
 
 def with_metaclass(meta, *bases):
-    """Python 2 & 3 compatible helper which installs a metaclass on a new class.
+    """Python 2 & 3 helper for installing metaclasses.
 
     Example:
 
@@ -401,13 +401,14 @@ def with_metaclass(meta, *bases):
             pass
 
     Args:
-        meta: class. The metaclass to install on the derived class.
+        meta: type. The metaclass to install on the derived class.
         *bases: tuple(class). The base classes to install on the derived class.
+            When empty, `object` will be the sole base class.
 
     Returns:
-        class. A proxy class that modifies the classes which inherit from it to
-        install the given meta class and to inherit from the given base classes.
-        The proxy class itself does not actually become a base class.
+        class. A proxy class that mutates the classes which inherit from it to
+        install the input meta class and inherit from the input base classes.
+        The proxy class itself does not actually become one of the base classes.
     """
     if not bases:
         bases = (OBJECT,)

@@ -31,7 +31,7 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
     def __init__(
             self,
             project=feconf.OPPIA_PROJECT_ID,
-            region=feconf.GOOGLE_CLOUD_DATAFLOW_REGION,
+            region=feconf.GOOGLE_APP_ENGINE_REGION,
             **kwargs):
         """Initializes a new JobOptions instance.
 
@@ -57,4 +57,6 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
         parser.add_argument(
             '--model_getter',
             help='PTransform responsible for getting storage models',
+            # TODO(#11475): Assign a proper default value after we have access
+            # to the Cloud NDB PTransforms.
             default=None, type=beam.PTransform)

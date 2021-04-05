@@ -14,7 +14,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base classes for all of Oppia's Apache Beam jobs."""
+"""Base classes for all of Oppia's Apache Beam jobs.
+
+Jobs are composed of the following components:
+    - Pipelines
+    - PTransforms
+    - PValues/PCollections
+    - Runners
+
+Pipelines manage a DAG (directed acyclic graph) of PValues and the
+PTransforms that compute them. Conceptually, Pvalues are the DAG's nodes and
+PTransforms are the edges.
+
+For example:
+
+    .------------. io.ReadFromText(fname) .-------. FlatMap(str.split)
+    | Input File | ---------------------> | Lines | -----------------.
+    '------------'                        '-------'                  |
+                                                                     |
+       .----------------. combiners.Count.PerElement() .-------.     |
+    .- | (word, count)s | <--------------------------- | Words | <---'
+    |  '----------------'                              '-------'
+    |
+    | MapTuple(lambda word, count: '%s: %d' % (word, count)) .------------.
+    '------------------------------------------------------> | "word: #"s |
+                                                             '------------'
+                                                                    |
+                             .-------------. io.WriteToText(ofname) |
+                             | Output File | <----------------------'
+                             '-------------'
+
+PCollections are PValues that represent a dataset of (virtually) any size,
+including unbounded/continuous datasets. They are the primary input and
+output types used by PTransforms.
+
+Runners provide a run() method for visiting every node (PValue) in the
+pipeline's DAG by executing the edges (PTransforms) to compute their values.
+At Oppia, we use DataflowRunner() to have our Pipelines run on the Google
+Cloud Dataflow service: https://cloud.google.com/dataflow.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -61,45 +99,7 @@ class JobMetaClass(type):
 
 
 class JobBase(python_utils.with_metaclass(JobMetaClass)):
-    """The base class for all of Oppia's Apache Beam jobs.
-
-    Jobs are composed of the following components:
-        - Pipelines
-        - PTransforms
-        - PValues/PCollections
-        - Runners
-
-    Pipelines manage a DAG (directed acyclic graph) of PValues and the
-    PTransforms that compute them. Conceptually, Pvalues are the DAG's nodes and
-    PTransforms are the edges.
-
-    For example:
-
-        .------------. io.ReadFromText(fname) .-------. ParDo(str.split)
-        | Input File | ---------------------> | Lines | ---------------.
-        '------------'                        '-------'                |
-                                                                       |
-           .----------------. combiners.Count.PerElement() .-------.   |
-        .- | (word, count)s | <--------------------------- | Words | <-'
-        |  '----------------'                              '-------'
-        |
-        | MapTuple(lambda word, count: '%s: %d' % (word, count)) .------------.
-        '------------------------------------------------------> | "word: #"s |
-                                                                 '------------'
-                                                                        |
-                                .--------------. io.WriteToText(ofname) |
-                                | Output File! | <----------------------'
-                                '--------------'
-
-    PCollections are PValues that represent a dataset of (virtually) any size,
-    including unbounded/continuous datasets. They are the primary input and
-    output types used by PTransforms.
-
-    Runners provide a run() method for visiting every node (PValue) in the
-    pipeline's DAG by executing the edges (PTransforms) to compute their values.
-    At Oppia, we use DataflowRunner() to have our Pipelines run on the Google
-    Cloud Dataflow service: https://cloud.google.com/dataflow.
-    """
+    """The base class for all of Oppia's Apache Beam jobs."""
 
     def __init__(
             self, pipeline=beam.Pipeline, runner=runners.DataflowRunner(),

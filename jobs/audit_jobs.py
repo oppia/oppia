@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Audit jobs that validate all of the storage models."""
+"""Audit jobs that validate all of the storage models in the datastore."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -66,7 +66,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         existing_model_errors = (
             (kind_and_existing_model_pairs, kind_and_audit_class_pairs)
             | 'Join models and audit classes by kind' >> beam.CoGroupByKey()
-            | 'Filter empty joins' >> beam.Filter(self._is_non_empty_join_pair)
+            | 'Filter empty joins' >> beam.Filter(self._is_non_empty_join)
             | 'Audit the models' >> beam.FlatMap(self._audit_models)
         )
 
@@ -85,8 +85,8 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         """Runs each of the audit DoFns on each of the models.
 
         Args:
-            join_result: tuple(str, tuple(models, DoFns)). The output from
-                CoGroupByKey.
+            join_result: tuple(str, tuple(PCollection, PCollection)). The output
+                from CoGroupByKey.
 
         Returns:
             PCollection. An aggregate PCollection of errors from the audits.
@@ -98,12 +98,12 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         )
         return audit_error_pcolls | beam.Flatten()
 
-    def _is_non_empty_join_pair(self, join_result):
+    def _is_non_empty_join(self, join_result):
         """Returns whether the joined pair of (models, audit_classes) are empty.
 
         Args:
-            join_result: tuple(str, tuple(models, DoFns)). The output from
-                CoGroupByKey.
+            join_result: tuple(str, tuple(PCollection, PCollection)). The output
+                from CoGroupByKey.
 
         Returns:
             bool. Whether both the models and audit classes are not empty.

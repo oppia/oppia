@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base test class for Apache Beam jobs."""
+"""Utilities for running Apache Beam tests."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -50,7 +50,7 @@ class BeamTestBase(test_utils.TestBase):
 
 
 class PTransformTestBase(BeamTestBase):
-    """Base class that prepares a test pipeline for executing PTransforms."""
+    """Base class that provides a test pipeline for executing PTransforms."""
 
     def __init__(self, *args, **kwargs):
         super(PTransformTestBase, self).__init__(*args, **kwargs)

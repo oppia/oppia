@@ -15,9 +15,6 @@
 # limitations under the License.
 
 """Helper functions for beam validators and one-off jobs.
-
-The clone function should be used in every beam function since beam
-functions require all input to be immutable.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -37,6 +34,9 @@ def clone_model(model, **new_values):
     The cloned entity will have exactly the same property values as the
     original entity, except where overridden. By default, it will have no
     parent entity or key name, unless supplied.
+
+    IMPORTANT: This function should be used in EVERY DoFn beacse beam expects
+    that all operations DO NOT MODIFY THEIR INPUTS.
 
     Args:
         model: datastore_services.Model. Model to clone.
