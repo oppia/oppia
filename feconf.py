@@ -213,14 +213,23 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
+# The minimum version of the Android feedback report info blob schema.
+MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
+
 # The current version of the Android feedback report info blob schema.
 CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+MINIMUM_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the web feedback report info blob schema.
 CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the app feedback report daily stats blob schema.
-CURRENT_REPORT_STATS_SCHEMA_VERSION = 1
+CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
+# The minimum version of the app feedback report daily stats blob schema.
+MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
 
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
@@ -516,7 +525,7 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 3
+NUM_PRETEST_QUESTIONS = 0
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -1132,8 +1141,13 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+
+# TODO(#11462): Delete this after Firebase authentication has been deployed.
+ENABLE_USER_CREATION = True
+
 # The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live-on in the
+# arbitrary. If it is changed later on, then the cookie will live on in the
 # users' browsers as garbage (although it would expire eventually, see MAX_AGE).
 FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the

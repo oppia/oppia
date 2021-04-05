@@ -23,6 +23,7 @@ import types
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])
@@ -35,12 +36,19 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     PLATFORM_WEB = 'web'
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
+    REPORT_SUBMITTED_TIMESTAMP_1_MSEC = (
+        utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP_1))
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
     REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615519337)
+    REPORT_SUBMITTED_TIMESTAMP_2_MSEC = (
+        utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP_2))
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_CREATION_TIMESTAMP_MSEC = (
+        utils.get_time_in_millisecs(TICKET_CREATION_TIMESTAMP))
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+        'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
+        '16CharString1234')
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
@@ -79,12 +87,14 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel(
                 id='%s.%s.%s' % (
                     self.PLATFORM_ANDROID,
-                    self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+                    int(
+                        self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
                     'randomInteger123'),
                 platform=self.PLATFORM_ANDROID,
                 scrubbed_by=self.USER_ID,
                 ticket_id='%s.%s.%s' % (
-                    'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                    'random_hash',
+                    int(self.TICKET_CREATION_TIMESTAMP_MSEC),
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
                 report_type=self.REPORT_TYPE_SUGGESTION,
@@ -183,14 +193,16 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 self.USER_ID))
 
         report_id = '%s.%s.%s' % (
-            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+            self.PLATFORM_ANDROID,
+            int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
             'randomInteger123')
         expected_data = {
             report_id: {
                 'scrubbed_by': self.USER_ID,
                 'platform': self.PLATFORM_ANDROID,
                 'ticket_id': self.TICKET_ID,
-                'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP_1.isoformat(),
+                'submitted_on': utils.get_human_readable_time_string(
+                    self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
                 'report_type': self.REPORT_TYPE_SUGGESTION,
                 'category': self.CATEGORY_OTHER,
                 'platform_version': self.PLATFORM_VERSION
@@ -207,7 +219,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # The only user references will be those who have scrubbed a report.
         report_id = '%s.%s.%s' % (
-            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1.second,
+            self.PLATFORM_ANDROID,
+            int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
             'randomInteger123')
         model_entity = model_class.get(report_id)
         model_entity.scrubbed_by = 'scrubber_user'
@@ -223,23 +236,29 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    REPORT_SUBMITTED_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+        REPORT_SUBMITTED_TIMESTAMP)
     # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     NEWEST_REPORT_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
+        TICKET_CREATION_TIMESTAMP)
 
     PLATFORM = 'android'
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     TICKET_NAME = 'example ticket name'
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+        'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
+        '16CharString1234')
     REPORT_IDS = ['%s.%s.%s' % (
-        PLATFORM, REPORT_SUBMITTED_TIMESTAMP.second, 'randomInteger123')]
+        PLATFORM, int(REPORT_SUBMITTED_TIMESTAMP_MSEC),
+        'randomInteger123')]
 
     def test_create_and_get_ticket_model(self):
         ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                ticket_name=self.TICKET_NAME,
+                ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
                 github_issue_number=None,
                 newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
                 report_ids=self.REPORT_IDS))
@@ -268,7 +287,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     app_feedback_report_models.AppFeedbackReportTicketModel)):
                 app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                    ticket_name=self.TICKET_NAME,
+                    ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
                     github_issue_number=None,
                     newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
                     report_ids=self.REPORT_IDS)
@@ -290,34 +309,39 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
 
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_CREATION_TIMESTAMP_MSEC = (
+        utils.get_time_in_millisecs(TICKET_CREATION_TIMESTAMP))
     TICKET_ID = '%s.%s.%s' % (
-        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+        'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
+        '16CharString1234')
     # Timestamp date in sec since epoch for Mar 19 2021 UTC.
-    STATS_DATE_TIMESTAMP = datetime.date.fromtimestamp(1616173836)
+    STATS_DATE = datetime.date.fromtimestamp(1616173836)
     DAILY_STATS = {
-        'daily_param_stats': {
-            'report_type': {
-                'suggestion': 1, 'issue': 1, 'crash': 1}},
-        'daily_total_report_submitted': 3}
+        'report_type': {
+            'suggestion': 1, 'issue': 1, 'crash': 1}}
+    TOTAL_REPORTS_SUBMITTED = 3
 
     def test_create_and_get_stats_model(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform='android',
                 ticket_id=self.TICKET_ID,
-                stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                daily_ticket_stats=self.DAILY_STATS))
+                stats_tracking_date=self.STATS_DATE,
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                daily_param_stats=self.DAILY_STATS))
 
         stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get(
                 entity_id))
 
         self.assertEqual(stats_model.id, '%s:%s:%s' % (
-            'android', self.TICKET_ID, self.STATS_DATE_TIMESTAMP.isoformat()))
+            'android', self.TICKET_ID, self.STATS_DATE.isoformat()))
         self.assertEqual(stats_model.platform, 'android')
         self.assertEqual(
-            stats_model.stats_tracking_date, self.STATS_DATE_TIMESTAMP)
-        self.assertEqual(stats_model.daily_ticket_stats, self.DAILY_STATS)
+            stats_model.stats_tracking_date, self.STATS_DATE)
+        self.assertEqual(
+            stats_model.total_reports_submitted, self.TOTAL_REPORTS_SUBMITTED)
+        self.assertEqual(stats_model.daily_param_stats, self.DAILY_STATS)
 
     def test_create_raises_exception_by_mocking_collision(self):
         # Test Exception for AppFeedbackReportStatsModel.
@@ -335,16 +359,18 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
                 app_feedback_report_models.AppFeedbackReportStatsModel.create(
                     platform='android',
                     ticket_id=self.TICKET_ID,
-                    stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                    daily_ticket_stats=self.DAILY_STATS)
+                    total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                    stats_tracking_date=self.STATS_DATE,
+                    daily_param_stats=self.DAILY_STATS)
 
     def test_get_stats_for_ticket(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
                 platform='android',
                 ticket_id=self.TICKET_ID,
-                stats_tracking_date=self.STATS_DATE_TIMESTAMP,
-                daily_ticket_stats=self.DAILY_STATS))
+                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+                stats_tracking_date=self.STATS_DATE,
+                daily_param_stats=self.DAILY_STATS))
         expected_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get(
                 entity_id))

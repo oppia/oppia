@@ -197,13 +197,13 @@ class _Gae(Platform):
 
     @classmethod
     def import_auth_services(cls):
-        """Imports and returns gae_auth_services module.
+        """Imports and returns firebase_auth_services module.
 
         Returns:
-            module. The gae_auth_services module.
+            module. The firebase_auth_services module.
         """
-        from core.platform.auth import gae_auth_services
-        return gae_auth_services
+        from core.platform.auth import firebase_auth_services
+        return firebase_auth_services
 
     @classmethod
     def import_transaction_services(cls):
