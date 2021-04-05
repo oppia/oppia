@@ -15,6 +15,9 @@
 /**
  * @fileoverview Component for usage of side-navigation-bar
  * directly in *mainpage.html files
+ *
+ * Note developers: This wrapper component can be removed after migration
+ * is complete
  */
 
 import { Component } from '@angular/core';
@@ -37,4 +40,6 @@ export class SideNavigationBarWrapperComponent {
 }
 
 angular.module('oppia').directive('oppiaSideNavigationBarWrapper',
-  downgradeComponent({ component: SideNavigationBarWrapperComponent }));
+  downgradeComponent({
+    component: SideNavigationBarWrapperComponent
+  }) as angular.IDirectiveFactory);

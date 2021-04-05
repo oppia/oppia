@@ -58,4 +58,6 @@ export class AlertMessageComponent {
 }
 
 angular.module('oppia').directive('oppiaAlertMessage',
-  downgradeComponent({ component: AlertMessageComponent }));
+  downgradeComponent({
+    component: AlertMessageComponent
+  }) as angular.IDirectiveFactory);

@@ -75,7 +75,7 @@ import { DynamicContentModule } from './angular-html-bind/dynamic-content.module
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
 import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
-import { LimiToPipe } from 'filters/limit-to.pipe';
+import { LimitToPipe } from 'filters/limit-to.pipe';
 import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.directive';
 import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
@@ -158,7 +158,7 @@ const toastrConfig = {
     ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
-    LimiToPipe,
+    LimitToPipe,
     LoadingDotsComponent,
     LoadingMessageComponent,
     ProfileLinkImageComponent,
@@ -232,7 +232,7 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
     OppiaFooterDirective,
-    LimiToPipe,
+    LimitToPipe,
     LoadingMessageComponent,
     ImageUploaderComponent,
     OnScreenKeyboardComponent,

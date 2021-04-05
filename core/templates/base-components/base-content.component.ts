@@ -67,6 +67,12 @@ export class BaseContentComponent {
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
 
+    /**
+     * Note to developers
+     * pageTitleService variable is undefined when defining functions in the
+     * conventional way
+     * It only becomes properly defined when used in ngOnInit
+     */
     this.getHeaderText = () => {
       return this.pageTitleService.getPageTitleForMobileView();
     };
@@ -76,6 +82,9 @@ export class BaseContentComponent {
     };
   }
 
+  /**
+   * This function can be removed after top navigation directive is migrated
+   */
   toggleSidebar(): void {
     this.sidebarStatusService.toggleSidebar();
   }
@@ -114,4 +123,6 @@ export class BaseContentComponent {
 }
 
 angular.module('oppia').directive('oppiaBaseContent',
-  downgradeComponent({ component: BaseContentComponent }));
+  downgradeComponent({
+    component: BaseContentComponent
+  }) as angular.IDirectiveFactory);

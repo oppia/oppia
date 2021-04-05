@@ -16,10 +16,10 @@
  * @fileoverview LimitTo filter for Oppia.
  */
 
-import { LimiToPipe } from './limit-to.pipe';
+import { LimitToPipe } from './limit-to.pipe';
 
 describe('LimitTo Pipe', () => {
-  const limitToPipe = new LimiToPipe();
+  const limitToPipe = new LimitToPipe();
 
   it('should reduce number elements of array to given limit', () => {
     let list: string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];

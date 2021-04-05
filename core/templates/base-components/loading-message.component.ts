@@ -28,4 +28,6 @@ export class LoadingMessageComponent {
 }
 
 angular.module('oppia').directive('oppiaLoadingMessage',
-  downgradeComponent({ component: LoadingMessageComponent }));
+  downgradeComponent({
+    component: LoadingMessageComponent
+  }) as angular.IDirectiveFactory);

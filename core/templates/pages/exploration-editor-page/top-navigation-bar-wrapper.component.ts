@@ -15,6 +15,9 @@
 /**
  * @fileoverview Component for usage of top-navigation-bar
  * directly in *mainpage.html files
+ *
+ * Note developers: This wrapper component can be removed after migration
+ * is complete
  */
 
 import { Component } from '@angular/core';
@@ -37,4 +40,6 @@ export class TopNavigationBarWrapperComponent {
 }
 
 angular.module('oppia').directive('oppiaTopNavigationWrapper',
-  downgradeComponent({ component: TopNavigationBarWrapperComponent }));
+  downgradeComponent({
+    component: TopNavigationBarWrapperComponent
+  }) as angular.IDirectiveFactory);

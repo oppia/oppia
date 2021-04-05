@@ -22,7 +22,7 @@ import { AlertMessageComponent } from 'components/common-layout-directives/commo
 import { PromoBarComponent } from 'components/common-layout-directives/common-elements/promo-bar.component';
 import { SideNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { TopNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.directive';
-import { LimiToPipe } from 'filters/limit-to.pipe';
+import { LimitToPipe } from 'filters/limit-to.pipe';
 import { TranslatePipe } from 'filters/translate.pipe';
 import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { Observable, of } from 'rxjs';
@@ -98,7 +98,7 @@ describe('Base Content Component', () => {
         SideNavigationBarComponent,
         TranslatePipe,
         AlertMessageComponent,
-        LimiToPipe
+        LimitToPipe
       ],
       providers: [
         {

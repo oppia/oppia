@@ -18,7 +18,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AlertMessageComponent } from 'components/common-layout-directives/common-elements/alert-message.component';
-import { LimiToPipe } from 'filters/limit-to.pipe';
+import { LimitToPipe } from 'filters/limit-to.pipe';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
 describe('Warnings and Alert Component', () => {
@@ -30,7 +30,7 @@ describe('Warnings and Alert Component', () => {
       declarations: [
         WarningsAndAlertsComponent,
         AlertMessageComponent,
-        LimiToPipe
+        LimitToPipe
       ]
     }).compileComponents();
   }));

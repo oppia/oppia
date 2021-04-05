@@ -49,4 +49,6 @@ export class SideNavigationBarComponent {
 }
 
 angular.module('oppia').directive('oppiaSideNavigationBar',
-  downgradeComponent({ component: SideNavigationBarComponent }));
+  downgradeComponent({
+    component: SideNavigationBarComponent
+  }) as angular.IDirectiveFactory);

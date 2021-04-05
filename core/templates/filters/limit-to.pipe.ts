@@ -21,7 +21,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'limitTo'
 })
-export class LimiToPipe implements PipeTransform {
+export class LimitToPipe implements PipeTransform {
   transform<T>(value: T[], limit: number): T[] {
     return value.length > limit ? value.slice(0, limit) : value;
   }

@@ -54,7 +54,7 @@ import { SplashPageComponent } from './splash-page.component';
       deps: [PlatformFeatureService],
       multi: true
     }
-  ],
+  ]
 })
 class SplashPageModule {
   // Empty placeholder method to satisfy the `Compiler`.

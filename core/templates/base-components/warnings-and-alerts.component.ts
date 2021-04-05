@@ -31,4 +31,6 @@ export class WarningsAndAlertsComponent {
 }
 
 angular.module('oppia').directive('oppiaWarningsAndAlerts',
-  downgradeComponent({ component: WarningsAndAlertsComponent }));
+  downgradeComponent({
+    component: WarningsAndAlertsComponent
+  }) as angular.IDirectiveFactory);
