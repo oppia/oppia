@@ -101,6 +101,8 @@ module.exports = {
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
     library: commonPrefix + '/pages/library-page/library-page.import.ts',
+    login: commonPrefix + '/pages/login-page/login-page.import.ts',
+    logout: commonPrefix + '/pages/logout-page/logout-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
@@ -426,6 +428,22 @@ module.exports = {
           'level you want.'
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['login'],
+      filename: 'login-page.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/login-page/login-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['logout'],
+      filename: 'logout-page.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/logout-page/logout-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
