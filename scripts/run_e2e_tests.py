@@ -597,7 +597,7 @@ def main(args=None):
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
         output, return_code = run_tests(parsed_args)
-        # Don't rerun off of CI
+        # Don't rerun off of CI.
         if not flake_checker.check_if_on_ci():
             python_utils.PRINT('No reruns because not running on CI.')
             break
