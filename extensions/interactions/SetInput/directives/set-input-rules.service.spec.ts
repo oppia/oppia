@@ -20,7 +20,7 @@ import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 
 describe('Set Input rules service', () => {
-  let sirs: SetInputRulesService = null;
+  let sirs: SetInputRulesService;
   beforeEach(() => {
     sirs = new SetInputRulesService();
   });
