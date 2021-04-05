@@ -25,8 +25,8 @@ import python_utils
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-CLOUD_DATASTORE_EMULATOR_DATA_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, '.config', 'gcloud', 'emulators', 'datastore')
+CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
+    os.path.join(OPPIA_TOOLS_DIR, 'cloud_datastore_emulator_cache'))
 
 _PARSER = argparse.ArgumentParser(
     description="""

@@ -753,12 +753,6 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write(u'Some content in mock_app_dev.yaml\n')
             tmp.write(u'  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write(u'version: default')
-            tmp.write(u'  DATASTORE_DATASET: "testvalue"\n')
-            tmp.write(u'  DATASTORE_EMULATOR_HOST: "testvalue"\n')
-            tmp.write(u'  DATASTORE_EMULATOR_HOST_PATH: "testvalue"\n')
-            tmp.write(u'  DATASTORE_HOST: "testvalue"\n')
-            tmp.write(u'  DATASTORE_PROJECT_ID: "testvalue"\n')
-            tmp.write(u'  DATASTORE_USE_PROJECT_ID_AS_APP_ID: "testvalue"\n')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         app_yaml_temp_file.name = mock_yaml_filepath

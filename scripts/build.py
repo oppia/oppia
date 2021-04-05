@@ -211,15 +211,6 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         # The FIREBASE_AUTH_EMULATOR_HOST environment variable is only needed to
         # test locally, and MUST NOT be included in the deployed file.
         content = re.sub('  FIREBASE_AUTH_EMULATOR_HOST: ".*"\n', '', content)
-        # The DATASTORE_* environment variables are only needed to test locally,
-        # and MUST NOT be included in the deployed file.
-        content = re.sub('  DATASTORE_DATASET: ".*"\n', '', content)
-        content = re.sub('  DATASTORE_EMULATOR_HOST: ".*"\n', '', content)
-        content = re.sub('  DATASTORE_EMULATOR_HOST_PATH: ".*"\n', '', content)
-        content = re.sub('  DATASTORE_HOST: ".*"\n', '', content)
-        content = re.sub('  DATASTORE_PROJECT_ID: ".*"\n', '', content)
-        content = re.sub(
-            '  DATASTORE_USE_PROJECT_ID_AS_APP_ID: ".*"\n', '', content)
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with python_utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:

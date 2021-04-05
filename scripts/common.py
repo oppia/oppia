@@ -121,8 +121,8 @@ REDIS_SERVER_PATH = os.path.join(
 REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
-CLOUD_DATASTORE_EMULATOR_DATA_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, '.config', 'gcloud', 'emulators', 'datastore')
+CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
+    os.path.join(OPPIA_TOOLS_DIR, 'cloud_datastore_emulator_cache'))
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -957,24 +957,44 @@ def managed_elasticsearch_dev_server():
 
 @contextlib.contextmanager
 def managed_cloud_datastore_emulator():
-    """Returns a context manager to manage the Cloud Datastore emulator.
+    """Returns a context manager for the Cloud Datastore emulator.
 
     Yields:
         psutil.Process. The emulator process.
     """
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
     if not os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR):
         os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
 
+    emulator_hostport = '%s:%d' % (
+        feconf.CLOUD_DATASTORE_EMULATOR_HOST,
+        feconf.CLOUD_DATASTORE_EMULATOR_PORT)
     emulator_args = [
         GCLOUD_PATH, 'beta', 'emulators', 'datastore', 'start',
         '--project', feconf.OPPIA_PROJECT_ID,
         '--data-dir', CLOUD_DATASTORE_EMULATOR_DATA_DIR,
-        '--host-port', '%s:%d' % (
-            feconf.CLOUD_DATASTORE_EMULATOR_HOST,
-            feconf.CLOUD_DATASTORE_EMULATOR_PORT),
+        '--host-port', emulator_hostport,
         '--no-store-on-disk', '--consistency=1.0', '--quiet',
     ]
 
-    with managed_process(emulator_args, shell=True) as proc:
+    with contextlib2.ExitStack() as stack:
+        proc = stack.enter_context(managed_process(emulator_args, shell=True))
+
+        # Environment variables required to communicate with the emulator.
+        stack.enter_context(swap_env(
+            'DATASTORE_DATASET', feconf.OPPIA_PROJECT_ID))
+        stack.enter_context(swap_env(
+            'DATASTORE_EMULATOR_HOST', emulator_hostport))
+        stack.enter_context(swap_env(
+            'DATASTORE_EMULATOR_HOST_PATH', '%s/datastore' % emulator_hostport))
+        stack.enter_context(swap_env(
+            'DATASTORE_HOST', 'http://%s' % emulator_hostport))
+        stack.enter_context(swap_env(
+            'DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID))
+        stack.enter_context(swap_env(
+            'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
+
         wait_for_port_to_be_in_use(feconf.CLOUD_DATASTORE_EMULATOR_PORT)
         yield proc
