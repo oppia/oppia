@@ -1255,11 +1255,8 @@ def get_demo_exploration_components(demo_path):
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, exploration_id, assets_list,
         strip_voiceovers=False):
-    """Note that the default title and category will be used if the YAML
-    schema version is less than
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    since in that case the YAML schema will not have a title and category
-    present.
+    """Saves a new exploration given its representation in YAML form and the
+    list of assets associated with it.
 
     Args:
         committer_id: str. The id of the user who made the commit.
@@ -1279,7 +1276,6 @@ def save_new_exploration_from_yaml_and_assets(
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')
-    exp_schema_version = yaml_dict['schema_version']
 
     # The assets are committed before the exploration is created because the
     # migrating to state schema version 25 involves adding dimensions to
@@ -1291,16 +1287,7 @@ def save_new_exploration_from_yaml_and_assets(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(asset_filename, asset_content)
 
-    if (exp_schema_version <=
-            exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
-        # The schema of the YAML file for older explorations did not include
-        # a title and a category; these need to be manually specified.
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
-            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
-    else:
-        exploration = exp_domain.Exploration.from_yaml(
-            exploration_id, yaml_content)
+    exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
     if strip_voiceovers:

@@ -25,9 +25,9 @@ import { StoryUpdateService } from 'domain/story/story-update.service.ts';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
 
 describe('Story update service', () => {
-  let storyObjectFactory:StoryObjectFactory = null;
-  let storyUpdateService:StoryUpdateService = null;
-  let undoRedoService:UndoRedoService = null;
+  let storyObjectFactory: StoryObjectFactory = null;
+  let storyUpdateService: StoryUpdateService = null;
+  let undoRedoService: UndoRedoService = null;
   let _sampleStory = null;
 
   beforeEach(() => {

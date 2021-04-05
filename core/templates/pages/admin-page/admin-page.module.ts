@@ -26,12 +26,15 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { AdminFeaturesTabComponent } from
   'pages/admin-page/features-tab/admin-features-tab.component';
+import { AdminNavbarComponent } from './navbar/admin-navbar.component';
+import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { OppiaAdminProdModeActivitiesTabComponent } from
   './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 
 @NgModule({
   imports: [
@@ -43,12 +46,18 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminJobsTabComponent,
+    AdminNavbarComponent,
+    AdminDevModeActivitiesTabComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminJobsTabComponent,
+    AdminNavbarComponent,
+    AdminDevModeActivitiesTabComponent
   ],
   providers: [
     {

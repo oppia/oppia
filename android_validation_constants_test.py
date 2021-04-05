@@ -19,8 +19,8 @@ constants are the same.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.tests import test_utils
 
 

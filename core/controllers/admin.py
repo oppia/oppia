@@ -721,7 +721,7 @@ class AdminRoleHandler(base.BaseHandler):
             username=username)
 
         if topic_id:
-            user = user_services.UserActionsInfo(user_id)
+            user = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)
@@ -1101,7 +1101,7 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
 class DeleteUserHandler(base.BaseHandler):
     """Handler for deleting a user with specific ID."""
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_delete_any_user
     def delete(self):
         user_id = self.request.get('user_id', None)
         username = self.request.get('username', None)

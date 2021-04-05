@@ -254,6 +254,7 @@ describe('Skills List Directive', function() {
           additional_story_count: 0,
           subtopic_count: 0,
           total_skill_count: 0,
+          total_published_node_count: 0,
           uncategorized_skill_count: 0,
           thumbnail_filename: 'abc.svg',
           thumbnail_bg_color: '#FFFFFF',

@@ -54,14 +54,15 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
-        self.user_c = user_services.UserActionsInfo(self.user_id_c)
-        self.user_d = user_services.UserActionsInfo(self.user_id_d)
-        self.user_e = user_services.UserActionsInfo(self.user_id_e)
-        self.user_f = user_services.UserActionsInfo(self.user_id_f)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
-        self.user_moderator = user_services.UserActionsInfo(
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
+        self.user_c = user_services.get_user_actions_info(self.user_id_c)
+        self.user_d = user_services.get_user_actions_info(self.user_id_d)
+        self.user_e = user_services.get_user_actions_info(self.user_id_e)
+        self.user_f = user_services.get_user_actions_info(self.user_id_f)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+        self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
@@ -695,13 +696,14 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.MODERATOR_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
-        self.user_c = user_services.UserActionsInfo(self.user_id_c)
-        self.user_d = user_services.UserActionsInfo(self.user_id_d)
-        self.user_e = user_services.UserActionsInfo(self.user_id_e)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
-        self.user_moderator = user_services.UserActionsInfo(
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
+        self.user_c = user_services.get_user_actions_info(self.user_id_c)
+        self.user_d = user_services.get_user_actions_info(self.user_id_d)
+        self.user_e = user_services.get_user_actions_info(self.user_id_e)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+        self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
@@ -1081,8 +1083,8 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -1128,9 +1130,9 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.moderator = user_services.UserActionsInfo(self.moderator_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.moderator = user_services.get_user_actions_info(self.moderator_id)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(

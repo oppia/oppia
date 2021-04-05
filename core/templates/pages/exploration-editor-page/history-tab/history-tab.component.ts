@@ -42,12 +42,14 @@ angular.module('oppia').component('historyTab', {
   controller: [
     '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'LoaderService', 'RouterService', 'UrlInterpolationService',
+    'LoaderService', 'RouterService',
+    'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
         $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        LoaderService, RouterService, UrlInterpolationService,
+        LoaderService, RouterService,
+        UrlInterpolationService,
         VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

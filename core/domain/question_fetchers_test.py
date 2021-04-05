@@ -44,8 +44,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description 1')

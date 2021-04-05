@@ -223,7 +223,7 @@ export class AdminBackendApiService {
   }
 
   private _postRequestAsync(
-      handlerUrl:string, payload?:Object, action?:string): Promise<void> {
+      handlerUrl: string, payload?: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
@@ -540,6 +540,43 @@ export class AdminBackendApiService {
     };
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
+  }
+
+  // Admin Dev Mode Activities Tab Services.
+  async generateDummyExplorationsAsync(
+      numDummyExpsToGenerate: number,
+      numDummyExpsToPublish: number): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_explorations',
+      num_dummy_exps_to_generate: numDummyExpsToGenerate,
+      num_dummy_exps_to_publish: numDummyExpsToPublish
+    });
+  }
+
+  async reloadExplorationAsync(explorationId: string): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'reload_exploration',
+      exploration_id: String(explorationId)
+    });
+  }
+
+  async generateDummyNewStructuresDataAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_new_structures_data'
+    });
+  }
+
+  async generateDummyNewSkillDataAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_new_skill_data'
+    });
+  }
+
+  async reloadCollectionAsync(collectionId: string): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'reload_collection',
+      collection_id: String(collectionId)
+    });
   }
 }
 

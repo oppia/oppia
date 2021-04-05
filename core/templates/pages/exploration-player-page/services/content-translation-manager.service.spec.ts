@@ -176,7 +176,7 @@ describe('Content translation manager service', () => {
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
-          interaction.id, interaction.customizationArgs, true, null),
+          interaction.id, interaction.customizationArgs, true, null, null),
         interaction,
         rvof.createEmpty(),
         writtenTranslations,

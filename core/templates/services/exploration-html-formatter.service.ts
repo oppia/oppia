@@ -27,6 +27,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 
 // A service that provides a number of utility functions useful to both the
@@ -59,18 +60,28 @@ export class ExplorationHtmlFormatterService {
    *   Otherwise, parentHasLastAnswerProperty should be set to false.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
+   * @param {Solution} savedSolution - The saved solution that the interaction
+   * needs to be prefilled with.
    */
   getInteractionHtml(
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
-      labelForFocusTarget: string): string {
+      labelForFocusTarget: string,
+      savedSolution: Solution): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
+    if (savedSolution) {
+      // TODO(#12292): Refactor this once all interactions have been migrated to
+      // Angular 2+, such that we don't need to parse the string in the
+      // interaction directives/components.
+      element.attr(
+        'saved-solution', JSON.stringify(savedSolution.correctAnswer));
+    }
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }
@@ -113,7 +124,7 @@ export class ExplorationHtmlFormatterService {
 
   getShortAnswerHtml(
       answer: InteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;
 
     // TODO(sll): Get rid of this special case for multiple choice.

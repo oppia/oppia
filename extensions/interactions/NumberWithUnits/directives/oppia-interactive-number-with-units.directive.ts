@@ -99,7 +99,14 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
                   FORM_ERROR_TYPE, false);
               }
             });
-            ctrl.answer = '';
+            if ($attrs.savedSolution !== undefined) {
+              let savedSolution = JSON.parse($attrs.savedSolution);
+              savedSolution = NumberWithUnitsObjectFactory.fromDict(
+                savedSolution).toString();
+              ctrl.answer = savedSolution;
+            } else {
+              ctrl.answer = '';
+            }
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
             ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {

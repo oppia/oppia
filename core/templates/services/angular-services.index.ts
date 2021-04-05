@@ -54,6 +54,7 @@ import { CollectionUpdateService } from 'domain/collection/collection-update.ser
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
+import { LearnerViewInfoBackendApiService } from 'pages/exploration-player-page/services/learner-view-info-backend-api.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
@@ -157,6 +158,7 @@ import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -225,7 +227,6 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
-import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
 import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
@@ -435,7 +436,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
-  ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
@@ -451,6 +451,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['FatigueDetectionService',
     FatigueDetectionService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
+  ['FilterForMatchingSubstringPipe', FilterForMatchingSubstringPipe],
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FormatRtePreviewPipe', FormatRtePreviewPipe],
@@ -494,6 +495,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],
   ['LearnerParamsService', LearnerParamsService],
+  ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],

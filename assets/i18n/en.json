@@ -613,6 +613,7 @@
     "I18N_TEACH_TESTIMONIAL_4": "“to be written3”",
     "I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
     "I18N_TOPIC_VIEWER_CHAPTER": "Chapter",
+    "I18N_TOPIC_VIEWER_CHAPTERS": "{count, plural, one{1 chapter} other{# chapters}}",
     "I18N_TOPIC_VIEWER_DESCRIPTION": "Description",
     "I18N_TOPIC_VIEWER_LESSON": "Lesson",
     "I18N_TOPIC_VIEWER_LESSONS": "Lessons",

@@ -69,7 +69,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'

@@ -43,7 +43,7 @@ export interface Testimonial {
 export class SplashPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   classroomUrlFragment: string;
-  classroomUrl :string;
+  classroomUrl: string;
   displayedTestimonialId: number;
   testimonialCount: number;
   testimonials = [];

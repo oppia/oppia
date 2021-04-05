@@ -2446,9 +2446,10 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         super(DeleteUserHandlerTest, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.admin_user_id = self.get_user_id_from_email(
+            feconf.SYSTEM_EMAIL_ADDRESS)
 
     def test_delete_without_user_id_raises_error(self):
         self.delete_json(

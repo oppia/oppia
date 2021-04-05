@@ -24,10 +24,16 @@ import unittest
 from core.platform import models
 from jobs import jobs_utils
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+base_models, user_models = (
+    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class FooModel(base_models.BaseModel):
+    """Simple BaseModel subclass with a 'prop' string property."""
+
+    prop = datastore_services.StringProperty()
 
 
 class CloneTests(unittest.TestCase):
@@ -51,32 +57,32 @@ class CloneTests(unittest.TestCase):
         self.assertTrue(model.deleted)
         self.assertFalse(clone.deleted)
 
+    def test_clone_with_changes_to_id(self):
+        model = base_models.BaseModel(id='123')
+        clone = jobs_utils.clone_model(model, id='124')
+
+        self.assertNotEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, base_models.BaseModel)
+        self.assertEqual(model.id, '123')
+        self.assertEqual(clone.id, '124')
+
     def test_clone_sub_class(self):
-        class DerivedModel(base_models.BaseModel):
-            """Simple model with an extra 'field' string property."""
-
-            field = datastore_services.StringProperty()
-
-        model = DerivedModel(id='123', field='original')
+        model = FooModel(id='123', prop='original')
         clone = jobs_utils.clone_model(model)
 
         self.assertEqual(model, clone)
         self.assertIsNot(model, clone)
-        self.assertIsInstance(clone, DerivedModel)
-        self.assertEqual(model.field, 'original')
-        self.assertEqual(clone.field, 'original')
+        self.assertIsInstance(clone, FooModel)
+        self.assertEqual(model.prop, 'original')
+        self.assertEqual(clone.prop, 'original')
 
     def test_clone_sub_class_with_changes(self):
-        class DerivedModel(base_models.BaseModel):
-            """Simple model with an extra 'field' string property."""
-
-            field = datastore_services.StringProperty()
-
-        model = DerivedModel(id='123', field='original')
-        clone = jobs_utils.clone_model(model, field='updated')
+        model = FooModel(id='123', prop='original')
+        clone = jobs_utils.clone_model(model, prop='updated')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
-        self.assertIsInstance(clone, DerivedModel)
-        self.assertEqual(model.field, 'original')
-        self.assertEqual(clone.field, 'updated')
+        self.assertIsInstance(clone, FooModel)
+        self.assertEqual(model.prop, 'original')
+        self.assertEqual(clone.prop, 'updated')
