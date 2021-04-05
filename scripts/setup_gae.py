@@ -63,7 +63,7 @@ def main(args=None):
         try:
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-304.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-334.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
@@ -72,7 +72,7 @@ def main(args=None):
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-334.0.0/'))
         tar.close()
 
         # This command installs specific google cloud components for the google

@@ -1,14 +1,8 @@
-runtime: python27
-api_version: 1
-threadsafe: false
+runtime: python37
 instance_class: F2
 # The "version" line is added here so that MR jobs can run locally (see issue
 # #6534 on oppia/oppia).
 version: default
-
-builtins:
-- deferred: on
-- remote_api: on
 
 inbound_services:
 - warmup
@@ -49,12 +43,10 @@ handlers:
 - url: /webpack_bundles
   static_dir: webpack_bundles
   secure: always
-  application_readable: true
   expiration: "0"
 - url: /assets
   static_dir: assets
   secure: always
-  application_readable: true
   expiration: "0"
 # Serve js scripts and css files under core/templates.
 # This regex allows us to recursively serve js scripts.
@@ -74,7 +66,6 @@ handlers:
   upload: core/templates/(.*\.(html))$
   secure: always
   expiration: "0"
-  application_readable: true
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
@@ -122,22 +113,17 @@ handlers:
 # DYNAMIC
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP
-  login: admin
   secure: always
 - url: /mapreduce/worker(/.*)?
   script: mapreduce.main.APP
-  login: admin
   secure: always
 - url: /cron/.*
-  login: admin
   script: main_cron.app
   secure: always
 - url: /task/.*
-  login: admin
   script: main_taskqueue.app
   secure: always
 - url: /_ah/mail/.*
-  login: admin
   script: main_mail.app
   secure: always
 
@@ -233,19 +219,6 @@ handlers:
 - url: /.*
   script: main.app
   secure: always
-
-libraries:
-- name: jinja2
-  version: "2.6"
-- name: PIL
-  version: "1.1.7"
-# This is needed for sending requests to a mailgun HTTPS URL.
-- name: ssl
-  version: "2.7.11"
-- name: grpcio
-  version: 1.0.0
-- name: setuptools
-  version: 36.6.0
 
 # This is an access connector that connects to the Google Cloud Redis instance
 # used for memory caching. Please replace PROJECT_ID with the correct project id

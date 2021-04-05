@@ -28,7 +28,7 @@ _FUTURE_PATH = os.path.join(
     os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _FUTURE_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.4.1')
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -117,9 +117,9 @@ def url_join(base_url, relative_url):
         str. The full URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urljoin(base_url, relative_url)
 
 
@@ -134,9 +134,9 @@ def url_split(urlstring):
         tuple(str). The components of a URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlsplit(urlstring)
 
 
@@ -153,9 +153,9 @@ def url_parse(urlstring):
         tuple(str). The components of a URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlparse(urlstring)
 
 
@@ -171,9 +171,9 @@ def url_unsplit(url_parts):
         str. The complete URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlunsplit(url_parts)
 
 
@@ -190,9 +190,9 @@ def parse_query_string(query_string):
         lists of values for each name.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.parse_qs(query_string)
 
 
@@ -208,11 +208,11 @@ def urllib_unquote(content):
         str. The unquoted string.
     """
     try:
-        import urllib
-        return urllib.unquote(content)
-    except ImportError:
         import urllib.parse
         return urllib.urlparse.unquote(content)
+    except ImportError:
+        import urllib
+        return urllib.unquote(content)
 
 
 def url_quote(content):
@@ -226,9 +226,9 @@ def url_quote(content):
         str. The quoted string.
     """
     try:
-        import urllib as urlparse_quote
-    except ImportError:
         import urllib.parse as urlparse_quote
+    except ImportError:
+        import urllib as urlparse_quote
     return urlparse_quote.quote(content)
 
 
@@ -244,11 +244,11 @@ def url_unquote_plus(content):
         str. The unquoted string.
     """
     try:
-        import urllib
-        return urllib.unquote_plus(content)
-    except ImportError:
         import urllib.parse
         return urllib.parse.unquote_plus(content)
+    except ImportError:
+        import urllib
+        return urllib.unquote_plus(content)
 
 
 def url_encode(query, doseq=False):
@@ -265,9 +265,9 @@ def url_encode(query, doseq=False):
         str. The 'url-encoded' string.
     """
     try:
-        import urllib as urlparse_urlencode
-    except ImportError:
         import urllib.parse as urlparse_urlencode
+    except ImportError:
+        import urllib as urlparse_urlencode
     return urlparse_urlencode.urlencode(query, doseq)
 
 
@@ -284,6 +284,14 @@ def url_retrieve(source_url, filename=None):
         urlretrieve. The 'urlretrieve' object.
     """
     try:
+        import urllib.request
+        # Change the User-Agent to prevent servers from blocking requests.
+        # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
+        urllib.request.URLopener.version = (
+            'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
+            'Gecko/20100101 Firefox/47.0')
+        return urllib.request.urlretrieve(source_url, filename=filename)
+    except ImportError:
         import urllib
         # Change the User-Agent to prevent servers from blocking requests.
         # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
@@ -291,9 +299,6 @@ def url_retrieve(source_url, filename=None):
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
             'Gecko/20100101 Firefox/47.0')
         return urllib.urlretrieve(source_url, filename=filename)
-    except ImportError:
-        import urllib.request
-        return urllib.request.urlretrieve(source_url, filename=filename)
 
 
 def url_open(source_url):
@@ -308,11 +313,11 @@ def url_open(source_url):
         urlopen. The 'urlopen' object.
     """
     try:
-        import urllib2
-        return urllib2.urlopen(source_url)
-    except ImportError:
         import urllib.request
         return urllib.request.urlopen(source_url)
+    except ImportError:
+        import urllib2
+        return urllib2.urlopen(source_url)
 
 
 def url_request(source_url, data, headers):
@@ -329,11 +334,11 @@ def url_request(source_url, data, headers):
         Request. The 'Request' object.
     """
     try:
-        import urllib2
-        return urllib2.Request(source_url, data, headers)
-    except ImportError:
         import urllib.request
         return urllib.request.Request(source_url)
+    except ImportError:
+        import urllib2
+        return urllib2.Request(source_url, data, headers)
 
 
 def divide(number1, number2):
