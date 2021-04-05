@@ -597,13 +597,13 @@ def main(args=None):
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
         output, return_code = run_tests(parsed_args)
-        # Don't rerun passing tests.
-        if return_code == 0:
-            flake_checker.report_pass(parsed_args.suite)
-            break
         # Don't rerun off of CI.
         if not flake_checker.check_if_on_ci():
             python_utils.PRINT('No reruns because not running on CI.')
+            break
+        # Don't rerun passing tests.
+        if return_code == 0:
+            flake_checker.report_pass(parsed_args.suite)
             break
         flaky = flake_checker.is_test_output_flaky(
             output, parsed_args.suite)

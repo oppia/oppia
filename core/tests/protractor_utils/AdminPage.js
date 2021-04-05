@@ -356,10 +356,19 @@ var AdminPage = function() {
     await action.click('View Role Button', viewRoleButton);
   };
 
-  this.viewRolesbyUsername = async function(username) {
+  this.viewRolesByUsername = async function(username, expectResults) {
     await action.select('Role Drop Down', roleDropdown, 'By Username');
     await action.sendKeys('Role Username Option', roleUsernameOption, username);
     await action.click('View Role Button', viewRoleButton);
+    if (expectResults) {
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'Success.',
+        'Toast with "Success." taking too long to appear');
+    } else {
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'No results.',
+        'Toast with "No results." taking too long to appear');
+    }
   };
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
@@ -367,7 +376,8 @@ var AdminPage = function() {
     var usernames = await element.all(
       by.css('.protractor-test-roles-result-rows'))
       .map(async function(elm) {
-        var text = await elm.getText();
+        var text = await action.getText(
+          'Username in roles list on admin page', elm);
         return text;
       });
 
