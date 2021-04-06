@@ -148,10 +148,11 @@ class ValidateCommitCmdsSchema(beam.DoFn):
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
+            get_change_domain_class: function which returns a change domain class
             
         Yields:
-            ModelMutatedDuringJobError. [subject to change]
-            InconsistentTimestampsError. [subject to change]            
+            ModelMutatedDuringJobError. Error for missing commit commmand domain
+            InconsistentTimestampsError. Error for commit command validation    
         """
         model = jobs_utils.clone_model(input_model)
         change_domain_object = get_change_domain_class(model)

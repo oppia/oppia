@@ -149,3 +149,22 @@ class ModelExpiredError(ModelValidationErrorBase):
         super(ModelExpiredError, self).__init__(model)
         self.message = 'deleted=True when older than %s days' % (
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+
+
+class MissingCommitCommandDomainObjError(ModelValidationErrorBase):
+    """Error class for missing commit command domain  """
+
+    def __init__(self, model):
+        super(MissingCommitCommandDomainObjError, self).__init__(model)
+        self.message = 'Entity id %s: No commit command domain object defined '
+        'for entity with commands: %s' % (model.id, model.commit_cmds)
+
+
+class CommitCommandValidationFailedError(ModelValidationErrorBase):
+    """Error class for commit command domain validation"""
+
+    def __init__(self, cmd_name, model, commit_cmd_dict, e):
+        super(CommitCommandValidationFailedError, self).__init__(model)
+        self.message = 'commit cmd %s check' % cmd_name,
+        'Entity id %s: Commit command domain validation for '
+        'command: %s failed with error: %s' % (model.id, commit_cmd_dict, e)
