@@ -1976,14 +1976,26 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
             try:
                 prev_interaction_id = (
-                    prev_exp.state_interaction_ids_dict[state_name])
+                    prev_exp.state_interaction_ids_dict[prev_state_name]
+                    if prev_state_name in prev_exp.state_interaction_ids_dict
+                    else None)
                 current_interaction_id = (
                     exp.state_interaction_ids_dict[state_name])
-                exp_stats_list[i].state_stats_mapping[state_name] = (
-                    prev_exp_stats.state_stats_mapping[
-                        prev_state_name].clone()
-                    if current_interaction_id == prev_interaction_id else
-                    stats_domain.StateStats.create_default())
+                # In early schema versions of ExplorationModel, the END
+                # card was a persistant, implicit state present in every
+                # exploration. The snapshots of these old explorations have
+                # since been migrated but they do not have corresponding state
+                # stats models for the END state. So for such versions, a
+                # default state stats model should be created.
+                if current_interaction_id != prev_interaction_id or (
+                        current_interaction_id == 'EndExploration' and
+                        prev_state_name == 'END'):
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default())
+                else:
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        prev_exp_stats.state_stats_mapping[
+                            prev_state_name].clone())
                 missing_state_stats.append(
                     'StateStats(exp_id=%r, exp_version=%r, '
                     'state_name=%r)' % (exp_id, exp.version, state_name))
