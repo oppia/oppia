@@ -2122,7 +2122,8 @@ class MetaclassChecker(checkers.BaseChecker):
         'C0034': (
             'Please use python_utils.with_metaclass() instead of __metaclass__',
             'metaclass',
-            'Enforce usage of python_utils.with_metaclass() instead of __metaclass__'
+            'Enforce usage of python_utils.with_metaclass()' 
+            'instead of __metaclass__'
         )
     }
 
