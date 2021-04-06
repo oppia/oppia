@@ -59,7 +59,7 @@ def check_if_pr_is_translation_pr(source_branch):
 def main(tokens=None):
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'pr_url'
+        'pr_url',
         help='The URL of the pull request.'
     )
     args = parser.parse_args(tokens)
