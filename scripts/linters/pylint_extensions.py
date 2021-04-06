@@ -2116,13 +2116,13 @@ class MetaclassChecker(checkers.BaseChecker):
 
     __implements__ = interfaces.IAstroidChecker
 
-    name = 'metaclass'
+    name = 'replace-disallowed-metaclass-usage'
     priority = -1
     msgs = {
         'C0034': (
             'Please use python_utils.with_metaclass() instead of __metaclass__',
             'metaclass',
-            'Use python_utils.with_metaclass() instead of __metaclass__'
+            'Enforce usage of python_utils.with_metaclass() instead of __metaclass__'
         )
     }
 
@@ -2134,11 +2134,10 @@ class MetaclassChecker(checkers.BaseChecker):
             node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
         """
-        # Check if the given node has a metaclass.
-        meta = node.declared_metaclass()
-        if meta is None:
+
+        if node.declared_metaclass() is None:
             return
-        self.add_message('metaclass', node=node)
+        self.add_message('replace-disallowed-metaclass-usage', node=node)
 
 
 def register(linter):

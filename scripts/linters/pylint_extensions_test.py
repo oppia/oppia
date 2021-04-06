@@ -3276,7 +3276,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
 class MetaclassCheckerTests(unittest.TestCase):
 
-    def test_finds_metaclass_usage_add_msg(self):
+    def test_wrong_metaclass_usage_raises_error(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.MetaclassChecker)
@@ -3297,13 +3297,29 @@ class MetaclassCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='metaclass',
+                msg_id='replace-disallowed-metaclass-usage',
                 node=metaclass_node
-            ),
+            )
         ):
             checker_test_object.checker.visit_classdef(metaclass_node)
 
-    def test_finds_metaclass_usage_no_msg(self):
+    def test_no_metaclass_usage_raises_no_error(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.MetaclassChecker)
+        checker_test_object.setup_method()
+
+        metaclass_node = astroid.extract_node(
+            """
+            class MyObject: #@
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+            """)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_classdef(metaclass_node)
+
+    def test_correct_metaclass_usage_raises_no_error(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.MetaclassChecker)
@@ -3317,6 +3333,7 @@ class MetaclassCheckerTests(unittest.TestCase):
                 def fake_method(self, name):
                     yield (name, name)
             class MyObject: #@
+                python_utils.with_metaclass(FakeClass)
                 def __init__(self, fake_arg):
                     self.fake_arg = fake_arg
             """)
