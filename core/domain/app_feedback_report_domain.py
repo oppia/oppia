@@ -19,6 +19,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
+from core.domain import app_feedback_report_services
+from core.domain import exp_services
+from core.domain import story_domain
+from core.domain import topic_domain
 from core.platform import models
 
 import feconf
@@ -44,11 +50,13 @@ STATS_PARAMETER_NAMES = utils.create_enum(
     'entry_point_name', 'text_language_code', 'audio_language_code',
     'sdk_version', 'version_name')
 
+MINIMUM_ANDROID_SDK_VERSION = 2
 ANDROID_TEXT_SIZE = utils.create_enum('small', 'medium', 'large', 'extra_large')
 ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
     ENTRY_POINT.revision_card, ENTRY_POINT.crash]
-ANDROID_VERSION_NAME_DELIMITER = '.'
+ANDROID_VERSION_NAME_DELIMITER = '-'
+ANDROID_NETWORK_TYPES = utils.create_enum('wifi', 'cellular', 'none')
 
 ALLOWED_REPORT_TYPES = [
     REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
@@ -76,6 +84,11 @@ ALLLOWED_ANDROID_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.text_language_code,
     STATS_PARAMETER_NAMES.audio_language_code,
     STATS_PARAMETER_NAMES.sdk_version, STATS_PARAMETER_NAMES.version_name]
+ALLOWED_ANDROID_NETWORK_TYPES = [
+    ANDROID_NETWORK_TYPES.wifi, ANDROID_NETWORK_TYPES.cellular,
+    ANDROID_NETWORK_TYPES.none]
+
+MAXIMUM_TICKET_NAME_LENGTH = 100
 
 class AppFeedbackReport(python_utils.OBJECT):
     """Domain object for a single feedback report."""
@@ -138,6 +151,8 @@ class AppFeedbackReport(python_utils.OBJECT):
         Raises:
             ValidationError. One or more attributes of the AppFeedbackReport are
                 not valid.
+            NotImplementedError. The full validation for web report domain
+                objects is not implemented yet.
         """
         self.require_valid_platform(self.platform)
 
@@ -145,9 +160,9 @@ class AppFeedbackReport(python_utils.OBJECT):
             self.require_valid_scrubber_id(self.scrubbed_by)
 
         if self.ticket_id is not None:
-            self.require_valid_ticket_id(self.ticket_id)
+            AppFeedbackReportTicket.validate_ticket_id(self.ticket_id)
 
-        self.require_valid_submission_datetime(self.report_submitted_timestamp)
+        self.require_valid_report_datetime(self.report_submitted_timestamp)
 
         self.user_supplied_feedback.validate()
 
@@ -204,26 +219,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                 'The scrubber_by user id %r is invalid.' % scrubber_id)
 
     @classmethod
-    def require_valid_ticket_id(cls, ticket_id):
-        """Checks whether the ticket id is a valid one.
-
-        Args:
-            ticket_id: str. The ticket id to validate.
-
-        Raises:
-            ValidationError. The id is an invalid format.
-        """
-        if not isinstance(ticket_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Report\'s ticket id should be a string, received: %s' % (
-                    ticket_id))
-        if len(ticket_id.split(
-            app_feedback_report_models.TICKET_ID_DELIMITER)) != 3:
-            raise utils.ValidationError('The ticket_id %s is invalid' % (
-                ticket_id))
-
-    @classmethod
-    def require_valid_submission_datetime(cls, submission_datetime):
+    def require_valid_report_datetime(cls, submission_datetime):
         """Checks whether the report submission datetime is a valid one.
 
         Args:
@@ -377,7 +373,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 category, other_text_input)
 
     @classmethod
-    def require_valid_selected_items_for_category(cls, category, selected_items):
+    def require_valid_selected_items_for_category(
+            cls, category, selected_items):
         """Checks whether the user_feedback_selected_items are valid.
 
         Args:
@@ -447,8 +444,8 @@ class DeviceSystemContext(python_utils.OBJECT):
         Args:
             version_name: str. The specific version of the app being used to
                 submit the report.
-            device_country_locale_code: str. The user's country locale represented as
-                an ISO-3166 code.
+            device_country_locale_code: str. The user's country locale
+                represented as an ISO-3166 code.
         """
         self.version_name = version_name
         self.device_country_locale_code = device_country_locale_code
@@ -543,11 +540,26 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """
         self.require_valid_version_name(self.version_name)
         self.require_valid_package_version_code(self.package_version_code)
-        self.require_valid_country_locale_code(self.device_country_locale_code)
-        self.require_valid_language_locale_code(self.device_language_locale_code)
-        self.require_valid_device_model(self.device_model)
+        self.require_valid_locale_code(
+            'country', self.device_country_locale_code)
+        self.require_valid_locale_code(
+            'language',self.device_language_locale_code)
+
+        if self.device_model is None:
+            raise utils.ValidationError('No device model supplied.')
+        if not isinstance(self.device_model, python_utils):
+            raise utils.ValidationError(
+                'Android device model must be an string, received: %r.' % (
+                    country_locale_code))
+    
         self.require_valid_sdk_version(self.sdk_version)
-        self.require_valid_build_fingerprint(self.build_fingerprint)
+        if self.build_fingerprint is NotImplemented:
+            raise utils.ValidationError('No build fingerprint supplied.')
+        if not isinstance(self.build_fingerprint, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Build fingerprint must be a string, received: %r.' % (
+                    self.build_fingerprint))
+    
         self.require_valid_network_type(self.network_type)
         
     @classmethod
@@ -557,7 +569,6 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
         Args:
             version_name: str. The version name for this report.
-
         Raises:
             ValidationError. The given app version name is not valid.
         """
@@ -567,8 +578,10 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             raise utils.ValidationError(
                 'Version name must be a string, received: %r.' % version_name)
         if len(version_name.split(ANDROID_VERSION_NAME_DELIMITER)) != 3:
-            raise utils.ValidationError('The version name.')
-        
+            raise utils.ValidationError(
+                'The version name is not a valid string format, received: '
+                '%s.' % version_name)
+
     @classmethod
     def require_valid_package_version_code(cls, package_version_code):
         """Checks whether the package version code is a valid string code for
@@ -576,7 +589,6 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
         Args:
             package_version_code: int. The package version code for this report.
-
         Raises:
             ValidationError. The given code is not valid.
         """
@@ -586,60 +598,92 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             raise utils.ValidationError(
                 'Package verion code must be an int, received: %r.' % (
                     package_version_code))
-        if package_version_code < feconf.MIN_ANDROID_PACKAGE_VERSION_CODE or (
-            package_version_code > feconf.MAX_ANDROID_PACKAGE_VERSION_CODE):
+        if not (
+            feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE <=
+            package_version_code <=
+            feconf.MAXIMUM_ANDROID_PACKAGE_VERSION_CODE):
             raise utils.ValidationError(
                 'Package version code is not a valid int, received: %d. The '
-                'maximum supported version is %d and the minimum supported '
-                'version is %d.' % (
+                'supported version codes are within the range [%d, %d].' % (
                     package_version_code,
-                    feconf.MAX_ANDROID_PACKAGE_VERSION_CODE,
-                    feconf.MIN_ANDROID_PACKAGE_VERSION_CODE))
+                    feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE,
+                    feconf.MAXIMUM_ANDROID_PACKAGE_VERSION_CODE))
 
     @classmethod
-    def require_valid_country_locale_code(cls, country_locale_code):
-        """Checks whether the country locale code is a valid  code.
+    def require_valid_locale_code(cls, locale_type, locale_code):
+        """Checks whether the device's locale code is a valid  code.
 
         Args:
-            country_locale_code: str. The device's country locale code
+            locale_type: str. The type of locale code to verify; can be either
+                'country' or 'language'.
+            locale_code: str. The device's country locale code
                 that sent the report.
-
         Raises:
             ValidationError. The given code is not valid.
         """
-    
+        if locale_code is None:
+            raise utils.ValidationError(
+                'No device %s locale code supplied.' % locale_type)
+        if not isinstance(locale_code, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'The device\'s %s locale code must be an string, '
+                'received: %r.' % locale_type, locale_code)
+        if not self._match_locale_code_string(locale_code):
+            raise utils.ValidationError(
+                'The device\'s %s locale code is not a valid string, '
+                'received: %s.' % locale_type, locale_code)
+
     @classmethod
-    def require_valid_language_locale_code(cls, language_locale_code):
-        """Checks whether the language locale code is a valid  code.
+    def _match_locale_code_string(cls, code):
+        """Helper that checks whether the given locale code is a valid code.
 
         Args:
-            language_locale_code: str. The device's country locale code
-                that sent the report.
+            code: str. The device's country locale code that sent the report.
 
         Raises:
-            ValidationError. The given code is not valid.
+            bool. Whether the given code is valid. Valid codes are alphabetic
+            string that may contain a number of single hyphens.
         """
+        regex_string = r'\w+(?:-\w+)+'
+        return re.compile(regex_string).match(code)
     
     @classmethod
-    def require_valid_device_model(cls, device_model):
-        """Checks whether the device model is a valid string.
+    def require_valid_sdk_version(cls, sdk_version):
+        """Checks that the Android device's SDK version is a positive integer.
 
         Args:
-            device_model: str. The device's country locale code
-                that sent the report.
-
+            sdk_version: int. The SDK version of the device sending this report.
         Raises:
-            ValidationError. The given code is not valid.
+            ValidationError. The given SDK version  is not valid.
         """
-    
-    # @classmethod
-    # def require_valid_sdk_version(cls, sdk_version):
-    
-    # @classmethod
-    # def require_valid_build_fingerprint(cls, build_fingerprint):
+        if sdk_version is None:
+            raise utils.ValidationError('No SDK version supplied.')
+        if not isinstance(sdk_version, int):
+            raise utils.ValidationError(
+                'SDK version must be an int, received: %r.' % sdk_version)
+        if sdk_version < MINIMUM_ANDROID_SDK_VERSION:
+            raise utils.ValidationError(
+                'Invalid SDK version, received: %s.' % sdk_version)
      
-    # @classmethod
-    # def require_valid_network_type(cls, network_type):
+    @classmethod
+    def require_valid_network_type(cls, network_type):
+        """Checks that the Android device's network type is valid.
+
+        Args:
+            network_type: str. The network type the device was connected to when
+                sending the report, correponding to one of the
+                ALLOWED_ANDROID_NETWORK_TYPES enums.
+        Raises:
+            ValidationError. The given network is not valid.
+        """
+        if network_type is None:
+            raise utils.ValidationError('No network type supplied.')
+        if not isinstance(network_type, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Network type  must be a string, received: %r.' % network_type)
+        if network_type not in ALLOWED_ANDROID_NETWORK_TYPES:
+            raise utils.ValidationError(
+                'Invalid network type, received: %s.' % network_type)
 
 
 class EntryPoint(python_utils.OBJECT):
@@ -654,6 +698,18 @@ class EntryPoint(python_utils.OBJECT):
                 used, corresponding to an ENTRY_POINT enum.
         """
         self.entry_point_name = entry_point_name
+
+    def to_dict():
+        """Returns a dict representing this NavigationDrawerEntryPoint domain
+        object.
+
+        Raises:
+            NotImplementedError. Suclasses should implement their own dict
+                representations.
+        """
+        raise NotImplementedError(
+            'Subclasses of EntryPoint should implement their own dict '
+            'representations.')
 
 
 class NavigationDrawerEntryPoint(EntryPoint):
@@ -710,6 +766,60 @@ class LessonPlayerEntryPoint(EntryPoint):
             'exploration_id': self.exploration_id
         }
 
+    def validate(self):
+        """Validates this LessonPlayerEntryPoint domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                LessonPlayerEntryPoint are not valid.
+        """
+        self.require_valid_entry_point_name(self.entry_point_name)
+        topic_domain.require_valid_topic_id(self.topic_id)
+        story_domain.require_valid_story_id(self.story_id)
+        self.require_valid_entry_point_exploration(
+            self.exploration_id, self.story_id)
+    
+    @classmethod
+    def require_valid_entry_point_name(cls, entry_point_name)
+        """Validates this LessonPlayerEntryPoint name.
+
+        Args:
+            entry_point_name: str. The name used for this entry point object.
+        Raises:
+            ValidationError. The name is not valid for the type.
+        """
+        if entry_point_name is None:
+            raise utils.ValidationError('No entry point name supplied.')
+        if not isinstance(entry_point_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Entry point name must be a string, received: %r.' % (
+                    entry_point_name))
+        if entry_point_name is not ENTRY_POINT.lesson_player:
+            raise utils.ValidationError(
+                'Invalid emtry point name, received: %s.' % entry_point_name)
+
+    @classmethod
+    def require_valid_entry_point_exploration(cls, exploration_id, story_id):
+        """Checks whether the exploration id is a valid one.
+
+        Args:
+            exploration_id: str. The exploraiton ID to validate.
+            story_id: str. The ID of the story that has this exploration.
+        Raises:
+            ValidationError. The exploration ID is not a valid ID.
+        """
+        if not isinstance(exploration_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Exploration id should be a string, received: %r' % (
+                    exploration_id))
+        expected_story_id = exp_services.get_story_id_linked_to_exploration(
+            exploration_id)
+        if  (expected_story_id != story_id):
+            raise utils.ValidationError(
+                'Exploration with id %s is not part of story with id of %s, '
+                'should be found in story with id of %s' % (
+                    exploration_id, story_id, expected_story_id))
+
 
 class RevisionCardEntryPoint(EntryPoint):
     """Domain object for the Android revision card entry point."""
@@ -740,6 +850,39 @@ class RevisionCardEntryPoint(EntryPoint):
             'topic_id': self.topic_id,
             'subtopic_id': self.subtopic_id
         }
+
+    def validate(self):
+        """Validates this RevisionCardEntryPoint domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                RevisionCardEntryPoint are not valid.
+        """
+        self.require_valid_entry_point_name(self.entry_point_name)
+        topic_domain.require_valid_topic_id(self.topic_id)
+        if not isinstance(self.subtopic_id, int):
+            raise utils.ValidationError(
+                'Expected subtopic id to be an int, received %s' % (
+                    self.subtopic_id))
+    
+    @classmethod
+    def require_valid_entry_point_name(cls, entry_point_name)
+        """Validates this RevisionCardEntryPoint name.
+
+        Args:
+            entry_point_name: str. The name used for this entry point object.
+        Raises:
+            ValidationError. The name is not valid for the type.
+        """
+        if entry_point_name is None:
+            raise utils.ValidationError('No entry point name supplied.')
+        if not isinstance(entry_point_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Entry point name must be a string, received: %r.' % (
+                    entry_point_name))
+        if entry_point_name is not ENTRY_POINT.revision_card:
+            raise utils.ValidationError(
+                'Invalid emtry point name, received: %s.' % entry_point_name)
 
 
 class CrashEntryPoint(EntryPoint):
@@ -793,6 +936,55 @@ class AppContext(python_utils.OBJECT):
             'text_language_code': self.text_language_code,
             'audio_language_code': self.audio_language_code
         }
+
+    @classmethod
+    def validate():
+        """Validates this AppContext domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                AppContext are not valid.
+        """
+        self.entry_point.validate()
+        self.require_valid_language_code('text', self.text_language_code)
+        self.require_valid_language_code('audio', self.audio_language_code)
+
+    @classmethod
+    def require_valid_language_code(self, language_type, language_code):
+        """Checks that the language code is valid
+
+        Args:
+            language_type: str. The type of language code being validates,
+                either 'text' or 'audio'.
+            language_code: str. The language code being validated, as determined
+                by the Oppia app.
+        Raises:
+            ValidationError. The given code is not valid.
+        """
+        if language_code is None:
+            raise utils.ValidationError(
+                'No app %s language code supplied.' % language_type)
+        if not isinstance(language_code, int):
+            raise utils.ValidationError(
+                'Expected the app\'s %s language code to be a string, '
+                'received: %r' % language_type, language_code)
+        if not self._match_language_code_string(language_code):
+            raise utils.ValidationError(
+                'The app\'s %s language code is not a valid string, '
+                'received: %s.' % language_type, language_code)
+
+    @classmethod
+    def _match_language_code_string(cls, code):
+        """Helper that checks whether the given language code is a valid code.
+
+        Args:
+            code: str. The language code set on the app.
+        Raises:
+            bool. Whether the given code is valid. Valid codes are alphabetic
+            string that may contain a number of single hyphens.
+        """
+        regex_string = r'\w+(?:-\w+)+'
+        return re.compile(regex_string).match(code)
 
 
 class AndroidAppContext(AppContext):
@@ -859,6 +1051,62 @@ class AndroidAppContext(AppContext):
             'logcat_logs': self.logcat_logs
         }
 
+    def validate():
+        """Validates this AndroidAppContext domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                AndroidAppContext are not valid.
+        """
+        super(AndroidAppContext, self).validate()
+        self.require_valid_text_size(self.text_size)
+        if (self.only_allows_wifi_download_and_update is None) or not (
+            isinstance(self.only_allowed_wifi_download_and_update, bool)):
+            raise utils.ValidationError(
+                'only_allowed_wifi_download_and_update field should be a '
+                'boolean, received: %r' % (
+                    self.only_allowed_wifi_download_and_update))
+        if (self.automatically_update_topics is None) or not (
+            isinstance(self.automatically_update_topics, bool)):
+            raise utils.ValidationError(
+                'automatically_update_topics field should be a '
+                'boolean, received: %r' % self.automatically_update_topics)
+        if (self.account_is_profile_admin is None) or not (
+            isinstance(self.account_is_profile_admin, bool)):
+            raise utils.ValidationError(
+                'account_is_profile_admin field should be a '
+                'boolean, received: %r' % self.account_is_profile_admin)
+        if self.event_logs is None or not isinstance(
+            self.event_logs, list)):
+            raise utils.ValidationError(
+                'Should have an event log list, received: %r' % self.event_logs)
+        if self.logcat_logs is None or not isinstance(
+            self.logcat_logs, list)):
+            raise utils.ValidationError(
+                'Should have a logcat lots list, received: %r' % (
+                    self.logcat_logs))
+
+    @classmethod
+    def require_valid_text_size(cls, text_size):
+        """Checks whether the package version code is a valid string code for
+        Oppia Android.
+
+        Args:
+            text_size: str. The text size set on the app, corresponding to an
+                ANDROID_TEXT_SIZE enum.
+        Raises:
+            ValidationError. The given text size is not valid.
+        """
+        if text_size is None:
+            raise utils.ValidationError('No text size supplied.')
+        if not isinstance(text_size, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Text size must be a stirng, received: %r.' % text_size)
+        if text_size not in ANDROID_TEXT_SIZE:
+            raise utils.ValidationError(
+                'App text size should be one of %s, received: %s' % (
+                    ANDROID_TEXT_SIZE, text_size))
+
 
 class AppFeedbackReportTicket(python_utils.OBJECT):
     """Domain object for a single ticket created for feedback reports."""
@@ -886,7 +1134,8 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         object.
 
         Returns:
-            dict. A dict, mapping all fields of AppFeedbackReportTicket instance.
+            dict. A dict, mapping all fields of AppFeedbackReportTicket
+            instance.
         """
         return {
             'ticket_id': self.ticket_id,
@@ -895,6 +1144,80 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                 self.newest_report_creation_timestamp.isoformat()),
             'reports': [report.report_id for report in self.reports]
         }
+
+    def validate():
+        """Validates this AppFeedbackReportTicket domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                AppFeedbackReportTicket are not valid.
+        """
+        
+        self.require_valid_ticket_id(self.ticket_id)
+        self.require_valid_ticket_name(self.ticket_name)
+        AppFeedbackReport.require_valid_report_datetime(
+            self.newest_report_creation_timestamp)
+        self.require_valid_reports(self.reports)
+    
+    @classmethod
+    def require_valid_ticket_id(cls, ticket_id):
+        """Checks whether the ticket id is a valid one.
+
+        Args:
+            ticket_id: str. The ticket id to validate.
+        Raises:
+            ValidationError. The id is an invalid format.
+        """
+        if ticket_id is None:
+            raise utils.ValidationError('No ticket ID supplied.')
+        if not isinstance(ticket_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'The ticket id should be a string, received: %s' % (
+                    ticket_id))
+        if len(ticket_id.split(
+            app_feedback_report_models.TICKET_ID_DELIMITER)) != 3:
+            raise utils.ValidationError('The ticket id %s is invalid' % (
+                ticket_id))
+
+    @classmethod
+    def require_valid_ticket_name(cls, ticket_name):
+        """Checks whether the ticket name is a valid one.
+
+        Args:
+            ticket_name: str. The ticket name to validate.
+        Raises:
+            ValidationError. The name is an invalid format.
+        """
+        if ticket_name is None:
+            raise utils.ValidationError('No ticket name supplied.')
+        if not isinstance(ticket_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'The ticket name should be a string, received: %s' % (
+                    ticket_name))
+        if len(ticket_name) > MAXIMUM_TICKET_NAME_LENGTH:
+            raise utils.ValidationError(
+                'The ticket name is too long, has %d characters but only '
+                'allowed %d characters' % (
+                    len(ticket_name), MAXIMUM_TICKET_NAME_LENGTH))
+
+    @classmethod
+    def require_valid_reports(cls, reports_list):
+        """Checks whether the reports in this ticket are valid.
+
+        Args:
+            reports_list: list(AppFeedbackReport). The list of reports
+                associated with this ticket.
+        Raises:
+            ValidationError. The list of reports is invalid.
+        """
+        if reports_list is None:
+            raise utils.ValidationError('No reports list supplied.')
+        if not isinstance(reports_list, list):
+            raise utils.ValidationError(
+                'The reports list should be a list, received: %r' % (
+                    reports_list))
+        for report in reports_list:
+            report.validate()
 
 
 class AppFeedbackReportDailyStats(python_utils.OBJECT):
@@ -911,19 +1234,101 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             stats_id: str. The unique ID for ths stats instance.
             ticket_id: str. The unique ID of the ticket that this object is
                 aggregating stats on.
-            date: datetime.date. The date that this object is aggregating stats
-                on, in UTC.
-            daily_param_stats: dict. A dict representing the statistics on this date.
-                Keys in this dict correpond to STATS_PARAMETER_NAMES enums,
-                while values are ReportStatsParameterValueCounts objects.
+            stats_tracking_date: datetime.date. The date that this object is
+                aggregating stats on, in UTC.
+            total_reports_submitted: int. The total number of reports submitted
+                on this date for this ticket.
+            daily_param_stats: dict. A dict representing the statistics on this
+                date. Keys in this dict correpond to STATS_PARAMETER_NAMES
+                enums, while values are ReportStatsParameterValueCounts objects.
         """
         self.stats_id = stats_id
         self.ticket_id = ticket_id
         self.platform = platform
         self.stats_tracking_date = stats_tracking_date
+        self.total_reports_submitted = total_reports_submitted
         self.daily_param_stats = daily_param_stats
 
-    # def to_dict():
+    def to_dict():
+        """Returns a dict representing this AppFeedbackReportDailyStats domain
+        object.
+
+        Returns:
+            dict. A dict, mapping all fields of AppFeedbackReportDailyStats
+            instance.
+        """
+        return {
+            'stats_id': self.stats_id,
+            'ticket_id': self.ticket_id,
+            'platofmr': self.platform,
+            'stats_tracking_date': self.stats_tracking_date.isoformat(),
+            'total_reports_submitted': self.total_reports_submitted.
+            'daily_param_stats': {
+                param_name: param_count.to_dict()
+                for (param_name, param_value_counts) in (
+                    self.daily_param_stats.items())
+            }
+        }
+
+    def validate():
+        """Validates this AppFeedbackReportDailyStats domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                AppFeedbackReportDailyStats are not valid.
+        """
+        self.require_valid_stats_id(self.stats_id)
+        AppFeedbackReportTicket.require_valid_ticket_id(self.ticket_id)
+        AppFeedbackReportTicket.require_valid_ticket_name(self.ticket_name)
+        AppFeedbackReport.require_valid_report_datetime(
+            self.stats_tracking_date)
+        if not isinstance(self.total_reports_submitted, int):
+            raise utils.ValidationError(
+                'The total number of submitted reports should be an int, '
+                'received: %r' % total_reports_submitted)
+        if self.total_reports_submitted < 1:
+            raise utils.ValidationError(
+                'The total number of submitted reports should be a positive '
+                'int, received: %d' % total_reports_submitted)
+        self.require_valid_daily_param_stats(self.daily_param_stats)
+
+    @classmethod
+    def require_valid_stats_id(cls, stats_id):
+        """Checks whether the stats id is a valid one.
+
+        Args:
+            stats_id: str. The stats id to validate.
+        Raises:
+            ValidationError. The id is an invalid format.
+        """
+        if stats_id is None:
+            raise utils.ValidationError('No stats ID supplied.')
+        if not isinstance(stats_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'The stats id should be a string, received: %r' % stats_id)
+        if len(stats_id.split(
+            app_feedback_report_models.STATS_ID_DELIMITER)) != 3:
+            raise utils.ValidationError('The stats id %s is invalid' % stats_id)
+
+    @classmethod
+    def require_valid_daily_param_stats(cls, param_stats):
+        """Checks whether the statistics in this domain object are valid.
+
+        Args:
+            param_stats: dict. The dict representing the daily stats for this
+                ticket.
+        Raises:
+            ValidationError. The dict is an invalid format.
+        """
+        if not isinstance(param_stats, dict):
+            raise utils.ValidationError(
+                'The param stats should be a dict, received: %r' % param_stats)
+        for (param_name, param_count_obj) in param_stats.items():
+            if param_name not in STATS_PARAMETER_NAMES:
+                raise utils.ValidationError(
+                    'The param %s is not a valid param to aggregate stats on, '
+                    'must be one of %s' % param_name, STATS_PARAMETER_NAMES)
+            param_count_object.validate()
 
 
 class ReportStatsParameterValueCounts(python_utils.OBJECT):
@@ -943,10 +1348,28 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
         self.parameter_value_counts
 
     def to_dict():
-        data_dict = dict()
-        for key, value in self.parameter_value_counts:
-            data_dict[key] = value
-        return data_dict
+        return {
+            param_value_name: value_count
+            for (param_value_name, value_count) in (
+                self.parameter_value_counts.items())
+        }
+
+    def validate():
+        """Validates this ReportStatsParameterValueCounts domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                ReportStatsParameterValueCounts are not valid.
+        """
+        for (param_value, param_count) in self.parameter_value_counts:
+            if not isinstance(param_value, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'The param value should be a string, received: %r' % (
+                        param_value))
+            if not isinstance(param_count, int) or param_count < 1:
+                raise utils.ValidationError(
+                    'The param value count should be a positive int, '
+                    'received: %r' % param_count)
 
 
 class AppFeedbackReportFilter(python_utils.OBJECT):
@@ -971,3 +1394,18 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             'filter_options': self.filter_options
         }
 
+    def validate():
+        """Validates this AppFeedbackReportFilter domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                AppFeedbackReportFilter are not valid.
+        """
+        if not isinstance(self.filter_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'The filter name should be a string, received: %r' % (
+                    self.filter_name))
+        if not isinstance(self.filter_options, list):
+            raise utils.ValidationError(
+                'The filter options should be a list, received: %r' % (
+                    self.filter_options))

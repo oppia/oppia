@@ -154,44 +154,6 @@ def _get_entry_point(
         raise utils.InvalidInputException(
             "Received unexpected entry point type.")
 
-
-# def is_ex
-
-
-# // Called when an admin triages reports; updates the assigned ticket in the
-# // AppFeedbackReportModel and modifies the AppFeedbackReportStatsModel so that
-# // aggregates are accurate (occurs in a transaction)
-# def reassign_ticket(report_id, ticket_id)
-
-# // Called when updates a ticket name. Updates the entity in the
-# // AppFeedbackReportTicketModel and the relevant tickets in the
-# // AppFeedbackReportModel (both occurs in a transaction)>
-# def edit_ticket_name(ticket_id)
-
-# // Called when an maintainer needs to scrub a report or if the report is expiring
-# // (occurs in a transaction)
-# def scrub_report(report_id)
-
-# // Fetches and processes the next batch of reports maintainers want to view and
-# // returns a list of FeedbackReports.
-# def get_next_batch_of_reports(active_filters, page_num, cursor):
-#    list<FeedbackReport>
-
-# // Fetches and processes the next batch of reports maintainers want to view.
-# // Returns a list of FeedbackReportTickets
-# def get_next_batch_of_tickets(active_filters, page_num, cursor):
-#    list<FeedbackReportTicket>
-
-# // Fetches and processes a list of FeedbackReportDailyStats to display in the
-# // dashboard
-# def get_stats(ticket_id, splice_val): list<FeedbackReportDailyStats>
-
-# // Calculates all the possible filters values that can be applied to the current
-# // set of reports based on the storage models. This will fetch from the
-# // AndroidFeedbackReportModel based on the a constant
-# // ALLOWED_ANDROID_REPORT_FILTERS
-# def get_all_filter_options() : FeedbackReportFilter
-
 def scrub_all_unscrubbed_expiring_reports():
     """Fetches the reports that are expiring and must be scrubbed.
 
@@ -275,3 +237,41 @@ def _scrub_report_info(report_info_dict):
         if key not in app_feedback_report_models.REPORT_INFO_TO_REDACT:
             new_report_info[key] = report_info_dict[key]
     return new_report_info
+
+
+# def is_ex
+
+
+# // Called when an admin triages reports; updates the assigned ticket in the
+# // AppFeedbackReportModel and modifies the AppFeedbackReportStatsModel so that
+# // aggregates are accurate (occurs in a transaction)
+# def reassign_ticket(report_id, ticket_id)
+
+# // Called when updates a ticket name. Updates the entity in the
+# // AppFeedbackReportTicketModel and the relevant tickets in the
+# // AppFeedbackReportModel (both occurs in a transaction)>
+# def edit_ticket_name(ticket_id)
+
+# // Called when an maintainer needs to scrub a report or if the report is expiring
+# // (occurs in a transaction)
+# def scrub_report(report_id)
+
+# // Fetches and processes the next batch of reports maintainers want to view and
+# // returns a list of FeedbackReports.
+# def get_next_batch_of_reports(active_filters, page_num, cursor):
+#    list<FeedbackReport>
+
+# // Fetches and processes the next batch of reports maintainers want to view.
+# // Returns a list of FeedbackReportTickets
+# def get_next_batch_of_tickets(active_filters, page_num, cursor):
+#    list<FeedbackReportTicket>
+
+# // Fetches and processes a list of FeedbackReportDailyStats to display in the
+# // dashboard
+# def get_stats(ticket_id, splice_val): list<FeedbackReportDailyStats>
+
+# // Calculates all the possible filters values that can be applied to the current
+# // set of reports based on the storage models. This will fetch from the
+# // AndroidFeedbackReportModel based on the a constant
+# // ALLOWED_ANDROID_REPORT_FILTERS
+# def get_all_filter_options() : FeedbackReportFilter
