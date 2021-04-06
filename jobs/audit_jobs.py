@@ -30,10 +30,10 @@ import python_utils
 
 import apache_beam as beam
 
-AUDITS_BY_KIND = audit_decorators.AuditsExisting.get_audits_by_kind()
+AUDIT_DO_FNS_BY_KIND = audit_decorators.AuditsExisting.get_audits_by_kind()
 
-KIND_BY_INDEX = list(AUDITS_BY_KIND.keys())
-AUDITS_BY_INDEX = [AUDITS_BY_KIND[k] for k in KIND_BY_INDEX]
+KIND_BY_INDEX = list(AUDIT_DO_FNS_BY_KIND.keys())
+AUDIT_DO_FNS_BY_INDEX = [AUDIT_DO_FNS_BY_KIND[k] for k in KIND_BY_INDEX]
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):
@@ -47,8 +47,8 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         existing_models, deleted_models = (
             self.pipeline
             | 'Get all models' >> self.job_options.model_getter()
-            | 'Partition by model.deleted' >> beam.Partition(
-                lambda model, unused_num_partitions: int(model.deleted), 2)
+            | 'Partition by model.deleted' >> (
+                beam.Partition(lambda model, _: int(model.deleted), 2))
         )
 
         models_of_kind_by_index = (
@@ -78,17 +78,18 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
 
         get_label = lambda audit, kind: 'Run %s on %s' % (audit.__name__, kind)
         audit_error_pcolls = [
-            (models_of_kind | get_label(audit, kind) >> beam.ParDo(audit()))
+            models_of_kind | get_label(audit, kind) >> beam.ParDo(audit())
+
             for kind, audits, models_of_kind in python_utils.ZIP(
-                KIND_BY_INDEX, AUDITS_BY_INDEX, models_of_kind_by_index)
+                KIND_BY_INDEX, AUDIT_DO_FNS_BY_INDEX, models_of_kind_by_index)
             if models_of_kind and audits
             for audit in audits
         ]
 
         audit_error_pcolls.append(
             deleted_models
-            | 'Run ValidateDeletedModel on deleted models' >> beam.ParDo(
-                base_model_audits.ValidateDeletedModel())
+            | 'Run ValidateDeletedModel on deleted models' >> (
+                beam.ParDo(base_model_audits.ValidateDeletedModel()))
         )
 
         return audit_error_pcolls | 'Combine all audit errors' >> beam.Flatten()
