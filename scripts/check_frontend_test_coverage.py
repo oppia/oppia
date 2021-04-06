@@ -51,12 +51,12 @@ NOT_FULLY_COVERED_FILENAMES = [
     'base-content.directive.ts',
     'base-interaction-validation.service.ts',
     'Base.ts',
-    'boolean-editor.directive.ts',
+    'boolean-editor.component.ts',
     'change-list.service.ts',
     'ck-editor-4-rte.directive.ts',
     'ck-editor-4-widgets.initializer.ts',
     'code-repl-prediction.service.ts',
-    'code-string-editor.directive.ts',
+    'code-string-editor.component.ts',
     'codemirror-mergeview.directive.ts',
     'collection-details-editor.directive.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
@@ -75,7 +75,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection.model.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
-    'context.service.ts',
     'continue-button.directive.ts',
     'contribution-and-review.service.ts',
     'contribution-opportunities-backend-api.service.ts',
@@ -84,7 +83,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'conversation-skin.directive.ts',
     'conversion.ts',
     'convert-to-plain-text.pipe.ts',
-    'coord-two-dim-editor.directive.ts',
+    'coord-two-dim-editor.component.ts',
     'correctness-footer.directive.ts',
     'create-activity-button.directive.ts',
     'csrf-token.service.ts',
@@ -161,7 +160,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-code-repl.directive.ts',
     'oppia-interactive-continue.component.ts',
     'oppia-interactive-drag-and-drop-sort-input.directive.ts',
-    'oppia-interactive-end-exploration.directive.ts',
     'oppia-interactive-fraction-input.component.ts',
     'oppia-interactive-graph-input.component.ts',
     'oppia-interactive-image-click-input.directive.ts',
@@ -185,7 +183,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-response-code-repl.directive.ts',
     'oppia-response-continue.component.ts',
     'oppia-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-response-end-exploration.directive.ts',
     'oppia-response-fraction-input.component.ts',
     'oppia-response-graph-input.component.ts',
     'oppia-response-image-click-input.directive.ts',
@@ -203,7 +200,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-code-repl.directive.ts',
     'oppia-short-response-continue.component.ts',
     'oppia-short-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-short-response-end-exploration.directive.ts',
     'oppia-short-response-fraction-input.component.ts',
     'oppia-short-response-graph-input.component.ts',
     'oppia-short-response-image-click-input.directive.ts',
@@ -289,7 +285,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-questions-tab.directive.ts',
     'skill-rubrics-editor.directive.ts',
     'skill-selector-editor.directive.ts',
-    'skill-selector.directive.ts',
+    'skill-selector.component.ts',
     'SkillObjectFactory.ts',
     'skills-list.directive.ts',
     'skills-mastery-list.directive.ts',
@@ -386,6 +382,7 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
                 'It\'s not possible to diff the test coverage correctly.')
         _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
+        self.file_path = match.group(1)
 
         match = re.search(r'LF:(\d+)\n', stanza)
         if match is None:
@@ -463,7 +460,8 @@ def check_coverage_changes():
         file_name = stanza.file_name
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
-
+        if stanza.file_path.startswith('node_modules/'):
+            continue
         if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
                 errors += (
