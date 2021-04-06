@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import auth_domain
@@ -122,7 +121,6 @@ class SyncFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         user.uid,
                         (cls.FIREBASE_ACCOUNT_KEY, (None, user.disabled)))
                     yield (auth_id, assoc_info)
-                logging.info('Page processed: %d Firebase accounts')
                 page = page.get_next_page()
 
     @staticmethod
