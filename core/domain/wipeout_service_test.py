@@ -593,7 +593,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         test_utils.GenericTestBase):
     """Tests that the wipeout services properly deletes references in any
-    AppFeedbackReportModels with references to users that have been deleted.
+    AppFeedbackReportModels with the deleted user.
     """
 
     USER_1_EMAIL = 'some@email.com'
@@ -726,7 +726,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 self.user_1_id).pseudonymizable_entity_mappings[
                     models.NAMES.app_feedback_report])
 
-        # Verify user is pseudonymized.
+        # Verify the user is pseudonymized.
         report_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.REPORT_ID_1))
@@ -742,7 +742,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
                 self.user_2_id).pseudonymizable_entity_mappings[
                     models.NAMES.app_feedback_report])
 
-        # Verify pseudonym is the same for all report instances.
+        # Verify the pseudonym is the same for all report instances.
         report_model_2 = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.REPORT_ID_2))
@@ -793,8 +793,8 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
 
 class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
         test_utils.GenericTestBase):
-    """Tests that the wipeout services properly verify the status of deleted
-    users referenced in an AppFeedbackReportModel entity.
+    """Tests that the wipeout services properly verifies the deleted status of
+    AppFeedbackReportModels with previous references to a deleted user.
     """
 
     USER_1_EMAIL = 'some@email.com'

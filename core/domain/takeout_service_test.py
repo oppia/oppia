@@ -777,7 +777,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
         report_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                )
+            report_id)
         report_entity.scrubbed_by = self.USER_ID_1
         report_entity.update_timestamps()
         report_entity.put()

@@ -34,6 +34,11 @@ import utils
 
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
 EARLIEST_VALID_DATETIME = datetime.datetime.fromtimestamp(1614556800)
+# A buffer for the scrubbing validation to account for any cron delays.
+VALID_SCRUBBING_DATETIME_BUFFER = datetime.timedelta(days=2)
+# A buffer for validation with the submission date to account for time
+# differences caused by the user adjusting their system clocks.
+VALID_SUBMISSION_DATETIME_BUFFER = datetime.timedelta(days=7)
 
 
 class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
@@ -70,9 +75,9 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         """
         if item.platform == app_feedback_report_models.PLATFORM_CHOICE_ANDROID:
             if not (
-                feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION <=
-                item.android_report_info_schema_version <=
-                feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION <=
+                    item.android_report_info_schema_version <=
+                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
@@ -83,9 +88,9 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION))
         else:
             if not (
-                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION <=
-                item.web_report_info_schema_version <= 
-                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
+                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION <=
+                    item.web_report_info_schema_version <= 
+                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
@@ -93,11 +98,11 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                     'range of supported versions [%s, %s]' % (
                         item.id, item.web_report_info_schema_version,
                         feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
-                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+                        feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
     def _validate_created_on_datetime(cls, item):
-        """Validates that the submitted_on date of the model is less than the
+        """Validates that the created_on date of the model is less than the
         current time and greater than the earliest possible date of submissions
         (no earlier than March 2021).
 
@@ -111,7 +116,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
                 'Entity id %s: The created_on field has a value %s which is '
                 'greater than the time when the job was run' % (
-                    item.id, item.submitted_on))
+                    item.id, item.created_on))
         if item.created_on < EARLIEST_VALID_DATETIME:
             cls._add_error(
                 'created_on %s' % (
@@ -134,7 +139,8 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         # with a 2-day buffer time for the cron to run, in case the scrubbing is
         # delayed.
         latest_datetime = datetime.datetime.utcnow() - (
-            feconf.APP_FEEDBACK_REPORT_MAX_DAYS + datetime.timedelta(days=2))
+            feconf.APP_FEEDBACK_REPORT_MAX_DAYS +
+            VALID_SCRUBBING_DATETIME_BUFFER)
         if item.created_on < latest_datetime and not item.scrubbed_by:
             model_class = app_feedback_report_models.AppFeedbackReportModel
             cls._add_error(
@@ -232,14 +238,16 @@ class AppFeedbackReportTicketModelValidator(
                 validate.
         """
         current_datetime = datetime.datetime.utcnow()
-        if item.newest_report_timestamp > current_datetime:
+        if item.newest_report_timestamp > (
+                current_datetime + VALID_SUBMISSION_DATETIME_BUFFER):
             cls._add_error(
                 'newest_report_timestamp %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
                 'Entity id %s: The newest_report_timestamp field has a value %s'
                 ' which is greater than the time when the job was run' % (
                     item.id, item.newest_report_timestamp))
-        if item.newest_report_timestamp < EARLIEST_VALID_DATETIME:
+        if item.newest_report_timestamp < (
+                EARLIEST_VALID_DATETIME - VALID_SUBMISSION_DATETIME_BUFFER):
             cls._add_error(
                 'newest_report_timestamp %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -322,9 +330,9 @@ class AppFeedbackReportStatsModelValidator(
                 validate.
         """
         if not (
-            feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION <=
-            item.daily_param_stats_schema_version <=
-            feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
+                feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION <=
+                item.daily_param_stats_schema_version <=
+                feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
@@ -338,21 +346,26 @@ class AppFeedbackReportStatsModelValidator(
     def _validate_stats_tracking_date(cls, item):
         """Validates that the stats_tracking_date of the model is less than
         the current time and greater than the earliest possible date of
-        submissions (no earlier than March 2021).
+        submissions (no earlier than March 2021) with a 1-week buffer to account
+        for any slight differences in timestamps due to user's changin their
+        system clocks.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
         current_datetime = datetime.datetime.utcnow()
-        if item.stats_tracking_date > current_datetime.date():
+        if item.stats_tracking_date > (
+                current_datetime.date() + VALID_SUBMISSION_DATETIME_BUFFER):
             cls._add_error(
                 'stats_tracking_date %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
                 'Entity id %s: The stats_tracking_date field has a value %s '
                 'which is greater than the time when the job was run' % (
                     item.id, item.stats_tracking_date))
-        if item.stats_tracking_date < EARLIEST_VALID_DATETIME.date():
+        if item.stats_tracking_date < (
+                EARLIEST_VALID_DATETIME.date() -
+                VALID_SUBMISSION_DATETIME_BUFFER):
             cls._add_error(
                 'stats_tracking_date %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
