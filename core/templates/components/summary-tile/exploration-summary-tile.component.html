@@ -13,8 +13,8 @@
     <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
       <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
       <h3 class="activity-title protractor-test-exp-summary-tile-title">
-        <span *ngIf="isWindowLarge">{{ getExplorationTitle|truncate:40 }}</span>
-        <span *ngIf="!isWindowLarge">{{ getExplorationTitle|truncate:40 }}</span>
+        <span *ngIf="isWindowLarge">{{ getExplorationTitle | truncate:40 }}</span>
+        <span *ngIf="!isWindowLarge">{{ getExplorationTitle | truncate:40 }}</span>
       </h3>
     </div>
     <div *ngIf="!isPlaylistTile" class="title-section-mask"

@@ -90,13 +90,13 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
     this.activityType = constants.ACTIVITY_TYPE_EXPLORATION;
-    var contributorsSummary = this.getContributorsSummary || {};
+    let contributorsSummary = this.getContributorsSummary || {};
     this.contributors = Object.keys(
       contributorsSummary).sort(
-      function(contributorUsername1, contributorUsername2) {
-        var commitsOfContributor1 = contributorsSummary[
+      (contributorUsername1, contributorUsername2) => {
+        let commitsOfContributor1 = contributorsSummary[
           contributorUsername1].num_commits;
-        var commitsOfContributor2 = contributorsSummary[
+        let commitsOfContributor2 = contributorsSummary[
           contributorUsername2].num_commits;
         return commitsOfContributor2 - commitsOfContributor1;
       }
@@ -155,15 +155,13 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     if (!this.getExplorationId) {
       return '#';
     } else {
-      var result = '/explore/' + this.getExplorationId;
-      var urlParams = this.urlService.getUrlParams();
-      var parentExplorationIds = this.getParentExplorationIds;
+      let result = '/explore/' + this.getExplorationId;
+      let urlParams = this.urlService.getUrlParams();
+      let parentExplorationIds = this.getParentExplorationIds;
 
-      var collectionIdToAdd = this.getCollectionId;
-      var storyIdToAdd = null;
-      var storyNodeIdToAdd = null;
-      // Replace the collection ID with the one in the URL if it exists
-      // in urlParams.
+      let collectionIdToAdd = this.getCollectionId;
+      let storyIdToAdd = null;
+      let storyNodeIdToAdd = null;
       if (parentExplorationIds &&
           urlParams.hasOwnProperty('collection_id')) {
         collectionIdToAdd = urlParams.collection_id;
@@ -184,7 +182,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
           result, 'collection_id', collectionIdToAdd);
       }
       if (parentExplorationIds) {
-        for (var i = 0; i < parentExplorationIds.length - 1; i++) {
+        for (let i = 0; i < parentExplorationIds.length - 1; i++) {
           result = this.urlService.addField(
             result, 'parent', parentExplorationIds[i]);
         }

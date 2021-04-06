@@ -69,7 +69,7 @@ export class CollectionSummaryTileComponent implements OnInit {
   }
 
   getCollectionLink(): string {
-    var targetUrl = (
+    let targetUrl = (
       this.isLinkedToEditorPage ?
         CollectionSummaryTileConstants.COLLECTION_EDITOR_URL :
         CollectionSummaryTileConstants.COLLECTION_VIEWER_URL
