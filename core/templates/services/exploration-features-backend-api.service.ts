@@ -32,7 +32,7 @@ interface ExplorationFeaturesBackendDict {
 
 export interface ExplorationFeatures {
   isExplorationWhitelisted: boolean;
-  alwaysAskLearnersForAnswerDetails?: boolean;
+  alwaysAskLearnersForAnswerDetails: boolean;
 }
 
 @Injectable({

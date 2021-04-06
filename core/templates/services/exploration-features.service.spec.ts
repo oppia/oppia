@@ -36,8 +36,11 @@ describe('ExplorationFeatureService', () => {
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
     ExplorationFeaturesService.serviceIsInitialized = false;
 
+    // The property alwaysAskLearnersForAnswerDetails is not used. It is just
+    // for complete the ExplorationFeatures interface.
     featureData = {
       isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
     };
     explorationData = {
       param_changes: [testParamChanges],
