@@ -305,15 +305,10 @@ angular.module('oppia').factory('ExplorationEngineService', [
           AudioPreloaderService.init(exploration);
           AudioPreloaderService.kickOffAudioPreloader(
             exploration.getInitialState().name);
-          console.log("[exploration-engine]");
-          console.log("Calling image preloader service");
           ImagePreloaderService.init(exploration);
           ImagePreloaderService.kickOffImagePreloader(
             exploration.getInitialState().name);
           checkAlwaysAskLearnersForAnswerDetails();
-          console.log("[exploration-engine]");
-          console.log("Done with image preloader service");
-          console.log("Loading initial state");
           _loadInitialState(successCallback);
         }
         ContentTranslationLanguageService.init(
