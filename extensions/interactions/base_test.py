@@ -48,6 +48,7 @@ TEXT_INPUT_ID = 'TextInput'
 INTERACTIONS_THAT_USE_COMPONENTS = [
     'AlgebraicExpressionInput',
     'Continue',
+    'EndExploration',
     'FractionInput',
     'GraphInput',
     'MathEquationInput',
