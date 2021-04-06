@@ -21,15 +21,19 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from jobs import base_jobs
 from jobs import jobs_utils
+# TODO(#11475): All lint checks that ensure all jobs.transforms.*_audits modules
+# are imported.
 from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
+from jobs.transforms import user_audits # pylint: disable=unused-import
+import python_utils
 
 import apache_beam as beam
 
-# IMPORTANT: DO NOT REMOVE THIS IMPORT! It triggers all of the audit decorators.
-# The audit decorators register which kinds of models a DoFn should apply to,
-# and AuditAllStorageModelsJob uses the registry to programmatically apply them.
-from jobs.transforms import * # isort:skip  pylint: disable=import-only-modules, ungrouped-imports, wildcard-import, wrong-import-position, wrong-import-order
+AUDITS_BY_KIND = audit_decorators.AuditsExisting.get_audits_by_kind()
+
+KIND_BY_INDEX = list(AUDITS_BY_KIND.keys())
+AUDITS_BY_INDEX = [AUDITS_BY_KIND[kind] for kind in KIND_BY_INDEX]
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):
@@ -47,66 +51,44 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 lambda model, unused_num_partitions: int(model.deleted), 2)
         )
 
-        # TODO(#11475): Implement "ValidateModelRelationships" using this pcoll.
-        kind_and_existing_model_pairs = (
+        models_of_kind_by_index = (
             existing_models
-            | 'Map existing models to (kind, model) pairs' >> beam.Map(
-                lambda model: (jobs_utils.get_model_kind(model), model))
+            # NOTE: Partition returns a statically-sized list of PCollections.
+            # Creating partitions can be wasteful when there are only a few
+            # items, like in our unit tests. In exchange, we can take advantage
+            # of the high parallelizability of PCollections, which are designed
+            # for huge datasets and parallel processing.
+            #
+            # Alternatively, we could have used GroupBy. However, that returns
+            # an _iterable_ over the groups instead of a PCollection, and so it
+            # is vulnerable to out-of-memory errors.
+            #
+            # Since this job is concerned with running audits on EVERY MODEL IN
+            # STORAGE, Partition is the clear winner regardless of the overhead
+            # we'll see in unit tests.
+            | 'Split models into parallelizable PCollections' >> beam.Partition(
+                lambda m, _, kinds: kinds.index(jobs_utils.get_model_kind(m)),
+                # NOTE: Partition requires a hard-coded number of slices, it
+                # cannot be used with dynamic numbers generated in a pipeline.
+                # The KIND_BY_INDEX list satisfies this requirement, since it
+                # is determined and finalized after importing all of the modules
+                # that use the AuditsExisting decorator.
+                len(KIND_BY_INDEX), KIND_BY_INDEX)
         )
 
-        audits_by_kind = audit_decorators.AuditsExisting.get_audits_by_kind()
-        kind_and_audit_class_pairs = (
-            self.pipeline
-            | 'Compute the predefined (kind, audit class) pairs' >> beam.Create(
-                (kind, audit_class)
-                for kind, audit_classes in audits_by_kind.items()
-                for audit_class in audit_classes)
-        )
+        get_label = lambda audit, kind: 'Run %s on %s' % (audit.__name__, kind)
+        audit_error_pcolls = [
+            (models_of_kind | get_label(audit, kind) >> beam.ParDo(audit()))
+            for kind, audits, models_of_kind in python_utils.ZIP(
+                KIND_BY_INDEX, AUDITS_BY_INDEX, models_of_kind_by_index)
+            if models_of_kind and audits
+            for audit in audits
+        ]
 
-        existing_model_errors = (
-            (kind_and_existing_model_pairs, kind_and_audit_class_pairs)
-            | 'Join models and audit classes by kind' >> beam.CoGroupByKey()
-            | 'Filter empty joins' >> beam.Filter(self._is_non_empty_join)
-            | 'Audit the models' >> beam.FlatMap(self._audit_models)
-        )
-
-        deleted_model_errors = (
+        audit_error_pcolls.append(
             deleted_models
             | 'Run ValidateDeletedModel on deleted models' >> beam.ParDo(
                 base_model_audits.ValidateDeletedModel())
         )
 
-        return (
-            (existing_model_errors, deleted_model_errors)
-            | 'Combine errors' >> beam.Flatten()
-        )
-
-    def _audit_models(self, join_result):
-        """Runs each of the audit DoFns on each of the models.
-
-        Args:
-            join_result: tuple(str, tuple(PCollection, PCollection)). The output
-                from CoGroupByKey.
-
-        Returns:
-            PCollection. An aggregate PCollection of errors from the audits.
-        """
-        kind, (models, audit_classes) = join_result
-        audit_error_pcolls = (
-            models | 'Run %s on %ss' % (cls.__name__, kind) >> beam.ParDo(cls())
-            for cls in audit_classes
-        )
-        return audit_error_pcolls | beam.Flatten()
-
-    def _is_non_empty_join(self, join_result):
-        """Returns whether the joined pair of (models, audit_classes) are empty.
-
-        Args:
-            join_result: tuple(str, tuple(PCollection, PCollection)). The output
-                from CoGroupByKey.
-
-        Returns:
-            bool. Whether both the models and audit classes are not empty.
-        """
-        _, (models, audit_classes) = join_result
-        return models and audit_classes
+        return audit_error_pcolls | 'Combine all audit errors' >> beam.Flatten()

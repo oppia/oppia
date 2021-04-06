@@ -23,7 +23,7 @@ Jobs are composed of the following components:
     - Runners
 
 Pipelines manage a DAG (directed acyclic graph) of PValues and the
-PTransforms that compute them. Conceptually, Pvalues are the DAG's nodes and
+PTransforms that compute them. Conceptually, PValues are the DAG's nodes and
 PTransforms are the edges.
 
 For example:
@@ -66,17 +66,33 @@ import apache_beam as beam
 from apache_beam import runners
 
 
-class JobMetaClass(type):
+class JobMetaclass(type):
     """Meta class for all of Oppia's Apache Beam jobs.
 
     This class keeps track of the complete list of jobs. The list can be read
-    with the JobMetaClass.get_jobs() class method.
+    with the JobMetaclass.get_jobs() class method.
     """
 
     _JOB_REGISTRY = []
 
-    def __new__(mcs, name, bases, dct):
-        run_impl = dct.pop('run', None)
+    def __new__(mcs, name, bases, namespace):
+        """Creates a new class whose type is JobMetaclass.
+
+        Args:
+            name: str. The name of the class.
+            bases: tuple(type). The sequence of base classes for the new class.
+            namespace: dict(str: *). The namespace of the class. This is where
+                methods, functions, and attributes on the class are stored.
+
+        https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
+
+        Returns:
+            class. A new class with type: JobMetaclass.
+
+        Raises:
+            TypeError. If the new would-be class does not have a run() method.
+        """
+        run_impl = namespace.pop('run', None)
         if run_impl is None:
             raise TypeError('Jobs must define run() method')
 
@@ -85,25 +101,28 @@ class JobMetaClass(type):
             """Decorates run() to enter the pipeline context before starting."""
             with self.pipeline:
                 return run_impl(self, *args, **kwargs)
-        dct['run'] = run_with_pipeline_context
+        namespace['run'] = run_with_pipeline_context
 
-        job_cls = type.__new__(mcs, name, bases, dct)
+        # NOTE: type.__new__ is a static function.
+        job_cls = type.__new__(mcs, name, bases, namespace)
         if not name.endswith('Base'):
             mcs._JOB_REGISTRY.append(job_cls)
         return job_cls
 
     @classmethod
     def get_jobs(mcs):
-        """Returns all jobs that have inherited from the JobBase class."""
+        """Returns all jobs that have inherited from the JobBase class.
+
+        Returns:
+            list(class). The classes that have been created with this metaclass.
+        """
         return list(mcs._JOB_REGISTRY)
 
 
-class JobBase(python_utils.with_metaclass(JobMetaClass)):
+class JobBase(python_utils.with_metaclass(JobMetaclass)):
     """The base class for all of Oppia's Apache Beam jobs."""
 
-    def __init__(
-            self, pipeline=beam.Pipeline, runner=runners.DataflowRunner(),
-            options=job_options.JobOptions()):
+    def __init__(self, pipeline, runner, options):
         """Initializes a new job.
 
         Args:

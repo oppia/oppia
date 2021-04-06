@@ -23,8 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 from jobs import jobs_utils
 
-from apache_beam.io.gcp.datastore.v1new import types as beam_datastore
-from google.cloud import datastore as cloud_datastore
+from google.cloud import datastore as cloud_datastore_types
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -100,13 +99,8 @@ class GetModelKindTests(test_utils.TestBase):
             jobs_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
     def test_get_from_cloud_datastore_entity(self):
-        entity = cloud_datastore.Entity(
-            key=cloud_datastore.Key('BaseModel', '123', project='foo'))
-        self.assertEqual(jobs_utils.get_model_kind(entity), 'BaseModel')
-
-    def test_get_from_beam_datastore_entity(self):
-        entity = beam_datastore.Entity(
-            beam_datastore.Key(('BaseModel', '123'), project='foo'))
+        entity = cloud_datastore_types.Entity(
+            key=cloud_datastore_types.Key('BaseModel', '123', project='foo'))
         self.assertEqual(jobs_utils.get_model_kind(entity), 'BaseModel')
 
     def test_get_from_bad_value(self):

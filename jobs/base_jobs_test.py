@@ -32,8 +32,8 @@ from apache_beam.options import pipeline_options
 from apache_beam.testing import test_pipeline
 
 
-class JobMetaClass(base_jobs.JobMetaClass):
-    """Subclass of JobMetaClass to avoid interacting with the real registry."""
+class MockJobMetaclass(base_jobs.JobMetaclass):
+    """Subclass of JobMetaclass to avoid interacting with the real registry."""
 
     _JOB_REGISTRY = []
 
@@ -43,24 +43,24 @@ class JobMetaClass(base_jobs.JobMetaClass):
         del mcs._JOB_REGISTRY[:]
 
 
-class JobMetaClassTests(test_utils.TestBase):
+class JobMetaclassTests(test_utils.TestBase):
 
     def tearDown(self):
-        JobMetaClass.clear()
-        super(JobMetaClassTests, self).tearDown()
+        MockJobMetaclass.clear()
+        super(JobMetaclassTests, self).tearDown()
 
     def test_raises_type_error_if_class_is_missing_run_method(self):
         with self.assertRaisesRegexp(TypeError, r'must define run\(\) method'):
-            class JobWithoutRun(python_utils.with_metaclass(JobMetaClass)): # pylint: disable=unused-variable
+            class JobWithoutRun(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=unused-variable
                 """Did not implement run() method."""
 
                 def __init__(self):
                     pass
 
-        self.assertEqual(JobMetaClass.get_jobs(), [])
+        self.assertEqual(MockJobMetaclass.get_jobs(), [])
 
     def test_does_not_put_base_classes_in_registry(self):
-        class FooJobBase(python_utils.with_metaclass(JobMetaClass)): # pylint: disable=unused-variable
+        class FooJobBase(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=unused-variable
             """Job class with name that ends with 'Base'."""
 
             def __init__(self):
@@ -70,10 +70,10 @@ class JobMetaClassTests(test_utils.TestBase):
                 """Does nothing."""
                 pass
 
-        self.assertEqual(JobMetaClass.get_jobs(), [])
+        self.assertEqual(MockJobMetaclass.get_jobs(), [])
 
     def test_puts_non_base_classes_in_registry(self):
-        class FooJob(python_utils.with_metaclass(JobMetaClass)):
+        class FooJob(python_utils.with_metaclass(MockJobMetaclass)):
             """Job class that does nothing."""
 
             def __init__(self):
@@ -83,7 +83,7 @@ class JobMetaClassTests(test_utils.TestBase):
                 """Does nothing."""
                 pass
 
-        self.assertEqual(JobMetaClass.get_jobs(), [FooJob])
+        self.assertEqual(MockJobMetaclass.get_jobs(), [FooJob])
 
     def test_run_enters_pipeline_context(self):
         call_counter = test_utils.CallCounter(lambda: None)
@@ -97,7 +97,7 @@ class JobMetaClassTests(test_utils.TestBase):
             finally:
                 pass
 
-        class FooJob(python_utils.with_metaclass(JobMetaClass)):
+        class FooJob(python_utils.with_metaclass(MockJobMetaclass)):
             """Job that does nothing."""
 
             def __init__(self):

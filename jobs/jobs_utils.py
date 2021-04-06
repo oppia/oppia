@@ -21,8 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from apache_beam.io.gcp.datastore.v1new import types as beam_datastore
-from google.cloud import datastore as cloud_datastore
+from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
+from google.cloud import datastore as cloud_datastore_types
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -58,8 +58,8 @@ def get_model_kind(item):
     """Returns the "kind", a globally unique identifier, of the given item.
 
     Args:
-        item: base_models.Model|cloud_datastore.Entity|beam_datastore.Entity.
-            The item to inspect.
+        item: base_models.Model|cloud_datastore_types.Entity. The item to
+            inspect.
 
     Returns:
         str. The item's kind.
@@ -67,12 +67,10 @@ def get_model_kind(item):
     Raises:
         TypeError. When the argument is not a model.
     """
-    if (isinstance(item, base_models.BaseModel) or
+    if isinstance(item, base_models.BaseModel) or (
             isinstance(item, type) and issubclass(item, base_models.BaseModel)):
         return item._get_kind() # pylint: disable=protected-access
-    elif isinstance(item, cloud_datastore.Entity):
+    elif isinstance(item, cloud_datastore_types.Entity):
         return item.kind
-    elif isinstance(item, beam_datastore.Entity):
-        return item.to_client_entity().kind
     else:
         raise TypeError('%r is not a model type' % type(item).__name__)
