@@ -22,22 +22,23 @@ jobs:
           python-version: '2.x'
           architecture: 'x64'
       - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install wheel==0.35.0
+      - name: Check if PR is low-risk
+        run: echo "low_risk=" + $(python -m scripts.check_if_pr_is_low_risk ${{ github.event.pull_request.html_url }}) >> $GITHUB_ENV
       - name: Install third party
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ! env.low_risk
         run: python -m scripts.install_third_party_libs
       - name: Install chrome
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ! env.low_risk
         run: python -m scripts.install_chrome_for_ci
       - name: Run Additional Editor E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ! env.low_risk
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env
       - name: Run Additional Player E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ! env.low_risk
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
       - name: Uploading protractor-screenshots as Artifacts
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
+        if: ! env.low_risk
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots

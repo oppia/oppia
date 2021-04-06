@@ -82,12 +82,12 @@ commands:
             fi
 
   check_release_changelog_update_branch:
-    description: "Skip job for release changelog update PRs"
+    description: "Skip job for low-risk PRs"
     steps:
       - run:
-          name: Skip build for release changelog update PRs
+          name: Skip build for low-risk PRs
           command: |
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ ${CIRCLE_BRANCH} == update-changelog-for-release* ]]; then
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ python -m scripts.check_if_pr_is_low_risk ${CIRCLE_PULL_REQUEST} ]]; then
               circleci-agent step halt
             fi
 
