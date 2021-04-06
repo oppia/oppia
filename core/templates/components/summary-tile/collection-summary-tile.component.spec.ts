@@ -167,7 +167,7 @@ describe('Collection Summary Tile Component', () => {
       urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('thumbnailUrl');
 
-    component.getThumbnailIconUrl = 'thumbnailUrl'
+    component.getThumbnailIconUrl = 'thumbnailUrl';
     component.getCompleteThumbnailIconUrl();
     fixture.detectChanges();
 

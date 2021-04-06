@@ -120,10 +120,10 @@ class MockUrlService {
 
   getUrlParams(): UrlParamsType {
     return {
-      'collection_id': '1',
-      'story_id': '1',
-      'node_id': '1',
-    }
+      collection_id: '1',
+      story_id: '1',
+      node_id: '1',
+    };
   }
 
   getStoryIdFromViewerUrl(): string {
@@ -187,12 +187,12 @@ describe('Exploration Summary Tile Component', () => {
         RatingComputationService,
         {
           provide: UrlService,
-          useClass: MockUrlService 
+          useClass: MockUrlService
         },
         {
           provide: WindowDimensionsService,
           useValue: {
-            getWidth:() => 1000,
+            getWidth: () => 1000,
             getResizeEvent: () => of(resizeEvent)
           }
         },
@@ -224,11 +224,11 @@ describe('Exploration Summary Tile Component', () => {
     component.getObjective = 'objective';
     component.getCategory = 'category';
     component.getRatings = {
-      '1': 1,
-      '2': 0,
-      '3': 0,
-      '4': 0,
-      '5': 1
+      1: 1,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 1
     };
     component.getContributorsSummary = 'summary';
     component.getThumbnailIconUrl = '/subjects/Welcome';
@@ -261,7 +261,7 @@ describe('Exploration Summary Tile Component', () => {
     expect(component.activityType).toBe('exploration');
     expect(component.isRefresherExploration).toBe(true);
     expect(component.isWindowLarge).toBe(true);
-    
+
     expect(userServiceSpy).toHaveBeenCalled();
     expect(windowResizeSpy).toHaveBeenCalled();
     expect(windowWidthSpy).toHaveBeenCalled();
@@ -276,7 +276,7 @@ describe('Exploration Summary Tile Component', () => {
       windowDimensionsService, 'getResizeEvent').and.callThrough();
     const windowWidthSpy = spyOn(
       windowDimensionsService, 'getWidth').and.callThrough();
-    
+
     component.mobileCutoffPx = null;
     component.ngOnInit();
     tick();
@@ -300,7 +300,7 @@ describe('Exploration Summary Tile Component', () => {
       tick();
       fixture.detectChanges();
       expect(component.resizeSubscription.closed).toBe(true);
-  }));
+    }));
 
   it('should set the hover state to true', () => {
     component.setHoverState(true);
@@ -317,17 +317,17 @@ describe('Exploration Summary Tile Component', () => {
   });
 
   it('should navigate to parent exploration', fakeAsync(() => {
-  const explorationLinkSpy = spyOn(component, 'getExplorationLink')
-    .and.returnValue('/parent/id/1')
+    const explorationLinkSpy = spyOn(component, 'getExplorationLink')
+      .and.returnValue('/parent/id/1');
 
-  spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         href: '/parent/id/1'
       }
     });
 
     component.loadParentExploration();
-    let location = component.getExplorationLink()
+    let location = component.getExplorationLink();
 
     tick();
     fixture.detectChanges();
@@ -337,32 +337,32 @@ describe('Exploration Summary Tile Component', () => {
   }));
 
   it('should get the average ratings of the exploration', fakeAsync(() => {
-      const ratingsSpy = spyOn(
-        ratingComputationService, 'computeAverageRating')
-        .and.returnValue(3)
+    const ratingsSpy = spyOn(
+      ratingComputationService, 'computeAverageRating')
+      .and.returnValue(3);
 
-      let averageRatings = component.getAverageRating();
-      tick();
-      fixture.detectChanges();
-  
-      expect(ratingsSpy).toHaveBeenCalled();
-      expect(averageRatings).toBe(3);
-    }));
+    let averageRatings = component.getAverageRating();
+    tick();
+    fixture.detectChanges();
 
-    it('should fail to get the average ratings of the exploration' +
-      ' if rating are undefined',fakeAsync(() => {
-      const ratingsSpy = spyOn(
-        ratingComputationService, 'computeAverageRating')
-        .and.returnValue(3)
+    expect(ratingsSpy).toHaveBeenCalled();
+    expect(averageRatings).toBe(3);
+  }));
 
-      component.getRatings = null;
-      let averageRatings = component.getAverageRating();
-      tick();
-      fixture.detectChanges();
-  
-      expect(ratingsSpy).not.toHaveBeenCalled();
-      expect(averageRatings).toBe(null);
-    }));
+  it('should fail to get the average ratings of the exploration' +
+    ' if rating are undefined', fakeAsync(() => {
+    const ratingsSpy = spyOn(
+      ratingComputationService, 'computeAverageRating')
+      .and.returnValue(3);
+
+    component.getRatings = null;
+    let averageRatings = component.getAverageRating();
+    tick();
+    fixture.detectChanges();
+
+    expect(ratingsSpy).not.toHaveBeenCalled();
+    expect(averageRatings).toBe(null);
+  }));
 
   it('should get last updated Date & time', () => {
     const dateTimeSpy = spyOn(
@@ -380,8 +380,8 @@ describe('Exploration Summary Tile Component', () => {
     const dateTimeSpy = spyOn(
       dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
       .and.returnValue('1:30 am');
-    
-    component.getLastUpdatedMsec = null
+
+    component.getLastUpdatedMsec = null;
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
@@ -394,7 +394,7 @@ describe('Exploration Summary Tile Component', () => {
       urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('thumbnailUrl');
 
-    component.getThumbnailIconUrl = 'thumbnailUrl'
+    component.getThumbnailIconUrl = 'thumbnailUrl';
     component.getCompleteThumbnailIconUrl();
     fixture.detectChanges();
 
@@ -410,9 +410,9 @@ describe('Exploration Summary Tile Component', () => {
   });
 
   it('should return the url for the exploration' +
-    ' given collectionId and explorationId',fakeAsync(() => {
+    ' given collectionId and explorationId', fakeAsync(() => {
     const urlParamsSpy = spyOn(urlService, 'getUrlParams').and.returnValue({
-      'collection_id': '1',
+      collection_id: '1',
     });
     const addFieldSpy = spyOn(urlService, 'addField').and.callThrough();
     const result = component.getExplorationLink();
@@ -424,10 +424,10 @@ describe('Exploration Summary Tile Component', () => {
     expect(urlParamsSpy).toHaveBeenCalled();
     expect(addFieldSpy).toHaveBeenCalled();
   }));
-  
+
 
   it('should return the url for the exploration' +
-    ' given explorationId and storyId',fakeAsync(() => {
+    ' given explorationId and storyId', fakeAsync(() => {
     const urlParamsSpy = spyOn(urlService, 'getUrlParams').and.returnValue({
     });
     const urlPathSpy = spyOn(urlService, 'getPathname').and.returnValue(
@@ -441,7 +441,8 @@ describe('Exploration Summary Tile Component', () => {
     tick();
     fixture.detectChanges();
 
-    expect(result).toBe('/explore/1?collection_id=1&parent=1&parent=2&story_id=1&node_id=1');
+    expect(result).toBe(
+      '/explore/1?collection_id=1&parent=1&parent=2&story_id=1&node_id=1');
     expect(urlParamsSpy).toHaveBeenCalled();
     expect(urlPathSpy).toHaveBeenCalled();
     expect(storyIdSpy).toHaveBeenCalled();
@@ -449,10 +450,10 @@ describe('Exploration Summary Tile Component', () => {
   }));
 
   it('should return the url for the exploration' +
-    ' given nodeId and storyId',fakeAsync(() => {
+    ' given nodeId and storyId', fakeAsync(() => {
     const urlParamsSpy = spyOn(urlService, 'getUrlParams').and.returnValue({
-      'story_id': '1',
-      'node_id': '1',
+      story_id: '1',
+      node_id: '1',
     });
     const urlPathSpy = spyOn(urlService, 'getPathname').and.returnValue(
       '/story/fhfhvhgvhvvh');
