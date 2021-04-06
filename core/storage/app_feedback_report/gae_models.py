@@ -69,7 +69,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # to None since initially, new reports received will not be assigned to a
     # ticket.
     ticket_id = datastore_services.StringProperty(required=False, indexed=True)
-    # Datetime in UTC of when the report was submitted by the user on their
+    # The local datetime of when the report was submitted by the user on their
     # device. This may be much earlier than the model entity's creation date if
     # the report was locally cached for a long time on an Android device.
     submitted_on = datastore_services.DateTimeProperty(
@@ -151,15 +151,15 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Args:
             platform: str. The platform the report is submitted on.
             submitted_on: datetime.datetime. The date and time the report was
-                submitted, in UTC.
+                submitted, in the user's local time zone.
             report_type: str. The type of report.
             category: str. The category the report is providing feedback on.
             platform_version: str. The version of Oppia that the report was
                 submitted on.
             android_device_country_locale_code: str|None. The ISO-3166 code for
-                the user's country locale or None if its a web report.
+                the user's country locale or None if it's a web report.
             android_sdk_version: int|None. The SDK version running when on the
-                device or None if its a web report.
+                device or None if it's a web report.
             android_device_model: str|None. The device model of the Android
                 device, or None if it's a web report.
             entry_point: str. The entry point used to start the report.

@@ -32,6 +32,12 @@ import utils
     models.NAMES.base_model, models.NAMES.app_feedback_report
 ])
 
+# Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
+EARLIEST_VALID_DATETIME = datetime.datetime.fromtimestamp(1614556800)
+
+# A buffer for the scrubbing validation to account for any cron delays.
+VALID_SCRUBBING_DATETIME_BUFFER = datetime.timedelta(days=2)
+
 
 class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating AppFeedbackReportModel."""
@@ -58,87 +64,84 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _validate_schema_versions(cls, item):
-        """Validate that schema versions of the reports are not greater than the
-        current report schema or less than the minimum supported version.
+        """Validates that the schema version of the report is not greater
+        than the current report schema or less than the minimum supported
+        version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
         if item.platform == app_feedback_report_models.PLATFORM_CHOICE_ANDROID:
-            if item.android_report_info_schema_version > (
+            if not (
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION <=
+                    item.android_report_info_schema_version <=
                     feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: android report schema version %s is greater '
-                    'than current version %s' % (
+                    'Entity id %s: android report schema version %s is outside '
+                    'the range of supported versions [%s, %s]' % (
                         item.id, item.android_report_info_schema_version,
+                        feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION,
                         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION))
-            elif item.android_report_info_schema_version < (
-                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION):
-                cls._add_error(
-                    'report schema %s' % (
-                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: android report schema version %s is less '
-                    'than the minimum version %s' % (
-                        item.id, item.android_report_info_schema_version,
-                        feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION))
         else:
-            if item.web_report_info_schema_version > (
+            if not (
+                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION <=
+                    item.web_report_info_schema_version <=
                     feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (
                         base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: web report schema version %s is greater than'
-                    ' current version %s' % (
+                    'Entity id %s: web report schema version %s is outside the '
+                    'range of supported versions [%s, %s]' % (
                         item.id, item.web_report_info_schema_version,
+                        feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
                         feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
-            elif item.web_report_info_schema_version < (
-                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION):
-                cls._add_error(
-                    'report schema %s' % (
-                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: web report schema version %s is less '
-                    'than the minimum version %s' % (
-                        item.id, item.web_report_info_schema_version,
-                        feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION))
 
     @classmethod
-    def _validate_submitted_on_datetime(cls, item):
-        """Validate that submitted_on of model is less than current time and
-        greater than the earliest possible date of submissions (no earlier than
-        March 2021).
+    def _validate_created_on_datetime(cls, item):
+        """Validates that the created_on date of the model is less than the
+        current time and greater than the earliest possible date of submissions
+        (no earlier than March 2021).
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
         current_datetime = datetime.datetime.utcnow()
-        if item.submitted_on > current_datetime:
+        if item.created_on > current_datetime:
             cls._add_error(
-                'submitted_on %s' % (
+                'created_on %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
-                'Entity id %s: The submitted_on field has a value %s which is '
+                'Entity id %s: The created_on field has a value %s which is '
                 'greater than the time when the job was run' % (
-                    item.id, item.submitted_on))
-        if item.submitted_on < feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME:
+                    item.id, item.created_on))
+        if item.created_on < EARLIEST_VALID_DATETIME:
             cls._add_error(
-                'submitted_on %s' % (
+                'created_on %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
-                'Entity id %s: The submitted_on field has a value %s which is '
+                'Entity id %s: The created_on field has a value %s which is '
                 'less than the earliest possible submission date' % (
-                    item.id, item.submitted_on))
+                    item.id, item.created_on))
 
     @classmethod
     def _validate_expired_reports_are_scrubbed(cls, item):
-        """Validate that if the submitted_on of model is less than 90 days
-        before the current date, then the scrubbed_by field is non-None.
+        """Validates that if the submitted_on of model is less than expiring (at
+        or past it's storage age of
+        feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS), then the scrubbed_by
+        field is non-None. This validation adds a buffer time of
+        VALID_SCRUBBING_DATETIME_BUFFER to the maximum number of days a report
+        can be stored, in case there is a delay in the cron runtime that extends
+        the number of days the report is stored for.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
+        # The earliest creation date of reports that can be kept in storage with
+        # a 2-day buffer time for the cron to run, in case the scrubbing is
+        # delayed.
         latest_datetime = datetime.datetime.utcnow() - (
-            datetime.timedelta(
-                days=feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS))
+            feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
+            VALID_SCRUBBING_DATETIME_BUFFER)
         if item.created_on < latest_datetime and not item.scrubbed_by:
             model_class = app_feedback_report_models.AppFeedbackReportModel
             cls._add_error(
@@ -154,13 +157,13 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_schema_versions,
-            cls._validate_submitted_on_datetime,
+            cls._validate_created_on_datetime,
             cls._validate_expired_reports_are_scrubbed]
 
     @classmethod
     def _validate_external_ticket_id(
             cls, item, field_name_to_external_model_references):
-        """Validate that ticket_id is a valid AppFeedbackReportTicketModel.
+        """Validates that the ticket_id is a valid AppFeedbackReportTicketModel.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to
@@ -227,9 +230,9 @@ class AppFeedbackReportTicketModelValidator(
 
     @classmethod
     def _validate_newest_report_timestamp(cls, item):
-        """Validate that newest_report_timestamp is less than current time and
-        greater than the earliest possible date of submissions (no earlier than
-        March 2021).
+        """Validates that the newest_report_timestamp is less than current time
+        and greater than the earliest possible date of submissions (no earlier
+        than March 2021).
 
         Args:
             item: datastore_services.Model. AppFeedbackReportTicketModel to
@@ -259,7 +262,7 @@ class AppFeedbackReportTicketModelValidator(
     @classmethod
     def _validate_external_report_ids(
             cls, item, field_name_to_external_model_references):
-        """Validate that report_ids are valid AppFeedbackReportModels.
+        """Validates that the report_ids are valid AppFeedbackReportModels.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportTicketModel to
@@ -319,42 +322,36 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _validate_schema_version(cls, item):
-        """Validate that the schema version of the stats is not greater than the
-        current stats schema or lower than the minimum supported version.
+        """Validates that the schema version of the stats is not greater than
+        the current stats schema or lower than the minimum supported version.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
-        if item.daily_param_stats_schema_version > (
+        if not (
+                feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION <=
+                item.daily_param_stats_schema_version <=
                 feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
             cls._add_error(
                 'report stats schema %s' % (
                     base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                'Entity id %s: daily stats schema version %s is greater than '
-                'current version %s' % (
+                'Entity id %s: daily stats schema version %s is outside the '
+                'range of supported versions [%s, %s]' % (
                     item.id, item.daily_param_stats_schema_version,
+                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
-        elif item.daily_param_stats_schema_version < (
-                feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION):
-            cls._add_error(
-                'report stats schema %s' % (
-                    base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                'Entity id %s: daily stats schema version %s is less than the '
-                'minimum version %s' % (
-                    item.id, item.daily_param_stats_schema_version,
-                    feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION))
 
     @classmethod
     def _validate_stats_tracking_date(cls, item):
-        """Validate that stats_tracking_date of model is less than current time
-        and greater than the earliest possible date of submissions (no earlier
-        than March 2021).
+        """Validates that the stats_tracking_date of the model is greater than
+        the earliest possible date of submissions (no earlier than March 2021).
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
+<<<<<<< HEAD
         current_datetime = datetime.datetime.utcnow()
         if item.stats_tracking_date > current_datetime.date():
             cls._add_error(
@@ -365,6 +362,9 @@ class AppFeedbackReportStatsModelValidator(
                     item.id, item.stats_tracking_date))
         if item.stats_tracking_date < (
             feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.date()):
+=======
+        if item.stats_tracking_date < EARLIEST_VALID_DATETIME.date():
+>>>>>>> create-android-feedback-reporting-storage-models
             cls._add_error(
                 'stats_tracking_date %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -379,7 +379,7 @@ class AppFeedbackReportStatsModelValidator(
     @classmethod
     def _validate_external_ticket_id(
             cls, item, field_name_to_external_model_references):
-        """Validate that the ticket_id is a valid AppFeedbackReportTicketModel.
+        """Validates that the ticket_id is a valid AppFeedbackReportTicketModel.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
