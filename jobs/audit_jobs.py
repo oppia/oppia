@@ -30,8 +30,8 @@ import python_utils
 import apache_beam as beam
 
 AUDIT_DO_FNS_BY_KIND = audits_registry.get_audits_by_kind()
-KIND_BY_INDEX = list(AUDIT_DO_FNS_BY_KIND.keys())
-AUDIT_DO_FNS_BY_INDEX = [AUDIT_DO_FNS_BY_KIND[k] for k in KIND_BY_INDEX]
+KIND_BY_INDEX = tuple(AUDIT_DO_FNS_BY_KIND.keys())
+AUDIT_DO_FNS_BY_INDEX = tuple(AUDIT_DO_FNS_BY_KIND[k] for k in KIND_BY_INDEX)
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):
