@@ -111,6 +111,9 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
 
     Returns:
         _io.TextIOWrapper. The file object.
+
+    Raises:
+        IOError. The file cannot be opened.
     """
     # The try/except is needed here to unify the errors because io.open in
     # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
@@ -479,3 +482,8 @@ def reraise_exception():
     # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
     exec_info = sys.exc_info()
     six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
+
+
+def is_string(value):
+    """Returns whether value has a string type."""
+    return isinstance(value, six.string_types)

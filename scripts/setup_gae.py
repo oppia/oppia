@@ -75,18 +75,18 @@ def main(args=None):
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
         tar.close()
 
-        # This command installs specific google cloud components for the google
-        # cloud sdk to prevent the need for developers to install it themselves
-        # when the app engine development server starts up. The --quiet
-        # parameter specifically tells the gcloud program to autofill all
-        # prompts with default values. In this case, that means accepting all
-        # installations of gcloud packages.
-        subprocess.call([
-            common.GCLOUD_PATH,
-            'components', 'install', 'cloud-datastore-emulator',
-            'app-engine-python', 'app-engine-python-extras', '--quiet'])
-
         os.remove('gcloud-sdk.tar.gz')
+
+    # This command installs specific google cloud components for the google
+    # cloud sdk to prevent the need for developers to install it themselves when
+    # the app engine development server starts up. The --quiet parameter
+    # specifically tells the gcloud program to autofill all prompts with default
+    # values. In this case, that means accepting all installations of gcloud
+    # packages.
+    subprocess.call([
+        common.GCLOUD_PATH,
+        'components', 'install', 'beta', 'cloud-datastore-emulator',
+        'app-engine-python', 'app-engine-python-extras', '--quiet'])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

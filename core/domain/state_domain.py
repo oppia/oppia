@@ -32,6 +32,7 @@ from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rules_registry
+from core.domain import translatable_object_registry
 from extensions.objects.models import objects
 import feconf
 import python_utils
@@ -1425,21 +1426,38 @@ class Voiceover(python_utils.OBJECT):
 
 
 class WrittenTranslation(python_utils.OBJECT):
-    """Value object representing a written translation for a content."""
+    """Value object representing a written translation for a content.
+
+    Here, "content" could mean a string or a list of strings. The latter arises,
+    for example, in the case where we are checking for equality of a learner's
+    answer against a given set of strings. In such cases, the number of strings
+    in the translation of the original object may not be the same as the number
+    of strings in the original object.
+    """
 
     DATA_FORMAT_HTML = 'html'
-    DATA_FORMAT_UNICODE = 'unicode'
+    DATA_FORMAT_UNICODE_STRING = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE = {
+        DATA_FORMAT_HTML: 'TranslatableHtml',
+        DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
+        DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
+            'TranslatableSetOfNormalizedString'),
+        DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
+    }
 
     def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            data_format: str. 'unicode' or 'html'. Indicates if translation
-                field is html or unicode.
-            translation: str. A piece of user-submitted HTML or unicode. If
-                html, this is cleaned in such a way as to contain a restricted
-                set of HTML tags.
-            needs_update: bool. Whether translation is marked as needing
+            data_format: str. One of the keys in
+                DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE. Indicates the
+                type of the field (html, unicode, etc.).
+            translation: str|list(str). A user-submitted string or list of
+                strings that matches the given data format.
+            needs_update: bool. Whether the translation is marked as needing
                 review.
         """
         self.data_format = data_format
@@ -1476,24 +1494,25 @@ class WrittenTranslation(python_utils.OBJECT):
             written_translation_dict['needs_update'])
 
     def validate(self):
-        """Validates properties of the WrittenTranslation.
+        """Validates properties of the WrittenTranslation, normalizing the
+        translation if needed.
 
         Raises:
             ValidationError. One or more attributes of the WrittenTranslation
                 are invalid.
         """
-        if not isinstance(self.data_format, python_utils.BASESTRING):
+        if self.data_format not in (
+                self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
 
-        if not (self.data_format == self.DATA_FORMAT_UNICODE or
-                self.data_format == self.DATA_FORMAT_HTML):
-            raise utils.ValidationError(
-                'Invalid data_format: %s' % self.data_format)
-
-        if not isinstance(self.translation, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Invalid translation: %s' % self.translation)
+        translatable_class_name = (
+            self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[self.data_format])
+        translatable_obj_class = (
+            translatable_object_registry.Registry.get_object_class(
+                translatable_class_name))
+        self.translation = translatable_obj_class.normalize_value(
+            self.translation)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
