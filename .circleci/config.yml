@@ -81,7 +81,7 @@ commands:
               fi
             fi
 
-  check_release_changelog_update_branch:
+  skip_for_low_risk_prs:
     description: "Skip job for low-risk PRs"
     steps:
       - run:
@@ -137,7 +137,6 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
@@ -145,11 +144,12 @@ jobs:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
+      - skip_for_low_risk_prs
       - run:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-      - check_release_changelog_update_branch
+      - skip_for_low_risk_prs
       - run:
           name: Run e2e admin page test
           command: |
@@ -169,7 +169,6 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
@@ -177,6 +176,7 @@ jobs:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
+      - skip_for_low_risk_prs
       - run:
           name: Run e2e publication test
           command: |
@@ -199,13 +199,13 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - skip_for_low_risk_prs
       - install_chrome
       - run:
           name: Run e2e file upload features test
@@ -235,13 +235,13 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - skip_for_low_risk_prs
       - install_chrome
       - run:
           name: Run e2e topics and skills dashboard test
