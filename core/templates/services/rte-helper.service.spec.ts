@@ -67,7 +67,6 @@ describe('Rte Helper Service', function() {
       id: 'collapsible',
       iconDataUrl: '/rich_text_components/Collapsible/Collapsible.png',
       isComplex: true,
-      isLessonRelated: false,
       isBlockElement: true,
       requiresFs: false,
       tooltip: 'Insert collapsible block'
@@ -108,7 +107,6 @@ describe('Rte Helper Service', function() {
       id: 'image',
       iconDataUrl: '/rich_text_components/Image/Image.png',
       isComplex: false,
-      isLessonRelated: false,
       isBlockElement: true,
       requiresFs: true,
       tooltip: 'Insert image'
@@ -134,7 +132,6 @@ describe('Rte Helper Service', function() {
       id: 'link',
       iconDataUrl: '/rich_text_components/Link/Link.png',
       isComplex: false,
-      isLessonRelated: false,
       isBlockElement: false,
       requiresFs: false,
       tooltip: 'Insert link'
@@ -155,7 +152,6 @@ describe('Rte Helper Service', function() {
       id: 'math',
       iconDataUrl: '/rich_text_components/Math/Math.png',
       isComplex: false,
-      isLessonRelated: false,
       isBlockElement: false,
       requiresFs: false,
       tooltip: 'Insert mathematical formula'
@@ -180,7 +176,6 @@ describe('Rte Helper Service', function() {
       id: 'skillreview',
       iconDataUrl: '/rich_text_components/Skillreview/Skillreview.png',
       isComplex: false,
-      isLessonRelated: true,
       isBlockElement: false,
       requiresFs: false,
       tooltip: 'Insert Concept Card Link'
@@ -212,7 +207,6 @@ describe('Rte Helper Service', function() {
       id: 'svgdiagram',
       iconDataUrl: '/rich_text_components/Svgdiagram/Svgdiagram.png',
       isComplex: false,
-      isLessonRelated: false,
       isBlockElement: true,
       requiresFs: true,
       tooltip: 'Insert diagram'
@@ -238,7 +232,6 @@ describe('Rte Helper Service', function() {
       id: 'tabs',
       iconDataUrl: '/rich_text_components/Tabs/Tabs.png',
       isComplex: true,
-      isLessonRelated: false,
       isBlockElement: true,
       requiresFs: false,
       tooltip: 'Insert tabs (e.g. for hints)'
@@ -288,7 +281,6 @@ describe('Rte Helper Service', function() {
       id: 'video',
       iconDataUrl: '/rich_text_components/Video/Video.png',
       isComplex: false,
-      isLessonRelated: false,
       isBlockElement: true,
       requiresFs: false,
       tooltip: 'Insert video'
