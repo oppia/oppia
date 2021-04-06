@@ -67,7 +67,6 @@ angular.module('oppia').factory('RteHelperService', [
           continue;
         }
         var argName = attr.name.substring(0, separatorLocation);
-        console.log("[rte-helper]");
         customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
           attr.value);
       }

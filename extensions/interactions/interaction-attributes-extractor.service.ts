@@ -52,7 +52,6 @@ export class InteractionAttributesExtractorService {
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
       const attributesKey = `${caName}WithValue`;
-      console.log("[interaction-attributes-extractor]");
       caBackendDict[caName] = {
         value:
           this.htmlEscaperService.escapedJsonToObj(attributes[attributesKey])
