@@ -35,7 +35,7 @@ export class LogoutPageComponent implements OnInit {
       private loaderService: LoaderService, private windowRef: WindowRef) {}
 
   ngOnInit(): void {
-    this.loaderService.showLoadingScreen('Logging out');
+    this.loaderService.showLoadingScreen('I18N_LOGOUT_LOADING');
     this.authService.signOutAsync()
       .then(() => this.redirect(), error => this.onSignOutError(error));
   }

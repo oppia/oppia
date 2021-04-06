@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" lang="<[currentLang]>" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @load('base-components/header.template.html', {"title": "Logout | Oppia"})
+    @load('base-components/header.template.html', {"title": "Logout - Oppia"})
   </head>
   <body>
     <oppia-root>
@@ -11,7 +11,7 @@
             <ul class="nav navbar-nav oppia-navbar-breadcrumb">
               <li>
                 <span class="oppia-navbar-breadcrumb-separator"></span>
-                Logout <!-- TODO(#11462): Add i18n -->
+                <span translate="I18N_LOGOUT_PAGE_TITLE"></span>
               </li>
             </ul>
           </navbar-breadcrumb>
