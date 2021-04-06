@@ -64,7 +64,7 @@ import python_utils
 
 
 class JobMetaclass(type):
-    """Meta class for all of Oppia's Apache Beam jobs.
+    """Metaclass for all of Oppia's Apache Beam jobs.
 
     This class keeps track of the complete list of jobs. The list can be read
     with the JobMetaclass.get_jobs() class method.
@@ -73,12 +73,12 @@ class JobMetaclass(type):
     _JOB_REGISTRY = []
 
     def __new__(mcs, name, bases, namespace):
-        """Creates a new class whose type is JobMetaclass.
+        """Creates a new class with type: AuditDoFnMetaclass.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
 
         Args:
-            mcs: JobMetaclass. The metaclass instance.
+            mcs: JobMetaclass. The metaclass.
             name: str. The name of the class.
             bases: tuple(type). The sequence of base classes for the new class.
             namespace: dict(str: *). The namespace of the class. This is where
@@ -110,6 +110,9 @@ class JobMetaclass(type):
     @classmethod
     def get_jobs(mcs):
         """Returns all jobs that have inherited from the JobBase class.
+
+        Args:
+            mcs: JobMetaclass. The metaclass.
 
         Returns:
             list(class). The classes that have been created with this metaclass.

@@ -33,8 +33,10 @@ def clone_model(model, **new_values):
     original entity, except where overridden. By default, it will have no
     parent entity or key name, unless supplied.
 
-    IMPORTANT: This function should be used in EVERY DoFn beacse beam expects
-    that all operations DO NOT MODIFY THEIR INPUTS.
+    IMPORTANT: This function should be used in EVERY DoFn, beacse one of Apache
+    Beam's invariants is that all input values are IMMUTABLE.
+    TODO(#12449): Use a metaclass to wrap DoFn.process() with a function that
+    clones inputs, so that contributors don't need to remember to.
 
     Args:
         model: datastore_services.Model. Model to clone.

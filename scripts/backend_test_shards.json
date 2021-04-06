@@ -203,6 +203,7 @@
         "jobs.io.test_io_test",
         "jobs.job_options_test",
         "jobs.jobs_utils_test",
+        "jobs.transforms.audits_registry",
         "jobs.transforms.base_model_audits_test",
         "jobs.transforms.user_audits_test",
         "jobs.types.audit_errors_test"

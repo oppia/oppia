@@ -19,19 +19,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# TODO(#11475): All lint checks that ensure all jobs.transforms.*_audits modules
-# are imported.
+import itertools
+
 from jobs import base_jobs
 from jobs import jobs_utils
-from jobs.decorators import audit_decorators
+from jobs.transforms import audits_registry
 from jobs.transforms import base_model_audits
-from jobs.transforms import user_audits  # pylint: disable=unused-import
 import python_utils
 
 import apache_beam as beam
 
-AUDIT_DO_FNS_BY_KIND = audit_decorators.AuditsExisting.get_audits_by_kind()
-
+AUDIT_DO_FNS_BY_KIND = audits_registry.get_audits_by_kind()
 KIND_BY_INDEX = list(AUDIT_DO_FNS_BY_KIND.keys())
 AUDIT_DO_FNS_BY_INDEX = [AUDIT_DO_FNS_BY_KIND[k] for k in KIND_BY_INDEX]
 
@@ -76,15 +74,11 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 len(KIND_BY_INDEX), KIND_BY_INDEX)
         )
 
-        get_label = lambda audit, kind: 'Run %s on %s' % (audit.__name__, kind)
-        audit_error_pcolls = [
-            models_of_kind | get_label(audit, kind) >> beam.ParDo(audit())
-
-            for kind, audits, models_of_kind in python_utils.ZIP(
-                KIND_BY_INDEX, AUDIT_DO_FNS_BY_INDEX, models_of_kind_by_index)
-            if models_of_kind and audits
-            for audit in audits
-        ]
+        audit_error_pcolls = list(itertools.chain.from_iterable(
+            (self._run_do_fn(do_fn, model_kind, models) for do_fn in do_fns)
+            for do_fns, model_kind, models in python_utils.ZIP(
+                AUDIT_DO_FNS_BY_INDEX, KIND_BY_INDEX, models_of_kind_by_index)
+            if do_fns and models))
 
         audit_error_pcolls.append(
             deleted_models
@@ -93,3 +87,17 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         )
 
         return audit_error_pcolls | 'Combine all audit errors' >> beam.Flatten()
+
+    def _run_do_fn(self, do_fn, model_kind, models):
+        """Runs a DoFn over the specified kind of models.
+
+        Args:
+            do_fn: DoFn. The type of DoFn to run.
+            model_kind: str. The kind of model the DoFn is processing.
+            models: PCollection. The models for the DoFn to process.
+
+        Returns:
+            PCollection. The result of the DoFn, a PCollection of audit errors.
+        """
+        label = 'Running %s on %s' % (do_fn.__name__, model_kind)
+        return models | label >> beam.ParDo(do_fn())
