@@ -38,10 +38,6 @@ EARLIEST_VALID_DATETIME = datetime.datetime.fromtimestamp(1614556800)
 # A buffer for the scrubbing validation to account for any cron delays.
 VALID_SCRUBBING_DATETIME_BUFFER = datetime.timedelta(days=2)
 
-# A buffer for validation with the submission date to account for time
-# differences caused by the user adjusting their system clocks.
-VALID_SUBMISSION_DATETIME_BUFFER = datetime.timedelta(days=7)
-
 
 class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating AppFeedbackReportModel."""
@@ -129,10 +125,12 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _validate_expired_reports_are_scrubbed(cls, item):
-        """Validates that if the submitted_on of model is less than 92 days
-        before the current date, then the scrubbed_by field is non-None. This
-        gives a 2-day buffer time the maximum number of days a report can be
-        stored, in case there is a delay in the cron runtime.
+        """Validates that if the submitted_on of model is less than expiring (at
+        or past it's storage age of feconf.APP_FEEDBACK_REPORT_MAXIMUM_DAYS),
+        then the scrubbed_by field is non-None. This validation adds a buffer
+        time of VALID_SCRUBBING_DATETIME_BUFFER to the maximum number of days a
+        report can be stored, in case there is a delay in the cron runtime that
+        extends the number of days the report is stored for.
 
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
@@ -240,16 +238,14 @@ class AppFeedbackReportTicketModelValidator(
                 validate.
         """
         current_datetime = datetime.datetime.utcnow()
-        if item.newest_report_timestamp > (
-                current_datetime + VALID_SUBMISSION_DATETIME_BUFFER):
+        if item.newest_report_timestamp > current_datetime:
             cls._add_error(
                 'newest_report_timestamp %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
                 'Entity id %s: The newest_report_timestamp field has a value %s'
                 ' which is greater than the time when the job was run' % (
                     item.id, item.newest_report_timestamp))
-        if item.newest_report_timestamp < (
-                EARLIEST_VALID_DATETIME - VALID_SUBMISSION_DATETIME_BUFFER):
+        if item.newest_report_timestamp < EARLIEST_VALID_DATETIME:
             cls._add_error(
                 'newest_report_timestamp %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -346,28 +342,15 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _validate_stats_tracking_date(cls, item):
-        """Validates that the stats_tracking_date of the model is less than
-        the current time and greater than the earliest possible date of
-        submissions (no earlier than March 2021) with a 1-week buffer to account
-        for any slight differences in timestamps due to user's changing their
-        system clocks.
+        """Validates that the stats_tracking_date of the model is greater than
+        the earliest possible date of submissions (no earlier than March 2021).
 
         Args:
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
         current_datetime = datetime.datetime.utcnow()
-        if item.stats_tracking_date > (
-                current_datetime.date() + VALID_SUBMISSION_DATETIME_BUFFER):
-            cls._add_error(
-                'stats_tracking_date %s' % (
-                    base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
-                'Entity id %s: The stats_tracking_date field has a value %s '
-                'which is greater than the time when the job was run' % (
-                    item.id, item.stats_tracking_date))
-        if item.stats_tracking_date < (
-                EARLIEST_VALID_DATETIME.date() -
-                VALID_SUBMISSION_DATETIME_BUFFER):
+        if item.stats_tracking_date < EARLIEST_VALID_DATETIME.date():
             cls._add_error(
                 'stats_tracking_date %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
