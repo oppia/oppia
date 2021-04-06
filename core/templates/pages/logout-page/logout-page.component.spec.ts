@@ -110,7 +110,7 @@ describe('Logout Page', function() {
 
     component.ngOnInit();
 
-    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Signing out');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(authService.signOutAsync).toHaveBeenCalled();
 
     signOutPromise.resolve();
@@ -135,7 +135,7 @@ describe('Logout Page', function() {
 
     component.ngOnInit();
 
-    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Signing out');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(authService.signOutAsync).toHaveBeenCalled();
 
     signOutPromise.reject(new Error('uh-oh!'));
