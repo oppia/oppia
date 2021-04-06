@@ -32,16 +32,16 @@ jobs:
       - name: Print Low-Risk Status
         run: echo "${{ env.low_risk }}"
       - name: Install chrome
-        if: ${{ ! env.low_risk }}
+        if: ${{ env.low_risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
       - name: Run Additional Editor E2E Test
-        if: ${{ ! env.low_risk }}
+        if: ${{ env.low_risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env
       - name: Run Additional Player E2E Test
-        if: ${{ ! env.low_risk }}
+        if: ${{ env.low_risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
       - name: Uploading protractor-screenshots as Artifacts
-        if: ${{ ! env.low_risk }}
+        if: ${{ env.low_risk != 0 }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots
