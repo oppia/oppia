@@ -267,9 +267,6 @@ export class ExtractImageFilenamesFromStateService {
         filenamesInState.push(filename);
       }
       let allHtmlOfState = this._getAllHtmlOfState(state);
-      console.log("[extract-image-filenames-from-state]");
-      console.log("Got entire HTML of state:");
-      console.log(allHtmlOfState[0]);
       allHtmlOfState.forEach((htmlStr) => {
         filenamesInState = filenamesInState.concat(
           this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
