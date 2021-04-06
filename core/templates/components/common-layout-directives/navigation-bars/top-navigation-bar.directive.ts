@@ -61,7 +61,7 @@ angular.module('oppia').directive('topNavigationBar', [
             WindowDimensionsService, LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          var NAV_MODE_SIGNUP = 'signup';
+          var NAV_MODES_WITH_HIDDEN_USER_MENU = ['signup', 'login', 'logout'];
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'collection_editor',
             'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
@@ -222,7 +222,8 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.currentUrl = window.location.pathname.split('/')[1];
             ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
             ctrl.logoutUrl = LOGOUT_URL;
-            ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+            ctrl.userMenuIsShown = (
+              NAV_MODES_WITH_HIDDEN_USER_MENU.indexOf(ctrl.currentUrl) === -1);
             ctrl.inClassroomPage = false;
             ctrl.standardNavIsShown = (
               NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);

@@ -59,7 +59,7 @@ export class LoginPageComponent implements OnInit {
       return;
     }
 
-    this.loaderService.showLoadingScreen('Signing in');
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     this.authService.handleRedirectResultAsync().then(
       redirectSucceeded => redirectSucceeded ?
         this.redirectToSignUp() : this.authService.signInWithRedirectAsync(),
@@ -67,7 +67,7 @@ export class LoginPageComponent implements OnInit {
   }
 
   async onClickSignInButtonAsync(email: string): Promise<void> {
-    this.loaderService.showLoadingScreen('Signing in');
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     await this.authService.signInWithEmail(email).then(
       () => this.redirectToSignUp(), error => this.onSignInError(error));
   }
