@@ -89,32 +89,21 @@ class JobTestBase(BeamTestBase):
         self.model_io_stub.clear()
         super(JobTestBase, self).tearDown()
 
-    def run_job(self, pipeline=None, runner=None, options=None):
+    def run_job(self):
         """Runs a new instance of self.JOB_CLASS and returns its output.
 
-        Args:
-            pipeline: type(beam.Pipeline). The type of pipeline that will be
-                used to manage the job. Uses TestPipeline if not provided.
-            runner: type(PipelineRunner). The type of runner that will be used
-                to execute the pipeline. Uses DirectRunner if not provided.
-            options: JobOptions|None. A JobOptions instance used to configure
-                the pipeline and job. Uses options with runtime type checks and
-                stubbed model IO by default.
+        Test authors should override this method if their jobs need special
+        inputs.
 
         Returns:
             PCollection. The output of the job.
         """
-        if pipeline is None:
-            pipeline = test_pipeline.TestPipeline
-        if runner is None:
-            runner = runners.DirectRunner()
-        if options is None:
-            options = job_options.JobOptions(
-                runtime_type_check=True,
-                model_getter=self.model_io_stub.get_models)
-
-        job = self.JOB_CLASS(pipeline, runner, options)
-        return job.run()
+        pipeline = test_pipeline.TestPipeline
+        runner = runners.DirectRunner()
+        options = job_options.JobOptions(
+            runtime_type_check=True,
+            model_getter=self.model_io_stub.get_models)
+        return self.JOB_CLASS(pipeline, runner, options).run()
 
     def assert_job_output_is(self, expected):
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
@@ -125,5 +114,5 @@ class JobTestBase(BeamTestBase):
         self.assert_pcoll_equal(self.run_job(), expected)
 
     def assert_job_output_is_empty(self):
-        """Asserts that the output of self.JOB_CLASS is an empty pcoll."""
+        """Asserts that the output of self.JOB_CLASS is an empty PCollection."""
         self.assert_pcoll_empty(self.run_job())

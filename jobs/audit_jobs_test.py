@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 from jobs import audit_jobs
-from jobs import job_options
 from jobs import jobs_test_utils
 from jobs.transforms import base_model_audits
 from jobs.types import audit_errors
@@ -39,13 +38,6 @@ class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
 
     def test_empty_storage(self):
         self.assert_job_output_is_empty()
-
-    def test_raises_value_error_when_model_getter_is_none(self):
-        options = job_options.JobOptions(model_getter=None)
-
-        self.assertRaisesRegexp(
-            ValueError, 'JobOptions.model_getter must not be None',
-            lambda: self.run_job(options=options))
 
     def test_base_model_audits(self):
         base_model_with_invalid_id = base_models.BaseModel(
