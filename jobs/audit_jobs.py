@@ -68,9 +68,8 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 lambda m, _, kinds: kinds.index(jobs_utils.get_model_kind(m)),
                 # NOTE: Partition requires a hard-coded number of slices, it
                 # cannot be used with dynamic numbers generated in a pipeline.
-                # The KIND_BY_INDEX list satisfies this requirement, since it
-                # is determined and finalized after importing all of the modules
-                # that use the AuditsExisting decorator.
+                # The KIND_BY_INDEX is a constant tuple, so it satisfies that
+                # requirement.
                 len(KIND_BY_INDEX), KIND_BY_INDEX)
         )
 
