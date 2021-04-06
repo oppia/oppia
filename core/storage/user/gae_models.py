@@ -1907,7 +1907,7 @@ class UserQueryModel(base_models.BaseModel):
     # Query option to check if user has created collection.
     created_collection = datastore_services.BooleanProperty(default=False)
     # Query option to check if user has used LogicProof interaction in any
-    # of the explorations.
+    # of the explorations that they created.
     used_logic_proof_interaction = datastore_services.BooleanProperty(
         default=False)
     # List of all user_ids who satisfy all parameters given in above query.
