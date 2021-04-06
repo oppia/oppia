@@ -659,9 +659,28 @@ describe('Extracting Image file names in the state service', () => {
           param_changes: [],
           content: {
             content_id: 'content',
-            html: '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
-                  'quot;s4Content.png&amp;quot;">' +
-                  '</oppia-noninteractive-image></p>'
+            html: '<p><oppia-noninteractive-image filepath-with-value=\"' +
+                  '&amp;quot;s7Image.png&amp;quot;\">' +
+                  '</oppia-noninteractive-image>' +
+                  '<oppia-noninteractive-collapsible content-with-value=' +
+                  '\"&amp;quot;&amp;lt;p&amp;gt;Content.&amp;lt;/p&amp;' +
+                  'gt;&amp;lt;oppia-noninteractive-image ' +
+                  'filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;' +
+                  's7CollapsibleImage.png&amp;amp;amp;quot;\\&amp;quot;' +
+                  '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;' +
+                  '&amp;quot;\"></oppia-noninteractive-collapsible>' +
+                  '<oppia-noninteractive-tabs tab_contents-with-value=\"' +
+                  '[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;' +
+                  'quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p' +
+                  '&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},' +
+                  '{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;' +
+                  ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;' +
+                  'gt;Content2&amp;lt;/p&amp;gt;&amp;lt;' +
+                  'oppia-noninteractive-image filepath-with-value=\\' +
+                  '&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;' +
+                  'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/' +
+                  'oppia-noninteractive-image&amp;gt;&amp;quot;}]\">' +
+                  '</oppia-noninteractive-tabs></p>'
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
@@ -676,28 +695,7 @@ describe('Extracting Image file names in the state service', () => {
             default_outcome: {
               feedback: {
                 content_id: 'content',
-                html: '<oppia-noninteractive-image filepath-with-value=\"' +
-                      '&amp;quot;s7Image.png&amp;quot;\">' +
-                      '</oppia-noninteractive-image>' +
-                      '<oppia-noninteractive-collapsible content-with-value=' +
-                      '\"&amp;quot;&amp;lt;p&amp;gt;Content.&amp;lt;/p&amp;' +
-                      'gt;&amp;lt;oppia-noninteractive-image ' +
-                      'filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;' +
-                      's7CollapsibleImage.png&amp;amp;amp;quot;\\&amp;quot;' +
-                      '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;' +
-                      '&amp;quot;\"></oppia-noninteractive-collapsible>' +
-                      '<oppia-noninteractive-tabs tab_contents-with-value=\"' +
-                      '[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;' +
-                      'quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p' +
-                      '&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},' +
-                      '{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;' +
-                      ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;' +
-                      'gt;Content2&amp;lt;/p&amp;gt;&amp;lt;' +
-                      'oppia-noninteractive-image filepath-with-value=\\' +
-                      '&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;' +
-                      'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/' +
-                      'oppia-noninteractive-image&amp;gt;&amp;quot;}]\">' +
-                      '</oppia-noninteractive-tabs>'
+                html: '<p>Try again!</p>'
               },
               dest: 'State 4',
               param_changes: []
@@ -800,7 +798,7 @@ describe('Extracting Image file names in the state service', () => {
     };
   });
 
-  it('should get all the filenames of the images in a state',
+  fit('should get all the filenames of the images in a state',
     () => {
       let exploration = eof.createFromBackendDict(explorationDict);
       let states = exploration.getStates();
