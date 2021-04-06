@@ -46,6 +46,7 @@ import { KeyboardShortcutHelpModalComponent } from
   'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
+import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 import { StorySummaryTileDirective } from
   './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from
@@ -71,6 +72,7 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -96,6 +98,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    ObjectComponentsModule,
     ...firebaseAuthModules,
   ],
 
@@ -111,6 +114,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -147,6 +151,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ResponseHeaderComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
+    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -164,12 +169,14 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ObjectComponentsModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    ImageUploaderComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
     ResponseHeaderComponent,
