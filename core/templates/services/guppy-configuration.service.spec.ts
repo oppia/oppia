@@ -16,13 +16,12 @@
  * @fileoverview Unit test for GuppyConfigurationService
  */
 
-import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service';
-import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
 
 declare global {
   interface Window {
@@ -81,32 +80,37 @@ describe('GuppyConfigurationService', () => {
   });
 
   describe('Components calling the service', () => {
-    let ctrl = null;
+    let component: AlgebraicExpressionEditorComponent;
+    let fixture: ComponentFixture<AlgebraicExpressionEditorComponent>;
 
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'GuppyConfigurationService', guppyConfigurationService);
-      $provide.value('MathInteractionsService', new MathInteractionsService());
-      $provide.value(
-        'GuppyInitializationService', new GuppyInitializationService());
+    beforeEach(waitForAsync(() => {
+      TestBed.configureTestingModule(
+        {
+          imports: [HttpClientTestingModule],
+          declarations: [AlgebraicExpressionEditorComponent],
+        }
+      ).compileComponents();
     }));
-    beforeEach(angular.mock.inject(function($componentController) {
-      ctrl = $componentController('algebraicExpressionEditor');
-    }));
+    beforeEach(() => {
+      fixture = TestBed.createComponent(
+        AlgebraicExpressionEditorComponent);
+      component = fixture.componentInstance;
+      component.currentValue = '';
+    });
+
 
     it('should configure guppy on the first initialization', () => {
       GuppyConfigurationService.serviceIsInitialized = false;
       spyOn(Guppy, 'remove_global_symbol');
-      ctrl.$onInit();
+      component.ngOnInit();
       expect(Guppy.remove_global_symbol).toHaveBeenCalled();
     });
 
     it('should not configure guppy on multiple initializations', () => {
-      ctrl.$onInit();
+      component.ngOnInit();
 
       spyOn(Guppy, 'remove_global_symbol');
-      ctrl.$onInit();
+      component.ngOnInit();
       expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
 
       let mockComponent = new MockComponent(guppyConfigurationService);

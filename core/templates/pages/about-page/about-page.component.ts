@@ -21,9 +21,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AboutPageConstants } from './about-page.constants';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 import { WindowRef } from
-  'services/contextual/window-ref.service.ts';
+  'services/contextual/window-ref.service';
 
 interface CreditNames {
   letter: string;

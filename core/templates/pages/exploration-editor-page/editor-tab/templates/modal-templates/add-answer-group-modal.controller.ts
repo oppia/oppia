@@ -16,6 +16,8 @@
  * @fileoverview Controller for add answer group modal.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -46,6 +48,13 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    $scope.isInvalid = false;
+    $scope.directiveSubscriptions = new Subscription();
+    $scope.directiveSubscriptions.add(
+      StateEditorService.onObjectFormValidityChange.subscribe(
+        value => $scope.isInvalid = value
+      )
+    );
     $scope.feedbackEditorIsOpen = false;
     $scope.addState = addState;
     $scope.questionModeEnabled = (
@@ -100,6 +109,10 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
           $scope.tmpOutcome.labelledAsCorrect ? null : (
             $scope.tmpTaggedSkillMisconceptionId)),
         reopen: reopen
+      });
+
+      $scope.$on('$destroy', function() {
+        $scope.directiveSubscriptions.unsubscribe();
       });
     };
   }

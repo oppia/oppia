@@ -60,8 +60,8 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary protractor-test-close-add-response-modal" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
-  <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="addAnswerGroupForm.outcomeDetailsForm.$invalid || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
+  <button class="btn btn-success protractor-test-add-new-response" ng-click="saveResponse(false)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome)">Save Response</button>
+  <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
 </div>
 <style>
   outcome-feedback-editor {
