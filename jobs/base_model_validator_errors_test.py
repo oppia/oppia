@@ -276,3 +276,48 @@ class ModelExpiredErrorTests(ModelValidatorErrorTestBase):
             'ModelExpiredError in BaseModel(id="123"): deleted=True when older '
             'than %d days' % (
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
+
+
+class MissingCommitCommandDomainObjErrorTests(ModelValidatorErrorTestBase):
+
+    def test_message(self):
+        # define a model
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='private',
+            post_commit_is_private=False,
+            commit_cmds=[])
+        error = errors.MissingCommitCommandDomainObjError(model)
+
+        # assert equal to the expected error
+        self.assertEqual(
+            error.message,
+            'Entity id 123: No commit command domain object defined '
+            'for entity with commands: []')        
+
+
+class CommitCommandValidationFailedErrorTests(ModelValidatorErrorTestBase):
+
+    def test_message(self):
+        # define a model
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='private',
+            post_commit_is_private=False,
+            commit_cmds=[])
+        error = errors.CommitCommandValidationFailedError(model)
+
+        # assert equal to the expected error
+        self.assertEqual(
+            error.message,
+            'commit cmd [] check'
+            'Entity id 123: Commit command domain validation for '
+            'command: [what] failed with error: what ? ')        

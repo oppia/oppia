@@ -148,7 +148,7 @@ class ValidateCommitCmdsSchema(beam.DoFn):
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
-            get_change_domain_class: function which returns a change domain class
+            get_change_domain_class: function. Returns a change domain class
             
         Yields:
             ModelMutatedDuringJobError. Error for missing commit commmand domain
