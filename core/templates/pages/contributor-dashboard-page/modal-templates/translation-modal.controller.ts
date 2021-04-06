@@ -99,8 +99,8 @@ angular.module('oppia').controller('TranslationModalController', [
       var textAndAvailability = (
         TranslateTextService.getTextToTranslate());
       $scope.textToTranslate = textAndAvailability.text;
-      $scope.moreAvailable = textAndAvailability.more;
       $scope.previousTranslationAvailable = textAndAvailability.more;
+      $scope.moreAvailable = textAndAvailability.more;
       $scope.activeWrittenTranslation.html = '';
     };
 
