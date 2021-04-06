@@ -121,11 +121,6 @@ class UserSettingsModel(base_models.BaseModel):
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id, model,
         username, normalized_username, and display_alias fields.
@@ -367,11 +362,6 @@ class CompletedActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
@@ -447,11 +437,6 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     # The ids of the collections partially completed by the user.
     collection_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -533,11 +518,6 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # The name of the state at which the learner left the exploration when
     # he/she last played it.
     last_played_state_name = datastore_services.StringProperty(default=None)
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -674,11 +654,6 @@ class LearnerPlaylistModel(base_models.BaseModel):
     # IDs of all the collections in the playlist of the user.
     collection_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -1525,11 +1500,6 @@ class CollectionProgressModel(base_models.BaseModel):
     completed_explorations = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user:
         user_id field.
@@ -1708,11 +1678,6 @@ class StoryProgressModel(base_models.BaseModel):
     completed_node_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user:
         user_id field.
@@ -1878,8 +1843,13 @@ class UserQueryModel(base_models.BaseModel):
 
     The id of each instance of this model is alphanumeric id of length 12
     unique to each model instance.
+
+    This model turns off caching, because this results in stale data being
+    shown after each UserQueryOneOffJob.
     """
 
+    _use_cache = False
+    _use_memcache = False
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever
@@ -2061,11 +2031,6 @@ class UserSkillMasteryModel(base_models.BaseModel):
     # The degree of mastery of the user in the skill.
     degree_of_mastery = (
         datastore_services.FloatProperty(required=True, indexed=True))
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():

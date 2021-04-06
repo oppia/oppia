@@ -30,6 +30,7 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import takeout_service
+from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 import feconf
@@ -427,7 +428,7 @@ class UsernameCheckHandler(base.BaseHandler):
         """Handles POST requests."""
         username = self.payload.get('username')
         try:
-            user_services.UserSettings.require_valid_username(username)
+            user_domain.UserSettings.require_valid_username(username)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -462,7 +463,9 @@ class UserInfoHandler(base.BaseHandler):
         # The following headers are added to prevent caching of this response.
         self.response.cache_control.no_store = True
         if self.username:
-            user_actions = user_services.UserActionsInfo(self.user_id).actions
+            user_actions = user_services.get_user_actions_info(
+                self.user_id
+            ).actions
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             self.render_json({

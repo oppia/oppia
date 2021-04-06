@@ -10,9 +10,12 @@
     </div>
     <div class="topic-details" ng-style="{'background-color': $ctrl.getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !$ctrl.isPublished()}">
       <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
-      <span translate="I18N_TOPIC_VIEWER_CHAPTERS"
-            translate-values="{count: $ctrl.getTopicSummary().getTotalPublishedNodeCount()}"
-            translate-interpolation="messageformat">
+      <[$ctrl.getTopicSummary().getTotalPublishedNodeCount()]>
+      <span ng-if="$ctrl.getTopicSummary().getTotalPublishedNodeCount() === 1">
+        <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
+      </span>
+      <span ng-if="$ctrl.getTopicSummary().getTotalPublishedNodeCount() !== 1">
+        <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
       </span>
     </div>
   </a>
@@ -93,7 +96,7 @@
 
   .topic-card .topic-details {
     border-radius: 0 0 0.2em 0.2em;
-    color: #ffffff;
+    color: #fff;
     font-family: Roboto, Arial, sans-serif;
     font-size: 0.8em;
     height: 100px;

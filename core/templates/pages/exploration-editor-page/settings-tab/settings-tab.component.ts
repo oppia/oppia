@@ -16,6 +16,8 @@
  * @fileoverview Directive for the exploration settings tab.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -82,8 +84,6 @@ require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-
-import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('settingsTab', {
   bindings: {
@@ -163,8 +163,12 @@ angular.module('oppia').component('settingsTab', {
             ctrl.stateNames = ExplorationStatesService.getStateNames();
           }
           ctrl.hasPageLoaded = true;
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         });
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
         $rootScope.$applyAsync();
       };
 
@@ -263,6 +267,8 @@ angular.module('oppia').component('settingsTab', {
       };
 
       ctrl._successCallback = () => {
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
         $rootScope.$applyAsync();
       };
 
@@ -357,8 +363,17 @@ angular.module('oppia').component('settingsTab', {
             },
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
-            ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody);
+            ExplorationRightsService.saveModeratorChangeToBackendAsync(
+              emailBody).then(function() {
+              UserExplorationPermissionsService.fetchPermissionsAsync()
+                .then(function(permissions) {
+                  ctrl.canUnpublish = permissions.canUnpublish;
+                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
+                });
+            });
           }, function() {
             AlertsService.clearWarnings();
           });
@@ -403,6 +418,21 @@ angular.module('oppia').component('settingsTab', {
               ctrl.refreshSettingsTab();
             }
           )
+        );
+        ctrl.directiveSubscriptions.add(
+          UserExplorationPermissionsService.onUserExplorationPermissionsFetched
+            .subscribe(
+              () => {
+                UserExplorationPermissionsService.getPermissionsAsync()
+                  .then(function(permissions) {
+                    ctrl.canUnpublish = permissions.canUnpublish;
+                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the controller is migrated to angular.
+                    $rootScope.$applyAsync();
+                  });
+              }
+            )
         );
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
           EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
