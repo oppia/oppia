@@ -139,7 +139,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         # with a 2-day buffer time for the cron to run, in case the scrubbing is
         # delayed.
         latest_datetime = datetime.datetime.utcnow() - (
-            feconf.APP_FEEDBACK_REPORT_MAX_DAYS +
+            feconf.APP_FEEDBACK_REPORT_MAXIMUM_DAYS +
             VALID_SCRUBBING_DATETIME_BUFFER)
         if item.created_on < latest_datetime and not item.scrubbed_by:
             model_class = app_feedback_report_models.AppFeedbackReportModel

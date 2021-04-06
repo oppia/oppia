@@ -377,7 +377,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_validators.VALID_SCRUBBING_DATETIME_BUFFER -
             datetime.timedelta(days=1))
         valid_datetime = datetime.datetime.utcnow() - (
-            feconf.APP_FEEDBACK_REPORT_MAX_DAYS + valid_datetime_buffer)
+            feconf.APP_FEEDBACK_REPORT_MAXIMUM_DAYS + valid_datetime_buffer)
         model_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.report_id))
@@ -401,7 +401,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_validators.VALID_SCRUBBING_DATETIME_BUFFER +
             datetime.timedelta(days=2))
         invalid_datetime = datetime.datetime.utcnow() - (
-            feconf.APP_FEEDBACK_REPORT_MAX_DAYS + invalid_datetime_buffer)
+            feconf.APP_FEEDBACK_REPORT_MAXIMUM_DAYS + invalid_datetime_buffer)
         model_id = app_feedback_report_models.AppFeedbackReportModel.create(
             platform=self.PLATFORM_ANDROID,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
