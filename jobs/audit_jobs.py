@@ -19,13 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from jobs import base_jobs
-from jobs import jobs_utils
 # TODO(#11475): All lint checks that ensure all jobs.transforms.*_audits modules
 # are imported.
+from jobs import base_jobs
+from jobs import jobs_utils
 from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
-from jobs.transforms import user_audits # pylint: disable=unused-import
+from jobs.transforms import user_audits  # pylint: disable=unused-import
 import python_utils
 
 import apache_beam as beam
@@ -33,7 +33,7 @@ import apache_beam as beam
 AUDITS_BY_KIND = audit_decorators.AuditsExisting.get_audits_by_kind()
 
 KIND_BY_INDEX = list(AUDITS_BY_KIND.keys())
-AUDITS_BY_INDEX = [AUDITS_BY_KIND[kind] for kind in KIND_BY_INDEX]
+AUDITS_BY_INDEX = [AUDITS_BY_KIND[k] for k in KIND_BY_INDEX]
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):

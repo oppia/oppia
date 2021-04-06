@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.cloud import datastore as cloud_datastore_types
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])

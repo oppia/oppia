@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import inspect
-import itertools
 
 from core.platform import models
 from jobs import jobs_utils
@@ -53,10 +52,7 @@ class AuditsExisting(python_utils.OBJECT):
     and only if ValidateExplorationModelId inherits from ValidateModelId.
     """
 
-    _AUDITS_BY_KIND = {
-        cls: set()
-        for cls in itertools.chain(_ALL_BASE_MODEL_CLASSES, _ALL_MODEL_CLASSES)
-    }
+    _AUDITS_BY_KIND = collections.defaultdict(set)
 
     def __init__(self, *model_classes):
         """Initializes the decorator to target the given models.
@@ -81,7 +77,7 @@ class AuditsExisting(python_utils.OBJECT):
                 raise TypeError(
                     '%r is not a model registered in core.platform' % cls)
 
-    def __call__(self, new_audit):
+    def __call__(self, new_class):
         """Decorator which registers the given DoFn to the targeted models.
 
         This decorator also installs type constraints on the DoFn to guard it

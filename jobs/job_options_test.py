@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
-import feconf
 from jobs import job_options
 from jobs.io import test_io
 
@@ -31,16 +30,11 @@ class JobOptionsTests(test_utils.TestBase):
         options = job_options.JobOptions()
 
         self.assertIsNone(options.model_getter)
-        self.assertEqual(options.project, feconf.OPPIA_PROJECT_ID)
-        self.assertEqual(options.region, feconf.GOOGLE_APP_ENGINE_REGION)
 
     def test_overwritten_values(self):
         model_io_stub = test_io.ModelIoStub()
         get_models = model_io_stub.get_models
 
-        options = job_options.JobOptions(
-            model_getter=get_models, project='abc', region='123')
+        options = job_options.JobOptions(model_getter=get_models)
 
         self.assertIs(options.model_getter, get_models)
-        self.assertEqual(options.project, 'abc')
-        self.assertEqual(options.region, '123')

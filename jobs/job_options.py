@@ -43,12 +43,14 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
             **kwargs: dict(str: *). Downstream arguments for the base classes.
         """
         super(JobOptions, self).__init__(
+            model_getter=model_getter,
+            # GoogleCloudOptions arguments.
             project=feconf.OPPIA_PROJECT_ID,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             # TODO(#11475): Figure out what these values should be. We can't run
             # unit tests on DataflowRunner unless they have a valid GCS path.
             temp_location='gs://todo/todo', staging_location='gs://todo/todo',
-            project=project, region=region, **kwargs)
+            **kwargs)
 
     @classmethod
     def _add_argparse_args(cls, parser):

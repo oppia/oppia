@@ -26,7 +26,6 @@ from jobs import base_jobs
 from jobs import job_options
 import python_utils
 
-import apache_beam as beam
 from apache_beam import runners
 from apache_beam.options import pipeline_options
 from apache_beam.testing import test_pipeline
@@ -118,20 +117,12 @@ class JobMetaclassTests(test_utils.TestBase):
 
 class JobBaseTests(test_utils.TestBase):
 
-    def test_default_config(self):
-        job = base_jobs.JobBase()
-
-        self.assertIsInstance(job.pipeline, beam.Pipeline)
-        self.assertIsInstance(job.pipeline.runner, runners.DataflowRunner)
-        self.assertIsInstance(job.pipeline.options, job_options.JobOptions)
-
-    def test_explicit_config(self):
+    def test_config(self):
         pipeline = test_pipeline.TestPipeline
         runner = runners.DirectRunner()
         options = pipeline_options.TestOptions()
 
-        job = base_jobs.JobBase(
-            pipeline=pipeline, runner=runner, options=options)
+        job = base_jobs.JobBase(pipeline, runner, options)
 
         self.assertIsInstance(job.pipeline, test_pipeline.TestPipeline)
         self.assertIsInstance(job.pipeline.runner, runners.DirectRunner)
@@ -141,7 +132,9 @@ class JobBaseTests(test_utils.TestBase):
     def test_run_raises_not_implemented_error(self):
         pipeline = test_pipeline.TestPipeline
         runner = runners.DirectRunner()
-        job = base_jobs.JobBase(pipeline=pipeline, runner=runner)
+        options = job_options.JobOptions()
+
+        job = base_jobs.JobBase(pipeline, runner, options)
 
         self.assertRaisesRegexp(
             NotImplementedError, r'must implement the run\(\) method', job.run)

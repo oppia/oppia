@@ -113,7 +113,7 @@ class JobTestBase(BeamTestBase):
                 runtime_type_check=True,
                 model_getter=self.model_io_stub.get_models)
 
-        job = self.JOB_CLASS(pipeline=pipeline, runner=runner, options=options)
+        job = self.JOB_CLASS(pipeline, runner, options)
         return job.run()
 
     def assert_job_output_is(self, expected):

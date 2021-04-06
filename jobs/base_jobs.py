@@ -62,9 +62,6 @@ import functools
 from jobs import job_options
 import python_utils
 
-import apache_beam as beam
-from apache_beam import runners
-
 
 class JobMetaclass(type):
     """Meta class for all of Oppia's Apache Beam jobs.
@@ -78,13 +75,14 @@ class JobMetaclass(type):
     def __new__(mcs, name, bases, namespace):
         """Creates a new class whose type is JobMetaclass.
 
+        https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
+
         Args:
+            mcs: JobMetaclass. The metaclass instance.
             name: str. The name of the class.
             bases: tuple(type). The sequence of base classes for the new class.
             namespace: dict(str: *). The namespace of the class. This is where
                 methods, functions, and attributes on the class are stored.
-
-        https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
 
         Returns:
             class. A new class with type: JobMetaclass.
