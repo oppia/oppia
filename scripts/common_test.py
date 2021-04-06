@@ -1140,14 +1140,16 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_cloud_datastore_emulator(self):
         with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+
             stack.enter_context(self.swap_to_always_return(
                 common, 'wait_for_port_to_be_in_use'))
+            stack.enter_context(self.swap_to_always_return(
+                os.path, 'exists', value=True))
             stack.enter_context(self.swap_to_always_return(
                 shutil, 'rmtree'))
             stack.enter_context(self.swap_to_always_return(
                 os, 'makedirs'))
-
-            popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(common.managed_cloud_datastore_emulator())
 
@@ -1159,9 +1161,9 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_cloud_datastore_emulator_creates_missing_data_dir(self):
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self._swap_popen())
+
             stack.enter_context(self.swap_to_always_return(
                 common, 'wait_for_port_to_be_in_use'))
-
             stack.enter_context(self.swap_to_always_return(
                 os.path, 'exists', value=False))
             rmtree_counter = stack.enter_context(self.swap_with_call_counter(
@@ -1177,9 +1179,9 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_cloud_datastore_emulator_clears_data_dir(self):
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self._swap_popen())
+
             stack.enter_context(self.swap_to_always_return(
                 common, 'wait_for_port_to_be_in_use'))
-
             stack.enter_context(self.swap_to_always_return(
                 os.path, 'exists', value=True))
             rmtree_counter = stack.enter_context(self.swap_with_call_counter(
@@ -1196,9 +1198,9 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_cloud_datastore_emulator_acknowledges_data_dir(self):
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self._swap_popen())
+
             stack.enter_context(self.swap_to_always_return(
                 common, 'wait_for_port_to_be_in_use'))
-
             stack.enter_context(self.swap_to_always_return(
                 os.path, 'exists', value=True))
             rmtree_counter = stack.enter_context(self.swap_with_call_counter(

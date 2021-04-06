@@ -992,6 +992,8 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
 
         proc = stack.enter_context(managed_process(emulator_args, shell=True))
 
+        wait_for_port_to_be_in_use(feconf.CLOUD_DATASTORE_EMULATOR_PORT)
+
         # Environment variables required to communicate with the emulator.
         stack.enter_context(swap_env(
             'DATASTORE_DATASET', feconf.OPPIA_PROJECT_ID))
@@ -1006,5 +1008,4 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         stack.enter_context(swap_env(
             'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
 
-        wait_for_port_to_be_in_use(feconf.CLOUD_DATASTORE_EMULATOR_PORT)
         yield proc
