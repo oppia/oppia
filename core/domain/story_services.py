@@ -312,20 +312,20 @@ def validate_prerequisite_skills_in_story_contents(
             nodes_queue.append(node_id)
 
 
-def validate_explorations_for_story(exp_ids, raise_error):
+def validate_explorations_for_story(exp_ids, strict):
     """Validates the explorations in the given story and checks whether they
     are compatible with the mobile app and ready for publishing.
 
     Args:
         exp_ids: list(str). The exp IDs to validate.
-        raise_error: bool. Whether to raise an Exception when a validation error
+        strict: bool. Whether to raise an Exception when a validation error
             is encountered. If not, a list of the error messages are
-            returned. raise_error should be True when this is called before
+            returned. strict should be True when this is called before
             saving the story and False when this function is called from the
             frontend.
 
     Returns:
-        list(str). The various validation error messages (if raise_error is
+        list(str). The various validation error messages (if strict is
         False).
 
     Raises:
@@ -356,7 +356,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
                 'Expected story to only reference valid explorations, but found'
                 ' a reference to an invalid exploration with ID: %s'
                 % exp_id)
-            if raise_error:
+            if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
         else:
@@ -365,7 +365,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
                     'Exploration with ID %s is not public. Please publish '
                     'explorations before adding them to a story.'
                     % exp_id)
-                if raise_error:
+                if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
 
@@ -382,11 +382,11 @@ def validate_explorations_for_story(exp_ids, raise_error):
                     'All explorations in a story should be of the '
                     'same category. The explorations with ID %s and %s have'
                     ' different categories.' % (sample_exp_id, exp_id))
-                if raise_error:
+                if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
             validation_error_messages.extend(
-                exp_services.validate_exploration_for_story(exp, raise_error))
+                exp_services.validate_exploration_for_story(exp, strict))
 
     return validation_error_messages
 

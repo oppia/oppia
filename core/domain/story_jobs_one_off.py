@@ -185,10 +185,9 @@ class StoryExplorationsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if key == StoryExplorationsAuditOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
+            num_deleted = sum(ast.literal_eval(v) for v in values)
+            values = ['Encountered %d deleted stories.' % num_deleted]
         elif key == StoryExplorationsAuditOneOffJob._PROCESSED_KEY:
-            yield (key, ['Successfully processed %d stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)
+            num_processed = sum(ast.literal_eval(v) for v in values)
+            values = ['Successfully processed %d stories.' % num_processed]
+        yield (key, values)

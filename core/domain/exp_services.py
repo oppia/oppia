@@ -894,19 +894,19 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
             contributor, contribution_time_msec)
 
 
-def validate_exploration_for_story(exp, raise_error):
+def validate_exploration_for_story(exp, strict):
     """Validates an exploration with story validations.
 
     Args:
         exp: Exploration. Exploration object to be validated.
-        raise_error: bool. Whether to raise an Exception when a validation error
+        strict: bool. Whether to raise an Exception when a validation error
             is encountered. If not, a list of the error messages are
-            returned. raise_error should be True when this is called before
+            returned. strict should be True when this is called before
             saving the story and False when this function is called from the
             frontend.
 
     Returns:
-        list(str). The various validation error messages (if raise_error is
+        list(str). The various validation error messages (if strict is
         False).
 
     Raises:
@@ -923,7 +923,7 @@ def validate_exploration_for_story(exp, raise_error):
         error_string = (
             'Invalid language %s found for exploration '
             'with ID %s.' % (exp.language_code, exp.id))
-        if raise_error:
+        if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
@@ -931,7 +931,7 @@ def validate_exploration_for_story(exp, raise_error):
         error_string = (
             'Expected no exploration to have parameter '
             'values in it. Invalid exploration: %s' % exp.id)
-        if raise_error:
+        if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
@@ -939,7 +939,7 @@ def validate_exploration_for_story(exp, raise_error):
         error_string = (
             'Expected all explorations to have correctness feedback '
             'enabled. Invalid exploration: %s' % exp.id)
-        if raise_error:
+        if strict:
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
@@ -949,7 +949,7 @@ def validate_exploration_for_story(exp, raise_error):
             error_string = (
                 'Invalid interaction %s in exploration '
                 'with ID: %s.' % (state.interaction.id, exp.id))
-            if raise_error:
+            if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
 
@@ -958,7 +958,7 @@ def validate_exploration_for_story(exp, raise_error):
                 'RTE content in state %s of exploration '
                 'with ID %s is not supported on mobile.'
                 % (state_name, exp.id))
-            if raise_error:
+            if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
 
@@ -971,7 +971,7 @@ def validate_exploration_for_story(exp, raise_error):
                     'Exploration with ID: %s contains exploration '
                     'recommendations in its EndExploration interaction.'
                     % (exp.id))
-                if raise_error:
+                if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
     return validation_error_messages
@@ -1033,7 +1033,7 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     updated_exploration = apply_change_list(exploration_id, change_list)
-    if bool(get_story_id_linked_to_exploration(exploration_id)):
+    if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)

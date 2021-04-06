@@ -103,8 +103,9 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
                 self.user_id and not has_seen_translation_tutorial)
-            exploration_data['exploration_is_linked_to_story'] = bool(
-                exp_services.get_story_id_linked_to_exploration(exploration_id))
+            exploration_data['exploration_is_linked_to_story'] = (
+                exp_services.get_story_id_linked_to_exploration(
+                    exploration_id) is not None)
         except:
             raise self.PageNotFoundException
 
