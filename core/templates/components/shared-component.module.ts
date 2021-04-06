@@ -72,6 +72,7 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { SchemaBasedEditorsModule } from './forms/schema-based-editors/schema-based-editors.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -98,6 +99,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbModalModule,
     FormsModule,
     SchemaBasedEditorsModule,
+    ObjectComponentsModule,
     ...firebaseAuthModules,
   ],
 
@@ -166,6 +168,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ObjectComponentsModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
