@@ -727,7 +727,7 @@ describe('Extracting Image file names in the state service', () => {
                   dest: 'State 7',
                   feedback: {
                     content_id: 'feedback_1',
-                    html: "It is choice number 1."
+                    html: 'It is choice number 1.'
                   },
                   param_changes: [],
                   refresher_exploration_id: null
@@ -798,7 +798,7 @@ describe('Extracting Image file names in the state service', () => {
     };
   });
 
-  fit('should get all the filenames of the images in a state',
+  it('should get all the filenames of the images in a state',
     () => {
       let exploration = eof.createFromBackendDict(explorationDict);
       let states = exploration.getStates();
