@@ -80,6 +80,7 @@ import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.directive';
 import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { BaseContentComponent } from '../base-components/base-content.component';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -133,6 +134,7 @@ const toastrConfig = {
     NgbModalModule,
     FormsModule,
     ToastrModule.forRoot(toastrConfig),
+    ObjectComponentsModule,
     ...firebaseAuthModules,
   ],
 
@@ -223,6 +225,7 @@ const toastrConfig = {
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ObjectComponentsModule,
     // Components, directives, and pipes.
     AlertMessageComponent,
     AudioFileUploaderComponent,
