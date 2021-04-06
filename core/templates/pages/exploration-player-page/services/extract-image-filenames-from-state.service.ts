@@ -203,13 +203,16 @@ export class ExtractImageFilenamesFromStateService {
       let tabsTagList = dummyDocument.getElementsByTagName(
         'oppia-noninteractive-tabs');
       for (let i = 0; i < tabsTagList.length; i++) {
-        let contentWithValue = JSON.parse(
-          tabsTagList[i].getAttribute('content-with-value'));
-        let tabDocument = (
-          new DOMParser().parseFromString(contentWithValue, 'text/html'));
-        imageTagLists.push(
-          tabDocument.getElementsByTagName(
-            'oppia-noninteractive-image'));
+        let contentsWithValue = JSON.parse(
+          tabsTagList[i].getAttribute('tab_contents-with-value'));
+        for (let contentWithValue of contentsWithValue) {
+          let tabDocument = (
+            new DOMParser().parseFromString(
+              contentWithValue.content, 'text/html'));
+          imageTagLists.push(
+            tabDocument.getElementsByTagName(
+              'oppia-noninteractive-image'));  
+        }
       }
 
       for (let imageTagList of imageTagLists) {
@@ -218,10 +221,11 @@ export class ExtractImageFilenamesFromStateService {
           // But it actually contains the filename only. We use the variable
           // filename instead of filepath since in the end we are retrieving the
           // filenames in the exploration.
-          let filename = JSON.parse(this.htmlEscaperService.escapedStrToUnescapedStr(
-            imageTagList[i].getAttribute('filepath-with-value')));
+          let filename = JSON.parse(
+            this.htmlEscaperService.escapedStrToUnescapedStr(
+              imageTagList[i].getAttribute('filepath-with-value')));
           filenames.push(filename);
-        }  
+        }
       }
       return filenames;
     }
