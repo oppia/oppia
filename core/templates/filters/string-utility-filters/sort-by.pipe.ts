@@ -16,7 +16,14 @@
  * @fileoverview Sort By pipe for Oppia.
  */
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
-
+// SortBy pipe is a replica of angular js orderBy filter.
+// The first check of this pipe is to filter out whether the
+// received 'value' is a single dimensional array or a multidimensional array.
+// If it is a single dimensional array, the pipe will sort out
+// the array regarding either string or number.
+// In the case of the multidimensional array, the object will be
+// sorted with the given property as 'sortKey'.
+// We can all specify ascending and descending orders using 'isDescending'.
 @Pipe({
   name: 'sortBy',
 })
@@ -24,9 +31,9 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
   providedIn: 'root'
 })
 export class SortByPipe implements PipeTransform {
-  transform(
-      value: object[], isDescending: boolean,
-      sortKey?: string): object[] {
+  transform<T>(
+      value: T[], isDescending: boolean,
+      sortKey?: string): T[] {
     if (!value) {
       return value;
     }

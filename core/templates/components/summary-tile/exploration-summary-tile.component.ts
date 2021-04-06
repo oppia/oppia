@@ -162,6 +162,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       let collectionIdToAdd = this.getCollectionId;
       let storyIdToAdd = null;
       let storyNodeIdToAdd = null;
+      // Replace the collection ID with the one in the URL if it exists
+      // in urlParams.
       if (parentExplorationIds &&
           urlParams.hasOwnProperty('collection_id')) {
         collectionIdToAdd = urlParams.collection_id;
