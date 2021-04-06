@@ -347,7 +347,7 @@ class AppFeedbackReportStatsModelValidator(
         """Validates that the stats_tracking_date of the model is less than
         the current time and greater than the earliest possible date of
         submissions (no earlier than March 2021) with a 1-week buffer to account
-        for any slight differences in timestamps due to user's changin their
+        for any slight differences in timestamps due to user's changing their
         system clocks.
 
         Args:
