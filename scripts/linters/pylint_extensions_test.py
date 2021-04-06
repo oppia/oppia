@@ -3349,8 +3349,8 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
                 u"""
                 def sum(
                     a,b):
-
                     \"\"\" this returns sum of a and b.\"\"\"
+
                     return a+b
                 """)
         node_empty_line_below_function_def.file = filename
@@ -3444,4 +3444,32 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             node_no_empty_line_below_function_def)
 
         with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+    def test_empty_line_below_function_definition_without_doc_raises_error(
+        self):
+        node_empty_line_below_function_def = astroid.scoped_nodes.Function(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def sum(a,b):
+
+                    return a+b
+                """)
+        node_empty_line_below_function_def.file = filename
+        node_empty_line_below_function_def.path = filename
+        node_empty_line_below_function_def.fromlineno = 2
+
+        self.checker_test_object.checker.visit_functiondef(
+            node_empty_line_below_function_def)
+
+        message = testutils.Message(
+            msg_id='no-blank-lines-below-function-definiton.',
+            node=node_empty_line_below_function_def)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
