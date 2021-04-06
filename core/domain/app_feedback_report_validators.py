@@ -34,8 +34,10 @@ import utils
 
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC.
 EARLIEST_VALID_DATETIME = datetime.datetime.fromtimestamp(1614556800)
+
 # A buffer for the scrubbing validation to account for any cron delays.
 VALID_SCRUBBING_DATETIME_BUFFER = datetime.timedelta(days=2)
+
 # A buffer for validation with the submission date to account for time
 # differences caused by the user adjusting their system clocks.
 VALID_SUBMISSION_DATETIME_BUFFER = datetime.timedelta(days=7)
