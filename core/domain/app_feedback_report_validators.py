@@ -349,7 +349,6 @@ class AppFeedbackReportStatsModelValidator(
             item: datastore_services.Model. AppFeedbackReportStatsModel to
                 validate.
         """
-        current_datetime = datetime.datetime.utcnow()
         if item.stats_tracking_date < EARLIEST_VALID_DATETIME.date():
             cls._add_error(
                 'stats_tracking_date %s' % (
