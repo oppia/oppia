@@ -121,6 +121,8 @@
     "core/templates/services/loader.service.spec.ts",
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
+    "core/templates/services/schema-form-submitted.service.ts",
+    "core/templates/services/schema-form-submitted.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
     "core/templates/services/stateful/background-mask.service.spec.ts",
     "extensions/classifiers/count-vectorizer.service.ts",
@@ -140,10 +142,14 @@
     "extensions/interactions/ItemSelectionInput/directives/item-selection-input-rules.service.spec.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
+    "extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.ts",
+    "extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.ts",
-    "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts"
+    "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts",
+    "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
+    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
   ],
   "include": ["typings/*.ts"]
 }
