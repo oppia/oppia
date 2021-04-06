@@ -172,7 +172,6 @@ angular.module('oppia').run([
               var that = this;
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
-                console.log("[ck-editor-4-widgets]");
                 that.element.getChild(0).setAttribute(
                   spec.name + '-with-value',
                   HtmlEscaperService.objToEscapedJson(
@@ -189,7 +188,6 @@ angular.module('oppia').run([
               customizationArgSpecs.forEach(function(spec) {
                 var value = that.element.getChild(0).getAttribute(
                   spec.name + '-with-value');
-                console.log("[ck-editor-4-widgets]");
                 if (value) {
                   that.setData(
                     spec.name, HtmlEscaperService.escapedJsonToObj(value));

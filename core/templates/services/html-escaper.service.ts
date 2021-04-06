@@ -33,7 +33,6 @@ export class HtmlEscaperService {
    * @return {string} An escaped JSON version of the original string object.
    */
   objToEscapedJson(obj: Object): string {
-    console.log("Unescaped HTML ==> escaped JSON");
     return this.unescapedStrToEscapedStr(JSON.stringify(obj));
   }
 
@@ -46,7 +45,6 @@ export class HtmlEscaperService {
    * @throws Will throw error if empty string is passed to JSON decoder.
    */
   escapedJsonToObj(json: string): Object {
-    console.log("Escaped JSON ==> unescaped HTML");
     if (!json) {
       this.loggerService.error('Empty string was passed to JSON decoder.');
       return '';
@@ -61,7 +59,6 @@ export class HtmlEscaperService {
    * @return {string} an escaped string derived from the previous string.
    */
   unescapedStrToEscapedStr(str: string): string {
-    console.log("Unescaped HTML ==> escaped HTML");
     return String(str)
       .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')
@@ -77,12 +74,6 @@ export class HtmlEscaperService {
    * @return {string} an unescaped string derived from the previous string.
    */
   escapedStrToUnescapedStr(value: string): string {
-    console.log("Escaped HTML ==> unescaped HTML");
-    console.log(value);
-    if (value.startsWith("&quot;img")) {
-      var err = new Error();
-      console.log(err.stack);
-    }
     return String(value)
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, '\'')

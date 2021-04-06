@@ -98,7 +98,6 @@ export class ContentTranslationManagerService {
     const writtenTranslation = writtenTranslations.translationsMapping[
       content.contentId][languageCode];
     if (!this._isValidTranslation(writtenTranslation)) {
-      console.log(content.html);
       return content.html;
     } else {
       return writtenTranslation.getHtml();
