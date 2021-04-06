@@ -566,7 +566,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
-            Exception, 'Invalid unicode string set: 15'
+            AssertionError, 'Expected list, received 15'
             ):
             exploration.validate()
 

@@ -190,7 +190,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return True
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
@@ -214,15 +214,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.ELASTICSEARCH_SERVER_PORT,)])
         with swap_kill_process, subprocess_swap, swap_is_windows:
             with swap_set_constants_to_default:
-                with swap_wait_for_port_to_be_closed:
+                with swap_wait_for_port_to_not_be_in_use:
                     run_e2e_tests.cleanup()
 
     def test_cleanup_when_subprocesses_exist(self):
@@ -234,7 +235,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return True
 
         mock_processes = [
@@ -246,14 +247,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_kill_process_based_on_regex)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.ELASTICSEARCH_SERVER_PORT,)])
         with subprocess_swap, swap_kill_process, swap_set_constants_to_default:
-            with swap_wait_for_port_to_be_closed:
+            with swap_wait_for_port_to_not_be_in_use:
                 run_e2e_tests.cleanup()
         self.assertEqual(
             mock_kill_process_based_on_regex.called_times, len(mock_processes))
@@ -268,7 +270,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return False
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
@@ -292,9 +294,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,)])
         expected_error = (
@@ -303,7 +305,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
         with swap_kill_process, subprocess_swap, swap_is_windows:
             with swap_set_constants_to_default:
-                with swap_wait_for_port_to_be_closed:
+                with swap_wait_for_port_to_not_be_in_use:
                     with self.assertRaisesRegexp(
                         RuntimeError, expected_error
                     ):
@@ -316,7 +318,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        def mock_wait_for_port_to_be_closed(unused_port):
+        def mock_wait_for_port_to_not_be_in_use(unused_port):
             return True
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
@@ -344,9 +346,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
-        swap_wait_for_port_to_be_closed = self.swap_with_checks(
-            common, 'wait_for_port_to_be_closed',
-            mock_wait_for_port_to_be_closed,
+        swap_wait_for_port_to_not_be_in_use = self.swap_with_checks(
+            common, 'wait_for_port_to_not_be_in_use',
+            mock_wait_for_port_to_not_be_in_use,
             expected_args=[
                 (run_e2e_tests.OPPIA_SERVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
@@ -358,57 +360,57 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with swap_kill_process, subprocess_swap, swap_is_windows, (
             windows_exception):
             with swap_set_constants_to_default:
-                with swap_wait_for_port_to_be_closed:
+                with swap_wait_for_port_to_not_be_in_use:
                     run_e2e_tests.cleanup()
 
     def test_is_oppia_server_already_running_when_ports_closed(self):
-        def mock_is_port_open(unused_port):
+        def mock_is_port_in_use(unused_port):
             return False
 
-        is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open)
-        with is_port_open_swap:
+        is_port_in_use_swap = self.swap_with_checks(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        with is_port_in_use_swap:
             result = run_e2e_tests.is_oppia_server_already_running()
             self.assertFalse(result)
 
     def test_is_oppia_server_already_running_when_one_of_the_ports_is_open(
             self):
         running_port = run_e2e_tests.GOOGLE_APP_ENGINE_PORT
-        def mock_is_port_open(port):
+        def mock_is_port_in_use(port):
             if port == running_port:
                 return True
             return False
 
-        is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open)
-        with is_port_open_swap:
+        is_port_in_use_swap = self.swap_with_checks(
+            common, 'is_port_in_use', mock_is_port_in_use)
+        with is_port_in_use_swap:
             result = run_e2e_tests.is_oppia_server_already_running()
             self.assertTrue(result)
 
-    def test_wait_for_port_to_be_open_when_port_successfully_opened(self):
-        def mock_is_port_open(unused_port):
-            mock_is_port_open.wait_time += 1
-            if mock_is_port_open.wait_time > 10:
+    def test_wait_for_port_to_be_in_use_when_port_successfully_opened(self):
+        def mock_is_port_in_use(unused_port):
+            mock_is_port_in_use.wait_time += 1
+            if mock_is_port_in_use.wait_time > 10:
                 return True
             return False
-        mock_is_port_open.wait_time = 0
+        mock_is_port_in_use.wait_time = 0
 
         def mock_sleep(unused_time):
             mock_sleep.called_times += 1
             return
         mock_sleep.called_times = 0
 
-        is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap_with_checks(
+            common, 'is_port_in_use', mock_is_port_in_use)
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
 
-        with is_port_open_swap, sleep_swap:
-            common.wait_for_port_to_be_open(1)
-        self.assertEqual(mock_is_port_open.wait_time, 11)
+        with is_port_in_use_swap, sleep_swap:
+            common.wait_for_port_to_be_in_use(1)
+        self.assertEqual(mock_is_port_in_use.wait_time, 11)
         self.assertEqual(mock_sleep.called_times, 10)
 
-    def test_wait_for_port_to_be_open_when_port_failed_to_open(self):
-        def mock_is_port_open(unused_port):
+    def test_wait_for_port_to_be_in_use_when_port_failed_to_open(self):
+        def mock_is_port_in_use(unused_port):
             return False
 
         def mock_sleep(unused_time):
@@ -419,11 +421,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         mock_sleep.sleep_time = 0
 
-        is_port_open_swap = self.swap(common, 'is_port_open', mock_is_port_open)
+        is_port_in_use_swap = self.swap(
+            common, 'is_port_in_use', mock_is_port_in_use)
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
-        with is_port_open_swap, sleep_swap, exit_swap:
-            common.wait_for_port_to_be_open(1)
+        with is_port_in_use_swap, sleep_swap, exit_swap:
+            common.wait_for_port_to_be_in_use(1)
         self.assertEqual(
             mock_sleep.sleep_time,
             common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
@@ -866,7 +869,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -922,8 +925,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -988,7 +991,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1040,8 +1043,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -1252,7 +1255,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 with on_ci_swap, cleanup_swap, exit_swap:
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
+<<<<<<< HEAD
     def test_no_reruns_off_ci(self):
+=======
+    def test_no_reruns_off_ci_fail(self):
+
+>>>>>>> upstream/develop
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1305,6 +1313,58 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 with on_ci_swap, cleanup_swap, exit_swap:
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
+    def test_no_reruns_off_ci_pass(self):
+
+        mock_portserver = MockProcessClass()
+
+        def mock_check_if_on_ci():
+            return False
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 0
+
+        def mock_report_pass(unused_suite_name):
+            raise AssertionError('Tried to Report Pass')
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup_portserver():
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_start_portserver():
+            return mock_portserver
+
+        start_portserver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_portserver', mock_start_portserver,
+            expected_args=[tuple()])
+        cleanup_portserver_swap = self.swap(
+            run_e2e_tests, 'cleanup_portserver',
+            mock_cleanup_portserver)
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup_portserver, mock_portserver)])
+        run_swap = self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests)
+        report_pass_swap = self.swap(
+            flake_checker, 'report_pass', mock_report_pass)
+        on_ci_swap = self.swap(
+            flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
+        cleanup_swap = self.swap(
+            run_e2e_tests, 'cleanup', mock_cleanup)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
+        with register_swap, run_swap, report_pass_swap:
+            with start_portserver_swap, cleanup_portserver_swap:
+                with on_ci_swap, cleanup_swap, exit_swap:
+                    run_e2e_tests.main(args=['--suite', 'mySuite'])
+
     def test_start_tests_skip_build(self):
         mock_process = MockProcessClass()
 
@@ -1329,7 +1389,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1383,8 +1443,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -1502,7 +1562,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1556,8 +1616,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
@@ -1626,7 +1686,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_webdriver_manager(unused_arg):
             return
 
-        def mock_wait_for_port_to_be_open(unused_port):
+        def mock_wait_for_port_to_be_in_use(unused_port):
             return
 
         def mock_get_e2e_test_parameters(
@@ -1680,8 +1740,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
-                common, 'wait_for_port_to_be_open',
-                mock_wait_for_port_to_be_open,
+                common, 'wait_for_port_to_be_in_use',
+                mock_wait_for_port_to_be_in_use,
                 expected_args=[
                     (feconf.REDISPORT,),
                     (feconf.ES_LOCALHOST_PORT,),
