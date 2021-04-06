@@ -114,7 +114,6 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.uploadingTranslation = true;
         var imagesData = ImageLocalStorageService.getStoredImagesData();
         ImageLocalStorageService.flushStoredImagesData();
-        ContextService.resetImageSaveDestination();
         TranslateTextService.suggestTranslatedText(
           $scope.activeWrittenTranslation.html,
           TranslationLanguageService.getActiveLanguageCode(),
@@ -131,10 +130,12 @@ angular.module('oppia').controller('TranslationModalController', [
             $scope.activeWrittenTranslation.html = '';
             $scope.uploadingTranslation = false;
           }, () => {
+            ContextService.resetImageSaveDestination();
             $uibModalInstance.close();
           });
       }
       if (!$scope.moreAvailable) {
+        ContextService.resetImageSaveDestination();
         $uibModalInstance.close();
       }
     };
