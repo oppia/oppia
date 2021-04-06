@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the end-to-no-test-blockers.js file.
+ * @fileoverview Lint check to disallow usage of ddescribe
+ * fdescribe, xdescribe, fit, xit.
  */
 
 'use strict';
