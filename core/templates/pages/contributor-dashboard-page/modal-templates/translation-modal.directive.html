@@ -40,6 +40,12 @@
         </schema-based-editor>
       </div>
     </div>
+    <div ng-if="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
+      <ul>
+        <li ng-repeat="tip in TRANSLATION_TIPS[activeLanguageCode]"><[tip]>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
 <div class="modal-footer">
@@ -96,6 +102,12 @@
   }
   .oppia-text-to-translate-container {
     border: 1px solid #ccc;
+    margin: 15px 0;
+    padding: 20px;
+  }
+  .oppia-translation-tips-container {
+    background-color: #EEE;
+    border: 1px solid #EEE;
     margin: 15px 0;
     padding: 20px;
   }
