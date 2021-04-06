@@ -34,8 +34,8 @@
     </div>
     <continue-button ng-if="shouldContinueButtonBeShown()"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                     is-learn-again-button="isLearnAgainButton()"
-                     ng-click="onClickContinueButton()"
+                     [is-learn-again-button]="isLearnAgainButton()"
+                     [ng-click]="onClickContinueButton()"
                      class="d-block">
     </continue-button>
   </div>
