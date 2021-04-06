@@ -144,7 +144,7 @@ def check_if_pr_is_changelog_pr(pr):
     return ''
 
 
-LOW_RISK_PR_TYPES = {
+LOW_RISK_CHECKERS = {
     'translatewiki': check_if_pr_is_translation_pr,
     'changelog': check_if_pr_is_changelog_pr,
 }
@@ -161,15 +161,18 @@ def main(tokens=None):
     if not parsed_url:
         raise RuntimeError('Failed to parse PR URL %s', args.pr_url)
     owner, repo, number = parsed_url
-    print('----')
-    print(parsed_url)
-    print('----')
     pr = lookup_pr(owner, repo, number)
-    print(pr)
-    print('----')
-    remotes = common.run_cmd(['git', 'remote', '-v'])
-    print(remotes)
-    print('----')
+    for low_risk_type, low_risk_checker in LOW_RISK_CHECKERS.items():
+        reason_not_low_risk = low_risk_checker(pr)
+        if reason_not_low_risk:
+            python_utils.PRINT(
+                'PR is not a low-risk PR of type %s because: %s' %
+                (low_risk_type, reason_not_low_risk))
+        else:
+            python_utils.PRINT('PR is low-risk. Skipping some CI checks.')
+            exit(0)
+    python_utils.PRINT('PR is not low-risk. Running all CI checks.')
+    exit(1)
 
 
 if __name__ == '__main__':
