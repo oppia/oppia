@@ -30,30 +30,124 @@ from scripts import common
 
 GITHUB_API_PR_ENDPOINT = (
     'https://api.github.com/repos/%s/%s/pulls/%s')
+PR_URL_REGEX = (
+    r'^https://github.com/(?P<owner>\w+)/(?P<repo>\w+)/pull/(?P<num>\w+)/?$')
 
 
 def parse_pr_url(pr_url):
-    match = re.match(
-        r'^https://github.com/(?P<owner>)/(?P<repo>)/pull/(?P<num>)/?$')
+    match = re.match(PR_URL_REGEX, pr_url)
     if match:
         return match.group('owner', 'repo', 'num')
     else:
         return None
 
 
+def load_diff(url):
+    response = python_utils.url_request(url, None, None)
+    lines = [line.rstrip() for line in response]
+    response.close()
+    return lines
+
+
 def lookup_pr(owner, repo, pull_number):
-    response = python_utils.url_request(
-        GITHUB_API_ENDPOINT % (owner, repo, pull_number)
-    )
+    request = python_utils.url_request(
+        GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
+        None,
+        {'Accept': 'application/vnd.github.v3+json'})
+    response = python_utils.url_open(request)
     pr = json.load(response)
     response.close()
     return pr
 
 
-def check_if_pr_is_translation_pr(source_branch):
+def parse_diff(diff):
+    file_diffs = {}
+    old, new = '', ''
+    file_diff_started = False
+    for line in diff:
+        if line.startswith('diff --git '):
+            match = re.match(
+                '^diff --git a/(?P<old>) b/(?P<new>)$', line)
+            old, new = match.group('old', 'new')
+            file_diffs[old, new] = []
+            file_diff_started = False
+            continue
+        if line.startswith('+++'):
+            file_diff_started = True
+            continue
+        if bool(old) and bool(new) and file_diff_started:
+            fild_diffs[old, new].append(line)
+    for old, new in file_diffs:
+        lines = file_diffs[old, new]
+        i_start = -1
+        i_end = -1
+        for i, line in enumerate(lines):
+            if line.startswith(('-', '+')):
+                if i_start < 0:
+                    i_start = i
+                i_end = i
+        file_diffs[old, new] = lines[i_start:i_end + 1]
+    return file_diffs
+
+
+def check_if_pr_is_translation_pr(pr):
+    source_repo = pr['head']['repo']['full_name']
+    if source_repo != 'oppia/oppia':
+        return 'Source repo is not oppia/oppia'
+    pr_source_branch = pr['head']['ref']
     if source_branch != 'translatewiki-prs':
-        return False
-    return True
+        return 'Source branch is not translatewiki-prs'
+    diff = parse_diff(load_diff(pr['diff_url']))
+    for old, new in diff:
+        if not old == new:
+            return 'File name change: %s -> %s' % (old, new)
+        if not re.match(old, '^assets/i18n/[a-z-]+.json$'):
+            return 'File %s changed and not low-risk' % old
+    return ''
+
+
+def check_if_pr_is_changelog_pr(pr):
+    source_repo = pr['head']['repo']['full_name']
+    if source_repo != 'oppia/oppia':
+        return 'Source repo is not oppia/oppia'
+    pr_source_branch = pr['head']['ref']
+    if re.match(
+            '^update-changelog-for-release-v[0-9.]$',
+            source_branch):
+        return 'Source branch does not indicate a changelog PR'
+    diff = parse_diff(load_diff(pr['diff_url']))
+    for old, new in diff:
+        if not old == new:
+            return 'File name change: %s -> %s' % (old, new)
+        if old in ('AUTHORS', 'CONTRIBUTORS', 'CHANGELOG'):
+            pass
+        elif old == 'package.json':
+            lines = diff[old, new]
+            if len(lines) != 2:
+                return 'Too many lines changed in package.json'
+            if not (
+                    re.match(
+                        '-  "version": "[0-9].[0-9].[0-9]",',
+                        line[0],
+                    ) and re.match(
+                        '+  "version": "[0-9].[0-9].[0-9]",',
+                        line[0],
+                    )):
+                return 'package.json changes not low-risk'
+
+        elif old == 'core/templates/pages/about-page/about-page.constants.ts':
+            for line in diff[old, new]:
+                if not re.match(r'+    \'[A-Za-z ]\',', line):
+                    return 'about-page.constants.ts changes not low-risk'
+        else:
+            return 'File %s changed and not low-risk' % old
+    return ''
+
+
+LOW_RISK_PR_TYPES = {
+    'translatewiki': check_if_pr_is_translation_pr,
+    'changelog': check_if_pr_is_changelog_pr,
+}
 
 
 def main(tokens=None):
@@ -70,7 +164,7 @@ def main(tokens=None):
     print('----')
     print(parsed_url)
     print('----')
-    pr = lookup_pr(owner, repo, numer)
+    pr = lookup_pr(owner, repo, number)
     print(pr)
     print('----')
     remotes = common.run_cmd(['git', 'remote', '-v'])
