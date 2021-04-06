@@ -89,7 +89,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         else:
             if not (
                     feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION <=
-                    item.web_report_info_schema_version <= 
+                    item.web_report_info_schema_version <=
                     feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
                 cls._add_error(
                     'report schema %s' % (

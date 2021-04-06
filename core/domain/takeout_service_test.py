@@ -750,9 +750,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
         report_id = '%s.%s.%s' % (
-                self.PLATFORM_ANDROID,
-                self.REPORT_SUBMITTED_TIMESTAMP.second,
-                'randomInteger123')
+            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
+            'randomInteger123')
         app_feedback_report_models.AppFeedbackReportModel(
             id=report_id,
             platform=self.PLATFORM_ANDROID,
@@ -777,7 +776,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
         report_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-            report_id)
+                report_id))
         report_entity.scrubbed_by = self.USER_ID_1
         report_entity.update_timestamps()
         report_entity.put()

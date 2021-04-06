@@ -735,13 +735,13 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             daily_param_stats_schema_version=(
                 feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)
         ).put()
+
         self.expected_validation_output.append(
             (
                 u'[u\'failed validation check for model id check of '
                 'AppFeedbackReportStatsModel\', '
                 '[u\'Entity id invalid_entity_id: Entity id does not match '
                 'regex pattern\']]'))
-
         self.run_job_and_check_output(
             self.expected_validation_output, sort=True,
             literal_eval=False)
@@ -754,6 +754,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.daily_param_stats_schema_version = 2
         model_entity.update_timestamps()
         model_entity.put()
+
         expected_output = [
             (
                 u'[u\'failed validation check for report stats schema version '
@@ -764,7 +765,6 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.daily_param_stats_schema_version,
                     feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
-
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -776,6 +776,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.daily_param_stats_schema_version = 0
         model_entity.update_timestamps()
         model_entity.put()
+
         expected_output = [
             (
                 u'[u\'failed validation check for report stats schema version '
@@ -786,7 +787,6 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.daily_param_stats_schema_version,
                     feconf.MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION,
                     feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)]
-
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -805,6 +805,9 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 stats_id))
+        model_entity.stats_tracking_date = valid_datetime
+        model_entity.update_timestamps()
+        model_entity.put()
 
         expected_output = [
             u'[u\'fully-validated AppFeedbackReportStatsModel\', 2]']
@@ -827,6 +830,9 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 stats_id))
+        model_entity.stats_tracking_date = invalid_datetime
+        model_entity.update_timestamps()
+        model_entity.put()
 
         self.expected_validation_output.append(
             (
@@ -882,6 +888,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
+
         self.expected_validation_output.append(
             (
                 u'[u\'failed validation check for stats_tracking_date '
@@ -889,7 +896,6 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'id %s: The stats_tracking_date field has a value %s which '
                 'is less than the earliest possible submission date\']]') % (
                     model_entity.id, model_entity.stats_tracking_date))
-
         self.run_job_and_check_output(
             self.expected_validation_output, sort=True,
             literal_eval=False)
@@ -905,6 +911,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
+
         self.expected_validation_output.append(
             (
                 u'[u\'failed validation check for ticket_id field check of '
@@ -913,7 +920,6 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'invalid_ticket_id, expected model AppFeedbackReportTicketModel'
                 ' with id invalid_ticket_id but it doesn\'t exist"]]') % (
                     model_entity.id))
-
         self.run_job_and_check_output(
             self.expected_validation_output, sort=True,
             literal_eval=False)
@@ -926,6 +932,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 self.entity_id))
+
         expected_output = [
             (
                 u'[u\'failed validation check for ticket_id field check of '
@@ -934,6 +941,5 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 '%s, expected model AppFeedbackReportTicketModel'
                 ' with id %s but it doesn\'t exist"]]') % (
                     model_entity.id, self.TICKET_ID, self.TICKET_ID)]
-
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
