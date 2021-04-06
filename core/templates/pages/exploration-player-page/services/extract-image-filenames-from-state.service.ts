@@ -211,16 +211,16 @@ export class ExtractImageFilenamesFromStateService {
               contentWithValue.content, 'text/html'));
           imageTagLists.push(
             tabDocument.getElementsByTagName(
-              'oppia-noninteractive-image'));  
+              'oppia-noninteractive-image'));
         }
       }
 
       for (let imageTagList of imageTagLists) {
         for (let i = 0; i < imageTagList.length; i++) {
-          // We have the attribute of filepath in oppia-noninteractive-image tag.
-          // But it actually contains the filename only. We use the variable
-          // filename instead of filepath since in the end we are retrieving the
-          // filenames in the exploration.
+          // We have the attribute of filepath in oppia-noninteractive-image
+          // tag. But it actually contains the filename only. We use the
+          // variable filename instead of filepath since in the end we are
+          // retrieving the filenames in the exploration.
           let filename = JSON.parse(
             this.htmlEscaperService.escapedStrToUnescapedStr(
               imageTagList[i].getAttribute('filepath-with-value')));
