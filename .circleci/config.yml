@@ -87,7 +87,7 @@ commands:
       - run:
           name: Skip build for low-risk PRs
           command: |
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ python -m scripts.check_if_pr_is_low_risk ${CIRCLE_PULL_REQUEST} ]]; then
+            if python -m scripts.check_if_pr_is_low_risk ${CIRCLE_PULL_REQUEST}; then
               circleci-agent step halt
             fi
 
