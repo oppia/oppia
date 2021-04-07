@@ -147,6 +147,7 @@
         "core.domain.job_validators_test"
     ],
     "8": [
+        "core.domain.app_feedback_report_validators_test",
         "core.domain.taskqueue_services_test",
         "core.domain.collection_jobs_one_off_test",
         "core.domain.email_services_test",
@@ -196,6 +197,7 @@
     ],
     "9": [
         "core.domain.topic_validators_test",
+        "core.storage.app_feedback_report.gae_models_test",
         "core.domain.user_jobs_one_off_test",
         "jobs.audit_jobs_test",
         "jobs.base_jobs_test",
