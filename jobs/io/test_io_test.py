@@ -26,7 +26,7 @@ from jobs.io import test_io
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-class ModelIoStubTests(jobs_test_utils.PTransformTestBase):
+class ModelIoStubTests(jobs_test_utils.PipelinedTestBase):
 
     def test_get_models_returns_nothing_when_stub_is_empty(self):
         stub = test_io.ModelIoStub()

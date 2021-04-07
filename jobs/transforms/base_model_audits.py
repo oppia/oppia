@@ -41,6 +41,7 @@ import apache_beam as beam
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+BASE_MODEL_ID_REGEX = re.compile('^[A-Za-z0-9-_]{1,%s}$')
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
@@ -74,12 +75,15 @@ class ValidateDeletedModel(beam.DoFn):
 class ValidateBaseModelId(beam.DoFn):
     """DoFn to validate model ids.
 
-    Models with special ID checks should derive from this class and override the
-    MODEL_ID_REGEX attribute or the entire process() method, then decorate it to
-    target the appropriate model(s).
+    IMPORTANT: Models with special ID checks should derive from this class and
+    override __init__ to assign a different value to self._regex, or replace the
+    process() method entirely. Be sure to decorate the new class with a specific
+    model type.
     """
 
-    MODEL_ID_REGEX = re.compile('^[A-Za-z0-9-_]{1,%s}$')
+    def __init__(self):
+        super(ValidateBaseModelId, self).__init__()
+        self._regex = BASE_MODEL_ID_REGEX
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
@@ -92,10 +96,9 @@ class ValidateBaseModelId(beam.DoFn):
             ModelIdRegexError. An error class for models with invalid IDs.
         """
         model = jobs_utils.clone_model(input_model)
-        regex = self.MODEL_ID_REGEX
 
-        if not regex.match(model.id):
-            yield audit_errors.ModelIdRegexError(model, regex.pattern)
+        if not self._regex.match(model.id):
+            yield audit_errors.ModelIdRegexError(model, self._regex.pattern)
 
 
 @audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)

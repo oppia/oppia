@@ -33,4 +33,6 @@ from jobs.transforms import base_model_audits
 class ValidateUserModelId(base_model_audits.ValidateBaseModelId):
     """Overload for models keyed by a user ID, which have a special format."""
 
-    MODEL_ID_REGEX = re.compile(feconf.USER_ID_REGEX)
+    def __init__(self):
+        super(ValidateUserModelId, self).__init__()
+        self._regex = re.compile(feconf.USER_ID_REGEX)

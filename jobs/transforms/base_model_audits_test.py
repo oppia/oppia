@@ -29,7 +29,7 @@ import apache_beam as beam
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-class ValidateDeletedTests(jobs_test_utils.PTransformTestBase):
+class ValidateDeletedTests(jobs_test_utils.PipelinedTestBase):
 
     def test_process_reports_error_for_old_deleted_model(self):
         expired_model = base_models.BaseModel(
@@ -49,7 +49,7 @@ class ValidateDeletedTests(jobs_test_utils.PTransformTestBase):
         ])
 
 
-class ValidateModelTimeFieldTests(jobs_test_utils.PTransformTestBase):
+class ValidateModelTimeFieldTests(jobs_test_utils.PipelinedTestBase):
 
     def test_process_reports_model_timestamp_relationship_error(self):
         invalid_timestamp = base_models.BaseModel(
@@ -84,7 +84,7 @@ class ValidateModelTimeFieldTests(jobs_test_utils.PTransformTestBase):
         ])
 
 
-class ValidateModelIdTests(jobs_test_utils.PTransformTestBase):
+class ValidateModelIdTests(jobs_test_utils.PipelinedTestBase):
 
     def test_validate_model_id(self):
         invalid_id_model = base_models.BaseModel(
@@ -101,11 +101,11 @@ class ValidateModelIdTests(jobs_test_utils.PTransformTestBase):
         self.assert_pcoll_equal(output, [
             audit_errors.ModelIdRegexError(
                 invalid_id_model,
-                base_model_audits.ValidateBaseModelId.MODEL_ID_REGEX.pattern),
+                base_model_audits.BASE_MODEL_ID_REGEX.pattern),
         ])
 
 
-class ValidatePostCommitIsPrivateTests(jobs_test_utils.PTransformTestBase):
+class ValidatePostCommitIsPrivateTests(jobs_test_utils.PipelinedTestBase):
 
     def test_validate_post_commit_is_private_when_status_is_public(self):
         invalid_commit_status = base_models.BaseCommitLogEntryModel(

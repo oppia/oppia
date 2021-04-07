@@ -32,7 +32,7 @@ import apache_beam as beam
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class ValidateUserModelIdTests(jobs_test_utils.PTransformTestBase):
+class ValidateUserModelIdTests(jobs_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
 

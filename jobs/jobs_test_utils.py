@@ -58,11 +58,11 @@ class BeamTestBase(test_utils.TestBase):
             actual, beam_testing_util.is_empty())
 
 
-class PTransformTestBase(BeamTestBase):
-    """Base class that provides a test pipeline for executing PTransforms."""
+class PipelinedTestBase(BeamTestBase):
+    """Base class that runs tests within the context of a TestPipeline."""
 
     def __init__(self, *args, **kwargs):
-        super(PTransformTestBase, self).__init__(*args, **kwargs)
+        super(PipelinedTestBase, self).__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
             options=test_pipeline.PipelineOptions(runtime_type_check=True))
@@ -70,10 +70,10 @@ class PTransformTestBase(BeamTestBase):
     def run(self, *args, **kwargs):
         """Runs the test within the context of a test pipeline."""
         with self.pipeline:
-            super(PTransformTestBase, self).run(*args, **kwargs)
+            super(PipelinedTestBase, self).run(*args, **kwargs)
 
 
-class JobTestBase(BeamTestBase):
+class JobTestBase(PipelinedTestBase):
     """Base class with helpful methods for testing Oppia's jobs.
 
     Subclasses must add the class constant JOB_CLASS to use the helper methods.
@@ -84,6 +84,8 @@ class JobTestBase(BeamTestBase):
     def __init__(self, *args, **kwargs):
         super(JobTestBase, self).__init__(*args, **kwargs)
         self.model_io_stub = test_io.ModelIoStub()
+        self.pipeline.options.view_as(job_options.JobOptions).model_getter = (
+            self.model_io_stub.get_models)
 
     def tearDown(self):
         self.model_io_stub.clear()
@@ -98,12 +100,7 @@ class JobTestBase(BeamTestBase):
         Returns:
             PCollection. The output of the job.
         """
-        pipeline = test_pipeline.TestPipeline
-        runner = runners.DirectRunner()
-        options = job_options.JobOptions(
-            runtime_type_check=True,
-            model_getter=self.model_io_stub.get_models)
-        return self.JOB_CLASS(pipeline, runner, options).run()
+        return self.JOB_CLASS(self.pipeline).run()
 
     def assert_job_output_is(self, expected):
         """Asserts the output of self.JOB_CLASS matches the given PCollection.

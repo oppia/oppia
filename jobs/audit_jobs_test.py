@@ -44,16 +44,13 @@ class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_run_with_empty_model_getter(self):
-        pipeline = test_pipeline.TestPipeline
-        runner = runners.DirectRunner()
-        options = job_options.JobOptions(
-            runtime_type_check=True, model_getter=None)
-
-        job = audit_jobs.AuditAllStorageModelsJob(pipeline, runner, options)
+        pipeline = test_pipeline.TestPipeline(
+            runner=runners.DirectRunner(),
+            options=job_options.JobOptions(model_getter=None))
 
         self.assertRaisesRegexp(
             ValueError, 'JobOptions.model_getter must not be None',
-            job.run)
+            audit_jobs.AuditAllStorageModelsJob(pipeline).run)
 
     def test_base_model_audits(self):
         base_model_with_invalid_id = base_models.BaseModel(
@@ -83,9 +80,9 @@ class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
             last_updated=self.NOW)
 
         self.model_io_stub.put_multi([
-            base_model_with_inconsistent_timestamps,
             base_model_with_invalid_id,
             base_model_with_invalid_timestamps,
+            base_model_with_inconsistent_timestamps,
             expired_base_model,
             valid_base_model,
         ])
@@ -93,7 +90,7 @@ class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
         self.assert_job_output_is([
             audit_errors.ModelIdRegexError(
                 base_model_with_invalid_id,
-                base_model_audits.ValidateBaseModelId.MODEL_ID_REGEX.pattern),
+                base_model_audits.BASE_MODEL_ID_REGEX.pattern),
             audit_errors.ModelMutatedDuringJobError(
                 base_model_with_invalid_timestamps),
             audit_errors.InconsistentTimestampsError(

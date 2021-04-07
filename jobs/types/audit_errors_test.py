@@ -132,10 +132,11 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
 
     def test_str(self):
         self.assertEqual(
-            repr(FooError(self.model)), 'FooError in BaseModel(id="123"): foo')
+            repr(FooError(self.model)),
+            '\'FooError in BaseModel(id="123"): foo\'')
         self.assertEqual(
             python_utils.UNICODE(FooError(self.model)),
-            'FooError in BaseModel(id="123"): foo')
+            '\'FooError in BaseModel(id="123"): foo\'')
 
     def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))

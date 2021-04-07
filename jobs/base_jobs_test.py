@@ -19,27 +19,21 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import contextlib
-
 from core.tests import test_utils
 from jobs import base_jobs
-from jobs import job_options
+from jobs import jobs_test_utils
 import python_utils
-
-from apache_beam import runners
-from apache_beam.options import pipeline_options
-from apache_beam.testing import test_pipeline
 
 
 class MockJobMetaclass(base_jobs.JobMetaclass):
     """Subclass of JobMetaclass to avoid interacting with the real registry."""
 
-    _JOB_REGISTRY = []
+    _JOB_REGISTRY = {}
 
     @classmethod
     def clear(mcs):
         """Clears the registry of jobs."""
-        del mcs._JOB_REGISTRY[:]
+        mcs._JOB_REGISTRY.clear()
 
 
 class JobMetaclassTests(test_utils.TestBase):
@@ -48,16 +42,6 @@ class JobMetaclassTests(test_utils.TestBase):
         MockJobMetaclass.clear()
         super(JobMetaclassTests, self).tearDown()
 
-    def test_raises_type_error_if_class_is_missing_run_method(self):
-        with self.assertRaisesRegexp(TypeError, r'must define run\(\) method'):
-            class JobWithoutRun(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=unused-variable
-                """Did not implement run() method."""
-
-                def __init__(self):
-                    pass
-
-        self.assertEqual(MockJobMetaclass.get_jobs(), [])
-
     def test_does_not_put_base_classes_in_registry(self):
         class FooJobBase(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=unused-variable
             """Job class with name that ends with 'Base'."""
@@ -65,11 +49,7 @@ class JobMetaclassTests(test_utils.TestBase):
             def __init__(self):
                 pass
 
-            def run(self):
-                """Does nothing."""
-                pass
-
-        self.assertEqual(MockJobMetaclass.get_jobs(), [])
+        self.assertEqual(MockJobMetaclass.get_jobs(), {})
 
     def test_puts_non_base_classes_in_registry(self):
         class FooJob(python_utils.with_metaclass(MockJobMetaclass)):
@@ -78,63 +58,29 @@ class JobMetaclassTests(test_utils.TestBase):
             def __init__(self):
                 pass
 
-            def run(self):
-                """Does nothing."""
-                pass
+        self.assertEqual(MockJobMetaclass.get_jobs(), {'FooJob': FooJob})
 
-        self.assertEqual(MockJobMetaclass.get_jobs(), [FooJob])
-
-    def test_run_enters_pipeline_context(self):
-        call_counter = test_utils.CallCounter(lambda: None)
-
-        @contextlib.contextmanager
-        def call_func_when_entered(func):
-            """Calls func when entered."""
-            func()
-            try:
-                yield
-            finally:
-                pass
-
+    def test_raises_type_error_for_jobs_with_duplicate_names(self):
         class FooJob(python_utils.with_metaclass(MockJobMetaclass)):
-            """Job that does nothing."""
+            """Job class that does nothing."""
 
             def __init__(self):
-                self.pipeline = call_func_when_entered(call_counter)
-
-            def run(self):
-                """Does nothing."""
                 pass
 
-        foo_job = FooJob()
+        del FooJob # NOTE: Deletes the variable, not the class.
 
-        self.assertEqual(call_counter.times_called, 0)
+        with self.assertRaisesRegexp(TypeError, 'name is already used'):
+            class FooJob(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=function-redefined
+                """Job class with duplicate name."""
 
-        foo_job.run()
+                def __init__(self):
+                    pass
 
-        self.assertEqual(call_counter.times_called, 1)
 
-
-class JobBaseTests(test_utils.TestBase):
-
-    def test_config(self):
-        pipeline = test_pipeline.TestPipeline
-        runner = runners.DirectRunner()
-        options = pipeline_options.TestOptions()
-
-        job = base_jobs.JobBase(pipeline, runner, options)
-
-        self.assertIsInstance(job.pipeline, test_pipeline.TestPipeline)
-        self.assertIsInstance(job.pipeline.runner, runners.DirectRunner)
-        self.assertIsInstance(
-            job.pipeline.options, pipeline_options.TestOptions)
+class JobBaseTests(jobs_test_utils.PipelinedTestBase):
 
     def test_run_raises_not_implemented_error(self):
-        pipeline = test_pipeline.TestPipeline
-        runner = runners.DirectRunner()
-        options = job_options.JobOptions()
-
-        job = base_jobs.JobBase(pipeline, runner, options)
-
         self.assertRaisesRegexp(
-            NotImplementedError, r'must implement the run\(\) method', job.run)
+            NotImplementedError,
+            r'Subclasses must implement the run\(\) method',
+            base_jobs.JobBase(self.pipeline).run)
