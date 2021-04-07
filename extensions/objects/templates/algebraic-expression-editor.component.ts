@@ -23,7 +23,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { EventBusGroup, EventBusService } from 'oppia-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'oppia-events/oppia-events';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
@@ -40,14 +41,17 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   hasBeenTouched: boolean = false;
   alwaysEditable: boolean = true;
   currentValue: string = '';
+  eventBusGroup: EventBusGroup;
 
   constructor(
     private deviceInfoService: DeviceInfoService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private mathInteractionsService: MathInteractionsService,
-    private stateEditorService: StateEditorService
-  ) {}
+    private eventBusService: EventBusService
+  ) {
+    this.eventBusGroup = new EventBusGroup(this.eventBusService);
+  }
 
   ngOnInit(): void {
     if (this.value === null) {
@@ -131,7 +135,8 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     if (!this.hasBeenTouched) {
       this.warningText = '';
     }
-    this.stateEditorService.onObjectFormValidityChange.emit(!answerIsValid);
+    this.eventBusGroup.emit(new ObjectFormValidityChangeEvent(
+      {value: !answerIsValid}));
     return answerIsValid;
   }
 
