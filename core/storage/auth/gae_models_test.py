@@ -63,12 +63,6 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             parent_user_id=self.USER_ID
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            auth_models.UserAuthDetailsModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy_is_delete_at_end(self):
         self.assertEqual(
             auth_models.UserAuthDetailsModel.get_deletion_policy(),
@@ -292,3 +286,24 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             })
+
+
+class FirebaseSeedModelTests(test_utils.GenericTestBase):
+    """Tests for auth_models.FirebaseSeedModel."""
+
+    USER_ID = 'user_id'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            auth_models.FirebaseSeedModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_get_model_association_to_user(self):
+        self.assertEqual(
+            auth_models.FirebaseSeedModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_has_reference_to_existing_user_id(self):
+        self.assertFalse(
+            auth_models.FirebaseSeedModel.has_reference_to_user_id(
+                self.USER_ID))
