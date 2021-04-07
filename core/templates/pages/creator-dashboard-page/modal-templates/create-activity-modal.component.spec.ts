@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CreateActivityModalComponent.
  */
 
-import { ComponentFixture, TestBed, fakeAsync } from
+import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
@@ -87,35 +87,30 @@ describe('Create Activity Modal Component', () =>{
     userService = TestBed.get(UserService);
   }));
 
-  it('should check if user is logged in or not', fakeAsync(() => {
-    const UserInfoObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: true
-    };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject))
-    );
-    component.ngOnInit();
-    component.canCreateCollections = true;
-    expect(component.canCreateCollections).toBeTrue();
-  }));
-
   it('should evalute component properties after component is initialized',
-    () => {
-      component.canCreateCollections = true;
+    fakeAsync(() => {
+      const UserInfoObject = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: true,
+        preferred_site_language_code: null,
+        username: 'tester',
+        email: 'test@test.com',
+        user_is_logged_in: true
+      };
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+        UserInfo.createFromBackendDict(UserInfoObject))
+      );
+      component.ngOnInit();
+      flushMicrotasks();
       expect(component.canCreateCollections).toBeTrue();
       expect(component.getStaticImageUrl('/activity/exploration.svg'))
         .toBe('/assets/images/activity/exploration.svg');
       expect(component.getStaticImageUrl('/activity/collection.svg'))
         .toBe('/assets/images/activity/collection.svg');
-    });
+    }));
 
   it('should create new exploration when choosing exploration as the new' +
     ' activity', () => {

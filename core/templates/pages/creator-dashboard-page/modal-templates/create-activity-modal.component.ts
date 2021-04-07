@@ -30,7 +30,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 export class CreateActivityModalComponent implements OnInit {
   explorationImageUrl: string;
   collectionImageUrl: string;
-  canCreateCollections: boolean = false;
+  canCreateCollections: boolean = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
