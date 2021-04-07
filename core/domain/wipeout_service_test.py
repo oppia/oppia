@@ -1288,6 +1288,8 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             collection_mappings[self.COL_1_ID])
 
     def test_one_collection_with_missing_snapshot_is_pseudonymized(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         collection_models.CollectionCommitLogEntryModel(
             id='collection-%s-1' % self.COL_2_ID,
             collection_id=self.COL_2_ID,
@@ -1299,8 +1301,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
-            wipeout_service.pre_delete_user(self.user_1_id)
-            self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1313,12 +1313,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
                 '\'CollectionRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
                 'commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
-                '[WIPEOUT] The commit log model '
-                '\'ExplorationCommitLogEntryModel\' and '
-                'snapshot models [\'ExplorationSnapshotMetadataModel\', '
-                '\'ExplorationRightsSnapshotMetadataModel\'] IDs differ. '
-                'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'an_exploration_id\'].'
             ]
         )
 
@@ -1534,7 +1528,9 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
+        self.publish_collection(self.user_1_id, self.COL_1_ID)
         self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
+        self.publish_collection(self.user_1_id, self.COL_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -1913,7 +1909,9 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXP_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 

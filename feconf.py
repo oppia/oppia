@@ -213,11 +213,9 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
-# The maximum number of days a feedback report can be kept in storage.
-APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS = 90
 # The maximum number of days a feedback report can be saved in storage before it
 # must be scrubbed.
-APP_FEEDBACK_REPORT_MAXIMUM_DAYS = datetime.timedelta(days=90)
+APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS = datetime.timedelta(days=90)
 
 # The minimum version of the Android feedback report info blob schema.
 MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
@@ -232,7 +230,7 @@ MINIMUM_WEB_REPORT_SCHEMA_VERSION = 1
 CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
 
 # The current version of the app feedback report daily stats blob schema.
-CURRENT_APP_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
 
 # The minimum version of the app feedback report daily stats blob schema.
 MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
@@ -1150,6 +1148,9 @@ GAE_AUTH_PROVIDER_ID = 'gae'
 FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
+
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
 

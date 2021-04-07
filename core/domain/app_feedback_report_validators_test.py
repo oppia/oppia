@@ -101,14 +101,15 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 android_report_info=self.ANDROID_REPORT_INFO,
                 web_report_info=None))
 
-        self.expected_validation_output = [
+        self.expected_successful_validation_output = [
             u'[u\'fully-validated AppFeedbackReportModel\', 1]']
         self.job_class = (
             prod_validation_jobs.AppFeedbackReportModelAuditOneOffJob)
 
     def test_standard_model(self):
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=False, literal_eval=False)
+            self.expected_successful_validation_output, sort=False,
+            literal_eval=False)
 
     def test_model_validation_with_valid_external_references_succesful(self):
         model_entity = (
@@ -125,7 +126,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             report_ids=[self.report_id]).put()
 
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=False,
+            self.expected_successful_validation_output, sort=False,
             literal_eval=False)
 
     def test_model_validation_with_invalid_external_references_id_fails(self):
@@ -196,14 +197,14 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
 
-        self.expected_validation_output.append(
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
             u'[u\'failed validation check for model id check of '
             'AppFeedbackReportModel\', '
             '[u\'Entity id invalid_entity_id: Entity id does not match regex '
             'pattern\']]')
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=True,
-            literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_with_android_schema_version_greater_than_current_schema_fails(
             self):
@@ -274,17 +275,18 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         web_entity.update_timestamps()
         web_entity.put()
 
-        self.expected_validation_output.append((
-            u'[u\'failed validation check for report schema version check of '
-            'AppFeedbackReportModel\', '
-            '[u\'Entity id %s: web report schema version %s is outside the '
-            'range of supported versions [%s, %s]\']]') % (
-                web_entity.id, web_entity.web_report_info_schema_version,
-                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
-                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
+            (
+                u'[u\'failed validation check for report schema version check '
+                'of AppFeedbackReportModel\', '
+                '[u\'Entity id %s: web report schema version %s is outside the '
+                'range of supported versions [%s, %s]\']]') % (
+                    web_entity.id, web_entity.web_report_info_schema_version,
+                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
+                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=True,
-            literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_web_schema_version_less_than_min_schema_fails(self):
         web_report_id = (
@@ -311,16 +313,18 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         web_entity.update_timestamps()
         web_entity.put()
 
-        self.expected_validation_output.append((
-            u'[u\'failed validation check for report schema version check of '
-            'AppFeedbackReportModel\', '
-            '[u\'Entity id %s: web report schema version %s is outside the '
-            'range of supported versions [%s, %s]\']]') % (
-                web_entity.id, web_entity.web_report_info_schema_version,
-                feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
-                feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
+            (
+                u'[u\'failed validation check for report schema version check '
+                'of AppFeedbackReportModel\', '
+                '[u\'Entity id %s: web report schema version %s is outside the '
+                'range of supported versions [%s, %s]\']]') % (
+                    web_entity.id, web_entity.web_report_info_schema_version,
+                    feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
+                    feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=True, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_created_on_greater_than_current_time_fails(self):
         model_entity = (
@@ -356,7 +360,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         # Add a scrubber user so that it passes the scrubbing validation.
         model_entity.scrubbed_by = 'scrubber_user'
         model_entity.created_on = (
-            app_feedback_report_validators.EARLIEST_VALID_DATETIME -
+            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME -
             datetime.timedelta(days=4))
         model_entity.update_timestamps()
         model_entity.put()
@@ -388,12 +392,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
 
         # We want to suppress the error from the created_on timestamp validation
         # because if this test is run APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS
-        # within the EARLIEST_VALID_DATETIME, it will fail the created_on
-        # timestamp validation. This is because the scrubbed_by field
-        # validator checks that the scrubbed_by field exists if the created_on
-        # timestamp is more than APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS
-        # before the current timestamp, so if the current timestamp is within
-        # this number of days from the EARLIEST_VALID_DATETIME, the created_on
+        # number of days within the EARLIEST_APP_FEEDBACK_REPORT_DATETIME, it
+        # will fail the created_on timestamp validation. This is because the
+        # scrubbed_by field validator checks that the scrubbed_by field exists
+        # if the created_on timestamp is more than
+        # APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS number of days before the
+        # current timestamp, so if the current timestamp is within this number
+        # of days from the EARLIEST_APP_FEEDBACK_REPORT_DATETIME, the created_on
         # validation check will always fail.
         validator_class = (
             app_feedback_report_validators.AppFeedbackReportModelValidator)
@@ -401,7 +406,8 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             validator_class, '_validate_created_on_datetime',
             types.MethodType(lambda x, y: True, validator_class)):
             self.run_job_and_check_output(
-                self.expected_validation_output, sort=False, literal_eval=False)
+                self.expected_successful_validation_output, sort=False,
+                literal_eval=False)
 
     def test_model_no_scrubbed_by_field_with_created_on_outside_buffer_fails(
             self):
@@ -436,7 +442,8 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.update_timestamps()
         model_entity.put()
 
-        self.expected_validation_output.append(
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
             (
                 u'[u\'failed validation check for scrubbed_by field check of '
                 'AppFeedbackReportModel\', '
@@ -447,20 +454,21 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     utils.get_time_in_millisecs(model_entity.created_on)))
         # We want to suppress the error from the created_on timestamp validation
         # because if this test is run APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS
-        # within the EARLIEST_VALID_DATETIME, it will fail the created_on
-        # timestamp validation. This is because the scrubbed_by field validator
-        # checks that the scrubbed_by field exists if the created_on timestamp
-        # is more than APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS before the
+        # number of days within the EARLIEST_APP_FEEDBACK_REPORT_DATETIME, it
+        # will fail the created_on timestamp validation. This is because the
+        # scrubbed_by field  validator checks that the scrubbed_by field exists
+        # if the created_on timestamp is more than
+        # APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS number of days before the
         # current timestamp, so if the current timestamp is within this number
-        # of days from the EARLIEST_VALID_DATETIME, the created_on validation
-        # check will always fail.
+        # of days from the EARLIEST_APP_FEEDBACK_REPORT_DATETIME, the created_on
+        # validation check will always fail.
         validator_class = (
             app_feedback_report_validators.AppFeedbackReportModelValidator)
         with self.swap(
             validator_class, '_validate_created_on_datetime',
             types.MethodType(lambda x, y: True, validator_class)):
             self.run_job_and_check_output(
-                self.expected_validation_output, sort=True, literal_eval=False)
+                expected_output, sort=True, literal_eval=False)
 
 
 class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -532,14 +540,14 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
         ).put()
 
-        self.expected_validation_output = [
+        self.expected_successful_validation_output = [
             u'[u\'fully-validated AppFeedbackReportTicketModel\', 1]']
         self.job_class = (
             prod_validation_jobs.AppFeedbackReportTicketModelAuditOneOffJob)
 
     def test_standard_model(self):
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=False,
+            self.expected_successful_validation_output, sort=False,
             literal_eval=False)
 
     def test_model_validation_with_invalid_id_fails(self):
@@ -550,15 +558,16 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
             report_ids=self.REPORT_IDS_LIST
         ).put()
-        self.expected_validation_output.append(
+
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
             u'[u\'failed validation check for model id check of '
             'AppFeedbackReportTicketModel\', '
             '[u\'Entity id invalid_entity_id: Entity id does not match regex '
             'pattern\']]')
 
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=True,
-            literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_newest_report_greater_than_current_datetime_fails(self):
         model_entity = (
@@ -585,7 +594,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 self.ticket_id))
         model_entity.newest_report_timestamp = (
-            app_feedback_report_validators.EARLIEST_VALID_DATETIME -
+            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME -
             datetime.timedelta(hours=1))
         model_entity.update_timestamps()
         model_entity.put()
@@ -687,14 +696,14 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
             report_ids=[self.REPORT_ID]).put()
 
-        self.expected_validation_output = [
+        self.expected_successful_validation_output = [
             u'[u\'fully-validated AppFeedbackReportStatsModel\', 1]']
         self.job_class = (
             prod_validation_jobs.AppFeedbackReportStatsModelAuditOneOffJob)
 
     def test_standard_model(self):
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=False,
+            self.expected_successful_validation_output, sort=False,
             literal_eval=False)
 
     def test_model_validation_with_invalid_id_fails(self):
@@ -709,15 +718,15 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 feconf.CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION)
         ).put()
 
-        self.expected_validation_output.append(
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
             (
                 u'[u\'failed validation check for model id check of '
                 'AppFeedbackReportStatsModel\', '
                 '[u\'Entity id invalid_entity_id: Entity id does not match '
                 'regex pattern\']]'))
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=True,
-            literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_stats_schema_version_greater_than_current_schema_fails(
             self):
@@ -764,9 +773,8 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_stats_tracking_date_less_than_earliest_datetime_fails(self):
-        validator_class = app_feedback_report_validators
         invalid_datetime = (
-            validator_class.EARLIEST_VALID_DATETIME -
+            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME -
             datetime.timedelta(days=1))
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.create(
@@ -779,7 +787,8 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
 
-        self.expected_validation_output.append(
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
             (
                 u'[u\'failed validation check for stats_tracking_date '
                 'datetime check of AppFeedbackReportStatsModel\', [u\'Entity '
@@ -787,7 +796,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'is less than the earliest possible submission date\']]') % (
                     model_entity.id, model_entity.stats_tracking_date))
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=True, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_validation_with_invalid_external_references_ids_fails(self):
         entity_id = (
@@ -801,7 +810,8 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
 
-        self.expected_validation_output.append(
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
             (
                 u'[u\'failed validation check for ticket_id field check of '
                 'AppFeedbackReportStatsModel\', '
@@ -810,8 +820,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 ' with id invalid_ticket_id but it doesn\'t exist"]]') % (
                     model_entity.id))
         self.run_job_and_check_output(
-            self.expected_validation_output, sort=True,
-            literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_validation_with_deleted_external_references_fails(self):
         ticket_model_to_delete = (
