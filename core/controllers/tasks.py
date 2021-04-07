@@ -179,8 +179,10 @@ class DeferredTasksHandler(base.BaseHandler):
     DEFERRED_TASK_FUNCTIONS = {
         taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
-        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS: (
-            exp_services.delete_explorations_from_subscribed_users),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: (
+            exp_services.delete_explorations_from_user_models),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: (
+            exp_services.delete_explorations_from_activities),
         taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: (
             exp_services.regenerate_exploration_summary_with_new_contributor),
         taskqueue_services.FUNCTION_ID_UPDATE_STATS: (

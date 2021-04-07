@@ -56,11 +56,12 @@ def run_job_for_deleted_exp(
     output or error condition.
     """
     job_id = job_class.create_new()
-    # Check there is one job in the taskqueue corresponding to
-    # delete_exploration_from_subscribed_users.
+    # Check there are two jobs in the taskqueue corresponding to
+    # delete_explorations_from_user_models and
+    # delete_explorations_from_activities.
     self.assertEqual(
         self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
     job_class.enqueue(job_id)
     self.assertEqual(
         self.count_jobs_in_mapreduce_taskqueue(

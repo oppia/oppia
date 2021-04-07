@@ -26,6 +26,7 @@ from core.domain import activity_services
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import subscription_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -1202,6 +1203,9 @@ def unpublish_exploration(committer, exploration_id):
     """
     _unpublish_activity(
         committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, [exploration_id])
 
 
 # Rights functions for collections.

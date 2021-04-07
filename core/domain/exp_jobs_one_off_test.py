@@ -74,11 +74,12 @@ def run_job_for_deleted_exp(
     output or error condition.
     """
     job_id = job_class.create_new()
-    # Check there is one job in the taskqueue corresponding to
-    # delete_exploration_from_subscribed_users.
+    # Check there are two jobs in the taskqueue corresponding to
+    # delete_explorations_from_user_models and
+    # delete_explorations_from_activities.
     self.assertEqual(
         self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
     job_class.enqueue(job_id)
     self.assertEqual(
         self.count_jobs_in_mapreduce_taskqueue(
@@ -3921,3 +3922,201 @@ class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(self, exp_jobs_one_off.RatioTermsAuditOneOffJob)
+
+
+class ExpSnapshotsDeletionJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    EXP_ID = 'exp_id0'
+
+    def setUp(self):
+        super(ExpSnapshotsDeletionJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = exp_jobs_one_off.ExpSnapshotsDeletionJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsDeletionJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            exp_jobs_one_off.ExpSnapshotsDeletionJob.get_output(job_id))
+        eval_output = [
+            ast.literal_eval(stringified_item)
+            for stringified_item in stringified_output
+        ]
+        return eval_output
+
+    def test_deletion_job_deletes_snapshot_content_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS_DELETED - ExplorationSnapshotContentModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_snapshot_metadata_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS_DELETED - ExplorationSnapshotMetadataModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_right_snapshot_content_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS_DELETED - ExplorationRightsSnapshotContentModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_right_snapshot_metadata_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS_DELETED - ExplorationRightsSnapshotMetadataModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_all_snapshot_models(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['SUCCESS_DELETED - ExplorationSnapshotContentModel', 1],
+                ['SUCCESS_DELETED - ExplorationSnapshotMetadataModel', 1],
+                ['SUCCESS_DELETED - ExplorationRightsSnapshotContentModel', 1],
+                ['SUCCESS_DELETED - ExplorationRightsSnapshotMetadataModel', 1]
+            ]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_does_not_delete_models(self):
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['SUCCESS_PASS - ExplorationSnapshotContentModel', 1],
+                ['SUCCESS_PASS - ExplorationSnapshotMetadataModel', 1],
+                ['SUCCESS_PASS - ExplorationRightsSnapshotContentModel', 1],
+                ['SUCCESS_PASS - ExplorationRightsSnapshotMetadataModel', 1]
+            ]
+        )
+
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))

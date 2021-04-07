@@ -42,8 +42,11 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(
+    feedback_models, opportunity_models, suggestion_models
+) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.suggestion
+])
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
@@ -873,3 +876,39 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 observed_log_messages[0],
                 'Missing language codes [u\'new_lang\'] in exploration '
                 'opportunity model with id 0')
+
+    def test_delete_exp_opportunities_corresponding_to_story_when_story_deleted(
+            self):
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_1',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_2',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+
+        opportunity_services.delete_exp_opportunities_corresponding_to_story(
+            'story_id'
+        )
+
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                'exp_1', strict=False
+            )
+        )
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                'exp_2', strict=False
+            )
+        )

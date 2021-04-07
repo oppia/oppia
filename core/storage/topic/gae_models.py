@@ -45,6 +45,50 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to topics.
+
+    A new instance of this model is created and saved every time a commit to
+    TopicModel occurs.
+
+    The id for this model is of the form 'topic-[topic_id]-[version]'.
+    """
+
+    # The id of the topic being edited.
+    topic_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_instance_id(cls, topic_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            topic_id: str. The id of the topic being edited.
+            version: int. The version number of the topic after the commit.
+
+        Returns:
+            str. The commit id with the topic id and version number.
+        """
+        return 'topic-%s-%s' % (topic_id, version)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
 class TopicModel(base_models.VersionedModel):
     """Model for storing Topics.
 
@@ -54,6 +98,7 @@ class TopicModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = TopicCommitLogEntryModel
     ALLOW_REVERT = False
 
     # The name of the topic.
@@ -218,48 +263,6 @@ class TopicModel(base_models.VersionedModel):
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
-
-
-class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to topics.
-
-    A new instance of this model is created and saved every time a commit to
-    TopicModel occurs.
-
-    The id for this model is of the form 'topic-[topic_id]-[version]'.
-    """
-
-    # The id of the topic being edited.
-    topic_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @classmethod
-    def _get_instance_id(cls, topic_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
-
-        Args:
-            topic_id: str. The id of the topic being edited.
-            version: int. The version number of the topic after the commit.
-
-        Returns:
-            str. The commit id with the topic id and version number.
-        """
-        return 'topic-%s-%s' % (topic_id, version)
-
-    @staticmethod
-    def get_model_association_to_user():
-        """Model does not contain user data."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 

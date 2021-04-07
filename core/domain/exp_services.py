@@ -795,11 +795,15 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
+    # Remove from activities.
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
-def delete_explorations_from_subscribed_users(exploration_ids):
+def delete_explorations_from_user_models(exploration_ids):
     """Remove explorations from all subscribers' exploration_ids.
 
     Args:
@@ -817,6 +821,69 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     user_models.UserSubscriptionsModel.update_timestamps_multi(
         subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
+
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_all().filter(
+            user_models.ExplorationUserDataModel.exploration_id.IN(
+                exploration_ids
+            )
+        ).fetch()
+    )
+    user_models.ExplorationUserDataModel.delete_multi(exp_user_data_models)
+
+    user_contributions_models = (
+        user_models.UserContributionsModel.get_all().filter(
+            datastore_services.any_of(
+                user_models.UserContributionsModel.created_exploration_ids.IN(
+                    exploration_ids
+                ),
+                user_models.UserContributionsModel.edited_exploration_ids.IN(
+                    exploration_ids
+                )
+            )
+        ).fetch()
+    )
+    for model in user_contributions_models:
+        model.created_exploration_ids = [
+            exp_id for exp_id in model.created_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+        model.edited_exploration_ids = [
+            exp_id for exp_id in model.edited_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+    user_models.UserContributionsModel.update_timestamps_multi(
+        user_contributions_models)
+    user_models.UserContributionsModel.put_multi(user_contributions_models)
+
+
+def delete_explorations_from_activities(exploration_ids):
+    """Remove explorations from exploration_ids field in completed and
+    incomplete activities models.
+
+    Args:
+        exploration_ids: list(str). The ids of the explorations to delete.
+    """
+    if not exploration_ids:
+        return
+
+    model_classes = (
+        user_models.CompletedActivitiesModel,
+        user_models.IncompleteActivitiesModel,
+    )
+    all_entities = []
+    for model_class in model_classes:
+        entities = model_class.query(
+            model_class.exploration_ids.IN(exploration_ids)
+        ).fetch()
+        for model in entities:
+            model.exploration_ids = [
+                id_ for id_ in model.exploration_ids
+                if id_ not in exploration_ids
+            ]
+        all_entities.extend(entities)
+    datastore_services.update_timestamps_multi(all_entities)
+    datastore_services.put_multi(all_entities)
 
 
 # Operations on exploration snapshots.
