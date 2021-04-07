@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for boolean editor.
+ * @fileoverview Component for boolean editor.
  */
 
 // The value for this editor is always editable.

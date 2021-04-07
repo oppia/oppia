@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for code string editor.
+ * @fileoverview Component for code string editor.
  */
 
 // Every editor directive should implement an alwaysEditable option. There

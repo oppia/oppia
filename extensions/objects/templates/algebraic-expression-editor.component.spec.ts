@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AlgebraicExpressionEditor } from './algebraic-expression-editor.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { AlgebraicExpressionEditorComponent } from './algebraic-expression-editor.component';
 
 describe('AlgebraicExpressionEditor', () => {
-  let component: AlgebraicExpressionEditor;
-  let fixture: ComponentFixture<AlgebraicExpressionEditor>;
+  let component: AlgebraicExpressionEditorComponent;
+  let fixture: ComponentFixture<AlgebraicExpressionEditorComponent>;
   let windowRef: WindowRef;
   let guppyInitializationService: GuppyInitializationService;
   let deviceInfoService: DeviceInfoService;
@@ -67,7 +67,7 @@ describe('AlgebraicExpressionEditor', () => {
     TestBed.configureTestingModule(
       {
         imports: [HttpClientTestingModule],
-        declarations: [AlgebraicExpressionEditor],
+        declarations: [AlgebraicExpressionEditorComponent],
         providers: [{provide: windowRef, useClass: MockWindowRef}]
       }
     ).compileComponents();
@@ -77,7 +77,7 @@ describe('AlgebraicExpressionEditor', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     fixture = TestBed.createComponent(
-      AlgebraicExpressionEditor);
+      AlgebraicExpressionEditorComponent);
     component = fixture.componentInstance;
     windowRef.nativeWindow.Guppy = MockGuppy;
     component.currentValue = '';
@@ -99,7 +99,10 @@ describe('AlgebraicExpressionEditor', () => {
   });
 
   it('should initialize component.value with an empty string', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
     component.value = null;
+    MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
   });
@@ -131,7 +134,8 @@ describe('AlgebraicExpressionEditor', () => {
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
-
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
   });

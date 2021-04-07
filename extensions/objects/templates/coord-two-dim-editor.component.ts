@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for coord two dim editor.
+ * @fileoverview Component for coord two dim editor.
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
@@ -26,24 +26,16 @@ import { icon, latLng, LeafletEvent, LeafletMouseEvent, marker, tileLayer } from
   styleUrls: []
 })
 export class CoordTwoDimEditorComponent implements OnInit {
+  private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
   @Input() value;
   @Output() valueChanged: EventEmitter<[number, number]> = new EventEmitter<
   [number, number]>();
-  latLangValue;
-  mapEvents = {
-    map: {
-      enable: ['click'],
-      logic: 'emit'
-    },
-    markers: {
-      enable: ['dragend'],
-      logic: 'emit'
-    }
-  };
-  mapCenter = latLng(0, 0);
+
   mapMarkers;
   optionsSpec = {
-    layers: [{ url: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }],
+    layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
   options;
