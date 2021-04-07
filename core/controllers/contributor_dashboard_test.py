@@ -601,8 +601,8 @@ class CompletedTranslationsHandlerTest(test_utils.GenericTestBase):
         })
 
         expected_output = {
-            'content_list': ['<p>Test content</p>'],
-            'translations_list': ['<p>Translated text</p>']
+            'content': ['<p>Test content</p>'],
+            'translations': ['<p>Translated text</p>']
         }
 
         self.assertEqual(output, expected_output)
@@ -627,8 +627,8 @@ class CompletedTranslationsHandlerTest(test_utils.GenericTestBase):
         })
 
         expected_output = {
-            'content_list': [],
-            'translations_list': []
+            'content': [],
+            'translations': []
         }
         self.assertEqual(output, expected_output)
 
