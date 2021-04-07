@@ -264,11 +264,11 @@ export class LearnerDashboardPageComponent implements OnInit {
       userInfoPromise,
       dashboardDataPromise,
     ]).then(() => {
-      this.loaderService.hideLoadingScreen();
       // The timeout is required because at execution time,
       // the element may not be present in the DOM yet.Thus it ensure
       // that the element is visible before focussing.
       setTimeout(() => {
+        this.loaderService.hideLoadingScreen();
         this.addFocusWithoutScroll('ourLessonsBtn');
       }, 0);
     // eslint-disable-next-line dot-notation

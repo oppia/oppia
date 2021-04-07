@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ describe('Learner Dashboard Backend API Service', () => {
     LearnerDashboardBackendApiService = null;
   let httpTestingController: HttpTestingController;
 
-  var sampleDataResults = {
+  let sampleDataResults = {
     incomplete_explorations_list: [{
       category: 'Arithmetic',
       created_on_msec: 1515553584276.8,
@@ -186,8 +186,8 @@ describe('Learner Dashboard Backend API Service', () => {
     completed_to_incomplete_collections: []
   };
 
-  var LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
-  var ERROR_STATUS_CODE = 400;
+  let LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
+  let ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -204,46 +204,181 @@ describe('Learner Dashboard Backend API Service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch learner dashboard data from the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch learner dashboard data from the' +
+    ' backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
-        .then(successHandler, failHandler);
+    learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    let req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it(
-    'should use rejection handler if learner dashboard data ' +
-    'backend request failed',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use rejection handler if learner dashboard data' +
+    ' backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
-        .then(successHandler, failHandler);
+    learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Error loading dashboard data.'
-      }, {
-        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-      });
+    let req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Error loading dashboard data.'
+    }, {
+      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(400);
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
+  }
+  ));
+
+  it('should add current message to the feedback updates thread' +
+    ' when calling addNewMessageAsync', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let updated_status = null;
+    let updated_subject = null;
+    let text = 'Sending message';
+    let url = '/threadhandler/exploration.4.Wfafsafd';
+    let payload = {
+      updated_status: updated_status,
+      updated_subject: updated_subject,
+      text: text
+    };
+
+    learnerDashboardBackendApiService.addNewMessageAsync(
+      url, payload
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/threadhandler/exploration.4.Wfafsafd');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to add current message to the feedback updates thread' +
+    ' when calling addNewMessageAsync', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let updated_status = null;
+    let updated_subject = null;
+    let text = 'Sending message';
+    let invalidUrl = '/invalidUrl';
+    let payload = {
+      updated_status: updated_status,
+      updated_subject: updated_subject,
+      text: text
+    };
+    learnerDashboardBackendApiService.addNewMessageAsync(
+      invalidUrl, payload
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/invalidUrl');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { error: 'Given URL is invalid.'},
+      { status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Given URL is invalid.');
+  }
+  ));
+
+  it('should get the data of current feedback updates thread' +
+    ' when calling addNewMessageAsync', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let url = '/threadhandler/exploration.4.Wfafsafd';
+    let result = [{
+        author_picture_data_url:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA",
+        author_username: "User",
+        created_on_msecs: 1617712024611.706,
+        message_id: 1,
+        text: "test",
+        updated_status: null
+    }];
+
+    learnerDashboardBackendApiService.onClickThreadAsync(
+      url
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/threadhandler/exploration.4.Wfafsafd');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(
+      {
+      message_summary_list: [{
+        author_picture_data_url:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA",
+        author_username: "User",
+        created_on_msecs: 1617712024611.706,
+        message_id: 1,
+        text: "test",
+        updated_status: null
+      }]
+    },
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to get the data of current feedback updates thread' +
+    ' when calling addNewMessageAsync', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let invalidUrl = '/invalidUrl';
+    learnerDashboardBackendApiService.onClickThreadAsync(
+      invalidUrl
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/invalidUrl');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(
+      { error: 'Given URL is invalid.'},
+      { status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Given URL is invalid.');
+  }
+  ));
 });

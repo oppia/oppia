@@ -16,7 +16,7 @@
  * @fileoverview Tests for LearnerPlaylistBackendApiService.
  */
 
-import { async, fakeAsync, flushMicrotasks, TestBed } from
+import { async, fakeAsync, flushMicrotasks, TestBed, tick } from
   '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule, HttpTestingController } from
@@ -28,8 +28,9 @@ import { LearnerPlaylistBackendApiService } from
   'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import { flush } from 'nerdamer';
 
-export class MockNgbModalRef {
+class MockNgbModalRef {
   componentInstance: {
     activityId: null,
     activityTitle: null,
@@ -37,7 +38,16 @@ export class MockNgbModalRef {
   };
 }
 
-describe('Learner playlist Backend Api service ', () => {
+class MockRemoveActivityNgbModalRef {
+  componentInstance: {
+    sectionNameI18nId: null,
+    subsectionName: null,
+    activityId: null,
+    activityTitle: null
+  }
+}
+
+fdescribe('Learner playlist Backend Api service ', () => {
   let learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService;
   let http: HttpTestingController;
   let activityId = '1';
@@ -150,29 +160,30 @@ describe('Learner playlist Backend Api service ', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  it('should open an ngbModal when removing from learner playlist',
-    () => {
-      let learnerDashboardActivityIds = LearnerDashboardActivityIds
-        .createFromBackendDict({
-          incomplete_exploration_ids: [],
-          incomplete_collection_ids: [],
-          completed_exploration_ids: [],
-          completed_collection_ids: [],
-          exploration_playlist_ids: [],
-          collection_playlist_ids: []
-        });
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
-          { componentInstance: MockNgbModalRef,
-            result: Promise.resolve('success')});
+  it('should open an ngbModal when removing from learner playlist'+
+    ' when calling removeFromLearnerPlaylistModal', () => {
+    let learnerDashboardActivityIds = LearnerDashboardActivityIds
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: []
       });
-      learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
-        '0', 'title', 'exploration', learnerDashboardActivityIds);
-      expect(modalSpy).toHaveBeenCalled();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success')});
     });
+    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
+      '0', 'title', 'exploration', learnerDashboardActivityIds);
+    expect(modalSpy).toHaveBeenCalled();
+  });
 
-  it('should remove an exploration from learner playlist', fakeAsync(() => {
+  it('should remove an exploration from learner playlist' +
+    ' when calling removeFromLearnerPlaylistModal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
@@ -199,7 +210,8 @@ describe('Learner playlist Backend Api service ', () => {
       ['1', '2']);
   }));
 
-  it('should remove a collection from learner playlist', fakeAsync(() => {
+  it('should remove a collection from learner playlist' +
+    ' when calling removeFromLearnerPlaylistModal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
@@ -227,30 +239,171 @@ describe('Learner playlist Backend Api service ', () => {
   }));
 
   it('should not remove anything from learner playlist when cancel ' +
-    'button is clicked', fakeAsync(() => {
+    'button is clicked when calling removeFromLearnerPlaylistModal',
+    fakeAsync(() => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>(
+          { componentInstance: MockNgbModalRef,
+            result: Promise.reject('fail')});
+      });
+
+      let learnerDashboardActivityIds = LearnerDashboardActivityIds
+        .createFromBackendDict({
+          incomplete_exploration_ids: [],
+          incomplete_collection_ids: [],
+          completed_exploration_ids: [],
+          completed_collection_ids: [],
+          exploration_playlist_ids: [],
+          collection_playlist_ids: ['0', '1', '2']
+        });
+
+      learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
+        activityId, 'title', 'collection', learnerDashboardActivityIds);
+      flushMicrotasks();
+
+      expect(modalSpy).toHaveBeenCalled();
+    }));
+
+  it('should opena a modal to remove an exploration from learner playlist' +
+    ' when calling removeActivityModal', fakeAsync(() => {
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
+
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
-        { componentInstance: MockNgbModalRef,
-          result: Promise.reject('fail')});
+        { componentInstance: MockRemoveActivityNgbModalRef,
+          result: Promise.resolve('url')
+        });
     });
 
-    let learnerDashboardActivityIds = LearnerDashboardActivityIds
-      .createFromBackendDict({
-        incomplete_exploration_ids: [],
-        incomplete_collection_ids: [],
-        completed_exploration_ids: [],
-        completed_collection_ids: [],
-        exploration_playlist_ids: [],
-        collection_playlist_ids: ['0', '1', '2']
-      });
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    let activityId = '0';
+    let activityTitle = 'title';
 
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
-      activityId, 'title', 'collection', learnerDashboardActivityIds);
+    learnerPlaylistBackendApiService.removeActivityModal(
+      sectionNameI18nId, subsectionName,
+      activityId, activityTitle);
+
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
-      ['0', '1', '2']);
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBe('removed');
+  }));
+
+  it('should opena a modal to remove a collection from learner playlist' +
+    ' when calling removeActivityModal', fakeAsync(() => {
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
+
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: MockRemoveActivityNgbModalRef,
+          result: Promise.resolve('success')
+        });
+    });
+
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    let activityId = '0';
+    let activityTitle = 'title';
+
+    learnerPlaylistBackendApiService.removeActivityModal(
+      sectionNameI18nId, subsectionName,
+      activityId, activityTitle)
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBe('removed');
+  }));
+
+  it('should opena a modal to remove an exploration from incomplete playlist' +
+    ' when calling removeActivityModal', fakeAsync(() => {
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
+
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: MockRemoveActivityNgbModalRef,
+          result: Promise.resolve('url')
+        });
+    });
+
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    let activityId = '0';
+    let activityTitle = 'title';
+
+    learnerPlaylistBackendApiService.removeActivityModal(
+      sectionNameI18nId, subsectionName,
+      activityId, activityTitle);
+
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBe('removed');
+  }));
+
+  it('should opena a modal to remove a collection from incomplete playlist' +
+    ' when calling removeActivityModal', fakeAsync(() => {
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
+
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: MockRemoveActivityNgbModalRef,
+          result: Promise.resolve('success')
+        });
+    });
+
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    let activityId = '0';
+    let activityTitle = 'title';
+
+    learnerPlaylistBackendApiService.removeActivityModal(
+      sectionNameI18nId, subsectionName,
+      activityId, activityTitle)
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBe('removed');
+  }));
+
+  it('should not open a modal if cancel button is clicked' +
+    ' when calling removeActivityModal', fakeAsync(() => {
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
+
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: MockRemoveActivityNgbModalRef,
+          result: Promise.reject('fail')
+        });
+    });
+
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    let activityId = '0';
+    let activityTitle = 'title';
+
+    learnerPlaylistBackendApiService.removeActivityModal(
+      sectionNameI18nId, subsectionName,
+      activityId, activityTitle);
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+      .toBe('canceled');
   }));
 });

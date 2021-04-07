@@ -27,7 +27,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
-import { Promise } from 'q';
 
 interface LearnerPlaylistResponseObject {
   'belongs_to_completed_or_incomplete_list': boolean
@@ -47,6 +46,7 @@ interface LearnerPlaylistResponseObject {
 export class LearnerPlaylistBackendApiService {
   successfullyAdded: boolean;
   addToLearnerPlaylistUrl: string;
+  removeActivityModalStatus: string;
 
   constructor(
     private alertsService: AlertsService,
@@ -122,25 +122,31 @@ export class LearnerPlaylistBackendApiService {
   // This function will open a modal to remove an exploration
   // from the given list either 'Play Later' or 'In Progress'
   // in Learner Dashboard Page.
-  removeActivityModal(
+  async removeActivityModal(
       sectionNameI18nId: string, subsectionName: string,
       activityId: string, activityTitle: string): Promise<void> {
+    this.removeActivityModalStatus = null;
     const modelRef = this.ngbModal.open(
       RemoveActivityModalComponent, {backdrop: true});
     modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
     modelRef.componentInstance.subsectionName = subsectionName;
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
-    return Promise((resolve, reject) => {
-      modelRef.result.then((playlistUrl) => {
+    await modelRef.result.then((playlistUrl) => {
       // eslint-disable-next-line dot-notation
-        this.http.delete<void>(playlistUrl).toPromise();
-        resolve();
+      this.http.delete<void>(playlistUrl).toPromise();
+      this.removeActivityModalStatus = 'removed';
       }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+        this.removeActivityModalStatus = 'canceled';
       });
+
+    return new Promise((resolve, reject) => {
+      if(this.removeActivityModalStatus === 'removed') {
+        resolve();
+      }
     });
   }
 }

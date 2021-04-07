@@ -101,7 +101,12 @@ angular.module('oppia').directive('baseContent', [
 
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
             LoaderService.onLoadingMessageChange.subscribe(
-              (message: string) => this.loadingMessage = message
+              (message: string) => {
+                this.loadingMessage = message
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$applyAsync();
+              }
             );
           };
 
