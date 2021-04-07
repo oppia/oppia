@@ -203,8 +203,8 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
-    it('should catch redundant rules caused by greater/less than or equal range',
-      () => {
+  it('should catch redundant rules caused by greater/less than or equal range',
+    () => {
       var warnings: Warning[];
       answerGroups[0].rules = [lessThanOrEqualToOneRule, equalsZeroRule];
       warnings = validatorService.getAllWarnings(
@@ -226,8 +226,8 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
-    it('should catch redundant rules caused by within tolerance range',
-      () => {
+  it('should catch redundant rules caused by within tolerance range',
+    () => {
       answerGroups[0].rules = [zeroWithinToleranceOfOneRule, equalsZeroRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
