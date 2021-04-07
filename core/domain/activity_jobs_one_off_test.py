@@ -33,7 +33,6 @@ from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import taskqueue_services
-from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -44,11 +43,11 @@ datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
 
 (
-    base_models, collection_models,
+    base_models, collection_models, config_models,
     exp_models, question_models, skill_models,
     story_models, topic_models, subtopic_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection,
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
     models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
     models.NAMES.story, models.NAMES.topic, models.NAMES.subtopic
 ])
@@ -473,7 +472,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -572,9 +571,6 @@ class MockCollectionRightsModel(
         # Create and delete events will already be recorded in the
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when collections
-            # are changed).
             collection_models.CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -619,9 +615,6 @@ class MockExplorationRightsModel(exp_models.ExplorationRightsModel):
         # Create and delete events will already be recorded in the
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when explorations
-            # are changed).
             exp_models.ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -948,547 +941,6 @@ class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
             [self.USER_1_ID, self.USER_4_ID],
             topic_models.TopicRightsSnapshotMetadataModel
             .get_by_id('%s-2' % self.TOP_2_ID).content_user_ids)
-
-
-class AddCommitCmdsUserIdsMetadataJobTests(test_utils.GenericTestBase):
-
-    COL_1_ID = 'col_1_id'
-    EXP_1_ID = 'exp_1_id'
-    TOP_1_ID = 'top_1_id'
-    TOP_2_ID = 'top_2_id'
-
-    USER_3_ID = 'user_3_id'
-    USER_4_ID = 'user_4_id'
-    USER_GAE_3_ID = 'user_gae_3_id'
-    USERNAME_1 = 'usernamea'
-    USERNAME_2 = 'usernameb'
-    EMAIL_1 = 'emaila@example.com'
-    EMAIL_2 = 'emailb@example.com'
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.create_new())
-        activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        stringified_output = (
-            activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.get_output(
-                job_id))
-        eval_output = [ast.literal_eval(stringified_item) for
-                       stringified_item in stringified_output]
-        return [
-            [key, sorted(values) if isinstance(values, list) else values]
-            for key, values in eval_output]
-
-    def setUp(self):
-        super(AddCommitCmdsUserIdsMetadataJobTests, self).setUp()
-
-        self.collection_rights_model_swap = self.swap(
-            collection_models,
-            'CollectionRightsModel',
-            MockCollectionRightsModel)
-        self.exploration_rights_model_swap = self.swap(
-            exp_models, 'ExplorationRightsModel', MockExplorationRightsModel)
-        self.topic_rights_model_swap = self.swap(
-            topic_models, 'TopicRightsModel', MockTopicRightsModel)
-
-        self.signup(self.EMAIL_1, self.USERNAME_1)
-        self.signup(self.EMAIL_2, self.USERNAME_2)
-
-        self.USER_1_ID = self.get_user_id_from_email(self.EMAIL_1)
-        self.USER_2_ID = self.get_user_id_from_email(self.EMAIL_2)
-
-        self.USER_GAE_1_ID = self.get_gae_id_from_email(self.EMAIL_1)
-        self.USER_GAE_2_ID = self.get_gae_id_from_email(self.EMAIL_2)
-
-    def test_add_commit_cmds_user_ids_to_collection_rights_snapshot(self):
-        with self.collection_rights_model_swap:
-            collection_model = collection_models.CollectionRightsModel(
-                id=self.COL_1_ID,
-                owner_ids=[self.USER_1_ID],
-                editor_ids=[self.USER_2_ID],
-                voice_artist_ids=[],
-                viewer_ids=[],
-                community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                viewable_if_private=False,
-                first_published_msec=0.0
-            )
-            collection_model.save(
-                'cid',
-                'Created new collection rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            collection_model.owner_ids = [self.USER_3_ID]
-            collection_model.save(
-                'cid',
-                'Change owner',
-                [{
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_3_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                }])
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output, [['SUCCESS-CollectionRightsSnapshotMetadataModel', 2]])
-        self.assertItemsEqual(
-            [],
-            collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_3_ID],
-            collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).commit_cmds_user_ids)
-
-    def test_add_commit_cmds_user_ids_to_exploration_rights_snapshot(self):
-        with self.exploration_rights_model_swap:
-            exp_model = exp_models.ExplorationRightsModel(
-                id=self.EXP_1_ID,
-                owner_ids=[self.USER_1_ID, self.USER_2_ID],
-                editor_ids=[self.USER_2_ID],
-                voice_artist_ids=[],
-                viewer_ids=[],
-                community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                viewable_if_private=False,
-                first_published_msec=0.0)
-            exp_model.save(
-                'cid', 'Created new exploration rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            exp_model.owner_ids = [self.USER_3_ID]
-            exp_model.save(
-                'cid',
-                'Change owner',
-                [{
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_3_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                }])
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output, [['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2]])
-        self.assertItemsEqual(
-            [],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_3_ID],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds_user_ids)
-
-    def test_fix_user_ids_in_exploration_rights_snapshot(self):
-        with self.exploration_rights_model_swap:
-            exp_model = exp_models.ExplorationRightsModel(
-                id=self.EXP_1_ID,
-                owner_ids=[self.USER_3_ID],
-                editor_ids=[self.USER_2_ID],
-                voice_artist_ids=[],
-                viewer_ids=[],
-                community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                viewable_if_private=False,
-                first_published_msec=0.0)
-            exp_model.save(
-                'cid', 'Created new exploration rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            exp_model.owner_ids = [
-                self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
-            exp_model.save(
-                'cid',
-                'Change owner',
-                [
-                    {
-                        'cmd': rights_domain.CMD_CHANGE_ROLE,
-                        'assignee_id': self.USER_GAE_1_ID,
-                        'old_role': rights_domain.ROLE_NONE,
-                        'new_role': rights_domain.ROLE_OWNER
-                    },
-                    {
-                        'cmd': rights_domain.CMD_CHANGE_ROLE,
-                        'assignee_id': self.USER_GAE_2_ID,
-                        'old_role': rights_domain.ROLE_EDITOR,
-                        'new_role': rights_domain.ROLE_OWNER
-                    }
-                ])
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            output,
-            [
-                ['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2],
-                ['MIGRATION_SUCCESS', 1]
-            ]
-        )
-
-        self.assertItemsEqual(
-            [
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_1_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                },
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_2_ID,
-                    'old_role': rights_domain.ROLE_EDITOR,
-                    'new_role': rights_domain.ROLE_OWNER
-                }
-            ],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds
-        )
-        self.assertItemsEqual(
-            [
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_1_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                },
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_2_ID,
-                    'old_role': rights_domain.ROLE_EDITOR,
-                    'new_role': rights_domain.ROLE_OWNER
-                }
-            ],
-            exp_models.ExplorationCommitLogEntryModel
-            .get_by_id('rights-%s-2' % self.EXP_1_ID).commit_cmds
-        )
-
-    def test_fix_user_ids_in_exploration_rights_snapshot_with_missing_commit(
-            self):
-        with self.exploration_rights_model_swap:
-            exp_model = exp_models.ExplorationRightsModel(
-                id=self.EXP_1_ID,
-                owner_ids=[self.USER_3_ID],
-                editor_ids=[self.USER_2_ID],
-                voice_artist_ids=[],
-                viewer_ids=[],
-                community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                viewable_if_private=False,
-                first_published_msec=0.0)
-            exp_model.save(
-                'cid', 'Created new exploration rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            exp_model.owner_ids = [
-                self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
-            exp_model.save(
-                'cid',
-                'Change owner',
-                [
-                    {
-                        'cmd': rights_domain.CMD_CHANGE_ROLE,
-                        'assignee_id': self.USER_GAE_1_ID,
-                        'old_role': rights_domain.ROLE_NONE,
-                        'new_role': rights_domain.ROLE_OWNER
-                    },
-                    {
-                        'cmd': rights_domain.CMD_CHANGE_ROLE,
-                        'assignee_id': self.USER_GAE_2_ID,
-                        'old_role': rights_domain.ROLE_EDITOR,
-                        'new_role': rights_domain.ROLE_OWNER
-                    }
-                ])
-
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'rights-%s-2' % self.EXP_1_ID
-            ).delete()
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            output,
-            [
-                ['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2],
-                [
-                    'MIGRATION_SUCCESS_MISSING_COMMIT_LOG',
-                    ['%s-2' % self.EXP_1_ID]
-                ]
-            ]
-        )
-
-        self.assertItemsEqual(
-            [
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_1_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                },
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_2_ID,
-                    'old_role': rights_domain.ROLE_EDITOR,
-                    'new_role': rights_domain.ROLE_OWNER
-                }
-            ],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds
-        )
-
-    def test_fix_user_ids_in_exploration_rights_snapshot_with_missing_user(
-            self):
-        with self.exploration_rights_model_swap:
-            exp_model = exp_models.ExplorationRightsModel(
-                id=self.EXP_1_ID,
-                owner_ids=[self.USER_3_ID],
-                editor_ids=[self.USER_2_ID],
-                voice_artist_ids=[],
-                viewer_ids=[],
-                community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                viewable_if_private=False,
-                first_published_msec=0.0)
-            exp_model.save(
-                'cid', 'Created new exploration rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            exp_model.owner_ids = [
-                self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
-            exp_model.save(
-                'cid',
-                'Change owner',
-                [
-                    {
-                        'cmd': rights_domain.CMD_CHANGE_ROLE,
-                        'assignee_id': self.USER_GAE_1_ID,
-                        'old_role': rights_domain.ROLE_NONE,
-                        'new_role': rights_domain.ROLE_OWNER
-                    },
-                    {
-                        'cmd': rights_domain.CMD_CHANGE_ROLE,
-                        'assignee_id': self.USER_GAE_3_ID,
-                        'old_role': rights_domain.ROLE_EDITOR,
-                        'new_role': rights_domain.ROLE_OWNER
-                    }
-                ])
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            output,
-            [
-                ['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2],
-                ['MIGRATION_FAILURE', ['(\'exp_1_id-2\', u\'user_gae_3_id\')']],
-            ]
-        )
-
-        self.assertItemsEqual(
-            [
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_GAE_1_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                },
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_GAE_3_ID,
-                    'old_role': rights_domain.ROLE_EDITOR,
-                    'new_role': rights_domain.ROLE_OWNER
-                }
-            ],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds
-        )
-        self.assertItemsEqual(
-            [
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_GAE_1_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                },
-                {
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_GAE_3_ID,
-                    'old_role': rights_domain.ROLE_EDITOR,
-                    'new_role': rights_domain.ROLE_OWNER
-                }
-            ],
-            exp_models.ExplorationCommitLogEntryModel
-            .get_by_id('rights-%s-2' % self.EXP_1_ID).commit_cmds
-        )
-
-    def test_add_commit_cmds_user_ids_to_topic_rights_snapshot(self):
-        with self.topic_rights_model_swap:
-            topic_model = topic_models.TopicRightsModel(
-                id=self.TOP_1_ID,
-                manager_ids=[self.USER_1_ID])
-            topic_model.commit(
-                'cid',
-                'Created new topic rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            topic_model.manager_ids = [self.USER_1_ID, self.USER_3_ID]
-            topic_model.commit(
-                'cid',
-                'Add manager',
-                [{
-                    'cmd': topic_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_3_ID,
-                    'old_role': topic_domain.ROLE_NONE,
-                    'new_role': topic_domain.ROLE_MANAGER
-                }])
-            topic_model.manager_ids = [self.USER_3_ID]
-            topic_model.commit(
-                'cid',
-                'Remove manager',
-                [{
-                    'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
-                    'removed_user_id': self.USER_1_ID,
-                }])
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output, [['SUCCESS-TopicRightsSnapshotMetadataModel', 3]])
-        self.assertItemsEqual(
-            [],
-            topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_3_ID],
-            topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_1_ID],
-            topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-3' % self.TOP_1_ID).commit_cmds_user_ids)
-
-    def test_add_commit_cmds_user_ids_to_multiple_rights_snapshots(self):
-        with self.collection_rights_model_swap:
-            collection_model = collection_models.CollectionRightsModel(
-                id=self.COL_1_ID,
-                owner_ids=[],
-                editor_ids=[self.USER_1_ID],
-                voice_artist_ids=[],
-                viewer_ids=[],
-                community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                viewable_if_private=False,
-                first_published_msec=0.0
-            )
-            collection_model.save(
-                'cid',
-                'Created new collection rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            collection_model.editor_ids = [self.USER_1_ID, self.USER_4_ID]
-            collection_model.save(
-                'cid',
-                'Add editor',
-                [{
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_4_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_EDITOR
-                }])
-
-        with self.exploration_rights_model_swap:
-            exp_model = exp_models.ExplorationRightsModel(
-                id=self.EXP_1_ID,
-                owner_ids=[self.USER_1_ID, self.USER_2_ID],
-                editor_ids=[],
-                voice_artist_ids=[],
-                viewer_ids=[self.USER_4_ID],
-                community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                viewable_if_private=False,
-                first_published_msec=0.0)
-            exp_model.save(
-                'cid', 'Created new exploration rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            exp_model.owner_ids = [
-                self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
-            exp_model.save(
-                'cid',
-                'Add owner',
-                [{
-                    'cmd': rights_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_3_ID,
-                    'old_role': rights_domain.ROLE_NONE,
-                    'new_role': rights_domain.ROLE_OWNER
-                }])
-
-        with self.topic_rights_model_swap:
-            topic_model_1 = topic_models.TopicRightsModel(
-                id=self.TOP_1_ID,
-                manager_ids=[self.USER_1_ID, self.USER_2_ID])
-            topic_model_1.commit(
-                'cid',
-                'Created new topic rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            topic_model_1.manager_ids = [
-                self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
-            topic_model_1.commit(
-                'cid',
-                'Add manager',
-                [{
-                    'cmd': topic_domain.CMD_CHANGE_ROLE,
-                    'assignee_id': self.USER_3_ID,
-                    'old_role': topic_domain.ROLE_NONE,
-                    'new_role': topic_domain.ROLE_MANAGER
-                }])
-            topic_model_2 = topic_models.TopicRightsModel(
-                id=self.TOP_2_ID,
-                manager_ids=[self.USER_1_ID, self.USER_4_ID])
-            topic_model_2.commit(
-                'cid', 'Created new topic rights',
-                [{'cmd': rights_domain.CMD_CREATE_NEW}])
-            topic_model_2.manager_ids = [self.USER_4_ID]
-            topic_model_2.commit(
-                'cid', 'Remove manager',
-                [{
-                    'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
-                    'removed_user_id': self.USER_1_ID,
-                }])
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            output,
-            [
-                ['SUCCESS-CollectionRightsSnapshotMetadataModel', 2],
-                ['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2],
-                ['SUCCESS-TopicRightsSnapshotMetadataModel', 4]
-            ]
-        )
-
-        self.assertItemsEqual(
-            [],
-            collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.COL_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_4_ID],
-            collection_models.CollectionRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.COL_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_3_ID],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [],
-            topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_3_ID],
-            topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [],
-            topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.TOP_2_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_1_ID],
-            topic_models.TopicRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.TOP_2_ID).commit_cmds_user_ids)
 
 
 class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
@@ -2137,3 +1589,577 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
+
+
+class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    EXP_ID = 'exp_id0'
+    QUESTION_ID = 'question_id0'
+    SKILL_ID = 'skill_id0'
+    DUMMY_COMMIT_CMDS = [
+        {
+            'cmd': 'some_command',
+            'other_field': 'test'
+        }, {
+            'cmd': 'some_other_command',
+            'other_field': 'test',
+            'different_field': 'test'
+        }
+    ]
+    DUMMY_CREATE_COMMIT_CMDS = [
+        {
+            'cmd': 'create_new',
+            'other_field': 'test'
+        }
+    ]
+    DUMMY_CREATE_COMMIT_CMDS = [
+        {
+            'cmd': 'create_new',
+            'other_field': 'test'
+        }
+    ]
+
+    def setUp(self):
+        super(AddMissingCommitLogsOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_class = activity_jobs_one_off.AddMissingCommitLogsOneOffJob
+        job_id = job_class.create_new()
+        activity_jobs_one_off.AddMissingCommitLogsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            activity_jobs_one_off.AddMissingCommitLogsOneOffJob
+            .get_output(job_id))
+
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
+        return eval_output
+
+    def test_validate_model_names_list(self):
+        job_class = activity_jobs_one_off.AddMissingCommitLogsOneOffJob
+        class_names = {
+            cls.__name__ for cls in (
+                job_class.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS)}
+        model_names_with_default_commit_status = set(
+            job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS)
+        model_names_with_commit_status_in_rights = set(
+            job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS)
+        aggregate_model_names = (
+            model_names_with_default_commit_status |
+            model_names_with_commit_status_in_rights)
+        common_model_names = (
+            model_names_with_default_commit_status &
+            model_names_with_commit_status_in_rights)
+
+        self.assertEqual(len(common_model_names), 0)
+        self.assertItemsEqual(class_names, aggregate_model_names)
+        self.assertItemsEqual(
+            class_names, set(job_class.MODEL_NAMES_TO_PROPERTIES.keys()))
+
+    def test_delete_exp_rights_related_models(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public',
+            version=1,
+            deleted=True
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+        ).put()
+
+        expected_output = [
+            [
+                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'related models-ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+
+        parent_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXP_ID)
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                '%s-%s' % (self.EXP_ID, 1)))
+
+        self.assertIsNone(parent_model)
+        self.assertIsNone(snapshot_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_delete_skill_related_models(self):
+        skill_model = skill_models.SkillModel(
+            id=self.SKILL_ID,
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False,
+            deleted=True,
+            version=1
+        )
+        base_models.BaseModel.put_multi([skill_model])
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        expected_output = [
+            [
+                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'related models-SkillSnapshotMetadataModel',
+                ['skill_id0-1']
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+
+        parent_model = skill_models.SkillModel.get_by_id(
+            self.SKILL_ID)
+        snapshot_model = (
+            skill_models.SkillSnapshotMetadataModel.get_by_id(
+                '%s-%s' % (self.SKILL_ID, 1)))
+
+        self.assertIsNone(parent_model)
+        self.assertIsNone(snapshot_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_delete_question_related_models(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        question_model = question_models.QuestionModel(
+            id=self.QUESTION_ID,
+            question_state_data=question_state_data,
+            question_state_data_schema_version=1,
+            language_code='en',
+            deleted=True,
+            version=1
+        )
+        base_models.BaseModel.put_multi([question_model])
+        question_models.QuestionSnapshotMetadataModel(
+            id='%s-1' % self.QUESTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        expected_output = [
+            [
+                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'related models-QuestionSnapshotMetadataModel',
+                ['question_id0-1']
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+
+        parent_model = question_models.QuestionModel.get_by_id(
+            self.QUESTION_ID)
+        snapshot_model = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                '%s-%s' % (self.QUESTION_ID, 1)))
+
+        self.assertIsNone(parent_model)
+        self.assertIsNone(snapshot_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_exp_rights_commit_logs(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public'
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        content_dict = {
+            'status': 'public',
+            'owner_ids': self.albert_id,
+            'editor_ids': self.albert_id,
+            'voice_artist_ids': self.albert_id,
+            'viewer_ids': self.albert_id
+        }
+
+        exp_models.ExplorationRightsSnapshotContentModel(
+            id='%s-1' % self.EXP_ID,
+            content=content_dict
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'rights-%s-%s' % (self.EXP_ID, 1)))
+
+        expected_output = [
+            [
+                'SUCCESS-Added missing commit log model-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+        expected_commit_model = exp_models.ExplorationCommitLogEntryModel(
+            exploration_id=self.EXP_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
+
+        self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_exp_rights_with_commit_type_create(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public'
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        content_dict = {
+            'status': 'public',
+            'owner_ids': self.albert_id,
+            'editor_ids': self.albert_id,
+            'voice_artist_ids': self.albert_id,
+            'viewer_ids': self.albert_id
+        }
+
+        exp_models.ExplorationRightsSnapshotContentModel(
+            id='%s-1' % self.EXP_ID,
+            content=content_dict
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='create',
+            commit_cmds=self.DUMMY_CREATE_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        expected_output = [
+            [
+                'Found commit log model-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                1
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_question_commit_logs(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        question_model = question_models.QuestionModel(
+            id=self.QUESTION_ID,
+            question_state_data=question_state_data,
+            question_state_data_schema_version=1,
+            language_code='en'
+        )
+        base_models.BaseModel.put_multi([question_model])
+        question_models.QuestionSnapshotContentModel(
+            id='%s-1' % self.QUESTION_ID).put()
+        question_models.QuestionSnapshotMetadataModel(
+            id='%s-1' % self.QUESTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-%s' % (self.QUESTION_ID, 1)))
+
+        expected_output = [
+            [
+                'SUCCESS-Added missing commit log model-' +
+                'QuestionSnapshotMetadataModel',
+                ['question_id0-1']
+            ]
+        ]
+        expected_commit_model = question_models.QuestionCommitLogEntryModel(
+            question_id=self.QUESTION_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
+
+        self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_skill_commit_logs(self):
+        skill_model = skill_models.SkillModel(
+            id=self.SKILL_ID,
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        base_models.BaseModel.put_multi([skill_model])
+
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-%s-%s' % (self.SKILL_ID, 1)))
+
+        expected_output = [
+            [
+                'SUCCESS-Added missing commit log model-' +
+                'SkillSnapshotMetadataModel',
+                ['skill_id0-1']
+            ]
+        ]
+        expected_commit_model = skill_models.SkillCommitLogEntryModel(
+            skill_id=self.SKILL_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
+
+        self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_skill_parent_model(self):
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-%s-%s' % (self.SKILL_ID, 1)))
+
+        expected_output = [
+            [
+                'Missing Parent Model-No changes-' +
+                'SkillSnapshotMetadataModel',
+                1
+            ]
+        ]
+
+        self.assertIsNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+
+class SnapshotMetadataCommitMsgAuditOneOffJobTests(
+        test_utils.GenericTestBase):
+    """Tests for the one-off commit message audit job."""
+
+    def _count_one_off_jobs_in_queue(self):
+        """Counts one off jobs in the taskqueue."""
+        return self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgAuditOneOffJob.create_new())
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgAuditOneOffJob.enqueue(job_id))
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        results = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgAuditOneOffJob.get_output(job_id))
+        return [ast.literal_eval(stringified_item) for
+                stringified_item in results]
+
+    def test_message_counts_correct(self):
+        """Ensures the audit job correctly gets commit message counts of
+        varying lengths.
+        """
+
+        value_less_than_375 = 100
+        value_equal_to_375 = 375
+        value_greater_than_375 = 400
+        num_models_per_category = 2
+
+        model_class = config_models.ConfigPropertySnapshotMetadataModel
+        for i in python_utils.RANGE(num_models_per_category):
+            model_class(
+                id='model_id-%d-%d' % (i, value_less_than_375),
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='a' * value_less_than_375).put()
+            model_class(
+                id='model_id-%d-%d' % (i, value_equal_to_375),
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='a' * value_equal_to_375).put()
+            model_class(
+                id='model_id-%d-%d' % (i, value_greater_than_375),
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='a' * value_greater_than_375).put()
+        self.maxDiff = None
+        one_off_results = self._run_one_off_job()
+        expected_results = [
+            ['GREATER_THAN_375', [
+                'ConfigPropertySnapshotMetadataModel with id model_id-0-400.' +
+                ' Message: %s' % ('a' * value_greater_than_375),
+                'ConfigPropertySnapshotMetadataModel with id model_id-1-400.' +
+                ' Message: %s' % ('a' * value_greater_than_375),
+            ]],
+            ['LESS_OR_EQUAL_TO_375', 2 * num_models_per_category + 1]]
+
+        # Ensure results have same length.
+        self.assertEqual(len(one_off_results), len(expected_results))
+
+        # Create results dictionaries.
+        one_off_results_dict = dict()
+        expected_results_dict = dict()
+        for i, _ in enumerate(one_off_results):
+            one_off_results_dict[one_off_results[i][0]] = one_off_results[i][1]
+            expected_results_dict[
+                expected_results[i][0]] = expected_results[i][1]
+
+        one_off_results_dict[
+            'GREATER_THAN_375'
+        ] = sorted(one_off_results_dict['GREATER_THAN_375'])
+        expected_results_dict[
+            'GREATER_THAN_375'
+        ] = sorted(expected_results_dict['GREATER_THAN_375'])
+        self.assertDictEqual(one_off_results_dict, expected_results_dict)
+
+    def test_job_can_run_multiple_times(self):
+        num_test_runs = 5
+        for _ in python_utils.RANGE(num_test_runs):
+            self.test_message_counts_correct()
+
+
+class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
+        test_utils.GenericTestBase):
+    """Tests for the one-off commit message shrinking job for
+    BaseSnapshotMetadata classes.
+    """
+
+    def _count_one_off_jobs_in_queue(self):
+        """Counts one off jobs in the taskqueue."""
+        return self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgShrinkOneOffJob.create_new())
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgShrinkOneOffJob.enqueue(job_id))
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        results = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgShrinkOneOffJob.get_output(job_id))
+        return [ast.literal_eval(stringified_item) for
+                stringified_item in results]
+
+    def test_message_truncated_correctly_base_snapshot_metadata(self):
+        """Ensures the job corretly shrinks commit message lengths for
+        BaseSnapshotMetadataModel.
+        """
+        model_class = config_models.ConfigPropertySnapshotMetadataModel
+        model_class(
+            id='model_id-0',
+            committer_id='committer_id',
+            commit_type='create',
+            commit_message='a' * 400).put()
+        self._run_one_off_job()
+        self.assertEqual(
+            len(model_class.get_by_id('model_id-0').commit_message),
+            375)
+
+    def test_message_truncated_correctly_commit_log_entry(self):
+        """Ensures the job corretly shrinks commit message lengths for
+        CommitLogEntryModel.
+        """
+        commit = collection_models.CollectionCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'a', 'a' * 400, [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False)
+        commit.collection_id = 'b'
+        commit.update_timestamps()
+        commit.put()
+        self._run_one_off_job()
+        self.assertEqual(
+            len(
+                collection_models.CollectionCommitLogEntryModel.get_by_id(
+                    commit.id).commit_message),
+            375)
+
+        # Ensure nothing happens to messages of proper length.
+        self._run_one_off_job()
+        self.assertEqual(
+            len(
+                collection_models.CollectionCommitLogEntryModel.get_by_id(
+                    commit.id).commit_message),
+            375)

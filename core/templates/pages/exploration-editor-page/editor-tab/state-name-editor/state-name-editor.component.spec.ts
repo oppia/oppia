@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { EditabilityService } from 'services/editability.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -30,7 +30,8 @@ import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 describe('State Name Editor component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -41,9 +42,8 @@ describe('State Name Editor component', function() {
   var routerService = null;
   var stateEditorService = null;
   var stateNameService = null;
-
   var mockExternalSaveEventEmitter = null;
-
+  var focusManagerService = null;
   var mockExplorationData = {
     explorationId: 0,
     autosaveChangeList: function() {}
@@ -53,6 +53,8 @@ describe('State Name Editor component', function() {
   var validAutosaveResponse = {
     is_version_of_draft_valid: true
   };
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('directiveTemplates'));
 
@@ -64,6 +66,7 @@ describe('State Name Editor component', function() {
     editabilityService = TestBed.get(EditabilityService);
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
+    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -87,7 +90,7 @@ describe('State Name Editor component', function() {
     $rootScope = $injector.get('$rootScope');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
-
+    focusManagerService = $injector.get('FocusManagerService');
     spyOn(mockExplorationData, 'autosaveChangeList');
     spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
 
@@ -209,7 +212,6 @@ describe('State Name Editor component', function() {
     });
     ctrl.$onInit();
   }));
-
   afterEach(() => {
     ctrl.$onDestroy();
   });
@@ -243,19 +245,21 @@ describe('State Name Editor component', function() {
   });
 
   it('should save state names independently when editting more than one state',
-    function() {
+    fakeAsync(() => {
       stateEditorService.setActiveStateName('Third State');
       ctrl.saveStateName('Fourth State');
+      tick(200);
       expect(explorationStatesService.getState('Fourth State')).toBeTruthy();
       expect(explorationStatesService.getState('Third State')).toBeFalsy();
 
       stateEditorService.setActiveStateName('First State');
       ctrl.saveStateName('Fifth State');
+      tick(200);
       expect(explorationStatesService.getState('Fifth State')).toBeTruthy();
       expect(explorationStatesService.getState('First State')).toBeFalsy();
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
   it('should not re-save state names when it did not changed', function() {
     stateEditorService.setActiveStateName('Second State');
@@ -297,5 +301,12 @@ describe('State Name Editor component', function() {
     ctrl.tmpStateName = 'SampleState';
     mockExternalSaveEventEmitter.emit();
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
+  });
+
+  it('should apply focus on main tab', () => {
+    var focusSpy = spyOn(focusManagerService, 'setFocus');
+    ctrl.TabName = 'main';
+    ctrl.initStateNameEditor();
+    expect(focusSpy).toHaveBeenCalledWith('oppiaEditableSection');
   });
 });

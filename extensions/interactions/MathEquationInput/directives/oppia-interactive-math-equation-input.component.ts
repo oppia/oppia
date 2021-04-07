@@ -83,7 +83,10 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         GuppyConfigurationService.init();
         GuppyInitializationService.init(
           'guppy-div-learner',
-          MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+          MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,
+          $attrs.savedSolution !== undefined ?
+          JSON.parse($attrs.savedSolution) : ''
+        );
         GuppyInitializationService.setCustomOskLetters(
           HtmlEscaperService.escapedJsonToObj(
             $attrs.customOskLettersWithValue));

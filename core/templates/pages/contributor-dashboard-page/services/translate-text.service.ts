@@ -17,56 +17,94 @@
  * fields.
  */
 
+export class StateAndContent {
+  constructor(
+    private _stateName: string,
+    private _contentID: string,
+    private _contentText: string) {}
+
+  get stateName(): string {
+    return this._stateName;
+  }
+
+  set stateName(newStateName: string) {
+    this._stateName = newStateName;
+  }
+
+  get contentID(): string {
+    return this._contentID;
+  }
+
+  set contentID(newContentID: string) {
+    this._contentID = newContentID;
+  }
+
+  get contentText(): string {
+    return this._contentText;
+  }
+
+  set contentText(newContentText: string) {
+    this._contentText = newContentText;
+  }
+}
+
 angular.module('oppia').factory('TranslateTextService', [
   '$http', function($http) {
+    const STARTING_INDEX = -1;
     var stateWiseContents = null;
     var stateWiseContentIds = {};
-    var activeStateName = null;
-    var activeContentId = null;
+    var stateAndContent = [];
     var stateNamesList = [];
     var activeExpId = null;
     var activeExpVersion = null;
-
-    const getNextContentId = function() {
-      return stateWiseContentIds[activeStateName].pop();
-    };
-
-    const getNextState = function() {
-      const currentIndex = stateNamesList.indexOf(activeStateName);
-      return stateNamesList[currentIndex + 1];
-    };
+    var activeIndex = STARTING_INDEX;
+    var activeStateName = null;
+    var activeContentId = null;
+    var activeContentText = null;
 
     const getNextText = function() {
-      if (stateNamesList.length === 0) {
+      if (stateAndContent.length === 0) {
         return null;
       }
-      activeContentId = getNextContentId();
-      if (!activeContentId) {
-        activeStateName = getNextState();
-        if (!activeStateName) {
-          return null;
-        }
-        activeContentId = getNextContentId();
+      activeIndex += 1;
+      activeStateName = stateAndContent[activeIndex].stateName;
+      activeContentId = stateAndContent[activeIndex].contentID;
+      activeContentText =
+       stateAndContent[activeIndex].contentText;
+      return activeContentText;
+    };
+
+    const getPreviousText = function() {
+      if (stateAndContent.length === 0 || activeIndex <= 0) {
+        return null;
       }
-      return stateWiseContents[activeStateName][activeContentId];
+      activeIndex -= 1;
+      activeStateName = stateAndContent[activeIndex].stateName;
+      activeContentId = stateAndContent[activeIndex].contentID;
+      activeContentText =
+        stateAndContent[activeIndex].contentText;
+      return activeContentText;
+    };
+
+    const isPreviousTextAvailableForTranslation = function() {
+      return activeIndex > 0;
     };
 
     const isMoreTextAvailableForTranslation = function() {
-      if (stateNamesList.length === 0) {
+      if (stateAndContent.length === 0) {
         return false;
       }
-      return !(
-        stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
-          stateWiseContentIds[activeStateName].length === 0);
+      return (activeIndex + 1 < stateAndContent.length);
     };
 
     return {
       init: function(expId, languageCode, successCallback) {
         stateWiseContents = null;
         stateWiseContentIds = {};
-        activeStateName = null;
-        activeContentId = null;
         stateNamesList = [];
+        stateAndContent = [];
+        activeIndex = STARTING_INDEX;
+
         activeExpId = expId;
         activeExpVersion = null;
 
@@ -85,6 +123,11 @@ angular.module('oppia').factory('TranslateTextService', [
               stateWiseContents[stateName])) {
               if (text !== '') {
                 contentIds.push(contentId);
+                // Text needs to be cast as string or else it is recognized
+                // as unknown.
+                stateAndContent.push(
+                  new StateAndContent(
+                    stateName, contentId, text as string));
                 stateHasText = true;
               }
             }
@@ -95,9 +138,6 @@ angular.module('oppia').factory('TranslateTextService', [
               stateWiseContentIds[stateName] = contentIds;
             }
           }
-          if (stateNamesList.length > 0) {
-            activeStateName = stateNamesList[0];
-          }
           successCallback();
         });
       },
@@ -107,8 +147,15 @@ angular.module('oppia').factory('TranslateTextService', [
           more: isMoreTextAvailableForTranslation()
         };
       },
+      getPreviousTextToTranslate: function() {
+        return {
+          text: getPreviousText(),
+          more: isPreviousTextAvailableForTranslation()
+        };
+      },
       suggestTranslatedText: function(
-          translationHtml, languageCode, imagesData, successCallback) {
+          translationHtml, languageCode, imagesData,
+          successCallback, errorCallback) {
         const url = '/suggestionhandler/';
         const postData = {
           suggestion_type: 'translate_content',
@@ -121,11 +168,10 @@ angular.module('oppia').factory('TranslateTextService', [
             content_id: activeContentId,
             state_name: activeStateName,
             language_code: languageCode,
-            content_html: stateWiseContents[activeStateName][activeContentId],
+            content_html: activeContentText,
             translation_html: translationHtml
           }
         };
-
         let body = new FormData();
         body.append('payload', JSON.stringify(postData));
         let filenames = imagesData.map(obj => obj.filename);
@@ -146,7 +192,7 @@ angular.module('oppia').factory('TranslateTextService', [
           headers: {
             'Content-Type': undefined
           }
-        }).then(successCallback);
+        }).then(successCallback, errorCallback);
       }
     };
   }]);

@@ -5,6 +5,9 @@ cron:
 - description: clean up old mapreduce jobs
   url: /cron/jobs/cleanup
   schedule: every sunday 08:00
+- description: weekly cleanup of models marked as deleted
+  url: /cron/models/cleanup
+  schedule: every thursday 09:00
 - description: weekly copy of a user's dashboard statistics
   url: /cron/users/dashboard_stats
   schedule: every monday 09:00

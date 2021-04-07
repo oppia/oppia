@@ -16,53 +16,45 @@
  * @fileoverview Module for the exploration editor page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/guppy.import';
-import 'third-party-imports/midi-js.import';
-import 'third-party-imports/ng-audio.import';
-import 'third-party-imports/ng-joy-ride.import';
-import 'third-party-imports/skulpt.import';
-import 'third-party-imports/ui-tree.import';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngAudio', 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui-leaflet',
-  'ui.sortable', 'ui.tree', uiValidate,
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-
-import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
+import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
+    InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
-    OppiaAngularRootComponent
+    ContentLanguageSelectorComponent,
+    OppiaAngularRootComponent,
+    ParamChangesEditorDirective,
+    StateParamChangesEditorComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
-    OppiaAngularRootComponent
+    ContentLanguageSelectorComponent,
+    OppiaAngularRootComponent,
+    StateParamChangesEditorComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   providers: [
     {

@@ -28,22 +28,22 @@ require(
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
-require('services/question-validation.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
   'ContextService', 'ImageLocalStorageService',
   'QuestionSuggestionService', 'QuestionUndoRedoService',
-  'QuestionValidationService', 'UrlInterpolationService',
-  'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
-  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  'QuestionValidationService', 'SiteAnalyticsService',
+  'UrlInterpolationService', 'question', 'questionId', 'questionStateData',
+  'skill', 'skillDifficulty', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService,
       ContextService, ImageLocalStorageService,
       QuestionSuggestionService, QuestionUndoRedoService,
-      QuestionValidationService, UrlInterpolationService,
-      question, questionId, questionStateData, skill, skillDifficulty,
-      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      QuestionValidationService, SiteAnalyticsService,
+      UrlInterpolationService, question, questionId, questionStateData,
+      skill, skillDifficulty, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;
@@ -62,6 +62,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       if (!$scope.isQuestionValid()) {
         return;
       }
+      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+        'Question');
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
       ContextService.resetImageSaveDestination();
@@ -78,7 +80,32 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);
     };
-
+    $scope.skillId = $scope.skill.getId();
+    $scope.onClickChangeDifficulty = function() {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/topic-editor-page/modal-templates/' +
+          'select-skill-and-difficulty-modal.template.html'),
+        backdrop: true,
+        resolve: {
+          skillId: () => $scope.skillId
+        },
+        controller: (
+          'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
+      }).result.then(function(result) {
+        if (AlertsService.warnings.length === 0) {
+          $scope.skillDifficulty = result.skillDifficulty;
+          skillDifficulty = result.skillDifficulty;
+          $scope.skillDifficultyString = Object.entries(
+            SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
+            entry => entry[1] === skillDifficulty)[0];
+        }
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    };
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
         $uibModal.open({

@@ -16,60 +16,64 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// UserService.ts is upgraded to Angular 8.
-import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/user.service.ts');
+import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { UserService } from 'services/user.service';
+import { UrlService } from './contextual/url.service';
 
-describe('User Service', function() {
-  var UserService, $httpBackend, UrlInterpolationService;
-  var CsrfService = null;
-  var UrlService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', {
-      location: {
-        pathname: 'home'
-      }
-    });
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+class MockWindowRef {
+  _window = {
+    location: {
+      pathname: 'home'
     }
-  }));
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    UserService = $injector.get('UserService');
-    UrlInterpolationService = $injector.get(
-      'UrlInterpolationService');
-    UrlService = $injector.get(
-      'UrlService');
-    $httpBackend = $injector.get('$httpBackend');
+describe('User Api Service', () => {
+  let userService: UserService = null;
+  let urlInterpolationService: UrlInterpolationService = null;
+  let urlService: UrlService = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService: CsrfTokenService = null;
+  let windowRef: MockWindowRef = null;
 
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+  beforeEach(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: WindowRef, useValue: windowRef }]
     });
-  }));
+    httpTestingController = TestBed.get(HttpTestingController);
+    userService = TestBed.get(UserService);
+    urlInterpolationService = TestBed.get(UrlInterpolationService);
+    urlService = TestBed.get(UrlService);
+    csrfService = TestBed.get(CsrfTokenService);
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    spyOn(csrfService, 'getTokenAsync').and.callFake(
+      () =>{
+        return new Promise((resolve, reject) => {
+          resolve('sample-csrf-token');
+        });
+      });
   });
 
-  it('should return userInfo data', function() {
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should return userInfo data', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
+    const sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -77,14 +81,13 @@ describe('User Service', function() {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: true
     };
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    var sampleUserInfo = UserInfo.createFromBackendDict(
-      sampleUserInfoBackendObject as UserInfoBackendDict);
+    const sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject);
 
-    UserService.getUserInfoAsync().then(function(userInfo) {
+    userService.getUserInfoAsync().then((userInfo) => {
       expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
@@ -94,24 +97,51 @@ describe('User Service', function() {
       expect(userInfo.canCreateCollections()).toBe(
         sampleUserInfo.canCreateCollections());
       expect(userInfo.getUsername()).toBe(sampleUserInfo.getUsername());
+      expect(userInfo.getEmail()).toBe(sampleUserInfo.getEmail());
       expect(userInfo.getPreferredSiteLanguageCode()).toBe(
         sampleUserInfo.getPreferredSiteLanguageCode());
     });
 
-    $httpBackend.flush();
-  });
+    const req = httpTestingController.expectOne('/userinfohandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfoBackendObject);
 
-  it('should return new userInfo data when url path is signup', function() {
-    spyOn(UrlService, 'getPathname').and.returnValue('/signup');
-    var sampleUserInfo = UserInfo.createDefault();
+    flushMicrotasks();
+  }));
 
-    UserService.getUserInfoAsync().then(function(userInfo) {
-      expect(userInfo).toEqual(sampleUserInfo);
-    });
-  });
+  it('should return new userInfo data when url path is signup',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/signup');
+      const sampleUserInfo = UserInfo.createDefault();
 
-  it('should not fetch userInfo if it is was fetched before', function() {
-    var sampleUserInfoBackendObject = {
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+    }));
+
+  it('should return new userInfo data when url path is logout',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/logout');
+      const sampleUserInfo = UserInfo.createDefault();
+
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+    }));
+
+  it('should return new userInfo data when url path is login',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/login');
+      const sampleUserInfo = UserInfo.createDefault();
+
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+    }));
+
+  it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
+    // Creating a test user for checking profile picture of user.
+    const sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -119,25 +149,29 @@ describe('User Service', function() {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: true
     };
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    var sampleUserInfo = UserInfo.createFromBackendDict(
-      sampleUserInfoBackendObject as UserInfoBackendDict);
+    const sampleUserInfo = UserInfo.createFromBackendDict(
+      sampleUserInfoBackendObject);
 
-    UserService.getUserInfoAsync().then(function(userInfo) {
+    userService.getUserInfoAsync().then((userInfo) => {
       expect(userInfo).toEqual(sampleUserInfo);
       // Fetch userInfo again.
-      UserService.getUserInfoAsync().then(function(sameUserInfo) {
+      userService.getUserInfoAsync().then((sameUserInfo) => {
         expect(sameUserInfo).toEqual(userInfo);
       });
     });
-    $httpBackend.flush(1);
-  });
+    const req = httpTestingController.expectOne('/userinfohandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfoBackendObject);
 
-  it('should return new userInfo data if user is not logged', function() {
-    var sampleUserInfoBackendObject = {
+    flushMicrotasks();
+  }));
+
+  it('should return new userInfo data if user is not logged', fakeAsync(() => {
+    // Creating a test user for checking profile picture of user.
+    const sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -145,21 +179,24 @@ describe('User Service', function() {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: false
     };
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    var sampleUserInfo = UserInfo.createDefault();
+    const sampleUserInfo = UserInfo.createDefault();
 
-    UserService.getUserInfoAsync().then(function(userInfo) {
+    userService.getUserInfoAsync().then((userInfo) => {
       expect(userInfo).toEqual(sampleUserInfo);
     });
-    $httpBackend.flush();
-  });
+    const req = httpTestingController.expectOne('/userinfohandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfoBackendObject);
 
-  it('should return image data', function() {
+    flushMicrotasks();
+  }));
+
+  it('should return image data', fakeAsync(() => {
     var requestUrl = '/preferenceshandler/profile_picture';
-    // Create a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -168,31 +205,31 @@ describe('User Service', function() {
       can_create_collections: true,
       preferred_site_language_code: null,
       username: 'tester',
+      email: 'test@test.com',
       user_is_logged_in: true
     };
-    $httpBackend.expect('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    $httpBackend.expect('GET', requestUrl).respond(
-      200, {profile_picture_data_url: 'image data'});
 
-    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+    userService.getProfileImageDataUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe('image data');
     });
-    $httpBackend.flush();
 
-    $httpBackend.when('GET', '/userinfohandler').respond(
-      200, sampleUserInfoBackendObject);
-    $httpBackend.when('GET', requestUrl).respond(404);
+    const req1 = httpTestingController.expectOne('/userinfohandler');
+    expect(req1.request.method).toEqual('GET');
+    req1.flush(sampleUserInfoBackendObject);
 
-    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-      expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));
-    });
-    $httpBackend.flush();
-  });
+    flushMicrotasks();
 
-  it('should return the default profile image path when user is not logged',
-    function() {
+    const req2 = httpTestingController.expectOne(requestUrl);
+    expect(req2.request.method).toEqual('GET');
+    req2.flush({profile_picture_data_url: 'image data'});
+
+    flushMicrotasks();
+  }));
+
+  it('should return image data when second GET request returns 404',
+    fakeAsync(() => {
+      var requestUrl = '/preferenceshandler/profile_picture';
+      // Creating a test user for checking profile picture of user.
       var sampleUserInfoBackendObject = {
         is_moderator: false,
         is_admin: false,
@@ -201,95 +238,151 @@ describe('User Service', function() {
         can_create_collections: true,
         preferred_site_language_code: null,
         username: 'tester',
-        user_is_logged_in: false
+        email: 'test@test.com',
+        user_is_logged_in: true
       };
-      $httpBackend.expect('GET', '/userinfohandler').respond(
-        200, sampleUserInfoBackendObject);
 
-      UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-        expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
+      userService.getProfileImageDataUrlAsync().then((dataUrl) => {
+        expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
           '/avatar/user_blue_72px.webp'));
       });
-      $httpBackend.flush();
-    });
+      const req1 = httpTestingController.expectOne('/userinfohandler');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(sampleUserInfoBackendObject);
 
-  it('should return the login url', function() {
-    var loginUrl = '/login';
-    var currentUrl = 'home';
-    $httpBackend.expect('GET', '/url_handler?current_url=' + currentUrl)
-      .respond({login_url: loginUrl});
+      flushMicrotasks();
 
-    UserService.getLoginUrlAsync().then(function(dataUrl) {
+      const req2 = httpTestingController.expectOne(requestUrl);
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(404);
+
+      flushMicrotasks();
+    }));
+
+  it('should return the default profile image path when user is not logged',
+    fakeAsync(() => {
+      // Creating a test user for checking profile picture of user.
+      const sampleUserInfoBackendObject = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: true,
+        preferred_site_language_code: null,
+        username: 'tester',
+        email: 'test@test.com',
+        user_is_logged_in: false
+      };
+
+      userService.getProfileImageDataUrlAsync().then((dataUrl) => {
+        expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.webp'));
+      });
+      const req = httpTestingController.expectOne('/userinfohandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleUserInfoBackendObject);
+
+      flushMicrotasks();
+    }));
+
+  it('should return the login url', fakeAsync(() => {
+    const loginUrl = '/login';
+    const currentUrl = 'home';
+
+    userService.getLoginUrlAsync().then((dataUrl) => {
       expect(dataUrl).toBe(loginUrl);
     });
-    $httpBackend.flush();
-  });
+    const req = httpTestingController.expectOne(
+      '/url_handler?current_url=' + currentUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({login_url: loginUrl});
 
-  it('should set a profile image data url', function() {
-    var newProfileImageDataurl = '/avatar/x.png';
-    $httpBackend.expect('PUT', '/preferenceshandler/data')
-      .respond({profile_picture_data_url: newProfileImageDataurl});
+    flushMicrotasks();
+  }));
 
-    UserService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
-      function(response) {
-        expect(response.data.profile_picture_data_url).toBe(
-          newProfileImageDataurl);
-      }
-    );
-    $httpBackend.flush();
-  });
+  it('should return the login url with the correct return url',
+    fakeAsync(() => {
+      const loginUrl = '/login';
+      const returnUrl = 'home';
 
-  it('should handle when set profile image data url is reject', function() {
-    var newProfileImageDataurl = '/avatar/x.png';
-    var errorMessage = 'It\'s not possible to set a new profile image data';
-    $httpBackend.expect('PUT', '/preferenceshandler/data')
-      .respond(500, errorMessage);
-
-    UserService.setProfileImageDataUrlAsync(newProfileImageDataurl)
-      /* eslint-disable-next-line dot-notation */
-      .catch(function(error) {
-        expect(error.data).toEqual(errorMessage);
+      userService.setReturnUrl(returnUrl);
+      userService.getLoginUrlAsync().then(function(dataUrl) {
+        expect(dataUrl).toBe(loginUrl);
       });
-    $httpBackend.flush();
-  });
+      const req = httpTestingController.expectOne(
+        '/url_handler?current_url=' + returnUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({login_url: loginUrl});
 
-  it('should return user contribution rights data', function() {
-    var sampleUserContributionRightsDict = {
+      flushMicrotasks();
+    }));
+
+  it('should set a profile image data url', fakeAsync(() => {
+    const newProfileImageDataurl = '/avatar/x.png';
+    userService.setProfileImageDataUrlAsync(newProfileImageDataurl);
+    const req = httpTestingController.expectOne('/preferenceshandler/data');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({profile_picture_data_url: newProfileImageDataurl});
+
+    flushMicrotasks();
+  }));
+
+  it('should handle when set profile image data url is reject',
+    fakeAsync(() => {
+      const newProfileImageDataurl = '/avatar/x.png';
+      const errorMessage = 'It\'s not possible to set a new profile image data';
+      userService.setProfileImageDataUrlAsync(newProfileImageDataurl);
+      const req = httpTestingController.expectOne('/preferenceshandler/data');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(errorMessage);
+
+      flushMicrotasks();
+    }));
+
+  it('should return user contribution rights data', fakeAsync(() => {
+    const sampleUserContributionRightsDict = {
       translation: ['hi'],
       voiceover: [],
       question: true
     };
-    $httpBackend.expect('GET', '/usercontributionrightsdatahandler').respond(
-      200, sampleUserContributionRightsDict);
 
-    UserService.getUserContributionRightsData().then(function(
-        userContributionRights) {
-      expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
-    });
-    $httpBackend.flush();
-  });
+    userService.getUserContributionRightsDataAsync().then(
+      (userContributionRights) => {
+        expect(userContributionRights).
+          toEqual(sampleUserContributionRightsDict);
+      });
+    const req = httpTestingController.expectOne(
+      '/usercontributionrightsdatahandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserContributionRightsDict);
 
-  it('should not fetch userContributionRights if it is was fetched before',
-    function() {
-      var sampleUserContributionRightsDict = {
+    flushMicrotasks();
+  }));
+
+  it('should not fetch user contribution rights if it is was fetched before',
+    fakeAsync(() => {
+      const sampleUserContributionRightsDict = {
         translation: ['hi'],
         voiceover: [],
         question: true
       };
-      $httpBackend.expect('GET', '/usercontributionrightsdatahandler').respond(
-        200, sampleUserContributionRightsDict);
 
-      UserService.getUserContributionRightsData().then(
-        function(userContributionRights) {
-          expect(userContributionRights).toEqual(
-            sampleUserContributionRightsDict);
-          // Fetch userContributionRightsInfo again.
-          UserService.getUserContributionRightsData().then(function(
-              sameUserContributionRights) {
+      userService.getUserContributionRightsDataAsync().then(
+        (userContributionRights) => {
+          expect(userContributionRights)
+            .toEqual(sampleUserContributionRightsDict);
+          // Fetch userCommunityRightsInfo again.
+          userService.getUserContributionRightsDataAsync().then((
+              sameUserContributionRights) => {
             expect(sameUserContributionRights).toEqual(
               sampleUserContributionRightsDict);
           });
         });
-      $httpBackend.flush(1);
-    });
+      const req = httpTestingController.expectOne(
+        '/usercontributionrightsdatahandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleUserContributionRightsDict);
+
+      flushMicrotasks();
+    }));
 });

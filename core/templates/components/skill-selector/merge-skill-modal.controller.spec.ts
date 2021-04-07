@@ -16,12 +16,17 @@
  * @fileoverview Unit tests for MergeSkillModalController.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Merge Skill Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var categorizedSkills = [];
   var skill = {};
   var skillSummaries = {};
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -46,14 +51,22 @@ describe('Merge Skill Modal Controller', function() {
       expect($scope.skillSummaries).toBe(skillSummaries);
       expect($scope.categorizedSkills).toBe(categorizedSkills);
       expect($scope.allowSkillsFromOtherTopics).toBe(true);
-      expect($scope.selectedSkillId).toBe('');
+      expect($scope.selectedSkillId).toBe(null);
     });
 
   it('should merge skill on closing modal', function() {
     $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       skill: skill,
-      supersedingSkillId: ''
+      supersedingSkillId: null
     });
+  });
+
+  it('should set new selected skill', function() {
+    $scope.selectedSkillId = '2';
+    expect($scope.selectedSkillId).toBe('2');
+
+    $scope.setSelectedSkillId('1');
+    expect($scope.selectedSkillId).toBe('1');
   });
 });

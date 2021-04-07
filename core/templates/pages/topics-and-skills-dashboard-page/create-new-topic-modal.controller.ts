@@ -26,7 +26,7 @@ require('services/image-local-storage.service.ts');
 import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
-const topicPropertiesConstants = require('constants.ts');
+import topicPropertiesConstants from 'assets/constants';
 
 angular.module('oppia').controller('CreateNewTopicModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',

@@ -1,4 +1,4 @@
-<admin-navbar user-email="$ctrl.userEmail" logout-url="$ctrl.logoutUrl"></admin-navbar>
+<oppia-admin-navbar logout-url="$ctrl.logoutUrl"></oppia-admin-navbar>
 
 <div align="center"
      ng-if="$ctrl.statusMessage"
@@ -8,15 +8,16 @@
 <br>
 
 <div class="oppia-admin-page-tabs-container">
-  <admin-dev-mode-activities-tab ng-if="$ctrl.isActivitiesTabOpen() && $ctrl.inDevMode"
-                                 set-status-message="$ctrl.setStatusMessage">
-  </admin-dev-mode-activities-tab>
-  <admin-prod-mode-activities-tab ng-if="$ctrl.isActivitiesTabOpen() && !$ctrl.inDevMode">
-  </admin-prod-mode-activities-tab>
+  <oppia-admin-dev-mode-activities-tab ng-if="$ctrl.isActivitiesTabOpen() && $ctrl.inDevMode"
+                                       (set-status-message)="$ctrl.setStatusMessage($event)">
+  </oppia-admin-dev-mode-activities-tab>
 
-  <admin-jobs-tab ng-if="$ctrl.isJobsTabOpen()"
-                  set-status-message="$ctrl.setStatusMessage">
-  </admin-jobs-tab>
+  <oppia-admin-prod-mode-activities-tab ng-if="$ctrl.isActivitiesTabOpen() && !$ctrl.inDevMode">
+  </oppia-admin-prod-mode-activities-tab>
+
+  <oppia-admin-jobs-tab ng-if="$ctrl.isJobsTabOpen()"
+                        (set-status-message)="$ctrl.setStatusMessage($event)">
+  </oppia-admin-jobs-tab>
 
   <admin-config-tab ng-if="$ctrl.isConfigTabOpen()"
                     set-status-message="$ctrl.setStatusMessage">
@@ -38,6 +39,11 @@
 <div ng-if="$ctrl.inDevMode" class="oppia-dev-mode">
   Dev Mode
 </div>
+
+<div ng-if="$ctrl.isDummyFeatureEnabled()" class="oppia-dev-mode protractor-test-angularjs-dummy-feature-indicator">
+  AngularJS: Dummy Feature Enabled
+</div>
+
 <style>
   admin-page .oppia-admin-page-tabs-container {
     padding-top: 16px;
@@ -50,5 +56,8 @@
     position: fixed;
     right: 30px;
     z-index: 3000;
+  }
+  admin-page .protractor-test-angularjs-dummy-feature-indicator {
+    bottom: 50px;
   }
 </style>

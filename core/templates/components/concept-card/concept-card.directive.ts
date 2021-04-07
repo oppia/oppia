@@ -61,7 +61,7 @@ angular.module('oppia').directive('conceptCard', [
                 }
               }
             });
-            ConceptCardBackendApiService.loadConceptCards(
+            ConceptCardBackendApiService.loadConceptCardsAsync(
               ctrl.getSkillIds()
             ).then(function(conceptCardObjects) {
               conceptCardObjects.forEach(function(conceptCardObject) {

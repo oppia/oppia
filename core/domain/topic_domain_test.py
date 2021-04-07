@@ -50,8 +50,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
 
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
 
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
@@ -76,7 +76,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             'version': 0,
             'practice_tab_is_displayed': False,
-            'meta_tag_content': ''
+            'meta_tag_content': '',
+            'page_title_fragment_for_web': ''
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -1264,6 +1265,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'uncategorized_skill_count': 1,
             'subtopic_count': 1,
             'total_skill_count': 1,
+            'total_published_node_count': 1,
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
@@ -1272,8 +1274,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', current_time,
-            current_time)
+            1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
+            current_time, current_time)
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic summary passes validation.
@@ -1419,6 +1421,18 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected total_skill_count to be greater than or equal to '
             'uncategorized_skill_count 10, received \'5\'')
+
+    def test_validation_fails_with_invalid_total_published_node_count(self):
+        self.topic_summary.total_published_node_count = '10'
+        self._assert_validation_error(
+            'Expected total published node count to be an integer, '
+            'received \'10\'')
+
+    def test_validation_fails_with_negative_total_published_node_count(self):
+        self.topic_summary.total_published_node_count = -1
+        self._assert_validation_error(
+            'Expected total_published_node_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_subtopic_count(self):
         self.topic_summary.subtopic_count = '10'

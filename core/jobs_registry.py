@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
+from core.domain import auth_jobs_one_off
 from core.domain import collection_jobs_one_off
 from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
@@ -35,7 +36,6 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
-from core.domain import takeout_domain_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
@@ -46,29 +46,40 @@ import python_utils
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
     activity_jobs_one_off.AddContentUserIdsContentJob,
-    activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
+    activity_jobs_one_off.AddMissingCommitLogsOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
+    activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
+    activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
+    auth_jobs_one_off.PopulateFirebaseAccountsOneOffJob,
+    auth_jobs_one_off.SeedFirebaseOneOffJob,
+    auth_jobs_one_off.SyncFirebaseAccountsOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
+    collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob,
+    collection_jobs_one_off.RemoveCollectionModelNodesOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob,
+    exp_jobs_one_off.RemoveDeprecatedExplorationRightsModelFieldsOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
     exp_jobs_one_off.ExplorationMigrationAuditJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationRteMathContentValidationOneOffJob,
+    exp_jobs_one_off.ExpSnapshotsMigrationAuditJob,
+    exp_jobs_one_off.ExpSnapshotsMigrationJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
-    exp_jobs_one_off.PopulateXmlnsAttributeInExplorationMathSvgImagesJob,
+    exp_jobs_one_off.RatioTermsAuditOneOffJob,
     exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
-    exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     exp_jobs_one_off.XmlnsAttributeInExplorationMathSvgImagesAuditJob,
     exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
     exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
+    exp_jobs_one_off.ExpSnapshotsDeletionJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
     feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
@@ -80,11 +91,16 @@ ONE_OFF_JOB_MANAGERS = [
         .InteractionCustomizationArgsValidationOneOffJob),
     interaction_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob,
+    interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+    (
+        opportunity_jobs_one_off.
+        RenameExplorationOpportunitySummaryModelPropertiesJob),
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
-    question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,
+    question_jobs_one_off.QuestionSnapshotsMigrationAuditJob,
+    question_jobs_one_off.QuestionSnapshotsMigrationJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
@@ -101,20 +117,22 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
     stats_jobs_one_off.StatisticsCustomizationArgsAudit,
-    story_jobs_one_off.DeleteOrphanStoriesOneOffJob,
+    stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
+    story_jobs_one_off.DescriptionLengthAuditOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
-    story_jobs_one_off.OrphanStoriesAuditJob,
-    suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
+    story_jobs_one_off.DeleteStoryCommitLogsOneOffJob,
+    suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,
+    suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
+    suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
-    suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
-    takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
+    topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob,
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
-    user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
+    user_jobs_one_off.CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
@@ -122,18 +140,28 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.RemoveGaeUserIdOneOffJob,
-    user_jobs_one_off.RemoveGaeIdOneOffJob,
+    user_jobs_one_off.RemoveActivityIDsOneOffJob,
+    user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob,
     user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob,
     user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
     user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
+    user_jobs_one_off.DiscardOldDraftsOneOffJob,
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
+    user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
+    user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
+    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob,
+    user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
+    user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
+    user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
 # to show controls on the admin dashboard.
 AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.AppFeedbackReportModelAuditOneOffJob,
+    prod_validation_jobs_one_off.AppFeedbackReportTicketModelAuditOneOffJob,
+    prod_validation_jobs_one_off.AppFeedbackReportStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
@@ -163,6 +191,7 @@ AUDIT_JOB_MANAGERS = [
     ),
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
     prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob,
+    prod_validation_jobs_one_off.DeletedUsernameModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
@@ -186,6 +215,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
         .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
@@ -247,7 +277,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .TrainingJobExplorationMappingModelAuditOneOffJob
+        .StateTrainingJobsMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
@@ -256,6 +286,8 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserContributionProficiencyModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserIdByFirebaseAuthIdModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FirebaseSeedModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,
     prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserRecentChangesBatchModelAuditOneOffJob,

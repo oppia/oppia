@@ -31,6 +31,7 @@ export class SubtopicsListComponent {
   @Input() subtopicsList: Subtopic[];
   @Input() topicId: string;
   @Input() topicUrlFragment: string;
+  @Input() topicName: string;
   constructor() {}
 }
 

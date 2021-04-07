@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for SelectSkillModalController.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Select Skill Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -33,6 +37,7 @@ describe('Select Skill Modal Controller', function() {
   }, {
     id: '3'
   }];
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -72,5 +77,13 @@ describe('Select Skill Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       id: '2'
     });
+  });
+
+  it('should set new selected skill', function() {
+    $scope.selectedSkillId = '2';
+    expect($scope.selectedSkillId).toBe('2');
+
+    $scope.setSelectedSkillId('1');
+    expect($scope.selectedSkillId).toBe('1');
   });
 });

@@ -15,7 +15,7 @@
 /**
  * @fileoverview Component for the Social Sharing Links.
  */
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -42,6 +42,7 @@ export class SharingLinksComponent implements OnInit {
   @Input() smallFont: boolean;
   classroomUrl: string;
   activityId: string;
+  activityUrlFragment: string;
   serverName: string;
   escapedTwitterText: string;
 
@@ -54,8 +55,10 @@ export class SharingLinksComponent implements OnInit {
   ngOnInit(): void {
     if (this.shareType === 'exploration') {
       this.activityId = this.explorationId;
+      this.activityUrlFragment = 'explore';
     } else if (this.shareType === 'collection') {
       this.activityId = this.collectionId;
+      this.activityUrlFragment = 'collection';
     } else {
       throw new Error(
         'SharingLinks directive can only be used either in the' +
@@ -84,15 +87,15 @@ export class SharingLinksComponent implements OnInit {
 
   getUrl(network: SharingPlatform): string {
     if (network === 'facebook') {
-      return `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=${this.serverName}/${this.shareType}/${this.activityId}&display=popup&ref=plugin&src=share_button`;
+      return `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=${this.serverName}/${this.activityUrlFragment}/${this.activityId}&display=popup&ref=plugin&src=share_button`;
     }
 
     if (network === 'twitter') {
-      return `https://twitter.com/share?text=${this.escapedTwitterText}&url=${this.serverName}/${this.shareType}/${this.activityId}`;
+      return `https://twitter.com/share?text=${this.escapedTwitterText}&url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
     }
 
     if (network === 'classroom') {
-      return `https://classroom.google.com/share?url=${this.serverName}/${this.shareType}/${this.activityId}`;
+      return `https://classroom.google.com/share?url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
     }
   }
 

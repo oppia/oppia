@@ -17,15 +17,12 @@
  */
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
-const constants = require('constants.ts');
-
 describe('State Object Factory', () => {
-  let sof;
-  let stateObject;
-  const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
+  let sof: StateObjectFactory;
+  let stateObject: StateBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -33,7 +30,7 @@ describe('State Object Factory', () => {
     });
     sof = TestBed.get(StateObjectFactory);
 
-    stateObject = {
+    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
         html: '',
@@ -80,14 +77,14 @@ describe('State Object Factory', () => {
       written_translations: {
         translations_mapping: {
           content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
         }
       }
-    };
-  });
+    });
 
-  beforeAll(() => {
-    constants.NEW_STATE_TEMPLATE = {
+    stateObject = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -134,14 +131,12 @@ describe('State Object Factory', () => {
       written_translations: {
         translations_mapping: {
           content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
         }
       }
     };
-  });
-
-  afterAll(() => {
-    constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
   });
 
   it('should create a new state object from backend dict', () => {
@@ -196,5 +191,26 @@ describe('State Object Factory', () => {
 
     expect(stateObjectDefault).toEqual(otherState);
     expect(stateObjectDefault.name).toEqual('Other state');
+  });
+
+  it('should correctly get required written translation content ids', () => {
+    const state = sof.createFromBackendDict('State name', stateObject);
+    state.interaction.id = null;
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'rule_input_2']));
+
+    state.writtenTranslations.addContentId('feedback_1');
+    state.writtenTranslations.addWrittenTranslation(
+      'feedback_1', 'fr', 'html', '<p>Translation</p>');
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'rule_input_2', 'feedback_1']));
+
+    state.interaction.id = 'TextInput';
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set([
+      'content', 'rule_input_2', 'feedback_1', 'hint_1', 'default_outcome']));
   });
 });

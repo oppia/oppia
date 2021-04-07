@@ -31,8 +31,14 @@ You can also append the following options to the above command:
         core/controllers directory. (You can change "core/controllers" to any
         valid subdirectory path.)
 
+    --test_shard=1 runs all tests in shard 1.
+
     --generate_coverage_report generates a coverage report as part of the final
         test output (but it makes the tests slower).
+
+    --ignore_coverage only has an affect when --generate_coverage_report
+        is specified. In that case, the tests will not fail just because
+        code coverage is not 100%.
 
 Note: If you've made some changes and tests are failing to run at all, this
 might mean that you have introduced a circular dependency (e.g. module A
@@ -46,6 +52,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import importlib
 import inspect
+import json
 import multiprocessing
 import os
 import re
@@ -65,21 +72,6 @@ import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-i
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION),
-
-    os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'grpcio-%s' % common.GRPCIO_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
-    os.path.join(
-        common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
-    os.path.join(
-        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
-    common.CURR_DIR
-]
-
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
     'coverage-%s' % common.COVERAGE_VERSION)
@@ -90,13 +82,20 @@ COVERAGE_MODULE_PATH = os.path.join(
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+# This path points to a JSON file that defines which modules belong to
+# each shard.
+SHARDS_SPEC_PATH = os.path.join(
+    os.getcwd(), 'scripts', 'backend_test_shards.json')
+SHARDS_WIKI_LINK = (
+    'https://github.com/oppia/oppia/wiki/Writing-backend-tests#common-errors')
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 _PARSER = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
-IMPORTANT: Only one of --test_path and --test_target should be specified.
+IMPORTANT: Only one of --test_path,  --test_target, and --test_shard
+should be specified.
 """)
 
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
@@ -108,9 +107,17 @@ _EXCLUSIVE_GROUP.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
     type=python_utils.UNICODE)
+_EXCLUSIVE_GROUP.add_argument(
+    '--test_shard',
+    help='optional name of shard to run',
+    type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
+    action='store_true')
+_PARSER.add_argument(
+    '--ignore_coverage',
+    help='optional; if specified, tests will not fail due to coverage',
     action='store_true')
 _PARSER.add_argument(
     '--exclude_load_tests',
@@ -175,7 +182,7 @@ class TestingTaskSpec(python_utils.OBJECT):
             None, None, None, [result])]
 
 
-def _get_all_test_targets(test_path=None, include_load_tests=True):
+def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -227,11 +234,69 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
+def _get_all_test_targets_from_shard(shard_name):
+    """Find all test modules in a shard.
+
+    Args:
+        shard_name: str. The name of the shard.
+
+    Returns:
+        list(str). The dotted module names that belong to the shard.
+    """
+    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+        shards_spec = json.load(shards_file)
+    return shards_spec[shard_name]
+
+
+def _check_shards_match_tests(include_load_tests=True):
+    """Check whether the test shards match the tests that exist.
+
+    Args:
+        include_load_tests: bool. Whether to include load tests.
+
+    Returns:
+        str. A description of any problems found, or an empty string if
+        the shards match the tests.
+    """
+    with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+        shards_spec = json.load(shards_file)
+    shard_modules = sorted([
+        module for shard in shards_spec.values() for module in shard])
+    test_classes = _get_all_test_targets_from_path(
+        include_load_tests=include_load_tests)
+    test_modules_set = set()
+    for test_class in test_classes:
+        last_dot_index = test_class.rfind('.')
+        module_name = test_class[:last_dot_index]
+        test_modules_set.add(module_name)
+    test_modules = sorted(test_modules_set)
+    if test_modules == shard_modules:
+        return ''
+    if len(set(shard_modules)) != len(shard_modules):
+        # A module is duplicated, so we find the duplicate.
+        for module in shard_modules:
+            if shard_modules.count(module) != 1:
+                return '{} duplicated in {}'.format(
+                    module, SHARDS_SPEC_PATH)
+        raise Exception('Failed to find  module duplicated in shards.')
+    # Since there are no duplicates among the shards, we know the
+    # problem must be a module in one list but not the other.
+    shard_modules_set = set(shard_modules)
+    shard_extra = shard_modules_set - test_modules_set
+    if shard_extra:
+        return 'Modules {} in shards not found. See {}.'.format(
+            shard_extra, SHARDS_WIKI_LINK)
+    test_extra = test_modules_set - shard_modules_set
+    assert test_extra
+    return 'Modules {} not in shards. See {}.'.format(
+        test_extra, SHARDS_WIKI_LINK)
+
+
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    for directory in DIRS_TO_ADD_TO_SYS_PATH:
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
 
@@ -259,9 +324,17 @@ def main(args=None):
 
         os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
-    if parsed_args.test_target and parsed_args.test_path:
+    test_specs_provided = sum([
+        1 if argument else 0
+        for argument in (
+            parsed_args.test_target, parsed_args.test_path,
+            parsed_args.test_shard)
+    ])
+
+    if test_specs_provided > 1:
         raise Exception(
-            'At most one of test_path and test_target should be specified.')
+            'At most one of test_path, test_target and test_shard may '
+            'be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
@@ -282,9 +355,16 @@ def main(args=None):
             time.sleep(3)
             python_utils.PRINT('Redirecting to its corresponding test file...')
             all_test_targets = [parsed_args.test_target + '_test']
+    elif parsed_args.test_shard:
+        validation_error = _check_shards_match_tests(
+            include_load_tests=False)
+        if validation_error:
+            raise Exception(validation_error)
+        all_test_targets = _get_all_test_targets_from_shard(
+            parsed_args.test_shard)
     else:
         include_load_tests = not parsed_args.exclude_load_tests
-        all_test_targets = _get_all_test_targets(
+        all_test_targets = _get_all_test_targets_from_path(
             test_path=parsed_args.test_path,
             include_load_tests=include_load_tests)
 
@@ -419,7 +499,8 @@ def main(args=None):
 
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
-        if coverage_result.group('total') != '100':
+        if (coverage_result.group('total') != '100'
+                and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
 
     python_utils.PRINT('')

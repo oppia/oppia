@@ -24,7 +24,6 @@ from core.domain import caching_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-from core.domain import user_services
 from core.tests import test_utils
 import utils
 
@@ -117,19 +116,17 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client(
                 {
-                    'client_type': 'Android',
+                    'platform_type': 'Android',
                     'browser_type': None,
                     'app_version': '1.0.0',
-                    'user_locale': 'en',
                 }
             )
             self.assertEqual(
                 context.server_mode,
                 platform_parameter_domain.FEATURE_STAGES.dev)
-            self.assertEqual(context.client_type, 'Android')
+            self.assertEqual(context.platform_type, 'Android')
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
-            self.assertEqual(context.user_locale, 'en')
 
     def test_get_all_feature_flag_dicts_returns_correct_dicts(self):
         expected_dicts = [
@@ -143,10 +140,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_values_in_dev_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client({
-                'client_type': 'Android',
+                'platform_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             })
             self.assertEqual(
                 feature_services.evaluate_all_feature_flag_values_for_client(
@@ -159,10 +155,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_values_in_prod_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', False):
             context = feature_services.create_evaluation_context_for_client({
-                'client_type': 'Android',
+                'platform_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             })
             self.assertEqual(
                 feature_services.evaluate_all_feature_flag_values_for_client(
@@ -210,7 +205,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             ],
                         },
                         {
-                            'type': 'client_type',
+                            'type': 'platform_type',
                             'conditions': [
                                 [
                                     '=',
@@ -225,115 +220,6 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         )
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
-
-    def test_evaluate_feature_for_prod_server_no_user_defaults_match_to_en_lang(
-            self):
-        registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules',
-            [
-                {
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain.SERVER_MODES.prod
-                                ]
-                            ],
-                        },
-                        {
-                            'type': 'user_locale',
-                            'conditions': [
-                                [
-                                    '=',
-                                    'en'
-                                ]
-                            ],
-                        }
-                    ],
-                    'value_when_matched': True
-                }
-            ]
-        )
-        with self.swap(constants, 'DEV_MODE', False):
-            self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
-
-    def test_evaluate_feature_for_en_user_defaults_match_to_en_lang(
-            self):
-        user_services.update_preferred_site_language_code(self.user_id, 'en')
-        self.login(self.OWNER_EMAIL)
-        registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules',
-            [
-                {
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain.SERVER_MODES.prod
-                                ]
-                            ],
-                        },
-                        {
-                            'type': 'user_locale',
-                            'conditions': [
-                                [
-                                    '=',
-                                    'en'
-                                ]
-                            ],
-                        }
-                    ],
-                    'value_when_matched': True
-                }
-            ]
-        )
-        with self.swap(constants, 'DEV_MODE', False):
-            self.assertTrue(
-                feature_services.is_feature_enabled(self.prod_feature.name))
-
-    def test_evaluate_feature_for_fr_user_defaults_does_not_match_to_en_lang(
-            self):
-        user_services.update_preferred_site_language_code(self.user_id, 'fr')
-        self.login(self.OWNER_EMAIL)
-        registry.Registry.update_platform_parameter(
-            self.prod_feature.name, self.user_id, 'edit rules',
-            [
-                {
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain.SERVER_MODES.prod
-                                ]
-                            ],
-                        },
-                        {
-                            'type': 'user_locale',
-                            'conditions': [
-                                [
-                                    '=',
-                                    'en'
-                                ]
-                            ],
-                        }
-                    ],
-                    'value_when_matched': True
-                }
-            ]
-        )
-        # Since the feature is only enable for users who have French selected as
-        # their preferred site language code, the feature shouldn't be enabled
-        # for the current logged in user.
-        with self.swap(constants, 'DEV_MODE', False):
-            self.assertFalse(
                 feature_services.is_feature_enabled(self.prod_feature.name))
 
     def test_get_feature_flag_values_with_unknown_name_raises_error(self):
@@ -386,8 +272,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     {
                         'filters': [
                             {
-                                'type': 'user_locale',
-                                'conditions': [['=', 'en']]
+                                'type': 'app_version',
+                                'conditions': [['=', '1.2.3']]
                             }
                         ],
                         'value_when_matched': True

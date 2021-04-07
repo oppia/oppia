@@ -19,17 +19,13 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Subtopic editor tab', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   var ctrl = null;
   var skillSummary = null;
   var TopicEditorStateService = null;
@@ -61,7 +57,7 @@ describe('Subtopic editor tab', function() {
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
-      fetchTotalQuestionCountForSkillIds: () => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIdsAsync: () => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');

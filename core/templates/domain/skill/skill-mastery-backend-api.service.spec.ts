@@ -73,7 +73,7 @@ describe('Skill mastery backend API service', () => {
       let requestUrl = '/skill_mastery_handler/data' +
         '?comma_separated_skill_ids=skillId1,skillId2';
 
-      skillMasteryBackendApiService.fetchSkillMasteryDegrees(
+      skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
         ['skillId1', 'skillId2']).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(requestUrl);
@@ -95,7 +95,7 @@ describe('Skill mastery backend API service', () => {
       let requestUrl = '/skill_mastery_handler/data' +
         '?comma_separated_skill_ids=skillId1,skillId2';
 
-      skillMasteryBackendApiService.fetchSkillMasteryDegrees(
+      skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
         ['skillId1', 'skillId2']).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(requestUrl);
@@ -117,7 +117,7 @@ describe('Skill mastery backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      skillMasteryBackendApiService.updateSkillMasteryDegrees(
+      skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
         masteryPerSkillMapping).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -136,7 +136,7 @@ describe('Skill mastery backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      skillMasteryBackendApiService.updateSkillMasteryDegrees(
+      skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
         masteryPerSkillMapping).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(

@@ -30,8 +30,11 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import main_cron
 import python_utils
 import utils
+
+import webtest
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -161,14 +164,14 @@ class UserContributionsTests(test_utils.GenericTestBase):
         # a single exploration shows 1 created and 1 edited exploration.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-        user_a = user_services.UserActionsInfo(user_a_id)
+        user_a = user_services.get_user_actions_info(user_a_id)
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
+        self.process_and_flush_pending_mapreduce_tasks()
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
-
         self.assertEqual(len(
             response_dict['created_exp_summary_dicts']), 1)
         self.assertEqual(len(
@@ -188,7 +191,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
 
         self.signup(self.EMAIL_B, self.USERNAME_B)
         user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-        user_a = user_services.UserActionsInfo(user_a_id)
+        user_a = user_services.get_user_actions_info(user_a_id)
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
@@ -199,6 +202,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
                 'property_name': 'objective',
                 'new_value': 'the objective'
             })], 'Test edit')
+        self.process_and_flush_pending_tasks()
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)
@@ -731,7 +735,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
         user_services.create_new_user(
-            self.get_gae_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
+            self.get_auth_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -816,6 +820,75 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
             self.delete_json('/delete-account-handler', expected_status_int=404)
 
 
+class DeleteAccountTests(test_utils.GenericTestBase):
+    """Integration tests for the account deletion."""
+
+    def setUp(self):
+        super(DeleteAccountTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        self.enable_deletion_swap = (
+            self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True))
+        self.testapp_swap_1 = self.swap(
+            self, 'testapp', webtest.TestApp(main_cron.app))
+        self.testapp_swap_2 = self.swap(
+            self, 'testapp', webtest.TestApp(main_cron.app))
+
+    def _run_account_deletion(self):
+        """Execute complete deletion for the user that is logged in."""
+        with self.enable_deletion_swap:
+            data = self.delete_json('/delete-account-handler')
+            self.assertEqual(data, {'success': True})
+
+        self.logout()
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        with self.testapp_swap_1:
+            self.get_html_response('/cron/users/user_deletion')
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        with self.testapp_swap_2:
+            self.get_html_response('/cron/users/fully_complete_user_deletion')
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.logout()
+
+    def test_delete_account_without_activities(self):
+        self._run_account_deletion()
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.editor_id))
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
+        self.assertIsNotNone(
+            user_models.DeletedUserModel.get_by_id(self.editor_id))
+
+    def test_new_signup_after_deleting_account(self):
+        self._run_account_deletion()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.assertNotEqual(
+            self.editor_id, self.get_user_id_from_email(self.EDITOR_EMAIL))
+
+    def test_delete_account_with_activities(self):
+        self.save_new_valid_collection('col_id', self.editor_id)
+        self.save_new_valid_exploration('exp_id', self.editor_id)
+        self.save_new_topic('topic_id', self.editor_id)
+        self.save_new_skill('skill_id', self.editor_id)
+        self.save_new_story('story_id', self.editor_id, 'topic_id')
+        self.save_new_subtopic('subtopic_id', self.editor_id, 'topic_id')
+
+        self._run_account_deletion()
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.editor_id))
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
+        self.assertIsNotNone(
+            user_models.DeletedUserModel.get_by_id(self.editor_id))
+
+
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
@@ -829,7 +902,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             id=self.get_user_id_from_email(self.EDITOR_EMAIL),
             creator_ids=[],
             collection_ids=[],
-            activity_ids=[],
+            exploration_ids=[],
             general_feedback_thread_ids=[]).put()
 
     def test_export_account_handler(self):
@@ -892,6 +965,69 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 ]
             )
 
+    def test_data_does_not_export_if_user_id_leaked(self):
+        # Update user settings to constants.
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(user_id)
+        user_settings.last_agreed_to_terms = self.GENERIC_DATE
+        user_settings.last_logged_in = self.GENERIC_DATE
+
+        # For testing, set the user_settings.username to the user_id.
+        user_settings.username = user_settings.user_id
+
+        user_settings.validate()
+        user_models.UserSettingsModel(
+            id=user_settings.user_id,
+            email=user_settings.email,
+            role=user_settings.role,
+            username=user_settings.username,
+            normalized_username=user_settings.normalized_username,
+            last_agreed_to_terms=user_settings.last_agreed_to_terms,
+            last_started_state_editor_tutorial=(
+                user_settings.last_started_state_editor_tutorial),
+            last_started_state_translation_tutorial=(
+                user_settings.last_started_state_translation_tutorial),
+            last_logged_in=user_settings.last_logged_in,
+            last_edited_an_exploration=user_settings.last_edited_an_exploration,
+            last_created_an_exploration=(
+                user_settings.last_created_an_exploration),
+            profile_picture_data_url=user_settings.profile_picture_data_url,
+            default_dashboard=user_settings.default_dashboard,
+            creator_dashboard_display_pref=(
+                user_settings.creator_dashboard_display_pref),
+            user_bio=user_settings.user_bio,
+            subject_interests=user_settings.subject_interests,
+            first_contribution_msec=user_settings.first_contribution_msec,
+            preferred_language_codes=user_settings.preferred_language_codes,
+            preferred_site_language_code=(
+                user_settings.preferred_site_language_code),
+            preferred_audio_language_code=(
+                user_settings.preferred_audio_language_code),
+            deleted=user_settings.deleted
+        ).put()
+
+        constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
+        time_swap = self.swap(
+            user_services, 'record_user_logged_in', lambda *args: None)
+
+        with constants_swap, time_swap:
+            data = self.get_custom_response(
+                '/export-account-handler', 'text/plain')
+
+            # Check downloaded zip file.
+            filename = 'oppia_takeout_data.zip'
+            self.assertEqual(
+                data.headers['Content-Disposition'],
+                'attachment; filename=%s' % filename)
+            zf_saved = zipfile.ZipFile(
+                python_utils.string_io(buffer_value=data.body))
+            self.assertEqual(
+                zf_saved.namelist(),
+                [
+                    'oppia_takeout_data.json',
+                ]
+            )
+
     def test_export_account_handler_disabled_logged_in(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
             self.get_json('/export-account-handler', expected_status_int=404)
@@ -926,7 +1062,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         self.signup('abc@example.com', 'abc')
 
         user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
+            self.get_auth_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 

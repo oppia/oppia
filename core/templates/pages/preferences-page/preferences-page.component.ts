@@ -21,7 +21,7 @@ require('cropperjs/dist/cropper.min.css');
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
@@ -33,6 +33,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/prevent-page-unload-event.service.ts');
 require('services/user.service.ts');
 require('services/utils.service.ts');
 
@@ -45,17 +46,18 @@ angular.module('oppia').component('preferencesPage', {
   },
   template: require('./preferences-page.component.html'),
   controller: [
-    '$http', '$q', '$timeout', '$translate', '$uibModal', '$window',
-    'AlertsService', 'I18nLanguageCodeService',
-    'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
-    'UserService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
+    '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
+    '$window', 'AlertsService', 'I18nLanguageCodeService',
+    'LanguageUtilService', 'LoaderService', 'PreventPageUnloadEventService',
+    'UrlInterpolationService', 'UserService',
+    'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
     'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
-    'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
-    function(
-        $http, $q, $timeout, $translate, $uibModal, $window,
-        AlertsService, I18nLanguageCodeService,
-        LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
+    'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES', function(
+        $http, $q, $rootScope, $timeout, $translate, $uibModal,
+        $window, AlertsService, I18nLanguageCodeService,
+        LanguageUtilService, LoaderService, PreventPageUnloadEventService,
+        UrlInterpolationService, UserService,
+        DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
         ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
         SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
@@ -65,10 +67,14 @@ angular.module('oppia').component('preferencesPage', {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       var _saveDataItem = function(updateType, data) {
+        PreventPageUnloadEventService.addListener();
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
-        }).then(() => AlertsService.addInfoMessage('Saved!', 1000));
+        }).then(() => {
+          PreventPageUnloadEventService.removeListener();
+          AlertsService.addInfoMessage('Saved!', 1000);
+        });
       };
 
       // Select2 dropdown cannot automatically refresh its display
@@ -84,6 +90,10 @@ angular.module('oppia').component('preferencesPage', {
 
       ctrl.saveUserBio = function(userBio) {
         _saveDataItem('user_bio', userBio);
+      };
+
+      ctrl.registerBioChanged = function() {
+        PreventPageUnloadEventService.addListener();
       };
 
       ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
@@ -180,6 +190,9 @@ angular.module('oppia').component('preferencesPage', {
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           ctrl.email = userInfo.getEmail();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(

@@ -23,8 +23,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class AngularNameService {
+  /**
+   * Static type variable to store angular name.
+   */
   static angularName: string;
 
+  /**
+   * Gets the name of interaction rules service after
+   * the IDs have been mapped to angular names.
+   * @param interactionId - The interaction id.
+   * @returns - The angular name after mapping with ID is done.
+   */
   getNameOfInteractionRulesService(interactionId: string): string {
     AngularNameService.angularName = interactionId.charAt(0) +
     interactionId.slice(1) + 'RulesService';

@@ -34,13 +34,13 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
-  'AssetsBackendApiService', 'ContextService',
+  '$rootScope', 'AssetsBackendApiService', 'ContextService',
   'ImageClickInputRulesService', 'ImagePreloaderService',
   'InteractionAttributesExtractorService', 'PlayerPositionService',
   'UrlInterpolationService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'LOADING_INDICATOR_URL',
   function(
-      AssetsBackendApiService, ContextService,
+      $rootScope, AssetsBackendApiService, ContextService,
       ImageClickInputRulesService, ImagePreloaderService,
       InteractionAttributesExtractorService, PlayerPositionService,
       UrlInterpolationService, EXPLORATION_EDITOR_TAB_CONTEXT,
@@ -185,9 +185,11 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
                     ctrl.isTryAgainShown = false;
                     ctrl.isLoadingIndicatorShown = false;
                     ctrl.imageUrl = objectUrl;
+                    $rootScope.$applyAsync();
                   }, function() {
                     ctrl.isTryAgainShown = true;
                     ctrl.isLoadingIndicatorShown = false;
+                    $rootScope.$applyAsync();
                   });
               };
               ctrl.loadImage();

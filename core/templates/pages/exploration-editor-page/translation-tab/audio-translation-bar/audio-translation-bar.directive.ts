@@ -19,8 +19,6 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require(
-  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
 require('filters/format-timer.filter.ts');
 require(
   'pages/exploration-editor-page/translation-tab/modal-templates/' +
@@ -76,11 +74,11 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
-  'UrlInterpolationService', 'UserExplorationPermissionsService',
-  'UserService',
+  '$rootScope', 'UrlInterpolationService',
+  'UserExplorationPermissionsService', 'UserService',
   function(
-      UrlInterpolationService, UserExplorationPermissionsService,
-      UserService) {
+      $rootScope, UrlInterpolationService,
+      UserExplorationPermissionsService, UserService) {
     return {
       restrict: 'E',
       scope: {
@@ -99,6 +97,9 @@ angular.module('oppia').directive('audioTranslationBar', [
             scope.dropAreaIsAccessible = permissions.canVoiceover;
             scope.userIsGuest = !userIsLoggedIn;
             scope.$digest();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
             return false;
           });
         });

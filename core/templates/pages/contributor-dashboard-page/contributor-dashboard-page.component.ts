@@ -38,7 +38,7 @@ require(
 require(
   'pages/contributor-dashboard-page/voiceover-opportunities/' +
   'voiceover-opportunities.component.ts');
-
+require('services/stateful/focus-manager.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/local-storage.service.ts');
@@ -51,15 +51,17 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
+    '$rootScope', '$timeout', '$window', 'FocusManagerService',
     'LanguageUtilService', 'LocalStorageService',
-    'TranslationLanguageService', 'UrlInterpolationService', 'UserService',
-    'CONTRIBUTOR_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
-    'OPPIA_AVATAR_LINK_URL',
+    'TranslationLanguageService', 'UrlInterpolationService',
+    'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
+    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
+        $rootScope, $timeout, $window, FocusManagerService,
         LanguageUtilService, LocalStorageService,
-        TranslationLanguageService, UrlInterpolationService, UserService,
-        CONTRIBUTOR_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_LANGUAGE_CODE,
-        OPPIA_AVATAR_LINK_URL) {
+        TranslationLanguageService, UrlInterpolationService,
+        UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
+        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
       var prevSelectedLanguageCode = (
@@ -89,9 +91,26 @@ angular.module('oppia').component('contributorDashboardPage', {
         return (
           activeTabDetail.customizationOptions.indexOf('language') !== -1);
       };
+
       ctrl.onTabClick = function(activeTabName) {
         ctrl.activeTabName = activeTabName;
+        // The $timeout is required because at execution time,
+        // the element may not be present in the DOM yet. Thus, it ensures
+        // that the element is visible before focusing.
+        if (ctrl.activeTabName === 'translateTextTab') {
+          $timeout(() => {
+            ctrl.addFocusWithoutScroll('selectLangDropDown');
+          }, 0);
+        }
       };
+
+      ctrl.addFocusWithoutScroll = function(label) {
+        FocusManagerService.setFocus(label);
+        $timeout(function() {
+          $window.scrollTo(0, 0);
+        }, 5);
+      };
+
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = null;
         ctrl.username = null;
@@ -101,12 +120,32 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
+        ctrl.defaultHeaderVisible = true;
 
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
+        WindowRef.nativeWindow.addEventListener('scroll', function() {
+          ctrl.scrollFunction();
         });
 
-        UserService.getUserContributionRightsData().then(
+        ctrl.scrollFunction = function() {
+          if (WindowRef.nativeWindow.pageYOffset >= 5) {
+            ctrl.defaultHeaderVisible = false;
+          } else {
+            ctrl.defaultHeaderVisible = true;
+          }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
+        };
+
+        UserService.getProfileImageDataUrlAsync().then(
+          function(dataUrl) {
+            ctrl.profilePictureDataUrl = dataUrl;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
+          });
+
+        UserService.getUserContributionRightsDataAsync().then(
           function(userContributionRights) {
             ctrl.userCanReviewTranslationSuggestionsInLanguages = (
               getLanguageDescriptions(
@@ -127,6 +166,12 @@ angular.module('oppia').component('contributorDashboardPage', {
               ctrl.userCanReviewVoiceoverSuggestionsInLanguages
                 .length > 0 ||
               ctrl.userCanReviewQuestions);
+
+            ctrl.tabsDetails.submitQuestionTab.enabled = (
+              userContributionRights.can_suggest_questions);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           });
 
         UserService.getUserInfoAsync().then(function(userInfo) {
@@ -138,6 +183,9 @@ angular.module('oppia').component('contributorDashboardPage', {
             ctrl.userIsLoggedIn = false;
             ctrl.username = '';
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         ctrl.languageCode = (

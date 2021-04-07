@@ -26,11 +26,27 @@ from core import jobs
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
-from core.domain import topic_fetchers
 from core.platform import models
 import feconf
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
+
+
+class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates description length"""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(model_instance):
+        if len(model_instance.description) > 1000:
+            yield (model_instance.corresponding_topic_id, model_instance.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield ('Topic Id: %s' % key, 'Story Id: %s' % values)
 
 
 class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -60,6 +76,8 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         story = story_fetchers.get_story_by_id(item.id)
         try:
             story.validate()
+            story_services.validate_prerequisite_skills_in_story_contents(
+                story.corresponding_topic_id, story.story_contents)
         except Exception as e:
             logging.error(
                 'Story %s failed validation: %s' % (item.id, e))
@@ -134,85 +152,21 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class DeleteOrphanStoriesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to delete orphaned Story models and associated Summary
-    models.
-    """
-
-    _DELETED_KEY = 'story_deleted'
-    _ERROR_KEY = 'story_errored'
-    _SKIPPED_KEY = 'story_skipped'
-    _PROCESSED_KEY = 'successfully_deleted_stories'
+class DeleteStoryCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to delete unneeded story commit logs."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [story_models.StoryModel]
+        return [story_models.StoryCommitLogEntryModel]
 
     @staticmethod
-    def map(item):
-        if item.deleted:
-            yield (DeleteOrphanStoriesOneOffJob._DELETED_KEY, 1)
-            return
-
-        topic = topic_fetchers.get_topic_by_id(
-            item.corresponding_topic_id, strict=False)
-        if topic is None or item.id not in topic.get_canonical_story_ids():
-            try:
-                story_services.delete_story(
-                    feconf.SYSTEM_COMMITTER_ID, item.id)
-                yield (DeleteOrphanStoriesOneOffJob._PROCESSED_KEY, item.id)
-                return
-            except Exception as e:
-                yield (
-                    DeleteOrphanStoriesOneOffJob._ERROR_KEY,
-                    'Deletion of story %s failed: %s' % (item.id, e))
-                return
-
-        yield (DeleteOrphanStoriesOneOffJob._SKIPPED_KEY, 1)
+    def map(model):
+        if story_models.StoryModel.get(model.story_id, strict=False) is None:
+            model.delete()
+            yield ('SUCCESS_DELETED', model.story_id)
+        else:
+            yield ('SUCCESS_NO_ACTION', model.story_id)
 
     @staticmethod
     def reduce(key, values):
-        if key == DeleteOrphanStoriesOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == DeleteOrphanStoriesOneOffJob._SKIPPED_KEY:
-            yield (key, ['Skipped %d valid stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)
-
-
-class OrphanStoriesAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """An audit job that outputs story ids of orphaned Story models."""
-
-    _DELETED_KEY = 'story_deleted'
-    _SKIPPED_KEY = 'story_skipped'
-    _SEEN_KEY = 'orphaned_story_ids'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            yield (OrphanStoriesAuditJob._DELETED_KEY, 1)
-            return
-
-        topic = topic_fetchers.get_topic_by_id(
-            item.corresponding_topic_id, strict=False)
-        if topic is None or item.id not in topic.get_canonical_story_ids():
-            yield (OrphanStoriesAuditJob._SEEN_KEY, item.id)
-            return
-        yield (OrphanStoriesAuditJob._SKIPPED_KEY, 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == OrphanStoriesAuditJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == OrphanStoriesAuditJob._SKIPPED_KEY:
-            yield (key, ['Skipped %d valid stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)
+        yield (key, len(values))

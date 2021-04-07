@@ -36,29 +36,28 @@ require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
-
-import { Subscription } from 'rxjs';
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').component('translationOpportunities', {
   template: require('./translation-opportunities.component.html'),
   controller: [
     '$rootScope', '$uibModal', 'ContributionOpportunitiesService',
-    'TranslationLanguageService', 'UrlInterpolationService', 'UserService',
+    'SiteAnalyticsService', 'TranslationLanguageService',
+    'UrlInterpolationService', 'UserService',
     function(
         $rootScope, $uibModal, ContributionOpportunitiesService,
-        TranslationLanguageService, UrlInterpolationService, UserService) {
+        SiteAnalyticsService, TranslationLanguageService,
+        UrlInterpolationService, UserService) {
       var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
+      var allOpportunities = {};
       var userIsLoggedIn = false;
+
       var getOpportunitySummary = function(expId) {
-        for (var index in ctrl.opportunities) {
-          if (ctrl.opportunities[index].id === expId) {
-            return ctrl.opportunities[index];
-          }
-        }
+        return allOpportunities[expId];
       };
 
-      var updateWithNewOpportunities = function(opportunities, more) {
+      var getPresentableOpportunitiesData = function({opportunities, more}) {
+        let opportunitiesDicts = [];
         for (var index in opportunities) {
           var opportunity = opportunities[index];
           var subheading = opportunity.getOpportunitySubheading();
@@ -67,30 +66,17 @@ angular.module('oppia').component('translationOpportunities', {
             TranslationLanguageService.getActiveLanguageCode());
           var progressPercentage = (
             opportunity.getTranslationProgressPercentage(languageCode));
-
-          ctrl.opportunities.push({
+          var opportunityDict = {
             id: opportunity.getExplorationId(),
             heading: heading,
             subheading: subheading,
             progressPercentage: progressPercentage.toFixed(2),
             actionButtonTitle: 'Translate'
-          });
+          };
+          allOpportunities[opportunityDict.id] = opportunityDict;
+          opportunitiesDicts.push(opportunityDict);
         }
-        ctrl.moreOpportunitiesAvailable = more;
-        ctrl.opportunitiesAreLoading = false;
-        // TODO(#8521): Remove the use of $rootScope.$apply().
-        $rootScope.$apply();
-      };
-
-      ctrl.onLoadMoreOpportunities = function() {
-        if (
-          !ctrl.opportunitiesAreLoading &&
-            ctrl.moreOpportunitiesAvailable) {
-          ctrl.opportunitiesAreLoading = true;
-          ContributionOpportunitiesService.getMoreTranslationOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
-        }
+        return {opportunitiesDicts, more};
       };
 
       ctrl.onClickButton = function(expId) {
@@ -98,6 +84,8 @@ angular.module('oppia').component('translationOpportunities', {
           ContributionOpportunitiesService.showRequiresLoginModal();
           return;
         }
+        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
+          'Translation');
         var opportunity = getOpportunitySummary(expId);
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -111,39 +99,35 @@ angular.module('oppia').component('translationOpportunities', {
             }
           },
           controller: 'TranslationModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function() {
+        }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
       };
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          TranslationLanguageService.onActiveLanguageChanged.subscribe(
-            () => {
-              ctrl.opportunities = [];
-              ctrl.opportunitiesAreLoading = true;
-              ctrl.moreOpportunitiesAvailable = true;
-              ContributionOpportunitiesService.getTranslationOpportunities(
-                TranslationLanguageService.getActiveLanguageCode(),
-                updateWithNewOpportunities);
-            }
-          )
-        );
-        ctrl.opportunities = [];
-        ctrl.opportunitiesAreLoading = true;
-        ctrl.moreOpportunitiesAvailable = true;
-        ctrl.progressBarRequired = true;
 
+      ctrl.$onInit = function() {
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
-        ContributionOpportunitiesService.getTranslationOpportunities(
-          TranslationLanguageService.getActiveLanguageCode(),
-          updateWithNewOpportunities);
       };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
+
+      ctrl.loadMoreOpportunities = function() {
+        return ContributionOpportunitiesService
+          .getMoreTranslationOpportunitiesAsync(
+            TranslationLanguageService.getActiveLanguageCode()).then(
+            getPresentableOpportunitiesData);
+      };
+
+      ctrl.loadOpportunities = function() {
+        return ContributionOpportunitiesService
+          .getTranslationOpportunitiesAsync(
+            TranslationLanguageService.getActiveLanguageCode()).then(
+            getPresentableOpportunitiesData);
       };
     }
   ]

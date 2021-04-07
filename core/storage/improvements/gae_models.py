@@ -120,7 +120,13 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """OK to delete task entries since they're just a historical record."""
+        """Model contains data to delete corresponding to a user:
+        resolver_id field.
+
+        It is okay to delete task entries since, after they are resolved, they
+        only act as a historical record. The removal just removes the historical
+        record.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -132,9 +138,21 @@ class TaskEntryModel(base_models.BaseModel):
         """
         cls.delete_multi(cls.query(cls.resolver_id == user_id))
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance shared across users since multiple
+        users resolve tasks.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
     @classmethod
     def get_export_policy(cls):
-        """TaskEntryModel contains the user ID that acted on a task."""
+        """Model contains data to export corresponding to a user:
+        TaskEntryModel contains the ID of the user that acted on a task.
+        """
         return dict(super(cls, cls).get_export_policy(), **{
             'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -143,11 +161,23 @@ class TaskEntryModel(base_models.BaseModel):
             'task_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'target_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'target_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'issue_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_description': base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
             'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
-            'resolved_on': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'resolved_on': base_models.EXPORT_POLICY.EXPORTED
         })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'resolver_id': 'task_ids_resolved_by_user',
+            'issue_description': 'issue_descriptions',
+            'status': 'statuses',
+            'resolved_on': 'resolution_msecs'
+        }
 
     @staticmethod
     def export_data(user_id):
@@ -165,7 +195,13 @@ class TaskEntryModel(base_models.BaseModel):
             TaskEntryModel.resolver_id == user_id)
         return {
             'task_ids_resolved_by_user': (
-                [t.id for t in task_ids_resolved_by_user])
+                [t.id for t in task_ids_resolved_by_user]),
+            'issue_descriptions': (
+                [t.issue_description for t in task_ids_resolved_by_user]),
+            'statuses': (
+                [t.status for t in task_ids_resolved_by_user]),
+            'resolution_msecs': (
+                [t.resolved_on for t in task_ids_resolved_by_user]),
         }
 
     @classmethod

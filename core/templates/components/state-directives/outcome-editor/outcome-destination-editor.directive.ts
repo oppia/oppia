@@ -27,10 +27,13 @@ require('services/editability.service.ts');
 require('services/user.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
+require('constants.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('outcomeDestinationEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'MAX_STATE_NAME_LENGTH',
+  function(UrlInterpolationService, MAX_STATE_NAME_LENGTH,) {
     return {
       restrict: 'E',
       scope: {},
@@ -44,15 +47,15 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         'outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
-        'StateEditorService', 'StateGraphLayoutService', 'UserService',
-        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
-        'PLACEHOLDER_OUTCOME_DEST',
+        '$rootScope', '$timeout', 'EditorFirstTimeEventsService',
+        'FocusManagerService', 'StateEditorService', 'StateGraphLayoutService',
+        'UserService', 'ENABLE_PREREQUISITE_SKILLS',
+        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $scope, EditorFirstTimeEventsService, FocusManagerService,
-            StateEditorService, StateGraphLayoutService, UserService,
-            ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
-            PLACEHOLDER_OUTCOME_DEST) {
+            $rootScope, $timeout, EditorFirstTimeEventsService,
+            FocusManagerService, StateEditorService, StateGraphLayoutService,
+            UserService, ENABLE_PREREQUISITE_SKILLS,
+            EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var currentStateName = null;
@@ -67,30 +70,15 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
           };
 
           ctrl.isCreatingNewState = function(outcome) {
+            ctrl.maxLen = MAX_STATE_NAME_LENGTH;
             return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
           };
-          ctrl.$onInit = function() {
-            ctrl.directiveSubscriptions.add(
-              StateEditorService.onSaveOutcomeDestDetails.subscribe(
-                () => {
-                  if (ctrl.isSelfLoop()) {
-                    ctrl.outcome.dest = StateEditorService.getActiveStateName();
-                  }
-                  // Create new state if specified.
-                  if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-                    EditorFirstTimeEventsService
-                      .registerFirstCreateSecondStateEvent();
 
-                    var newStateName = ctrl.outcome.newStateName;
-                    ctrl.outcome.dest = newStateName;
-                    delete ctrl.outcome.newStateName;
-
-                    ctrl.addState(newStateName);
-                  }
-                }
-              )
-            );
-            $scope.$watch(StateEditorService.getStateNames, function() {
+          ctrl.updateOptionNames = function() {
+            // $timeout is being used here to update the view.
+            // $scope.$applyAsync() doesn't work and $scope.$apply() causes
+            // console errors.
+            $timeout(() => {
               currentStateName = StateEditorService.getActiveStateName();
 
               var questionModeEnabled = StateEditorService.isInQuestionMode();
@@ -163,7 +151,33 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                   text: 'A New Card Called...'
                 });
               }
-            }, true);
+              // This value of 10ms is arbitrary, it has no significance.
+            }, 10);
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onSaveOutcomeDestDetails.subscribe(() => {
+                if (ctrl.isSelfLoop()) {
+                  ctrl.outcome.dest = StateEditorService.getActiveStateName();
+                }
+                // Create new state if specified.
+                if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+                  EditorFirstTimeEventsService
+                    .registerFirstCreateSecondStateEvent();
+
+                  var newStateName = ctrl.outcome.newStateName;
+                  ctrl.outcome.dest = newStateName;
+                  delete ctrl.outcome.newStateName;
+
+                  ctrl.addState(newStateName);
+                }
+              }));
+            ctrl.updateOptionNames();
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onStateNamesChanged.subscribe(() => {
+                ctrl.updateOptionNames();
+              }));
             ctrl.canAddPrerequisiteSkill = (
               ENABLE_PREREQUISITE_SKILLS &&
               StateEditorService.isExplorationWhitelisted());
@@ -174,6 +188,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               // development.
               ctrl.canEditRefresherExplorationId = (
                 userInfo.isAdmin() || userInfo.isModerator());
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
 
             ctrl.explorationAndSkillIdPattern =

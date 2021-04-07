@@ -17,16 +17,19 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Test Interaction Panel directive', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var CurrentInteractionService = null;
   var ExplorationStatesService = null;
-
+  var ctrl = null;
   var stateName = 'Introduction';
   var state = {
     interaction: {
@@ -34,11 +37,22 @@ describe('Test Interaction Panel directive', function() {
     }
   };
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -54,13 +68,14 @@ describe('Test Interaction Panel directive', function() {
       .returnValue(false);
 
     $scope = $rootScope.$new();
-    var ctrl = $componentController('testInteractionPanel', {
+    ctrl = $componentController('testInteractionPanel', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
     }, {
       getStateName: () => stateName
     });
     ctrl.$onInit();
+    CurrentInteractionService.updateViewWithNewAnswer();
   }));
 
   it('should initialize controller properties after its initialization',
@@ -72,7 +87,7 @@ describe('Test Interaction Panel directive', function() {
   it('should submit answer when clicking on button', function() {
     spyOn(CurrentInteractionService, 'submitAnswer');
     $scope.onSubmitAnswerFromButton();
-
+    ctrl.$onDestroy();
     expect(CurrentInteractionService.submitAnswer).toHaveBeenCalled();
   });
 });

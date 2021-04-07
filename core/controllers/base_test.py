@@ -30,13 +30,17 @@ import sys
 import types
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classifier_domain
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import main
@@ -48,6 +52,7 @@ import webapp2
 import webtest
 
 current_user_services = models.Registry.import_current_user_services()
+auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
@@ -257,13 +262,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.assertIn('login_url', response)
             self.assertIsNone(response['login_url'])
 
-    def test_401_is_returned_when_user_is_not_signed_up_and_csrf_is_requested(
-            self):
-        self.login(self.OWNER_EMAIL)
-        response = self.get_json(
-            feconf.CSRF_HANDLER_URL, expected_status_int=401)
-        self.assertEqual(response['error'], 'User details not found.')
-
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
@@ -318,7 +316,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator = user_services.UserActionsInfo(creator_user_id)
+        creator = user_services.get_user_actions_info(creator_user_id)
         editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
         exploration_id = '1_en_test_exploration'
         self.save_new_valid_exploration(
@@ -711,38 +709,61 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/plain')
 
 
-class LogoutPageTests(test_utils.GenericTestBase):
+class SessionBeginHandlerTests(test_utils.GenericTestBase):
+    """Tests for /session_begin handler."""
 
-    def test_logout_page(self):
-        """Tests for logout handler."""
-        exp_services.load_demo('0')
-        # Logout with valid query arg. This test only validates that the login
-        # cookies have expired after hitting the logout url.
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
-        response = self.get_html_response('/logout', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+    def test_get(self):
+        swap = self.swap_with_call_counter(
+            auth_services, 'establish_auth_session')
 
-    def test_logout_page_with_redirect_url(self):
-        exp_services.load_demo('0')
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
-        response = self.get_html_response(
-            '/logout?redirect_url=community-library', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        with swap as call_counter:
+            self.get_html_response('/session_begin', expected_status_int=200)
 
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
-        self.assertIn('community-library', response.headers['Location'])
+        self.assertEqual(call_counter.times_called, 1)
 
-    def test_logout_page_with_dev_mode_disabled(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            self.get_html_response(
-                '/logout', expected_status_int=302)
+
+class SessionEndHandlerTests(test_utils.GenericTestBase):
+    """Tests for /session_end handler."""
+
+    def test_get(self):
+        swap = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        with swap as call_counter:
+            self.get_html_response('/session_end', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+
+class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
+    """Tests for /seed_firebase handler."""
+
+    def test_get(self):
+        swap = self.swap_with_call_counter(
+            firebase_auth_services, 'seed_firebase')
+
+        with swap as call_counter:
+            response = self.get_html_response(
+                '/seed_firebase', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(response.location, 'http://localhost/')
+
+    def test_get_with_error(self):
+        swap = self.swap_with_call_counter(
+            firebase_auth_services, 'seed_firebase', raises=Exception())
+
+        captured_logging_context = self.capture_logging(min_level=logging.ERROR)
+
+        with swap as call_counter, captured_logging_context as logs:
+            response = self.get_html_response(
+                '/seed_firebase', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(response.location, 'http://localhost/')
+        self.assert_matches_regexps(logs, [
+            'Failed to prepare for SeedFirebaseOneOffJob'
+        ])
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -960,6 +981,16 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
     applied on them.
     """
 
+    # Following handlers are present in base.py where acl_decorators cannot be
+    # imported.
+    UNDECORATED_HANDLERS = frozenset([
+        'CsrfTokenHandler',
+        'Error404Handler',
+        'SessionBeginHandler',
+        'SessionEndHandler',
+        'SeedFirebaseHandler',
+    ])
+
     def test_every_method_has_decorator(self):
         handlers_checked = []
 
@@ -971,10 +1002,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             else:
                 handler = route.handler
 
-            # Following handler are present in base.py where acl_decorators
-            # cannot be imported.
-            if (handler.__name__ in (
-                    ('CsrfTokenHandler', 'Error404Handler', 'LogoutPage'))):
+            if handler.__name__ in self.UNDECORATED_HANDLERS:
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -1191,6 +1219,13 @@ class SignUpTests(test_utils.GenericTestBase):
 
         self.get_html_response('/community-library')
 
+    def test_500_error_is_raised_when_enable_user_creation_is_false(self):
+        self.login('abc@example.com')
+
+        with self.swap(feconf, 'ENABLE_USER_CREATION', False):
+            response = self.get_response_without_checking_for_errors(
+                '%s?return_url=/' % feconf.SIGNUP_URL, [500])
+
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
@@ -1204,3 +1239,71 @@ class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
             None, csrf_token))
+
+
+class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
+    """Unit tests for OppiaMLVMHandler class."""
+
+    class IncorrectMockVMHandler(base.OppiaMLVMHandler):
+        """Derived VM Handler class with missing function implementation for
+        extract_request_message_vm_id_and_signature function.
+        """
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+        @acl_decorators.is_from_oppia_ml
+        def post(self):
+            return self.render_json({})
+
+    class CorrectMockVMHandler(base.OppiaMLVMHandler):
+        """Derived VM Handler class with
+        extract_request_message_vm_id_and_signature function implementation.
+        """
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+        def extract_request_message_vm_id_and_signature(self):
+            """Returns the message, vm_id and signature retrieved from the
+            incoming requests.
+            """
+            signature = self.payload.get('signature')
+            vm_id = self.payload.get('vm_id')
+            message = self.payload.get('message')
+            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
+
+        @acl_decorators.is_from_oppia_ml
+        def post(self):
+            self.render_json({'job_id': 'new_job'})
+
+    def setUp(self):
+        super(OppiaMLVMHandlerTests, self).setUp()
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route('/incorrectmock', self.IncorrectMockVMHandler),
+            webapp2.Route('/correctmock', self.CorrectMockVMHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_that_incorrect_derived_class_raises_exception(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            payload['message'], payload['vm_id'])
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/incorrectmock', payload, expected_status_int=500)
+
+    def test_that_correct_derived_class_does_not_raise_exception(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            payload['message'], payload['vm_id'])
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/correctmock', payload, expected_status_int=200)

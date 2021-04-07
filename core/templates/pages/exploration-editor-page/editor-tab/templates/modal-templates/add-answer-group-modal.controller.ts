@@ -16,10 +16,13 @@
  * @fileoverview Controller for add answer group modal.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-
+require(
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -31,20 +34,27 @@ require('services/generate-content-id.service.ts');
 
 angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
-  'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',
-  'StateEditorService', 'addState', 'currentInteractionId',
-  'stateName', 'COMPONENT_NAME_FEEDBACK',
+  'GenerateContentIdService', 'OutcomeObjectFactory',
+  'PopulateRuleContentIdsService', 'RuleObjectFactory', 'StateEditorService',
+  'addState', 'currentInteractionId', 'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
-      GenerateContentIdService, OutcomeObjectFactory, RuleObjectFactory,
-      StateEditorService, addState, currentInteractionId,
-      stateName, COMPONENT_NAME_FEEDBACK,
+      GenerateContentIdService, OutcomeObjectFactory,
+      PopulateRuleContentIdsService, RuleObjectFactory, StateEditorService,
+      addState, currentInteractionId, stateName, COMPONENT_NAME_FEEDBACK,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    $scope.isInvalid = false;
+    $scope.directiveSubscriptions = new Subscription();
+    $scope.directiveSubscriptions.add(
+      StateEditorService.onObjectFormValidityChange.subscribe(
+        value => $scope.isInvalid = value
+      )
+    );
     $scope.feedbackEditorIsOpen = false;
     $scope.addState = addState;
     $scope.questionModeEnabled = (
@@ -70,7 +80,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
         currentInteractionId &&
         INTERACTION_SPECS[currentInteractionId].is_linear);
     };
-    $scope.tmpRule = RuleObjectFactory.createNew(null, {});
+    $scope.tmpRule = RuleObjectFactory.createNew(null, {}, {});
     var feedbackContentId = GenerateContentIdService.getNextStateId(
       COMPONENT_NAME_FEEDBACK);
     $scope.tmpOutcome = OutcomeObjectFactory.createNew(
@@ -87,6 +97,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.addAnswerGroupForm = {};
 
     $scope.saveResponse = function(reopen) {
+      PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);
       StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
@@ -98,6 +109,10 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
           $scope.tmpOutcome.labelledAsCorrect ? null : (
             $scope.tmpTaggedSkillMisconceptionId)),
         reopen: reopen
+      });
+
+      $scope.$on('$destroy', function() {
+        $scope.directiveSubscriptions.unsubscribe();
       });
     };
   }

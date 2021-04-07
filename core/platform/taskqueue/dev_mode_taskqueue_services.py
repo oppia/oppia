@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from core.platform.taskqueue import cloud_tasks_emulator
+import feconf
 
 import requests
 
@@ -47,14 +48,15 @@ def _task_handler(url, payload, queue_name, task_name=None):
     headers['X-Appengine-TaskExecutionCount'] = '0'
     headers['X-Appengine-TaskETA'] = '0'
     # Special header to fake the admin role when making requests to the task
-    # handlers in DEV_mode.
+    # handlers in DEV_MODE.
     headers['X-AppEngine-Fake-Is-Admin'] = '1'
     headers['method'] = 'POST'
     complete_url = 'http://localhost:%s%s' % (GOOGLE_APP_ENGINE_PORT, url)
     requests.post(
         complete_url,
         json=payload,
-        headers=headers)
+        headers=headers,
+        timeout=feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)
 
 
 CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)

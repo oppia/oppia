@@ -22,7 +22,13 @@
       <div class="story-input-header">
         <span>Description*</span>
       </div>
-      <textarea rows="3" cols="50" ng-model="story.description" class="form-control protractor-test-new-story-description-field required" aria-label="Description"></textarea>
+      <textarea rows="3" cols="50" maxlength="<[MAX_CHARS_IN_STORY_DESCRIPTION]>" ng-model="story.description" class="form-control protractor-test-new-story-description-field required" aria-label="Description"></textarea>
+      <span class="oppia-input-box-subtitle">
+        <em>
+          Story description should be at most
+          <[MAX_CHARS_IN_STORY_DESCRIPTION]> characters.
+        </em>
+      </span>
     </div>
     <div class="story-input">
       <div class="story-input-header">

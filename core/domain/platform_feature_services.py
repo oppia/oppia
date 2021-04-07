@@ -38,7 +38,6 @@ from constants import constants
 from core import platform_feature_list
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-from core.domain import user_services
 from core.platform import models
 
 current_user_services = models.Registry.import_current_user_services()
@@ -116,9 +115,7 @@ def is_feature_enabled(feature_name):
     Returns:
         bool. The value of the feature flag, True if it's enabled.
     """
-    user_settings = user_services.get_user_settings_by_gae_id(
-        current_user_services.get_current_gae_id())
-    return _evaluate_feature_flag_value_for_server(feature_name, user_settings)
+    return _evaluate_feature_flag_value_for_server(feature_name)
 
 
 def update_feature_flag_rules(
@@ -160,30 +157,18 @@ def _get_server_mode():
         if constants.DEV_MODE else platform_parameter_domain.SERVER_MODES.prod)
 
 
-def _create_evaluation_context_for_server(user_settings):
+def _create_evaluation_context_for_server():
     """Returns evaluation context with information of the server.
-
-    Args:
-        user_settings: UserSettings|None. The settings of the current logged in
-            user, if any.
 
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    language_code = 'en' # Default language code if no preference is set.
-    if (
-            user_settings is not None and
-            user_settings.preferred_site_language_code is not None):
-        language_code = user_settings.preferred_site_language_code
-
-    # TODO(#11073): Properly set app version below, and rename the user_locale
-    # to correspond to a selected language code. Consider also renaming
-    # client_type to something that better encapsulates frontends and backends.
+    # TODO(#11208): Properly set app version below using GAE app version as
+    # part of the server & client context.
     return platform_parameter_domain.EvaluationContext.from_dict(
         {
-            'client_type': 'Backend',
+            'platform_type': 'Backend',
             'app_version': None,
-            'user_locale': language_code,
         },
         {
             'server_mode': _get_server_mode()
@@ -220,20 +205,18 @@ def _evaluate_feature_flag_values_for_context(feature_names_set, context):
     return result_dict
 
 
-def _evaluate_feature_flag_value_for_server(feature_name, user_settings):
+def _evaluate_feature_flag_value_for_server(feature_name):
     """Evaluates and returns the values of the feature flag, using context
     from the server only.
 
     Args:
         feature_name: str. The name of the feature flag that needs to
             be evaluated.
-        user_settings: UserSettings|None. The settings of the current logged in
-            user, if any.
 
     Returns:
         bool. The value of the feature flag, True if it's enabled.
     """
-    context = _create_evaluation_context_for_server(user_settings)
+    context = _create_evaluation_context_for_server()
     values_dict = _evaluate_feature_flag_values_for_context(
         set([feature_name]), context)
     return values_dict[feature_name]

@@ -17,35 +17,62 @@
  * domain objects.
  */
 
-export interface AddStateNameChangeList {
-  'cmd': 'add_state';
+import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamSpecBackendDict } from 'domain/exploration/ParamSpecObjectFactory';
+import { InteractionBackendDict } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslationsBackendDict } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { SubtitledHtmlBackendDict } from './SubtitledHtmlObjectFactory';
+import { RecordedVoiceOverBackendDict } from './RecordedVoiceoversObjectFactory';
+
+export type ExplorationChange = (
+  ExplorationChangeAddState |
+  ExplorationChangeRenameState |
+  ExplorationChangeDeleteState |
+  ExplorationChangeEditStateProperty |
+  ExplorationChangeEditExplorationProperty|
+  RevertChangeList |
+  CreateChangeList |
+  MigrateStatesVersionChangeList);
+
+export interface ExplorationChangeAddState {
+  cmd: 'add_state';
   'state_name': string;
 }
 
-export interface DeleteStateChangeList {
-  'cmd': 'delete_state';
-  'state_name': string;
-}
-
-export interface EditExplorationPropertyChangeList {
-  'cmd': 'edit_exploration_property';
-  'new_value': Object;
-  'old_value': Object;
-  'property_name': string;
-}
-
-export interface EditStatePropertyChangeList {
-  'cmd': 'edit_state_property';
-  'new_value': Object;
-  'old_value': Object;
-  'property_name': string;
-  'state_name': string;
-}
-
-export interface RenameStateChangeList {
-  'cmd': 'rename_state';
+export interface ExplorationChangeRenameState {
+  cmd: 'rename_state',
   'new_state_name': string;
   'old_state_name': string;
+}
+
+export interface ExplorationChangeDeleteState {
+  cmd: 'delete_state';
+  'state_name': string;
+}
+
+export interface ExplorationChangeEditStateProperty {
+  cmd: 'edit_state_property',
+  'new_value': SubtitledHtmlBackendDict |
+    InteractionBackendDict |
+    ParamChangeBackendDict[] |
+    RecordedVoiceOverBackendDict |
+    WrittenTranslationsBackendDict |
+    boolean | number | string;
+  'old_value': SubtitledHtmlBackendDict |
+    InteractionBackendDict |
+    ParamChangeBackendDict[] |
+    RecordedVoiceOverBackendDict |
+    WrittenTranslationsBackendDict |
+    boolean | number | string;
+  'state_name': string;
+  'property_name': string;
+}
+
+export interface ExplorationChangeEditExplorationProperty {
+  cmd: 'edit_exploration_property';
+  'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  'property_name': string;
 }
 
 export interface RevertChangeList {
@@ -65,27 +92,17 @@ export interface MigrateStatesVersionChangeList {
   'to_version': number;
 }
 
-export type ExplorationChangeList = (
-  AddStateNameChangeList |
-  DeleteStateChangeList |
-  EditExplorationPropertyChangeList |
-  EditStatePropertyChangeList |
-  RenameStateChangeList |
-  RevertChangeList |
-  CreateChangeList |
-  MigrateStatesVersionChangeList);
-
 export interface ExplorationDraftDict {
-  draftChanges: ExplorationChangeList[];
+  draftChanges: ExplorationChange[];
   draftChangeListId: number
 }
 
 export class ExplorationDraft {
-  draftChanges: ExplorationChangeList[];
+  draftChanges: ExplorationChange[];
   draftChangeListId: number;
 
   constructor(
-      draftChanges: ExplorationChangeList[], draftChangeListId: number) {
+      draftChanges: ExplorationChange[], draftChangeListId: number) {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
   }
@@ -103,7 +120,7 @@ export class ExplorationDraft {
     return (currentDraftId === this.draftChangeListId);
   }
 
-  getChanges(): ExplorationChangeList[] {
+  getChanges(): ExplorationChange[] {
     return this.draftChanges;
   }
 
@@ -115,7 +132,7 @@ export class ExplorationDraft {
   }
 
   static toLocalStorageDict(
-      changeList: ExplorationChangeList[],
+      changeList: ExplorationChange[],
       draftChangeListId: number): ExplorationDraftDict {
     return {
       draftChanges: changeList,

@@ -17,9 +17,10 @@
  * use in Protractor tests.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var waitFor = require('../protractor_utils/waitFor.js');
+var action = require('./action.js');
+var forms = require('./forms.js');
+var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 var path = require('path');
 
 var ExplorationEditorTranslationTab = function() {
@@ -30,32 +31,17 @@ var ExplorationEditorTranslationTab = function() {
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
-    try {
-      await waitFor.visibilityOf(
-        dismissWelcomeModalButton, 'Welcome modal not becoming visible');
-      await waitFor.elementToBeClickable(
-        dismissWelcomeModalButton,
-        'Welcome modal is taking too long to appear');
-      await dismissWelcomeModalButton.click();
-      await waitFor.invisibilityOf(
-        translationWelcomeModal,
-        'Translation welcome modal takes too long to disappear');
-    } catch (e) {
-      // Since the welcome modal appears only once, the wait for its
-      // visibilty will only resolve once and timeout the other times.
-      // This is just an empty error function to catch the timeouts that
-      // happen when the the welcome modal has been dismissed once. If
-      // this is not present then protractor uses the default error
-      // function which is not appropriate in this case as this is not an
-      // error.
-    }
+    await action.click(
+      'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
+    await waitFor.invisibilityOf(
+      translationWelcomeModal,
+      'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
     if (await buttons.count() === 1) {
-      var skipButton = await button.get(0);
-      await skipButton.click();
-    } else if (await buttons.count() > 1) {
+      await action.click('Skip button', button.get(0));
+    } else if (await buttons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
     }
@@ -215,8 +201,9 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.visibilityOf(
       languageSelectorElement,
       'Language selector takes too long to appear.');
-    await languageSelectorElement.element(
-      by.cssContainingText('option', language)).click();
+    var languageButton = languageSelectorElement.element(
+      by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
   };
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
@@ -235,22 +222,14 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.uploadAudioRecord = async function(audioPath) {
-    await waitFor.elementToBeClickable(
-      uploadAudioButton,
-      'Audio Record button is not clickable');
-    await uploadAudioButton.click();
+    await action.click('Audio Record Button', uploadAudioButton);
     absPath = path.resolve(__dirname, audioPath);
-    await waitFor.visibilityOf(
-      audioUploadInput,
-      'Audio upload input field is not visible');
-    await audioUploadInput.sendKeys(absPath);
+    await action.sendKeys(
+      'Audio upload input', audioUploadInput, absPath, false);
   };
 
   this.saveAudioRecord = async function() {
-    await waitFor.elementToBeClickable(
-      saveUploadedAudioButton,
-      'Save uploaded audio button is not clickable');
-    await saveUploadedAudioButton.click();
+    await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -323,10 +302,9 @@ var ExplorationEditorTranslationTab = function() {
   this.uploadAudio = async function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    await audioUploadInput.sendKeys(audioAbsolutePath);
-    await waitFor.elementToBeClickable(
-      saveUploadedAudioButton, 'Save button is not clickable');
-    await saveUploadedAudioButton.click();
+    await action.sendKeys(
+      'Audio upload input', audioUploadInput, audioAbsolutePath, false);
+    await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.invisibilityOf(
       saveUploadedAudioButton,
       'Upload Audio modal takes too long to disappear');
@@ -360,9 +338,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.openUploadAudioModal = async function() {
-    await waitFor.elementToBeClickable(
-      uploadAudioButton, 'Upload Audio button is not clickable');
-    await uploadAudioButton.click();
+    await action.click('Upload Audio button', uploadAudioButton);
   };
 
   this.closeUploadAudioModal = async function() {

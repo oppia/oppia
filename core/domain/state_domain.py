@@ -22,16 +22,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import itertools
-import json
 import logging
 import re
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
+from core.domain import rules_registry
+from core.domain import translatable_object_registry
+from extensions.objects.models import objects
 import feconf
 import python_utils
 import schema_utils
@@ -97,7 +99,8 @@ class AnswerGroup(python_utils.OBJECT):
         """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
-            [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
+            [RuleSpec.from_dict(rs)
+             for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -176,12 +179,11 @@ class AnswerGroup(python_utils.OBJECT):
         outcome_html = self.outcome.feedback.html
         html_list += [outcome_html]
 
-        html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        html_field_types_to_rule_specs = (
+            rules_registry.Registry.get_html_field_types_to_rule_specs())
         for rule_spec in self.rule_specs:
             for interaction_and_rule_details in (
-                    html_field_types_to_rule_specs_dict.values()):
+                    html_field_types_to_rule_specs.values()):
                 # Check that the value corresponds to the answer group's
                 # associated interaction id.
                 if (
@@ -230,7 +232,8 @@ class AnswerGroup(python_utils.OBJECT):
         return html_list
 
     @staticmethod
-    def convert_html_in_answer_group(answer_group_dict, conversion_fn):
+    def convert_html_in_answer_group(
+            answer_group_dict, conversion_fn, html_field_types_to_rule_specs):
         """Checks for HTML fields in an answer group dict and converts it
         according to the conversion function.
 
@@ -238,6 +241,11 @@ class AnswerGroup(python_utils.OBJECT):
             answer_group_dict: dict. The answer group dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
             dict. The converted answer group dict.
@@ -249,7 +257,7 @@ class AnswerGroup(python_utils.OBJECT):
                 answer_group_dict['rule_specs']):
             answer_group_dict['rule_specs'][rule_spec_index] = (
                 RuleSpec.convert_html_in_rule_spec(
-                    rule_spec, conversion_fn))
+                    rule_spec, conversion_fn, html_field_types_to_rule_specs))
 
         return answer_group_dict
 
@@ -398,7 +406,9 @@ class Solution(python_utils.OBJECT):
         self.explanation.validate()
 
     @staticmethod
-    def convert_html_in_solution(interaction_id, solution_dict, conversion_fn):
+    def convert_html_in_solution(
+            interaction_id, solution_dict, conversion_fn,
+            html_field_types_to_rule_specs, interaction_spec):
         """Checks for HTML fields in a solution and convert it according
         to the conversion function.
 
@@ -407,6 +417,12 @@ class Solution(python_utils.OBJECT):
             solution_dict: dict. The Solution dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example.
+            interaction_spec: dict. The specification for the interaction.
 
         Returns:
             dict. The converted Solution dict.
@@ -414,20 +430,13 @@ class Solution(python_utils.OBJECT):
         if interaction_id is None:
             return solution_dict
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                interaction_id))
-
         solution_dict['explanation']['html'] = (
             conversion_fn(solution_dict['explanation']['html']))
 
-        if interaction.can_have_solution:
-            html_field_types_to_rule_specs_dict = json.loads(
-                utils.get_file_contents(
-                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        if interaction_spec['can_have_solution']:
             if solution_dict['correct_answer']:
-                for html_type in html_field_types_to_rule_specs_dict.keys():
-                    if html_type == interaction.answer_type:
+                for html_type in html_field_types_to_rule_specs.keys():
+                    if html_type == interaction_spec['answer_type']:
 
                         if (
                                 html_type ==
@@ -550,9 +559,8 @@ class InteractionInstance(python_utils.OBJECT):
                 interaction instance.
             default_outcome: Outcome. The default outcome of the interaction
                 instance.
-            confirmed_unclassified_answers: list(AnswerGroup). List of answers
-                which have been confirmed to be associated with the default
-                outcome.
+            confirmed_unclassified_answers: list(*). List of answers which have
+                been confirmed to be associated with the default outcome.
             hints: list(Hint). List of hints for this interaction.
             solution: Solution. A possible solution for the question asked in
                 this interaction.
@@ -588,12 +596,10 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             bool. Whether the interaction is supported by the Android app.
         """
-        if self.id:
-            return (
-                self.id in
-                android_validation_constants.VALID_INTERACTION_IDS)
-
-        return True
+        return (
+            self.id is None or
+            self.id in android_validation_constants.VALID_INTERACTION_IDS
+        )
 
     def is_rte_content_supported_on_android(
             self, require_valid_component_names):
@@ -781,8 +787,7 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            html_list += answer_group.get_all_html_content_strings(
-                self.id)
+            html_list += answer_group.get_all_html_content_strings(self.id)
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -802,12 +807,11 @@ class InteractionInstance(python_utils.OBJECT):
         if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list += [solution_html]
-            html_field_types_to_rule_specs_dict = json.loads(
-                utils.get_file_contents(
-                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+            html_field_types_to_rule_specs = (
+                rules_registry.Registry.get_html_field_types_to_rule_specs())
 
             if self.solution.correct_answer:
-                for html_type in html_field_types_to_rule_specs_dict.keys():
+                for html_type in html_field_types_to_rule_specs.keys():
                     if html_type == interaction.answer_type:
                         if (
                                 html_type ==
@@ -1422,29 +1426,43 @@ class Voiceover(python_utils.OBJECT):
 
 
 class WrittenTranslation(python_utils.OBJECT):
-    """Value object representing a written translation for a content."""
+    """Value object representing a written translation for a content.
+
+    Here, "content" could mean a string or a list of strings. The latter arises,
+    for example, in the case where we are checking for equality of a learner's
+    answer against a given set of strings. In such cases, the number of strings
+    in the translation of the original object may not be the same as the number
+    of strings in the original object.
+    """
 
     DATA_FORMAT_HTML = 'html'
-    DATA_FORMAT_UNICODE = 'unicode'
+    DATA_FORMAT_UNICODE_STRING = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE = {
+        DATA_FORMAT_HTML: 'TranslatableHtml',
+        DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
+        DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
+            'TranslatableSetOfNormalizedString'),
+        DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
+    }
 
     def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            data_format: str. 'unicode' or 'html'. Indicates if translation
-                field is html or unicode.
-            translation: str. A piece of user-submitted HTML or unicode. If
-                html, this is cleaned in such a way as to contain a restricted
-                set of HTML tags.
-            needs_update: bool. Whether translation is marked as needing
+            data_format: str. One of the keys in
+                DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE. Indicates the
+                type of the field (html, unicode, etc.).
+            translation: str|list(str). A user-submitted string or list of
+                strings that matches the given data format.
+            needs_update: bool. Whether the translation is marked as needing
                 review.
         """
         self.data_format = data_format
         self.translation = translation
         self.needs_update = needs_update
-
-        if data_format == self.DATA_FORMAT_HTML:
-            self.translation = html_cleaner.clean(self.translation)
 
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
@@ -1476,24 +1494,25 @@ class WrittenTranslation(python_utils.OBJECT):
             written_translation_dict['needs_update'])
 
     def validate(self):
-        """Validates properties of the WrittenTranslation.
+        """Validates properties of the WrittenTranslation, normalizing the
+        translation if needed.
 
         Raises:
             ValidationError. One or more attributes of the WrittenTranslation
                 are invalid.
         """
-        if not isinstance(self.data_format, python_utils.BASESTRING):
+        if self.data_format not in (
+                self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
 
-        if not (self.data_format == self.DATA_FORMAT_UNICODE or
-                self.data_format == self.DATA_FORMAT_HTML):
-            raise utils.ValidationError(
-                'Invalid data_format: %s' % self.data_format)
-
-        if not isinstance(self.translation, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Invalid translation: %s' % self.translation)
+        translatable_class_name = (
+            self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[self.data_format])
+        translatable_obj_class = (
+            translatable_object_registry.Registry.get_object_class(
+                translatable_class_name))
+        self.translation = translatable_obj_class.normalize_value(
+            self.translation)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
@@ -1711,23 +1730,6 @@ class WrittenTranslations(python_utils.OBJECT):
         else:
             self.translations_mapping.pop(content_id, None)
 
-    def get_translation_counts(self):
-        """Return a dict representing the number of translation available in a
-        languages in which there exist at least one translation in the
-        WrittenTranslation object.
-
-        Returns:
-            dict(str, int). A dict with language code as a key and number of
-            translation available in that language as the value.
-        """
-        translation_counts = collections.defaultdict(int)
-        for translations in self.translations_mapping.values():
-            for language, translation in translations.items():
-                if not translation.needs_update:
-                    translation_counts[language] += 1
-
-        return translation_counts
-
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the WrittenTranslations.
 
@@ -1760,15 +1762,27 @@ class WrittenTranslations(python_utils.OBJECT):
                 written_translations_dict['translations_mapping'].items()):
             for language_code in (
                     language_code_to_written_translation.keys()):
-                if (written_translations_dict['translations_mapping'][
-                        content_id][language_code]['data_format'] ==
-                        WrittenTranslation.DATA_FORMAT_HTML):
+                translation_dict = written_translations_dict[
+                    'translations_mapping'][content_id][language_code]
+                if 'data_format' in translation_dict:
+                    if (translation_dict['data_format'] ==
+                            WrittenTranslation.DATA_FORMAT_HTML):
+                        written_translations_dict['translations_mapping'][
+                            content_id][language_code]['translation'] = (
+                                conversion_fn(written_translations_dict[
+                                    'translations_mapping'][content_id][
+                                        language_code]['translation'])
+                            )
+                elif 'html' in translation_dict:
+                    # TODO(#11950): Delete this once old schema migration
+                    # functions are deleted.
+                    # This "elif" branch is needed because, in states schema
+                    # v33, this function is called but the dict is still in the
+                    # old format (that doesn't have a "data_format" key).
                     written_translations_dict['translations_mapping'][
-                        content_id][language_code]['translation'] = (
-                            conversion_fn(written_translations_dict[
-                                'translations_mapping'][content_id][
-                                    language_code]['translation'])
-                        )
+                        content_id][language_code]['html'] = (
+                            conversion_fn(translation_dict['html']))
+
         return written_translations_dict
 
 
@@ -2048,7 +2062,8 @@ class RuleSpec(python_utils.OBJECT):
                 param_obj.normalize(param_value)
 
     @staticmethod
-    def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
+    def convert_html_in_rule_spec(
+            rule_spec_dict, conversion_fn, html_field_types_to_rule_specs):
         """Checks for HTML fields in a Rule Spec and converts it according
         to the conversion function.
 
@@ -2056,14 +2071,15 @@ class RuleSpec(python_utils.OBJECT):
             rule_spec_dict: dict. The Rule Spec dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
             dict. The converted Rule Spec dict.
         """
-        html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-
         # TODO(#9413): Find a way to include a reference to the interaction
         # type in the Draft change lists.
         # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
@@ -2072,7 +2088,7 @@ class RuleSpec(python_utils.OBJECT):
         # type and draft changes use this method. The rules_index_dict below
         # is used to figure out the assembly of the html in the rulespecs.
         for interaction_and_rule_details in (
-                html_field_types_to_rule_specs_dict.values()):
+                html_field_types_to_rule_specs.values()):
             rule_type_has_html = (
                 rule_spec_dict['rule_type'] in
                 interaction_and_rule_details['ruleTypes'].keys())
@@ -2366,6 +2382,21 @@ class State(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % feedback_content_id)
             content_id_list.append(feedback_content_id)
+
+            for rule_spec in answer_group.rule_specs:
+                for param_name, value in rule_spec.inputs.items():
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                    if issubclass(param_type, objects.BaseTranslatableObject):
+                        if value['contentId'] in content_id_list:
+                            raise utils.ValidationError(
+                                'Found a duplicate content '
+                                'id %s' % value['contentId'])
+                        content_id_list.append(value['contentId'])
+
         if self.interaction.default_outcome:
             default_outcome_content_id = (
                 self.interaction.default_outcome.feedback.content_id)
@@ -2536,9 +2567,9 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info(
+            logging.exception(
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
-            raise Exception('Could not convert state dict to YAML.')
+            python_utils.reraise_exception()
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
@@ -2547,11 +2578,22 @@ class State(python_utils.OBJECT):
         languages in which there exists at least one translation in the state
         object.
 
+        Note: This method only counts the translations which are translatable as
+        per _get_all_translatable_content method.
+
         Returns:
             dict(str, int). A dict with language code as a key and number of
             translations available in that language as the value.
         """
-        return self.written_translations.get_translation_counts()
+        translation_counts = collections.defaultdict(int)
+        translations_mapping = self.written_translations.translations_mapping
+
+        for content_id in self._get_all_translatable_content():
+            for language_code, translation in (
+                    translations_mapping[content_id].items()):
+                if not translation.needs_update:
+                    translation_counts[language_code] += 1
+        return translation_counts
 
     def get_translatable_content_count(self):
         """Returns the number of content fields available for translation in
@@ -2647,12 +2689,30 @@ class State(python_utils.OBJECT):
         Args:
             interaction_id: str. The new interaction id to set.
         """
-        self.interaction.id = interaction_id
+        if self.interaction.id:
+            old_content_id_list = [
+                answer_group.outcome.feedback.content_id for answer_group in (
+                    self.interaction.answer_groups)]
 
-        # TODO(sll): This should also clear interaction.answer_groups (except
-        # for the default rule). This is somewhat mitigated because the client
-        # updates interaction_answer_groups directly after this, but we should
-        # fix it.
+            for answer_group in self.interaction.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    for param_name, value in rule_spec.inputs.items():
+                        param_type = (
+                            interaction_registry.Registry.get_interaction_by_id(
+                                self.interaction.id
+                            ).get_rule_param_type(
+                                rule_spec.rule_type, param_name))
+
+                        if issubclass(
+                                param_type, objects.BaseTranslatableObject
+                        ):
+                            old_content_id_list.append(value['contentId'])
+
+            self._update_content_ids_in_assets(
+                old_content_id_list, [])
+
+        self.interaction.id = interaction_id
+        self.interaction.answer_groups = []
 
     def update_next_content_id_index(self, next_content_id_index):
         """Update the interaction next content id index attribute.
@@ -2707,9 +2767,22 @@ class State(python_utils.OBJECT):
                 % answer_groups_list)
 
         interaction_answer_groups = []
+        new_content_id_list = []
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
+
+        for answer_group in self.interaction.answer_groups:
+            for rule_spec in answer_group.rule_specs:
+                for param_name, value in rule_spec.inputs.items():
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                    if issubclass(param_type, objects.BaseTranslatableObject):
+                        old_content_id_list.append(value['contentId'])
+
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
@@ -2746,18 +2819,25 @@ class State(python_utils.OBJECT):
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:
+                        if issubclass(
+                                param_type,
+                                objects.BaseTranslatableObject
+                        ):
+                            new_content_id_list.append(value['contentId'])
+
                         try:
                             normalized_param = param_type.normalize(value)
                         except Exception:
                             raise Exception(
                                 '%s has the wrong type. It should be a %s.' %
                                 (value, param_type.__name__))
+
                     rule_inputs[param_name] = normalized_param
 
                 answer_group.rule_specs.append(rule_spec)
         self.interaction.answer_groups = interaction_answer_groups
 
-        new_content_id_list = [
+        new_content_id_list += [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
         self._update_content_ids_in_assets(
@@ -2890,6 +2970,10 @@ class State(python_utils.OBJECT):
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
+        Note: Currently, we don't support interaction translation through
+        contributor dashboard, this method only returns content which are
+        translatable through the contributor dashboard.
+
         Returns:
             dict(str, str). Returns a dict with key as content id and content
             html as the value.
@@ -2938,7 +3022,12 @@ class State(python_utils.OBJECT):
             .get_content_ids_that_are_correctly_translated(language_code))
 
         for content_id in available_translation_content_ids:
-            del content_id_to_html[content_id]
+            # Interactions can be translated through editor pages but
+            # _get_all_translatable_content returns contents which are only
+            # translatable through the contributor dashboard page, we are
+            # ignoring the content ids related to interaction translation below
+            # if it doesn't exist in content_id_to_html.
+            content_id_to_html.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
         # translations which needs update.
@@ -3016,7 +3105,8 @@ class State(python_utils.OBJECT):
     @classmethod
     def convert_html_fields_in_state(
             cls, state_dict, conversion_fn,
-            state_uses_old_interaction_cust_args_schema=False):
+            state_uses_old_interaction_cust_args_schema=False,
+            state_uses_old_rule_template_schema=False):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -3027,7 +3117,11 @@ class State(python_utils.OBJECT):
             state_uses_old_interaction_cust_args_schema: bool. Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
-                schema v40).
+                schema v36).
+            state_uses_old_rule_template_schema: bool. Wheter the rule inputs
+                contain html in the form of DragAndDropHtmlString,
+                SetOfHtmlString, or ListOfSetsOfHtmlString (shoud be True if
+                prior to state schema v42).
 
         Returns:
             dict. The converted state_dict.
@@ -3040,11 +3134,22 @@ class State(python_utils.OBJECT):
                     state_dict['interaction']['default_outcome'],
                     conversion_fn))
 
+        if state_uses_old_rule_template_schema:
+            # We need to retrieve an older version of
+            # html_field_types_to_rule_specs to properly convert html, since
+            # after state schema v41, some html fields were removed.
+            html_field_types_to_rule_specs = (
+                rules_registry.Registry.get_html_field_types_to_rule_specs(
+                    state_schema_version=41))
+        else:
+            html_field_types_to_rule_specs = (
+                rules_registry.Registry.get_html_field_types_to_rule_specs())
+
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
             state_dict['interaction']['answer_groups'][answer_group_index] = (
                 AnswerGroup.convert_html_in_answer_group(
-                    answer_group, conversion_fn)
+                    answer_group, conversion_fn, html_field_types_to_rule_specs)
             )
 
         if 'written_translations' in state_dict.keys():
@@ -3061,11 +3166,37 @@ class State(python_utils.OBJECT):
         if interaction_id is None:
             return state_dict
 
+        # TODO(#11950): Drop the following 'if' clause once all snapshots have
+        # been migrated. This is currently causing issues in migrating old
+        # snapshots to schema v34 because MathExpressionInput was still around
+        # at the time. It is conceptually OK to ignore customization args here
+        # because the MathExpressionInput has no customization arg fields.
+        if interaction_id == 'MathExpressionInput':
+            if state_dict['interaction']['solution']:
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    conversion_fn(state_dict['interaction']['solution'][
+                        'explanation']['html']))
+            return state_dict
+
         if state_dict['interaction']['solution']:
+            if state_uses_old_rule_template_schema:
+                interaction_spec = (
+                    interaction_registry.Registry
+                    .get_all_specs_for_state_schema_version(41)[
+                        interaction_id]
+                )
+            else:
+                interaction_spec = (
+                    interaction_registry.Registry
+                    .get_all_specs()[interaction_id]
+                )
             state_dict['interaction']['solution'] = (
                 Solution.convert_html_in_solution(
                     state_dict['interaction']['id'],
-                    state_dict['interaction']['solution'], conversion_fn))
+                    state_dict['interaction']['solution'],
+                    conversion_fn,
+                    html_field_types_to_rule_specs,
+                    interaction_spec))
 
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to

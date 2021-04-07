@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
-from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -37,6 +36,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import taskqueue_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -59,7 +59,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
@@ -182,67 +182,6 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
-    """Test the handler for initialising exploration with
-    state_classifier_mapping.
-    """
-
-    def test_creation_of_state_classifier_mapping(self):
-        super(ExplorationStateClassifierMappingTests, self).setUp()
-        exploration_id = '15'
-
-        self.login(self.VIEWER_EMAIL)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        exp_services.delete_demo(exploration_id)
-        # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
-        # save_exploration handles job creation for trainable states.
-        # Since only one demo exploration has a trainable state, we modify our
-        # values for MIN_ASSIGNED_LABELS and MIN_TOTAL_TRAINING_EXAMPLES to let
-        # the classifier_demo_exploration.yaml be trainable. This is
-        # completely for testing purposes.
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.load_demo(exploration_id)
-
-        # Retrieve job_id of created job (because of save_exp).
-        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 1)
-        for job in all_jobs:
-            job_id = job.id
-
-        classifier_services.store_classifier_data(job_id, {})
-
-        expected_state_classifier_mapping = {
-            'text': {
-                'algorithm_id': 'TextClassifier',
-                'classifier_data': {},
-                'data_schema_version': 1
-            }
-        }
-        # Call the handler.
-        exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id))
-        retrieved_state_classifier_mapping = exploration_dict[
-            'state_classifier_mapping']
-
-        self.assertEqual(
-            expected_state_classifier_mapping,
-            retrieved_state_classifier_mapping)
-
-    def test_exploration_handler_raises_error_with_invalid_version(self):
-        exploration_id = '15'
-
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-
-        exp_services.load_demo(exploration_id)
-        self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id),
-            params={'v': 10}, expected_status_int=404)
-
-
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
@@ -259,9 +198,8 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
-        super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'user', name='Topic',
             description='A new topic', canonical_story_ids=[],
@@ -1092,7 +1030,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration.
         self.login(self.EDITOR_EMAIL)
@@ -1203,7 +1141,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         # Save and publish explorations.
         self.save_new_valid_exploration(
@@ -1854,49 +1792,33 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
             self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         self.aggregated_stats.pop('num_starts')
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
                     'exp_version': self.exp_version})
 
-        self.assertEqual(len(observed_log_messages), 1)
+        self.assertEqual(len(captured_logs), 1)
         self.assertIn(
-            'num_starts not in aggregated stats dict.',
-            observed_log_messages[0])
+            'num_starts not in aggregated stats dict.', captured_logs[0])
 
     def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
             self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
                     'exp_version': self.exp_version})
 
-        self.assertEqual(len(observed_log_messages), 1)
+        self.assertEqual(len(captured_logs), 1)
         self.assertIn(
             'total_hit_count not in state stats mapping '
-            'of Home in aggregated stats dict.',
-            observed_log_messages[0])
+            'of Home in aggregated stats dict.', captured_logs[0])
 
 
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):

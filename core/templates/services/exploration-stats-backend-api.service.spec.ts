@@ -68,7 +68,7 @@ describe('Exploration stats backend api service', () => {
     });
     let onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsBackendApiService.fetchExplorationStats('eid')
+    explorationStatsBackendApiService.fetchExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
 
     let req = httpTestingController.expectOne('/createhandler/statistics/eid');

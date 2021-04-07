@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import config_domain
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 import feconf
@@ -32,6 +33,14 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         super(BaseClassroomControllerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+
+class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
+
+    def test_redirect_to_default_classroom(self):
+        response = self.get_html_response('/learn', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/learn/math', response.headers['location'])
 
 
 class ClassroomPageTests(BaseClassroomControllerTests):
@@ -56,8 +65,8 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        topic_id_1 = topic_services.get_new_topic_id()
-        topic_id_2 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
             topic_id_1, 'private_topic_name',
             'private-topic-name', 'description')
@@ -100,14 +109,17 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         json_response = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
         public_topic_summary_dict = (
-            topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
+            topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict())
+        public_topic_summary_dict['is_published'] = True
         private_topic_summary_dict = (
-            topic_services.get_topic_summary_by_id(topic_id_1).to_dict())
+            topic_fetchers.get_topic_summary_by_id(topic_id_1).to_dict())
+        private_topic_summary_dict['is_published'] = False
 
         expected_dict = {
             'name': 'math',
-            'public_topic_summary_dicts': [public_topic_summary_dict],
-            'private_topic_summary_dicts': [private_topic_summary_dict],
+            'topic_summary_dicts': [
+                private_topic_summary_dict, public_topic_summary_dict
+            ],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom'
         }

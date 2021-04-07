@@ -19,8 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import functools
-import json
+import copy
 import logging
 import os
 import re
@@ -30,16 +29,15 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import interaction_registry
+from core.domain import rules_registry
 from core.domain import state_domain
+from core.domain import translatable_object_registry
 from core.tests import test_utils
 import feconf
 import schema_utils
 import utils
 
-
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return html_validation_service.regenerate_image_filename_using_dimensions(
-        filename, 490, 120)
+import contextlib2
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -327,7 +325,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        html_list = state.get_all_html_content_strings()
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        def mock_get_interaction_by_id(cls, interaction_id):
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
+            interaction.answer_type = 'ListOfSetsOfHtmlStrings'
+            return interaction
+
+        rules_registry_swap = self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs))
+
+        interaction_registry_swap = self.swap(
+            interaction_registry.Registry, 'get_interaction_by_id',
+            classmethod(mock_get_interaction_by_id))
+
+        with rules_registry_swap, interaction_registry_swap:
+            html_list = state.get_all_html_content_strings()
+
         self.assertEqual(
             html_list,
             [
@@ -398,7 +418,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Equals'
             }],
@@ -575,11 +598,30 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_solution(solution)
         exp_services.save_new_exploration('owner_id', exploration)
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'ItemSelectionInput'))
-        interaction.can_have_solution = True
-        html_list = state.get_all_html_content_strings()
+        mock_html_field_types_to_rule_specs_dict = (
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        def mock_get_interaction_by_id(cls, interaction_id):
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
+            interaction.answer_type = 'SetOfHtmlString'
+            interaction.can_have_solution = True
+            return interaction
+
+        rules_registry_swap = self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs))
+
+        interaction_registry_swap = self.swap(
+            interaction_registry.Registry, 'get_interaction_by_id',
+            classmethod(mock_get_interaction_by_id))
+
+        with rules_registry_swap, interaction_registry_swap:
+            html_list = state.get_all_html_content_strings()
+
         self.assertEqual(
             html_list,
             [
@@ -648,17 +690,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_answer_groups(state_answer_groups)
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             html_type_dict['format'] = 'invalid format'
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'The rule spec does not belong to a valid format.'):
@@ -762,19 +808,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_customization_args_dict)
         state.update_interaction_answer_groups(state_answer_groups)
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             if html_type_dict['interactionId'] == 'ItemSelectionInput':
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'Rule spec should have at least one valid input variable with '
@@ -856,11 +905,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
         interaction.answer_type = 'DragAndDropHtmlString'
-        with self.assertRaisesRegexp(
-            Exception,
-            'The solution does not have a valid '
-            'correct_answer type.'):
-            state.get_all_html_content_strings()
+
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The solution does not have a valid '
+                'correct_answer type.'):
+                state.get_all_html_content_strings()
 
     def test_get_all_html_when_interaction_is_none(self):
         """Test the method for extracting all the HTML from a state
@@ -1081,7 +1141,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1181,6 +1244,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_supports_android(self, 'NumericInput')
         _verify_interaction_supports_android(self, 'TextInput')
         _verify_interaction_supports_android(self, 'NumericExpressionInput')
+        _verify_interaction_supports_android(self, 'RatioExpressionInput')
         _verify_interaction_supports_android(self, None)
 
         _verify_interaction_does_not_support_android(self, 'CodeRepl')
@@ -1189,8 +1253,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_interaction_does_not_support_android(self, 'LogicProof')
         _verify_interaction_does_not_support_android(self, 'MusicNotesInput')
         _verify_interaction_does_not_support_android(self, 'PencilCodeEditor')
-        _verify_interaction_does_not_support_android(
-            self, 'RatioExpressionInput')
         _verify_interaction_does_not_support_android(self, 'SetInput')
 
         _verify_all_interaction_ids_checked(self)
@@ -1244,7 +1306,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1302,6 +1367,118 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': '<p>The default outcome.</p>'
             })
 
+    def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Placeholder'
+                }
+            },
+            'rows': {'value': 1}
+        }
+        init_state.update_interaction_customization_args(
+            state_interaction_cust_args)
+
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['Test']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        init_state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {},
+                'default_outcome': {},
+                'solution': {},
+                'feedback_1': {},
+                'ca_placeholder_0': {
+                    'hi': {
+                        'data_format': 'unicode',
+                        'translation': 'Placeholder translation',
+                        'needs_update': False
+                    }
+                },
+                'rule_input_4': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        init_state.update_written_translations(written_translations)
+
+        self.assertEqual(
+            init_state.get_content_id_mapping_needing_translations('hi'), {
+                'hint_1': '<p>hint one</p>',
+                'solution': '<p>hello_world is a string</p>',
+                'feedback_1': '<p>Feedback</p>',
+                'default_outcome': '<p>The default outcome.</p>'
+            })
+
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
@@ -1316,6 +1493,46 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.add_translation('content', 'hi', '<p>Translated text</p>')
 
         self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
+
+    def test_get_translation_counts_returns_correct_value(self):
+        state = state_domain.State.create_default_state(None)
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+
+        self.set_interaction_for_state(state, 'TextInput')
+
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
+        state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, solution_dict)
+
+        state.update_interaction_solution(solution)
+        state.validate({}, True)
+        state.add_translation('hint_1', 'hi', 'Some translation')
+        state.add_translation('content', 'hi', 'Some translation')
+
+        self.assertEqual(state.get_translation_counts(), {'hi': 2})
+
+        # Adding interaction placeholder translation won't be reflected in
+        # get_translation_counts method.
+        state.add_translation('ca_placeholder_0', 'hi', 'Some translation')
+
+        self.assertEqual(state.get_translation_counts(), {'hi': 2})
 
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
@@ -1420,199 +1637,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.update_solicit_answer_details('abc')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
-
-    def test_convert_html_fields_in_state(self):
-        """Test conversion of html strings in state."""
-        state_dict = {
-            'content': {
-                'content_id': 'content', 'html': 'Hello!'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': 'hello',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
-
-        state_dict_in_textangular = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': '<p>hello</p>',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
-
-        state_dict_with_image_caption = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image caption-'
-                            'with-value="&amp;quot;&amp;quot;" filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': '<p>hello</p>',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
-
-        state_dict_with_image_dimensions = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            u'<p><oppia-noninteractive-image '
-                            'caption-with-value="&amp;quot;&amp;quot;" '
-                            'filepath-with-value="&amp;quot;'
-                            'random_height_490_width_120.png&amp;'
-                            'quot;"></oppia-noninteractive-image>Hello this '
-                            'is test case to check image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': '<p>hello</p>',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
-
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_to_textangular),
-            state_dict_in_textangular)
-
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.add_caption_attr_to_image),
-            state_dict_with_image_caption)
-
-        add_dimensions_to_image_tags = functools.partial(
-            html_validation_service.add_dimensions_to_image_tags,
-            'eid')
-
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-
-            self.assertEqual(
-                state_domain.State.convert_html_fields_in_state(
-                    state_dict, add_dimensions_to_image_tags),
-                state_dict_with_image_dimensions)
 
     def test_convert_html_fields_in_state_with_drag_and_drop_interaction(self):
         """Test the method for converting all the HTML in a state having
@@ -1932,7 +1956,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components,
+                state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_item_selection_interaction(self):
@@ -2158,16 +2183,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hints': []
             }
         }
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'ItemSelectionInput'))
-        interaction.can_have_solution = True
+        interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            41)['ItemSelectionInput']['can_have_solution'] = True
 
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components,
+                state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_text_input_interaction(self):
@@ -2347,6 +2371,437 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 add_math_content_to_math_rte_components),
             state_dict_with_new_math_schema)
 
+    def test_convert_html_fields_in_state_with_math_expression_input(self):
+        """Test the method for converting all the HTML in a state having
+        MathExpressionInput interaction.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        answer_group_with_old_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': html_with_old_math_schema
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        answer_group_with_new_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': html_with_new_math_schema
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_old_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': '42',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_with_old_math_schema
+                    }
+                },
+                'answer_groups': [answer_group_with_old_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_old_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': 'MathExpressionInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }]
+            }
+        }
+
+        state_dict_with_new_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': html_with_new_math_schema
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': '42',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_with_new_math_schema
+                    }
+                },
+                'answer_groups': [answer_group_with_new_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_with_new_math_schema
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': 'MathExpressionInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_new_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_new_math_schema
+                        }
+                    }]
+            }
+        }
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_old_math_schema,
+                html_validation_service.
+                add_math_content_to_math_rte_components),
+            state_dict_with_new_math_schema)
+
+    def test_convert_html_fields_in_state_with_old_written_translations(self):
+        """Test the method for converting all the HTML in a state having
+        written_translations in the old format. This is needed for converting
+        older snapshots (prior to state schema version 35) properly.
+
+        TODO(#11950): Remove this test once old schema migration functions are
+        deleted.
+        """
+        html_with_old_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        html_with_new_math_schema = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        written_translations_dict_with_old_math_schema_and_old_format = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': html_with_old_math_schema,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': html_with_old_math_schema,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_with_new_math_schema_and_old_format = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': html_with_new_math_schema,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': html_with_new_math_schema,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        answer_group_dict_with_old_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_old_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        answer_group_dict_with_new_math_schema = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[html_with_new_math_schema]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        state_dict_with_old_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [answer_group_dict_with_old_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_with_old_math_schema
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }]
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_old_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_old_math_schema
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_old_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+
+            },
+            'written_translations': (
+                written_translations_dict_with_old_math_schema_and_old_format)
+        }
+
+        state_dict_with_new_math_schema = {
+            'content': {
+                'content_id': 'content', 'html': 'Hello!'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [answer_group_dict_with_new_math_schema],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': (
+                            '<p><oppia-noninteractive-image filepath'
+                            '-with-value="&amp;quot;random.png&amp;'
+                            'quot;"></oppia-noninteractive-image>'
+                            'Hello this is test case to check '
+                            'image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_with_new_math_schema
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        }, {
+                            'content_id': 'ca_choices_2',
+                            'html': '<p>3</p>'
+                        }, {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }]
+                    },
+                    'allowMultipleItemsInSamePosition': {'value': True}
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': html_with_new_math_schema
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': html_with_new_math_schema
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_with_new_math_schema],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+
+            },
+            'written_translations': (
+                written_translations_dict_with_new_math_schema_and_old_format)
+        }
+        self.assertEqual(
+            state_domain.State.convert_html_fields_in_state(
+                state_dict_with_old_math_schema,
+                html_validation_service.
+                add_math_content_to_math_rte_components,
+                state_uses_old_rule_template_schema=True),
+            state_dict_with_new_math_schema)
+
     def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(
             self):
         """Test the method for converting the HTML in a state
@@ -2432,24 +2887,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             html_type_dict['format'] = 'invalid format'
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(
+                unused_cls, state_schema_version=None): # pylint: disable=unused-argument
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)):
             with self.assertRaisesRegexp(
                 Exception,
                 'The rule spec does not belong to a valid format.'):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.
-                    add_math_content_to_math_rte_components)
+                    add_math_content_to_math_rte_components,
+                    state_uses_old_rule_template_schema=True)
 
     def test_convert_html_fields_in_rule_spec_with_invalid_input_variable(self):
         """Test the method for converting the HTML in a state
@@ -2535,19 +2994,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             if html_type_dict['interactionId'] == 'ItemSelectionInput':
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'Rule spec should have at least one valid input variable with '
@@ -2622,16 +3084,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
             mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString'))
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'The solution does not have a valid '
@@ -2755,7 +3220,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.Solution.convert_html_in_solution(
                 None, solution_dict,
                 html_validation_service.
-                add_math_content_to_math_rte_components), solution_dict)
+                add_math_content_to_math_rte_components,
+                rules_registry.Registry.get_html_field_types_to_rule_specs(),
+                {}
+            ), solution_dict)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
@@ -2870,7 +3338,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         written_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid translation'):
+            AssertionError, 'Expected unicode HTML string, received 30'):
             with self.swap(written_translation, 'translation', 30):
                 written_translation.validate()
 
@@ -3141,7 +3609,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected state param_changes to be a list, received 0'):
             exploration.init_state.validate(None, True)
 
-    def test_validate_duplicate_content_id_with_answer_groups(self):
+    def test_validate_duplicate_content_id_with_answer_group_feedback(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         answer_group_dict = {
             'outcome': {
@@ -3157,7 +3625,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3175,6 +3646,48 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id feedback_1'):
+            exploration.init_state.validate(None, True)
+
+    def test_validate_duplicate_content_id_with_answer_group_rules(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
+                    }
+                },
+                'rule_type': 'Contains'
+            }, {
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test1']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        exploration.init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id rule_input_Contains'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
@@ -3244,24 +3757,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.validate(None, True)
 
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'info', _mock_logging_function)
-        invalid_state_dict_assert_raises = self.assertRaisesRegexp(
-            Exception, 'Could not convert state dict to YAML')
-
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with logging_swap, invalid_state_dict_assert_raises:
+        with contextlib2.ExitStack() as stack:
+            captured_logs = stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            stack.enter_context(
+                self.assertRaisesRegexp(
+                    Exception, 'string indices must be integers')
+            )
+
             exploration.init_state.convert_state_dict_to_yaml(
                 'invalid_state_dict', 10)
 
-        self.assertEqual(
-            observed_log_messages, ['Bad state dict: invalid_state_dict'])
+        self.assertEqual(len(captured_logs), 1)
+        self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
 
     def test_cannot_update_hints_with_content_id_not_in_written_translations(
             self):
@@ -3573,7 +4083,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected rule_inputs to be a dict'):
+            Exception,
+            re.escape('Expected rule_inputs to be a dict, received []')
+        ):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3617,7 +4129,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[]]
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': [[]]
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3628,7 +4143,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '[[]] has the wrong type. It should be a SetOfNormalizedString.'
+                '{u\'normalizedStrSet\': [[]], u\'contentId\': u\'rule_input_'
+                'Equals\'} has the wrong type. It should be a TranslatableSetOf'
+                'NormalizedString.'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
@@ -3658,7 +4175,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3778,7 +4298,15 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
-    def test_from_and_to_dict_wroks_correctly(self):
+    def test_data_formats_are_correct_and_complete(self):
+        translatable_class_names_in_data_formats = sorted(
+            state_domain.WrittenTranslation.
+            DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
+        self.assertEqual(
+            translatable_class_names_in_data_formats,
+            translatable_object_registry.Registry.get_all_class_names())
+
+    def test_from_and_to_dict_works_correctly(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {
@@ -3791,7 +4319,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'data_format': 'html',
                         'translation': 'Hey!',
                         'needs_update': False
-                    }
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
+                        'needs_update': False
+                    },
                 },
                 'feedback_1': {
                     'hi': {
@@ -3802,6 +4335,11 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'data_format': 'html',
                         'translation': 'hello!',
+                        'needs_update': False
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
                         'needs_update': False
                     }
                 }

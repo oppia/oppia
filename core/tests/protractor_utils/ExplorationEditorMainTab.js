@@ -152,23 +152,16 @@ var ExplorationEditorMainTab = function() {
   // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
-    // If the editor welcome modal shows up, exit it.
-    var isVisible = await editorWelcomeModal.isPresent();
-
-    if (isVisible) {
-      await waitFor.elementToBeClickable(
-        dismissWelcomeModalButton,
-        'Welcome modal is taking too long to appear');
-      await dismissWelcomeModalButton.click();
-    }
-
+    // Exit the welcome modal.
+    await action.click(
+      'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
     await waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
     if (await buttons.count() === 1) {
-      await (await buttons.get(0)).click();
+      await action.click('Skip button', buttons.get(0));
     } else if (await buttons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
@@ -179,10 +172,11 @@ var ExplorationEditorMainTab = function() {
     // Finish the tutorial.
     var finishTutorialButtons = element.all(by.buttonText('Finish'));
     await waitFor.elementToBeClickable(
-      await finishTutorialButtons.first(),
+      finishTutorialButtons.first(),
       'Finish Tutorial Stage button is not clickable');
     if (await finishTutorialButtons.count() === 1) {
-      await finishTutorialButtons.get(0).click();
+      await action.click(
+        'Finish Tutorial Stage button', finishTutorialButtons.get(0));
     } else {
       throw new Error('There is more than 1 Finish button!');
     }
@@ -206,10 +200,11 @@ var ExplorationEditorMainTab = function() {
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButtons = element.all(by.css('.nextBtn'));
       await waitFor.elementToBeClickable(
-        await nextTutorialStageButtons.first(),
+        nextTutorialStageButtons.first(),
         'Next Tutorial Stage button is not clickable');
       if (await nextTutorialStageButtons.count() === 1) {
-        await nextTutorialStageButtons.get(0).click();
+        await action.click(
+          'Next Tutorial Stage button', nextTutorialStageButtons.get(0));
         await waitFor.invisibilityOf(
           tutorialTabHeadingElement,
           'Tutorial stage takes too long to disappear');
@@ -222,7 +217,9 @@ var ExplorationEditorMainTab = function() {
   this.startTutorial = async function() {
     await waitFor.visibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
-    await element(by.css('.protractor-test-start-tutorial')).click();
+    var startTutorialButton = element(
+      by.css('.protractor-test-start-tutorial'));
+    await action.click('Start Tutorial button', startTutorialButton);
     await waitFor.visibilityOf(
       element(by.css('.ng-joyride-title')),
       'Tutorial modal takes too long to appear');
@@ -248,6 +245,7 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = async function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
+    await action.waitForAutosave();
     // Open the "Add Response" modal if it is not already open.
     await waitFor.elementToBeClickable(
       addResponseButton, 'Response Editor button is not clickable');
@@ -269,9 +267,7 @@ var ExplorationEditorMainTab = function() {
     // Open the feedback entry form if it is not already open.
     var isVisible = await feedbackEditor.isPresent();
     if (isVisible) {
-      await waitFor.elementToBeClickable(
-        feedbackEditor, 'Feedback editor takes too long to be clickable.');
-      await feedbackEditor.click();
+      await action.click('Feedback editor', feedbackEditor);
     }
 
     if (feedbackInstructions) {
@@ -350,6 +346,7 @@ var ExplorationEditorMainTab = function() {
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
+        await action.waitForAutosave();
         // Begin editing feedback.
         await action.click(
           'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
@@ -467,12 +464,9 @@ var ExplorationEditorMainTab = function() {
     } else {
       targetOption = destName;
     }
-    await waitFor.visibilityOf(
-      await editOutcomeDestDropdownOptions(targetOption),
-      'editOutcomeDestDropdownOptions taking too long to appear');
-    expect(await editOutcomeDestDropdownOptions(targetOption).isDisplayed())
-      .toBe(true);
-    await editOutcomeDestDropdownOptions(targetOption).click();
+
+    var outcomeDestOption = await editOutcomeDestDropdownOptions(targetOption);
+    await action.click('Outcome Destination Option', outcomeDestOption);
 
     if (createNewDest) {
       await editOutcomeDestStateInput.sendKeys(destName);
@@ -490,6 +484,7 @@ var ExplorationEditorMainTab = function() {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
+    await action.waitForAutosave();
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
@@ -503,6 +498,7 @@ var ExplorationEditorMainTab = function() {
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     expect(await saveStateContentButton.isDisplayed()).toBe(true);
+    await waitFor.elementToBeClickable(saveStateContentButton);
     await saveStateContentButton.click();
     await waitFor.invisibilityOf(
       saveStateContentButton,
@@ -528,7 +524,8 @@ var ExplorationEditorMainTab = function() {
   // ---- HINT ----
 
   this.addHint = async function(hint) {
-    await addHintButton.click();
+    await action.waitForAutosave();
+    await action.click('Add Hint', addHintButton);
     var addHintModal = element(
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
@@ -546,7 +543,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.addSolution = async function(interactionId, solution) {
-    await addSolutionButton.click();
+    await action.waitForAutosave();
+    await action.click('Add Solution', addSolutionButton);
     var addOrUpdateSolutionModal = element(
       by.css('.protractor-test-add-or-update-solution-modal'));
     await waitFor.visibilityOf(
@@ -573,6 +571,7 @@ var ExplorationEditorMainTab = function() {
   // ---- INTERACTIONS ----
 
   this.deleteInteraction = async function() {
+    await action.waitForAutosave();
     await action.click('Delete interaction button', deleteInteractionButton);
 
     // Click through the "are you sure?" warning.
@@ -588,6 +587,7 @@ var ExplorationEditorMainTab = function() {
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
   this.setInteraction = async function(interactionId) {
+    await action.waitForAutosave();
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
     await closeAddResponseModal();
@@ -598,6 +598,7 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setInteractionWithoutCloseAddResponse = async function(interactionId) {
+    await action.waitForAutosave();
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
   };
@@ -608,33 +609,29 @@ var ExplorationEditorMainTab = function() {
       deleteInteractionButton,
       'Please delete interaction before creating a new one');
 
-    await waitFor.elementToBeClickable(
-      addInteractionButton,
-      'Add Interaction button takes too long to be clickable');
-    expect(await addInteractionButton.isDisplayed()).toBe(true);
-    await addInteractionButton.click();
+    await action.click('Add Interaction button', addInteractionButton);
 
     var INTERACTION_ID_TO_TAB_NAME = {
-      Continue: 'General',
-      EndExploration: 'General',
-      ImageClickInput: 'General',
-      ItemSelectionInput: 'General',
-      MultipleChoiceInput: 'General',
-      TextInput: 'General',
-      FractionInput: 'Math',
-      GraphInput: 'Math',
-      LogicProof: 'Math',
-      NumericInput: 'Math',
-      SetInput: 'Math',
-      AlgebraicExpressionInput: 'Math',
-      MathEquationInput: 'Math',
-      NumericExpressionInput: 'Math',
-      NumberWithUnits: 'Math',
-      RatioExpressionInput: 'Math',
-      CodeRepl: 'Programming',
-      PencilCodeEditor: 'Programming',
-      MusicNotesInput: 'Music',
-      InteractiveMap: 'Geography'
+      Continue: 'commonly-used',
+      EndExploration: 'commonly-used',
+      ImageClickInput: 'commonly-used',
+      ItemSelectionInput: 'commonly-used',
+      MultipleChoiceInput: 'commonly-used',
+      NumericInput: 'commonly-used',
+      TextInput: 'commonly-used',
+      FractionInput: 'math',
+      GraphInput: 'math',
+      LogicProof: 'math',
+      SetInput: 'math',
+      AlgebraicExpressionInput: 'math',
+      MathEquationInput: 'math',
+      NumericExpressionInput: 'math',
+      NumberWithUnits: 'math',
+      RatioExpressionInput: 'math',
+      CodeRepl: 'programming',
+      PencilCodeEditor: 'programming',
+      MusicNotesInput: 'music',
+      InteractiveMap: 'geography'
     };
 
     expect(
@@ -840,6 +837,7 @@ var ExplorationEditorMainTab = function() {
   // ---- STATE GRAPH ----
 
   this.deleteState = async function(stateName) {
+    await action.waitForAutosave();
     await general.scrollToTop();
     var nodeElement = await explorationGraph.all(
       by.cssContainingText('.protractor-test-node', stateName)).first();
@@ -865,6 +863,7 @@ var ExplorationEditorMainTab = function() {
   // NOTE: if the state is not visible in the state graph this function will
   // fail.
   this.moveToState = async function(targetName) {
+    await action.waitForAutosave();
     await general.scrollToTop();
     var listOfNames = await stateNodes.map(async function(stateElement) {
       return await stateNodeLabel(stateElement).getText();
@@ -893,19 +892,17 @@ var ExplorationEditorMainTab = function() {
   this.setStateName = async function(name) {
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
-    await waitFor.elementToBeClickable(
-      stateNameContainer, 'State Name Container takes too long to appear');
-    await stateNameContainer.click();
-    await stateNameInput.clear();
-    await stateNameInput.sendKeys(name);
+    await action.waitForAutosave();
+    await action.click('State Name Container', stateNameContainer);
+    await action.clear('State Name input', stateNameInput);
+    await action.sendKeys('State Name input', stateNameInput, name);
 
-    await waitFor.elementToBeClickable(
-      stateNameSubmitButton,
-      'State Name Submit button takes too long to be clickable');
-    await stateNameSubmitButton.click();
+    await action.click('State Name Submit button', stateNameSubmitButton);
 
     // Wait for state name container to completely disappear
     // and re-appear again.
+    await waitFor.visibilityOf(
+      stateNameContainer, 'State Name Container takes too long to appear');
     await waitFor.textToBePresentInElement(
       stateNameContainer, name,
       'Current state name is:' + await stateNameContainer.getAttribute(
@@ -913,6 +910,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectCurrentStateToBe = async function(name) {
+    await waitFor.visibilityOf(
+      stateNameContainer, 'State Name Container taking too long to show up');
     await waitFor.textToBePresentInElement(
       stateNameContainer, name,
       'Expecting current state ' + await stateNameContainer.getAttribute(

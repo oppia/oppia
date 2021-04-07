@@ -21,18 +21,13 @@ import { EventEmitter } from '@angular/core';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   var $scope = null;
   var $uibModalInstance = null;
   var ctrl = null;
@@ -67,7 +62,6 @@ describe('Topic editor tab directive', function() {
       return mockTasdReinitializedEventEmitter;
     }
   };
-
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -357,6 +351,23 @@ describe('Topic editor tab directive', function() {
         spyOn(TopicUpdateService, 'setMetaTagContent'));
       $scope.updateTopicMetaTagContent('New meta tag content');
       expect(topicMetaTagContentSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if topic page title is updated',
+    function() {
+      var topicPageTitleFragmentForWebSpy = spyOn(
+        TopicUpdateService, 'setPageTitleFragmentForWeb');
+      $scope.updateTopicPageTitleFragmentForWeb('new page title');
+      expect(topicPageTitleFragmentForWebSpy).toHaveBeenCalled();
+    });
+
+  it('should not call the TopicUpdateService if topic page title is same',
+    function() {
+      $scope.updateTopicPageTitleFragmentForWeb('New page title');
+      var topicPageTitleFragmentForWebSpy = spyOn(
+        TopicUpdateService, 'setPageTitleFragmentForWeb');
+      $scope.updateTopicPageTitleFragmentForWeb('New page title');
+      expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
     });
 
   it('should call the TopicUpdateService if practice tab is displayed ' +

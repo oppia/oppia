@@ -106,9 +106,9 @@
         <div>
           <p translate="I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE"></p>
           <button type="button"
-                  class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
+                  class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button oppia-autofocus"
                   ng-click="$ctrl.createNewExploration()"
-                  translate="I18N_CREATE_EXPLORATION">
+                  translate="I18N_CREATE_EXPLORATION" autofocus>
           </button>
           <button type="button"
                   class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
@@ -379,17 +379,19 @@
       <div ng-if="!$ctrl.activeThread">
         <div ng-if="$ctrl.mySuggestionsList.length > 0">
           <h2>Suggestions created</h2>
-          <thread-table threads="$ctrl.mySuggestionsList"
-                        on-click-row="$ctrl.setActiveThread">
-          </thread-table>
+          <oppia-thread-table ng-if="$ctrl.mySuggestionsList"
+                              [threads]="$ctrl.mySuggestionsList"
+                              (row-click)="$ctrl.setActiveThread($event)">
+          </oppia-thread-table>
           <br>
         </div>
 
         <div ng-if="$ctrl.suggestionsToReviewList.length > 0">
           <h2>Suggestions to review</h2>
-          <thread-table threads="$ctrl.suggestionsToReviewList"
-                        on-click-row="$ctrl.setActiveThread">
-          </thread-table>
+          <oppia-thread-table ng-if="$ctrl.suggestionsToReviewList"
+                              [threads]="$ctrl.suggestionsToReviewList"
+                              (row-click)="$ctrl.setActiveThread($event)">
+          </oppia-thread-table>
           <br>
         </div>
       </div>
@@ -624,7 +626,7 @@
 
   .oppia-dashboard-list-view-item {
     background: #fff;
-    margin: 20px 7.5px 0px 7.5px;
+    margin: 20px 7.5px 0 7.5px;
     padding: 10px 20px;
   }
   .oppia-dashboard-table {
@@ -814,6 +816,12 @@
     width: 160px;
   }
 
+  @media(max-width: 464px) {
+    .oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
+      position: absolute;
+      top: 1.75em;
+    }
+  }
   @media(max-width: 815px) {
     .oppia-dashboard-container .oppia-dashboard-tabs {
       justify-content: center;
@@ -893,6 +901,14 @@
 
     .oppia-exp-arrow:after {
       content: none;
+    }
+  }
+  @media(max-width: 316px) {
+    body {
+     width: fit-content;
+    }
+    .md-card {
+     width: fit-content;
     }
   }
 </style>

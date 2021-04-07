@@ -23,6 +23,7 @@ import contextlib
 import datetime
 import functools
 
+from core.platform import models
 import python_utils
 
 from google.appengine.api import datastore_types
@@ -30,10 +31,13 @@ from google.appengine.datastore import datastore_query
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
+transaction_services = models.Registry.import_transaction_services()
 Model = ndb.Model
 Key = ndb.Key
 
 BooleanProperty = ndb.BooleanProperty
+DateProperty = ndb.DateProperty
+ComputedProperty = ndb.ComputedProperty
 DateTimeProperty = ndb.DateTimeProperty
 FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
@@ -70,28 +74,45 @@ def get_multi(keys):
     return ndb.get_multi(keys)
 
 
-def put_multi(models):
+def update_timestamps_multi(entities, update_last_updated_time=True):
+    """Update the created_on and last_updated fields of all given entities.
+
+    Args:
+        entities: list(datastore_services.Model). List of model instances to
+            be stored.
+        update_last_updated_time: bool. Whether to update the
+            last_updated field of the model.
+    """
+    for entity in entities:
+        entity.update_timestamps(
+            update_last_updated_time=update_last_updated_time)
+
+
+def put_multi(entities):
     """Stores a sequence of Model instances.
 
     Args:
-        models: list(datastore_services.Model). A list of Model instances.
+        entities: list(datastore_services.Model). A list of Model instances.
 
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(models)
+    return ndb.put_multi(entities)
 
 
-def put_multi_async(models):
-    """Stores a sequence of Model instances asynchronously.
+@transaction_services.run_in_transaction_wrapper
+def delete_multi_transactional(keys):
+    """Deletes models corresponding to a sequence of keys and runs it through
+    a transaction. Either all models are deleted, or none of them in the case
+    when the transaction fails.
 
     Args:
-        models: list(datastore_services.Model). A list of Model instances.
+        keys: list(str). A list of keys.
 
     Returns:
-        list(future). A list of futures.
+        list(None). A list of Nones, one per deleted model.
     """
-    return ndb.put_multi_async(models)
+    return ndb.delete_multi(keys)
 
 
 def delete_multi(keys):
@@ -216,14 +237,14 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
     return all_models_grouped_by_model_type
 
 
-def make_pseudo_random_hr_consistency_policy():
+def make_instantaneous_global_consistency_policy():
     """Returns a policy that always gives the same sequence of consistency
     decisions.
 
     Returns:
         datastore_stub_util.PseudoRandomHRConsistencyPolicy. The policy.
     """
-    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
+    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1.0)
 
 
 @contextlib.contextmanager

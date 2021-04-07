@@ -83,7 +83,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
@@ -113,78 +113,48 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        self.login(self.AUTHOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    suggestion_models
-                    .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': (
-                    suggestion_models.TARGET_TYPE_EXPLORATION),
-                'target_id': 'exp1',
-                'target_version_at_submission': exploration.version,
-                'change': {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'State 1',
-                    'old_value': self.old_content,
-                    'new_value': self.new_content
-                },
-                'description': 'change to state 1',
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self.login(self.AUTHOR_EMAIL_2)
-        csrf_token = self.get_new_csrf_token()
-
-        self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    suggestion_models
-                    .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': (
-                    suggestion_models.TARGET_TYPE_EXPLORATION),
-                'target_id': 'exp1',
-                'target_version_at_submission': exploration.version,
-                'change': {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'State 2',
-                    'old_value': self.old_content,
-                    'new_value': self.new_content
-                },
-                'description': 'change to state 2',
-            }, csrf_token=csrf_token)
-
-        self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    suggestion_models
-                    .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': (
-                    suggestion_models.TARGET_TYPE_EXPLORATION),
-                'target_id': 'exp1',
-                'target_version_at_submission': exploration.version,
-                'change': {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'State 3',
-                    'old_value': self.old_content,
-                    'new_value': self.new_content
-                },
-                'description': 'change to state 3',
-            }, csrf_token=csrf_token)
-        self.logout()
+        # Create some suggestions in the backend.
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            self.author_id, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'old_value': self.old_content,
+                'new_value': self.new_content
+            },
+            'change to state 1')
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            self.author_id_2, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 2',
+                'old_value': self.old_content,
+                'new_value': self.new_content
+            },
+            'change to state 2')
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', exploration.version,
+            self.author_id_2, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 3',
+                'old_value': self.old_content,
+                'new_value': self.new_content
+            },
+            'change to state 3')
 
         self.login(self.TRANSLATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': 'exp1',
                 'target_version_at_submission': exploration.version,
                 'change': {
@@ -199,66 +169,25 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         self.logout()
 
-    def test_create_suggestion(self):
-        self.login(self.AUTHOR_EMAIL_2)
+    def test_edit_state_content_suggestion_is_not_allowed(self):
+        self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    suggestion_models
-                    .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': (
-                    suggestion_models.TARGET_TYPE_EXPLORATION),
+                'suggestion_type': feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': 'exp1',
-                'target_version_at_submission': exploration.version,
+                'target_version_at_submission': 2,
                 'change': {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'State 3',
+                    'state_name': 'State 1',
+                    'old_value': self.old_content,
                     'new_value': self.new_content
                 },
-                'description': 'change again to state 3',
-            }, csrf_token=csrf_token)
-        suggestions = self.get_json(
-            '%s?author_id=%s' % (
-                feconf.SUGGESTION_LIST_URL_PREFIX,
-                self.author_id_2))['suggestions']
-        self.assertEqual(len(suggestions), 3)
-        self.logout()
-
-    def test_create_suggestion_invalid_target_version_input(self):
-        self.login(self.AUTHOR_EMAIL_2)
-        csrf_token = self.get_new_csrf_token()
-
-        response = self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    suggestion_models
-                    .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': (
-                    suggestion_models.TARGET_TYPE_EXPLORATION),
-                'target_id': 'exp1',
-                'target_version_at_submission': 'invalid target version',
-                'change': {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                    'state_name': 'State 3',
-                    'new_value': self.new_content
-                },
-                'description': 'change again to state 3',
+                'description': 'change to state 1',
             }, csrf_token=csrf_token, expected_status_int=400)
-        suggestions = self.get_json(
-            '%s?author_id=%s' % (
-                feconf.SUGGESTION_LIST_URL_PREFIX,
-                self.author_id_2))['suggestions']
-
-        self.assertEqual(
-            response['error'],
-            'Expected target_version_at_submission to be an int, received <type'
-            ' \'unicode\'>')
-        self.assertEqual(len(suggestions), 2)
         self.logout()
 
     def test_suggestion_to_exploration_handler_with_invalid_suggestion_id(self):
@@ -319,8 +248,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, self.editor_id)
 
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_TOPIC, exp_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_TOPIC, exp_id, 1,
             self.author_id, {
                 'cmd': (
                     question_domain
@@ -394,8 +323,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id, 1,
             self.editor_id, change_cmd, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
@@ -492,12 +421,12 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion_to_accept['suggestion_id']), {
                 'action': u'accept',
                 'commit_message':
-                    u'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                    u'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
                 'review_message': u'Accepted'
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Commit messages must be at most 1000 characters long.'
+            'Commit messages must be at most 375 characters long.'
         )
 
     def test_accept_suggestion(self):
@@ -645,7 +574,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestions = self.get_json(
             '%s?author_id=%s&target_type=%s&target_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX, self.author_id_2,
-                suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID)
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
             )['suggestions']
         self.assertEqual(len(suggestions), 2)
 
@@ -784,8 +713,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': exp_id,
                 'target_version_at_submission': exploration.version,
                 'change': {
@@ -843,7 +772,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
-    AUTHOR_EMAIL_2 = 'author2@example.com'
 
     # Needs to be 12 characters long.
     SKILL_ID = 'skill1234567'
@@ -874,8 +802,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
                 'change': {
@@ -890,20 +818,29 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         self.logout()
 
+    def test_create_question_suggestion(self):
+        self.login(self.AUTHOR_EMAIL)
+        suggestions = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions']
+        self.assertEqual(len(suggestions), 1)
+        self.logout()
+
     def test_query_question_suggestions(self):
         suggestions = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions']
         self.assertEqual(len(suggestions), 1)
         suggestion = suggestions[0]
         self.assertEqual(
             suggestion['suggestion_type'],
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+            feconf.SUGGESTION_TYPE_ADD_QUESTION)
         self.assertEqual(suggestion['target_id'], self.SKILL_ID)
         self.assertEqual(
-            suggestion['target_type'], suggestion_models.TARGET_TYPE_SKILL)
+            suggestion['target_type'], feconf.ENTITY_TYPE_SKILL)
         self.assertEqual(
             suggestion['change']['cmd'],
             question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION)
@@ -912,7 +849,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         suggestion_to_accept = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions'][0]
 
         self.login(self.ADMIN_EMAIL)
@@ -931,7 +868,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         suggestion_post_accept = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions'][0]
         self.assertEqual(
             suggestion_post_accept['status'],
@@ -954,6 +891,39 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_to_accept['suggestion_id'])
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'This looks good!')
+
+    def test_create_suggestion_invalid_target_version_input(self):
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
+                'target_id': self.SKILL_ID,
+                'target_version_at_submission': 'invalid_target_version',
+                'change': {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': self.question_dict,
+                    'skill_id': self.SKILL_ID,
+                    'skill_difficulty': 0.3
+                },
+                'description': 'Add new question to skill'
+            }, csrf_token=csrf_token, expected_status_int=400)
+        suggestions = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions']
+
+        self.assertEqual(
+            response['error'],
+            'Expected target_version_at_submission to be an int, received <type'
+            ' \'unicode\'>')
+        self.assertEqual(len(suggestions), 1)
+        self.logout()
 
     def test_suggestion_creation_with_valid_images(self):
         self.save_new_skill(
@@ -987,8 +957,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
                 'change': {
@@ -1031,8 +1001,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         response_dict = self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
                 'change': {
@@ -1081,8 +1051,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         response_dict = self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
                 'change': {
@@ -1142,8 +1112,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.skill_id,
                 'target_version_at_submission': 1,
                 'change': {
@@ -1163,7 +1133,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
 
         thread_id = feedback_services.create_thread(
-            suggestion_models.TARGET_TYPE_QUESTION, self.skill_id,
+            feconf.ENTITY_TYPE_QUESTION, self.skill_id,
             self.author_id, 'description', '', has_suggestion=True)
 
         csrf_token = self.get_new_csrf_token()
@@ -1193,8 +1163,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id, 1,
             self.author_id, change_cmd, 'sample description')
 
         suggestion_id = suggestion_services.query_suggestions(
@@ -1433,7 +1403,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.reviewer_id = self.editor_id
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
@@ -1458,8 +1428,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': (suggestion_models.TARGET_TYPE_EXPLORATION),
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {
@@ -1486,8 +1456,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
                 'change': {
@@ -1588,7 +1558,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
@@ -1666,8 +1636,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': (suggestion_models.TARGET_TYPE_EXPLORATION),
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {
@@ -1694,8 +1664,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
                 'change': {

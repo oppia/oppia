@@ -19,7 +19,7 @@ import { TestBed } from '@angular/core/testing';
 import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Logger Service', () => {
-  let ls;
+  let ls: LoggerService;
 
   beforeEach(() => {
     ls = TestBed.get(LoggerService);

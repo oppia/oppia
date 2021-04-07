@@ -37,19 +37,20 @@ require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/contextual/url.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
-    '$rootScope', 'AlertsService', 'AssetsBackendApiService',
+    '$rootScope', '$window', 'AlertsService', 'AssetsBackendApiService',
     'LoaderService', 'StoryViewerBackendApiService',
-    'UrlInterpolationService', 'UrlService', 'ENTITY_TYPE',
-    'FATAL_ERROR_CODES',
+    'UrlInterpolationService', 'UrlService', 'UserService',
+    'ENTITY_TYPE', 'FATAL_ERROR_CODES',
     function(
-        $rootScope, AlertsService, AssetsBackendApiService,
+        $rootScope, $window, AlertsService, AssetsBackendApiService,
         LoaderService, StoryViewerBackendApiService,
-        UrlInterpolationService, UrlService, ENTITY_TYPE,
-        FATAL_ERROR_CODES) {
+        UrlInterpolationService, UrlService, UserService,
+        ENTITY_TYPE, FATAL_ERROR_CODES) {
       var ctrl = this;
 
       ctrl.storyViewerBackendApiService = (
@@ -95,14 +96,12 @@ angular.module('oppia').component('storyViewerPage', {
         return iconParametersArray;
       };
 
-      ctrl.isChapterLocked = function(node) {
-        if (
-          node.isCompleted() || (
-            node.getId() ===
-            ctrl.storyPlaythroughObject.getNextPendingNodeId())) {
-          return false;
-        }
-        return true;
+      ctrl.signIn = function() {
+        UserService.getLoginUrlAsync().then(
+          loginUrl => {
+            loginUrl ? $window.location = loginUrl : (
+              $window.location.reload());
+          });
       };
 
       ctrl.getExplorationUrl = function(node) {
@@ -123,6 +122,13 @@ angular.module('oppia').component('storyViewerPage', {
 
       ctrl.$onInit = function() {
         ctrl.storyIsLoaded = false;
+        ctrl.isLoggedIn = false;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.isLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
+        });
         LoaderService.showLoadingScreen('Loading');
         var topicUrlFragment = (
           UrlService.getTopicUrlFragmentFromLearnerUrl());
@@ -130,7 +136,7 @@ angular.module('oppia').component('storyViewerPage', {
           UrlService.getClassroomUrlFragmentFromLearnerUrl());
         var storyUrlFragment = (
           UrlService.getStoryUrlFragmentFromLearnerUrl());
-        ctrl.storyViewerBackendApiService.fetchStoryData(
+        ctrl.storyViewerBackendApiService.fetchStoryDataAsync(
           topicUrlFragment,
           classroomUrlFragment,
           storyUrlFragment).then(

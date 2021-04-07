@@ -44,10 +44,52 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
+class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to questions.
+
+    A new instance of this model is created and saved every time a commit to
+    QuestionModel occurs.
+
+    The id for this model is of the form 'question-[question_id]-[version]'.
+    """
+
+    # The id of the question being edited.
+    question_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_instance_id(cls, question_id, question_version):
+        """Returns ID of the question commit log entry model.
+
+        Args:
+            question_id: str. The question id whose states are mapped.
+            question_version: int. The version of the question.
+
+        Returns:
+            str. A string containing question ID and
+            question version.
+        """
+        return 'question-%s-%s' % (question_id, question_version)
 
 
 class QuestionModel(base_models.VersionedModel):
@@ -58,6 +100,7 @@ class QuestionModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = QuestionCommitLogEntryModel
     ALLOW_REVERT = True
 
     # An object representing the question state data.
@@ -85,14 +128,17 @@ class QuestionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionModel doesn't contain any data directly corresponding to
-        a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_state_data_schema_version':
@@ -221,32 +267,22 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question-skill link should be kept since questions are only
-        anonymized and are not deleted whe user is deleted.
-        """
-        return base_models.DELETION_POLICY.KEEP
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_difficulty': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether QuestionSkillLinkModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -376,7 +412,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
             raise Exception('Please keep the number of skill IDs below 20.')
 
-        if not skill_ids:
+        if (not skill_ids) or (total_question_count == 0):
             return []
 
         question_count_per_skill = int(
@@ -632,42 +668,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         cls.delete_multi(question_skill_links)
 
 
-class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to questions.
-
-    A new instance of this model is created and saved every time a commit to
-    QuestionModel occurs.
-
-    The id for this model is of the form 'question-[question_id]-[version]'.
-    """
-
-    # The id of the question being edited.
-    question_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @classmethod
-    def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    @classmethod
-    def _get_instance_id(cls, question_id, question_version):
-        """Returns ID of the question commit log entry model.
-
-        Args:
-            question_id: str. The question id whose states are mapped.
-            question_version: int. The version of the question.
-
-        Returns:
-            str. A string containing question ID and
-            question version.
-        """
-        return 'question-%s-%s' % (question_id, question_version)
-
-
 class QuestionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia question.
 
@@ -706,16 +706,23 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @classmethod
-    def get_export_policy(cls):
+    @staticmethod
+    def get_model_association_to_user():
         """Model data has already been exported as a part of the QuestionModel
         export_data function, and thus a new export_data function does not
         need to be defined here.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because because noteworthy details that belong to this model have
+        already been exported as a part of the QuestionModel export_data
+        function.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'question_model_last_updated':

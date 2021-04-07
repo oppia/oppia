@@ -58,7 +58,8 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('translationTab', {
   template: require('./translation-tab.component.html'),
-  controller: ['$scope', '$templateCache', '$uibModal',
+  controller: [
+    '$scope', '$templateCache', '$uibModal',
     'ContextService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'RouterService', 'SiteAnalyticsService',
     'StateEditorService', 'StateRecordedVoiceoversService',
@@ -87,7 +88,7 @@ angular.module('oppia').component('translationTab', {
       ngJoyrideTemplate = ngJoyrideTemplate.replace(
         /\{\{/g, '<[').replace(/\}\}/g, ']>');
 
-      var initTranslationTab = function() {
+      $scope.initTranslationTab = function() {
         StateTutorialFirstTimeService.initTranslation(
           ContextService.getExplorationId());
         var stateName = StateEditorService.getActiveStateName();
@@ -100,13 +101,17 @@ angular.module('oppia').component('translationTab', {
         $scope.showTranslationTabSubDirectives = true;
         TranslationTabActiveModeService.activateVoiceoverMode();
         LoaderService.hideLoadingScreen();
+
+        if (EditabilityService.inTutorialMode()) {
+          $scope.startTutorial();
+        }
       };
 
       $scope.leaveTutorial = function() {
         EditabilityService.onEndTutorial();
         $scope.$apply();
         StateTutorialFirstTimeService.markTranslationTutorialFinished();
-        $scope.translationTutorial = false;
+        $scope.tutorialInProgress = false;
       };
 
       $scope.onFinishTutorial = function() {
@@ -118,13 +123,12 @@ angular.module('oppia').component('translationTab', {
       };
 
       var permissions = null;
-      $scope.onStartTutorial = function() {
+      $scope.startTutorial = function() {
         if (permissions === null) {
           return;
         }
         if (permissions.canVoiceover) {
-          EditabilityService.onStartTutorial();
-          $scope.translationTutorial = true;
+          $scope.tutorialInProgress = true;
         }
       };
 
@@ -139,7 +143,7 @@ angular.module('oppia').component('translationTab', {
         }).result.then(function(explorationId) {
           SiteAnalyticsService.registerAcceptTutorialModalEvent(
             explorationId);
-          $scope.onStartTutorial();
+          $scope.startTutorial();
         }, function(explorationId) {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(
             explorationId);
@@ -151,20 +155,20 @@ angular.module('oppia').component('translationTab', {
         LoaderService.showLoadingScreen('Loading');
         $scope.isTranslationTabBusy = false;
         $scope.showTranslationTabSubDirectives = false;
+        $scope.tutorialInProgress = false;
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshTranslationTab.subscribe(
             () => {
-              initTranslationTab();
+              $scope.initTranslationTab();
             }
           )
         );
         // Toggles the translation tab tutorial on/off.
-        $scope.translationTutorial = false;
         $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
           type: 'title',
           heading: 'Translations In Oppia',
           text: (
-            'Hello, welcome to Translation Tab! ' +
+            'Hello, welcome to the Translation Tab! ' +
             'This tour will walk you through the translation page. ' +
             'Hit the "Next" button to begin.')
         }, {
@@ -199,8 +203,8 @@ angular.module('oppia').component('translationTab', {
           text: (
             'Then, choose a card from the exploration overview by ' +
             'clicking on the card. The selected card will have ' +
-            'a bolded border. Cards that have missing translations are ' +
-            'coloured yellow or red, and these are good places to start.'),
+            'a bold border. Cards with missing translations are ' +
+            'coloured yellow or red. These are good places to start.'),
           placement: 'left'
         }, {
           type: 'function',
@@ -217,8 +221,8 @@ angular.module('oppia').component('translationTab', {
           selector: _ID_TUTORIAL_TRANSLATION_STATE,
           heading: 'Choose a Part of the Card to Translate',
           text: (
-            '<p>Next choose one of the parts of the lesson card from ' +
-            'menu at the top. This lists all the translatable parts ' +
+            '<p>Next, choose a part of the lesson card to translate. This ' +
+            'menu at the top lists all the translatable parts ' +
             'of the card. Within each tab, multiple sections may be ' +
             'available for translating.</p>'),
           placement: 'bottom'
@@ -234,6 +238,12 @@ angular.module('oppia').component('translationTab', {
           heading: 'Recording Audio',
           text: (
             '<p>To create audio translations in Oppia, ' +
+            'we recommend using the ' +
+            '<i class="material-icons" style="color:#009688" >' +
+            '&#xE2C6;</i>' +
+            'button to <b>upload</b> audio files from your computer.</p>' +
+            '<p>You can also record via your browser, but that may lead to ' +
+            'degraded audio quality. If you would like to do so anyway, ' +
             'simply follow these 3 steps:</p>' +
             '<ol>' +
             '  <li>' +
@@ -253,11 +263,7 @@ angular.module('oppia').component('translationTab', {
             '    style="color:#009688" > &#xE161;</i> button ' +
             '    to confirm the recording.' +
             '  </li>' +
-            '</ol>' +
-            '<p>Alternatively, you can use the ' +
-            '<i class="material-icons" style="color:#009688" >' +
-            '&#xE2C6;</i>' +
-            'button to <b>upload</b> audio files from your computer.</p>')
+            '</ol>')
         }, {
           type: 'function',
           fn: function(isGoingForward) {
@@ -284,12 +290,12 @@ angular.module('oppia').component('translationTab', {
             '    &#xE039;</i> button. ' +
             '  </li>' +
             '  <li>' +
-            '    To do retakes, click ' +
+            '    To do retakes, click the ' +
             '    <i class="material-icons" style="color:#009688">' +
             '    &#xE028;</i> button. ' +
             '  </li>' +
             '  <li>' +
-            '    To delete a recording, click ' +
+            '    To delete a recording, click the ' +
             '    <i class="material-icons" style="color:#009688">' +
             '    &#xE872;</i> button. ' +
             '  </li>' +
@@ -327,13 +333,6 @@ angular.module('oppia').component('translationTab', {
           // eslint-disable-next-line max-len
           StateTutorialFirstTimeService.onEnterTranslationForTheFirstTime.subscribe(
             () => $scope.showWelcomeTranslationModal()
-          )
-        );
-        ctrl.directiveSubscriptions.add(
-          StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
-            () => {
-              $scope.onStartTutorial();
-            }
           )
         );
       };

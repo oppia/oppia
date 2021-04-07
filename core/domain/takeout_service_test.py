@@ -31,20 +31,21 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (
-    collection_models, config_models, email_models,
-    exploration_models, feedback_models, improvements_models,
-    question_models, skill_models, story_models,
-    subtopic_models, suggestion_models, topic_models,
-    user_models
+    app_feedback_report_models, auth_models, base_models, collection_models,
+    config_models, email_models, exploration_models, feedback_models,
+    improvements_models, question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.app_feedback_report, models.NAMES.auth,
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 
@@ -93,8 +94,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         10) Creates new exploration rights.
         11) Populates user settings.
         """
-        super(TakeoutServiceProfileUserUnitTests, self).setUp()
-
         # Setup for UserSkillModel.
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
@@ -200,7 +199,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
-        super(TakeoutServiceProfileUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
@@ -277,7 +275,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
     COLLECTION_IDS_2 = ['32', '44', '6']
-    ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
@@ -313,6 +310,37 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         {'cmd': 'some_command'},
         {'cmd2': 'another_command'}
     ]
+    PLATFORM_ANDROID = 'android'
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_ID = '%s.%s.%s' % (
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    DEVICE_COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 28
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
@@ -333,8 +361,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         15) Populates user settings.
         16) Creates two reply-to ids for feedback.
         17) Creates a task closed by the user.
+        18) Simulates user_1 scrubbing a report.
         """
-        super(TakeoutServiceFullUserUnitTests, self).setUp()
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -376,7 +404,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_1, creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.ACTIVITY_IDS,
+            exploration_ids=self.EXPLORATION_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATE).put()
 
@@ -477,8 +505,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXPLORATION_IDS[0], 1,
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
@@ -708,9 +736,53 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        user_models.UserEmailPreferencesModel(
+            id=self.USER_ID_1,
+            site_updates=False,
+            editor_role_notifications=False,
+            feedback_message_notifications=False,
+            subscription_notifications=False
+        ).put()
+        auth_models.UserAuthDetailsModel(
+            id=self.USER_ID_1,
+            parent_user_id=self.PROFILE_ID_1
+        ).put()
+
+        # Set-up for AppFeedbackReportModel scrubbed by user.
+        report_id = '%s.%s.%s' % (
+            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
+            'randomInteger123')
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=report_id,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=None,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=(
+                self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        report_entity = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id))
+        report_entity.scrubbed_by = self.USER_ID_1
+        report_entity.update_timestamps()
+        report_entity.put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
-        super(TakeoutServiceFullUserUnitTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
@@ -734,8 +806,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     def test_export_data_for_full_user_trivial_is_correct(self):
         """Trivial test of export_data functionality."""
         self.set_up_trivial()
-
+        self.maxDiff = None
         # Generate expected output.
+        app_feedback_report = {}
         collection_progress_data = {}
         collection_rights_data = {
             'editable_collection_ids': [],
@@ -765,11 +838,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': None,
             'normalized_username': None,
-            'last_agreed_to_terms': None,
-            'last_started_state_editor_tutorial': None,
-            'last_started_state_translation_tutorial': None,
-            'last_logged_in': None,
-            'last_edited_an_exploration': None,
+            'last_agreed_to_terms_msec': None,
+            'last_started_state_editor_tutorial_msec': None,
+            'last_started_state_translation_tutorial_msec': None,
+            'last_logged_in_msec': None,
+            'last_edited_an_exploration_msec': None,
+            'last_created_an_exploration_msec': None,
             'profile_picture_filename': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -780,20 +854,22 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'display_alias': None,
-            'pin': None
         }
         skill_data = {}
         stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
-            'activity_ids': [],
+            'exploration_ids': [],
             'collection_ids': [],
             'creator_usernames': [],
             'general_feedback_thread_ids': [],
-            'last_checked': None
+            'last_checked_msec': None
         }
         task_entry_data = {
-            'task_ids_resolved_by_user': []
+            'task_ids_resolved_by_user': [],
+            'issue_descriptions': [],
+            'resolution_msecs': [],
+            'statuses': []
         }
         topic_rights_data = {
             'managed_topic_ids': []
@@ -814,8 +890,11 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
         expected_platform_parameter_sm = {}
+        expected_user_auth_details = {}
+        expected_user_email_preferences = {}
 
         expected_user_data = {
+            'app_feedback_report': app_feedback_report,
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
@@ -862,6 +941,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
+            'user_auth_details': expected_user_auth_details,
+            'user_email_preferences': expected_user_email_preferences
         }
 
         # Perform export and compare.
@@ -875,6 +956,186 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
         expected_images = []
         self.assertEqual(expected_images, observed_images)
+
+    def test_exports_have_single_takeout_dict_key(self):
+        """Test to ensure that all export policies that specify a key for the
+        Takeout dict are also models that specify this policy are type
+        MULTIPLE_INSTANCES_PER_USER.
+        """
+        self.set_up_non_trivial()
+
+        # We set up the feedback_thread_model here so that we can easily
+        # access it when computing the expected data later.
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=self.THREAD_ENTITY_TYPE,
+            entity_id=self.THREAD_ENTITY_ID,
+            original_author_id=self.USER_ID_1,
+            status=self.THREAD_STATUS,
+            subject=self.THREAD_SUBJECT,
+            has_suggestion=self.THREAD_HAS_SUGGESTION,
+            summary=self.THREAD_SUMMARY,
+            message_count=self.THREAD_MESSAGE_COUNT
+        )
+        feedback_thread_model.put()
+
+        thread_id = feedback_services.create_thread(
+            self.THREAD_ENTITY_TYPE,
+            self.THREAD_ENTITY_ID,
+            self.USER_ID_1,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+        feedback_services.create_message(
+            thread_id,
+            self.USER_ID_1,
+            self.THREAD_STATUS,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+
+        # Retrieve all models for export.
+        all_models = [
+            clazz
+            for clazz in test_utils.get_storage_model_classes()
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
+        ]
+
+        for model in all_models:
+            export_method = model.get_model_association_to_user()
+            export_policy = model.get_export_policy()
+            num_takeout_keys = 0
+            for field_export_policy in export_policy.values():
+                if (field_export_policy ==
+                        base_models
+                        .EXPORT_POLICY
+                        .EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
+                    num_takeout_keys += 1
+
+            if (export_method ==
+                    base_models.MODEL_ASSOCIATION_TO_USER
+                    .MULTIPLE_INSTANCES_PER_USER):
+                # If the id is used as a Takeout key, then we should not
+                # have any fields exported as the key for the Takeout.
+                self.assertEqual(
+                    num_takeout_keys,
+                    0 if model.ID_IS_USED_AS_TAKEOUT_KEY else 1)
+            else:
+                self.assertEqual(num_takeout_keys, 0)
+
+    def test_exports_follow_export_policies(self):
+        """Test to ensure that all fields that should be exported
+        per the export policy are exported, and exported in the proper format.
+        """
+        self.set_up_non_trivial()
+
+        # We set up the feedback_thread_model here so that we can easily
+        # access it when computing the expected data later.
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=self.THREAD_ENTITY_TYPE,
+            entity_id=self.THREAD_ENTITY_ID,
+            original_author_id=self.USER_ID_1,
+            status=self.THREAD_STATUS,
+            subject=self.THREAD_SUBJECT,
+            has_suggestion=self.THREAD_HAS_SUGGESTION,
+            summary=self.THREAD_SUMMARY,
+            message_count=self.THREAD_MESSAGE_COUNT
+        )
+        feedback_thread_model.put()
+
+        thread_id = feedback_services.create_thread(
+            self.THREAD_ENTITY_TYPE,
+            self.THREAD_ENTITY_ID,
+            self.USER_ID_1,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+        feedback_services.create_message(
+            thread_id,
+            self.USER_ID_1,
+            self.THREAD_STATUS,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+
+        # Retrieve all models for export.
+        all_models = [
+            clazz
+            for clazz in test_utils.get_storage_model_classes()
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
+        ]
+
+        # Iterate over models and test export policies.
+        for model in all_models:
+            export_method = model.get_model_association_to_user()
+            export_policy = model.get_export_policy()
+            renamed_export_keys = model.get_field_names_for_takeout()
+            exported_field_names = []
+            field_used_as_key_for_takeout_dict = None
+            for field_name in model._properties: # pylint: disable=protected-access
+                if (export_policy[field_name] ==
+                        base_models.EXPORT_POLICY.EXPORTED):
+                    if field_name in renamed_export_keys:
+                        exported_field_names.append(
+                            renamed_export_keys[field_name]
+                        )
+                    else:
+                        exported_field_names.append(field_name)
+                elif (export_policy[field_name] ==
+                      base_models
+                      .EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT):
+                    field_used_as_key_for_takeout_dict = field_name
+
+            if (export_method ==
+                    base_models
+                    .MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER):
+                self.assertEqual(len(exported_field_names), 0)
+            elif (export_method ==
+                  base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER):
+                exported_data = model.export_data(self.USER_ID_1)
+                self.assertEqual(
+                    sorted([
+                        python_utils.UNICODE(key)
+                        for key in exported_data.keys()]),
+                    sorted(exported_field_names)
+                )
+            elif (export_method ==
+                  base_models
+                  .MODEL_ASSOCIATION_TO_USER
+                  .ONE_INSTANCE_SHARED_ACROSS_USERS):
+                self.assertIsNotNone(
+                    model.get_field_name_mapping_to_takeout_keys)
+                exported_data = model.export_data(self.USER_ID_1)
+                field_mapping = model.get_field_name_mapping_to_takeout_keys()
+                self.assertEqual(
+                    sorted(exported_field_names),
+                    sorted(field_mapping.keys())
+                )
+                self.assertEqual(
+                    sorted(exported_data.keys()),
+                    sorted(field_mapping.values())
+                )
+            elif (export_method ==
+                  base_models
+                  .MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER):
+                exported_data = model.export_data(self.USER_ID_1)
+                for model_id in exported_data.keys():
+                    # If we are using a field as a Takeout key.
+                    if field_used_as_key_for_takeout_dict:
+                        # Ensure that we export the field.
+                        self.assertEqual(
+                            model_id,
+                            getattr(
+                                model,
+                                field_used_as_key_for_takeout_dict)
+                        )
+                    self.assertEqual(
+                        sorted([
+                            python_utils.UNICODE(key)
+                            for key in exported_data[model_id].keys()]),
+                        sorted(exported_field_names)
+                    )
 
     def test_export_data_for_full_user_nontrivial_is_correct(self):
         """Nontrivial test of export_data functionality."""
@@ -912,9 +1173,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
-                'rated_on': self.GENERIC_EPOCH,
+                'rated_on_msec': self.GENERIC_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.GENERIC_EPOCH,
+                'draft_change_list_last_updated_msec': self.GENERIC_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -988,7 +1249,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             }
         }
         expected_general_feedback_thread_user_data = {
-            thread_id: self.MESSAGE_IDS_READ_BY_USER
+            thread_id: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_BY_USER
+            }
         }
         expected_general_feedback_message_data = {
             thread_id + '.0': {
@@ -1020,8 +1283,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
                 'status': suggestion_models.STATUS_IN_REVIEW,
@@ -1042,11 +1305,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_EPOCH,
-            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
-            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
-            'last_logged_in': self.GENERIC_EPOCH,
-            'last_edited_an_exploration': self.GENERIC_EPOCH,
+            'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial_msec': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial_msec': self.GENERIC_EPOCH,
+            'last_logged_in_msec': self.GENERIC_EPOCH,
+            'last_edited_an_exploration_msec': self.GENERIC_EPOCH,
+            'last_created_an_exploration_msec': self.GENERIC_EPOCH,
             'profile_picture_filename': 'user_settings_profile_picture.png',
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -1057,21 +1321,24 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
-            'pin': self.GENERIC_PIN
         }
 
         expected_reply_to_data = {
-            self.THREAD_ID_1: self.USER_1_REPLY_TO_ID_1,
-            self.THREAD_ID_2: self.USER_1_REPLY_TO_ID_2
+            self.THREAD_ID_1: {
+                'reply_to_id': self.USER_1_REPLY_TO_ID_1
+            },
+            self.THREAD_ID_2: {
+                'reply_to_id': self.USER_1_REPLY_TO_ID_2
+            }
         }
 
         expected_subscriptions_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
+            'exploration_ids': self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
-            'last_checked': self.GENERIC_EPOCH
+            'last_checked_msec': self.GENERIC_EPOCH
         }
 
         expected_task_entry_data = {
@@ -1200,6 +1467,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        expected_user_email_preferences = {}
+        expected_user_auth_details = {}
+        expected_app_feedback_report = {
+            '%s.%s.%s' % (
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
+                'randomInteger123'): {
+                    'scrubbed_by': self.USER_ID_1,
+                    'platform': self.PLATFORM_ANDROID,
+                    'ticket_id': self.TICKET_ID,
+                    'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+                    'report_type': self.REPORT_TYPE_SUGGESTION,
+                    'category': self.CATEGORY_OTHER,
+                    'platform_version': self.PLATFORM_VERSION}}
 
         expected_user_data = {
             'user_stats': expected_stats_data,
@@ -1251,6 +1531,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
+            'user_email_preferences': expected_user_email_preferences,
+            'user_auth_details': expected_user_auth_details,
+            'app_feedback_report': expected_app_feedback_report
         }
 
         user_takeout_object = takeout_service.export_data_for_user(
@@ -1288,10 +1571,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'role': self.PROFILE_1_ROLE,
             'username': None,
             'normalized_username': None,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': None,
+            'last_agreed_to_terms_msec': self.GENERIC_DATE,
+            'last_started_state_editor_tutorial_msec': None,
             'last_started_state_translation_tutorial': None,
-            'last_logged_in': self.GENERIC_DATE,
+            'last_logged_in_msec': self.GENERIC_DATE,
             'last_created_an_exploration': None,
             'last_edited_an_exploration': None,
             'profile_picture_data_url': None,

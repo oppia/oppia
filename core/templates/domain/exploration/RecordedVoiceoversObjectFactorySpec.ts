@@ -131,7 +131,7 @@ describe('RecordedVoiceovers object factory', () => {
     var contentIdList = [
       'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
       'hint_2', 'solution'];
-    expect(rv.getAllContentId()).toEqual(contentIdList);
+    expect(rv.getAllContentIds()).toEqual(contentIdList);
   });
 
   it('should correctly get all bindable audio voiceovers', () => {
@@ -182,7 +182,7 @@ describe('RecordedVoiceovers object factory', () => {
 
   it('should get all language code for a given content id', () => {
     var LanguageCodeList = ['en', 'hi'];
-    expect(rv.getVoiceoverLanguageCodes('hint_1')).toEqual(LanguageCodeList);
+    expect(rv.getLanguageCodes('hint_1')).toEqual(LanguageCodeList);
   });
 
   it('should correctly check content id has voiceovers', () => {
@@ -209,7 +209,7 @@ describe('RecordedVoiceovers object factory', () => {
     var contentIdList = [
       'content', 'default_outcome', 'feedback_2', 'hint_1', 'hint_2',
       'solution'];
-    expect(rv.getAllContentId()).toEqual(contentIdList);
+    expect(rv.getAllContentIds()).toEqual(contentIdList);
     expect(() => {
       rv.deleteContentId('feedback_3');
     }).toThrowError('Unable to find the given content id.');

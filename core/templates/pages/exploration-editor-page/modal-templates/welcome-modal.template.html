@@ -10,8 +10,8 @@
       </p>
 
       <button type="button"
-              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-start-tutorial"
-              ng-click="confirm(explorationId)">
+              class="btn oppia-welcome-modal-button oppia-transition-200 protractor-test-start-tutorial oppia-autofocus"
+              ng-click="confirm(explorationId)" autofocus>
         Yes, please!
       </button>
 
@@ -49,9 +49,9 @@
 
   .oppia-welcome-modal .oppia-welcome-modal-button {
     background-color: #015c53;
-    border-radius: 0;
+    border-radius: 4px;
     color: #fff;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 14px;
     margin-top: 10px;
     text-transform: uppercase;

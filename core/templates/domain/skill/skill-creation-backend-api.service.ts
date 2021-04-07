@@ -68,7 +68,7 @@ export class SkillCreationBackendApiService {
       errorCallback: (reason: string) => void,
       description: string, rubrics: RubricBackendDict, explanation: string,
       linkedTopicIds: string[], imagesData: ImageData[]): void {
-    let postData:SkillCreationBackendDict = {
+    let postData: SkillCreationBackendDict = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,

@@ -66,13 +66,6 @@ angular.module('oppia').constant(
     .INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
 
 angular.module('oppia').constant(
-  'ACTION_ACCEPT_SUGGESTION',
-  ExplorationEditorPageConstants.ACTION_ACCEPT_SUGGESTION);
-angular.module('oppia').constant(
-  'ACTION_REJECT_SUGGESTION',
-  ExplorationEditorPageConstants.ACTION_REJECT_SUGGESTION);
-
-angular.module('oppia').constant(
   'STATUS_COMPLIMENT', ExplorationEditorPageConstants.STATUS_COMPLIMENT);
 angular.module('oppia').constant(
   'STATUS_FIXED', ExplorationEditorPageConstants.STATUS_FIXED);

@@ -26,12 +26,13 @@ from core.domain import activity_services
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import subscription_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
 
-current_user_services = models.Registry.import_current_user_services()
+datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
@@ -116,7 +117,8 @@ def _update_exploration_summary(activity_rights):
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
-    exp_services.regenerate_exploration_summary(activity_rights.id, None)
+    exp_services.regenerate_exploration_and_contributors_summaries(
+        activity_rights.id)
 
 
 def _update_collection_summary(activity_rights):
@@ -129,9 +131,9 @@ def _update_collection_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-
     from core.domain import collection_services
-    collection_services.regenerate_collection_summary(activity_rights.id, None)
+    collection_services.regenerate_collection_and_contributors_summaries(
+        activity_rights.id)
 
 
 def _update_activity_summary(activity_type, activity_rights):
@@ -254,6 +256,65 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
                     model, constants.ACTIVITY_TYPE_EXPLORATION))
 
     return exp_models_list
+
+
+def _get_activity_rights_where_user_is_owner(activity_type, user_id):
+    """Returns a list of activity rights where the user is the owner.
+
+    Args:
+        activity_type: str. The type of activity. Possible values:
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user has some
+        role.
+    """
+    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        rights_model_class = exp_models.ExplorationRightsModel
+    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+        rights_model_class = collection_models.CollectionRightsModel
+
+    activity_rights_models = rights_model_class.query(
+        datastore_services.any_of(
+            rights_model_class.owner_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_activity_rights_from_model(activity_rights_model, activity_type)
+        for activity_rights_model in activity_rights_models
+    ]
+
+
+def get_exploration_rights_where_user_is_owner(user_id):
+    """Returns a list of exploration rights where the user is the owner.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
+    """
+    return _get_activity_rights_where_user_is_owner(
+        constants.ACTIVITY_TYPE_EXPLORATION, user_id
+    )
+
+
+def get_collection_rights_where_user_is_owner(user_id):
+    """Returns a list of collection rights where the user is the owner.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
+    """
+    return _get_activity_rights_where_user_is_owner(
+        constants.ACTIVITY_TYPE_COLLECTION, user_id
+    )
 
 
 def is_exploration_private(exploration_id):
@@ -820,7 +881,9 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
             'This user does not have any role in %s with ID %s'
             % (activity_type, activity_id))
 
-    assignee_username = user_services.get_username(removed_user_id)
+    assignee_username = user_services.get_usernames(removed_user_id)[0]
+    if assignee_username is None:
+        assignee_username = 'ANONYMOUS'
     commit_message = 'Remove %s from role %s for %s' % (
         assignee_username, old_role, activity_type)
     commit_cmds = [{
@@ -1140,6 +1203,9 @@ def unpublish_exploration(committer, exploration_id):
     """
     _unpublish_activity(
         committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, [exploration_id])
 
 
 # Rights functions for collections.

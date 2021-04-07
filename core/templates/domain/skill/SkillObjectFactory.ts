@@ -40,7 +40,7 @@ import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
 import { RubricObjectFactory, Rubric, RubricBackendDict } from
   'domain/skill/RubricObjectFactory';
 import { ValidatorsService } from 'services/validators.service.ts';
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 export class Skill {
   _id: string;
@@ -54,7 +54,7 @@ export class Skill {
   _supersedingSkillId: string | null;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
-  SKILL_DIFFICULTIES: string[] = constants.SKILL_DIFFICULTIES;
+  SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(
       id: string, description: string, misconceptions: Misconception[],
@@ -226,7 +226,7 @@ export class Skill {
   }
   getValidationIssues(): string[] {
     var issues = [];
-    if (this.getConceptCard().getExplanation().getHtml() === '') {
+    if (this.getConceptCard().getExplanation().html === '') {
       issues.push(
         'There should be review material in the concept card.');
     }

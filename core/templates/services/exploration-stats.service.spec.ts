@@ -50,13 +50,13 @@ describe('Exploration stats service', function() {
   });
 
   it('should callout to backend api service for stats', fakeAsync(() => {
-    spyOn(explorationStatsBackendApiService, 'fetchExplorationStats')
+    spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
       .and.returnValue(Promise.resolve(this.explorationStats));
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
@@ -66,17 +66,17 @@ describe('Exploration stats service', function() {
 
   it('should cache results after the first call', fakeAsync(() => {
     const backendApiSpy = (
-      spyOn(explorationStatsBackendApiService, 'fetchExplorationStats')
+      spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
         .and.returnValue(Promise.resolve(this.explorationStats)));
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
     flushMicrotasks();
 

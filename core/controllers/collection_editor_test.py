@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -44,8 +45,8 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.json_dict = {
             'version': 1,
@@ -229,7 +230,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         long_message_dict = self.json_dict.copy()
         long_message_dict['commit_message'] = (
-            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
+            'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
 
         # Call get handler to return the csrf token.
         csrf_token = self.get_new_csrf_token()
@@ -241,7 +242,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters long.'
+            'Commit messages must be at most 375 characters long.'
         )
 
         self.logout()

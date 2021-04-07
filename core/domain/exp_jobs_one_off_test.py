@@ -30,7 +30,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import image_validation_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import taskqueue_services
@@ -74,11 +74,12 @@ def run_job_for_deleted_exp(
     output or error condition.
     """
     job_id = job_class.create_new()
-    # Check there is one job in the taskqueue corresponding to
-    # delete_exploration_from_subscribed_users.
+    # Check there are two jobs in the taskqueue corresponding to
+    # delete_explorations_from_user_models and
+    # delete_explorations_from_activities.
     self.assertEqual(
         self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
     job_class.enqueue(job_id)
     self.assertEqual(
         self.count_jobs_in_mapreduce_taskqueue(
@@ -93,6 +94,330 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
+class MockExplorationModelWithDeprecatedFields(exp_models.ExplorationModel):
+    """Mock ExplorationModel to be able to set skill_tags, default_skin,
+    and skin_customizations.
+    """
+
+    skill_tags = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
+    default_skin = (
+        datastore_services.StringProperty(default='conversation_v1'))
+    skin_customizations = datastore_services.JsonProperty(indexed=False)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Override this to escape recursion, which will otherwise occur
+        when super() is used in a mocked class.
+        """
+
+        base_models.VersionedModel._trusted_commit( # pylint: disable=protected-access
+            self, committer_id, commit_type, commit_message, commit_cmds)
+
+
+class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob
+            .create_new()
+        )
+        (
+            exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob
+            .enqueue(job_id))
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    # This test for three deprecated fields is merged into one test because
+    # running three different tests resulted in failures. The failures were
+    # caused because the map() function of
+    # RemoveDeprecatedExplorationModelFieldsOneOffJob was called one time
+    # each by the test but the field was removed in only one test and rest
+    # two tests were failing.
+    def test_one_exp_models_with_deprecated_field(self):
+        with self.swap(
+            exp_models,
+            'ExplorationModel',
+            MockExplorationModelWithDeprecatedFields
+        ):
+            exp_model1 = exp_models.ExplorationModel(
+                id='exp_id1',
+                category='category',
+                title='title',
+                objective='objective',
+                language_code='en',
+                tags=[],
+                blurb='',
+                author_notes='',
+                init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+                param_specs={},
+                param_changes=[],
+                skill_tags=['tag1', 'tag2'],
+                default_skin='conversation_v1',
+                skin_customizations={},
+            )
+            rights_manager.create_new_exploration_rights('exp_id1', 'uid_1')
+            commit_message = 'New exploration created with title \'title\'.'
+            exp_model1.commit('uid_1', commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+
+            self.assertIsNotNone(exp_model1.skill_tags)
+            self.assertIsNotNone(exp_model1.default_skin)
+            self.assertIsNotNone(exp_model1.skin_customizations)
+
+            self.assertIn('skill_tags', exp_model1._values) # pylint: disable=protected-access
+            self.assertIn('skill_tags', exp_model1._properties) # pylint: disable=protected-access
+
+            self.assertIn('default_skin', exp_model1._values) # pylint: disable=protected-access
+            self.assertIn('default_skin', exp_model1._properties) # pylint: disable=protected-access
+
+            self.assertIn('skin_customizations', exp_model1._values) # pylint: disable=protected-access
+            self.assertIn('skin_customizations', exp_model1._properties) # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - ExplorationModel', 1]], output)
+
+            migrated_exp_model1 = (
+                exp_models.ExplorationModel.get_by_id('exp_id1'))
+
+            self.assertNotIn(
+                'skill_tags', migrated_exp_model1._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'skill_tags', migrated_exp_model1._properties)  # pylint: disable=protected-access
+
+            self.assertNotIn(
+                'default_skin', migrated_exp_model1._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'default_skin', migrated_exp_model1._properties)  # pylint: disable=protected-access
+
+            self.assertNotIn(
+                'skin_customizations', migrated_exp_model1._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'skin_customizations', migrated_exp_model1._properties)  # pylint: disable=protected-access
+
+            # Run job twice.
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)
+
+    def test_one_exploration_model_without_deprecated_fields(self):
+        original_exploration_model = exp_models.ExplorationModel(
+            id='exp_id4',
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights('exp_id4', 'uid_4')
+        commit_message = 'New exploration created with title \'title\'.'
+        original_exploration_model.commit('uid_4', commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+        original_exploration_model = (
+            exp_models.ExplorationModel.get_by_id('exp_id4'))
+        self.assertNotIn(
+            'skill_tags', original_exploration_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'skill_tags', original_exploration_model._properties)  # pylint: disable=protected-access
+
+        # Fields were never there to begin with, so already removed.
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)
+
+        migrated_exploration_model = (
+            exp_models.ExplorationModel.get_by_id('exp_id4'))
+        self.assertNotIn(
+            'skill_tags', migrated_exploration_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'skill_tags', migrated_exploration_model._properties)  # pylint: disable=protected-access
+
+
+class MockExplorationRightsModelWithDeprecatedFields(
+        exp_models.ExplorationRightsModel):
+    """Mock ExplorationRightsModel to be able to set translator_ids,
+    all_viewer_ids
+    """
+
+    translator_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
+
+    all_viewer_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Override this to escape recursion, which will otherwise occur
+        when super() is used in a mocked class.
+        """
+
+        base_models.VersionedModel._trusted_commit( # pylint: disable=protected-access
+            self, committer_id, commit_type, commit_message, commit_cmds)
+
+
+class RemoveDeprecatedExplorationRightsModelFieldsOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    EXP_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            .create_new()
+        )
+        (
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            .enqueue(job_id))
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            exp_jobs_one_off.
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    # This test for two deprecated fields is merged into one test because
+    # running two different tests resulted in failures. The failures were
+    # caused because the map() function of
+    # RemoveDeprecatedExplorationRightsModelFieldsOneOffJob was called one time
+    # each by the test but the field was removed in only one test and rest
+    # one test was failing.
+    def test_one_exp_rights_models_with_deprecated_field(self):
+        with self.swap(
+            exp_models,
+            'ExplorationRightsModel',
+            MockExplorationRightsModelWithDeprecatedFields
+        ):
+            exp_models.ExplorationRightsModel(
+                id=self.EXP_ID_1,
+                owner_ids=[self.USER_ID_1],
+                editor_ids=[self.USER_ID_1],
+                voice_artist_ids=[self.USER_ID_1],
+                viewer_ids=[self.USER_ID_2],
+                community_owned=False,
+                status='public',
+                viewable_if_private=False,
+                first_published_msec=0.1,
+                translator_ids=[self.USER_ID_1],
+                all_viewer_ids=[],
+            ).save(
+                self.USER_ID_COMMITTER, 'Created new exploration right',
+                [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+            exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
+                self.EXP_ID_1)
+
+            self.assertIsNotNone(exp_rights_model.translator_ids)
+            self.assertIsNotNone(exp_rights_model.all_viewer_ids)
+
+            self.assertIn('translator_ids', exp_rights_model._values) # pylint: disable=protected-access
+            self.assertIn('translator_ids', exp_rights_model._properties) # pylint: disable=protected-access
+
+            self.assertIn('all_viewer_ids', exp_rights_model._values) # pylint: disable=protected-access
+            self.assertIn('all_viewer_ids', exp_rights_model._properties) # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - ExplorationRightsModel', 1]], output)
+
+            migrated_exp_rights_model = (
+                exp_models.ExplorationRightsModel.get_by_id(self.EXP_ID_1))
+
+            self.assertNotIn(
+                'translator_ids', migrated_exp_rights_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'translator_ids', migrated_exp_rights_model._properties)  # pylint: disable=protected-access
+
+            self.assertNotIn(
+                'all_viewer_ids', migrated_exp_rights_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'all_viewer_ids', migrated_exp_rights_model._properties)  # pylint: disable=protected-access
+
+            # Run job twice.
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', 1]],
+                output)
+
+    def test_one_exp_rights_model_without_deprecated_fields(self):
+        exp_models.ExplorationRightsModel(
+            id=self.EXP_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status='public',
+            viewable_if_private=False,
+            first_published_msec=0.1,
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+        exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXP_ID_1)
+
+        self.assertNotIn(
+            'translator_ids', exp_rights_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'translator_ids', exp_rights_model._properties)  # pylint: disable=protected-access
+
+        self.assertNotIn(
+            'all_viewer_ids', exp_rights_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'all_viewer_ids', exp_rights_model._properties)  # pylint: disable=protected-access
+
+        # Fields were never there to begin with, so already removed.
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - ExplorationRightsModel', 1]], output)
+
+        migrated_exploration_model = (
+            exp_models.ExplorationRightsModel.get_by_id(self.EXP_ID_1))
+
+        self.assertNotIn(
+            'translator_ids', migrated_exploration_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'translator_ids', migrated_exploration_model._properties)  # pylint: disable=protected-access
+
+        self.assertNotIn(
+            'all_viewer_ids', migrated_exploration_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'all_viewer_ids', migrated_exploration_model._properties)  # pylint: disable=protected-access
+
+
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
@@ -103,11 +428,11 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
@@ -215,7 +540,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -249,7 +574,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -299,7 +624,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -392,13 +717,19 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        self.save_new_exp_with_states_schema_v0(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_summary(
-            self.NEW_EXP_ID, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
@@ -424,8 +755,14 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration converts older explorations to a
         previous state schema version before running the audit job.
         """
-        self.save_new_exp_with_states_schema_v0(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
         exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
@@ -501,16 +838,16 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         }
 
         self.create_exploration_with_states_schema_version(
-            36,
+            41,
             self.NEW_EXP_ID,
             self.albert_id,
             {'Introduction': states_dict}
         )
 
         swap_states_schema_version = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
         swap_exp_schema_version = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
         with swap_states_schema_version, swap_exp_schema_version:
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
@@ -591,7 +928,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         }
 
         self.create_exploration_with_states_schema_version(
-            36,
+            41,
             self.NEW_EXP_ID,
             self.albert_id,
             {'Introduction': states_dict}
@@ -602,13 +939,13 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         swap_states_schema_version = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
         swap_exp_schema_version = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
 
         with swap_states_schema_version, swap_exp_schema_version, self.swap(
             exp_domain.Exploration,
-            '_convert_states_v36_dict_to_v37_dict',
+            '_convert_states_v41_dict_to_v42_dict',
             mock_conversion
         ):
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
@@ -621,8 +958,8 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             )
 
         expected_output = [
-            u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
-            'n to states v37: u\'property_that_dne\'"]]'
+            u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed '
+            'migration to states v42: u\'property_that_dne\'"]]'
         ]
         self.assertEqual(actual_output, expected_output)
 
@@ -679,8 +1016,14 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         failure for a default exploration (of states schema version 0), due to
         the exploration having a null interaction ID in its initial state.
         """
-        self.save_new_exp_with_states_schema_v0(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
@@ -701,13 +1044,19 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        self.save_new_exp_with_states_schema_v0(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_summary(
-            self.NEW_EXP_ID, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
@@ -735,8 +1084,14 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        self.save_new_exp_with_states_schema_v0(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
@@ -752,20 +1107,163 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job creates appropriate
         classifier data models for explorations.
         """
-        self.save_new_exp_with_states_schema_v21(
-            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exp_model = exp_models.ExplorationModel(
+                id=self.NEW_EXP_ID, category='category', title=self.EXP_TITLE,
+                objective='Old objective', language_code='en', tags=[],
+                blurb='', author_notes='', states_schema_version=41,
+                init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+                states={
+                    'END': {
+                        'classifier_model_id': None,
+                        'content': {
+                            'content_id': 'content',
+                            'html': 'Congratulations, you have finished!',
+                        },
+                        'interaction': {
+                            'answer_groups': [],
+                            'confirmed_unclassified_answers': [],
+                            'customization_args': {
+                                'recommendedExplorationIds': {'value': []},
+                            },
+                            'default_outcome': None,
+                            'hints': [],
+                            'id': 'EndExploration',
+                            'solution': None,
+                        },
+                        'next_content_id_index': 0,
+                        'param_changes': [],
+                        'recorded_voiceovers': {
+                            'voiceovers_mapping': {
+                                'content': {},
+                            }
+                        },
+                        'solicit_answer_details': False,
+                        'written_translations': {
+                            'translations_mapping': {
+                                'content': {},
+                            }
+                        }
+                    },
+                    'Introduction': {
+                        'classifier_model_id': None,
+                        'content': {'content_id': 'content', 'html': ''},
+                        'interaction': {
+                            'answer_groups': [{
+                                'outcome': {
+                                    'dest': 'END',
+                                    'feedback': {
+                                        'content_id': 'feedback_1',
+                                        'html': '<p>Correct!</p>',
+                                    },
+                                    'labelled_as_correct': False,
+                                    'missing_prerequisite_skill_id': None,
+                                    'param_changes': [],
+                                    'refresher_exploration_id': None,
+                                },
+                                'rule_specs': [{
+                                    'inputs': {
+                                        'x': {
+                                            'contentId': 'rule_input_3',
+                                            'normalizedStrSet': ['InputString']
+                                        }
+                                    },
+                                    'rule_type': 'Equals',
+                                }],
+                                'tagged_skill_misconception_id': None,
+                                'training_data': [
+                                    'answer1', 'answer2', 'answer3'
+                                ],
+                            }],
+                            'confirmed_unclassified_answers': [],
+                            'customization_args': {
+                                'placeholder': {
+                                    'value': {
+                                        'content_id': 'ca_placeholder_2',
+                                        'unicode_str': '',
+                                    },
+                                },
+                                'rows': {'value': 1},
+                            },
+                            'default_outcome': {
+                                'dest': 'Introduction',
+                                'feedback': {
+                                    'content_id': 'default_outcome',
+                                    'html': ''
+                                },
+                                'labelled_as_correct': False,
+                                'missing_prerequisite_skill_id': None,
+                                'param_changes': [],
+                                'refresher_exploration_id': None,
+                            },
+                            'hints': [],
+                            'id': 'TextInput',
+                            'solution': None,
+                        },
+                        'next_content_id_index': 4,
+                        'param_changes': [],
+                        'recorded_voiceovers': {
+                            'voiceovers_mapping': {
+                                'ca_placeholder_2': {},
+                                'content': {},
+                                'default_outcome': {},
+                                'feedback_1': {},
+                                'rule_input_3': {},
+                            }
+                        },
+                        'solicit_answer_details': False,
+                        'written_translations': {
+                            'translations_mapping': {
+                                'ca_placeholder_2': {},
+                                'content': {},
+                                'default_outcome': {},
+                                'feedback_1': {},
+                                'rule_input_3': {},
+                            }
+                        },
+                    },
+                }, param_specs={}, param_changes=[])
+            rights_manager.create_new_exploration_rights(
+                self.NEW_EXP_ID, self.albert_id)
+
+        commit_message = (
+            'New exploration created with title \'%s\'.' % self.EXP_TITLE)
+        exp_model.commit(self.albert_id, commit_message, [{
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category',
+        }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(
+            self.NEW_EXP_ID)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=self.NEW_EXP_ID, title=self.EXP_TITLE, category='category',
+            objective='Old objective', language_code='en', tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids, contributor_ids=[],
+            contributors_summary={})
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
+
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
         initial_state_name = list(exploration.states.keys())[0]
         # Store classifier model for the new exploration.
-        classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
-            'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
-            datetime.datetime.utcnow(), {}, initial_state_name,
-            feconf.TRAINING_JOB_STATUS_COMPLETE, 1)
+        classifier_model_id = (
+            classifier_models.ClassifierTrainingJobModel.create(
+                'TextClassifier', 'TextInput', self.NEW_EXP_ID,
+                exploration.version, datetime.datetime.utcnow(), {},
+                initial_state_name, feconf.TRAINING_JOB_STATUS_COMPLETE, 1))
         # Store training job model for the classifier model.
-        classifier_models.TrainingJobExplorationMappingModel.create(
+        classifier_models.StateTrainingJobsMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
-            classifier_model_id)
+            {'TextClassifier': classifier_model_id})
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
@@ -775,14 +1273,21 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
                     self.process_and_flush_pending_mapreduce_tasks()
 
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id))
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
         new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
-        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
-            self.NEW_EXP_ID, new_exploration.version,
-            [initial_state_name])[0]
+        classifier_exp_mapping_model = (
+            classifier_models.StateTrainingJobsMappingModel.get_models(
+                self.NEW_EXP_ID, new_exploration.version,
+                [initial_state_name]))[0]
         self.assertEqual(
-            classifier_exp_mapping_model.job_id, classifier_model_id)
+            classifier_exp_mapping_model.algorithm_ids_to_job_ids[
+                'TextClassifier'], classifier_model_id)
 
     def test_migration_job_fails_with_invalid_exploration(self):
         observed_log_messages = []
@@ -852,7 +1357,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
             owner, self.VALID_EXP_ID, True)
@@ -889,7 +1394,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
             owner, self.VALID_EXP_ID, True)
@@ -917,7 +1422,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         self.set_admins([self.ALBERT_NAME])
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
             owner, self.VALID_EXP_ID, True)
@@ -1306,8 +1811,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             exp_jobs_one_off
             .ExplorationContentValidationJobForCKEditor.get_output(job_id))
         expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
-            'exploration state schemas at present. when loading exploration\', '
+            u'[u\'Error Sorry, we can only process v41-v%s exploration state '
+            'schemas at present. when loading exploration\', '
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
@@ -1393,31 +1898,9 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1512,7 +1995,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 self.assertTrue(invalid_tag in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -1698,31 +2181,9 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1821,7 +2282,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
                     invalid_tag_info['invalid_tag'] in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -2217,223 +2678,11 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
             .RTECustomizationArgsValidationOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
-            'exploration state schemas at present. when loading exploration\', '
+            u'[u\'Error Sorry, we can only process v41-v%s exploration state '
+            'schemas at present. when loading exploration\', '
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
-
-
-class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
-        test_utils.GenericTestBase):
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests,
-            self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        self.process_and_flush_pending_tasks()
-
-    def test_the_job_adds_xmlns_attribute_in_svg_images_successful(self):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        invalid_svg_string = (
-            '<svg version="1.0" width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'The svg tag does not contains the \'xmlns\' attribute.'):
-            image_validation_services.validate_image_and_filename(
-                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
-
-        fs.commit(
-            'image/%s' % svg_filename, invalid_svg_string,
-            mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [
-            u'[u\'SUCCESS - CHANGED\', [u\'mathImg_12ab_height_1d2_width_2d3_'
-            u'vertical_3d2.svg\', u\'Exp Id: exp_id0\']]'])
-
-    def test_the_job_reports_validation_failure(self):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        invalid_svg_string = (
-            '<svg version="1.0" role="" width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Unsupported tags/attributes found in the SVG:'):
-            image_validation_services.validate_image_and_filename(
-                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
-
-        fs.commit(
-            'image/%s' % svg_filename, invalid_svg_string,
-            mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [
-            u'[u\'FAILED validation\', [u"Exploration with id exp_id0 failed '
-            'image validation for the filename '
-            'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg with following'
-            ' error: Unsupported tags/attributes found in the SVG:'
-            '\\n\\nattributes: [u\'svg:role\']"]]'])
-
-    def test_the_job_does_not_changes_a_valid_svg_image(self):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        old_svg_string = (
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
-            'width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        image_validation_services.validate_image_and_filename(
-            old_svg_string.encode(encoding='utf-8'), svg_filename)
-
-        filepath = 'image/%s' % svg_filename
-        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [u'[u\'UNCHANGED\', 1]'])
-
-        new_svg_string = fs.get(filepath)
-
-        self.assertEqual(
-            old_svg_string.encode(encoding='utf-8'), new_svg_string)
-
-    def test_no_action_is_performed_on_non_math_svgs(self):
-        """Test that no action is performed on non-math SVGs."""
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        old_svg_string = (
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
-            'width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'random_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        filepath = 'image/%s' % svg_filename
-        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [])
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        invalid_svg_string = (
-            '<svg version="1.0" role="" width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        fs.commit(
-            'image/%s' % svg_filename, invalid_svg_string,
-            mimetype='image/svg+xml')
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self,
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob)
 
 
 class XmlnsAttributeInExplorationMathSvgImagesAuditJobTests(
@@ -2565,90 +2814,6 @@ class MockExpSummaryModel(exp_models.ExpSummaryModel):
         indexed=True, repeated=True, required=False)
 
 
-class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.create_new())
-        exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        stringified_output = (
-            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob
-            .get_output(job_id))
-        eval_output = [ast.literal_eval(stringified_item) for
-                       stringified_item in stringified_output]
-        return eval_output
-
-    def test_one_summary_model_with_translator_id(self):
-        with self.swap(exp_models, 'ExpSummaryModel', MockExpSummaryModel):
-            original_summary_model = (
-                exp_models.ExpSummaryModel(
-                    id='id',
-                    title='title',
-                    category='category',
-                    objective='Objective',
-                    language_code='en',
-                    tags=[],
-                    ratings=feconf.get_empty_ratings(),
-                    scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-                    community_owned=False,
-                    translator_ids=['translator_id']
-                )
-            )
-            original_summary_model.put()
-
-            self.assertIsNotNone(original_summary_model.translator_ids)
-            self.assertIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
-            self.assertIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
-
-            output = self._run_one_off_job()
-            self.assertItemsEqual(
-                [['SUCCESS_REMOVED - ExpSummaryModel', 1]], output)
-
-            migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
-
-            self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
-            self.assertNotIn(
-                'translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
-            self.assertEqual(
-                original_summary_model.last_updated,
-                migrated_summary_model.last_updated)
-
-    def test_one_summary_model_without_username(self):
-        original_summary_model = (
-            exp_models.ExpSummaryModel(
-                id='id',
-                title='title',
-                category='category',
-                objective='Objective',
-                language_code='en',
-                tags=[],
-                ratings=feconf.get_empty_ratings(),
-                scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-                community_owned=False,
-            )
-        )
-        original_summary_model.put()
-
-        self.assertNotIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
-        self.assertNotIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            [['SUCCESS_ALREADY_REMOVED - ExpSummaryModel', 1]], output)
-
-        migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
-        self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
-        self.assertNotIn('translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
-        self.assertEqual(
-            original_summary_model.last_updated,
-            migrated_summary_model.last_updated)
-
-
 class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
 
     JOB = exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob
@@ -2692,7 +2857,7 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
 
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
         self.set_admins(['user'])
 
         self.save_new_valid_exploration(
@@ -3051,3 +3216,907 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
             'in regenerated model: %s\']]' % (
                 commit_log_model.created_on, metadata_model.created_on))]
         self.assertEqual(output, expected_output)
+
+
+class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
+    """Tests for ExplorationMigrationAuditJob."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExpSnapshotsMigrationAuditJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def create_exploration_with_states_schema_version(
+            self, states_schema_version, exp_id, user_id, states_dict):
+        """Saves a new default exploration with the given states dictionary in
+        the given state schema version. All passed state dictionaries in
+        'states_dict' must have the states schema version indicated by
+        'states_schema_version'.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            states_schema_version: int. The state schema version.
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states, in the
+                given states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=states_schema_version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def test_migration_audit_job_does_not_convert_up_to_date_exp(self):
+        """Tests that the snapshot migration audit job does not convert a
+        snapshot that is already the latest states schema version.
+        """
+        # Create a new, default exploration whose snapshots should not be
+        # affected by the job.
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(init_state, 'EndExploration')
+        init_state.update_interaction_default_outcome(None)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(job_id))
+        expected_output = [
+            '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+    def test_migration_audit_job_skips_deleted_explorations(self):
+        """Tests that the snapshot migration job skips deleted explorations
+        and does not attempt to migrate any of the snapshots.
+        """
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE)
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Note: This creates a summary based on the upgraded model (which is
+        # fine). A summary is needed to delete the exploration.
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
+
+        # Delete the exploration before migration occurs.
+        exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
+
+        # Ensure the exploration is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+
+        # This running without errors indicates the deleted exploration is
+        # being ignored, since otherwise exp_fetchers.get_exploration_by_id
+        # (used within the job) will raise an error.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+                job_id))
+        expected_output_choices = [
+            '[u\'INFO - Exploration does not exist\', [u\'%s-1\', u\'%s-2\']]' %
+            (self.NEW_EXP_ID, self.NEW_EXP_ID),
+            '[u\'INFO - Exploration does not exist\', [u\'%s-2\', u\'%s-1\']]' %
+            (self.NEW_EXP_ID, self.NEW_EXP_ID)
+        ]
+        self.assertEqual(len(actual_output), 1)
+        self.assertIn(actual_output[0], expected_output_choices)
+
+        # Ensure the exploration is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+    def test_migration_job_audit_success(self):
+        """Test that the audit job runs correctly on snapshots that use a
+        previous state schema.
+        """
+        swap_states_schema_version = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_version = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_version, swap_exp_schema_version:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(self.albert_id, exploration)
+        self.assertLess(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        # Bring the main exploration to the latest schema.
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
+        latest_schema_version = python_utils.UNICODE(
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '41',
+                'to_version': latest_schema_version
+            })
+        ]
+        exp_services.update_exploration(
+            self.albert_id, self.VALID_EXP_ID, migration_change_list,
+            'Ran Exploration Migration job.')
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        self.assertEqual(
+            exploration_model.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+                job_id))
+        expected_output = [
+            '[u\'SUCCESS\', 1]',
+            '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]'
+        ]
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    def test_migration_job_audit_failure(self):
+        """Test that the audit job catches any errors that would otherwise
+        occur during the migration.
+        """
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Bring the main exploration to the latest schema.
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
+        latest_schema_version = python_utils.UNICODE(
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '41',
+                'to_version': latest_schema_version
+            })
+        ]
+        exp_services.update_exploration(
+            self.albert_id, self.VALID_EXP_ID, migration_change_list,
+            'Ran Exploration Migration job.')
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        self.assertEqual(
+            exploration_model.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        # Make a mock conversion function that raises an error when trying to
+        # convert the old snapshot.
+        mock_conversion = classmethod(
+            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+
+        with self.swap(
+            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
+            mock_conversion
+        ):
+            job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+            actual_output = (
+                exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+                    job_id)
+            )
+
+        expected_output_message = (
+            u'[u\'MIGRATION_ERROR\', [u"Exploration snapshot %s-1 failed '
+            'migration to states v42: u\'property_that_dne\'"]]'
+            % self.VALID_EXP_ID
+        )
+        self.assertIn(expected_output_message, actual_output)
+
+    def test_audit_job_detects_invalid_exploration(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.language_code = 'invalid_language_code'
+        exploration_model.commit(
+            self.albert_id, 'Changed language_code.', [])
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
+
+        job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(job_id))
+        expected_output_message = (
+            '[u\'INFO - Exploration %s-1 failed non-strict validation\', '
+            '[u\'Invalid language_code: invalid_language_code\']]'
+            % self.VALID_EXP_ID)
+        self.assertIn(expected_output_message, actual_output)
+
+    def test_audit_job_detects_exploration_that_is_not_up_to_date(self):
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(self.albert_id, exploration)
+        self.assertLess(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        with swap_states_schema_42, swap_exp_schema_47:
+            job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.get_output(
+                job_id))
+        expected_output = [
+            '[u\'FAILURE - Exploration is not at latest schema version\', '
+            '[u\'%s\']]' % self.VALID_EXP_ID,
+        ]
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExpSnapshotsMigrationJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_migration_job_does_not_convert_up_to_date_exp(self):
+        """Tests that the exploration migration job does not convert a
+        snapshot that is already the latest states schema version.
+        """
+        # Create a new, default exploration that should not be affected by the
+        # job.
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(init_state, 'EndExploration')
+        init_state.update_interaction_default_outcome(None)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+        expected_output = [
+            '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+    def test_migration_job_succeeds_on_default_exploration(self):
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Bring the main exploration to schema version 42.
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': (
+                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+                'from_version': '41',
+                'to_version': '42'
+            })
+        ]
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        with swap_states_schema_42, swap_exp_schema_47:
+            exp_services.update_exploration(
+                self.albert_id, self.VALID_EXP_ID, migration_change_list,
+                'Ran Exploration Migration job.')
+
+            job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+        expected_output = [
+            '[u\'SUCCESS - Model saved\', 1]',
+            '[u\'SUCCESS - Model upgraded\', 1]',
+            '[u\'SUCCESS - Snapshot is already at latest schema version\', 1]']
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    def test_migration_job_skips_deleted_explorations(self):
+        """Tests that the exploration migration job skips deleted explorations
+        and does not attempt to migrate.
+        """
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.NEW_EXP_ID, title=self.EXP_TITLE)
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Note: This creates a summary based on the upgraded model (which is
+        # fine). A summary is needed to delete the exploration.
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
+
+        # Delete the exploration before migration occurs.
+        exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
+
+        # Ensure the exploration is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+        # Start migration job on sample exploration.
+        job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+
+        # This running without errors indicates the deleted exploration is
+        # being ignored, since otherwise exp_fetchers.get_exploration_by_id
+        # (used within the job) will raise an error.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+        expected_output_choices = [
+            '[u\'INFO - Exploration does not exist\', [u\'%s-1\', u\'%s-2\']]' %
+            (self.NEW_EXP_ID, self.NEW_EXP_ID),
+            '[u\'INFO - Exploration does not exist\', [u\'%s-2\', u\'%s-1\']]' %
+            (self.NEW_EXP_ID, self.NEW_EXP_ID)
+        ]
+        self.assertEqual(len(actual_output), 1)
+        self.assertIn(actual_output[0], expected_output_choices)
+
+        # Ensure the exploration is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
+    def test_migration_job_detects_invalid_exploration(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.language_code = 'invalid_language_code'
+        exploration_model.commit(
+            self.albert_id, 'Changed language_code.', [])
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [self.VALID_EXP_ID])
+
+        job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(job_id))
+        expected_output_message = (
+            '[u\'INFO - Exploration %s-1 failed non-strict validation\', '
+            '[u\'Invalid language_code: invalid_language_code\']]'
+            % self.VALID_EXP_ID)
+        self.assertIn(expected_output_message, actual_output)
+
+    def test_migration_job_detects_exploration_that_is_not_up_to_date(self):
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category')
+            exp_services.save_new_exploration(self.albert_id, exploration)
+        self.assertLess(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        with swap_states_schema_42, swap_exp_schema_47:
+            job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExpSnapshotsMigrationJob.get_output(
+                job_id))
+        expected_output = [
+            '[u\'FAILURE - Exploration is not at latest schema version\', '
+            '[u\'%s\']]' % self.VALID_EXP_ID,
+        ]
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class RatioTermsAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(RatioTermsAuditOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_number_of_ratio_terms_tabulated_are_correct_in_single_exp(self):
+        """Checks that correct number of ratio terms are shown when
+        there is single exploration.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        id1 = 'RatioExpressionInput'
+        id2 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 5
+            }
+        }
+        carg2 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 12
+            }
+        }
+        state1.update_interaction_id(id1)
+        state2.update_interaction_id(id2)
+        state1.update_interaction_customization_args(carg1)
+        state2.update_interaction_customization_args(carg2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start RatioTermsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.RatioTermsAuditOneOffJob.create_new()
+        exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(
+            job_id)
+        expected_output = [
+            '[u\'SUCCESS\', 1]',
+            '[u\'12\', [u\'exp_id0 State2\']]'
+        ]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_number_of_ratio_terms_tabulated_are_correct_in_multiple_exps(self):
+        """Checks that correct number of ratio terms are shown when
+        there are multiple explorations.
+        """
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration1.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration1.states['State1']
+        state2 = exploration1.states['State2']
+        id1 = 'RatioExpressionInput'
+        id2 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 5
+            }
+        }
+        carg2 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 12
+            }
+        }
+        state1.update_interaction_id(id1)
+        state2.update_interaction_id(id2)
+        state1.update_interaction_customization_args(carg1)
+        state2.update_interaction_customization_args(carg2)
+        exp_services.save_new_exploration(self.albert_id, exploration1)
+
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title='title', category='category')
+
+        exploration2.add_states(['State1', 'State2'])
+
+        state1 = exploration2.states['State1']
+        id1 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 11
+            }
+        }
+        state1.update_interaction_id(id1)
+        state1.update_interaction_customization_args(carg1)
+
+        exp_services.save_new_exploration(self.albert_id, exploration2)
+
+        # Start RatioTermsAuditOneOff job on sample exploration.
+        job_id = exp_jobs_one_off.RatioTermsAuditOneOffJob.create_new()
+        exp_jobs_one_off.RatioTermsAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = exp_jobs_one_off.RatioTermsAuditOneOffJob.get_output(
+            job_id)
+
+        actual_output_dict = {}
+
+        for item in [ast.literal_eval(value) for value in actual_output]:
+            if item[0] != 'SUCCESS':
+                actual_output_dict[item[0]] = set(item[1])
+            else:
+                actual_output_dict['SUCCESS'] = item[1]
+
+        expected_output_dict = {
+            '12': set(['exp_id0 State2']),
+            '11': set(['exp_id1 State1']),
+            'SUCCESS': 2
+        }
+
+        self.assertEqual(actual_output_dict, expected_output_dict)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        id1 = 'RatioExpressionInput'
+        carg1 = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'numberOfTerms': {
+                'value': 11
+            }
+        }
+        state1.update_interaction_id(id1)
+        state1.update_interaction_customization_args(carg1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(self, exp_jobs_one_off.RatioTermsAuditOneOffJob)
+
+
+class ExpSnapshotsDeletionJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    EXP_ID = 'exp_id0'
+
+    def setUp(self):
+        super(ExpSnapshotsDeletionJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = exp_jobs_one_off.ExpSnapshotsDeletionJob.create_new()
+        exp_jobs_one_off.ExpSnapshotsDeletionJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            exp_jobs_one_off.ExpSnapshotsDeletionJob.get_output(job_id))
+        eval_output = [
+            ast.literal_eval(stringified_item)
+            for stringified_item in stringified_output
+        ]
+        return eval_output
+
+    def test_deletion_job_deletes_snapshot_content_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS_DELETED - ExplorationSnapshotContentModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_snapshot_metadata_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS_DELETED - ExplorationSnapshotMetadataModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_right_snapshot_content_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS_DELETED - ExplorationRightsSnapshotContentModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_right_snapshot_metadata_model(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        exp_models.ExplorationSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationSnapshotMetadataModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+        exp_models.ExplorationRightsSnapshotContentModel.delete_by_id(
+            '%s-1' % self.EXP_ID)
+
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS_DELETED - ExplorationRightsSnapshotMetadataModel', 1]]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_deletes_all_snapshot_models(self):
+        exp_models.ExplorationModel.delete_by_id(self.EXP_ID)
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['SUCCESS_DELETED - ExplorationSnapshotContentModel', 1],
+                ['SUCCESS_DELETED - ExplorationSnapshotMetadataModel', 1],
+                ['SUCCESS_DELETED - ExplorationRightsSnapshotContentModel', 1],
+                ['SUCCESS_DELETED - ExplorationRightsSnapshotMetadataModel', 1]
+            ]
+        )
+
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+    def test_deletion_job_does_not_delete_models(self):
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output,
+            [
+                ['SUCCESS_PASS - ExplorationSnapshotContentModel', 1],
+                ['SUCCESS_PASS - ExplorationSnapshotMetadataModel', 1],
+                ['SUCCESS_PASS - ExplorationRightsSnapshotContentModel', 1],
+                ['SUCCESS_PASS - ExplorationRightsSnapshotMetadataModel', 1]
+            ]
+        )
+
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get(
+                '%s-1' % self.EXP_ID, strict=False))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get(
+                '%s-1' % self.EXP_ID, strict=False))

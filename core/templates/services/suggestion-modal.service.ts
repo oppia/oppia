@@ -40,8 +40,6 @@ export class SuggestionModalService {
   UNSAVED_CHANGES_MSG: string = (
     'You have unsaved changes to this exploration. Please save/discard your ' +
     'unsaved changes if you wish to accept.');
-  ACTION_ACCEPT_SUGGESTION: string = 'accept';
-  ACTION_REJECT_SUGGESTION: string = 'reject';
   ACTION_RESUBMIT_SUGGESTION: string = 'resubmit';
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';

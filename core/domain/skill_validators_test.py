@@ -158,12 +158,16 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.superseding_skill_0.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
         self.superseding_skill_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_2.id, self.model_instance_2.last_updated)]
+        expected_output = [
+            '[u\'fully-validated SkillModel\', 4]',
+            (
+                u'[u\'failed validation check for current time check of '
+                'SkillModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when '
+                'the job was run\']]'
+            ) % (self.model_instance_2.id, self.model_instance_2.last_updated)
+        ]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -210,7 +214,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id 0: based on field superseding_skill_ids '
                 'having value 3, expected model SkillModel with id 3 but it '
                 'doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 3]']
+            u'[u\'fully-validated SkillModel\', 4]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -371,6 +375,28 @@ class SkillSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 4]']
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SkillSnapshotMetadataModel\', 3]']
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SkillSnapshotMetadataModel\', 3]']
         self.process_and_flush_pending_mapreduce_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -738,6 +764,28 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
         self.process_and_flush_pending_mapreduce_tasks()
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_user_id_migration_bot(self):
+        self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_user_id(self):
+        self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

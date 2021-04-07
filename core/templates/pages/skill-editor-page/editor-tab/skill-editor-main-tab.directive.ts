@@ -15,7 +15,7 @@
 /**
  * @fileoverview Controller for the main tab of the skill editor.
  */
-
+require('services/stateful/focus-manager.service.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-description-editor/' +
   'skill-description-editor.directive.ts');
@@ -35,7 +35,6 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -46,14 +45,38 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', 'PageTitleService', 'QuestionCreationService',
-        'SkillEditorStateService',
+        '$scope', '$timeout', '$uibModal', 'FocusManagerService',
+        'PageTitleService',
+        'SkillEditorRoutingService', 'SkillEditorStateService',
+        'UndoRedoService',
         function(
-            $scope, PageTitleService, QuestionCreationService,
-            SkillEditorStateService) {
+            $scope, $timeout, $uibModal, FocusManagerService,
+            PageTitleService,
+            SkillEditorRoutingService, SkillEditorStateService,
+            UndoRedoService) {
           var ctrl = this;
           $scope.createQuestion = function() {
-            QuestionCreationService.createQuestion();
+            // This check is needed because if a skill has unsaved changes to
+            // misconceptions, then these will be reflected in the questions
+            // created at that time, but if page is refreshed/changes are
+            // discarded, the misconceptions won't be saved, but there will be
+            // some questions with these now non-existent misconceptions.
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill-editor-page/modal-templates/' +
+                  'save-pending-changes-modal.directive.html'),
+                backdrop: true,
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(null, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
+            } else {
+              SkillEditorRoutingService.navigateToQuestionsTab();
+              SkillEditorRoutingService.creatingNewQuestion(true);
+            }
           };
 
           $scope.getSubtopicName = function() {
@@ -93,6 +116,12 @@ angular.module('oppia').directive('skillEditorMainTab', [
             $scope.topicName = null;
             $scope.subtopicName = null;
             PageTitleService.setPageTitleForMobileView('Skill Editor');
+            // To ensure that the focus event function executes only after
+            // all the functions in the main thread have executed,
+            // $timeout is required.
+            $timeout(function() {
+              FocusManagerService.setFocus('newQuestionBtn');
+            }, 0);
           };
         }
       ]

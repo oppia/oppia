@@ -27,6 +27,7 @@ describe('Save Version Mismatch Modal Controller', () => {
   let $log = null;
   let logSpy = null;
   let $timeout = null;
+  let $q = null;
   const windowRef = new WindowRef();
   const mockExplorationData = {
     discardDraft: (callback) => callback()
@@ -53,7 +54,7 @@ describe('Save Version Mismatch Modal Controller', () => {
   beforeEach(angular.mock.inject(($injector, $controller) => {
     $log = $injector.get('$log');
     $timeout = $injector.get('$timeout');
-
+    $q = $injector.get('$q');
     logSpy = spyOn($log, 'error').and.callThrough();
 
     const $rootScope = $injector.get('$rootScope');
@@ -81,9 +82,16 @@ describe('Save Version Mismatch Modal Controller', () => {
         }
       });
       const discardDraftSpy = (
-        spyOn(mockExplorationData, 'discardDraft').and.callThrough());
+        spyOn(mockExplorationData, 'discardDraft').and.callFake(
+          () => {
+            var deferred = $q.defer();
+            deferred.resolve('sample-csrf-token');
+            return deferred.promise;
+          }
+        ));
 
       $scope.discardChanges();
+      $scope.$apply();
       expect(discardDraftSpy).toHaveBeenCalled();
 
       $timeout.flush(20);

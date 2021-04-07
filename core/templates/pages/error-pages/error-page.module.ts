@@ -16,15 +16,6 @@
  * @fileoverview Module for the error page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
-]);
-
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';

@@ -18,7 +18,7 @@
 
 import { fakeAsync } from '@angular/core/testing';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
 
@@ -28,8 +28,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -58,8 +56,11 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+// ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/graph-data.service');
 require('pages/exploration-editor-page/services/exploration-property.service');
@@ -82,8 +83,6 @@ describe('Exploration Warnings Service', function() {
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
         new RuleObjectFactory()));
-    $provide.value(
-      'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
@@ -864,7 +863,7 @@ describe('Exploration Warnings Service', function() {
     }));
 
     it('should update warning to an empty array', function() {
-      ExplorationStatesService.init({
+      ExplorationStatesService.init(<StateObjectsBackendDict> {
         Hola: {
           content: {
             content_id: 'content',
@@ -883,12 +882,20 @@ describe('Exploration Warnings Service', function() {
                   content_id: 'feedback_1',
                   html: ''
                 },
+                labelled_as_correct: false,
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                param_changes: []
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 10}
+                inputs: {x: {
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['10']
+                }}
               }],
-              training_data: ['1']
+              training_data: ['1'],
+              tagged_skill_misconception_id: null
             }],
             default_outcome: {
               dest: '',
@@ -896,6 +903,10 @@ describe('Exploration Warnings Service', function() {
                 content_id: '',
                 html: '',
               },
+              labelled_as_correct: false,
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              param_changes: []
             },
             customization_args: {
               rows: {
@@ -909,6 +920,16 @@ describe('Exploration Warnings Service', function() {
               }
             },
             hints: [],
+            confirmed_unclassified_answers: [],
+            solution: {
+              answer_is_exclusive: true,
+              correct_answer: '10',
+              explanation: {
+                html: 'placeholder value',
+                unicode_str: 'placeholder value',
+                content_id: ''
+              }
+            }
           },
           written_translations: {
             translations_mapping: {
@@ -916,6 +937,9 @@ describe('Exploration Warnings Service', function() {
               default_outcome: {},
             },
           },
+          classifier_model_id: null,
+          solicit_answer_details: false,
+          next_content_id_index: null,
         },
         State: {
           param_changes: [],
@@ -949,7 +973,8 @@ describe('Exploration Warnings Service', function() {
               default_outcome: {}
             }
           },
-          classifier_model_id: null
+          classifier_model_id: null,
+          next_content_id_index: null
         }
       });
       ExplorationWarningsService.updateWarnings();

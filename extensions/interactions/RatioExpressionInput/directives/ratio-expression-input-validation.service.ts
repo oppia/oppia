@@ -66,6 +66,14 @@ export class RatioExpressionInputValidationService {
             'The number of terms in a ratio should be greater than 1.')
         }
       ];
+    } else if (expectedNumberOfTerms > 10) {
+      return [
+        {
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'The number of terms in a ratio should not be greater than 10.')
+        }
+      ];
     } else {
       return [];
     }
@@ -86,19 +94,6 @@ export class RatioExpressionInputValidationService {
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
-
-    // Checks whether currentInput is in simplest form or not.
-    let isInSimplestForm = function(
-        currentRuleType: string,
-        ratio: Ratio,
-        currentInput: number[]
-    ): boolean {
-      return (
-        currentRuleType === 'IsEquivalent' &&
-        !Ratio.arrayEquals(
-          ratio.convertToSimplestForm(), currentInput)
-      );
-    };
 
     // Checks whether currentInput has less number of terms than seenInput.
     let hasLessNumberOfTerms = function(
@@ -130,6 +125,11 @@ export class RatioExpressionInputValidationService {
         var ratio: Ratio = null;
         if (currentRuleType === 'HasNumberOfTermsEqualTo') {
           currentInput = <number> rules[j].inputs.y;
+        } else if (currentRuleType === 'HasSpecificTermEqualTo') {
+          currentInput = [
+            <number> rules[j].inputs.x, // The x-th term
+            <number> rules[j].inputs.y, // Should have value y
+          ];
         } else {
           currentInput = <number[]> rules[j].inputs.x;
         }
@@ -143,6 +143,18 @@ export class RatioExpressionInputValidationService {
                   `Rule ${j + 1} from answer group ${i + 1} will never be` +
                   ' matched because it has differing number of terms than ' +
                   'required.'
+                )
+              });
+            }
+          } else if (currentRuleType === 'HasSpecificTermEqualTo') {
+            let termIndex = currentInput[0]; // Note: termIndex is 1-indexed.
+            if (termIndex > expectedNumberOfTerms) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${j + 1} from answer group ${i + 1} will never be` +
+                  ' matched because it expects more terms than the answer ' +
+                  'allows.'
                 )
               });
             }
@@ -160,21 +172,23 @@ export class RatioExpressionInputValidationService {
             }
           }
         }
-        ratio = Ratio.fromList(<number[]> currentInput);
-        if (isInSimplestForm(currentRuleType, ratio, currentInput)) {
-          warningsList.push({
-            type: AppConstants.WARNING_TYPES.ERROR,
-            message: (
-              `Rule ${j + 1} from answer group ${i + 1} will never be` +
-              ' matched because provided input is not in its simplest form.')
-          });
-        }
         for (let seenRule of seenRules) {
-          let seenInput = seenRule.inputs.x || seenRule.inputs.y;
           let seenRuleType = <string> seenRule.type;
+          let seenInput = null;
+          if (seenRuleType === 'HasNumberOfTermsEqualTo') {
+            seenInput = <number> seenRule.inputs.y;
+          } else if (seenRuleType === 'HasSpecificTermEqualTo') {
+            seenInput = [
+              <number> seenRule.inputs.x, // The x-th term
+              <number> seenRule.inputs.y, // Should have value y
+            ];
+          } else {
+            seenInput = <number[]> seenRule.inputs.x;
+          }
 
           if (
             seenRuleType === 'Equals' &&
+            currentRuleType !== 'IsEquivalent' &&
             currentRuleType !== 'HasNumberOfTermsEqualTo' && (
               ratioRulesService.Equals(
                 seenInput, {x: currentInput}))) {
@@ -188,8 +202,23 @@ export class RatioExpressionInputValidationService {
                 ' a matching input.')
             });
           } else if (
+            seenRuleType === 'HasSpecificTermEqualTo' &&
+            currentRuleType === 'Equals' && (
+              ratioRulesService.HasSpecificTermEqualTo(
+                currentInput, seenRule.inputs))) {
+            // This rule will make all of the following matching
+            // inputs obsolete.
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                `Rule ${j + 1} from answer group ${i + 1} will never` +
+                ' be matched because it is preceded by a' +
+                ' \'HasSpecificTermEqualTo\' rule with a matching input.')
+            });
+          } else if (
             seenRuleType === 'IsEquivalent' &&
-            currentRuleType !== 'HasNumberOfTermsEqualTo' && (
+            currentRuleType !== 'HasNumberOfTermsEqualTo' &&
+            currentRuleType !== 'HasSpecificTermEqualTo' && (
               ratioRulesService.IsEquivalent(
                 seenInput, {x: currentInput}))) {
             // This rule will make the following inputs with
@@ -219,7 +248,7 @@ export class RatioExpressionInputValidationService {
           } else if (
             currentRuleType === 'HasNumberOfTermsEqualTo' &&
             seenRuleType === 'HasNumberOfTermsEqualTo' && (
-              currentInput === seenRule.inputs.y)) {
+              currentInput === seenInput)) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (

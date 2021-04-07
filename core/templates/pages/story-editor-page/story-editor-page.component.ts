@@ -38,6 +38,7 @@ require('pages/story-editor-page/services/story-editor-navigation.service');
 require(
   'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
 require('domain/story/editable-story-backend-api.service.ts');
+require('domain/story/story-validation.service');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
@@ -52,16 +53,19 @@ angular.module('oppia').component('storyEditorPage', {
     '$uibModal', '$window', 'BottomNavbarStatusService',
     'EditableStoryBackendApiService', 'LoaderService',
     'PageTitleService', 'StoryEditorNavigationService',
-    'StoryEditorStateService', 'UndoRedoService',
+    'StoryEditorStateService', 'StoryValidationService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService', 'WindowRef',
+    'MAX_COMMIT_MESSAGE_LENGTH',
     function(
         $uibModal, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService, LoaderService,
         PageTitleService, StoryEditorNavigationService,
-        StoryEditorStateService, UndoRedoService,
-        UrlInterpolationService, UrlService, WindowRef) {
+        StoryEditorStateService, StoryValidationService, UndoRedoService,
+        UrlInterpolationService, UrlService, WindowRef,
+        MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
         if (UndoRedoService.getChangeCount() > 0) {
@@ -120,12 +124,21 @@ angular.module('oppia').component('storyEditorPage', {
 
       var _validateStory = function() {
         ctrl.validationIssues = ctrl.story.validate();
+        var nodes = ctrl.story.getStoryContents().getNodes();
+        let skillIdsInTopic = StoryEditorStateService.getSkillSummaries().map(
+          skill => skill.id);
+        if (ctrl.validationIssues.length === 0 && nodes.length > 0) {
+          let prerequisiteSkillValidationIssues = (
+            StoryValidationService.validatePrerequisiteSkillsInStoryContents(
+              skillIdsInTopic, ctrl.story.getStoryContents()));
+          ctrl.validationIssues = (
+            ctrl.validationIssues.concat(prerequisiteSkillValidationIssues));
+        }
         if (StoryEditorStateService.getStoryWithUrlFragmentExists()) {
           ctrl.validationIssues.push(
             'Story URL fragment already exists.');
         }
         _validateExplorations();
-        var nodes = ctrl.story.getStoryContents().getNodes();
         var storyPrepublishValidationIssues = (
           ctrl.story.prepublishValidate());
         var nodePrepublishValidationIssues = (

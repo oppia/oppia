@@ -150,12 +150,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            question_models.QuestionSkillLinkModel
-            .has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
@@ -519,6 +514,20 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
                 1, [], 0.6
+            )
+        )
+        self.assertEqual(question_skill_links, [])
+
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_equidistributed_by_skill(1, []))
+        self.assertEqual(question_skill_links, [])
+
+    def test_get_questions_with_zero_count(self):
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                0, ['skill_id1'], 0.6
             )
         )
         self.assertEqual(question_skill_links, [])

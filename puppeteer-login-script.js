@@ -22,9 +22,11 @@ const ADMIN_URL = 'http://127.0.0.1:8181/admin';
 const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
+var emailInput = '.protractor-test-sign-in-email-input';
+var signInButton = '.protractor-test-sign-in-button';
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
-var registerUser = '.protractor-test-register-user';
+var registerUser = '.protractor-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var updateFormName = '.protractor-update-form-name';
@@ -52,11 +54,10 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(
-      ADMIN_URL, { waitUntil: networkIdle});
-    await page.waitForSelector('#admin', {visible: true});
-    await page.click('#admin');
-    await page.click('#submit-login');
+    await page.goto(ADMIN_URL, {waitUntil: networkIdle});
+    await page.waitForSelector(emailInput, {visible: true});
+    await page.type(emailInput, 'testadmin@example.com');
+    await page.click(signInButton);
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, {visible: true});
@@ -107,7 +108,7 @@ const createCollections = async function(context, page) {
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin');
-    await page.waitFor(2000);
+    await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
     // eslint-disable-next-line no-console
@@ -125,7 +126,7 @@ const createExplorations = async function(context, page) {
     // Load in Exploration
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin', { waitUntil: 'networkidle0' });
-    await page.waitFor(2000);
+    await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click(
       '.protractor-test-reload-exploration-button');

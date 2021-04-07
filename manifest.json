@@ -1,10 +1,19 @@
 {
   "dependencies": {
+    "proto": {
+      "oppiaMlProto": {
+        "version": "0.0.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/oppia/oppia-ml-proto/archive/0.0.0.zip",
+        "rootDirPrefix": "oppia-ml-proto-",
+        "targetDirPrefix": "oppia-ml-proto-"
+      }
+    },
     "frontend": {
       "angular": {
-        "version": "1.7.9",
+        "version": "1.8.2",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9",
+        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2",
         "targetDirPrefix": "angularjs-",
         "files": [
           "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
@@ -37,9 +46,9 @@
         "targetDirPrefix": "lamejs-"
       },
       "angularTest": {
-        "version": "1.7.9",
+        "version": "1.8.2",
         "downloadFormat": "files",
-        "url": "https://code.angularjs.org/1.7.9",
+        "url": "https://code.angularjs.org/1.8.2",
         "targetDirPrefix": "angularjs-",
         "files": ["angular-mocks.js"]
       },

@@ -121,20 +121,36 @@ class UserSettingsModel(base_models.BaseModel):
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
-        """UserSettingsModel should be deleted after all the other models
-        belonging to the user are deleted or pseudonymized.
+        """Model contains data to delete corresponding to a user: id, model,
+        username, normalized_username, and display_alias fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @staticmethod
+    def get_field_names_for_takeout():
+        """The export method renames some time-related fields to clearly
+        indicate that they represent time in milliseconds since the epoch.
+        """
+        return {
+            'last_agreed_to_terms': 'last_agreed_to_terms_msec',
+            'last_started_state_editor_tutorial':
+                'last_started_state_editor_tutorial_msec',
+            'last_started_state_translation_tutorial':
+                'last_started_state_translation_tutorial_msec',
+            'last_logged_in': 'last_logged_in_msec',
+            'last_edited_an_exploration': 'last_edited_an_exploration_msec',
+            'last_created_an_exploration': 'last_created_an_exploration_msec'
+        }
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.EXPORTED,
             'role': base_models.EXPORT_POLICY.EXPORTED,
@@ -166,6 +182,7 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
+            # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -206,31 +223,36 @@ class UserSettingsModel(base_models.BaseModel):
             'role': user.role,
             'username': user.username,
             'normalized_username': user.normalized_username,
-            'last_agreed_to_terms': (
+            'last_agreed_to_terms_msec': (
                 utils.get_time_in_millisecs(user.last_agreed_to_terms)
                 if user.last_agreed_to_terms
                 else None
             ),
-            'last_started_state_editor_tutorial': (
+            'last_started_state_editor_tutorial_msec': (
                 utils.get_time_in_millisecs(
                     user.last_started_state_editor_tutorial)
                 if user.last_started_state_editor_tutorial
                 else None
             ),
-            'last_started_state_translation_tutorial': (
+            'last_started_state_translation_tutorial_msec': (
                 utils.get_time_in_millisecs(
                     user.last_started_state_translation_tutorial)
                 if user.last_started_state_translation_tutorial
                 else None
             ),
-            'last_logged_in': (
+            'last_logged_in_msec': (
                 utils.get_time_in_millisecs(user.last_logged_in)
                 if user.last_logged_in
                 else None
             ),
-            'last_edited_an_exploration': (
+            'last_edited_an_exploration_msec': (
                 utils.get_time_in_millisecs(user.last_edited_an_exploration)
                 if user.last_edited_an_exploration
+                else None
+            ),
+            'last_created_an_exploration_msec': (
+                utils.get_time_in_millisecs(user.last_created_an_exploration)
+                if user.last_created_an_exploration
                 else None
             ),
             'profile_picture_data_url': user.profile_picture_data_url,
@@ -244,7 +266,6 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
             'display_alias': user.display_alias,
-            'pin': user.pin
         }
 
     @classmethod
@@ -278,7 +299,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
-        """Returns whether or not a given normalized_username is taken.
+        """Returns whether or not a given normalized_username is taken or was
+        used by some deleted user.
 
         Args:
             normalized_username: str. The given user's normalized username.
@@ -286,8 +308,16 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             bool. Whether the normalized_username has already been taken.
          """
-        return bool(cls.get_all().filter(
-            cls.normalized_username == normalized_username).get())
+        hashed_normalized_username = utils.convert_to_hash(
+            normalized_username, DeletedUsernameModel.ID_LENGTH)
+        return (
+            cls.query().filter(
+                cls.normalized_username == normalized_username
+            ).get() is not None
+            or DeletedUsernameModel.get(
+                hashed_normalized_username, strict=False
+            ) is not None
+        )
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
@@ -332,20 +362,18 @@ class CompletedActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
+    def get_deletion_policy():
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_deletion_policy():
-        """CompletedActivitiesModel can be deleted since it only contains
-        information relevant to the one user.
-        """
-        return base_models.DELETION_POLICY.DELETE
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED
@@ -391,8 +419,8 @@ class CompletedActivitiesModel(base_models.BaseModel):
             return {}
 
         return {
-            'completed_exploration_ids': user_model.exploration_ids,
-            'completed_collection_ids': user_model.collection_ids
+            'exploration_ids': user_model.exploration_ids,
+            'collection_ids': user_model.collection_ids
         }
 
 
@@ -411,20 +439,18 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
+    def get_deletion_policy():
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_deletion_policy():
-        """IncompleteActivitiesModel can be deleted since it only contains
-        information relevant to the one user.
-        """
-        return base_models.DELETION_POLICY.DELETE
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED
@@ -470,8 +496,8 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             return {}
 
         return {
-            'incomplete_exploration_ids': user_model.exploration_ids,
-            'incomplete_collection_ids': user_model.collection_ids
+            'exploration_ids': user_model.exploration_ids,
+            'collection_ids': user_model.collection_ids
         }
 
 
@@ -494,23 +520,26 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     last_played_state_name = datastore_services.StringProperty(default=None)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
-        """ExpUserLastPlaythroughModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user, since a user
+        has multiple playthroughs associated with their account.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
+            'exploration_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'last_played_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_played_state_name': base_models.EXPORT_POLICY.EXPORTED
@@ -605,8 +634,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         user_data = {}
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
-                'exp_version': user_model.last_played_exp_version,
-                'state_name': user_model.last_played_state_name
+                'last_played_exp_version': user_model.last_played_exp_version,
+                'last_played_state_name': user_model.last_played_state_name
             }
 
         return user_data
@@ -627,20 +656,18 @@ class LearnerPlaylistModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
+    def get_deletion_policy():
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_deletion_policy():
-        """LearnerPlaylistModel can be deleted since it only contains
-        information relevant to the one user.
-        """
-        return base_models.DELETION_POLICY.DELETE
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED
@@ -686,8 +713,8 @@ class LearnerPlaylistModel(base_models.BaseModel):
             return {}
 
         return {
-            'playlist_exploration_ids': user_model.exploration_ids,
-            'playlist_collection_ids': user_model.collection_ids
+            'exploration_ids': user_model.exploration_ids,
+            'collection_ids': user_model.collection_ids
         }
 
 
@@ -697,26 +724,27 @@ class UserContributionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # IDs of explorations that this user has created
-    # Includes subsequently deleted and private explorations.
+    # IDs of explorations that this user has created.
     created_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, default=None)
+        repeated=True, indexed=True)
     # IDs of explorations that this user has made a positive
     # (i.e. non-revert) commit to.
-    # Includes subsequently deleted and private explorations.
     edited_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, default=None)
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """UserContributionsModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'created_exploration_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -791,9 +819,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserEmailPreferencesModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -817,18 +843,40 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'site_updates': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'site_updates': base_models.EXPORT_POLICY.EXPORTED,
             'editor_role_notifications':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                base_models.EXPORT_POLICY.EXPORTED,
             'feedback_message_notifications':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                base_models.EXPORT_POLICY.EXPORTED,
             'subscription_notifications':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.EXPORTED
         })
+
+    @staticmethod
+    def export_data(user_id):
+        """Exports the UserEmailPreferencesModel for this user."""
+        user_email_preferences = UserEmailPreferencesModel.get_by_id(user_id)
+        if user_email_preferences:
+            return {
+                'site_updates': user_email_preferences.site_updates,
+                'editor_role_notifications':
+                    user_email_preferences.editor_role_notifications,
+                'feedback_message_notifications':
+                    user_email_preferences.feedback_message_notifications,
+                'subscription_notifications':
+                    user_email_preferences.subscription_notifications
+            }
+        else:
+            return {}
 
 
 class UserSubscriptionsModel(base_models.BaseModel):
@@ -837,9 +885,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(#10727): Rename this to exploration_ids and perform a migration.
-    activity_ids = (
+    # IDs of explorations that this user subscribes to.
+    exploration_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of collections that this user subscribes to.
     collection_ids = (
@@ -852,28 +899,39 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = datastore_services.DateTimeProperty(default=None)
 
-    # DEPRECATED in v2.6.8. Do not use. Use general_feedback_thread_ids instead.
-    feedback_thread_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-
     @staticmethod
     def get_deletion_policy():
-        """UserSubscriptionsModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
             'creator_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'last_checked': base_models.EXPORT_POLICY.EXPORTED,
-            'feedback_thread_ids': base_models.EXPORT_POLICY.EXPORTED
+            'last_checked': base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def get_field_names_for_takeout(cls):
+        """Indicates that creator_ids are an exception in the export policy
+        for Takeout. Also renames timestamp fields to clearly indicate that
+        they represent milliseconds since the epoch.
+        """
+        return dict(super(cls, cls).get_field_names_for_takeout(), ** {
+            # We do not want to expose creator_ids, so we instead return
+            # creator_usernames.
+            'creator_ids': 'creator_usernames',
+            'last_checked': 'last_checked_msec'
         })
 
     @classmethod
@@ -924,12 +982,12 @@ class UserSubscriptionsModel(base_models.BaseModel):
             creator.username for creator in creator_user_models]
 
         user_data = {
-            'activity_ids': user_model.activity_ids,
+            'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
             'creator_usernames': creator_usernames,
-            'last_checked':
+            'last_checked_msec':
                 None if user_model.last_checked is None else
                 utils.get_time_in_millisecs(user_model.last_checked)
         }
@@ -949,9 +1007,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserSubscribersModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -982,10 +1038,17 @@ class UserSubscribersModel(base_models.BaseModel):
             ).get(keys_only=True) is not None or
             cls.get_by_id(user_id) is not None)
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is not included because it contains data corresponding to other
+        users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """This model is not included because it contains data about other
-        users.
+        """Model contains data corresponding to a user, but this model is not
+        exported because it contains data corresponding to other users.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'subscriber_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -1007,9 +1070,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserRecentChangesBatchModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -1033,9 +1094,14 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'job_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -1095,14 +1161,17 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserStatsModel can be deleted since it only contains information
-        relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'impact_score': base_models.EXPORT_POLICY.EXPORTED,
             'total_plays': base_models.EXPORT_POLICY.EXPORTED,
@@ -1229,8 +1298,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationUserDataModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -1244,12 +1313,31 @@ class ExplorationUserDataModel(base_models.BaseModel):
         datastore_services.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there are
+        multiple explorations (and corresponding data) relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @staticmethod
+    def get_field_names_for_takeout():
+        """Fields are renamed to clarify that they represent the time in
+        milliseconds since the epoch.
+        """
+        return {
+            'rated_on': 'rated_on_msec',
+            'draft_change_list_last_updated':
+                'draft_change_list_last_updated_msec'
+        }
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
+            'exploration_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'rating': base_models.EXPORT_POLICY.EXPORTED,
             'rated_on': base_models.EXPORT_POLICY.EXPORTED,
             'draft_change_list': base_models.EXPORT_POLICY.EXPORTED,
@@ -1362,13 +1450,13 @@ class ExplorationUserDataModel(base_models.BaseModel):
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
-                'rated_on': (
+                'rated_on_msec': (
                     utils.get_time_in_millisecs(user_model.rated_on)
                     if user_model.rated_on
                     else None
                 ),
                 'draft_change_list': user_model.draft_change_list,
-                'draft_change_list_last_updated': (
+                'draft_change_list_last_updated_msec': (
                     utils.get_time_in_millisecs(
                         user_model.draft_change_list_last_updated)
                     if user_model.draft_change_list_last_updated
@@ -1410,23 +1498,26 @@ class CollectionProgressModel(base_models.BaseModel):
     completed_explorations = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
-        """CollectionProgressModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there can be
+        multiple collections associated with a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'collection_id': base_models.EXPORT_POLICY.EXPORTED,
+            'collection_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'completed_explorations': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1559,8 +1650,9 @@ class CollectionProgressModel(base_models.BaseModel):
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
-            user_data[user_model.collection_id] = (
-                user_model.completed_explorations)
+            user_data[user_model.collection_id] = {
+                'completed_explorations': user_model.completed_explorations
+            }
 
         return user_data
 
@@ -1584,23 +1676,26 @@ class StoryProgressModel(base_models.BaseModel):
     completed_node_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
-        """StoryProgressModel can be deleted since it only contains information
-        relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since a user
+        can have multiple stories associated with their account.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_id': base_models.EXPORT_POLICY.EXPORTED,
+            'story_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'completed_node_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1735,7 +1830,9 @@ class StoryProgressModel(base_models.BaseModel):
         found_models = cls.get_all().filter(cls.user_id == user_id)
         user_data = {}
         for user_model in found_models:
-            user_data[user_model.story_id] = user_model.completed_node_ids
+            user_data[user_model.story_id] = {
+                'completed_node_ids': user_model.completed_node_ids
+            }
         return user_data
 
 
@@ -1744,8 +1841,13 @@ class UserQueryModel(base_models.BaseModel):
 
     The id of each instance of this model is alphanumeric id of length 12
     unique to each model instance.
+
+    This model turns off caching, because this results in stale data being
+    shown after each UserQueryOneOffJob.
     """
 
+    _use_cache = False
+    _use_memcache = False
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever
@@ -1778,25 +1880,27 @@ class UserQueryModel(base_models.BaseModel):
         datastore_services.StringProperty(default=None, indexed=True))
     # Current status of the query.
     query_status = datastore_services.StringProperty(
-        indexed=True,
-        choices=[
-            feconf.USER_QUERY_STATUS_PROCESSING,
-            feconf.USER_QUERY_STATUS_COMPLETED,
-            feconf.USER_QUERY_STATUS_ARCHIVED,
-            feconf.USER_QUERY_STATUS_FAILED
-        ])
+        indexed=True, choices=feconf.ALLOWED_USER_QUERY_STATUSES)
 
     @staticmethod
     def get_deletion_policy():
-        """UserQueryModel can be deleted since it only contains information
-        relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_ids and submitter_id fields.
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @classmethod
-    def get_export_policy(cls):
+    @staticmethod
+    def get_model_association_to_user():
         """Model is not exported since this is a computed model
         and the information already exists in other exported models.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but model is not
+        exported since this is a computed model and because noteworthy details
+        that belong to this model have already been exported.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'inactive_in_last_n_days': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1880,7 +1984,9 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserBulkEmailsModel should be kept for audit purposes."""
+        """Model contains data corresponding to a user: id field, but it isn't
+        deleted because it is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @classmethod
@@ -1895,9 +2001,14 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -1920,23 +2031,26 @@ class UserSkillMasteryModel(base_models.BaseModel):
         datastore_services.FloatProperty(required=True, indexed=True))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
-        """UserSkillMasteryModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_ids field.
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since a user has
+        many relevant skill masteries.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_id': base_models.EXPORT_POLICY.EXPORTED,
+            'skill_id':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'degree_of_mastery': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -1992,7 +2106,9 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
         for mastery_model in mastery_models:
             mastery_model_skill_id = mastery_model.skill_id
-            user_data[mastery_model_skill_id] = mastery_model.degree_of_mastery
+            user_data[mastery_model_skill_id] = {
+                'degree_of_mastery': mastery_model.degree_of_mastery
+            }
 
         return user_data
 
@@ -2018,17 +2134,25 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserContributionProficiencyModel can be deleted since it only
-        contains information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_ids field.
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since a user has
+        multiple relevant contribution proficiencies.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED,
+            'score_category':
+                base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
             'score': base_models.EXPORT_POLICY.EXPORTED,
             'onboarding_email_sent': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -2199,12 +2323,12 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_review_voiceover_for_language_codes = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     can_review_questions = datastore_services.BooleanProperty(indexed=True)
+    can_submit_questions = datastore_services.BooleanProperty(
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """The model can be deleted since it only contains information relevant
-        to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -2249,18 +2373,25 @@ class UserContributionRightsModel(base_models.BaseModel):
                 rights_model.can_review_translation_for_language_codes),
             'can_review_voiceover_for_language_codes': (
                 rights_model.can_review_voiceover_for_language_codes),
-            'can_review_questions': rights_model.can_review_questions
+            'can_review_questions': rights_model.can_review_questions,
+            'can_submit_questions': rights_model.can_submit_questions
         }
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'can_review_translation_for_language_codes':
                 base_models.EXPORT_POLICY.EXPORTED,
             'can_review_voiceover_for_language_codes':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'can_review_questions': base_models.EXPORT_POLICY.EXPORTED
+            'can_review_questions': base_models.EXPORT_POLICY.EXPORTED,
+            'can_submit_questions': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -2311,6 +2442,18 @@ class UserContributionRightsModel(base_models.BaseModel):
             keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
+    @classmethod
+    def get_question_submitter_user_ids(cls):
+        """Returns the IDs of the users who have rights to submit questions.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to submit
+            questions.
+        """
+        contributor_keys = cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
+            keys_only=True)
+        return [contributor_key.id() for contributor_key in contributor_keys]
+
 
 class PendingDeletionRequestModel(base_models.BaseModel):
     """Model for storing pending deletion requests.
@@ -2323,6 +2466,11 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # The email of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
+    # Normalized username of the deleted user. May be None in the cases when
+    # the user was deleted after a short time and thus the username wasn't that
+    # known on the Oppia site.
+    normalized_long_term_username = (
+        datastore_services.StringProperty(indexed=True))
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
     role = datastore_services.StringProperty(required=True, indexed=True)
@@ -2352,19 +2500,30 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PendingDeletionRequestModel should be deleted after all the other
-        models belonging to the user are deleted or pseudonymized.
+        """Model contains data to delete corresponding to a user: id, email,
+        and normalized_long_term_username fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
-    @classmethod
-    def get_export_policy(cls):
-        """Model does not need to exported as it temporarily holds user
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not need to be exported as it temporarily holds user
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
         """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but the model does not
+        need to be exported as it temporarily holds user requests for data
+        deletion, and does not contain any information relevant to the user for
+        data export.
+        """
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'normalized_long_term_username': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
@@ -2398,12 +2557,22 @@ class DeletedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """DeletedUserModel contains only IDs that were deleted."""
+        """Model contains data corresponding to a user: id field, but it is
+        corresponding to a deleted user.
+        """
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """DeletedUserModel contains only IDs that were deleted."""
+        """Model doesn't contain any data directly corresponding to a
+        particular, existing user. DeletedUserModel contains only IDs that were
+        deleted.
+        """
         return dict(super(cls, cls).get_export_policy(), **{})
 
     @classmethod
@@ -2424,12 +2593,19 @@ class PseudonymizedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PseudonymizedUserModel contains only pseudonymous ids."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """PseudonymizedUserModel contains only pseudonymous ids."""
+        """Model doesn't contain any data directly corresponding to a user.
+        PseudonymizedUserModel contains only pseudonymous ids.
+        """
         return dict(super(cls, cls).get_export_policy(), **{})
 
     @classmethod
@@ -2461,95 +2637,32 @@ class PseudonymizedUserModel(base_models.BaseModel):
         raise Exception('New id generator is producing too many collisions.')
 
 
-class UserAuthDetailsModel(base_models.BaseModel):
-    """Stores the authentication details for a particular user.
-
-    Instances of this class are keyed by user id.
+class DeletedUsernameModel(base_models.BaseModel):
+    """Model for storing deleted username hashes. The username hash is stored
+    in the ID of this model.
     """
 
-    # Authentication detail for sign-in using google id (GAE). Exists only
-    # for full users. None for profile users.
-    gae_id = datastore_services.StringProperty(indexed=True)
-    # For profile users, the user ID of the full user associated with that
-    # profile. None for full users. Required for profiles because gae_id
-    # attribute is None for them, hence this attribute stores their association
-    # with a full user who do have a gae_id.
-    parent_user_id = (
-        datastore_services.StringProperty(indexed=True, default=None))
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
+    ID_LENGTH = 32
 
     @staticmethod
     def get_deletion_policy():
-        """The model can be deleted since it only contains information
-        relevant to one user account.
+        """Model contains data corresponding to a user: id field, but it is
+        corresponding to a deleted user.
+
+        Model contains only hashes of usernames that were deleted. The hashes
+        are kept in order to prevent the reuse of usernames of deleted users.
         """
-        return base_models.DELETION_POLICY.DELETE_AT_END
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Currently, the model holds authentication details relevant only for
-        backend, and no exportable user data. It may contain user data in
-        the future.
+        """Model doesn't contain any data directly corresponding to a user.
+        DeletedUsernameModel contains only hashes of usernames that were
+        deleted.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'parent_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserAuthDetailsModel for the user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be deleted.
-        """
-        cls.delete_by_id(user_id)
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether UserAuthDetailsModel exists for the given user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any UserAuthDetailsModel refers to the given user ID.
-        """
-        return cls.get_by_id(user_id) is not None
-
-    @classmethod
-    def get_by_auth_id(cls, auth_service, auth_id):
-        """Fetch a user entry by auth_id of a particular auth service.
-
-        Args:
-            auth_service: str. Name of the auth service.
-            auth_id: str. Authentication detail corresponding to the
-                authentication service.
-
-        Returns:
-            UserAuthDetailsModel. The UserAuthDetailsModel instance having a
-            particular user mapped to the given auth_id and the auth service
-            if there exists one, else None.
-        """
-
-        if auth_service == feconf.AUTH_METHOD_GAE:
-            return cls.query(cls.gae_id == auth_id).get()
-        return None
-
-    @classmethod
-    def get_all_profiles_by_parent_user_id(cls, parent_user_id):
-        """Fetch all user entries with the given parent_user_id.
-
-        Args:
-            parent_user_id: str. User id of the parent_user whose associated
-                profiles we are querying for.
-
-        Returns:
-            list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
-            mapped to the queried parent_user_id.
-        """
-        return cls.query(cls.parent_user_id == parent_user_id).fetch()
+        return dict(super(cls, cls).get_export_policy(), **{})

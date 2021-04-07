@@ -20,7 +20,7 @@
             </i>
           </span>
         </div>
-        <div ng-if="misconceptions.length > 0" class="oppia-option-list-container">
+        <div ng-if="misconceptions.length > 0" class="oppia-option-list-container protractor-test-misconception-list-container">
           <ul class="nav oppia-option-list nav-stacked nav-pills"
               role="tablist"
               ng-model="misconceptions">
@@ -30,14 +30,14 @@
               <a ng-click="changeActiveMisconceptionIndex($index)"
                  class="oppia-rule-tab protractor-test-misconception-<[$index]>"
                  ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
-                <summary-list-header index="$index"
-                                     disable-sorting="true"
-                                     summary="getMisconceptionSummary(misconception)"
-                                     short-summary="getMisconceptionSummary(misconception)"
-                                     is-active="$index === activeMisconceptionIndex"
-                                     is-delete-available="isEditable"
-                                     on-delete-fn="openDeleteMisconceptionModal">
-                </summary-list-header>
+                <oppia-summary-list-header [index]="$index"
+                                           [disable-sorting]="true"
+                                           [summary]="getMisconceptionSummary(misconception)"
+                                           [short-summary]="getMisconceptionSummary(misconception)"
+                                           [is-active]="$index === activeMisconceptionIndex"
+                                           [is-delete-available]="isEditable"
+                                           (summary-delete)="openDeleteMisconceptionModal($event.index, $event.event)">
+                </oppia-summary-list-header>
               </a>
 
               <div ng-if="activeMisconceptionIndex === $index">
@@ -67,7 +67,7 @@
 
   skill-misconceptions-editor .add-skill-misconception-button {
     background-color: #058CA6;
-    color: #FFFFFF;
+    color: #FFF;
   }
 
   skill-misconceptions-editor .helper-text {

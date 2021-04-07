@@ -19,8 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ClassroomDomainConstants } from
-  'domain/classroom/classroom-domain.constants.ts';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlySubtopicPageData } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
@@ -52,7 +51,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     this.subtopicUrlFragment = (
       this.urlService.getSubtopicUrlFragmentFromLearnerUrl());
-    this.subtopicViewerBackendApiService.fetchSubtopicData(
+    this.subtopicViewerBackendApiService.fetchSubtopicDataAsync(
       this.topicUrlFragment,
       this.classroomUrlFragment,
       this.subtopicUrlFragment).then(

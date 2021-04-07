@@ -27,6 +27,9 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { Subscription } from 'rxjs';
 
+import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.model';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
+
 describe('Skills List Directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -39,7 +42,7 @@ describe('Skills List Directive', function() {
   var $rootScope = null;
   var directive = null;
   var $timeout = null;
-  var EditableTopicBackendApiService = null;
+  var editableTopicBackendApiService = null;
   var SkillBackendApiService = null;
 
   var mockTasdReinitializedEventEmitter;
@@ -47,7 +50,7 @@ describe('Skills List Directive', function() {
   var testSubscription = null;
 
   var MockTopicsAndSkillsDashboardBackendApiService = {
-    mergeSkills: () => {
+    mergeSkillsAsync: () => {
       var deferred = $q.defer();
       deferred.resolve();
       return deferred.promise;
@@ -65,7 +68,7 @@ describe('Skills List Directive', function() {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
 
-    EditableTopicBackendApiService =
+    editableTopicBackendApiService =
         $injector.get('EditableTopicBackendApiService');
     SkillBackendApiService = $injector.get('SkillBackendApiService');
     directive = $injector.get('skillsListDirective')[0];
@@ -152,6 +155,42 @@ describe('Skills List Directive', function() {
       expect(tasdReinitializedSpy).toHaveBeenCalled();
     }));
 
+  it('should reinitialize the page after failing to deleting a skill',
+    fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.reject('Subtopic does not have any skills linked'));
+
+      var skillId = 'CdjnJUE332dd';
+      ctrl.deleteSkill(skillId);
+
+      $timeout.flush();
+      tick(100);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
+    }));
+
+  it(
+    'should reinitialize the page after failing to deleting a skill with ' +
+    'questions',
+    fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.reject('Please delete all questions from skills first.'));
+
+      var skillId = 'CdjnJUE332dd';
+      ctrl.deleteSkill(skillId);
+
+      $timeout.flush();
+      tick(100);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
+    }));
+
   it('should select and show edit options for a skill', function() {
     const skillId1 = 'uXcdsad3f42';
     const skillId2 = 'aEdf44DGfre';
@@ -205,15 +244,44 @@ describe('Skills List Directive', function() {
       });
 
       $scope.getEditableTopicSummaries = function() {
-        return [{id: 'dnfsdk', version: 1}];
+        let sampleTopicSummary = TopicSummary.createFromBackendDict({
+          id: 'dnfsdk',
+          name: 'topicName',
+          language_code: 'en',
+          description: 'abc',
+          version: 1,
+          canonical_story_count: 0,
+          additional_story_count: 0,
+          subtopic_count: 0,
+          total_skill_count: 0,
+          total_published_node_count: 0,
+          uncategorized_skill_count: 0,
+          thumbnail_filename: 'abc.svg',
+          thumbnail_bg_color: '#FFFFFF',
+          topic_model_created_on: 45,
+          topic_model_last_updated: 45,
+          url_fragment: 'topic-one'
+        });
+        return [sampleTopicSummary];
       };
-      var skillId = 'CdjnJUE332dd';
+      var skill = AugmentedSkillSummary.createFromBackendDict({
+        language_code: 'en',
+        skill_model_last_updated: 1594649197855.071,
+        skill_model_created_on: 1594649197855.059,
+        id: 'CdjnJUE332dd',
+        worked_examples_count: 0,
+        description: 'Dummy Skill 1',
+        misconception_count: 0,
+        version: 1,
+        classroom_names: ['classroom'],
+        topic_names: ['topicName']
+      });
 
       var topicUpdateSpy = (spyOn(
-        EditableTopicBackendApiService, 'updateTopic').and.returnValue(
+        editableTopicBackendApiService, 'updateTopic').and.returnValue(
         $q.resolve()));
 
-      ctrl.assignSkillToTopic(skillId);
+      ctrl.assignSkillToTopic(skill);
       $timeout.flush(100);
       expect(topicUpdateSpy).toHaveBeenCalled();
       expect(tasdReinitializedSpy).toHaveBeenCalled();

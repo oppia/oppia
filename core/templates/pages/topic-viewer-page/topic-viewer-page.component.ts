@@ -83,14 +83,15 @@ export class TopicViewerPageComponent implements OnInit {
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
 
     this.loaderService.showLoadingScreen('Loading');
-    this.topicViewerBackendApiService.fetchTopicData(
+    this.topicViewerBackendApiService.fetchTopicDataAsync(
       this.topicUrlFragment, this.classroomUrlFragment).then(
       (readOnlyTopic: ReadOnlyTopic) => {
         this.topicId = readOnlyTopic.getTopicId();
         this.topicName = readOnlyTopic.getTopicName();
         this.topicDescription = readOnlyTopic.getTopicDescription();
         this.pageTitleService.setPageTitle(
-          `Learn ${this.topicName} | ${this.topicDescription} | Oppia`);
+          `Learn ${this.topicName} | ` +
+          `${readOnlyTopic.getPageTitleFragmentForWeb()} | Oppia`);
         this.pageTitleService.updateMetaTag(readOnlyTopic.getMetaTagContent());
         this.canonicalStorySummaries = (
           readOnlyTopic.getCanonicalStorySummaries());

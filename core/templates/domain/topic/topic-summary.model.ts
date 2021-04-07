@@ -26,6 +26,7 @@ export interface TopicSummaryBackendDict {
   'additional_story_count': number;
   'subtopic_count': number;
   'total_skill_count': number;
+  'total_published_node_count': number;
   'uncategorized_skill_count': number;
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
@@ -46,6 +47,7 @@ export class TopicSummary {
       public canonicalStoryCount: number,
       public subtopicCount: number,
       public totalSkillCount: number,
+      public totalPublishedNodeCount: number,
       public uncategorizedSkillCount: number,
       public languageCode: string,
       public description: string,
@@ -68,6 +70,7 @@ export class TopicSummary {
       topicSummaryBackendDict.canonical_story_count,
       topicSummaryBackendDict.subtopic_count,
       topicSummaryBackendDict.total_skill_count,
+      topicSummaryBackendDict.total_published_node_count,
       topicSummaryBackendDict.uncategorized_skill_count,
       topicSummaryBackendDict.language_code,
       topicSummaryBackendDict.description,
@@ -101,6 +104,10 @@ export class TopicSummary {
 
   getTotalSkillCount(): number {
     return this.totalSkillCount;
+  }
+
+  getTotalPublishedNodeCount(): number {
+    return this.totalPublishedNodeCount;
   }
 
   getUncategorizedSkillCount(): number {
@@ -145,5 +152,9 @@ export class TopicSummary {
 
   getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
+  }
+
+  isTopicPublished(): boolean {
+    return this.isPublished;
   }
 }

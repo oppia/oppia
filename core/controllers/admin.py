@@ -25,6 +25,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_services
 from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -50,15 +51,13 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 class AdminPage(base.BaseHandler):
@@ -83,7 +82,7 @@ class AdminHandler(base.BaseHandler):
 
         recent_job_data = jobs.get_data_for_recent_jobs()
         unfinished_job_data = jobs.get_data_for_unfinished_jobs()
-        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
         for job in unfinished_job_data:
@@ -246,6 +245,20 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
+            elif self.payload.get('action') == (
+                    'regenerate_missing_exploration_stats'):
+                exp_id = self.payload.get('exp_id')
+                (
+                    exp_stats, state_stats,
+                    num_valid_exp_stats, num_valid_state_stats
+                ) = exp_services.regenerate_missing_stats_for_exploration(
+                    exp_id)
+                result = {
+                    'missing_exp_stats': exp_stats,
+                    'missing_state_stats': state_stats,
+                    'num_valid_exp_stats': num_valid_exp_stats,
+                    'num_valid_state_stats': num_valid_state_stats
+                }
             elif self.payload.get('action') == 'update_feature_flag_rules':
                 feature_name = self.payload.get('feature_name')
                 new_rule_dicts = self.payload.get('new_rules')
@@ -277,8 +290,9 @@ class AdminHandler(base.BaseHandler):
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
+            logging.error('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
-            raise
+            python_utils.reraise_exception()
 
     def _reload_exploration(self, exploration_id):
         """Reloads the exploration in dev_mode corresponding to the given
@@ -401,8 +415,8 @@ class AdminHandler(base.BaseHandler):
             if self.user.role != feconf.ROLE_ID_ADMIN:
                 raise Exception(
                     'User does not have enough rights to generate data.')
-            topic_id_1 = topic_services.get_new_topic_id()
-            topic_id_2 = topic_services.get_new_topic_id()
+            topic_id_1 = topic_fetchers.get_new_topic_id()
+            topic_id_2 = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
@@ -708,12 +722,57 @@ class AdminRoleHandler(base.BaseHandler):
             username=username)
 
         if topic_id:
-            user = user_services.UserActionsInfo(user_id)
+            user = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)
 
         self.render_json({})
+
+
+class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
+    """Handler for granting a user super admin privileges."""
+
+    PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
+        username = self.payload.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException('No such user exists')
+
+        auth_services.grant_super_admin_privileges(user_id)
+        self.render_json(self.values)
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if user_settings is None:
+            raise self.InvalidInputException('No such user exists')
+
+        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.InvalidInputException(
+                'Cannot revoke privileges from the default super admin account')
+
+        auth_services.revoke_super_admin_privileges(user_settings.user_id)
+        self.render_json(self.values)
 
 
 class AdminJobOutputHandler(base.BaseHandler):
@@ -752,9 +811,15 @@ class DataExtractionQueryHandler(base.BaseHandler):
         exp_id = self.request.get('exp_id')
         try:
             exp_version = int(self.request.get('exp_version'))
-            exploration = exp_fetchers.get_exploration_by_id(
-                exp_id, version=exp_version)
-        except Exception:
+        except ValueError:
+            raise self.InvalidInputException(
+                'Version %s cannot be converted to int.'
+                % self.request.get('exp_version')
+            )
+
+        exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, strict=False, version=exp_version)
+        if exploration is None:
             raise self.InvalidInputException(
                 'Entity for exploration with id %s and version %s not found.'
                 % (exp_id, self.request.get('exp_version')))
@@ -780,66 +845,72 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddContributionReviewerHandler(base.BaseHandler):
-    """Handles adding reviewer for contributor dashboard page."""
+class AddContributionRightsHandler(base.BaseHandler):
+    """Handles adding contribution rights for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def post(self):
-        new_reviewer_username = self.payload.get('username')
-        new_reviewer_user_id = (
-            user_services.get_user_id_from_username(new_reviewer_username))
+        username = self.payload.get('username')
+        user_id = user_services.get_user_id_from_username(username)
 
-        if new_reviewer_user_id is None:
-            raise self.InvalidInputException(
-                'Invalid username: %s' % new_reviewer_username)
+        if user_id is None:
+            raise self.InvalidInputException('Invalid username: %s' % username)
 
-        review_category = self.payload.get('review_category')
+        category = self.payload.get('category')
         language_code = self.payload.get('language_code', None)
 
-        if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
+        if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
             if not utils.is_supported_audio_language_code(language_code):
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
             if user_services.can_review_translation_suggestions(
-                    new_reviewer_user_id, language_code=language_code):
+                    user_id, language_code=language_code):
                 raise self.InvalidInputException(
                     'User %s already has rights to review translation in '
-                    'language code %s' % (
-                        new_reviewer_username, language_code))
+                    'language code %s' % (username, language_code))
             user_services.allow_user_to_review_translation_in_language(
-                new_reviewer_user_id, language_code)
-        elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
+                user_id, language_code)
+        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
             if not utils.is_supported_audio_language_code(language_code):
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
             if user_services.can_review_voiceover_applications(
-                    new_reviewer_user_id, language_code=language_code):
+                    user_id, language_code=language_code):
                 raise self.InvalidInputException(
                     'User %s already has rights to review voiceover in '
-                    'language code %s' % (
-                        new_reviewer_username, language_code))
+                    'language code %s' % (username, language_code))
             user_services.allow_user_to_review_voiceover_in_language(
-                new_reviewer_user_id, language_code)
-        elif review_category == constants.REVIEW_CATEGORY_QUESTION:
-            if user_services.can_review_question_suggestions(
-                    new_reviewer_user_id):
+                user_id, language_code)
+        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
+            if user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to review question.' % (
-                        new_reviewer_username))
-            user_services.allow_user_to_review_question(new_reviewer_user_id)
+                        username))
+            user_services.allow_user_to_review_question(user_id)
+        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
+            if user_services.can_submit_question_suggestions(user_id):
+                raise self.InvalidInputException(
+                    'User %s already has rights to submit question.' % (
+                        username))
+            user_services.allow_user_to_submit_question(user_id)
         else:
             raise self.InvalidInputException(
-                'Invalid review_category: %s' % review_category)
+                'Invalid category: %s' % category)
 
-        email_manager.send_email_to_new_contribution_reviewer(
-            new_reviewer_user_id, review_category, language_code=language_code)
+        if category in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
+        ]:
+            email_manager.send_email_to_new_contribution_reviewer(
+                user_id, category, language_code=language_code)
         self.render_json({})
 
 
-class RemoveContributionReviewerHandler(base.BaseHandler):
-    """Handles removing reviewer for contributor dashboard."""
+class RemoveContributionRightsHandler(base.BaseHandler):
+    """Handles removing contribution rights for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -862,9 +933,11 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
         removal_type = self.payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
-        elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
-            review_category = self.payload.get('review_category')
-            if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
+        elif (removal_type ==
+              constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
+            category = self.payload.get('category')
+            if (category ==
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
                 if not user_services.can_review_translation_suggestions(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -872,7 +945,8 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_translation_review_rights_in_language(
                     user_id, language_code)
-            elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
+            elif (category ==
+                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER):
                 if not user_services.can_review_voiceover_applications(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -880,18 +954,31 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_voiceover_review_rights_in_language(
                     user_id, language_code)
-            elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+            elif (category ==
+                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
                 if not user_services.can_review_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to review question.' % (
                             username))
                 user_services.remove_question_review_rights(user_id)
+            elif (category ==
+                  constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
+                if not user_services.can_submit_question_suggestions(user_id):
+                    raise self.InvalidInputException(
+                        '%s does not have rights to submit question.' % (
+                            username))
+                user_services.remove_question_submit_rights(user_id)
             else:
                 raise self.InvalidInputException(
-                    'Invalid review_category: %s' % review_category)
+                    'Invalid category: %s' % category)
 
-            email_manager.send_email_to_removed_contribution_reviewer(
-                user_id, review_category, language_code=language_code)
+            if category in [
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
+            ]:
+                email_manager.send_email_to_removed_contribution_reviewer(
+                    user_id, category, language_code=language_code)
         else:
             raise self.InvalidInputException(
                 'Invalid removal_type: %s' % removal_type)
@@ -899,32 +986,32 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
         self.render_json({})
 
 
-class ContributionReviewersListHandler(base.BaseHandler):
-    """Handler to show the existing reviewers."""
+class ContributorUsersListHandler(base.BaseHandler):
+    """Handler to show users with contribution rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        review_category = self.request.get('review_category')
+        category = self.request.get('category')
         language_code = self.request.get('language_code', None)
         if language_code is not None and not (
                 utils.is_supported_audio_language_code(language_code)):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
-        if review_category not in [
-                constants.REVIEW_CATEGORY_TRANSLATION,
-                constants.REVIEW_CATEGORY_VOICEOVER,
-                constants.REVIEW_CATEGORY_QUESTION]:
-            raise self.InvalidInputException(
-                'Invalid review_category: %s' % review_category)
-        usernames = user_services.get_contribution_reviewer_usernames(
-            review_category, language_code=language_code)
+        if category not in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
+            raise self.InvalidInputException('Invalid category: %s' % category)
+        usernames = user_services.get_contributor_usernames(
+            category, language_code=language_code)
         self.render_json({'usernames': usernames})
 
 
-class ContributionReviewerRightsDataHandler(base.BaseHandler):
-    """Handler to show the review rights of a user."""
+class ContributionRightsDataHandler(base.BaseHandler):
+    """Handler to show the contribution rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -944,7 +1031,8 @@ class ContributionReviewerRightsDataHandler(base.BaseHandler):
                 user_rights.can_review_translation_for_language_codes),
             'can_review_voiceover_for_language_codes': (
                 user_rights.can_review_voiceover_for_language_codes),
-            'can_review_questions': user_rights.can_review_questions
+            'can_review_questions': user_rights.can_review_questions,
+            'can_submit_questions': user_rights.can_submit_questions
         })
 
 
@@ -1039,3 +1127,44 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
             'number_of_pending_deletion_models': (
                 wipeout_service.get_number_of_pending_deletion_requests())
         })
+
+
+class VerifyUserModelsDeletedHandler(base.BaseHandler):
+    """Handler for getting whether any models exist for specific user ID."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        user_id = self.request.get('user_id', None)
+        if user_id is None:
+            raise self.InvalidInputException('Missing user_id param')
+        user_is_deleted = wipeout_service.verify_user_deleted(
+            user_id, include_delete_at_end_models=True)
+        self.render_json({'related_models_exist': not user_is_deleted})
+
+
+class DeleteUserHandler(base.BaseHandler):
+    """Handler for deleting a user with specific ID."""
+
+    @acl_decorators.can_delete_any_user
+    def delete(self):
+        user_id = self.request.get('user_id', None)
+        username = self.request.get('username', None)
+        if user_id is None:
+            raise self.InvalidInputException('Missing user_id param')
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+        user_id_from_username = (
+            user_services.get_user_id_from_username(username))
+        if user_id_from_username is None:
+            raise self.InvalidInputException(
+                'The username doesn\'t belong to any user'
+            )
+        if user_id_from_username != user_id:
+            raise self.InvalidInputException(
+                'The user ID retrieved from the username and '
+                'the user ID provided by admin differ.'
+            )
+        wipeout_service.pre_delete_user(user_id)
+        self.render_json({'success': True})

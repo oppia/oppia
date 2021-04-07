@@ -20,14 +20,14 @@
         <span ng-if="averageRating"><[averageRating | number:1]></span>
       </li>
 
-      <li>
+      <li class="mr-0">
         <span class="far fa-eye" uib-tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_VIEWS_TOOLTIP' | translate]></span>
         </span>
         <[numViews | summarizeNonnegativeNumber]>
       </li>
 
-      <li>
+      <li class="mr-0">
         <span class="far fa-clock" uib-tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]></span>
         </span>
@@ -55,11 +55,11 @@
       </ul>
     </ul>
 
-    <div ng-if="!explorationIsPrivate" class="oppia-info-card-bottom-row" layout="row">
-      <div flex="40">
+    <div ng-if="!explorationIsPrivate" class="oppia-info-card-bottom-row">
+      <div flex="40" class="pb-1">
         <md-content layout="row">
           <div class="oppia-info-card-tag-icon">
-            <span class="fas fa-tags" tooltip-append-to-body="true"
+            <span class="fas fa-tags oppia-info-card-modal-tooltip" tooltip-append-to-body="true"
                   uib-tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
                   tooltip-placement="top">
               <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>
@@ -102,10 +102,21 @@
     color: red;
   }
   .oppia-info-card-bottom-row em {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .oppia-info-card-content .oppia-contributors-icon {
     cursor: default;
-    margin-right: 5px;
+    margin-right: 0.3125rem;
+  }
+  .oppia-info-card-content p {
+    line-height: 1.5;
+    padding-bottom: 0.5rem;
+  }
+  .oppia-info-card-bottom-row {
+    line-height: 1.5;
+  }
+  .fas.fa-tags.oppia-info-card-modal-tooltip {
+    margin-left: 0.0625rem;
+    margin-right: 0.1875rem;
   }
 </style>

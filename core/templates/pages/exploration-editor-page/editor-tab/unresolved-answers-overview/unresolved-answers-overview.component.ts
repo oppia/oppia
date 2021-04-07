@@ -31,6 +31,9 @@ require(
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require('services/editability.service.ts');
@@ -98,7 +101,7 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/teach-oppia-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'TeachOppiaModalController'
         }).result.then(function() {}, function() {
           // Note to developers:

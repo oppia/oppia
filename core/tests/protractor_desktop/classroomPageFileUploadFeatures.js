@@ -51,8 +51,8 @@ describe('Classroom page functionality', function() {
       });
   });
 
-  beforeEach(async function() {
-    await users.login('creator@classroomPage.com');
+  afterAll(async function() {
+    await users.logout();
   });
 
   it('should add a new published topic to the Math classroom',
@@ -63,6 +63,7 @@ describe('Classroom page functionality', function() {
         'Topic 1', 'topic-one', 'Description', false);
       await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
       await topicEditorPage.updateMetaTagContent('topic meta tag');
+      await topicEditorPage.updatePageTitleFragment('topic page title');
       await topicEditorPage.saveTopic('Added thumbnail.');
       var url = await browser.getCurrentUrl();
       var topicId = url.split('/')[4].slice(0, -1);
@@ -106,7 +107,6 @@ describe('Classroom page functionality', function() {
       await topicEditorPage.publishTopic();
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(1);
-      await users.logout();
     });
 
   afterEach(async function() {

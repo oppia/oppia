@@ -32,22 +32,23 @@ export interface OutcomeBackendDict {
   'dest': string;
   'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
-  'param_changes': ParamChangeBackendDict[];
-  'refresher_exploration_id': string;
-  'missing_prerequisite_skill_id': string;
+  'param_changes': readonly ParamChangeBackendDict[];
+  'refresher_exploration_id': string | null;
+  'missing_prerequisite_skill_id': string | null;
 }
 
 export class Outcome {
   dest: string;
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
-  paramChanges: ParamChangeBackendDict[];
-  refresherExplorationId: string;
-  missingPrerequisiteSkillId: string;
+  paramChanges: readonly ParamChangeBackendDict[];
+  refresherExplorationId: string | null;
+  missingPrerequisiteSkillId: string | null;
   constructor(
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
-      paramChanges: ParamChangeBackendDict[], refresherExplorationId: string,
-      missingPrerequisiteSkillId: string) {
+      paramChanges: readonly ParamChangeBackendDict[],
+      refresherExplorationId: string | null,
+      missingPrerequisiteSkillId: string | null) {
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
@@ -72,7 +73,7 @@ export class Outcome {
   }
 
   hasNonemptyFeedback(): boolean {
-    return this.feedback.getHtml().trim() !== '';
+    return this.feedback.html.trim() !== '';
   }
 
   /**
@@ -96,7 +97,7 @@ export class OutcomeObjectFactory {
 
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: ParamChangeBackendDict[]): Outcome {
+      paramChanges: readonly ParamChangeBackendDict[]): Outcome {
     return new Outcome(
       dest,
       this.subtitledHtmlObjectFactory.createDefault(

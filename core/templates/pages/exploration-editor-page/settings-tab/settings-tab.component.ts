@@ -16,6 +16,8 @@
  * @fileoverview Directive for the exploration settings tab.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -83,8 +85,6 @@ require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-import { Subscription } from 'rxjs';
-
 angular.module('oppia').component('settingsTab', {
   bindings: {
     currentUserIsAdmin: '=',
@@ -92,7 +92,7 @@ angular.module('oppia').component('settingsTab', {
   },
   template: require('./settings-tab.component.html'),
   controller: [
-    '$http', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'EditabilityService', 'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
@@ -107,7 +107,7 @@ angular.module('oppia').component('settingsTab', {
     'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
-        $http, $uibModal, AlertsService, ChangeListService,
+        $http, $rootScope, $uibModal, AlertsService, ChangeListService,
         EditabilityService, EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
@@ -163,7 +163,13 @@ angular.module('oppia').component('settingsTab', {
             ctrl.stateNames = ExplorationStatesService.getStateNames();
           }
           ctrl.hasPageLoaded = true;
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveExplorationTitle = function() {
@@ -209,6 +215,13 @@ angular.module('oppia').component('settingsTab', {
       ctrl.areParametersEnabled = function() {
         return ExplorationFeaturesService.areParametersEnabled();
       };
+
+      ctrl.areParametersUsed = function() {
+        if (ctrl.hasPageLoaded) {
+          return (ExplorationDataService.data.param_changes.length > 0);
+        }
+      };
+
       ctrl.enableParameters = function() {
         ExplorationFeaturesService.enableParameters();
       };
@@ -253,25 +266,33 @@ angular.module('oppia').component('settingsTab', {
           !ExplorationRightsService.viewableIfPrivate());
       };
 
+      ctrl._successCallback = () => {
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the controller is migrated to angular.
+        $rootScope.$applyAsync();
+      };
+
       // Methods for muting notifications.
       ctrl.muteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          true);
+          true, ctrl._successCallback);
       };
       ctrl.muteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          true
+          true,
+          ctrl._successCallback
         );
       };
 
       ctrl.unmuteFeedbackNotifications = function() {
         UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          false
+          false,
+          ctrl._successCallback
         );
       };
       ctrl.unmuteSuggestionNotifications = function() {
         UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          false);
+          false, ctrl._successCallback);
       };
 
       // Methods relating to control buttons.
@@ -342,8 +363,17 @@ angular.module('oppia').component('settingsTab', {
             },
             controller: 'ModeratorUnpublishExplorationModalController'
           }).result.then(function(emailBody) {
-            ExplorationRightsService.saveModeratorChangeToBackend(
-              emailBody);
+            ExplorationRightsService.saveModeratorChangeToBackendAsync(
+              emailBody).then(function() {
+              UserExplorationPermissionsService.fetchPermissionsAsync()
+                .then(function(permissions) {
+                  ctrl.canUnpublish = permissions.canUnpublish;
+                  ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
+                });
+            });
           }, function() {
             AlertsService.clearWarnings();
           });
@@ -388,6 +418,21 @@ angular.module('oppia').component('settingsTab', {
               ctrl.refreshSettingsTab();
             }
           )
+        );
+        ctrl.directiveSubscriptions.add(
+          UserExplorationPermissionsService.onUserExplorationPermissionsFetched
+            .subscribe(
+              () => {
+                UserExplorationPermissionsService.getPermissionsAsync()
+                  .then(function(permissions) {
+                    ctrl.canUnpublish = permissions.canUnpublish;
+                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the controller is migrated to angular.
+                    $rootScope.$applyAsync();
+                  });
+              }
+            )
         );
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
           EXPLORATION_TITLE_INPUT_FOCUS_LABEL);

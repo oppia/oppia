@@ -5,6 +5,7 @@
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
+      <content-language-selector></content-language-selector>
       <a ng-class="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
          ng-href="<[OPPIA_AVATAR_LINK_URL]>"
          target="_blank"
@@ -232,7 +233,7 @@
     padding: 6px 12px;
   }
   tutor-card .oppia-no-interaction-text {
-    color: #FF0000;
+    color: #F00;
   }
 
   /* When the size of the browser is reduced, and the answer submitted is
@@ -248,7 +249,7 @@
   @media screen and (max-width: 959px) {
     .oppia-learner-view-card .instructions-button {
       background-color: #0D48A1;
-      color: #ffffff;
+      color: #fff;
       padding: 6px 12px;
       white-space: normal;
     }

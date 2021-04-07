@@ -35,11 +35,11 @@ angular.module('oppia').directive('createActivityButton', [
       template: require('./create-activity-button.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$timeout', '$uibModal', '$window',
+        '$rootScope', '$timeout', '$uibModal', '$window',
         'ExplorationCreationService', 'SiteAnalyticsService',
         'UrlService', 'UserService', 'ALLOW_YAML_FILE_UPLOAD',
         function(
-            $timeout, $uibModal, $window,
+            $rootScope, $timeout, $uibModal, $window,
             ExplorationCreationService, SiteAnalyticsService,
             UrlService, UserService, ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;
@@ -90,6 +90,9 @@ angular.module('oppia').directive('createActivityButton', [
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
             // If the user clicked on a 'create' button to get to the dashboard,
             // open the create modal immediately (or redirect to the exploration

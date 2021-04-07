@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import os
 
 from constants import constants
@@ -26,7 +27,9 @@ from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+from proto import text_classifier_pb2
 import python_utils
+import utils
 
 
 class FileSystemServicesTests(test_utils.GenericTestBase):
@@ -61,7 +64,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.user_id_admin)
+        self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self):
         with python_utils.open_file(
@@ -201,25 +204,35 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
         self.fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id'))
-        self.classifier_data = {
+        self.classifier_data_proto = (
+            text_classifier_pb2.TextClassifierFrozenModel())
+        self.classifier_data_proto.model_json = json.dumps({
             'param1': 40,
             'param2': [34.2, 54.13, 95.23],
             'submodel': {
                 'param1': 12
             }
-        }
+        })
 
     def test_save_and_get_classifier_data(self):
         """Test that classifier data is stored and retrieved correctly."""
         fs_services.save_classifier_data(
-            'exp_id', 'job_id', self.classifier_data)
-        classifier_data = fs_services.read_classifier_data('exp_id', 'job_id')
-        self.assertEqual(classifier_data, self.classifier_data)
+            'exp_id', 'job_id', self.classifier_data_proto)
+        filepath = 'job_id-classifier-data.pb.xz'
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id'))
+        classifier_data = utils.decompress_from_zlib(fs.get(filepath))
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.ParseFromString(classifier_data)
+        self.assertEqual(
+            classifier_data_proto.model_json,
+            self.classifier_data_proto.model_json)
 
     def test_remove_classifier_data(self):
         """Test that classifier data is removed upon deletion."""
         fs_services.save_classifier_data(
-            'exp_id', 'job_id', self.classifier_data)
-        self.assertTrue(self.fs.isfile('job_id-classifier-data.json'))
+            'exp_id', 'job_id', self.classifier_data_proto)
+        self.assertTrue(self.fs.isfile('job_id-classifier-data.pb.xz'))
         fs_services.delete_classifier_data('exp_id', 'job_id')
-        self.assertFalse(self.fs.isfile('job_id-classifier-data.json'))
+        self.assertFalse(self.fs.isfile('job_id-classifier-data.pb.xz'))

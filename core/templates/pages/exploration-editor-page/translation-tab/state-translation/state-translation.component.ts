@@ -26,6 +26,7 @@ require(
   'state-translation-editor.component.ts'
 );
 
+require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
@@ -59,10 +60,15 @@ import { Subscription } from 'rxjs';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+import {
+  TRANSLATION_DATA_FORMAT_HTML,
+  TRANSLATION_DATA_FORMAT_UNICODE,
+  TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+  TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+} from 'domain/exploration/WrittenTranslationObjectFactory';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 angular.module('oppia').component('stateTranslation', {
   bindings: {
@@ -79,6 +85,7 @@ angular.module('oppia').component('stateTranslation', {
     'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
     'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
     'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
+    'COMPONENT_NAME_RULE_INPUT',
     'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
     'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     function(
@@ -91,13 +98,24 @@ angular.module('oppia').component('stateTranslation', {
         TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
         COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
         COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
+        COMPONENT_NAME_RULE_INPUT,
         COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
         RULE_SUMMARY_WRAP_CHARACTER_COUNT
     ) {
+      // A map from translatable rule input types to their corresponding data
+      // formats.
+      var RULE_INPUT_TYPES_TO_DATA_FORMATS = {
+        TranslatableSetOfNormalizedString: (
+          TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING),
+        TranslatableSetOfUnicodeString: (
+          TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING),
+      };
+
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      $scope.isVoiceoverModeActive = (
-        TranslationTabActiveModeService.isVoiceoverModeActive);
+      $scope.isVoiceoverModeActive = function() {
+        return (TranslationTabActiveModeService.isVoiceoverModeActive());
+      };
       var isTranslatedTextRequired = function() {
         return (
           TranslationTabActiveModeService.isVoiceoverModeActive() &&
@@ -107,7 +125,7 @@ angular.module('oppia').component('stateTranslation', {
       $scope.getRequiredHtml = function(subtitledHtml) {
         var html = null;
         if (isTranslatedTextRequired()) {
-          var contentId = subtitledHtml.getContentId();
+          var contentId = subtitledHtml.contentId;
           var activeLanguageCode = (
             TranslationLanguageService.getActiveLanguageCode());
           var writtenTranslations = (
@@ -118,10 +136,10 @@ angular.module('oppia').component('stateTranslation', {
             var writtenTranslation = (
               writtenTranslations.getWrittenTranslation(
                 contentId, activeLanguageCode));
-            html = writtenTranslation.getHtml();
+            html = writtenTranslation.getTranslation();
           }
         } else {
-          html = subtitledHtml.getHtml();
+          html = subtitledHtml.html;
         }
         return html;
       };
@@ -161,39 +179,63 @@ angular.module('oppia').component('stateTranslation', {
           return;
         }
         let activeContentId = null;
-        let activeDataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
+        let activeDataFormat = TRANSLATION_DATA_FORMAT_HTML;
 
         if (tabId === $scope.TAB_ID_CONTENT) {
-          activeContentId = $scope.stateContent.getContentId();
+          activeContentId = $scope.stateContent.contentId;
         } else if (tabId === $scope.TAB_ID_FEEDBACK) {
           $scope.activeAnswerGroupIndex = 0;
           if ($scope.stateAnswerGroups.length > 0) {
             activeContentId = (
-              $scope.stateAnswerGroups[0].outcome.feedback.getContentId());
+              $scope.stateAnswerGroups[0].outcome.feedback.contentId);
           } else {
             activeContentId = (
-              $scope.stateDefaultOutcome.feedback.getContentId());
+              $scope.stateDefaultOutcome.feedback.contentId);
           }
         } else if (tabId === $scope.TAB_ID_HINTS) {
           $scope.activeHintIndex = 0;
           activeContentId = (
-            $scope.stateHints[0].hintContent.getContentId());
+            $scope.stateHints[0].hintContent.contentId);
         } else if (tabId === $scope.TAB_ID_SOLUTION) {
-          activeContentId = $scope.stateSolution.explanation.getContentId();
+          activeContentId = $scope.stateSolution.explanation.contentId;
         } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
           $scope.activeCustomizationArgContentIndex = 0;
           const activeContent = (
             $scope.interactionCustomizationArgTranslatableContent[0].content
           );
-          activeContentId = activeContent.getContentId();
+          activeContentId = activeContent.contentId;
           if (activeContent instanceof SubtitledUnicode) {
-            activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
+            activeDataFormat = TRANSLATION_DATA_FORMAT_UNICODE;
           }
+        } else if (tabId === $scope.TAB_ID_RULE_INPUTS) {
+          if ($scope.interactionRuleTranslatableContents.length === 0) {
+            throw new Error(
+              'Accessed rule input translation tab when there are no rules');
+          }
+
+          // Note that only 'TextInput' and 'SetInput' have translatable rule
+          // types. The rules tab is disabled for other interactions.
+          const {
+            rule, inputName, contentId
+          } = $scope.interactionRuleTranslatableContents[0];
+          activeContentId = contentId;
+          const inputType = rule.inputTypes[inputName];
+          activeDataFormat = RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
+          $scope.activeRuleContentIndex = 0;
         }
         TranslationTabActiveContentIdService.setActiveContent(
-          activeContentId,
-          activeDataFormat);
+          activeContentId, activeDataFormat);
         $scope.activatedTabId = tabId;
+      };
+
+      $scope.getHumanReadableRuleInputValues = function(inputValue, inputType) {
+        if (inputType === 'TranslatableSetOfNormalizedString') {
+          return ('[' + inputValue.normalizedStrSet.join(', ') + ']');
+        } else if (inputType === 'TranslatableSetOfUnicodeString') {
+          return ('[' + inputValue.unicodeStrSet.join(', ') + ']');
+        } else {
+          throw new Error(`The ${inputType} type is not implemented.`);
+        }
       };
 
       $scope.summarizeDefaultOutcome = function(
@@ -224,7 +266,7 @@ angular.module('oppia').component('stateTranslation', {
           summary +=
             $filter(
               'convertToPlainText'
-            )(defaultOutcome.feedback.getHtml());
+            )(defaultOutcome.feedback.html);
         }
         return summary;
       };
@@ -251,8 +293,8 @@ angular.module('oppia').component('stateTranslation', {
         if (hasFeedback) {
           summary += (
             shortenRule ?
-              $filter('truncate')(outcome.feedback.getHtml(), 30) :
-              $filter('convertToPlainText')(outcome.feedback.getHtml()));
+              $filter('truncate')(outcome.feedback.html, 30) :
+              $filter('convertToPlainText')(outcome.feedback.html));
         }
         return summary;
       };
@@ -295,6 +337,8 @@ angular.module('oppia').component('stateTranslation', {
         } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
           return (
             $scope.interactionCustomizationArgTranslatableContent.length === 0);
+        } else if (tabId === $scope.TAB_ID_RULE_INPUTS) {
+          return $scope.interactionRuleTranslatableContents.length === 0;
         }
       };
 
@@ -308,9 +352,28 @@ angular.module('oppia').component('stateTranslation', {
         }
         $scope.activeHintIndex = newIndex;
         var activeContentId = (
-          $scope.stateHints[newIndex].hintContent.getContentId());
+          $scope.stateHints[newIndex].hintContent.contentId);
         TranslationTabActiveContentIdService.setActiveContent(
-          activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
+          activeContentId, TRANSLATION_DATA_FORMAT_HTML);
+      };
+
+      $scope.changeActiveRuleContentIndex = function(newIndex) {
+        if (ctrl.isTranslationTabBusy) {
+          StateEditorService.onShowTranslationTabBusyModal.emit();
+          return;
+        }
+        if ($scope.activeRuleContentIndex === newIndex) {
+          return;
+        }
+        const {
+          rule, inputName, contentId
+        } = $scope.interactionRuleTranslatableContents[newIndex];
+        const activeContentId = contentId;
+        const inputType = rule.inputTypes[inputName];
+        const activeDataFormat = RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
+        TranslationTabActiveContentIdService.setActiveContent(
+          activeContentId, activeDataFormat);
+        $scope.activeRuleContentIndex = newIndex;
       };
 
       $scope.changeActiveCustomizationArgContentIndex = function(newIndex) {
@@ -325,12 +388,12 @@ angular.module('oppia').component('stateTranslation', {
           $scope.interactionCustomizationArgTranslatableContent[
             newIndex].content
         );
-        const activeContentId = activeContent.getContentId();
+        const activeContentId = activeContent.contentId;
         let activeDataFormat = null;
         if (activeContent instanceof SubtitledUnicode) {
-          activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
+          activeDataFormat = TRANSLATION_DATA_FORMAT_UNICODE;
         } else if (activeContent instanceof SubtitledHtml) {
-          activeDataFormat = WRITTEN_TRANSLATION_TYPE_HTML;
+          activeDataFormat = TRANSLATION_DATA_FORMAT_HTML;
         }
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId, activeDataFormat);
@@ -347,14 +410,14 @@ angular.module('oppia').component('stateTranslation', {
           $scope.activeAnswerGroupIndex = newIndex;
           if (newIndex === $scope.stateAnswerGroups.length) {
             activeContentId = (
-              $scope.stateDefaultOutcome.feedback.getContentId());
+              $scope.stateDefaultOutcome.feedback.contentId);
           } else {
             activeContentId = (
               $scope.stateAnswerGroups[newIndex]
-                .outcome.feedback.getContentId());
+                .outcome.feedback.contentId);
           }
           TranslationTabActiveContentIdService.setActiveContent(
-            activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
+            activeContentId, TRANSLATION_DATA_FORMAT_HTML);
         }
       };
 
@@ -384,10 +447,31 @@ angular.module('oppia').component('stateTranslation', {
 
       $scope.getSubtitledContentSummary = function(subtitledContent) {
         if (subtitledContent instanceof SubtitledHtml) {
-          return $filter('formatRtePreview')(subtitledContent.getHtml());
+          return $filter('formatRtePreview')(subtitledContent.html);
         } else if (subtitledContent instanceof SubtitledUnicode) {
-          return subtitledContent.getUnicode();
+          return subtitledContent.unicode;
         }
+      };
+
+      const getInteractionRuleTranslatableContents = (): {
+        rule: Rule, inputName: string, contentId: string
+      }[] => {
+        const allRules = $scope.stateAnswerGroups.map(
+          answerGroup => answerGroup.rules).flat();
+
+        const interactionRuleTranslatableContent = [];
+        allRules.forEach(rule => {
+          Object.keys(rule.inputs).forEach(inputName => {
+            if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
+              const contentId = rule.inputs[inputName].contentId;
+              interactionRuleTranslatableContent.push({
+                rule, inputName, contentId
+              });
+            }
+          });
+        });
+
+        return interactionRuleTranslatableContent;
       };
 
       $scope.getInteractionCustomizationArgTranslatableContents = function(
@@ -471,6 +555,8 @@ angular.module('oppia').component('stateTranslation', {
           $scope.getInteractionCustomizationArgTranslatableContents(
             $scope.stateInteractionCustomizationArgs)
         );
+        $scope.interactionRuleTranslatableContents = (
+          getInteractionRuleTranslatableContents());
 
         if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
           $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +
@@ -486,6 +572,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
         $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
         $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
+        $scope.TAB_ID_RULE_INPUTS = COMPONENT_NAME_RULE_INPUT;
         $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
         $scope.TAB_ID_CUSTOMIZATION_ARGS = (
           COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
@@ -500,6 +587,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.activeHintIndex = null;
         $scope.activeAnswerGroupIndex = null;
         $scope.activeCustomizationArgContentIndex = null;
+        $scope.activeRuleContentIndex = null;
         $scope.stateContent = null;
         $scope.stateInteractionId = null;
         $scope.stateAnswerGroups = [];

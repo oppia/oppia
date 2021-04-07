@@ -39,13 +39,15 @@ require(
 angular.module('oppia').component('statisticsTab', {
   template: require('./statistics-tab.component.html'),
   controller: [
-    '$q', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
+    '$q', '$rootScope', '$scope', '$uibModal',
+    'AlertsService', 'ComputeGraphService',
     'ExplorationDataService', 'ExplorationStatsService',
     'ReadOnlyExplorationBackendApiService', 'RouterService',
     'StateInteractionStatsService', 'StatesObjectFactory',
     'UrlInterpolationService',
     function(
-        $q, $scope, $uibModal, AlertsService, ComputeGraphService,
+        $q, $rootScope, $scope, $uibModal,
+        AlertsService, ComputeGraphService,
         ExplorationDataService, ExplorationStatsService,
         ReadOnlyExplorationBackendApiService, RouterService,
         StateInteractionStatsService, StatesObjectFactory,
@@ -55,7 +57,7 @@ angular.module('oppia').component('statisticsTab', {
       const refreshExplorationStatistics = () => {
         $q.all([
           ReadOnlyExplorationBackendApiService.loadLatestExploration(expId),
-          ExplorationStatsService.getExplorationStats(expId)
+          ExplorationStatsService.getExplorationStatsAsync(expId)
         ]).then(responses => {
           const [expResponse, expStats] = responses;
           const initStateName = expResponse.exploration.init_state_name;
@@ -91,6 +93,7 @@ angular.module('oppia').component('statisticsTab', {
           if (expStats.numActualStarts > 0) {
             $scope.explorationHasBeenVisited = true;
           }
+          $rootScope.$applyAsync();
         });
       };
 

@@ -19,6 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { ContentTranslationLanguageService } from
+  'pages/exploration-player-page/services/content-translation-language.service';
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { State } from 'domain/state/StateObjectFactory';
 import {
@@ -37,7 +41,11 @@ type CustomizationArgsWithChoices = (
   providedIn: 'root'
 })
 export class ExtractImageFilenamesFromStateService {
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor(
+    private htmlEscaperService: HtmlEscaperService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService
+  ) {}
 
     INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
     INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';
@@ -52,7 +60,10 @@ export class ExtractImageFilenamesFromStateService {
      *                         should be returned.
      */
     _getStateContentHtml(state: State): string {
-      return state.content.getHtml();
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      return this.contentTranslationManagerService.getTranslatedHtml(
+        state.writtenTranslations, languageCode, state.content);
     }
 
     /**
@@ -63,13 +74,21 @@ export class ExtractImageFilenamesFromStateService {
      */
     _getOutcomesHtml(state: State): string {
       let outcomesHtml = '';
-      state.interaction.answerGroups.forEach(function(answerGroup) {
-        let answerGroupHtml = answerGroup.outcome.feedback.getHtml();
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      state.interaction.answerGroups.forEach(answerGroup => {
+        let answerGroupHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            answerGroup.outcome.feedback));
         outcomesHtml = outcomesHtml.concat(answerGroupHtml);
       });
       if (state.interaction.defaultOutcome !== null) {
-        outcomesHtml = outcomesHtml.concat(
-          state.interaction.defaultOutcome.feedback.getHtml());
+        let defaultOutcomeHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            state.interaction.defaultOutcome.feedback));
+        outcomesHtml = outcomesHtml.concat(defaultOutcomeHtml);
       }
       return outcomesHtml;
     }
@@ -80,8 +99,13 @@ export class ExtractImageFilenamesFromStateService {
      */
     _getHintsHtml(state: State): string {
       let hintsHtml = '';
-      state.interaction.hints.forEach(function(hint) {
-        let hintHtml = hint.hintContent.getHtml();
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      state.interaction.hints.forEach(hint => {
+        let hintHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            hint.hintContent));
         hintsHtml = hintsHtml.concat(hintHtml);
       });
       return hintsHtml;
@@ -93,7 +117,11 @@ export class ExtractImageFilenamesFromStateService {
      *                         returned.
      */
     _getSolutionHtml(state: State): string {
-      return state.interaction.solution.explanation.getHtml();
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      return this.contentTranslationManagerService.getTranslatedHtml(
+        state.writtenTranslations, languageCode,
+        state.interaction.solution.explanation);
     }
 
     /**
@@ -113,10 +141,16 @@ export class ExtractImageFilenamesFromStateService {
           state.interaction.id === this.INTERACTION_TYPE_ITEM_SELECTION ||
           state.interaction.id === this.INTERACTION_TYPE_DRAG_AND_DROP_SORT) {
         let customizationArgsHtml = '';
+        let languageCode = (
+          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+        );
+        const self = this;
         (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
           .choices.value.forEach(function(value) {
             customizationArgsHtml = (
-              customizationArgsHtml.concat(value.getHtml()));
+              customizationArgsHtml.concat(
+                self.contentTranslationManagerService.getTranslatedHtml(
+                  state.writtenTranslations, languageCode, value)));
           });
         _allHtmlInTheState.push(customizationArgsHtml);
       }

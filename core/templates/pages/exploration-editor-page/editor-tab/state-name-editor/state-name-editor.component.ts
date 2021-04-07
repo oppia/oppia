@@ -31,29 +31,37 @@ require('services/editability.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/external-save.service.ts');
 
+require('constants.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('stateNameEditor', {
   template: require('./state-name-editor.component.html'),
   controller: [
-    '$filter', 'EditabilityService', 'ExplorationStatesService',
+    '$filter', 'EditabilityService',
+    'ExplorationStatesService',
     'ExternalSaveService', 'FocusManagerService', 'RouterService',
-    'StateEditorService', 'StateNameService',
+    'StateEditorService', 'StateNameService', 'MAX_STATE_NAME_LENGTH',
     function(
-        $filter, EditabilityService, ExplorationStatesService,
+        $filter, EditabilityService,
+        ExplorationStatesService,
         ExternalSaveService, FocusManagerService, RouterService,
-        StateEditorService, StateNameService) {
+        StateEditorService, StateNameService, MAX_STATE_NAME_LENGTH) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
 
       ctrl.initStateNameEditor = function() {
         StateNameService.init();
+        if (ctrl.TabName === 'main') {
+          FocusManagerService.setFocus('oppiaEditableSection');
+        }
       };
 
       ctrl.openStateNameEditor = function() {
         var stateName = StateEditorService.getActiveStateName();
         StateNameService.setStateNameEditorVisibility(true);
         StateNameService.setStateNameSavedMemento(stateName);
+        ctrl.maxLen = MAX_STATE_NAME_LENGTH;
         ctrl.tmpStateName = stateName;
         FocusManagerService.setFocus('stateNameEditorOpened');
       };

@@ -4,7 +4,7 @@
       Create New Subtopic
     </h3>
   </div>
-  <div>
+  <div ng-if="$ctrl.topic.getSubtopicById($ctrl.subtopicId)">
     <div class="modal-body new-subtopic-editor protractor-test-new-subtopic-editor">
       <div class="create-new-subtopic-input-field">
         <div>
@@ -97,7 +97,7 @@
     margin: 10px 0 0;
   }
   .new-subtopic-editor .error-msg {
-    color: #ff0000;
+    color: #f00;
     font-size: smaller;
     margin: 10px 0 0;
   }
@@ -127,13 +127,13 @@
       display: flex;
     }
     .create-new-subtopic .modal-header h3 {
-      color: #FFFFFF;
+      color: #FFF;
     }
     .create-new-subtopic .create-new-subtopic-input-field {
       margin: 25px 0;
     }
     .create-new-subtopic .modal-close-button {
-      color: #FFFFFF;
+      color: #FFF;
       display: block;
       font-size: 20px;
     }

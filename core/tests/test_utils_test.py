@@ -19,16 +19,21 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
 import os
 
 from constants import constants
 from core import jobs
+from core.domain import auth_domain
 from core.domain import param_domain
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
+import mock
+import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
@@ -163,6 +168,144 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         self.assertIsNone(wrapped.pre_call_hook('args'))
 
 
+class AuthServicesStubTests(test_utils.GenericTestBase):
+
+    EMAIL = 'user@test.com'
+
+    def setUp(self):
+        super(AuthServicesStubTests, self).setUp()
+        self.stub = test_utils.AuthServicesStub()
+
+    def test_get_auth_claims_from_request(self):
+        request = webapp2.Request.blank('/')
+
+        self.assertIsNone(self.stub.get_auth_claims_from_request(request))
+
+        with self.login_context(self.EMAIL):
+            self.assertEqual(
+                self.stub.get_auth_claims_from_request(request),
+                auth_domain.AuthClaims(
+                    self.get_auth_id_from_email(self.EMAIL), self.EMAIL, False))
+
+        with self.super_admin_context():
+            self.assertEqual(
+                self.stub.get_auth_claims_from_request(request),
+                auth_domain.AuthClaims(
+                    self.get_auth_id_from_email(self.SUPER_ADMIN_EMAIL),
+                    self.SUPER_ADMIN_EMAIL,
+                    True))
+
+        self.assertIsNone(self.stub.get_auth_claims_from_request(request))
+
+    def test_get_association_that_is_present(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
+
+    def test_get_association_that_is_missing(self):
+        self.assertIsNone(self.stub.get_user_id_from_auth_id('does_not_exist'))
+        self.assertIsNone(self.stub.get_auth_id_from_user_id('does_not_exist'))
+
+    def test_get_multi_associations_with_all_present(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid2', 'uid2'))
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']),
+            ['uid1', 'uid2', 'uid3'])
+        self.assertEqual(
+            self.stub.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', 'aid2', 'aid3'])
+
+    def test_get_multi_associations_with_one_missing(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+        # The aid2 <-> uid2 association is missing.
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']),
+            ['uid1', None, 'uid3'])
+        self.assertEqual(
+            self.stub.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', None, 'aid3'])
+
+    def test_associate_auth_id_with_user_id_without_collision(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
+
+    def test_associate_auth_id_with_user_id_with_collision_raises(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('aid', 'uid'))
+
+    def test_associate_multi_auth_ids_with_user_ids_without_collisions(self):
+        self.stub.associate_multi_auth_ids_with_user_ids(
+            [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+             auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+             auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+        self.assertEqual(
+            [self.stub.get_user_id_from_auth_id('aid1'),
+             self.stub.get_user_id_from_auth_id('aid2'),
+             self.stub.get_user_id_from_auth_id('aid3')],
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(self):
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate_multi_auth_ids_with_user_ids(
+                [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+                 auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+                 auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+    def test_present_association_is_not_considered_to_be_deleted(self):
+        # This operation creates the external auth association.
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.assertFalse(
+            self.stub.verify_external_auth_associations_are_deleted('uid'))
+
+    def test_missing_association_is_considered_to_be_deleted(self):
+        self.assertTrue(self.stub.verify_external_auth_associations_are_deleted(
+            'does_not_exist'))
+
+    def test_delete_association_when_it_is_present(self):
+        # This operation creates the external auth association.
+        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+        self.assertFalse(
+            self.stub.verify_external_auth_associations_are_deleted('uid'))
+
+        self.stub.delete_external_auth_associations('uid')
+
+        self.assertTrue(
+            self.stub.verify_external_auth_associations_are_deleted('uid'))
+
+    def test_delete_association_when_it_is_missing_does_not_raise(self):
+        # Should not raise.
+        self.stub.delete_external_auth_associations('does_not_exist')
+
+
 class CallCounterTests(test_utils.GenericTestBase):
     def test_call_counter_counts_the_number_of_times_a_function_gets_called(
             self):
@@ -228,9 +371,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(None), 1)
-        with self.assertRaisesRegexp(
-            RuntimeError, 'MapReduce task to URL .+ failed'):
-            self.process_and_flush_pending_mapreduce_tasks()
+        self.assertRaisesRegexp(
+            RuntimeError, 'MapReduce task failed: Task<.*>',
+            self.process_and_flush_pending_mapreduce_tasks)
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
@@ -288,6 +431,72 @@ class TestUtilsTests(test_utils.GenericTestBase):
             Exception, 'Expected params to be a dict'):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
+
+    def test_capture_logging(self):
+        logging.info('0')
+        with self.capture_logging() as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.info('6')
+
+        self.assertEqual(logs, ['1', '2', '3', '4'])
+
+    def test_capture_logging_with_min_level(self):
+        logging.info('0')
+        with self.capture_logging(min_level=logging.WARN) as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.error('6')
+
+        self.assertEqual(logs, ['3', '4'])
+
+    def test_swap_to_always_return_without_value_uses_none(self):
+        obj = mock.Mock()
+        obj.func = lambda: obj
+
+        self.assertIs(obj.func(), obj)
+
+        with self.swap_to_always_return(obj, 'func'):
+            self.assertIsNone(obj.func())
+
+    def test_swap_to_always_return_with_value(self):
+        obj = mock.Mock()
+        obj.func = lambda: 0
+
+        self.assertEqual(obj.func(), 0)
+
+        with self.swap_to_always_return(obj, 'func', value=123):
+            self.assertEqual(obj.func(), 123)
+
+    def test_swap_to_always_raise_without_error_uses_empty_exception(self):
+        obj = mock.Mock()
+        obj.func = lambda: None
+        self.assertIsNone(obj.func())
+
+        with self.swap_to_always_raise(obj, 'func'):
+            try:
+                obj.func()
+            except Exception as e:
+                self.assertIs(type(e), Exception)
+                self.assertEqual(python_utils.UNICODE(e), '')
+            else:
+                self.fail(msg='obj.func() did not raise an Exception')
+
+    def test_swap_to_always_raise_with_error(self):
+        obj = mock.Mock()
+        obj.func = lambda: python_utils.divide(1, 0)
+
+        self.assertRaisesRegexp(
+            ZeroDivisionError, 'integer division or modulo by zero', obj.func)
+
+        with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
+            self.assertRaisesRegexp(ValueError, 'abc', obj.func)
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
@@ -368,10 +577,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getenv(key, default): # pylint: disable=unused-argument
             return
         getenv_swap = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_kwargs=[
-                {'key': '123', 'default': '456'},
-                {'key': '678', 'default': '900'},
-            ])
+            os, 'getenv', mock_getenv,
+            expected_args=[('123',), ('678',)],
+            expected_kwargs=[{'default': '456'}, {'default': '900'}])
 
         with getenv_swap:
             SwapWithCheckTestClass.functions_with_kwargs()

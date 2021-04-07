@@ -49,7 +49,7 @@ describe('Csrf Token Service', function() {
   it('should error if initialize is called more than once', () => {
     csrfTokenService.initializeToken();
 
-    expect(csrfTokenService.initializeToken)
+    expect(() => csrfTokenService.initializeToken())
       .toThrowError('Token request has already been made');
   });
 

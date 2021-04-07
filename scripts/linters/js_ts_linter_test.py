@@ -59,7 +59,6 @@ VALID_CONSTANT_OUTSIDE_CLASS_AJS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_constant_outside_class.constants.ajs.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
-EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_COMPONENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_two_component.ts')
 INVALID_SCOPE_TRUE_FILEPATH = os.path.join(
@@ -126,30 +125,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
             Exception, r'Exception raised from parse_script\(\)'):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE).perform_all_lint_checks()
-
-    def test_check_extra_js_file_found(self):
-        def mock_readlines(unused_self, unused_filepath):
-            return ('var a = 10;\n',)
-
-        def mock_read(unused_self, unused_filepath):
-            return 'var a = 10;\n'
-
-        readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
-        read_swap = self.swap(
-            pre_commit_linter.FileCache, 'read', mock_read)
-
-        with readlines_swap, read_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [EXTRA_JS_FILEPATH], [], FILE_CACHE).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        expected_messages = ['Found extra .js file']
-        expected_messages.extend([
-            'If you want the above files to be present as js files, add '
-            'them to the list JS_FILEPATHS_NOT_TO_BUILD in build.py. '
-            'Otherwise, rename them to .ts'])
-        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_js_and_ts_component_name_and_count_with_two_component(self):
         def mock_compile_all_ts_files():

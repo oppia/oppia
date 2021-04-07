@@ -22,7 +22,10 @@
     <loc>https://www.oppia.org/contact</loc>
   </url>
   <url>
-    <loc>https://www.oppia.org/fractions</loc>
+    <loc>https://www.oppia.org/math/fractions</loc>
+  </url>
+  <url>
+    <loc>https://www.oppia.org/learn/math</loc>
   </url>
   <url>
     <loc>https://www.oppia.org/explore/0</loc>

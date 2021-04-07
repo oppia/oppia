@@ -5,7 +5,7 @@
               ng-class="{'btn-success': isStorySaveable()}"
               ng-click="saveChanges()"
               ng-disabled="!isStorySaveable()">
-        <span ng-if="!isSaveInProgress()">
+        <span ng-if="!$ctrl.isSaveInProgress()">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Save Story">
             &#xE161;
@@ -17,7 +17,7 @@
           </span>
         </span>
 
-        <span ng-if="isSaveInProgress()">
+        <span ng-if="$ctrl.isSaveInProgress()">
           <span class="oppia-save-publish-button-label">Saving</span>
           <loading-dots></loading-dots>
         </span>
@@ -31,7 +31,7 @@
     </div>
   </li>
   <li class="oppia-editor-publish-button-container">
-    <button type="button" ng-if="!isStoryPublished()"
+    <button type="button" ng-if="!$ctrl.isStoryPublished()"
             class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
             ng-click="publishStory()"
             ng-class="{'btn-success': !isStorySaveable() && getWarningsCount() === 0 && validationIssues.length === 0 && explorationValidationIssues.length === 0 && prepublishValidationIssues.length === 0}"
@@ -43,7 +43,7 @@
       <span class="oppia-save-publish-button-label">Publish Story</span>
     </button>
     <button type="button" ng-click="unpublishStory()"
-            ng-if="isStoryPublished()"
+            ng-if="$ctrl.isStoryPublished()"
             class="btn btn-secondary protractor-test-unpublish-story-button"
             ng-disabled="isStorySaveable()">
       Unpublish Story
@@ -92,14 +92,14 @@
           <span>Discard Changes</span>
         </div>
         <div class="story-nav-dropdown-option">
-          <div ng-if="!isStoryPublished()"
+          <div ng-if="!$ctrl.isStoryPublished()"
                ng-click="publishStory()"
                ng-disabled="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="material-icons">&#xE254;</i>
             <span>Publish Story</span>
           </div>
           <div ng-click="unpublishStory()"
-               ng-if="isStoryPublished()"
+               ng-if="$ctrl.isStoryPublished()"
                ng-disabled="isStorySaveable()">
             <i class="material-icons">&#xE254;</i>
             <span>Unpublish Story</span>
@@ -108,10 +108,10 @@
       </div>
       <div class="story-nav-dropdown-content right-container">
         <div class="story-nav-dropdown-text" ng-disabled="!isStorySaveable()" ng-click="saveChanges()">
-          <span ng-if="isSaveInProgress()">
+          <span ng-if="$ctrl.isSaveInProgress()">
             <span>Saving</span>
           </span>
-          <span ng-if="!isSaveInProgress()">
+          <span ng-if="!$ctrl.isSaveInProgress()">
             Save Changes
           </span>
           <span ng-if="getChangeListLength() > 0">
@@ -182,14 +182,14 @@
     }
     story-editor-navbar .save-changes-btn {
       background-color: #008098;
-      color: #FFFFFF;
+      color: #FFF;
       font-weight: bold;
       width: 80%;
     }
     story-editor-navbar .discard-changes-btn {
       background-color: #008098;
       bottom: 47px;
-      color: #FFFFFF;
+      color: #FFF;
       font-weight: bold;
       left: 12px;
       position: absolute;
@@ -203,7 +203,7 @@
     }
     .arrow-up-container {
       align-items: center;
-      background-color: #FFFFFF;
+      background-color: #FFF;
       border: 1px solid #808080;
       border-radius: 4px;
       display: flex;

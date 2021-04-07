@@ -62,6 +62,39 @@ max-line-length=80
 indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
+forbidden-imports=
+    core.storage:core.domain,
+    core.domain:core.controllers,
+    core.controllers:core.platform|core.storage
+
+disallowed-functions-and-replacements-str=
+  now=>datetime.datetime.utcnow,
+  assertEquals=>self.assertEqual,
+  StringIO=>python_utils.string_io,
+  urlparse.urlsplit=>python_utils.url_split,
+  urlparse.urlparse=>python_utils.url_parse,
+  urlparse.urlunsplit=>python_utils.url_unsplit,
+  urlparse.parse_qs=>python_utils.parse_query_string,
+  urlparse.urljoin=>python_utils.url_join,
+  urllib.unquote=>python_utils.urllib_unquote,
+  urllib.urlparse.unquote=>python_utils.urllib_unquote,
+  next=>python_utils.NEXT,
+  range=>python_utils.RANGE,
+  round=>python_utils.ROUND,
+  str=>python_utils.convert_to_bytes or python_utils.UNICODE,
+  zip=>python_utils.ZIP,
+  basestring=>python_utils.BASESTRING,
+  iteritems=>items,
+  itervalues=>values,
+  iterkeys=>keys,
+  print=>python_utils.PRINT,
+  open=>python_utils.open_file,
+  input=>python_utils.INPUT,
+  map=>python_utils.MAP
+
+disallowed-functions-and-replacements-regex=
+  \.put_async\(=>put,
+  \.put_multi_async\(=>put_multi
 
 [SIMILARITIES]
 

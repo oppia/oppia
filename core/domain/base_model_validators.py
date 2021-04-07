@@ -23,18 +23,20 @@ import collections
 import datetime
 import re
 
+from constants import constants
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
-
-USER_ID_REGEX = 'uid_[a-z]{32}'
 
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
+ERROR_CATEGORY_COMMIT_MESSAGE_CHECK = 'commit message check'
 ERROR_CATEGORY_COUNT_CHECK = 'count check'
 ERROR_CATEGORY_CURRENT_TIME_CHECK = 'current time check'
 ERROR_CATEGORY_DATETIME_CHECK = 'datetime check'
@@ -60,6 +62,8 @@ ERROR_CATEGORY_SUMMARY_CHECK = 'summary check'
 ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
+ERROR_CATEGORY_STALE_CHECK = 'stale check'
+ERROR_CATEGORY_INVALID_IDS_IN_FIELD = 'invalid ids in field'
 
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
@@ -67,10 +71,12 @@ VALIDATION_MODE_NON_STRICT = 'non-strict'
 
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
-    """Value object providing the class and ids to fetch an external model."""
+    """Value object providing the class and ids to fetch an external model.
+    NOTE TO DEVELOPERS: For UserSettingsModel, use the
+    UserSettingsModelFetcherDetails class instead of this one.
+    """
 
-    def __init__(
-            self, field_name, model_class, model_ids):
+    def __init__(self, field_name, model_class, model_ids):
         """Initializes an ExternalModelFetcherDetails domain object.
 
         Args:
@@ -82,10 +88,86 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
+
+        Raises:
+            Exception. This class was used instead of
+                UserSettingsModelFetcherDetails for the UserSettingsModel.
         """
+        if model_class == user_models.UserSettingsModel:
+            raise Exception(
+                'When fetching instances of UserSettingsModel, please use ' +
+                'UserSettingsModelFetcherDetails instead of ' +
+                'ExternalModelFetcherDetails')
+        validated_model_ids = []
+        model_id_errors = []
+        for model_id in model_ids:
+            if not model_id:
+                model_id_errors.append(
+                    'A model id in the field \'%s\' '
+                    'is empty' % field_name)
+            else:
+                validated_model_ids.append(model_id)
         self.field_name = field_name
         self.model_class = model_class
-        self.model_ids = model_ids
+        self.model_ids = validated_model_ids
+        self.model_id_errors = model_id_errors
+
+
+class UserSettingsModelFetcherDetails(python_utils.OBJECT):
+    """Value object providing ids to fetch the user settings model."""
+
+    def __init__(
+            self, field_name, model_ids,
+            may_contain_system_ids, may_contain_pseudonymous_ids):
+        """Initializes the UserSettingsModelFetcherDetails domain object.
+
+        Args:
+            field_name: str. A specific name used as an identifier by the
+                storage model which is used to identify the user settings model
+                reference. For example: `'committer_id': UserSettingsModel`
+                means that committer_id is a field which contains a user_id
+                used to identify the external model UserSettingsModel.
+            model_ids: list(str). The list of user settings model IDs for which
+                to fetch the UserSettingsModels.
+            may_contain_system_ids: bool. Whether the model IDs contain
+                system IDs which should be omitted before attempting to fetch
+                the corresponding models. Set may_contain_system_ids to True if
+                and only if this field can contain admin or bot IDs.
+            may_contain_pseudonymous_ids: bool. Whether the model ids contain
+                pseudonymous IDs which should be omitted before attempting to
+                fetch the corresponding models. Set may_contain_pseudonymous_ids
+                to True if and only if this field can contain user IDs that
+                are pseudonymized as part of Wipeout. In other words, these
+                fields can only be in models that have LOCALLY_PSEUDONYMIZE as
+                their DELETION_POLICY.
+        """
+        model_id_errors = []
+        validated_model_ids = []
+        for model_id in model_ids:
+            if model_id in feconf.SYSTEM_USERS.values():
+                if not may_contain_system_ids:
+                    model_id_errors.append(
+                        'The field \'%s\' should not contain '
+                        'system IDs' % field_name)
+            elif utils.is_pseudonymous_id(model_id):
+                if not may_contain_pseudonymous_ids:
+                    model_id_errors.append(
+                        'The field \'%s\' should not contain '
+                        'pseudonymous IDs' % field_name)
+            elif not utils.is_user_id_valid(
+                    model_id,
+                    allow_system_user_id=False,
+                    allow_pseudonymous_id=False
+            ):
+                model_id_errors.append(
+                    'The user id %s in the field \'%s\' is '
+                    'invalid' % (model_id, field_name))
+            else:
+                validated_model_ids.append(model_id)
+        self.field_name = field_name
+        self.model_class = user_models.UserSettingsModel
+        self.model_ids = validated_model_ids
+        self.model_id_errors = model_id_errors
 
 
 class ExternalModelReference(python_utils.OBJECT):
@@ -281,6 +363,10 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for external_model_fetcher_details in (
                 cls._get_external_id_relationships(item)):
+            for error in external_model_fetcher_details.model_id_errors:
+                cls._add_error(
+                    ERROR_CATEGORY_INVALID_IDS_IN_FIELD,
+                    'Entity id %s: %s' % (item.id, error))
             multiple_models_ids_to_fetch[
                 external_model_fetcher_details.field_name] = (
                     external_model_fetcher_details.model_class,
@@ -291,14 +377,17 @@ class BaseModelValidator(python_utils.OBJECT):
                 list(multiple_models_ids_to_fetch.values())))
 
         for index, field_name in enumerate(multiple_models_ids_to_fetch):
-            (model_class, model_ids) = multiple_models_ids_to_fetch[field_name]
-            fetched_model_instances = fetched_model_instances_for_all_ids[index]
+            (model_class, model_ids) = (
+                multiple_models_ids_to_fetch[field_name])
+            fetched_model_instances = (
+                fetched_model_instances_for_all_ids[index])
 
             for (model_id, model_instance) in python_utils.ZIP(
                     model_ids, fetched_model_instances):
-                cls.field_name_to_external_model_references[field_name].append(
-                    ExternalModelReference(
-                        model_class, model_id, model_instance))
+                cls.field_name_to_external_model_references[
+                    field_name].append(
+                        ExternalModelReference(
+                            model_class, model_id, model_instance))
 
     @classmethod
     def _validate_model_time_fields(cls, item):
@@ -378,6 +467,28 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for func in cls._get_external_instance_custom_validation_functions():
             func(item, cls.field_name_to_external_model_references)
+
+    @classmethod
+    def validate_deleted(cls, item):
+        """Validate that the models marked as deleted are hard-deleted after
+        eight weeks.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+        """
+        cls.errors.clear()
+        date_now = datetime.datetime.utcnow()
+        date_before_which_models_should_be_deleted = (
+            date_now - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
+        period_to_hard_delete_models_in_days = (
+            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+        if item.last_updated < date_before_which_models_should_be_deleted:
+            cls._add_error(
+                'entity %s' % ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: model marked as deleted is older than %s weeks'
+                % (item.id, python_utils.divide(
+                    period_to_hard_delete_models_in_days, 7))
+            )
 
 
 class BaseSummaryModelValidator(BaseModelValidator):
@@ -655,6 +766,22 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
                         item.id, commit_cmd_dict, e))
 
     @classmethod
+    def _validate_commit_message_length(cls, item):
+        """Validates that commit_message length is less than
+        MAX_COMMIT_MESSAGE_LENGTH.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+        """
+
+        if item.commit_message and (
+                len(item.commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+            cls._add_error(
+                ERROR_CATEGORY_COMMIT_MESSAGE_CHECK,
+                'Entity id %s: Commit message larger than accepted length'
+                % (item.id))
+
+    @classmethod
     def validate(cls, item):
         """Run _fetch_field_name_to_external_model_references and all
         _validate functions.
@@ -666,6 +793,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
 
         cls._validate_commit_type(item)
         cls._validate_commit_cmds_schema(item)
+        cls._validate_commit_message_length(item)
 
 
 class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
@@ -746,7 +874,7 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return r'^%s$' % USER_ID_REGEX
+        return r'^%s$' % feconf.USER_ID_REGEX
 
     @classmethod
     def _validate_explorations_are_public(

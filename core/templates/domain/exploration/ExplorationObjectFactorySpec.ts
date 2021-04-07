@@ -20,8 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ExplorationObjectFactory } from
-  'domain/exploration/ExplorationObjectFactory';
+import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -34,7 +33,8 @@ import { SubtitledUnicode } from
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
-  let sof: StateObjectFactory, exploration, vof: VoiceoverObjectFactory;
+  let sof: StateObjectFactory, exploration: Exploration,
+    vof: VoiceoverObjectFactory;
   let ssof: StatesObjectFactory;
   let iof: InteractionObjectFactory;
   let ls: LoggerService;
@@ -147,15 +147,8 @@ describe('Exploration object factory', () => {
       },
     };
 
-    const explorationDict = {
-      id: 1,
+    const explorationDict: ExplorationBackendDict = {
       title: 'My Title',
-      category: 'Art',
-      objective: 'Your objective',
-      tags: [],
-      blurb: '',
-      author_notes: '',
-      states_schema_version: 15,
       init_state_name: 'Introduction',
       language_code: 'en',
       states: {
@@ -163,7 +156,9 @@ describe('Exploration object factory', () => {
         'second state': secondState},
       param_specs: {},
       param_changes: [],
-      version: 1
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      version: '1'
     };
 
     exploration = eof.createFromBackendDict(explorationDict);
@@ -379,4 +374,20 @@ describe('Exploration object factory', () => {
     expect(exploration.getAuthorRecommendedExpIds('second state'))
       .toEqual([]);
   });
+
+  it('should correctly get displayable written translation language codes',
+    () => {
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual([]);
+
+      const firstState = exploration.getState('first state');
+
+      firstState.interaction.id = null;
+      firstState.writtenTranslations.addWrittenTranslation(
+        'content', 'fr', 'html', '<p>translation</p>');
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual(['fr']);
+    });
 });

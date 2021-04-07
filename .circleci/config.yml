@@ -19,19 +19,16 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      - e2e_non_prod_miscellaneous_tests:
+      - e2e_miscellaneous_tests:
           requires:
-            - setup_and_typescript_tests
-      - e2e_non_prod_new_structure_tests:
+            - e2e_navigation_and_misc
+      - e2e_new_structure_tests:
           requires:
-            - setup_and_typescript_tests
+            - e2e_navigation_and_misc
       - e2e_navigation_and_misc:
           requires:
             - setup_and_typescript_tests
       - e2e_library_and_collections:
-          requires:
-            - e2e_navigation_and_misc
-      - e2e_users:
           requires:
             - e2e_navigation_and_misc
 
@@ -44,18 +41,12 @@ anchor_for_job_defaults: &job_defaults
 
 commands:
   install_chrome:
-    # Chrome version installed should be consistent with that installed on Travis CI.
+    # Chrome version installed should be consistent with that installed on Github Actions.
     description: "Install Chrome"
     steps:
       - run:
-          name:  Install chrome version 77.0.3865.75-1
-          command: |
-            sudo apt-get update
-            sudo apt-get install lsb-release
-            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
-            sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-            sudo dpkg -i google-chrome.deb
-            google-chrome --version
+          name: Install chrome
+          command: python -m scripts.install_chrome_for_ci
 
   merge_target_branch:
     description: "Merge to target branch"
@@ -96,10 +87,16 @@ commands:
       - run:
           name: Skip build for release changelog update PRs
           command: |
-            PR_BRANCH=$(curl -s https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER} | jq -r '.head.ref')
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ "$PR_BRANCH" == update-changelog-for-release* ]]; then
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ ${CIRCLE_BRANCH} == update-changelog-for-release* ]]; then
               circleci-agent step halt
             fi
+
+  upload_screenshots:
+    description: "Upload protractor screenshots folder as an artifact"
+    steps:
+      - store_artifacts:
+          path: /home/circleci/protractor-screenshots/
+          destination: protractor-screenshots
 
 jobs:
   setup_and_typescript_tests:
@@ -127,9 +124,11 @@ jobs:
       - persist_to_workspace:
           root: /home/circleci/
           paths:
+            - oppia/proto/
             - oppia/node_modules/
             - oppia/third_party/
             - oppia_tools/
+      - upload_screenshots
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
@@ -138,13 +137,14 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e navigation test
           command: |
@@ -163,6 +163,7 @@ jobs:
             - oppia/backend_prod_files/
             - oppia/build/
             - oppia/third_party/generated/
+      - upload_screenshots
 
   e2e_library_and_collections:
     <<: *job_defaults
@@ -170,24 +171,20 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e publication test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --server_log_level="info" --prod_env
       - run:
           name: Run e2e library test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
-      - run:
-          name: Run e2e classroomPage test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
       - run:
           name: Run e2e collections test
           command: |
@@ -196,100 +193,77 @@ jobs:
           name: Run e2e accessibility page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+      - upload_screenshots
 
-  e2e_users:
+  e2e_miscellaneous_tests:
     <<: *job_defaults
     steps:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - run:
-          name: Run e2e users test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
-      - run:
-          name: Run e2e subscriptions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
-      - run:
-          name: Run e2e profileMenu test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
-      - run:
-          name: Run e2e preferences test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
-      - run:
-          name: Run e2e profileFeatures test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
-
-  # Non-prod e2e Tests
-  # The following tests must be run in a non-production environment because they are uploading files.
-  # All other e2e tests should be run in prod mode.
-  e2e_non_prod_miscellaneous_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - check_release_changelog_update_branch
-      - merge_target_branch
       - install_chrome
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Set up python by installing protobuf and enum
-          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadFeatures" --prod_env
       - run:
           name: Run e2e play voiceovers test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env
       - run:
           name: Run e2e file upload extensions test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env
       - run:
           name: Run e2e contributor dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
+      # Feature Gating test suites must run in non-production environment because
+      # the dummy_feature being used must not be enabled in production environment.
+      - run:
+          name: Run e2e feature gating test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
+      - upload_screenshots
 
-  e2e_non_prod_new_structure_tests:
+  e2e_new_structure_tests:
     <<: *job_defaults
     steps:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --prod_env
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
       - run:
           name: Run e2e topic and story editor test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
+      - run:
+          name: Run e2e topic and story viewer test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
+      - upload_screenshots
 
 notify:
   webhooks:

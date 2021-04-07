@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+
 from constants import constants
 from core.domain import question_services
 from core.domain import story_domain
@@ -44,7 +45,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.login(self.ADMIN_EMAIL)
         self.TOPIC_ID = 'topic_id'
         self.STORY_ID = 'story_id'
@@ -55,6 +56,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.EXP_ID_0 = '0'
         self.EXP_ID_1 = '1'
         self.EXP_ID_7 = '7'
+        self.NEW_TOPIC_ID = 'new_topic_id'
+        self.NEW_STORY_ID = 'new_story_id'
 
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End',
@@ -230,6 +233,121 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
 
 class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
+
+    def test_redirect_when_node_id_does_not_refer_to_the_first_node(self):
+        self.NEW_USER_EMAIL = 'newUser@newUser.com'
+        self.NEW_USER_USERNAME = 'newUser'
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            response = self.get_html_response(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_3), expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic/story/title-one',
+                response.headers['location'])
+
+    def test_redirect_for_returning_user_with_completed_nodes(self):
+        self.NEW_USER_EMAIL = 'newUser@newUser.com'
+        self.NEW_USER_USERNAME = 'newUser'
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            response = self.get_html_response(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_1), expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic/story/title-one',
+                response.headers['location'])
+
+    def test_redirect_for_single_node_story(self):
+        self.login(self.ADMIN_EMAIL)
+        self.STORY_URL_FRAGMENT = 'story-two'
+        self.NEW_USER_EMAIL = 'newUser@newUser.com'
+        self.NEW_USER_USERNAME = 'newUser'
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.admin_id, self.EXP_ID_0)
+
+        story = story_domain.Story.create_default_story(
+            self.NEW_STORY_ID, 'Title', 'Description', self.NEW_TOPIC_ID,
+            self.STORY_URL_FRAGMENT)
+        story.meta_tag_content = 'story meta content'
+
+        exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_0], user=self.admin))
+        self.node_1 = {
+            'id': self.NODE_ID_1,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_1,
+            'exp_summary_dict': exp_summary_dicts[0],
+            'completed': False
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1)
+        ]
+        self.nodes = story.story_contents.nodes
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_2'
+        story_services.save_new_story(self.admin_id, story)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.NEW_TOPIC_ID, 'user', name='new topic',
+            url_fragment='topic-frag',
+            description='A new topic', canonical_story_ids=[story.id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+        topic_services.publish_topic(self.NEW_TOPIC_ID, self.admin_id)
+        topic_services.publish_story(
+            self.NEW_TOPIC_ID, self.NEW_STORY_ID, self.admin_id)
+        self.logout()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            response = self.get_html_response(
+                '%s/staging/topic-frag/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_1), expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic-frag/story/story-two',
+                response.headers['location'])
+
+    def test_redirect_to_next_node(self):
+        self.NEW_USER_EMAIL = 'newUser@newUser.com'
+        self.NEW_USER_USERNAME = 'newUser'
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            response = self.get_html_response(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_2), expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/explore/1?topic_url_fragment=topic'
+                '&story_url_fragment=title-one&node_id=node_1'
+                '&classroom_url_fragment=staging',
+                response.headers['location'])
 
     def test_post_fails_when_new_structures_not_enabled(self):
         csrf_token = self.get_new_csrf_token()

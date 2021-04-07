@@ -23,6 +23,7 @@ import functools
 
 from constants import constants
 from core.controllers import base
+from core.domain import classifier_services
 from core.domain import classroom_services
 from core.domain import feedback_services
 from core.domain import question_services
@@ -38,12 +39,8 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-from core.platform import models
 import feconf
-
-current_user_services = models.Registry.import_current_user_services()
-
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+import utils
 
 
 def _redirect_based_on_return_type(
@@ -204,7 +201,7 @@ def can_view_skills(handler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
+        except utils.ValidationError:
             raise self.InvalidInputException
 
         try:
@@ -571,13 +568,53 @@ def can_access_admin_page(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not current_user_services.is_current_user_super_admin():
+        if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
     test_super_admin.__wrapped__ = True
 
     return test_super_admin
+
+
+def can_delete_any_user(handler):
+    """Decorator that checks if the current user can delete any user.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can delete any user.
+    """
+
+    def test_primary_admin(self, **kwargs):
+        """Checks if the user is logged in and is a primary admin e.g. user with
+        email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user is not a primary admin of the
+                application.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        email = user_services.get_email_from_user_id(self.user_id)
+        if email != feconf.SYSTEM_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                '%s cannot delete any user.' % self.user_id)
+
+        return handler(self, **kwargs)
+    test_primary_admin.__wrapped__ = True
+
+    return test_primary_admin
 
 
 def can_upload_exploration(handler):
@@ -608,9 +645,9 @@ def can_upload_exploration(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not current_user_services.is_current_user_super_admin():
+        if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException(
-                'You do not have credentials to upload exploration.')
+                'You do not have credentials to upload explorations.')
         return handler(self, **kwargs)
     test_can_upload.__wrapped__ = True
 
@@ -803,6 +840,12 @@ def can_view_feedback_thread(handler):
         """
         if '.' not in thread_id:
             raise self.InvalidInputException('Thread ID must contain a .')
+
+        entity_type = feedback_services.get_thread(thread_id).entity_type
+        entity_types_with_unrestricted_view_suggestion_access = (
+            feconf.ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS)
+        if entity_type in entity_types_with_unrestricted_view_suggestion_access:
+            return handler(self, thread_id, **kwargs)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
@@ -1471,7 +1514,7 @@ def can_perform_cron_tasks(handler):
                 credentials to access the page.
         """
         if (self.request.headers.get('X-AppEngine-Cron') is None and
-                not self.is_super_admin):
+                not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
         else:
@@ -1556,7 +1599,7 @@ def can_manage_question_skill_status(handler):
 
 
 def require_user_id_else_redirect_to_homepage(handler):
-    """Decorator that checks if a user_id is associated to the current
+    """Decorator that checks if a user_id is associated with the current
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
 
@@ -1613,7 +1656,7 @@ def can_edit_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -1781,7 +1824,7 @@ def can_delete_question(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (role_services.ACTION_DELETE_ANY_QUESTION in
                 user_actions_info.actions):
@@ -1828,7 +1871,7 @@ def can_add_new_story_to_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -1972,7 +2015,7 @@ def can_delete_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         if role_services.ACTION_DELETE_ANY_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
@@ -2012,7 +2055,7 @@ def can_create_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         if role_services.ACTION_CREATE_NEW_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
@@ -2106,10 +2149,10 @@ def can_delete_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
@@ -2150,7 +2193,7 @@ def can_create_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if role_services.ACTION_CREATE_NEW_TOPIC in user_actions_info.actions:
             return handler(self, **kwargs)
@@ -2194,7 +2237,7 @@ def can_access_topics_and_skills_dashboard(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD in
@@ -2239,10 +2282,10 @@ def can_view_any_topic_editor(handler):
             raise self.NotLoggedInException
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
@@ -2286,7 +2329,7 @@ def can_manage_rights_for_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_MANAGE_TOPIC_RIGHTS in
@@ -2332,10 +2375,10 @@ def can_change_topic_publication_status(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_CHANGE_TOPIC_STATUS in
@@ -2408,7 +2451,7 @@ def can_access_topic_viewer_page(handler):
         topic_id = topic.id
         topic_rights = topic_fetchers.get_topic_rights(
             topic_id, strict=False)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 topic_rights.topic_is_published or
@@ -2441,7 +2484,7 @@ def can_access_story_viewer_page(handler):
         Args:
             classroom_url_fragment: str. The classroom url fragment.
             topic_url_fragment: str. The url fragment of the topic
-                associated to the story.
+                associated with the story.
             story_url_fragment: str. The story url fragment.
             *args: list(*). A list of arguments from the calling function.
             **kwargs: *. Keyword arguments.
@@ -2475,7 +2518,7 @@ def can_access_story_viewer_page(handler):
         topic_is_published = False
         topic_id = story.corresponding_topic_id
         story_id = story.id
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
             if topic.url_fragment != topic_url_fragment:
@@ -2538,7 +2581,7 @@ def can_access_subtopic_viewer_page(handler):
         Args:
             classroom_url_fragment: str. The classroom url fragment.
             topic_url_fragment: str. The url fragment of the topic
-                associated to the subtopic.
+                associated with the subtopic.
             subtopic_url_fragment: str. The url fragment of the Subtopic.
             **kwargs: *. Keyword arguments.
 
@@ -2566,7 +2609,7 @@ def can_access_subtopic_viewer_page(handler):
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         topic_rights = topic_fetchers.get_topic_rights(topic.id)
 
         if (
@@ -2668,10 +2711,10 @@ def get_decorator_for_accepting_suggestion(decorator):
             """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
-            user_actions_info = user_services.UserActionsInfo(self.user_id)
-            if (
-                    role_services.ACTION_ACCEPT_ANY_SUGGESTION in
-                    user_actions_info.actions):
+            user_actions = user_services.get_user_actions_info(
+                self.user_id
+            ).actions
+            if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
                 return handler(self, target_id, suggestion_id, **kwargs)
 
             if len(suggestion_id.split('.')) != 3:
@@ -2692,13 +2735,13 @@ def get_decorator_for_accepting_suggestion(decorator):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
             if suggestion.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 if user_services.can_review_translation_suggestions(
                         self.user_id,
                         language_code=suggestion.change.language_code):
                     return handler(self, target_id, suggestion_id, **kwargs)
             elif suggestion.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION):
                 if user_services.can_review_question_suggestions(self.user_id):
                     return handler(self, target_id, suggestion_id, **kwargs)
 
@@ -2739,11 +2782,11 @@ def can_view_reviewable_suggestions(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
         if suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
         elif suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
         else:
@@ -2850,3 +2893,43 @@ def can_play_entity(handler):
     test_can_play_entity.__wrapped__ = True
 
     return test_can_play_entity
+
+
+def is_from_oppia_ml(handler):
+    """Decorator to check whether the incoming request is from a valid Oppia-ML
+    VM instance.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now can check if incoming
+        request is from a valid VM instance.
+    """
+    def test_request_originates_from_valid_oppia_ml_instance(self, **kwargs):
+        """Checks if the incoming request is from a valid Oppia-ML VM
+        instance.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. If incoming request is not from a valid
+                Oppia-ML VM instance.
+        """
+        oppia_ml_auth_info = (
+            self.extract_request_message_vm_id_and_signature())
+        if (oppia_ml_auth_info.vm_id == feconf.DEFAULT_VM_ID and
+                not constants.DEV_MODE):
+            raise self.UnauthorizedUserException
+        if not classifier_services.verify_signature(oppia_ml_auth_info):
+            raise self.UnauthorizedUserException
+
+        return handler(self, **kwargs)
+
+    test_request_originates_from_valid_oppia_ml_instance.__wrapped__ = True
+
+    return test_request_originates_from_valid_oppia_ml_instance

@@ -28,7 +28,7 @@ import { QuestionBackendDict } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { QuestionSummaryForOneSkillBackendDict } from
-  'domain/question/QuestionSummaryForOneSkillObjectFactory';
+  'domain/question/question-summary-for-one-skill-object.model';
 
 interface QuestionCountBackendResponse {
   'total_question_count': number;
@@ -181,7 +181,7 @@ export class QuestionBackendApiService {
    * Returns a list of questions based on the list of skill ids and number
    * of questions requested.
    */
-  fetchQuestions(
+  async fetchQuestionsAsync(
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
@@ -191,13 +191,14 @@ export class QuestionBackendApiService {
     });
   }
 
-  fetchTotalQuestionCountForSkillIds(skillIds: string[]): Promise<number> {
+  async fetchTotalQuestionCountForSkillIdsAsync(
+      skillIds: string[]): Promise<number> {
     return new Promise((resolve, reject) => {
       this._fetchTotalQuestionCountForSkillIds(skillIds, resolve, reject);
     });
   }
 
-  fetchQuestionSummaries(
+  async fetchQuestionSummariesAsync(
       skillId: string,
       cursor: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {

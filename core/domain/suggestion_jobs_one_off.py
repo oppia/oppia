@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from constants import constants
 from core import jobs
@@ -29,9 +28,57 @@ from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
-(suggestion_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.suggestion, models.NAMES.user])
+(feedback_models, suggestion_models, user_models,) = (
+    models.Registry.import_models(
+        [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
 transaction_services = models.Registry.import_transaction_services()
+
+
+class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that can be used to migrate state schema
+    versions of question suggestions.
+
+    This job will create domain objects out of the models. The object conversion
+    process of a suggestion automatically performs schema updating. This
+    job persists that conversion work, keeping question suggestions up-to-date
+    and improving the load time of question suggestions.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.suggestion_type != (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            return
+
+        try:
+            # Suggestion class itself updates the question state dict of the
+            # suggestion while initializing the object.
+            suggestion = suggestion_services.get_suggestion_from_model(item)
+        except Exception as e:
+            yield ('MIGRATION_FAILURE', (item.id, e))
+            return
+
+        try:
+            suggestion.validate()
+        except Exception as e:
+            yield ('POST_MIGRATION_VALIDATION_FALIURE', (item.id, e))
+            return
+
+        item.change_cmd = suggestion.change.to_dict()
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+
+        yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        if key == 'SUCCESS':
+            value = len(value)
+        yield (key, value)
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -73,10 +120,10 @@ class SuggestionSvgFilenameValidationOneOffJob(
 
     @staticmethod
     def map(item):
-        if item.target_type != suggestion_models.TARGET_TYPE_EXPLORATION:
+        if item.target_type != feconf.ENTITY_TYPE_EXPLORATION:
             return
         if item.suggestion_type != (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             return
         suggestion = suggestion_services.get_suggestion_from_model(item)
         html_string_list = suggestion.get_all_html_content_strings()
@@ -122,127 +169,6 @@ class SuggestionSvgFilenameValidationOneOffJob(
             yield (key, values)
 
 
-class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-time job that can be used to migrate the Math components in the
-    suggestions to the new Math Schema.
-    """
-
-    _ERROR_KEY_BEFORE_MIGRATION = 'validation_error'
-    _ERROR_KEY_AFTER_MIGRATION = 'validation_error_after_migration'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [suggestion_models.GeneralSuggestionModel]
-
-    @staticmethod
-    def map(item):
-        suggestion = suggestion_services.get_suggestion_by_id(item.id)
-        try:
-            suggestion.validate()
-        except Exception as e:
-            logging.error(
-                'Suggestion %s failed validation: %s' % (item.id, e))
-            yield (
-                SuggestionMathMigrationOneOffJob._ERROR_KEY_BEFORE_MIGRATION,
-                'Suggestion %s failed validation: %s' % (item.id, e))
-            return
-        html_string_list = suggestion.get_all_html_content_strings()
-        html_string = ''.join(html_string_list)
-        error_list = (
-            html_validation_service.
-            validate_math_tags_in_html_with_attribute_math_content(html_string))
-        # Migrate the suggestion only if the suggestions have math-tags with
-        # old schema.
-        if len(error_list) > 0:
-            suggestion.convert_html_in_suggestion_change(
-                html_validation_service.add_math_content_to_math_rte_components)
-            try:
-                suggestion.validate()
-            except Exception as e:
-                logging.error(
-                    'Suggestion %s failed validation after migration: %s' % (
-                        item.id, e))
-                yield (
-                    SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
-                    'Suggestion %s failed validation: %s' % (
-                        item.id, e))
-                return
-            item.change_cmd = suggestion.change.to_dict()
-            item.update_timestamps(update_last_updated_time=False)
-            item.put()
-            yield ('suggestion_migrated', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key not in [
-                SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
-                SuggestionMathMigrationOneOffJob._ERROR_KEY_BEFORE_MIGRATION]:
-            no_of_suggestions_migrated = (
-                sum(ast.literal_eval(v) for v in values))
-            yield (key, ['%d suggestions successfully migrated.' % (
-                no_of_suggestions_migrated)])
-        else:
-            yield (key, values)
-
-
-class PopulateSuggestionLanguageCodeMigrationOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """A reusable one-time job that may be used to add the language_code field
-    to suggestions that do not have that field yet. The language_code field
-    allows question and translation suggestions to be queried by language.
-    This job will load all existing suggestions from the data store, update
-    them, if needed, and immediately store them back into the data store.
-    """
-
-    _VALIDATION_ERROR_KEY = 'validation_error'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [suggestion_models.GeneralSuggestionModel]
-
-    @staticmethod
-    def map(item):
-        # Exit early if the suggestion has been marked deleted, or if the
-        # suggestion has already set the language code property, or if the
-        # suggestion type is not queryable by language, since ndb automatically
-        # sets properties that aren't intialized to None.
-        if item.deleted or item.language_code or item.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
-            return
-
-        suggestion = suggestion_services.get_suggestion_from_model(item)
-        if suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-            # Set the language code to be the language of the question.
-            suggestion.language_code = suggestion.change.question_dict[
-                'language_code']
-        elif suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            # Set the language code to be the language of the translation.
-            suggestion.language_code = suggestion.change.language_code
-        # Validate the suggestion before updating the storage model.
-        try:
-            suggestion.validate()
-        except Exception as e:
-            logging.error(
-                'Suggestion %s failed validation: %s' % (
-                    item.id, e))
-            yield (
-                PopulateSuggestionLanguageCodeMigrationOneOffJob
-                ._VALIDATION_ERROR_KEY,
-                'Suggestion %s failed validation: %s' % (
-                    item.id, e))
-            return
-        item.language_code = suggestion.language_code
-        item.update_timestamps()
-        item.put()
-        yield ('%s_suggestion_migrated' % item.suggestion_type, item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
 class PopulateContributionStatsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to initialize, or regenerate,
@@ -273,7 +199,7 @@ class PopulateContributionStatsOneOffJob(
             # Contributor Dashboard or if the suggestion is not currently in
             # review.
             if item.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
                         item.status != suggestion_models.STATUS_IN_REVIEW):
                 return
             suggestion = suggestion_services.get_suggestion_from_model(item)
@@ -308,6 +234,7 @@ class PopulateContributionStatsOneOffJob(
     @staticmethod
     def reduce(key, values):
 
+        @transaction_services.run_in_transaction_wrapper
         def _update_community_contribution_stats_transactional(
                 key, count_value):
             """Updates the CommunityContributionStatsModel according to the
@@ -348,10 +275,10 @@ class PopulateContributionStatsOneOffJob(
             # Update the suggestion counts.
             else:
                 if item_category == (
-                        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                        feconf.SUGGESTION_TYPE_ADD_QUESTION):
                     stats_model.question_suggestion_count = count_value
                 elif item_category == (
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                     (
                         stats_model
                         .translation_suggestion_counts_by_lang_code[
@@ -363,9 +290,108 @@ class PopulateContributionStatsOneOffJob(
             return key, count_value
 
         key_from_transaction, count_value_from_transaction = (
-            transaction_services.run_in_transaction(
-                _update_community_contribution_stats_transactional, key,
-                len(values)))
+            _update_community_contribution_stats_transactional(
+                key, len(values)))
 
         # Only yield the values from the transactions.
         yield (key_from_transaction, count_value_from_transaction)
+
+
+class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate final_reviewer_id property in the
+    suggestion models which do not have but are expected to have one.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield ('DELETED_MODELS', item.id)
+            return
+
+        if not (item.status in [
+                suggestion_models.STATUS_ACCEPTED,
+                suggestion_models.STATUS_REJECTED] and (
+                    item.final_reviewer_id is None)):
+            yield ('UNCHANGED_MODELS', item.id)
+            return
+
+        message_status = feedback_models.STATUS_CHOICES_FIXED
+        if item.status == suggestion_models.STATUS_REJECTED:
+            message_status = feedback_models.STATUS_CHOICES_IGNORED
+
+        message_model_class = feedback_models.GeneralFeedbackMessageModel
+        message_models = message_model_class.query(
+            message_model_class.thread_id == item.id,
+            message_model_class.updated_status == message_status).fetch()
+
+        if not message_models:
+            yield ('FAILED_NONE_MESSAGE_MODEL', (item.id, item.status))
+            return
+
+        if len(message_models) != 1:
+            yield ('FAILED_MULTIPLE_MESSAGE_MODEL', (item.id, item.status))
+            return
+
+        item.final_reviewer_id = message_models[0].author_id
+
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+        yield ('CHANGED_MODELS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key in ['CHANGED_MODELS', 'UNCHANGED_MODELS', 'DELETED_MODELS']:
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class ContentSuggestionFormatUpdateOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates the format of content suggestions."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.suggestion_type != feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+            return
+
+        changes_made = False
+        if 'old_value' in item.change_cmd:
+            del item.change_cmd['old_value']
+            changes_made = True
+            yield ('CHANGED - Removed old_value', item.id)
+        if 'content_id' in item.change_cmd['new_value']:
+            del item.change_cmd['new_value']['content_id']
+            changes_made = True
+            yield ('CHANGED - Removed content_id', item.id)
+
+        # Validate the eventual suggestion format.
+        try:
+            assert set(item.change_cmd.keys()) == set([
+                'state_name', 'cmd', 'new_value', 'property_name']), (
+                    'Bad change_cmd keys')
+            assert item.change_cmd['cmd'] == 'edit_state_property', (
+                'Wrong cmd in change_cmd')
+            assert item.change_cmd['property_name'] == 'content', (
+                'Bad property name')
+            assert item.change_cmd['new_value'].keys() == ['html'], (
+                'Bad new_value keys')
+        except AssertionError as e:
+            yield ('Failed assertion', '%s %s' % (item.id, e))
+
+        if changes_made:
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
+            yield ('SUCCESS - Updated suggestion', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

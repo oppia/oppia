@@ -16,6 +16,7 @@
  * @fileoverview Puppeteer script to collects dynamic urls for lighthouse tests.
  */
 
+var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
 
@@ -32,9 +33,11 @@ var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
 
+var emailInput = '.protractor-test-sign-in-email-input';
+var signInButton = '.protractor-test-sign-in-button';
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
-var registerUser = '.protractor-test-register-user';
+var registerUser = '.protractor-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.protractor-test-create-activity';
@@ -83,9 +86,9 @@ const login = async function(browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       ADMIN_URL, { waitUntil: networkIdle});
-    await page.waitForSelector('#admin', {visible: true});
-    await page.click('#admin');
-    await page.click('#submit-login');
+    await page.waitForSelector(emailInput, {visible: true});
+    await page.type(emailInput, 'testadmin@example.com');
+    await page.click(signInButton);
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, {visible: true});
@@ -192,10 +195,10 @@ const getTopicEditorUrl = async function(browser, page) {
     await page.click(topicPhotoSubmit);
 
     await page.waitForSelector(confirmTopicCreationButton, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.click(confirmTopicCreationButton);
-    // Doing waitFor(10000) to handle new tab being opened.
-    await page.waitFor(10000);
+    // Doing waitForTimeout(10000) to handle new tab being opened.
+    await page.waitForTimeout(10000);
     await browser.pages();
 
     // Refresh page and click on topic link.
@@ -234,9 +237,9 @@ const getStoryEditorUrl = async function(browser, page) {
     await page.click(storyPhotoSubmit);
 
     await page.waitForSelector(confirmStoryCreationButton, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.click(confirmStoryCreationButton);
-    await page.waitFor(15000);
+    await page.waitForTimeout(15000);
     storyEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -255,14 +258,14 @@ const getSkillEditorUrl = async function(browser, page) {
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.keyboard.type('Skill Overview here');
 
     await page.waitForSelector(confirmSkillCreationButton, {visible: true});
-    await page.waitFor(5000);
+    await page.waitForTimeout(5000);
     await page.click(confirmSkillCreationButton);
-    // Doing waitFor(15000) to handle new tab being opened.
-    await page.waitFor(15000);
+    // Doing waitForTimeout(15000) to handle new tab being opened.
+    await page.waitForTimeout(15000);
     let pages = await browser.pages();
     skillEditorUrl = await pages[2].url();
     if (await skillEditorUrl.includes('topic_editor')) {
@@ -275,6 +278,8 @@ const getSkillEditorUrl = async function(browser, page) {
 };
 
 const main = async function() {
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+  FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();

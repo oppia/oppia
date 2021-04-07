@@ -24,25 +24,37 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Text Input rules service', () => {
-  var tirs: TextInputRulesService = null;
+  let tirs: TextInputRulesService;
+
+  let RULE_INPUT, RULE_INPUT_PLURAL, RULE_INPUT_EMPTY;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
     });
     tirs = TestBed.get(TextInputRulesService);
+
+    RULE_INPUT = {
+      x: {
+        contentId: 'rule_input',
+        normalizedStrSet: ['abc def']
+      }
+    };
+
+    RULE_INPUT_PLURAL = {
+      x: {
+        contentId: 'rule_input',
+        normalizedStrSet: ['testing', 'abc def']
+      }
+    };
+
+    RULE_INPUT_EMPTY = {
+      x: {
+        contentId: 'rule_input',
+        normalizedStrSet: []
+      }
+    };
   });
-
-  const RULE_INPUT = {
-    x: ['abc def']
-  };
-
-  const RULE_INPUT_PLURAL = {
-    x: ['testing', 'abc def']
-  };
-
-  const RULE_INPUT_EMPTY = {
-    x: []
-  };
 
   it('should have a correct \'equals\' rule', () => {
     expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);

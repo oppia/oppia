@@ -50,6 +50,7 @@ require(
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 import { Subscription } from 'rxjs';
 import debounce from 'lodash/debounce';
@@ -61,13 +62,15 @@ import { TopicsAndSkillsDashboardFilter } from
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$scope', '$timeout', 'AlertsService', 'SkillCreationService',
+    '$rootScope', '$scope', '$timeout', 'AlertsService',
+    'FocusManagerService', 'SkillCreationService',
     'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
     'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
     'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
-        $rootScope, $scope, $timeout, AlertsService, SkillCreationService,
+        $rootScope, $scope, $timeout, AlertsService,
+        FocusManagerService, SkillCreationService,
         TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, WindowDimensionsService,
         FATAL_ERROR_CODES, SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
@@ -82,8 +85,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
        * @param {Boolean} stayInSameTab - To stay in the same tab or not.
       */
       ctrl._initDashboard = function(stayInSameTab) {
-        TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-          function(response) {
+        TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+          .then(function(response) {
             ctrl.totalTopicSummaries = response.topicSummaries;
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
             ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
@@ -94,6 +97,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                 return summary.canEditTopic === true;
               }
             ));
+            FocusManagerService.setFocus('createTopicBtn');
             ctrl.totalSkillCount = response.totalSkillCount;
             ctrl.skillsCategorizedByTopics = (
               response.categorizedSkillsDict);
@@ -115,6 +119,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                       ctrl.untriagedSkillSummaries.length !== 0) {
               ctrl.activeTab = ctrl.TAB_NAME_SKILLS;
               ctrl.initSkillDashboard();
+              FocusManagerService.setFocus('createSkillBtn');
             }
             ctrl.classrooms = response.allClassroomNames;
             // Adding the if checks since karma tests adds
@@ -142,7 +147,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                 'Unexpected error code from the server.');
             }
           }
-        );
+          );
       };
 
       /**
@@ -172,8 +177,10 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.filterObject.reset();
         if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
           ctrl.goToPageNumber(ctrl.topicPageNumber);
+          FocusManagerService.setFocus('createTopicBtn');
         } else if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
           ctrl.initSkillDashboard();
+          FocusManagerService.setFocus('createSkillBtn');
         }
       };
 
@@ -218,7 +225,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       ctrl.fetchSkills = function() {
         if (ctrl.moreSkillsPresent) {
           TopicsAndSkillsDashboardBackendApiService
-            .fetchSkillsDashboardData(
+            .fetchSkillsDashboardDataAsync(
               ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
               (response) => {
                 ctrl.moreSkillsPresent = response.more;

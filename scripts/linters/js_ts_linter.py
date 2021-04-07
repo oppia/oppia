@@ -29,7 +29,6 @@ import sys
 
 import python_utils
 
-from .. import build
 from .. import common
 from .. import concurrent_task_utils
 
@@ -61,6 +60,31 @@ INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
     'UpgradedServices' # We don't want this service to be present in the index.
 ]
+
+
+def _parse_js_or_ts_file(filepath, file_content, **kwargs):
+    """Runs the correct function to parse the given file's source code.
+
+    With ES2015 and later, a JavaScript program can be either a script or a
+    module. It is a very important distinction, since a parser such as Esprima
+    needs to know the type of the source to be able to analyze its syntax
+    correctly. This is achieved by choosing the parseScript function to parse a
+    script and the parseModule function to parse a module.
+
+    https://esprima.readthedocs.io/en/latest/syntactic-analysis.html#distinguishing-a-script-and-a-module
+
+    Args:
+        filepath: str. Path of the source file.
+        file_content: str. Code to compile.
+        **kwargs: dict(*: *). Passed along to esprima.
+
+    Returns:
+        dict. Parsed contents produced by esprima.
+    """
+    parse_function = (
+        esprima.parseScript if filepath.endswith('.js') else
+        esprima.parseModule)
+    return parse_function(file_content, **kwargs)
 
 
 def _get_expression_from_node_if_one_exists(
@@ -176,8 +200,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             try:
                 # Use esprima to parse a JS or TS file.
-                parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content, comment=True)
+                parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
+                    filepath, file_content, comment=True)
             except Exception:
                 if filepath.endswith('.js'):
                     raise
@@ -185,8 +209,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
 
                 file_content = self.file_cache.read(compiled_js_filepath)
-                parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content)
+                parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
+                    filepath, file_content)
 
         return parsed_js_and_ts_files
 
@@ -356,38 +380,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     or (
                         previous_line_has_comment_with_ts_error and
                         previous_line_has_comment))
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
-    def _check_extra_js_files(self):
-        """Checks if the changes made include extra js files in core
-        or extensions folder which are not specified in
-        build.JS_FILEPATHS_NOT_TO_BUILD.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Extra JS files'
-        error_messages = []
-        failed = False
-        js_files_to_check = self.js_filepaths
-
-        for filepath in js_files_to_check:
-            if filepath.startswith(('core/templates', 'extensions')) and (
-                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
-                        not filepath.endswith('protractor.js')):
-                error_message = (
-                    '%s  --> Found extra .js file\n' % filepath)
-                error_messages.append(error_message)
-                failed = True
-
-        if failed:
-            err_msg = (
-                'If you want the above files to be present as js files, '
-                'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
-                'build.py. Otherwise, rename them to .ts\n')
-            error_messages.append(err_msg)
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
@@ -712,7 +704,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     file_content = self.file_cache.read(
                         compiled_js_filepath).decode('utf-8')
 
-                    parsed_script = esprima.parseScript(file_content)
+                    parsed_script = (
+                        _parse_js_or_ts_file(filepath, file_content))
                     parsed_nodes = parsed_script.body
                     angularjs_constants_list = []
                     components_to_check = ['constant']
@@ -814,6 +807,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             # *.constants.ajs.ts file are in sync.
             if filepath.endswith('.constants.ts') and (
                     is_corresponding_angularjs_filepath):
+                angular_constants_nodes = None
                 for node in parsed_nodes:
                     try:
                         # Here we are treating 'app.constants.ts' differently
@@ -832,9 +826,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     except (AttributeError, IndexError, TypeError):
                         continue
 
-                for angular_constant_node in angular_constants_nodes:
-                    angular_constants_list.append(
-                        angular_constant_node.key.name)
+                if angular_constants_nodes:
+                    for angular_constant_node in angular_constants_nodes:
+                        angular_constants_list.append(
+                            angular_constant_node.key.name)
 
                 angular_constants_set = set(angular_constants_list)
                 if len(angular_constants_set) != len(
@@ -1026,7 +1021,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         linter_stdout = []
 
-        linter_stdout.append(self._check_extra_js_files())
         linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
         linter_stdout.append(self._check_sorted_dependencies())
@@ -1095,9 +1089,6 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             # and if that is True then we are replacing "error" with empty
             # string('') which is at the index 1 and message-id from the end.
             if re.search(r'^\d+:\d+', line.lstrip()):
-                # Replacing message-id with an empty string('').
-                if not 'Parsing error:' in line:
-                    line = re.sub(r'(\w+-*)+$', '', line)
                 error_string = re.search(r'error', line).group(0)
                 error_message = line.replace(error_string, '', 1)
             else:

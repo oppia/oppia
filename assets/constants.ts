@@ -17,7 +17,7 @@
  * @fileoverview Initializes constants for the Oppia codebase.
  */
 
-export = {
+export default {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
@@ -47,6 +47,9 @@ export = {
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
+
+  "ACTION_ACCEPT_SUGGESTION": "accept",
+  "ACTION_REJECT_SUGGESTION": "reject",
 
   "SKILL_STATUS_OPTIONS": {
     "ALL": "All",
@@ -4738,127 +4741,172 @@ export = {
   // stripped out to give a shorter description.
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
-    "description": "English"
+    "description": "English",
+    "direction": "ltr"
   }, {
     "code": "ar",
-    "description": "العربية (Arabic)"
+    "description": "العربية (Arabic)",
+    "direction": "rtl"
   }, {
     "code": "sq",
-    "description": "shqip (Albanian)"
+    "description": "shqip (Albanian)",
+    "direction": "ltr"
   }, {
     "code": "bg",
-    "description": "български (Bulgarian)"
+    "description": "български (Bulgarian)",
+    "direction": "ltr"
   }, {
     "code": "bn",
-    "description": "বাংলা (Bangla)"
+    "description": "বাংলা (Bangla)",
+    "direction": "ltr"
   }, {
     "code": "ca",
-    "description": "català (Catalan)"
+    "description": "català (Catalan)",
+    "direction": "ltr"
   }, {
     "code": "zh",
-    "description": "中文 (Chinese)"
+    "description": "中文 (Chinese)",
+    "direction": "ltr"
   }, {
     "code": "hr",
-    "description": "hrvatski (Croatian)"
+    "description": "hrvatski (Croatian)",
+    "direction": "ltr"
   }, {
     "code": "cs",
-    "description": "čeština (Czech)"
+    "description": "čeština (Czech)",
+    "direction": "ltr"
   }, {
     "code": "da",
-    "description": "dansk (Danish)"
+    "description": "dansk (Danish)",
+    "direction": "ltr"
   }, {
     "code": "nl",
-    "description": "Nederlands (Dutch)"
+    "description": "Nederlands (Dutch)",
+    "direction": "ltr"
   }, {
     "code": "tl",
-    "description": "Filipino (Filipino)"
+    "description": "Filipino (Filipino)",
+    "direction": "ltr"
   }, {
     "code": "fi",
-    "description": "suomi (Finnish)"
+    "description": "suomi (Finnish)",
+    "direction": "ltr"
   }, {
     "code": "fr",
-    "description": "français (French)"
+    "description": "français (French)",
+    "direction": "ltr"
   }, {
     "code": "de",
-    "description": "Deutsch (German)"
+    "description": "Deutsch (German)",
+    "direction": "ltr"
   }, {
     "code": "el",
-    "description": "ελληνικά (Greek)"
+    "description": "ελληνικά (Greek)",
+    "direction": "ltr"
   }, {
     "code": "he",
-    "description": "עברית (Hebrew)"
+    "description": "עברית (Hebrew)",
+    "direction": "rtl"
   }, {
     "code": "hi",
-    "description": "हिन्दी (Hindi)"
+    "description": "हिन्दी (Hindi)",
+    "direction": "ltr"
+  }, {
+    "code": "hi-en",
+    "description": "Hinglish",
+    "direction": "ltr"
   }, {
     "code": "hu",
-    "description": "magyar (Hungarian)"
+    "description": "magyar (Hungarian)",
+    "direction": "ltr"
   }, {
     "code": "id",
-    "description": "Bahasa Indonesia (Indonesian)"
+    "description": "Bahasa Indonesia (Indonesian)",
+    "direction": "ltr"
   }, {
     "code": "it",
-    "description": "italiano (Italian)"
+    "description": "italiano (Italian)",
+    "direction": "ltr"
   }, {
     "code": "ja",
-    "description": "日本語 (Japanese)"
+    "description": "日本語 (Japanese)",
+    "direction": "ltr"
   }, {
     "code": "kab",
-    "description": "Taqbaylit (Kabyle)"
+    "description": "Taqbaylit (Kabyle)",
+    "direction": "ltr"
   }, {
     "code": "ko",
-    "description": "한국어 (Korean)"
+    "description": "한국어 (Korean)",
+    "direction": "ltr"
   }, {
     "code": "lv",
-    "description": "latviešu (Latvian)"
+    "description": "latviešu (Latvian)",
+    "direction": "ltr"
   }, {
     "code": "lt",
-    "description": "lietuvių (Lithuanian)"
+    "description": "lietuvių (Lithuanian)",
+    "direction": "ltr"
   }, {
     "code": "no",
-    "description": "Norsk (Norwegian)"
+    "description": "Norsk (Norwegian)",
+    "direction": "ltr"
   }, {
     "code": "fa",
-    "description": "فارسی (Persian)"
+    "description": "فارسی (Persian)",
+    "direction": "rtl"
   }, {
     "code": "pl",
-    "description": "polszczyzna (Polish)"
+    "description": "polszczyzna (Polish)",
+    "direction": "ltr"
   }, {
     "code": "pt",
-    "description": "português (Portuguese)"
+    "description": "português (Portuguese)",
+    "direction": "ltr"
   }, {
     "code": "ro",
-    "description": "română (Romanian)"
+    "description": "română (Romanian)",
+    "direction": "ltr"
   }, {
     "code": "ru",
-    "description": "pусский (Russian)"
+    "description": "pусский (Russian)",
+    "direction": "ltr"
   }, {
     "code": "sr",
-    "description": "cрпски (Serbian)"
+    "description": "cрпски (Serbian)",
+    "direction": "ltr"
   }, {
     "code": "sk",
-    "description": "slovenčina (Slovak)"
+    "description": "slovenčina (Slovak)",
+    "direction": "ltr"
   }, {
     "code": "sl",
-    "description": "slovenščina (Slovenian)"
+    "description": "slovenščina (Slovenian)",
+    "direction": "ltr"
   }, {
     "code": "es",
-    "description": "español (Spanish)"
+    "description": "español (Spanish)",
+    "direction": "ltr"
   }, {
     "code": "sv",
-    "description": "svenska (Swedish)"
+    "description": "svenska (Swedish)",
+    "direction": "ltr"
   }, {
     "code": "th",
-    "description": "ภาษาไทย (Thai)"
+    "description": "ภาษาไทย (Thai)",
+    "direction": "ltr"
   }, {
     "code": "tr",
-    "description": "Türkçe (Turkish)"
+    "description": "Türkçe (Turkish)",
+    "direction": "ltr"
   }, {
     "code": "uk",
-    "description": "yкраїнська (Ukrainian)"
+    "description": "yкраїнська (Ukrainian)",
+    "direction": "ltr"
   }, {
     "code": "vi",
-    "description": "Tiếng Việt (Vietnamese)"
+    "description": "Tiếng Việt (Vietnamese)",
+    "direction": "ltr"
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the
@@ -4884,10 +4932,13 @@ export = {
     "text": "العربية"
   }, {
     "id": "kab",
-    "text": "Taqbaylit"
+    "text": "Taqbaylit (Kabyle)"
   }, {
     "id": "vi",
     "text": "Tiếng Việt"
+  }, {
+    "id": "tr",
+    "text": "Türkçe (Turkish)"
   }, {
     "id": "hi",
     "text": "हिन्दी"
@@ -4909,187 +4960,248 @@ export = {
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
     "description": "English",
-    "relatedLanguages": ["en"]
+    "relatedLanguages": ["en"],
+    "direction": "ltr"
   }, {
     "id": "ak",
     "description": "Akan",
-    "relatedLanguages": ["ak"]
+    "relatedLanguages": ["ak"],
+    "direction": "ltr"
   }, {
     "id": "sq",
     "description": "Albanian",
-    "relatedLanguages": ["sq"]
+    "relatedLanguages": ["sq"],
+    "direction": "ltr"
   }, {
     "id": "ar",
     "description": "Arabic",
-    "relatedLanguages": ["ar"]
+    "relatedLanguages": ["ar"],
+    "direction": "rtl"
   }, {
     "id": "bg",
     "description": "Bulgarian",
-    "relatedLanguages": ["bg"]
+    "relatedLanguages": ["bg"],
+    "direction": "ltr"
   }, {
     "id": "bn",
     "description": "Bangla",
-    "relatedLanguages": ["bn"]
+    "relatedLanguages": ["bn"],
+    "direction": "ltr"
   }, {
     "id": "ms",
     "description": "Bahasa Melayu",
-    "relatedLanguages": ["ms"]
+    "relatedLanguages": ["ms"],
+    "direction": "ltr"
   }, {
     "id": "ca",
     "description": "Catalan",
-    "relatedLanguages": ["ca"]
+    "relatedLanguages": ["ca"],
+    "direction": "ltr"
   }, {
     "id": "zh",
     "description": "Chinese",
-    "relatedLanguages": ["zh"]
+    "relatedLanguages": ["zh"],
+    "direction": "ltr"
   }, {
     "id": "hr",
     "description": "Croatian",
-    "relatedLanguages": ["hr"]
+    "relatedLanguages": ["hr"],
+    "direction": "ltr"
   }, {
     "id": "cs",
     "description": "Czech",
-    "relatedLanguages": ["cs"]
+    "relatedLanguages": ["cs"],
+    "direction": "ltr"
   }, {
     "id": "da",
     "description": "Danish",
-    "relatedLanguages": ["da"]
+    "relatedLanguages": ["da"],
+    "direction": "ltr"
+  }, {
+    "id": "prs",
+    "description": "Dari",
+    "relatedLanguages": ["prs"],
+    "direction": "ltr"
   }, {
     "id": "nl",
     "description": "Dutch",
-    "relatedLanguages": ["nl"]
+    "relatedLanguages": ["nl"],
+    "direction": "ltr"
   }, {
     "id": "ee",
     "description": "Ewe",
-    "relatedLanguages": ["ee"]
+    "relatedLanguages": ["ee"],
+    "direction": "ltr"
   }, {
     "id": "tl",
     "description": "Filipino",
-    "relatedLanguages": ["tl"]
+    "relatedLanguages": ["tl"],
+    "direction": "ltr"
   }, {
     "id": "fi",
     "description": "Finnish",
-    "relatedLanguages": ["fi"]
+    "relatedLanguages": ["fi"],
+    "direction": "ltr"
   }, {
     "id": "fr",
     "description": "French",
-    "relatedLanguages": ["fr"]
+    "relatedLanguages": ["fr"],
+    "direction": "ltr"
   }, {
     "id": "de",
     "description": "German",
-    "relatedLanguages": ["de"]
+    "relatedLanguages": ["de"],
+    "direction": "ltr"
   }, {
     "id": "el",
     "description": "Greek",
-    "relatedLanguages": ["el"]
+    "relatedLanguages": ["el"],
+    "direction": "ltr"
   }, {
     "id": "gaa",
     "description": "Ga",
-    "relatedLanguages": ["gaa"]
+    "relatedLanguages": ["gaa"],
+    "direction": "ltr"
   }, {
     "id": "he",
     "description": "Hebrew",
-    "relatedLanguages": ["he"]
+    "relatedLanguages": ["he"],
+    "direction": "rtl"
   }, {
     "id": "hi",
     "description": "Hindi",
-    "relatedLanguages": ["hi"]
+    "relatedLanguages": ["hi"],
+    "direction": "ltr"
   }, {
     "id": "hi-en",
     "description": "Hinglish",
-    "relatedLanguages": ["hi", "en"]
+    "relatedLanguages": ["hi", "en"],
+    "direction": "ltr"
   }, {
     "id": "hu",
     "description": "Hungarian",
-    "relatedLanguages": ["hu"]
+    "relatedLanguages": ["hu"],
+    "direction": "ltr"
   }, {
     "id": "id",
     "description": "Indonesian",
-    "relatedLanguages": ["id"]
+    "relatedLanguages": ["id"],
+    "direction": "ltr"
   }, {
     "id": "it",
     "description": "Italian",
-    "relatedLanguages": ["it"]
+    "relatedLanguages": ["it"],
+    "direction": "ltr"
   }, {
     "id": "ja",
     "description": "Japanese",
-    "relatedLanguages": ["ja"]
+    "relatedLanguages": ["ja"],
+    "direction": "ltr"
   }, {
     "id": "kab",
     "description": "Kabyle",
-    "relatedLanguages": ["kab"]
+    "relatedLanguages": ["kab"],
+    "direction": "ltr"
   }, {
     "id": "ko",
     "description": "Korean",
-    "relatedLanguages": ["ko"]
+    "relatedLanguages": ["ko"],
+    "direction": "ltr"
   }, {
     "id": "lv",
     "description": "Latvian",
-    "relatedLanguages": ["lv"]
+    "relatedLanguages": ["lv"],
+    "direction": "ltr"
   }, {
     "id": "lt",
     "description": "Lithuanian",
-    "relatedLanguages": ["lt"]
+    "relatedLanguages": ["lt"],
+    "direction": "ltr"
   }, {
     "id": "no",
     "description": "Norwegian",
-    "relatedLanguages": ["no"]
+    "relatedLanguages": ["no"],
+    "direction": "ltr"
   }, {
     "id": "fa",
     "description": "Persian",
-    "relatedLanguages": ["fa"]
+    "relatedLanguages": ["fa"],
+    "direction": "rtl"
   }, {
     "id": "pl",
     "description": "Polish",
-    "relatedLanguages": ["pl"]
+    "relatedLanguages": ["pl"],
+    "direction": "ltr"
   }, {
     "id": "pt",
     "description": "Portuguese",
-    "relatedLanguages": ["pt"]
+    "relatedLanguages": ["pt"],
+    "direction": "ltr"
+  }, {
+    "id": "ps",
+    "description": "Pashto",
+    "relatedLanguages": ["ps"],
+    "direction": "rtl"
   }, {
     "id": "ro",
     "description": "Romanian",
-    "relatedLanguages": ["ro"]
+    "relatedLanguages": ["ro"],
+    "direction": "ltr"
   }, {
     "id": "ru",
     "description": "Russian",
-    "relatedLanguages": ["ru"]
+    "relatedLanguages": ["ru"],
+    "direction": "ltr"
   }, {
     "id": "sr",
     "description": "Serbian",
-    "relatedLanguages": ["sr"]
+    "relatedLanguages": ["sr"],
+    "direction": "ltr"
   }, {
     "id": "sk",
     "description": "Slovak",
-    "relatedLanguages": ["sk"]
+    "relatedLanguages": ["sk"],
+    "direction": "ltr"
   }, {
     "id": "sl",
     "description": "Slovenian",
-    "relatedLanguages": ["sl"]
+    "relatedLanguages": ["sl"],
+    "direction": "ltr"
   }, {
     "id": "es",
     "description": "Spanish",
-    "relatedLanguages": ["es"]
+    "relatedLanguages": ["es"],
+    "direction": "ltr"
   }, {
     "id": "sv",
     "description": "Swedish",
-    "relatedLanguages": ["sw"]
+    "relatedLanguages": ["sw"],
+    "direction": "ltr"
+  }, {
+    "id": "te",
+    "description": "Telugu",
+    "relatedLanguages": ["te"],
+    "direction": "ltr"
   }, {
     "id": "th",
     "description": "Thai",
-    "relatedLanguages": ["th"]
+    "relatedLanguages": ["th"],
+    "direction": "ltr"
   }, {
     "id": "tr",
     "description": "Turkish",
-    "relatedLanguages": ["tr"]
+    "relatedLanguages": ["tr"],
+    "direction": "ltr"
   }, {
     "id": "uk",
     "description": "Ukrainian",
-    "relatedLanguages": ["uk"]
+    "relatedLanguages": ["uk"],
+    "direction": "ltr"
   }, {
     "id": "vi",
     "description": "Vietnamese",
-    "relatedLanguages": ["vi"]
+    "relatedLanguages": ["vi"],
+    "direction": "ltr"
   }],
 
   "AUTOGENERATED_AUDIO_LANGUAGES": [{
@@ -5100,6 +5212,58 @@ export = {
     "speechSynthesisCodeMobile": "en_US"
   }],
 
+  "TRANSLATION_TIPS": {
+    "zh": [
+      // eslint-disable-next-line max-len
+      "Write fractions or numbers as they are, unless they are written out in words. For instance, one-fifth would be (五分之一)",
+      // eslint-disable-next-line max-len
+      "When referring to Mr. Baker (or, in general, Mr./Ms. followed by an occupation), leave it as Baker先生, since in certain cases Baker is the last name.",
+      "Make sure to use the correct punctuation:",
+      "Period = 。",
+      "Comma for compound sentences or translation phrases = ，",
+      "Comma for list of numbers or objects = 、",
+      // eslint-disable-next-line max-len
+      "Preserve bolding. If the original content has bold text, make sure it is bold in Chinese as well.",
+      // eslint-disable-next-line max-len
+      "Make sure that you have selected the correct words (e.g. words such as 再 and 在 )."
+    ],
+    "hi": [
+      // eslint-disable-next-line max-len
+      "Prefer simple Hindi words that are used in daily communication Note that common English words (pen, paper, cake, etc.) can be written as transliterations (पेन, पेपर, केक). For harder words, include the English word in parentheses, e.g. अंश (Numerator), हर (Denominator), भिन्न (Fraction).",
+      // eslint-disable-next-line max-len
+      "Use respectful pronouns (like “आप” instead of “तुम/तू ”) and a corresponding respectful tone like “करिये, करेंगे”.",
+      // eslint-disable-next-line max-len
+      "Use the same voice (active or passive) as in the original English text.",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Hindi as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      // eslint-disable-next-line max-len
+      "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
+    ],
+    "bn": [
+      // eslint-disable-next-line max-len
+      "Use simple Bangla words that are used in daily communication. Note that common English words (pencil, etc.) can be written as transliterations (e.g পেন্সিল ).",
+      "Use proper punctuation.",
+      "Full stop = |",
+      // eslint-disable-next-line max-len
+      "Use the same voice (active or passive) as in the original English text.",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Bangla as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
+    ],
+    "ar": [
+      // eslint-disable-next-line max-len
+      "In Oppia, we prefer to use simple words that can be easily understood by children. For example, we use “تابع قائلًا” instead of “أردف قائلًا”. Furthermore, the English words that are used in the Arab society regularly can be translated as follows; Arabic word (The regularly used English word). For example, we can translate the word cupcakes this way; كعك القوالب الصغيرة (cupcakes). ",
+      // eslint-disable-next-line max-len
+      "Use respectful ways and formal prefixes to address people. For example, use “سيدي” and “سيدتي”. ",
+      // eslint-disable-next-line max-len
+      "If the name has a meaning in Arabic, or in English, such as Baker or Crumb, always use words that indicate that they are names before writing the name itself. For example, you can use one of the following words depending on the context; “السيد، السيدة، العم، الجد، الجدة، الآنسة.”",
+      "Use the same voice (active or passive) as in the original English Text",
+      // eslint-disable-next-line max-len
+      "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Arabic as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes.",
+      // eslint-disable-next-line max-len
+      "Use the hyperlinks to different cards as shown in the original English Text."
+    ]
+  },
+
   // Types of view in creator dashboard page.
   "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
     "CARD": "card",
@@ -5107,13 +5271,14 @@ export = {
   },
 
   "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
       "TextInput",
-      "DragAndDropSortInput"
+      "DragAndDropSortInput",
+      "NumericInput"
     ]
   }, {
     "name": "Math",
@@ -5127,13 +5292,14 @@ export = {
   // These categories and interactions are displayed in the order in which they
   // appear in the interaction selector.
   "ALLOWED_INTERACTION_CATEGORIES": [{
-    "name": "General",
+    "name": "Commonly Used",
     "interaction_ids": [
       "Continue",
       "EndExploration",
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
+      "NumericInput",
       "TextInput",
       "DragAndDropSortInput"
     ]
@@ -5169,12 +5335,13 @@ export = {
     ]
   }],
 
-  "REVIEW_CATEGORY_TRANSLATION": "translation",
-  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
-  "REVIEW_CATEGORY_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION": "translation",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
+  "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
+  "CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION": "submit_question",
 
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
-  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
   "USER_FILTER_CRITERION_USERNAME": "username",
   "USER_FILTER_CRITERION_ROLE": "role",
 
@@ -5238,6 +5405,10 @@ export = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  // The default number of opportunities to show on the contributor dashboard
+  // page.
+  "OPPORTUNITIES_PAGE_SIZE": 10,
+
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
 
@@ -5255,6 +5426,7 @@ export = {
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
+  "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
@@ -5271,6 +5443,7 @@ export = {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5317,6 +5490,23 @@ export = {
   // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
+
+  "FIREBASE_AUTH_ENABLED": true,
+
+  // TODO(#11462): Delete this after Firebase authentication has been deployed.
+  "ENABLE_LOGIN_PAGE": true,
+
+  // Data required for Firebase authentication.
+  //
+  // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
+  // and change useEmulator to be false, before deploying to production.
+  "FIREBASE_CONFIG_API_KEY": "fake-api-key",
+  "FIREBASE_CONFIG_AUTH_DOMAIN": "",
+  "FIREBASE_CONFIG_PROJECT_ID": "dev-project-id",
+  "FIREBASE_CONFIG_STORAGE_BUCKET": "",
+  "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
+  "FIREBASE_CONFIG_APP_ID": "",
+  "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
@@ -5384,6 +5574,16 @@ export = {
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
 
+  // Allowed letters in the OSK.
+  "VALID_CUSTOM_OSK_LETTERS": [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
+    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+    "T", "U", "V", "W", "X", "Y", "Z",
+    "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
+    "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω", "Γ", "Δ", "Θ", "Λ", "Ξ", "Π", "Σ",
+    "Φ", "Ψ", "Ω"],
+
   // Number of custom letters allowed in the on-screen keyboard for math
   // interactions.
   "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
@@ -5427,7 +5627,7 @@ export = {
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
   // eslint-disable-next-line max-len
-  "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
+  "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
@@ -5440,7 +5640,7 @@ export = {
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
   // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": false,
+  "ENABLE_ACCOUNT_DELETION": true,
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": true,
@@ -5451,9 +5651,12 @@ export = {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
+  // Maximum allowed length of a state name.
+  "MAX_STATE_NAME_LENGTH": 50,
+
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
-  "PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES": ["Web", "Android", "Backend"],
+  "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
   // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.
@@ -5464,5 +5667,92 @@ export = {
   "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
-  "DEV_MODE": true
+  // Maximum allowed commit message length. 375 characters because indexed
+  // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
+  // up to 4 bytes long.
+  "MAX_COMMIT_MESSAGE_LENGTH": 375,
+
+  "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
+    {
+      "backend_id": "user_inactivity",
+      "backend_attr": "inactive_in_last_n_days",
+      "description": "Inactive in last n days",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "user_login_activity",
+      "backend_attr": "has_not_logged_in_for_n_days",
+      "description": "Has not logged in for n days",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "minimum_exp_created",
+      "backend_attr": "created_at_least_n_exps",
+      "description": "Has created at least n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "maximum_exp_created",
+      "backend_attr": "created_fewer_than_n_exps",
+      "description": "Has created fewer than n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "minimum_exp_edited",
+      "backend_attr": "edited_at_least_n_exps",
+      "description": "Has edited at least n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    },
+    {
+      "backend_id": "maximum_exp_edited",
+      "backend_attr": "edited_fewer_than_n_exps",
+      "description": "Has edited fewer than n explorations",
+      "schema": {
+        "type": "int",
+        "validators": [{
+          "id": "is_at_least",
+          "min_value": 0
+        }]
+      },
+      "default_value": null
+    }
+  ],
+
+  "DEV_MODE": true,
+  "EMULATOR_MODE": true
 } as const;

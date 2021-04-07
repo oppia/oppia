@@ -42,10 +42,121 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
+class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to explorations.
+
+    A new instance of this model is created and saved every time a commit to
+    ExplorationModel or ExplorationRightsModel occurs.
+
+    The id for this model is of the form
+    'exploration-[exploration_id]-[version]'.
+    """
+
+    # The id of the exploration being edited.
+    exploration_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
+        """
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_multi(cls, exp_id, exp_versions):
+        """Gets the ExplorationCommitLogEntryModels for the given exploration
+        id and exploration versions.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            exp_versions: list(int). The versions of the exploration.
+
+        Returns:
+            list(ExplorationCommitLogEntryModel). The list of
+            ExplorationCommitLogEntryModel instances which matches the given
+            exp_id and exp_versions.
+        """
+        instance_ids = [cls.get_instance_id(exp_id, exp_version)
+                        for exp_version in exp_versions]
+
+        return super(ExplorationCommitLogEntryModel, cls).get_multi(
+            instance_ids)
+
+    @classmethod
+    def get_instance_id(cls, exp_id, exp_version):
+        """Returns ID of the exploration commit log entry model.
+
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
+
+        Returns:
+            str. A string containing exploration ID and
+            exploration version.
+        """
+        return 'exploration-%s-%s' % (exp_id, exp_version)
+
+    @classmethod
+    def get_all_non_private_commits(
+            cls, page_size, urlsafe_start_cursor, max_age=None):
+        """Fetches a list of all the non-private commits sorted by their
+        last updated attribute.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+            max_age: datetime.timedelta. The maximum time duration within which
+                commits are needed.
+
+        Returns:
+            3-tuple of (results, cursor, more). Created no earlier than the
+            max_age before the current time where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this will
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+
+        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
+            raise ValueError(
+                'max_age must be a datetime.timedelta instance or None.')
+
+        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
+        if max_age:
+            query = query.filter(
+                cls.last_updated >= datetime.datetime.utcnow() - max_age)
+        return cls._fetch_page_sorted_by_last_updated(
+            query, page_size, urlsafe_start_cursor)
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -57,6 +168,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = ExplorationCommitLogEntryModel
     ALLOW_REVERT = True
 
     # What this exploration is called.
@@ -102,27 +214,19 @@ class ExplorationModel(base_models.VersionedModel):
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
 
-    # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
-    # caused GAE to raise an error on fetching a specific version of the
-    # exploration model.
-    # TODO(sll): Fix this error and remove this property.
-    skill_tags = datastore_services.StringProperty(repeated=True, indexed=True)
-    # DEPRECATED in v2.0.1. Do not use.
-    # TODO(sll): Remove this property from the model.
-    default_skin = datastore_services.StringProperty(default='conversation_v1')
-    # DEPRECATED in v2.5.4. Do not use.
-    skin_customizations = datastore_services.JsonProperty(indexed=False)
-
     @staticmethod
     def get_deletion_policy():
-        """ExplorationModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -138,10 +242,7 @@ class ExplorationModel(base_models.VersionedModel):
             'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -172,9 +273,6 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when explorations
-        # are changed).
         exploration_commit_log = ExplorationCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, exp_rights.status, exp_rights.community_owned
@@ -222,7 +320,54 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models.append(exploration_commit_log)
             ExplorationCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
+
+    @staticmethod
+    def convert_to_valid_dict(snapshot_dict):
+        """Replace invalid fields and values in the ExplorationModel dict.
+        Some old ExplorationModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the ExplorationModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+
+        if 'skill_tags' in snapshot_dict:
+            del snapshot_dict['skill_tags']
+        if 'default_skin' in snapshot_dict:
+            del snapshot_dict['default_skin']
+        if 'skin_customizations' in snapshot_dict:
+            del snapshot_dict['skin_customizations']
+
+        return snapshot_dict
+
+    def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+        Some old ExplorationSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+            with the snapshot.
+        """
+
+        self.populate(
+            **ExplorationModel.convert_to_valid_dict(snapshot_dict))
+        return self
 
 
 class ExplorationContextModel(base_models.BaseModel):
@@ -236,14 +381,17 @@ class ExplorationContextModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationContextModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -262,8 +410,8 @@ class ExplorationRightsSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there are owner_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
 
         The pseudonymization of this model is handled in the wipeout_service
@@ -334,23 +482,30 @@ class ExplorationRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationRightsModel contains data to pseudonymize/delete
-        corresponding to a user: viewer_ids, voice_artist_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
         """
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance shared across users since multiple
+        users contribute to an exploration and have varying rights.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -360,9 +515,20 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'owner_ids': 'owned_exploration_ids',
+            'editor_ids': 'editable_exploration_ids',
+            'viewer_ids': 'viewable_exploration_ids',
+            'voice_artist_ids': 'voiced_exploration_ids'
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -420,10 +586,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             dict. The content of the model. Only valid fields and values are
             present.
         """
-        # The all_viewer_ids field was previously used in some versions of the
-        # model, we need to remove it.
-        if 'all_viewer_ids' in model_dict:
-            del model_dict['all_viewer_ids']
 
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
@@ -436,6 +598,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
             model_dict['translator_ids'] = []
+
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+        if 'translator_ids' in model_dict:
+            del model_dict['translator_ids']
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.
@@ -493,9 +662,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when explorations
-            # are changed).
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -508,7 +674,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
@@ -566,111 +732,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'voiced_exploration_ids': voiced_exploration_ids,
             'viewable_exploration_ids': viewable_exploration_ids
         }
-
-
-class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to explorations.
-
-    A new instance of this model is created and saved every time a commit to
-    ExplorationModel or ExplorationRightsModel occurs.
-
-    The id for this model is of the form
-    'exploration-[exploration_id]-[version]'.
-    """
-
-    # The id of the exploration being edited.
-    exploration_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
-
-    @staticmethod
-    def get_deletion_policy():
-        """ExplorationCommitLogEntryModel contains data corresponding to a user
-        that requires pseudonymization/deletion: user_id field.
-        """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
-
-    @classmethod
-    def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    @classmethod
-    def get_multi(cls, exp_id, exp_versions):
-        """Gets the ExplorationCommitLogEntryModels for the given exploration
-        id and exploration versions.
-
-        Args:
-            exp_id: str. The id of the exploration.
-            exp_versions: list(int). The versions of the exploration.
-
-        Returns:
-            list(ExplorationCommitLogEntryModel). The list of
-            ExplorationCommitLogEntryModel instances which matches the given
-            exp_id and exp_versions.
-        """
-        instance_ids = [cls._get_instance_id(exp_id, exp_version)
-                        for exp_version in exp_versions]
-
-        return super(ExplorationCommitLogEntryModel, cls).get_multi(
-            instance_ids)
-
-    @classmethod
-    def _get_instance_id(cls, exp_id, exp_version):
-        """Returns ID of the exploration commit log entry model.
-
-        Args:
-            exp_id: str. The exploration id whose states are mapped.
-            exp_version: int. The version of the exploration.
-
-        Returns:
-            str. A string containing exploration ID and
-            exploration version.
-        """
-        return 'exploration-%s-%s' % (exp_id, exp_version)
-
-    @classmethod
-    def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        """Fetches a list of all the non-private commits sorted by their
-        last updated attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-            max_age: datetime.timedelta. The maximum time duration within which
-                commits are needed.
-
-        Returns:
-            3-tuple of (results, cursor, more). Created no earlier than the
-            max_age before the current time where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this will
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-
-        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError(
-                'max_age must be a datetime.timedelta instance or None.')
-
-        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
-        if max_age:
-            query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age)
-        return cls._fetch_page_sorted_by_last_updated(
-            query, page_size, urlsafe_start_cursor)
 
 
 class ExpSummaryModel(base_models.BaseModel):
@@ -760,7 +821,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExpSummaryModel contains data to pseudonymize/delete corresponding
+        """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, voice_artist_ids, editor_ids, owner_ids,
         contributor_ids, and contributors_summary fields.
         """
@@ -882,11 +943,18 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model data has already been exported as a part of the
+        ExplorationModel and thus does not need a separate export.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model data has already been exported as a part of the
-        ExplorationModel and thus does not need a separate export_data
-        function.
+        """Model contains data corresponding to a user, but this isn't exported
+        because because noteworthy details that belong to this model have
+        already been exported as a part of the ExplorationModel.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,

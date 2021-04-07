@@ -38,5 +38,6 @@ sudo apt-get install python3-yaml
 #     "ImportError: No module named functools_lru_cache"
 # error. See the Troubleshooting page for details:
 #    https://github.com/oppia/oppia/wiki/Troubleshooting
+sudo apt-get install python-matplotlib
 sudo apt-get install python3-matplotlib
 sudo pip install --upgrade pip

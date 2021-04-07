@@ -30,10 +30,8 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'feedback-popup.directive.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
-require(
-  'pages/exploration-player-page/suggestion-modal-for-learner-local-view/' +
-  'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
+require('services/attribution.service');
 require('services/user.service.ts');
 
 require(
@@ -50,16 +48,16 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$uibModal', 'AlertsService', 'ExplorationEngineService',
+        '$http', '$rootScope', '$uibModal', 'AlertsService',
+        'AttributionService', 'ExplorationEngineService',
         'LoaderService', 'ReadOnlyExplorationBackendApiService',
-        'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService',
         'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $uibModal, AlertsService, ExplorationEngineService,
+            $http, $rootScope, $uibModal, AlertsService,
+            AttributionService, ExplorationEngineService,
             LoaderService, ReadOnlyExplorationBackendApiService,
-            SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService,
             ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
@@ -69,16 +67,12 @@ angular.module('oppia').directive('learnerLocalNav', [
               FEEDBACK_POPOVER_PATH);
           };
 
-          ctrl.showLearnerSuggestionModal = function() {
-            SuggestionModalForExplorationPlayerService.showSuggestionModal(
-              'edit_exploration_state_content', {});
-          };
           ctrl.showFlagExplorationModal = function() {
             $uibModal.open({
               template: require(
                 'pages/exploration-player-page/templates/' +
                 'flag-exploration-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'FlagExplorationModalController',
             }).result.then(function(result) {
               var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
@@ -111,12 +105,22 @@ angular.module('oppia').directive('learnerLocalNav', [
               // No further action is needed.
             });
           };
+
+          ctrl.toggleAttributionModal = function() {
+            if (AttributionService.isAttributionModalShown()) {
+              AttributionService.hideAttributionModal();
+            } else {
+              AttributionService.showAttributionModal();
+            }
+          };
+
           ctrl.$onInit = function() {
             ctrl.explorationId = ExplorationEngineService.getExplorationId();
             ReadOnlyExplorationBackendApiService
               .loadExploration(ctrl.explorationId)
               .then(function(exploration) {
                 ctrl.canEdit = exploration.can_edit;
+                $rootScope.$applyAsync();
               });
             ctrl.username = '';
             ctrl.feedbackOptionIsShown = true;
@@ -129,6 +133,9 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.feedbackOptionIsShown = false;
               }
               LoaderService.hideLoadingScreen();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
           };
         }

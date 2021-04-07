@@ -38,7 +38,7 @@ import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
-interface InteractionRulesService {
+export interface InteractionRulesService {
   [ruleName: string]: (
     answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
 }

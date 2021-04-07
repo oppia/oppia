@@ -15,62 +15,136 @@
 /**
  * @fileoverview Component for the Oppia splash page.
  */
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('base-components/base-content.directive.ts');
+import splashConstants from 'assets/constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
+import { LoaderService } from 'services/loader.service.ts';
+import { UserService } from 'services/user.service';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+export interface Testimonial {
+  quote: string,
+  studentDetails: string,
+  imageUrl: string,
+  imageUrlWebp: string,
+  borderPresent: boolean
+}
 
-angular.module('oppia').component('splashPage', {
-  template: require('./splash-page.component.html'),
-  controller: [
-    '$timeout', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'WindowRef',
-    function(
-        $timeout, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, WindowRef) {
-      var ctrl = this;
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-      ctrl.getStaticSubjectImageUrl = function(subjectName) {
-        return UrlInterpolationService.getStaticImageUrl(
-          '/subjects/' + subjectName + '.svg');
-      };
+@Component({
+  selector: 'splashPage',
+  templateUrl: './splash-page.component.html',
+  styleUrls: []
+})
+export class SplashPageComponent implements OnInit {
+  isWindowNarrow: boolean = false;
+  classroomUrlFragment: string;
+  classroomUrl: string;
+  displayedTestimonialId: number;
+  testimonialCount: number;
+  testimonials = [];
+  userIsLoggedIn: boolean = null;
 
-      ctrl.onRedirectToLogin = function(destinationUrl) {
-        SiteAnalyticsService.registerStartLoginEvent(
-          'splashPageCreateExplorationButton');
-        $timeout(function() {
-          WindowRef.nativeWindow.location = destinationUrl;
-        }, 150);
-        return false;
-      };
+  constructor(
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionService: WindowDimensionsService,
+    private windowRef: WindowRef,
+    private userService: UserService,
+    private loaderService: LoaderService,
+  ) {}
 
-      ctrl.onClickBrowseLibraryButton = function() {
-        SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-        $timeout(function() {
-          WindowRef.nativeWindow.location = '/community-library';
-        }, 150);
-        return false;
-      };
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-      ctrl.onClickCreateExplorationButton = function() {
-        SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
-        $timeout(function() {
-          WindowRef.nativeWindow.location = '/creator-dashboard?mode=create';
-        }, 150);
-        return false;
-      };
-      ctrl.$onInit = function() {
-        ctrl.userIsLoggedIn = null;
-        LoaderService.showLoadingScreen('Loading');
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          LoaderService.hideLoadingScreen();
-        });
-      };
-    }
-  ]
-});
+  onClickBrowseLessonsButton(): void {
+    this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+  }
+
+  onClickStartContributingButton(): void {
+    this.siteAnalyticsService.registerClickStartContributingButtonEvent();
+    this.windowRef.nativeWindow.location.href = 'https://www.oppiafoundation.org/volunteer';
+  }
+
+  onClickStartTeachingButton(): void {
+    this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
+    this.windowRef.nativeWindow.location.href = ('/creator-guidelines');
+  }
+  // TODO(#11657): Extract the testimonials code into a separate component.
+  // The 2 functions below are to cycle between values:
+  // 0 to (testimonialCount - 1) for displayedTestimonialId.
+  incrementDisplayedTestimonialId(): void {
+    // This makes sure that incrementing from (testimonialCount - 1)
+    // returns 0 instead of testimonialCount,since we want the testimonials
+    // to cycle through.
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + 1) % this.testimonialCount;
+  }
+
+  decrementDisplayedTestimonialId(): void {
+    // This makes sure that decrementing from 0, returns
+    // (testimonialCount - 1) instead of -1, since we want the testimonials
+    // to cycle through.
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + this.testimonialCount - 1) %
+      this.testimonialCount;
+  }
+
+  getTestimonials(): [Testimonial, Testimonial, Testimonial, Testimonial] {
+    return [{
+      quote: 'I18N_SPLASH_TESTIMONIAL_1',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_1',
+      imageUrl: this.getStaticImageUrl('/splash/mira.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/mira.webp'),
+      borderPresent: false
+    },
+    {
+      quote: 'I18N_SPLASH_TESTIMONIAL_2',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_2',
+      imageUrl: this.getStaticImageUrl('/splash/Dheeraj_3.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/Dheeraj_3.webp'),
+      borderPresent: true
+    }, {
+      quote: 'I18N_SPLASH_TESTIMONIAL_3',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_3',
+      imageUrl: this.getStaticImageUrl('/splash/sama.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/sama.webp'),
+      borderPresent: false
+    }, {
+      quote: 'I18N_SPLASH_TESTIMONIAL_4',
+      studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_4',
+      imageUrl: this.getStaticImageUrl('/splash/Gaurav_2.png'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/Gaurav_2.webp'),
+      borderPresent: true
+    }];
+  }
+
+  ngOnInit(): void {
+    this.userIsLoggedIn = null;
+    this.displayedTestimonialId = 0;
+    this.testimonialCount = 4;
+    this.testimonials = this.getTestimonials();
+    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
+      '/learn/<classroomUrlFragment>', {
+        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+      });
+    this.loaderService.showLoadingScreen('Loading');
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+      this.loaderService.hideLoadingScreen();
+    });
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+    });
+  }
+}
+
+angular.module('oppia').directive('splashPage',
+  downgradeComponent({component: SplashPageComponent}));

@@ -41,10 +41,52 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
+class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to topics.
+
+    A new instance of this model is created and saved every time a commit to
+    TopicModel occurs.
+
+    The id for this model is of the form 'topic-[topic_id]-[version]'.
+    """
+
+    # The id of the topic being edited.
+    topic_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_instance_id(cls, topic_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            topic_id: str. The id of the topic being edited.
+            version: int. The version number of the topic after the commit.
+
+        Returns:
+            str. The commit id with the topic id and version number.
+        """
+        return 'topic-%s-%s' % (topic_id, version)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class TopicModel(base_models.VersionedModel):
@@ -56,6 +98,7 @@ class TopicModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = TopicCommitLogEntryModel
     ALLOW_REVERT = False
 
     # The name of the topic.
@@ -107,12 +150,17 @@ class TopicModel(base_models.VersionedModel):
     # The content of the meta tag in the Topic viewer page.
     meta_tag_content = datastore_services.StringProperty(
         indexed=True, default='')
+    # The page title fragment used in the Topic viewer web page.
+    # For example, if the full Topic viewer web page title is
+    # 'Learn Fractions | Add, Subtract, Multiply and Divide | Oppia'
+    # the page title fragment field represents the middle value 'Add, Subtract,
+    # Multiply and Divide'.
+    page_title_fragment_for_web = datastore_services.StringProperty(
+        indexed=True, default='')
 
     @staticmethod
     def get_deletion_policy():
-        """TopicModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
@@ -183,9 +231,14 @@ class TopicModel(base_models.VersionedModel):
             cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -205,45 +258,11 @@ class TopicModel(base_models.VersionedModel):
             'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_title_fragment_for_web': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
-
-
-class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to topics.
-
-    A new instance of this model is created and saved every time a commit to
-    TopicModel occurs.
-
-    The id for this model is of the form 'topic-[topic_id]-[version]'.
-    """
-
-    # The id of the topic being edited.
-    topic_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @classmethod
-    def _get_instance_id(cls, topic_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
-
-        Args:
-            topic_id: str. The id of the topic being edited.
-            version: int. The version number of the topic after the commit.
-
-        Returns:
-            str. The commit id with the topic id and version number.
-        """
-        return 'topic-%s-%s' % (topic_id, version)
-
-    @classmethod
-    def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -295,6 +314,9 @@ class TopicSummaryModel(base_models.BaseModel):
     # uncategorized).
     total_skill_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total number of published chapters in the topic.
+    total_published_node_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of skills that are not part of any subtopic.
     uncategorized_skill_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
@@ -309,14 +331,17 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -328,6 +353,8 @@ class TopicSummaryModel(base_models.BaseModel):
             'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_published_node_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'uncategorized_skill_count':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -349,8 +376,8 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there is manager_ids field.
+        """Model contains data corresponding to a user: inside the content field
+        there is a manager_ids field.
 
         The pseudonymization of this model is handled in the wipeout_service
         in the _pseudonymize_activity_models_with_associated_rights_models(),
@@ -395,7 +422,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicRightsModel contains data to pseudonymize corresponding
+        """Model contains data to pseudonymize or delete corresponding
         to a user: manager_ids field.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
@@ -491,13 +518,32 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance shared across users since multiple
+        users contribute to topics and their rights.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'manager_ids': 'managed_topic_ids'
+        }
 
     @classmethod
     def export_data(cls, user_id):

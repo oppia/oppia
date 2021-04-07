@@ -30,15 +30,15 @@ describe('Opportunities List Item Component', function() {
       ctrl = $componentController('opportunitiesListItem', {
         $scope: $scope,
       }, {
-        getOpportunity: () => ({
+        opportunity: {
           labelText: 'Label text',
           labelColor: '#fff',
           progressPercentage: 50
-        }),
+        },
         onClickActionButton: () => jasmine.createSpy('click', () => {}),
-        isLabelRequired: () => true,
-        isProgressBarRequired: () => true,
-        getOpportunityHeadingTruncationLength: () => null
+        labelRequired: true,
+        progressBarRequired: true,
+        opportunityHeadingTruncationLength: 35
       });
       ctrl.$onInit();
     }));
@@ -66,11 +66,11 @@ describe('Opportunities List Item Component', function() {
       ctrl = $componentController('opportunitiesListItem', {
         $scope: $scope,
       }, {
-        getOpportunity: () => null,
+        opportunity: null,
         onClickActionButton: () => jasmine.createSpy('click', () => {}),
-        isLabelRequired: () => true,
-        isProgressBarRequired: () => true,
-        getOpportunityHeadingTruncationLength: () => null
+        labelRequired: true,
+        progressBarRequired: true,
+        opportunityHeadingTruncationLength: null
       });
       ctrl.$onInit();
     }));
@@ -80,7 +80,7 @@ describe('Opportunities List Item Component', function() {
         expect(ctrl.opportunityDataIsLoading).toBe(true);
         expect(ctrl.labelText).toBe(undefined);
         expect(ctrl.labelStyle).toBe(undefined);
-        expect(ctrl.opportunityHeadingTruncationLength).toBe(35);
+        expect(ctrl.opportunityHeadingTruncationLength).toBe(40);
       });
   });
 });

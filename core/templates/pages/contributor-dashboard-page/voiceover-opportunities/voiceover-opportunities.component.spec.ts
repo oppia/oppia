@@ -24,6 +24,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Voiceover opportunities component', function() {
   var ctrl = null;
@@ -33,6 +34,8 @@ describe('Voiceover opportunities component', function() {
   var translationLanguageService = null;
 
   var activeLanguageChangedEmitter = new EventEmitter();
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(

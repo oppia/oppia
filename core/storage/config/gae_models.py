@@ -37,9 +37,7 @@ class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ConfigPropertySnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -60,9 +58,14 @@ class ConfigPropertyModel(base_models.VersionedModel):
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -84,9 +87,7 @@ class PlatformParameterSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        """PlatformParameterSnapshotContentModel doesn't contain any data
-        directly corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -109,9 +110,14 @@ class PlatformParameterModel(base_models.VersionedModel):
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE

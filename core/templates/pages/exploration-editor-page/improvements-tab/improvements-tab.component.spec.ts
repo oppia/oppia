@@ -37,7 +37,7 @@ import { ExplorationImprovementsTaskRegistryService } from
 
 // TODO(#7222): Remove usages of UpgradedServices. Used here because too many
 // indirect AngularJS dependencies are required for the improvements tab.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +
@@ -48,12 +48,7 @@ describe('Improvements tab', function() {
 
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function(
       $componentController, $rootScope, _ExplorationImprovementsService_,

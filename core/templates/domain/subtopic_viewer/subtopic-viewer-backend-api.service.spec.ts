@@ -67,7 +67,7 @@ describe('Subtopic viewer backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      subtopicViewerBackendApiService.fetchSubtopicData(
+      subtopicViewerBackendApiService.fetchSubtopicDataAsync(
         'topic', 'staging', '0').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/subtopic_data_handler/staging/topic/0');
@@ -86,7 +86,7 @@ describe('Subtopic viewer backend API service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      subtopicViewerBackendApiService.fetchSubtopicData(
+      subtopicViewerBackendApiService.fetchSubtopicDataAsync(
         'topic', 'staging', '0').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/subtopic_data_handler/staging/topic/0');

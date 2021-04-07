@@ -25,7 +25,12 @@ import { ContributionOpportunitiesBackendApiService } from
 import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { UserService } from 'services/user.service';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question opportunities component', function() {
   var ctrl = null;
@@ -35,10 +40,12 @@ describe('Question opportunities component', function() {
   var alertsService = null;
   var contributionOpportunitiesService = null;
   var questionUndoRedoService = null;
+  var siteAnalyticsService = null;
   var skillObjectFactory = null;
   var userService = null;
 
   var opportunitiesArray = [];
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -46,7 +53,9 @@ describe('Question opportunities component', function() {
     });
 
     alertsService = TestBed.get(AlertsService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
+    userService = TestBed.get(UserService);
   });
 
   beforeEach(angular.mock.module(
@@ -63,7 +72,6 @@ describe('Question opportunities component', function() {
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
     questionUndoRedoService = $injector.get('QuestionUndoRedoService');
-    userService = $injector.get('UserService');
 
     opportunitiesArray = [
       SkillOpportunity.createFromBackendDict({
@@ -86,57 +94,67 @@ describe('Question opportunities component', function() {
     });
   }));
 
-  it('should load question opportunities when component is initialized',
-    function() {
-      spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-        .callFake((callback) => {
-          callback(opportunitiesArray, false);
-        });
-      ctrl.$onInit();
+  it('should load question opportunities', () => {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
 
-      expect(ctrl.opportunities.length).toBe(2);
-      expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
+  });
+
+  it('should load more question opportunities', function() {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: true
+      }));
+
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(true);
     });
 
-  it('should load more question opportunities when reaching the end' +
-    ' of page and there are more opportunities available', function() {
-    spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-      .callFake((callback) => {
-        callback(opportunitiesArray, true);
-      });
+    spyOn(
+      contributionOpportunitiesService, 'getMoreSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+
+    ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
+  });
+
+  it('should register Contributor Dashboard suggest event when clicking on' +
+    ' suggest question button', function() {
+    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
     ctrl.$onInit();
     $rootScope.$apply();
 
-    expect(ctrl.opportunities.length).toBe(2);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(true);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    var getMoreSkillOpportunitiesSpy = spyOn(
-      contributionOpportunitiesService, 'getMoreSkillOpportunities');
-
-    getMoreSkillOpportunitiesSpy
-      .and.callFake((callback) => {
-        callback(opportunitiesArray, false);
-      });
-    ctrl.onLoadMoreOpportunities();
+    ctrl.onClickSuggestQuestionButton('1');
     $rootScope.$apply();
 
-    getMoreSkillOpportunitiesSpy.calls.reset();
-
-    expect(ctrl.opportunities.length).toBe(4);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    ctrl.onLoadMoreOpportunities();
-    expect(getMoreSkillOpportunitiesSpy).not.toHaveBeenCalled();
+    expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
+      .toHaveBeenCalledWith('Question');
   });
 
   it('should open requires login modal when trying to select a question and' +
     ' a skill difficulty and user is not logged', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => false
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => false
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -153,9 +171,10 @@ describe('Question opportunities component', function() {
   it('should open select skill and skill difficulty modal when clicking' +
     ' on suggesting question button', function() {
     spyOn($uibModal, 'open').and.callThrough();
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -193,13 +212,14 @@ describe('Question opportunities component', function() {
 
   it('should create a question when closing create question modal',
     function() {
-      alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       ctrl.$onInit();
       $rootScope.$apply();
+      alertsService.clearWarnings();
 
       openSpy.and.returnValue({
         result: $q.resolve({
@@ -239,13 +259,14 @@ describe('Question opportunities component', function() {
 
   it('should suggest a question when dismissing create question modal',
     function() {
-      alertsService.clearWarnings();
       var openSpy = spyOn($uibModal, 'open');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       ctrl.$onInit();
       $rootScope.$apply();
+      alertsService.clearWarnings();
 
       openSpy.and.returnValue({
         result: $q.resolve({
@@ -288,9 +309,10 @@ describe('Question opportunities component', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 

@@ -149,7 +149,8 @@ describe('Visiting user profile page', function() {
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
-      EXPLORATION.language
+      EXPLORATION.language,
+      true
     );
 
     await creatorDashboardPage.get();
@@ -164,6 +165,7 @@ describe('Visiting user profile page', function() {
     await profilePage.get(ANOTHER_USERNAME);
     await profilePage.expectToHaveExplorationCards();
     await profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
+    await users.logout();
   });
 
   it('should show created exploration stats for user', async function() {
@@ -171,10 +173,10 @@ describe('Visiting user profile page', function() {
 
     await profilePage.get(ANOTHER_USERNAME);
     await profilePage.expectToHaveCreatedExplorationStat('1');
+    await users.logout();
   });
 
   afterEach(async function() {
-    await users.logout();
     await general.checkForConsoleErrors([]);
   });
 });
@@ -206,12 +208,15 @@ describe('Playing the exploration', function() {
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
-      EXPLORATION.language
+      EXPLORATION.language,
+      true
     );
+    await users.logout();
   });
 
   it('should change the cards on clicking next and back buttons',
     async function() {
+      await users.login(TEST_EMAIL);
       await libraryPage.get();
       await libraryPage.findExploration(EXPLORATION.title);
       await libraryPage.playExploration(EXPLORATION.title);
@@ -242,6 +247,7 @@ describe('Playing the exploration', function() {
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('card 2'));
+      await users.logout();
     });
 
   afterEach(async function() {

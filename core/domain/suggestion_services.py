@@ -20,8 +20,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import heapq
+import logging
 import re
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -54,9 +56,9 @@ MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER = 5
 # emphasized text is the translation. Similarly, for question suggestions the
 # emphasized text is the question being asked.
 SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS = {
-    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
         lambda suggestion: suggestion.change.translation_html),
-    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+    feconf.SUGGESTION_TYPE_ADD_QUESTION: (
         lambda suggestion: suggestion.change.question_dict[
             'question_state_data']['content']['html'])
 }
@@ -90,16 +92,16 @@ def create_suggestion(
 
     status = suggestion_models.STATUS_IN_REVIEW
 
-    if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+    if target_type == feconf.ENTITY_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
-    if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+    if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
         # Suggestions of this type do not have an associated language code,
         # since they are not queryable by language.
         language_code = None
-    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+    elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
@@ -109,14 +111,18 @@ def create_suggestion(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
             raise Exception(
-                'The given content_html does not match the content of the '
-                'exploration.')
-    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+                'The Exploration content has changed since this translation '
+                'was submitted.')
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        change['question_dict']['language_code'] = (
+            constants.DEFAULT_LANGUAGE_CODE)
+        change['question_dict']['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         # The language code of the question, used for querying purposes.
-        language_code = change['question_dict']['language_code']
+        language_code = constants.DEFAULT_LANGUAGE_CODE
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
@@ -373,7 +379,7 @@ def accept_suggestion(
 
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
-        None, review_message)
+        None, review_message, should_send_email=False)
 
     # When recording of scores is enabled, the author of the suggestion gets an
     # increase in their score for the suggestion category.
@@ -463,7 +469,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
 
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
-        None, review_message
+        None, review_message, should_send_email=False
     )
 
 
@@ -479,7 +485,7 @@ def auto_reject_question_suggestions_for_skill_id(skill_id):
         [
             (
                 'suggestion_type',
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION),
             ('target_id', skill_id)
         ]
     )
@@ -596,7 +602,7 @@ def get_reviewable_suggestions(user_id, suggestion_type):
                 suggestion_type, user_id))
     ])
     user_review_rights = user_services.get_user_contribution_rights(user_id)
-    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+    if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         language_codes = (
             user_review_rights.can_review_translation_for_language_codes)
         return [
@@ -622,8 +628,7 @@ def get_question_suggestions_waiting_longest_for_review():
     ]
 
 
-def get_translation_suggestions_waiting_longest_for_review(
-        language_code):
+def get_translation_suggestions_waiting_longest_for_review(language_code):
     """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
     number of translation suggestions in the specified language code,
     sorted in descending order by review wait time.
@@ -643,6 +648,26 @@ def get_translation_suggestions_waiting_longest_for_review(
             .get_translation_suggestions_waiting_longest_for_review(
                 language_code)
         )
+    ]
+
+
+def get_translation_suggestions_in_review_by_exploration(exp_id):
+    """Returns translation suggestions in review by exploration ID.
+
+    Args:
+        exp_id: str. Exploration ID.
+
+    Returns:
+        list(Suggestion). A list of translation suggestions in review with
+        target_id == exp_id.
+    """
+    suggestion_models_in_review = (
+        suggestion_models.GeneralSuggestionModel
+        .get_translation_suggestions_in_review_with_exp_id(exp_id)
+    )
+    return [
+        get_suggestion_from_model(model) if model else None
+        for model in suggestion_models_in_review
     ]
 
 
@@ -1168,17 +1193,18 @@ def get_suggestion_types_that_need_reviewers():
     )
     if len(language_codes_that_need_reviewers) != 0:
         suggestion_types_needing_reviewers[
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT] = (
                 language_codes_that_need_reviewers
             )
 
     if stats.are_question_reviewers_needed():
         suggestion_types_needing_reviewers[
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] = {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION] = {}
 
     return suggestion_types_needing_reviewers
 
 
+@transaction_services.run_in_transaction_wrapper
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
@@ -1195,7 +1221,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     stats_model = suggestion_models.CommunityContributionStatsModel.get()
     for suggestion in suggestions:
         if suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if suggestion.language_code not in (
                     stats_model.translation_suggestion_counts_by_lang_code):
                 stats_model.translation_suggestion_counts_by_lang_code[
@@ -1210,7 +1236,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
                     del stats_model.translation_suggestion_counts_by_lang_code[
                         suggestion.language_code]
         elif suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
             stats_model.question_suggestion_count += amount
 
     # Create a community contribution stats object to validate the updates.
@@ -1219,6 +1245,9 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
 
     stats_model.update_timestamps()
     stats_model.put()
+
+    logging.info('Updated translation_suggestion_counts_by_lang_code: %s' % (
+        stats_model.translation_suggestion_counts_by_lang_code))
 
 
 def _update_suggestion_counts_in_community_contribution_stats(
@@ -1234,6 +1263,5 @@ def _update_suggestion_counts_in_community_contribution_stats(
             trigger count updates.
         amount: int. The amount to adjust the counts by.
     """
-    transaction_services.run_in_transaction(
-        _update_suggestion_counts_in_community_contribution_stats_transactional,
+    _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount)

@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core import platform_feature_list
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import platform_feature_services
@@ -35,10 +36,9 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
         the given client information.
         """
         context_dict = {
-            'client_type': self.request.get('client_type', None),
+            'platform_type': self.request.get('platform_type', None),
             'browser_type': self.request.get('browser_type', None),
             'app_version': self.request.get('app_version', None),
-            'user_locale': self.request.get('user_locale', None),
         }
         context = (
             platform_feature_services.create_evaluation_context_for_client(
@@ -53,3 +53,20 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
             .evaluate_all_feature_flag_values_for_client(context))
 
         self.render_json(result_dict)
+
+
+class PlatformFeatureDummyHandler(base.BaseHandler):
+    """Dummy handler for testing e2e feature gating flow."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        # This handler is gated by the dummy_feature flag, i.e. it's only
+        # visible when the dummy_feature is enabled.
+        if not platform_feature_services.is_feature_enabled(
+                platform_feature_list.PARAM_NAMES.dummy_feature):
+            raise self.PageNotFoundException()
+        self.render_json({
+            'msg': 'ok'
+        })

@@ -19,13 +19,18 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
+from constants import constants
 from core import jobs_registry
 from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class MockModel(base_models.BaseModel):
@@ -77,6 +82,7 @@ class MockSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
 
     EXTERNAL_MODEL_NAME = 'external model'
+
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
@@ -103,7 +109,39 @@ class MockBaseUserModelValidator(
         ]
 
 
+class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    pass
+
+
+class MockCommitLogEntryModelValidator(
+        base_model_validators.BaseCommitLogEntryModelValidator):
+
+    EXTERNAL_MODEL_NAME = 'mockmodel'
+
+    @classmethod
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('mock'):
+            return MockCommitLogEntryModel
+        else:
+            cls._add_error(
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
+                'Entity id %s: Entity id does not match regex pattern' % (
+                    item.id))
+            return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            )]
+
+
 class BaseValidatorTests(test_utils.AuditJobsTestBase):
+
+    USER_ID = 'uid_%s' % ('a' * 32)
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
@@ -166,3 +204,162 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         user.update_timestamps()
         user.put()
         MockBaseUserModelValidator().validate(user)
+
+    def test_validate_deleted_reports_error_for_old_deleted_model(self):
+        year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
+        model = MockModel(
+            id='123',
+            deleted=True,
+            last_updated=year_ago
+        )
+        model.update_timestamps(update_last_updated_time=False)
+        model.put()
+        validator = MockBaseUserModelValidator()
+        validator.validate_deleted(model)
+        self.assertEqual(
+            validator.errors,
+            {
+                'entity stale check': [
+                    'Entity id 123: model marked as '
+                    'deleted is older than 8 weeks'
+                ]
+            }
+        )
+
+    def test_external_model_fetcher_with_user_settings_raise_error(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'When fetching instances of UserSettingsModel, please use ' +
+            'UserSettingsModelFetcherDetails instead of ' +
+            'ExternalModelFetcherDetails'):
+            base_model_validators.ExternalModelFetcherDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [
+                    feconf.MIGRATION_BOT_USER_ID, self.USER_ID,
+                    self.PSEUDONYMOUS_ID
+                ]
+            )
+
+    def test_external_model_fetcher_with_invalid_id(self):
+        external_model = base_model_validators.ExternalModelFetcherDetails(
+            'mock_field', MockModel, ['', 'user-1']
+        )
+        self.assertItemsEqual(external_model.model_ids, ['user-1'])
+        self.assertItemsEqual(
+            external_model.model_id_errors,
+            ['A model id in the field \'mock_field\' is empty'])
+
+    def test_user_setting_model_fetcher_with_invalid_id(self):
+        user_settings_model = (
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'mock_field', ['User-1', self.USER_ID],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            ))
+        self.assertItemsEqual(user_settings_model.model_ids, [self.USER_ID])
+        self.assertItemsEqual(
+            user_settings_model.model_id_errors,
+            ['The user id User-1 in the field \'mock_field\' is invalid'])
+
+    def test_user_setting_model_fetcher_with_system_id(self):
+        user_settings_model = (
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [
+                    feconf.MIGRATION_BOT_USER_ID, self.USER_ID],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            ))
+        self.assertItemsEqual(user_settings_model.model_ids, [self.USER_ID])
+        self.assertItemsEqual(
+            user_settings_model.model_id_errors,
+            ['The field \'committer_ids\' should not contain system IDs'])
+
+    def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
+        user_settings_model = (
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [self.PSEUDONYMOUS_ID, self.USER_ID],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            ))
+        self.assertItemsEqual(user_settings_model.model_ids, [self.USER_ID])
+        self.assertItemsEqual(
+            user_settings_model.model_id_errors,
+            ['The field \'committer_ids\' should not contain pseudonymous IDs'])
+
+    def test_error_raised_when_fetching_external_model_with_system_ids(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=feconf.MIGRATION_BOT_USER_ID,
+            commit_cmds=[])
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'invalid ids in field': [
+                    'Entity id mock-12345: '
+                    'The field \'user_id\' should not contain system IDs'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_error_raised_when_fetching_external_model_with_pseudo_ids(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=self.PSEUDONYMOUS_ID,
+            commit_cmds=[])
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'invalid ids in field': [
+                    'Entity id mock-12345: '
+                    'The field \'user_id\' should not contain pseudonymous IDs'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_error_raised_when_user_id_is_invalid(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id='invalid_user_id',
+            commit_cmds=[])
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'invalid ids in field': [
+                    'Entity id mock-12345: '
+                    'The user id invalid_user_id in the field \'user_id\' is '
+                    'invalid'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_error_raised_when_commit_message_large(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=feconf.MIGRATION_BOT_USER_ID,
+            commit_cmds=[],
+            commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'commit message check': [
+                    'Entity id mock-12345: '
+                    'Commit message larger than accepted length'
+                ]
+            },
+            mock_validator.errors
+        )

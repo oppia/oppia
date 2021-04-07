@@ -15,7 +15,7 @@
 import { ServerMode } from
   'domain/platform_feature/platform-parameter-filter.model';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 /**
  * @fileoverview Constants for the admin features tab.
@@ -26,11 +26,9 @@ export const AdminFeaturesTabConstants = {
     ServerMode.Dev, ServerMode.Test, ServerMode.Prod
   ].map(val => val.toString()),
 
-  ALLOWED_CLIENT_TYPES: <string[]>
-    constants.PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES,
+  ALLOWED_PLATFORM_TYPES: constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES,
 
-  ALLOWED_BROWSER_TYPES: <string[]>
-    constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES,
+  ALLOWED_BROWSER_TYPES: constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES,
 
   // Matches app version with the numeric part only, hash and flavor are not
   // needed since hash is redundant and there is already app_version_flavor
@@ -41,6 +39,6 @@ export const AdminFeaturesTabConstants = {
   ALLOWED_SITE_LANGUAGE_IDS: constants.SUPPORTED_SITE_LANGUAGES
     .map((lang: {id: string}) => lang.id),
 
-  ALLOWED_APP_VERSION_FLAVORS: <string[]>
-    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS,
+  ALLOWED_APP_VERSION_FLAVORS: (
+    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS),
 } as const;

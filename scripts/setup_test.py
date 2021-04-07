@@ -456,16 +456,6 @@ class SetupTests(test_utils.GenericTestBase):
                 'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
-    def test_chrome_bin_setup_with_travis_var_set(self):
-        def mock_get(unused_var):
-            return 'Travis'
-        get_swap = self.swap(os.environ, 'get', mock_get)
-
-        with self.test_py_swap, self.create_swap, self.uname_swap:
-            with self.exists_swap, self.chown_swap, self.chmod_swap, get_swap:
-                setup.main(args=[])
-        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium-browser')
-
     def test_chrome_bin_setup_with_google_chrome(self):
         def mock_isfile(path):
             return path == '/usr/bin/google-chrome'

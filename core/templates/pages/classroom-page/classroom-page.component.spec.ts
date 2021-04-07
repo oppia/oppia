@@ -79,6 +79,10 @@ describe('Classroom page', () => {
       get: () => undefined,
       set: () => {}
     });
+    Object.defineProperty(ctrl, 'pageTitleService', {
+      get: () => undefined,
+      set: () => {}
+    });
   }));
 
   beforeEach(() => {
@@ -109,11 +113,12 @@ describe('Classroom page', () => {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
       classroomData = ClassroomData.createFromBackendData(
-        'Math', [], [], 'Course details', 'Topics covered'
+        'Math', [], 'Course details', 'Topics covered'
       );
       spyOn(
         ClassroomBackendApiService,
         'fetchClassroomDataAsync').and.returnValue($q.resolve(classroomData));
+      spyOnProperty(ctrl, 'pageTitleService').and.returnValue(PageTitleService);
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
       spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');
@@ -131,7 +136,7 @@ describe('Classroom page', () => {
       expect(ctrl.classroomDisplayName).toBe('Math');
 
       expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-        'Math Classroom | Oppia');
+        'Learn Math with Oppia | Oppia');
 
       expect(translationInitializedSpy).toHaveBeenCalled();
       expect(ctrl.classroomData.getName()).toEqual('Math');

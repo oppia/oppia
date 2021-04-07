@@ -41,14 +41,17 @@ class ExplorationRecommendationsModel(
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationRecommendationsModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'recommended_exploration_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -72,14 +75,17 @@ class TopicSimilaritiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """There is only a single TopicSimilaritiesModel in the entire
-        codebase.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

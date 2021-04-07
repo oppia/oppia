@@ -74,17 +74,17 @@ import {
 
 export interface InteractionBackendDict {
   'default_outcome': OutcomeBackendDict;
-  'answer_groups': AnswerGroupBackendDict[];
-  'confirmed_unclassified_answers': InteractionAnswer[];
+  'answer_groups': readonly AnswerGroupBackendDict[];
+  'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
-  'hints': HintBackendDict[];
+  'hints': readonly HintBackendDict[];
   'id': string;
   'solution': SolutionBackendDict;
 }
 
 export class Interaction {
   answerGroups: AnswerGroup[];
-  confirmedUnclassifiedAnswers: InteractionAnswer[];
+  confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
@@ -92,7 +92,7 @@ export class Interaction {
   solution: Solution;
   constructor(
       answerGroups: AnswerGroup[],
-      confirmedUnclassifiedAnswers: InteractionAnswer[],
+      confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
@@ -193,7 +193,7 @@ export class Interaction {
         value: Object[] | Object
     ): void => {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
-        contentIds.push(value.getContentId());
+        contentIds.push(value.contentId);
       } else if (value instanceof Array) {
         value.forEach(
           element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
@@ -372,7 +372,7 @@ export class InteractionObjectFactory {
   convertFromCustomizationArgsBackendDict(
       interactionId: string,
       caBackendDict: InteractionCustomizationArgsBackendDict
-  ) : InteractionCustomizationArgs {
+  ): InteractionCustomizationArgs {
     if (interactionId === null) {
       return {};
     }
@@ -437,45 +437,46 @@ export class InteractionObjectFactory {
     }
   }
 
-  createFromBackendDict(
-      interactionDict: InteractionBackendDict): Interaction {
-    var defaultOutcome;
-    if (interactionDict.default_outcome) {
-      defaultOutcome = this.outcomeFactory.createFromBackendDict(
-        interactionDict.default_outcome);
-    } else {
-      defaultOutcome = null;
-    }
-
+  createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
     return new Interaction(
-      this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
+      this.createAnswerGroupsFromBackendDict(
+        interactionDict.answer_groups,
+        interactionDict.id),
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
-        interactionDict.id,
-        interactionDict.customization_args),
-      defaultOutcome,
-      this.generateHintsFromBackend(interactionDict.hints),
+        interactionDict.id, interactionDict.customization_args),
+      interactionDict.default_outcome ? this.createOutcomeFromBackendDict(
+        interactionDict.default_outcome) : null,
+      this.createHintsFromBackendDict(interactionDict.hints),
       interactionDict.id,
-      interactionDict.solution ? (
-        this.generateSolutionFromBackend(interactionDict.solution)) : null);
+      interactionDict.solution ? this.createSolutionFromBackendDict(
+        interactionDict.solution) : null);
   }
 
-  generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: AnswerGroupBackendDict[]): AnswerGroup[] {
+  createAnswerGroupsFromBackendDict(
+      answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
+      interactionId: string
+  ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
-        answerGroupBackendDict);
+        answerGroupBackendDict, interactionId);
     });
   }
 
-  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]): Hint[] {
+  createHintsFromBackendDict(
+      hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
   }
 
-  generateSolutionFromBackend(
+  createOutcomeFromBackendDict(
+      outcomeBackendDict: OutcomeBackendDict): Outcome {
+    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
+  }
+
+  createSolutionFromBackendDict(
       solutionBackendDict: SolutionBackendDict): Solution {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }

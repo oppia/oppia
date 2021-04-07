@@ -17,7 +17,6 @@
  * the exploration editor.
  */
 
-var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -68,7 +67,7 @@ describe('ExplorationFeedback', function() {
     await users.createUser(
       'user6@ExplorationFeedback.com',
       'learnerFeedback');
-    await users.createAndLoginAdminUser(
+    await users.createAdmin(
       'user7@ExplorationFeedback.com',
       'superUserExplorationFeedback');
   });
@@ -83,7 +82,9 @@ describe('ExplorationFeedback', function() {
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -127,7 +128,9 @@ describe('ExplorationFeedback', function() {
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -180,7 +183,9 @@ describe('ExplorationFeedback', function() {
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
+      EXPLORATION_LANGUAGE,
+      true
+    );
     await creatorDashboardPage.get();
     expect(
       await creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -225,101 +230,6 @@ describe('ExplorationFeedback', function() {
     expect(await messages[1].getText()).toEqual(feedbackResponse);
     await users.logout();
   });
-
-  afterEach(async function() {
-    await general.checkForConsoleErrors([]);
-  });
-});
-
-describe('Suggestions on Explorations', function() {
-  var EXPLORATION_TITLE = 'Exploration with Suggestion';
-  var EXPLORATION_CATEGORY = 'Algorithms';
-  var EXPLORATION_OBJECTIVE = 'To explore something new';
-  var EXPLORATION_LANGUAGE = 'English';
-  var creatorDashboardPage = null;
-  var libraryPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorFeedbackTab = null;
-  var explorationPlayerPage = null;
-
-  beforeAll(async function() {
-    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    libraryPage = new LibraryPage.LibraryPage();
-
-    await users.createUser(
-      'user1@ExplorationSuggestions.com',
-      'authorExplorationSuggestions');
-    await users.createUser(
-      'user2@ExplorationSuggestions.com',
-      'suggesterExpSuggestions');
-    await users.createUser(
-      'user3@ExplorationSuggestions.com',
-      'studentExplorationSuggestions');
-    await users.createAndLoginAdminUser(
-      'user4@ExplorationSuggestions.com',
-      'configExplorationSuggestions');
-  });
-
-  it('should accepts & rejects a suggestion on a published exploration',
-    async function() {
-      await users.login('user1@ExplorationSuggestions.com');
-      await workflow.createAndPublishExploration(
-        EXPLORATION_TITLE,
-        EXPLORATION_CATEGORY,
-        EXPLORATION_OBJECTIVE,
-        EXPLORATION_LANGUAGE);
-      await users.logout();
-
-      // Suggester plays the exploration and suggests a change.
-      await users.login('user2@ExplorationSuggestions.com');
-      await libraryPage.get();
-      await libraryPage.findExploration(EXPLORATION_TITLE);
-      await libraryPage.playExploration(EXPLORATION_TITLE);
-
-      var suggestion1 = 'New Exploration';
-      var suggestionDescription1 = 'Uppercased the first letter';
-      var suggestion2 = 'New exploration';
-      var suggestionDescription2 = 'Changed';
-
-      await explorationPlayerPage.submitSuggestion(
-        suggestion1, suggestionDescription1);
-      await explorationPlayerPage.clickOnCloseSuggestionModalButton();
-      await explorationPlayerPage.submitSuggestion(
-        suggestion2, suggestionDescription2);
-      await users.logout();
-
-      // Exploration author reviews the suggestion and accepts it.
-      await users.login('user1@ExplorationSuggestions.com');
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.navigateToExplorationEditor();
-
-      await explorationEditorPage.navigateToFeedbackTab();
-      var threads = await explorationEditorFeedbackTab.getSuggestionThreads();
-      expect(threads.length).toEqual(2);
-      expect(threads[0]).toMatch(suggestionDescription2);
-      await explorationEditorFeedbackTab.acceptSuggestion(
-        suggestionDescription1);
-      await explorationEditorFeedbackTab.goBackToAllFeedbacks();
-      await explorationEditorFeedbackTab.rejectSuggestion(
-        suggestionDescription2);
-
-      await explorationEditorPage.navigateToPreviewTab();
-      await explorationPlayerPage.expectContentToMatch(
-        await forms.toRichText(suggestion1));
-      await users.logout();
-
-      // Student logs in and plays the exploration, finds the updated content.
-      await users.login('user3@ExplorationSuggestions.com');
-      await libraryPage.get();
-      await libraryPage.findExploration(EXPLORATION_TITLE);
-      await libraryPage.playExploration(EXPLORATION_TITLE);
-      await explorationPlayerPage.expectContentToMatch(
-        await forms.toRichText(suggestion1));
-      await users.logout();
-    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);

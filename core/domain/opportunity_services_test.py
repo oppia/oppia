@@ -39,10 +39,14 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 import python_utils
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(
+    feedback_models, opportunity_models, suggestion_models
+) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.suggestion
+])
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
@@ -68,7 +72,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -139,8 +143,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_thread_id_for_suggestion):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.suggestion_target_id,
                 self.suggestion_target_version_at_submission, self.owner_id,
                 self.suggestion_change, 'test description')
@@ -323,7 +327,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -376,6 +383,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
                     'state_name': 'Introduction',
                     'new_value': [answer_group_dict]
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+                    'new_value': 4
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -862,3 +876,39 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 observed_log_messages[0],
                 'Missing language codes [u\'new_lang\'] in exploration '
                 'opportunity model with id 0')
+
+    def test_delete_exp_opportunities_corresponding_to_story_when_story_deleted(
+            self):
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_1',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_2',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+
+        opportunity_services.delete_exp_opportunities_corresponding_to_story(
+            'story_id'
+        )
+
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                'exp_1', strict=False
+            )
+        )
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                'exp_2', strict=False
+            )
+        )

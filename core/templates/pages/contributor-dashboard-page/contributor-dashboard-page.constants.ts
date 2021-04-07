@@ -22,21 +22,24 @@ export const ContributorDashboardConstants = {
       ariaLabel: 'Check your contributions.',
       tabName: 'My Contributions',
       description: '',
-      customizationOptions: []
+      customizationOptions: [],
+      enabled: true
     },
     submitQuestionTab: {
       ariaLabel: 'See opportunities for adding new questions.',
       tabName: 'Submit Question',
       description: 'Submit a question for students to answer while ' +
         'practicing that skill.',
-      customizationOptions: ['sort']
+      customizationOptions: ['sort'],
+      enabled: false
     },
     translateTextTab: {
       ariaLabel: 'See opportunities for translation.',
       tabName: 'Translate Text',
       description: 'Translate the lesson text to help non-English speakers ' +
         'follow the lessons.',
-      customizationOptions: ['language', 'sort']
+      customizationOptions: ['language', 'sort'],
+      enabled: true
     }
   },
 

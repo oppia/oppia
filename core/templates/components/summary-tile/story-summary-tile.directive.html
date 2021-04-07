@@ -1,4 +1,4 @@
-<div class="story-summary-tile">
+<div class="story-summary-tile protractor-test-story-summary-title">
   <div class="story-progress-bar">
     <svg class="story-progress-svg" width="50" height="50" ng-if="$ctrl.nodeCount">
       <circle class="story-progress-circle total-circle"
@@ -6,13 +6,15 @@
               cy="25"
               r="20"
               stroke-dasharray="<[$ctrl.getStrokeDashArrayValues()]>"
-              stroke-dashoffset="-2.5"/>
+              stroke-dashoffset="-2.5"
+              stroke-linecap="round"/>
       <circle class="story-progress-circle completed-circle"
               cx="25"
               cy="25"
               r="20"
               stroke-dasharray="<[$ctrl.getCompletedStrokeDashArrayValues()]>"
-              stroke-dashoffset="-2.5"/>
+              stroke-dashoffset="-2.5"
+              stroke-linecap="<[$ctrl.completedStoriesCount ? 'round' : 'butt']>"/>
       <text x="25"
             y="-20"
             text-anchor="middle"
@@ -29,34 +31,34 @@
       <a ng-href="<[$ctrl.getStoryLink()]>" ng-class="{'disabled-link': !$ctrl.classroomUrlFragment}"><[$ctrl.storySummary.getTitle()]> </a>
     </strong>
     <span class="oppia-chapters-count">
-       <[$ctrl.nodeCount]> <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span><[($ctrl.nodeCount > 1) ? 's' : '']>
+      <span translate="I18N_TOPIC_VIEWER_CHAPTERS"
+            translate-values="{count: $ctrl.nodeCount}"
+            translate-interpolation="messageformat">
+      </span>
     </span>
   </div>
   <div class="story-details">
     <div class="story-thumbnail"
          ng-style="{background: $ctrl.storySummary.getThumbnailBgColor()}">
-      <img ng-src="<[$ctrl.thumbnailUrl]>"
-           alt=""
-           class="img-thumbnail"
-           ng-style="{background: $ctrl.storySummary.getThumbnailBgColor()}">
+      <a ng-href="<[$ctrl.getStoryLink()]>">
+        <img ng-src="<[$ctrl.thumbnailUrl]>"
+             alt=""
+             class="img-thumbnail"
+             ng-style="{background: $ctrl.storySummary.getThumbnailBgColor()}">
+      </a>
     </div>
     <div class="chapter-details">
-      <div ng-class="{'unavailable-chapter': !$ctrl.isPreviousChapterCompleted($index)}"
-           class="chapter-title"
+      <div class="chapter-title"
            ng-repeat="title in $ctrl.storySummary.getNodeTitles()">
         <div ng-if="$ctrl.storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
           done
         </div>
-        <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'incomplete-chapter': !$ctrl.storySummary.isNodeCompleted(title), 'complete-chapter': $ctrl.storySummary.isNodeCompleted(title)}"
+        <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'pending-chapter': !$ctrl.storySummary.isNodeCompleted(title) && $ctrl.isPreviousChapterCompleted($index), 'incomplete-chapter': !$ctrl.storySummary.isNodeCompleted(title), 'complete-chapter': $ctrl.storySummary.isNodeCompleted(title)}"
              ng-if="$index < $ctrl.chaptersDisplayed">
-          <a ng-if="$ctrl.isPreviousChapterCompleted($index)" ng-href="<[$ctrl.getChapterUrl(title)]>" rel="noopener" target="_blank">
+          <a ng-href="<[$ctrl.getChapterUrl(title)]>" rel="noopener" target="_blank">
             <span translate="I18N_TOPIC_VIEWER_CHAPTER">
             </span> <[$index + 1]>: <[title]>
           </a>
-          <span ng-if="!$ctrl.isPreviousChapterCompleted($index)">
-            <span translate="I18N_TOPIC_VIEWER_CHAPTER">
-            </span> <[$index + 1]>: <[title]>
-          </span>
         </div>
       </div>
       <div ng-click="$ctrl.showAllChapters()"
@@ -111,10 +113,6 @@
     margin-right: 6px;
   }
 
-  story-summary-tile .unavailable-chapter {
-    color: rgba(0, 0, 0, 0.5);
-  }
-
   story-summary-tile .view-button {
     color: #00645C;
     cursor: pointer;
@@ -163,6 +161,7 @@
 
   story-summary-tile .title-text {
     border-right: 1px solid #7B7B7B;
+    font-weight: 500;
     padding-right: 10px;
   }
 
@@ -190,7 +189,7 @@
   }
 
   story-summary-tile a {
-    color: #000000;
+    color: #000;
     cursor: pointer;
   }
 
@@ -208,6 +207,12 @@
     story-summary-tile .oppia-story-title {
       padding-top: 0;
       width: 75%;
+    }
+
+    story-summary-tile .title-text,
+    story-summary-tile .pending-chapter,
+    story-summary-tile .complete-chapter {
+      text-decoration: underline;
     }
   }
 

@@ -27,7 +27,7 @@ from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -141,7 +141,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         super(FeedbackThreadIntegrationTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
@@ -387,7 +387,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.owner_2 = user_services.UserActionsInfo(self.owner_id_2)
+        self.owner_2 = user_services.get_user_actions_info(self.owner_id_2)
 
         # Create an exploration.
         self.save_new_valid_exploration(
@@ -527,8 +527,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1,
             self.user_id, change_cmd, 'sample description')
 
         response = self.get_json(
@@ -551,8 +551,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
         expected_suggestion_dict = {
             'suggestion_type': (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            'target_type': feconf.ENTITY_TYPE_EXPLORATION,
             'target_id': self.EXP_ID,
             'status': suggestion_models.STATUS_IN_REVIEW,
             'author_name': self.USER_USERNAME
@@ -596,8 +596,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1,
             self.owner_id_1, change, 'sample description')
 
         thread_id = suggestion_services.query_suggestions(
@@ -627,7 +627,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.owner_id, name='Name',
             description='Description', canonical_story_ids=[],

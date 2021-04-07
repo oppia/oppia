@@ -30,7 +30,8 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(GaeAppIdentityServicesTests, self).setUp()
-        self.expected_application_id = test_utils.TestBase.EXPECTED_TEST_APP_ID
+        self.expected_application_id = (
+            test_utils.GenericTestBase.EXPECTED_TEST_APP_ID)
         self.expected_bucket_name = (
             '%s-resources' % self.expected_application_id)
 
@@ -41,7 +42,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def test_get_gcs_resource_bucket_name_prod(self):
         # Turn off DEV_MODE.
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
                 self.expected_bucket_name)

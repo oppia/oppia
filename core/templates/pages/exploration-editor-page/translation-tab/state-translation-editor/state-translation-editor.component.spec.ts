@@ -18,7 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -33,6 +32,13 @@ import { WrittenTranslationObjectFactory } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 describe('State Translation Editor Component', function() {
   var ctrl = null;
@@ -125,6 +131,8 @@ describe('State Translation Editor Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
+  importAllAngularServices();
+
   beforeEach(function() {
     stateEditorService = TestBed.get(StateEditorService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
@@ -145,6 +153,9 @@ describe('State Translation Editor Component', function() {
       StateRecordedVoiceoversService));
     $provide.value(
       'StateWrittenTranslationsService', stateWrittenTranslationsService);
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   describe('when has written translation', function() {
@@ -166,6 +177,8 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
+      spyOn(
+        translationLanguageService, 'getActiveLanguageDirection').and.stub();
       spyOnProperty(
         translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
@@ -332,7 +345,7 @@ describe('State Translation Editor Component', function() {
 
       expect(
         stateWrittenTranslationsService.displayed.getWrittenTranslation()
-          .getHtml()
+          .getTranslation()
       ).toBe('This is a html');
     });
 
@@ -367,10 +380,11 @@ describe('State Translation Editor Component', function() {
       $uibModal = $injector.get('$uibModal');
       editabilityService = $injector.get('EditabilityService');
       explorationStatesService = $injector.get('ExplorationStatesService');
-      translationLanguageService = $injector.get('TranslationLanguageService');
       translationTabActiveContentIdService = $injector.get(
         'TranslationTabActiveContentIdService');
-
+      translationLanguageService = $injector.get('TranslationLanguageService');
+      spyOn(
+        translationLanguageService, 'getActiveLanguageDirection').and.stub();
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
@@ -419,6 +433,15 @@ describe('State Translation Editor Component', function() {
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createNew('html', ''));
+    });
+
+    it('should open translation editor when it is editable and with a ' +
+       'Translatable object as data format', function() {
+      $scope.dataFormat = 'set_of_unicode_string';
+      $scope.openTranslationEditor();
+      expect($scope.translationEditorIsOpen).toBe(true);
+      expect($scope.activeWrittenTranslation).toEqual(
+        writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
     });
 
     it('should add written translation html when clicking on save' +

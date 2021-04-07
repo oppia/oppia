@@ -16,14 +16,24 @@
  * @fileoverview Directive scripts for the subtopic viewer.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+]);
+
+require('Polyfills.ts');
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/subtopic-viewer-page/subtopic-viewer-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
-
-require(
-  'pages/subtopic-viewer-page/navbar-pre-logo-action/' +
-  'subtopic-viewer-navbar-pre-logo-action.component.ts');
 
 require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');

@@ -34,6 +34,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
 import { UtilsService } from 'services/utils.service';
 
 interface Warning {
@@ -57,7 +58,7 @@ export class TextInputValidationService {
 
     if (
       !(placeholder instanceof SubtitledUnicode) ||
-      !angular.isString(placeholder.getUnicode())
+      !angular.isString(placeholder.unicode)
     ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -128,7 +129,8 @@ export class TextInputValidationService {
         seenRuleTypes.add(rule.type);
 
 
-        let currentStrings = <string[]> rule.inputs.x;
+        let currentStrings = (
+          <TranslatableSetOfNormalizedString>rule.inputs.x).normalizedStrSet;
         if (rule.type === 'Contains') {
           // Check if any of the current strings contain any of the previously
           // seen strings as a substring.
@@ -170,7 +172,9 @@ export class TextInputValidationService {
         } else if (rule.type === 'Equals') {
           if (seenStringsEquals.some(
             (seenString) => textInputRulesService.Equals(
-              seenString, {x: currentStrings}))) {
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -179,7 +183,9 @@ export class TextInputValidationService {
             });
           } else if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              seenString, {x: currentStrings}))) {
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -191,7 +197,9 @@ export class TextInputValidationService {
         } else if (rule.type === 'FuzzyEquals') {
           if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              seenString, {x: currentStrings}))) {
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +

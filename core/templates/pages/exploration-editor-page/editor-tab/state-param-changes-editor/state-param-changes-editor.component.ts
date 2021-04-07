@@ -17,19 +17,25 @@
  * state editor.
  */
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-param-changes.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StateParamChangesService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
-angular.module('oppia').component('stateParamChangesEditor', {
-  template: require('./state-param-changes-editor.component.html'),
-  controller: [
-    '$scope', 'StateParamChangesService',
-    function($scope, StateParamChangesService) {
-      $scope.StateParamChangesService = StateParamChangesService;
-    }
-  ]
-});
+@Component({
+  selector: 'state-param-changes-editor',
+  templateUrl: './state-param-changes-editor.component.html',
+  styleUrls: []
+})
+export class StateParamChangesEditorComponent implements OnInit {
+  spcs: StateParamChangesService;
+  constructor(public stateParamChangesService: StateParamChangesService) {}
+
+  ngOnInit(): void {
+    this.spcs = this.stateParamChangesService;
+  }
+}
+angular.module('oppia').directive(
+  'stateParamChangesEditor', downgradeComponent(
+    {component: StateParamChangesEditorComponent}));

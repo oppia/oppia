@@ -50,7 +50,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         queried_object = (
             email_services
-            .get_feedback_thread_reply_info_by_user_and_thread_ids(
+            .get_feedback_thread_reply_info_by_user_and_thread(
                 'user1', 'exploration.exp1.1'))
 
         self.assertEqual(queried_object.reply_to_id, reply_to_id)
@@ -58,7 +58,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
         queried_object = (
             email_services
-            .get_feedback_thread_reply_info_by_user_and_thread_ids(
+            .get_feedback_thread_reply_info_by_user_and_thread(
                 'user_unknown', 'invalid_thread_id'))
 
         self.assertEqual(queried_object, None)

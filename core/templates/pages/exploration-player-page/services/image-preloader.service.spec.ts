@@ -22,6 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ImagePreloaderService } from
   'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -43,9 +44,13 @@ describe('Image preloader service', () => {
   let imagePreloaderService: ImagePreloaderService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
+  let ctms: ContentTranslationManagerService;
+
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    draft_changes: [],
+    is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',
     init_state_name: initStateName,
@@ -278,7 +283,10 @@ describe('Image preloader service', () => {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '1'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['1']
+              }}
             }],
             outcome: {
               dest: 'State 1',
@@ -296,7 +304,10 @@ describe('Image preloader service', () => {
           }, {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '2'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['2']
+              }}
             }],
             outcome: {
               dest: 'State 1',
@@ -362,10 +373,15 @@ describe('Image preloader service', () => {
     explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
     contextService = TestBed.get(ContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+    ctms = TestBed.get(ContentTranslationManagerService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
+    spyOn(ctms, 'getTranslatedHtml').and.callFake(
+      (unusedWrittenTranslations, unusedLanguageCode, content) => {
+        return content.html;
+      });
 
     exploration = (
       explorationObjectFactory.createFromBackendDict(explorationDict));

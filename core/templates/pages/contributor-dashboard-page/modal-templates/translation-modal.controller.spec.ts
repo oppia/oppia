@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for TranslationModalController.
  */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Translation Modal Controller', function() {
   let $httpBackend = null;
@@ -23,6 +24,7 @@ describe('Translation Modal Controller', function() {
   let $uibModalInstance = null;
   let CkEditorCopyContentService = null;
   let CsrfTokenService = null;
+  let SiteAnalyticsService = null;
   let TranslateTextService = null;
   let TranslationLanguageService = null;
 
@@ -33,12 +35,15 @@ describe('Translation Modal Controller', function() {
   };
   let getTextToTranslateSpy = null;
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     const $rootScope = $injector.get('$rootScope');
     CsrfTokenService = $injector.get('CsrfTokenService');
+    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     TranslateTextService = $injector.get('TranslateTextService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     CkEditorCopyContentService = $injector.get('CkEditorCopyContentService');
@@ -100,6 +105,19 @@ describe('Translation Modal Controller', function() {
       expect($scope.loadingData).toBe(false);
     });
 
+  it('should register Contributor Dashboard submit suggestion event when' +
+    ' suggesting translated text',
+  function() {
+    $httpBackend.flush();
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardSubmitSuggestionEvent');
+    $scope.suggestTranslatedText();
+    expect(
+      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+      .toHaveBeenCalledWith('Translation');
+  });
+
   it('should suggest more text to be translated when contributor finish' +
     ' translating text and they would like to continue translating',
   function() {
@@ -125,6 +143,12 @@ describe('Translation Modal Controller', function() {
     });
     expect($scope.uploadingTranslation).toBe(false);
   });
+
+  it('should return null when clicking on a disabled back button',
+    function() {
+      $scope.returnToPreviousTranslation();
+      expect($scope.textToTranslate).toBe(null);
+    });
 
   it('should broadcast copy to ck editor when clicking on content',
     function() {
@@ -158,6 +182,22 @@ describe('Translation Modal Controller', function() {
       });
 
       $scope.suggestTranslatedText();
+      expect($uibModalInstance.close).toHaveBeenCalled();
+    });
+
+  it('should close modal when suggestion could not be submitted',
+    function() {
+      $httpBackend.flush();
+
+      const errorResponseObject = {
+        status_code: 401,
+        error: 'Error!'
+      };
+      $httpBackend.expectPOST('/suggestionhandler/').respond(
+        401, errorResponseObject);
+
+      $scope.suggestTranslatedText();
+      $httpBackend.flush();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 });

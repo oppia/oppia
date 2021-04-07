@@ -70,7 +70,7 @@ export class ExplorationRecommendationsService {
       includeSystemRecommendations = 'true';
     }
 
-    this.expRecommendationBackendApiService.getRecommendedSummaryDicts(
+    this.expRecommendationBackendApiService.getRecommendedSummaryDictsAsync(
       authorRecommendedExpIds, includeSystemRecommendations, collectionId,
       storyId, currentNodeId, this.explorationId).then(expSummaries => {
       successCallback(expSummaries);

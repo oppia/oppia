@@ -15,6 +15,9 @@
 /**
  * @fileoverview Unit tests for QuestionSuggestionEditorModalController.
  */
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Editor Modal Controller', function() {
   let $httpBackend = null;
@@ -22,10 +25,12 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let $uibModalInstance = null;
   let $q = null;
   let $scope = null;
+  let $flushPendingTasks = null;
   let CsrfTokenService = null;
   let QuestionObjectFactory = null;
   let QuestionSuggestionService = null;
   let QuestionUndoRedoService = null;
+  let SiteAnalyticsService = null;
   let SkillObjectFactory = null;
   let StateEditorService = null;
 
@@ -33,7 +38,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let questionId = null;
   let questionStateData = null;
   let skill = null;
-  const skillDifficulty = 0.3;
+  let skillDifficulty = 0.3;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -43,10 +49,12 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
       CsrfTokenService = $injector.get('CsrfTokenService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
+      SiteAnalyticsService = $injector.get('SiteAnalyticsService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
 
@@ -190,6 +198,17 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
+    it('should register Contributor Dashboard submit suggestion event on' +
+      ' submit', function() {
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardSubmitSuggestionEvent');
+      $scope.done();
+      expect(
+        SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+        .toHaveBeenCalledWith('Question');
+    });
+
     it('should dismiss modal if there is no pending changes', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       $scope.cancel();
@@ -219,8 +238,40 @@ describe('Question Suggestion Editor Modal Controller', function() {
 
       expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
     });
-  });
 
+    it('should open skill difficulty selection modal on clicking' +
+        ' change difficulty icon', function() {
+      var uibSpy = spyOn($uibModal, 'open').and.callThrough();
+      $scope.onClickChangeDifficulty();
+      $scope.$apply();
+      $flushPendingTasks();
+      expect(uibSpy).toHaveBeenCalled();
+    });
+
+    it('should change skill difficulty when skill difficulty' +
+      ' is edited via skill difficulty modal', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve({
+          skillDifficulty: 0.6
+        })
+      });
+      $scope.onClickChangeDifficulty();
+      $scope.$apply();
+      $flushPendingTasks();
+      expect($scope.skillDifficulty).toBe(0.6);
+      expect($scope.skillDifficultyString).toBe('Medium');
+    });
+
+    it('should dismiss modal if cancel button is clicked', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      $scope.onClickChangeDifficulty();
+      $scope.cancel();
+      $scope.$apply();
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+    });
+  });
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');

@@ -29,7 +29,7 @@ import { QuestionBackendDict } from
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 interface PretestQuestionsBackendResponse {
   'pretest_question_dicts': QuestionBackendDict[];
@@ -76,7 +76,7 @@ export class PretestQuestionBackendApiService {
     });
   }
 
-  fetchPretestQuestions(
+  async fetchPretestQuestionsAsync(
       explorationId: string,
       storyUrlFragment: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {

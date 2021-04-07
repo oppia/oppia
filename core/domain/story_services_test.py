@@ -26,12 +26,14 @@ from core.domain import param_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -57,13 +59,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.STORY_ID = story_services.get_new_story_id()
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
             abbreviated_name='topic-one', url_fragment='topic-one',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
+            uncategorized_skill_ids=['skill_4'], subtopics=[],
+            next_subtopic_id=0)
         self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
@@ -92,9 +95,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([user_services.get_username(self.user_id_a)])
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
 
     def test_compute_summary(self):
         story_summary = story_services.compute_summary_of_story(self.story)
@@ -295,6 +299,120 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
 
+    def test_prerequisite_skills_validation(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2', 'node_3'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': ['skill_4'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+
+        expected_error_string = (
+            'The skills with ids skill_4 were specified as prerequisites for '
+            'Chapter Title 3, but were not taught in any chapter before it')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_string):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.story.corresponding_topic_id, self.story.story_contents)
+
+    def test_story_with_loop(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        expected_error_string = 'Loops are not allowed in stories.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_string):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.story.corresponding_topic_id, self.story.story_contents)
+
     def test_does_story_exist_with_url_fragment(self):
         story_id_1 = story_services.get_new_story_id()
         story_id_2 = story_services.get_new_story_id()
@@ -314,7 +432,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.does_story_exist_with_url_fragment('story-three'))
 
     def test_update_story_with_invalid_corresponding_topic_id_value(self):
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_story(story_id, self.USER_ID, topic_id)
         changelist = [
@@ -333,7 +451,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, story_id, changelist, 'Added node.')
 
     def test_update_story_which_not_corresponding_topic_id(self):
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='A New Topic',
@@ -855,7 +973,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.url_fragment, 'updated-title')
 
     def test_cannot_update_story_if_url_fragment_already_exists(self):
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_story(
             story_id, self.USER_ID, topic_id,
@@ -1314,7 +1432,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_get_story_by_version(self):
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='A different topic',
@@ -1683,7 +1801,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.USER_ID = 'user'
 
         self.owner_id = 'owner'
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='New Topic',
             abbreviated_name='topic-two', url_fragment='topic-two',
@@ -1842,14 +1960,14 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 completed_node.to_dict(), self.nodes[ind].to_dict())
 
-    def test_get_pending_nodes_in_story(self):
+    def test_get_pending_and_all_nodes_in_story(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
 
         # The starting index is 1 because the first story node is completed,
         # and the pending nodes will start from the second node.
         for index, pending_node in enumerate(
-                story_fetchers.get_pending_nodes_in_story(
-                    self.owner_id, self.STORY_1_ID), start=1):
+                story_fetchers.get_pending_and_all_nodes_in_story(
+                    self.owner_id, self.STORY_1_ID)['pending_nodes'], start=1):
             self.assertEqual(
                 pending_node.to_dict(), self.nodes[index].to_dict())
 
@@ -1917,7 +2035,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_story_contents_to_latest_schema(self):
         story_id = story_services.get_new_story_id()
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         user_id = 'user_id'
         self.save_new_topic(
             topic_id, user_id, name='Topic',

@@ -16,10 +16,22 @@
  * @fileoverview Tests for Change model.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { BackendChangeObject, Change } from
   'domain/editor/undo_redo/change.model';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 
 describe('Change domain objects model', () => {
+  let questionObjectFactory: QuestionObjectFactory;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [],
+      providers: [QuestionObjectFactory]
+    });
+    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+  });
+
   it('should invoke no callbacks after creation', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     const reverseFunc = jasmine.createSpy('reverseChange');
@@ -49,12 +61,7 @@ describe('Change domain objects model', () => {
     const changeDomainObject = new Change(
       backendChangeObject, applyFunc, reverseFunc);
 
-    const fakeDomainObject: BackendChangeObject = {
-      cmd: 'update_question_property',
-      property_name: 'language_code',
-      new_value: 'newVal',
-      old_value: 'oldVal'
-    };
+    let fakeDomainObject = questionObjectFactory.createDefaultQuestion([]);
     changeDomainObject.applyChange(fakeDomainObject);
 
     expect(applyFunc).toHaveBeenCalledWith(
@@ -75,12 +82,7 @@ describe('Change domain objects model', () => {
     const changeDomainObject = new Change(
       backendChangeObject, applyFunc, reverseFunc);
 
-    const fakeDomainObject: BackendChangeObject = {
-      cmd: 'update_question_property',
-      property_name: 'language_code',
-      new_value: 'newVal',
-      old_value: 'oldVal'
-    };
+    let fakeDomainObject = questionObjectFactory.createDefaultQuestion([]);
     changeDomainObject.reverseChange(fakeDomainObject);
 
     expect(reverseFunc).toHaveBeenCalledWith(

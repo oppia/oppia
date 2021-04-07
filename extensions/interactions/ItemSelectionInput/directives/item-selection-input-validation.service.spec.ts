@@ -75,9 +75,9 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments = {
       choices: {
         value: [
-          new SubtitledHtml('Selection 1', ''),
-          new SubtitledHtml('Selection 2', ''),
-          new SubtitledHtml('Selection 3', '')
+          new SubtitledHtml('Selection 1', 'ca_0'),
+          new SubtitledHtml('Selection 2', 'ca_1'),
+          new SubtitledHtml('Selection 3', 'ca_2')
         ]
       },
       maxAllowableSelectionCount: {
@@ -91,9 +91,9 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1', 'Selection 2']
+          x: ['ca_0', 'ca_1']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -102,9 +102,9 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1', 'Selection 2', 'Selection 3']
+          x: ['ca_0', 'ca_1', 'ca_2']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -113,9 +113,9 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1']
+          x: ['ca_0']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -126,7 +126,7 @@ describe('ItemSelectionInputValidationService', () => {
         inputs: {
           x: []
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -135,9 +135,9 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
-          x: ['Selection 1']
+          x: ['ca_0']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -204,7 +204,7 @@ describe('ItemSelectionInputValidationService', () => {
     'should expect minAllowableSelectionCount to be less than the total ' +
     'number of selections',
     () => {
-    // Remove the last choice.
+      // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
       customizationArguments.minAllowableSelectionCount.value = 3;
@@ -217,6 +217,11 @@ describe('ItemSelectionInputValidationService', () => {
         type: WARNING_TYPES.CRITICAL,
         message: (
           'Please ensure that you have enough choices to reach the min count.')
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule 1 from answer group 1 options do not match ' +
+          'customization argument choices.')
       }]);
     });
 
@@ -231,13 +236,18 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
       message: 'Please ensure the choices are nonempty.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not match ' +
+        'customization argument choices.')
     }]);
   });
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
     customizationArguments.choices.value.push(
-      new SubtitledHtml('Selection 3', ''));
+      new SubtitledHtml('Selection 3', 'ca_4'));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -296,4 +306,17 @@ describe('ItemSelectionInputValidationService', () => {
           'should have at least one option.')
       }]);
     });
+
+  it('should expect all rule inputs to match choices', () => {
+    goodAnswerGroups[0].rules[0].inputs.x[0] = 'invalid_content_id';
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not match ' +
+        'customization argument choices.')
+    }]);
+  });
 });

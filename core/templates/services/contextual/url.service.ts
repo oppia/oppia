@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -111,8 +111,18 @@ export class UrlService {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[3]);
+    } else if (pathname.startsWith('/explore')) {
+      // The following section is for getting the URL fragment from the
+      // exploration player.
+      if (
+        this.getUrlParams().hasOwnProperty('topic_url_fragment') &&
+        this.getUrlParams().topic_url_fragment.match(
+          constants.VALID_URL_FRAGMENT_REGEX)) {
+        return this.getUrlParams().topic_url_fragment;
+      }
+    } else {
+      throw new Error('Invalid URL for topic');
     }
-    throw new Error('Invalid URL for topic');
   }
 
   getStoryUrlFragmentFromLearnerUrl(): string {
@@ -151,8 +161,18 @@ export class UrlService {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[2]);
+    } else if (pathname.startsWith('/explore')) {
+      // The following section is for getting the URL fragment from the
+      // exploration player.
+      if (
+        this.getUrlParams().hasOwnProperty('classroom_url_fragment') &&
+        this.getUrlParams().classroom_url_fragment.match(
+          constants.VALID_URL_FRAGMENT_REGEX)) {
+        return this.getUrlParams().classroom_url_fragment;
+      }
+    } else {
+      throw new Error('Invalid URL for classroom');
     }
-    throw new Error('Invalid URL for classroom');
   }
 
   /**

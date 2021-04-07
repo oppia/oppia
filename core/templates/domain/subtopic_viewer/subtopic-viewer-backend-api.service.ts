@@ -67,7 +67,7 @@ export class SubtopicViewerBackendApiService {
       });
   }
 
-  fetchSubtopicData(
+  async fetchSubtopicDataAsync(
       topicUrlFragment: string,
       classroomUrlFragment: string,
       subtopicUrlFragment: string): Promise<ReadOnlySubtopicPageData> {

@@ -16,15 +16,6 @@
  * @fileoverview Module for the splash page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -36,7 +27,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-
+import { SplashPageComponent } from './splash-page.component';
 @NgModule({
   imports: [
     BrowserModule,
@@ -44,9 +35,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    SplashPageComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    SplashPageComponent,
     OppiaAngularRootComponent
   ],
   providers: [

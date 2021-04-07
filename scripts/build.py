@@ -121,7 +121,10 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
+    'webpack_bundles/login-page.mainpage.html',
+    'webpack_bundles/logout-page.mainpage.html',
     'webpack_bundles/privacy-page.mainpage.html',
+    'webpack_bundles/playbook.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',
     'webpack_bundles/thanks-page.mainpage.html'
@@ -199,42 +202,56 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
             content = content.replace(
                 file_path, prod_file_prefix + file_path)
 
-    # The version: default line is required to run jobs on a local server (
-    # both in prod & non-prod env). This line is not required when app.yaml
-    # is generated during deployment. So, we remove this if the build process
-    # is being run from the deploy script.
     if deploy_mode:
+        # The version: default line is required to run jobs on a local server (
+        # both in prod & non-prod env). This line is not required when app.yaml
+        # is generated during deployment. So, we remove this if the build
+        # process is being run from the deploy script.
         content = content.replace('version: default', '')
+        # The FIREBASE_AUTH_EMULATOR_HOST environment variable is only needed to
+        # test locally, and MUST NOT be included in the deployed file.
+        content = re.sub('  FIREBASE_AUTH_EMULATOR_HOST: ".*"\n', '', content)
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with python_utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:
         prod_yaml_file.write(content)
 
 
-def modify_constants(prod_env=False, maintenance_mode=False):
+def modify_constants(
+        prod_env=False, emulator_mode=True, maintenance_mode=False):
     """Modify constants.ts and feconf.py.
 
     Args:
         prod_env: bool. Whether the server is started in prod mode.
+        emulator_mode: bool. Whether the server is started in emulator mode.
         maintenance_mode: bool. Whether the site should be put into
             the maintenance mode.
     """
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
     common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*', dev_mode_variable)
+        common.CONSTANTS_FILE_PATH,
+        r'"DEV_MODE": (true|false)',
+        dev_mode_variable)
+    emulator_mode_variable = (
+        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
+    common.inplace_replace_file(
+        common.CONSTANTS_FILE_PATH,
+        r'"EMULATOR_MODE": (true|false)',
+        emulator_mode_variable
+    )
 
     enable_maintenance_mode_variable = (
         'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
     common.inplace_replace_file(
         common.FECONF_PATH,
-        r'ENABLE_MAINTENANCE_MODE = .*',
+        r'ENABLE_MAINTENANCE_MODE = (True|False)',
         enable_maintenance_mode_variable)
 
 
 def set_constants_to_default():
     """Set variables in constants.ts and feconf.py to default values."""
-    modify_constants(prod_env=False, maintenance_mode=False)
+    modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
 
 
 def _minify(source_path, target_path):
@@ -1337,7 +1354,9 @@ def main(args=None):
                 'set in non-prod env.')
 
     modify_constants(
-        prod_env=options.prod_env, maintenance_mode=options.maintenance_mode)
+        prod_env=options.prod_env,
+        emulator_mode=not options.deploy_mode,
+        maintenance_mode=options.maintenance_mode)
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()

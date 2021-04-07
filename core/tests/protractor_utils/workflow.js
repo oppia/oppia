@@ -21,9 +21,11 @@ var forms = require('./forms.js');
 var path = require('path');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('./SkillEditorPage');
 
 var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
@@ -31,11 +33,21 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var stateNameText = element(
+  by.css('.oppia-state-name-text'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
   return await element(by.css('.protractor-test-save-role')).isEnabled();
 };
+
+// Check if exploration is community owned.
+var isExplorationCommunityOwned = async function() {
+  return await element(
+    by.css('.protractor-test-is-community-owned')
+  ).isPresent();
+};
+
 
 // Check if the warning message is visible when the title is ''.
 var checkForAddTitleWarning = async function() {
@@ -57,11 +69,13 @@ var openEditRolesForm = async function() {
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
-var createExploration = async function() {
+var createExploration = async function(welcomeModalIsShown) {
   await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  await explorationEditorMainTab.exitTutorial();
+  if (welcomeModalIsShown) {
+    await explorationEditorMainTab.exitTutorial();
+  }
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
@@ -80,11 +94,12 @@ var createExplorationAndStartTutorial = async function() {
       'ActivityCreationModal takes too long to be visible.');
     var createExplorationButton = element(
       by.css('.protractor-test-create-exploration'));
-    await waitFor.elementToBeClickable(
-      createExplorationButton,
-      'createExplorationButton takes too long to be clickable.');
-    await createExplorationButton.click();
+    await action.click('Create Exploration Button', createExplorationButton);
   }
+
+  await waitFor.pageToFullyLoad();
+  await waitFor.visibilityOf(
+    stateNameText, 'State name text takes too long to appear.');
 };
 
 /**
@@ -118,8 +133,12 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-publish-exploration')));
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
   await element(by.css('.protractor-test-publish-exploration')).click();
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   await prePublicationButtonElem.isPresent();
@@ -143,8 +162,8 @@ var publishExploration = async function() {
 
 // Creates and publishes a minimal exploration.
 var createAndPublishExploration = async function(
-    title, category, objective, language) {
-  await createExploration();
+    title, category, objective, language, welcomeModalIsShown) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
@@ -164,8 +183,8 @@ var createAndPublishExploration = async function(
 };
 
 var createAddExpDetailsAndPublishExp = async function(
-    title, category, objective, language, tags) {
-  await createExploration();
+    title, category, objective, language, tags, welcomeModalIsShown) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(
@@ -178,8 +197,9 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language) {
-  await createExploration();
+    title, category, objective, language, welcomeModalIsShown,
+    correctnessFeedbackIsEnabled) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));
@@ -199,6 +219,9 @@ var createAndPublishTwoCardExploration = async function(
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
   }
+  if (correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.enableCorrectnessFeedback();
+  }
   await explorationEditorPage.saveChanges();
   await publishExploration();
 };
@@ -207,11 +230,16 @@ var createAndPublishTwoCardExploration = async function(
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {
-  await element(by.css('.protractor-test-edit-roles')).click();
-  await element(by.css('.protractor-test-role-username')).sendKeys(username);
-  await element(by.css('.protractor-test-role-select')).
-    element(by.cssContainingText('option', roleName)).click();
-  await element(by.css('.protractor-test-save-role')).click();
+  await action.click(
+    'Edit roles', element(by.css('.protractor-test-edit-roles')));
+  await action.sendKeys(
+    'Username input',
+    element(by.css('.protractor-test-role-username')),
+    username);
+  await action.select(
+    'Role select', element(by.css('.protractor-test-role-select')), roleName);
+  await action.click(
+    'Save role', element(by.css('.protractor-test-save-role')));
 };
 
 var addExplorationManager = async function(username) {
@@ -319,6 +347,32 @@ var submitImage = async function(
   return await waitFor.pageToFullyLoad();
 };
 
+var createQuestion = async function() {
+  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await skillEditorPage.moveToQuestionsTab();
+  await skillEditorPage.clickCreateQuestionButton();
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('Question 1'));
+  await explorationEditorMainTab.setInteraction(
+    'TextInput', 'Placeholder', 5);
+  await explorationEditorMainTab.addResponse(
+    'TextInput', await forms.toRichText('Correct Answer'), null, false,
+    'FuzzyEquals', ['correct']);
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+  await responseEditor.markAsCorrect();
+  await (
+    await explorationEditorMainTab.getResponseEditor('default')
+  ).setFeedback(await forms.toRichText('Try again'));
+  await explorationEditorMainTab.addHint('Hint 1');
+  await explorationEditorMainTab.addSolution('TextInput', {
+    correctAnswer: 'correct',
+    explanation: 'It is correct'
+  });
+  await skillEditorPage.saveQuestion();
+};
+
 exports.getImageSource = getImageSource;
 exports.submitImage = submitImage;
 exports.uploadImage = uploadImage;
@@ -332,6 +386,7 @@ exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
+exports.isExplorationCommunityOwned = isExplorationCommunityOwned;
 exports.checkForAddTitleWarning = checkForAddTitleWarning;
 exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
 exports.openEditRolesForm = openEditRolesForm;
@@ -345,3 +400,4 @@ exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
+exports.createQuestion = createQuestion;

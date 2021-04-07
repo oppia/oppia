@@ -36,7 +36,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
           '/pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
           'suggestion-modal-for-creator-view.directive.html'
         ),
-        backdrop: true,
+        backdrop: 'static',
         size: 'lg',
         resolve: {
           suggestionIsHandled: function() {
@@ -119,6 +119,10 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
         })['catch'](function() {
           $log.error('Error resolving suggestion');
         });
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
 

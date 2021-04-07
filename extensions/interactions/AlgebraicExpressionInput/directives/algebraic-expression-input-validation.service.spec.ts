@@ -79,14 +79,14 @@ describe('AlgebraicExpressionInputValidationService', () => {
       inputs: {
         x: 'x^2'
       }
-    });
+    }, 'AlgebraicExpressionInput');
 
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x * x'
       }
-    });
+    }, 'AlgebraicExpressionInput');
 
     answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
@@ -115,13 +115,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
       inputs: {
         x: '(a+b)^2'
       }
-    });
+    }, 'AlgebraicExpressionInput');
     let isEquivalentTo2 = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'a^2 + 2*a*b + b^2'
       }
-    });
+    }, 'AlgebraicExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
@@ -140,13 +140,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
       inputs: {
         x: 'x ^ 2 - 1'
       }
-    });
+    }, 'AlgebraicExpressionInput');
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '-1 + x*x'
       }
-    });
+    }, 'AlgebraicExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
@@ -172,13 +172,13 @@ describe('AlgebraicExpressionInputValidationService', () => {
       inputs: {
         x: 'x * y'
       }
-    });
+    }, 'AlgebraicExpressionInput');
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'x + y'
       }
-    });
+    }, 'AlgebraicExpressionInput');
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
@@ -194,7 +194,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
         inputs: {
           x: 'x^2 + alpha - y/b'
         }
-      })
+      }, 'AlgebraicExpressionInput')
     ];
     customizationArgs = {
       customOskLetters: {
@@ -219,7 +219,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
         inputs: {
           x: 'x+y'
         }
-      })
+      }, 'AlgebraicExpressionInput')
     ];
     customizationArgs = {
       customOskLetters: {

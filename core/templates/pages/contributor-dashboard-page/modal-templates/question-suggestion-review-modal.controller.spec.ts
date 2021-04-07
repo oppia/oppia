@@ -20,12 +20,21 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Review Modal Controller', function() {
   let $scope = null;
+  let $http = null;
+  let $httpBackend = null;
   let $uibModalInstance = null;
   let QuestionObjectFactory = null;
+  let SiteAnalyticsService = null;
   let SuggestionModalService = null;
+  let acceptSuggestionSpy = null;
+  let rejectSuggestionSpy = null;
+  let cancelSuggestionSpy = null;
 
   const authorName = 'Username 1';
   const contentHtml = 'Content html';
@@ -34,12 +43,22 @@ describe('Question Suggestion Review Modal Controller', function() {
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
+  const suggestionId = '123';
+  let suggestion = null;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    SuggestionModalService = $injector.get('SuggestionModalService');
+    acceptSuggestionSpy = spyOn(SuggestionModalService, 'acceptSuggestion');
+    rejectSuggestionSpy = spyOn(SuggestionModalService, 'rejectSuggestion');
+    cancelSuggestionSpy = spyOn(SuggestionModalService, 'cancelSuggestion');
   }));
 
   describe('when skill rubrics is specified', function() {
@@ -50,13 +69,16 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
+      const $http = $injector.get('$http');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      SuggestionModalService = $injector.get('SuggestionModalService');
+      SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      spyOnAllFunctions(SuggestionModalService);
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardViewSuggestionForReview');
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
@@ -124,8 +146,11 @@ describe('Question Suggestion Review Modal Controller', function() {
         },
       });
 
+      suggestion = { status: 'accepted' };
+
       $scope = $rootScope.$new();
       $controller('QuestionSuggestionReviewModalController', {
+        $http: $http,
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         authorName: authorName,
@@ -135,7 +160,9 @@ describe('Question Suggestion Review Modal Controller', function() {
         questionHeader: questionHeader,
         reviewable: reviewable,
         skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics
+        skillRubrics: skillRubrics,
+        suggestion: suggestion,
+        suggestionId: suggestionId
       });
     }));
 
@@ -155,6 +182,14 @@ describe('Question Suggestion Review Modal Controller', function() {
         expect($scope.skillRubricExplanations).toEqual(['explanation']);
       });
 
+    it('should register Contributor Dashboard view suggestion for review' +
+      ' event after controller is initialized', function() {
+      expect(
+        // eslint-disable-next-line max-len
+        SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
+        .toHaveBeenCalledWith('Question');
+    });
+
     it('should reset validation error message when user updates question',
       function() {
         $scope.validationError = 'This is an error message';
@@ -164,10 +199,17 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     it('should accept suggestion in suggestion modal when clicking accept' +
       ' suggestion', function() {
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardAcceptSuggestion');
       $scope.reviewMessage = 'Review message example';
+
       $scope.accept();
 
-      expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalledWith(
+      expect(
+        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Question');
+      expect(acceptSuggestionSpy).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'accept',
           reviewMessage: 'Review message example',
@@ -177,10 +219,17 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     it('should reject suggestion in suggestion modal when clicking reject' +
     ' suggestion button', function() {
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
       $scope.reviewMessage = 'Review message example';
+
       $scope.reject();
 
-      expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalledWith(
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Question');
+      expect(rejectSuggestionSpy).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'reject',
           reviewMessage: 'Review message example'
@@ -191,7 +240,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     ' suggestion button', function() {
       $scope.cancel();
 
-      expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
+      expect(cancelSuggestionSpy).toHaveBeenCalledWith(
         $uibModalInstance);
     });
   });
@@ -202,12 +251,9 @@ describe('Question Suggestion Review Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      SuggestionModalService = $injector.get('SuggestionModalService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-
-      spyOnAllFunctions(SuggestionModalService);
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
@@ -276,7 +322,9 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
 
       $scope = $rootScope.$new();
+      suggestion = { status: 'accepted' };
       $controller('QuestionSuggestionReviewModalController', {
+        $http: $http,
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         authorName: authorName,
@@ -286,7 +334,9 @@ describe('Question Suggestion Review Modal Controller', function() {
         questionHeader: questionHeader,
         reviewable: reviewable,
         skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics
+        skillRubrics: skillRubrics,
+        suggestion: suggestion,
+        suggestionId: suggestionId
       });
     }));
 
@@ -295,5 +345,118 @@ describe('Question Suggestion Review Modal Controller', function() {
         expect($scope.skillRubricExplanations).toBe(
           'This rubric has not yet been specified.');
       });
+  });
+
+  describe('when a suggestion is rejected', function() {
+    let $rootScope = null;
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      $rootScope = $injector.get('$rootScope');
+      $httpBackend = $injector.get('$httpBackend');
+      const skillRubrics = [{
+        explanations: ['explanation'],
+        difficulty: 'Easy'
+      }];
+
+      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      question = QuestionObjectFactory.createFromBackendDict({
+        id: '1',
+        question_state_data: {
+          content: {
+            html: 'Question 1',
+            content_id: 'content_1'
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                dest: 'outcome 1',
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [],
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: null,
+              feedback: {
+                html: 'Correct Answer',
+                content_id: 'content_2'
+              },
+              param_changes: [],
+              labelled_as_correct: true
+            },
+            hints: [{
+              hint_content: {
+                html: 'Hint 1',
+                content_id: 'content_3'
+              }
+            }],
+            solution: {
+              correct_answer: 'This is the correct answer',
+              answer_is_exclusive: false,
+              explanation: {
+                html: 'Solution explanation',
+                content_id: 'content_4'
+              }
+            },
+            id: 'TextInput'
+          },
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
+          written_translations: {
+            translations_mapping: {}
+          },
+        },
+      });
+
+      $scope = $rootScope.$new();
+      suggestion = { status: 'rejected' };
+      $controller('QuestionSuggestionReviewModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        authorName: authorName,
+        contentHtml: contentHtml,
+        misconceptionsBySkill: misconceptionsBySkill,
+        question: question,
+        questionHeader: questionHeader,
+        reviewable: false,
+        skillDifficulty: skillDifficulty,
+        skillRubrics: skillRubrics,
+        suggestion: suggestion,
+        suggestionId: suggestionId
+      });
+    }));
+
+    it('should fetch the rejection message', function() {
+      const responseDict = {
+        messages: [
+          { text: 'Question submitted.' },
+          { text: 'This is a rejection.' }
+        ]
+      };
+
+      $httpBackend.expect('GET', '/threadhandler/123').respond(responseDict);
+      $httpBackend.flush();
+      expect($scope.reviewMessage).toBe('This is a rejection.');
+    });
   });
 });

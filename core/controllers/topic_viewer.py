@@ -67,30 +67,34 @@ class TopicPageDataHandler(base.BaseHandler):
 
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
-            pending_nodes = story_fetchers.get_pending_nodes_in_story(
-                self.user_id, story_summary.id)
+            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['all_nodes']
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
             story_summary_dict['completed_node_titles'] = completed_node_titles
-            story_summary_dict['pending_node_dicts'] = [
-                node.to_dict() for node in pending_nodes]
+            story_summary_dict['all_node_dicts'] = [
+                node.to_dict() for node in all_nodes]
             canonical_story_dicts.append(story_summary_dict)
 
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
-            pending_nodes = story_fetchers.get_pending_nodes_in_story(
-                self.user_id, story_summary.id)
+            all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['all_nodes']
+            pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+                self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles)
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
             story_summary_dict['completed_node_titles'] = completed_node_titles
-            story_summary_dict['pending_node_dicts'] = [
-                node.to_dict() for node in pending_nodes]
+            story_summary_dict['all_node_dicts'] = [
+                node.to_dict() for node in all_nodes]
             additional_story_dicts.append(story_summary_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
@@ -132,6 +136,7 @@ class TopicPageDataHandler(base.BaseHandler):
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
-            'meta_tag_content': topic.meta_tag_content
+            'meta_tag_content': topic.meta_tag_content,
+            'page_title_fragment_for_web': topic.page_title_fragment_for_web
         })
         self.render_json(self.values)

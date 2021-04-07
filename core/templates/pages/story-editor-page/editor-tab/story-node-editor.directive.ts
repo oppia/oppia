@@ -20,7 +20,7 @@ require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('components/skill-selector/select-skill-modal.controller.ts');
 require(
-  'components/skill-selector/skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.component.ts');
 require(
   'pages/story-editor-page/modal-templates/' +
   'new-chapter-title-modal.controller.ts');
@@ -37,12 +37,12 @@ require(
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/page-title.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const storyNodeConstants = require('constants.ts');
+import storyNodeConstants from 'assets/constants';
 
 angular.module('oppia').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -63,14 +63,18 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
-        'ExplorationIdValidationService', 'PageTitleService',
+        '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
+        'AlertsService',
+        'ExplorationIdValidationService', 'FocusManagerService',
+        'PageTitleService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_CHAPTER_TITLE', function(
-            $scope, $uibModal, AlertsService,
-            ExplorationIdValidationService, PageTitleService,
+            $rootScope, $scope, $timeout, $uibModal, $window,
+            AlertsService,
+            ExplorationIdValidationService, FocusManagerService,
+            PageTitleService,
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
@@ -113,14 +117,17 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.nodeIdToTitleMap =
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
                 $scope.storyNodeIds);
+            $scope.skillInfoHasLoaded = false;
             _recalculateAvailableNodes();
             $scope.allowedBgColors = (
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-              function(response) {
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+              .then(function(response) {
                 categorizedSkills = response.categorizedSkillsDict;
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
+                $scope.skillInfoHasLoaded = true;
+                $rootScope.$applyAsync();
               });
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
@@ -260,7 +267,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
@@ -298,7 +305,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
@@ -393,7 +400,12 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.chapterOutlineButtonsAreShown = (
               !$scope.chapterOutlineButtonsAreShown);
           };
-
+          $scope.addFocusWithoutScroll = function(label) {
+            FocusManagerService.setFocus(label);
+            $timeout(function() {
+              $window.scrollTo(0, 0);
+            }, 5);
+          };
           ctrl.$onInit = function() {
             // Regex pattern for exploration id,
             // EXPLORATION_AND_SKILL_ID_PATTERN
@@ -429,6 +441,12 @@ angular.module('oppia').directive('storyNodeEditor', [
               )
             );
             _init();
+            // The $timeout is required because at execution time,
+            // the element may not be present in the DOM yet.Thus it ensure
+            // that the element is visible before focussing.
+            $timeout(() => {
+              $scope.addFocusWithoutScroll('storyNodeDesc');
+            }, 0);
           };
 
           ctrl.$onDestroy = function() {

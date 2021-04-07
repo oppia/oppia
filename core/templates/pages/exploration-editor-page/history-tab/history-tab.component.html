@@ -32,17 +32,20 @@
       </div>
       <div class="filter-container">
         <span>Filter</span>
-        <input class="form-control" type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user">
+        <input class="form-control oppia-autofocus" type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user" focus-on="usernameInputField">
         <i class="fa fa-search"></i>
       </div>
       <div class="history-table-header">
+        <div class="history-table-header-version">
+          <span>Version No.</span>
+        </div>
         <div class="history-table-header-message">
           <span>Notes</span>
         </div>
         <div class="history-table-header-profile">
           <span>User</span>
         </div>
-        <div class="history-table-header-version" ng-click="$ctrl.reverseDateOrder()">
+        <div class="history-table-header-date" ng-click="$ctrl.reverseDateOrder()">
           <span>Date</span>
         </div>
       </div>
@@ -51,7 +54,7 @@
       </div>
       <div ng-repeat="metadata in $ctrl.explorationVersionMetadata track by $index" class="history-list-item protractor-test-history-list-item">
         <div class="history-table-index">
-          <[$index +1]>.
+          <[metadata.versionNumber]>.
         </div>
         <div class="history-table-message">
           <[metadata.commitMessage]>
@@ -59,7 +62,7 @@
         <div class="history-table-profile">
           <strong><profile-link-text [username]="metadata.committerId"></profile-link-text></strong>
         </div>
-        <div class="history-table-version">
+        <div class="history-table-version" title="<[metadata.tooltipText]>">
           <em class="protractor-test-history-tab-commit-date"><[metadata.createdOnMsecsStr]></em>
         </div>
         <div class="history-table-options protractor-test-history-list-options">
@@ -141,21 +144,23 @@
   history-tab .history-table-header {
     border-bottom: 2px solid #000;
     display: flex;
+    padding-left: 0.5em;
   }
+  history-tab .history-table-header-date,
   history-tab .history-table-header-message,
   history-tab .history-table-header-profile,
   history-tab .history-table-header-version {
     font-weight: bold;
   }
   history-tab  .history-table-header-message {
-    padding-left: 5%;
-    width: 60%;
+    width: 39%;
   }
   history-tab .history-table-header-profile,
+  history-tab .history-table-header-date,
   history-tab .history-table-header-version {
     width: 20%;
   }
-  history-tab .history-table-header-version {
+  history-tab .history-table-header-date {
     cursor: pointer;
   }
   history-tab .history-list-item {
@@ -165,13 +170,12 @@
     padding: 16px 10px;
     position: relative;
   }
-  history-tab .history-table-index {
-    width: 5%;
-  }
   history-tab .history-table-message {
-    width: 55%;
+    width: 40%;
   }
-  history-tab .history-table-profile {
+  history-tab .history-table-index,
+  history-tab .history-table-profile,
+  history-tab .history-table-version {
     width: 20%;
   }
   history-tab .pagination-page,
@@ -180,7 +184,7 @@
     padding: 0 10px;
   }
   history-tab .pagination-page a {
-    color: #333333;
+    color: #333;
     font-size: 14px;
     font-weight: bold;
   }

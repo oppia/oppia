@@ -33,10 +33,11 @@ describe('Preferences Controller', function() {
   var $timeout = null;
   var $uibModal = null;
   var CsrfService = null;
+  var PreventPageUnloadEventService = null;
   var UserService = null;
   var userInfo = {
     getUsername: () => 'myUsername',
-    email: () => 'myusername@email.com'
+    getEmail: () => 'myusername@email.com'
   };
   var mockWindow = {
     location: {
@@ -65,6 +66,8 @@ describe('Preferences Controller', function() {
     $uibModal = $injector.get('$uibModal');
 
     CsrfService = $injector.get('CsrfTokenService');
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     UserService = $injector.get('UserService');
 
     spyOn(CsrfService, 'getTokenAsync').and.returnValue(
@@ -244,8 +247,9 @@ describe('Preferences Controller', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve(newPicture)
     });
-    spyOn(UserService, 'setProfileImageDataUrlAsync').and.returnValue(
-      $q.resolve());
+    spyOn(
+      UserService, 'setProfileImageDataUrlAsync'
+    ).and.returnValue($q.resolve());
 
     ctrl.showEditProfilePictureModal();
     $rootScope.$apply();
@@ -265,4 +269,30 @@ describe('Preferences Controller', function() {
 
     expect(mockWindow.location.reload).not.toHaveBeenCalled();
   });
+
+  it('should add prevent reload event listener when a bio is changed',
+    function() {
+      spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
+      ctrl.registerBioChanged();
+      expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
+    });
+
+  it('should remove listener once http call is completed',
+    function() {
+      var userBio = 'User bio example';
+      var isRequestTheExpectOne = function(queryParams) {
+        return decodeURIComponent(queryParams)
+          .match('"update_type":"user_bio"');
+      };
+      spyOn(PreventPageUnloadEventService, 'removeListener').and.callThrough();
+
+      $httpBackend.expect(
+        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
+      ctrl.saveUserBio(userBio);
+      $httpBackend.flush();
+      expect(PreventPageUnloadEventService.removeListener).toHaveBeenCalled();
+
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
 });

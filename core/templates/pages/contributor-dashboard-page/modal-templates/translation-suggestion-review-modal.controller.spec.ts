@@ -24,11 +24,9 @@ import { UpgradedServices } from 'services/UpgradedServices';
 describe('Translation Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
-  let SuggestionModalService = null;
-
-  const contentHtml = 'Content html';
-  const reviewable = true;
-  const translationHtml = 'Translation html';
+  let SiteAnalyticsService = null;
+  let contributionAndReviewService = null;
+  let AlertsService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
@@ -38,64 +36,290 @@ describe('Translation Suggestion Review Modal Controller', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
-    const $rootScope = $injector.get('$rootScope');
-    SuggestionModalService = $injector.get('SuggestionModalService');
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    spyOnAllFunctions(SuggestionModalService);
-
-    $scope = $rootScope.$new();
-    $controller('TranslationSuggestionReviewModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      contentHtml: contentHtml,
-      reviewable: reviewable,
-      translationHtml: translationHtml
-    });
+    contributionAndReviewService = $injector.get(
+      'ContributionAndReviewService');
+    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
+    AlertsService = $injector.get('AlertsService');
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardViewSuggestionForReview');
   }));
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.contentHtml).toBe(contentHtml);
-      expect($scope.contentHtml).toBe(contentHtml);
-      expect($scope.reviewable).toBe(reviewable);
-      expect($scope.commitMessage).toBe('');
-      expect($scope.reviewMessage).toBe('');
+  describe('when reviewing suggestion', function() {
+    const reviewable = true;
+    const subheading = 'subheading_title';
+    const suggestion1 = {
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      }
+    };
+    const suggestion2 = {
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      }
+    };
+
+    const suggestionIdToSuggestion = {
+      suggestion_1: suggestion1,
+      suggestion_2: suggestion2
+    };
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      const $rootScope = $injector.get('$rootScope');
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      $scope = $rootScope.$new();
+      $controller('TranslationSuggestionReviewModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
+        reviewable: reviewable,
+        suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
+      });
+    }));
+
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.activeSuggestionId).toBe('suggestion_1');
+        expect($scope.activeSuggestion).toEqual(suggestion1);
+        expect($scope.subheading).toBe('subheading_title');
+        expect($scope.reviewable).toBe(reviewable);
+        expect($scope.reviewMessage).toBe('');
+      });
+
+    it('should register Contributor Dashboard view suggestion for review ' +
+      'event after controller is initialized', function() {
+      expect(
+        SiteAnalyticsService
+          .registerContributorDashboardViewSuggestionForReview)
+        .toHaveBeenCalledWith('Translation');
     });
 
-  it('should accept suggestion in suggestion modal service when clicking on' +
-    ' accept suggestion button', function() {
-    $scope.reviewMessage = 'Review message example';
-    $scope.commitMessage = 'Commit message example';
-    $scope.accept();
+    it('should accept suggestion in suggestion modal service when clicking on' +
+      ' accept and review next suggestion button', function() {
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
 
-    expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalledWith(
-      $uibModalInstance, {
-        action: 'accept',
-        commitMessage: 'Commit message example',
-        reviewMessage: 'Review message example',
-      });
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardAcceptSuggestion');
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            successCallback, errorCallback) => {
+          successCallback();
+        });
+
+      $scope.reviewMessage = 'Review message example';
+      $scope.acceptAndReviewNext();
+
+      expect($scope.activeSuggestionId).toBe('suggestion_2');
+      expect($scope.activeSuggestion).toEqual(suggestion2);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+      expect(
+        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'accept', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview,
+          jasmine.any(Function));
+
+      $scope.reviewMessage = 'Review message example 2';
+      $scope.acceptAndReviewNext();
+      expect(
+        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Translation');
+
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '2', 'suggestion_2', 'accept', 'Review message example 2',
+          'hint section of "StateName" card', $scope.showNextItemToReview,
+          jasmine.any(Function));
+      expect($uibModalInstance.close).toHaveBeenCalledWith([
+        'suggestion_1', 'suggestion_2']);
+    });
+
+    it('should reject suggestion in suggestion modal service when clicking on' +
+      ' reject and review next suggestion button', function() {
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            callback) => {
+          callback();
+        });
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
+
+      $scope.reviewMessage = 'Review message example';
+      $scope.rejectAndReviewNext();
+
+      expect($scope.activeSuggestionId).toBe('suggestion_2');
+      expect($scope.activeSuggestion).toEqual(suggestion2);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'reject', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview);
+
+      $scope.reviewMessage = 'Review message example 2';
+      $scope.rejectAndReviewNext();
+
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '2', 'suggestion_2', 'reject', 'Review message example 2',
+          'hint section of "StateName" card', $scope.showNextItemToReview);
+      expect($uibModalInstance.close).toHaveBeenCalledWith([
+        'suggestion_1', 'suggestion_2']);
+    });
+
+    it('should reject a suggestion if the backend pre accept validation ' +
+    'failed', function() {
+      expect($scope.activeSuggestionId).toBe('suggestion_1');
+      expect($scope.activeSuggestion).toEqual(suggestion1);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.reviewMessage).toBe('');
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardAcceptSuggestion');
+      spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
+        .and.callFake((
+            targetId, suggestionId, action, reviewMessage, commitMessage,
+            successCallback, errorCallback) => {
+          let dummyErrorResponse = {
+            data: { error: 'Error!' }
+          };
+          if (errorCallback) {
+            errorCallback(dummyErrorResponse);
+          }
+        });
+      spyOn(AlertsService, 'addWarning');
+
+      $scope.reviewMessage = 'Review message example';
+      $scope.acceptAndReviewNext();
+
+      expect(
+        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Translation');
+      expect(contributionAndReviewService.resolveSuggestionToExploration)
+        .toHaveBeenCalledWith(
+          '1', 'suggestion_1', 'accept', 'Review message example',
+          'hint section of "StateName" card', $scope.showNextItemToReview,
+          jasmine.any(Function));
+      expect(AlertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error!');
+    });
+
+    it('should cancel suggestion in suggestion modal service when clicking on' +
+    ' cancel suggestion button', function() {
+      $scope.cancel();
+      expect($uibModalInstance.close).toHaveBeenCalledWith([]);
+    });
   });
 
-  it('should reject suggestion in suggestion modal service when clicking on' +
-    ' reject suggestion button', function() {
-    $scope.reviewMessage = 'Review message example';
-    $scope.reject();
+  describe('when viewing suggestion', function() {
+    const reviewable = false;
+    let $httpBackend = null;
+    const subheading = 'subheading_title';
 
-    expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalledWith(
-      $uibModalInstance, {
-        action: 'reject',
-        reviewMessage: 'Review message example'
+    const suggestion1 = {
+      suggestion_id: 'suggestion_1',
+      target_id: '1',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      },
+      status: 'rejected'
+    };
+    const suggestion2 = {
+      suggestion_id: 'suggestion_2',
+      target_id: '2',
+      suggestion_type: 'translate_content',
+      change: {
+        content_id: 'hint_1',
+        content_html: 'Translation',
+        translation_html: 'Tradução',
+        state_name: 'StateName'
+      }
+    };
+
+    const suggestionIdToSuggestion = {
+      suggestion_1: suggestion1,
+      suggestion_2: suggestion2
+    };
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      const $rootScope = $injector.get('$rootScope');
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+      $httpBackend = $injector.get('$httpBackend');
+
+      $scope = $rootScope.$new();
+      $controller('TranslationSuggestionReviewModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        initialSuggestionId: 'suggestion_1',
+        subheading: subheading,
+        reviewable: reviewable,
+        suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
       });
-  });
+    }));
 
-  it('should cancel suggestion in suggestion modal service when clicking on' +
-  ' cancel suggestion button', function() {
-    $scope.cancel();
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.activeSuggestionId).toBe('suggestion_1');
+        expect($scope.activeSuggestion).toEqual(suggestion1);
+        expect($scope.reviewable).toBe(reviewable);
+        expect($scope.subheading).toBe('subheading_title');
 
-    expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
-      $uibModalInstance);
+        var messages = [{
+          author_username: '',
+          created_om_msecs: 0,
+          entity_type: '',
+          entity_id: '',
+          message_id: '',
+          text: '',
+          updated_status: '',
+          updated_subject: '',
+        }];
+        $httpBackend.expect('GET', '/threadhandler/' + 'suggestion_1').respond({
+          messages: messages
+        });
+        $httpBackend.flush();
+
+        expect($scope.reviewMessage).toBe('');
+      });
   });
 });

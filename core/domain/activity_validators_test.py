@@ -44,7 +44,7 @@ class ActivityReferencesModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             '1exp', title='title', category='category')

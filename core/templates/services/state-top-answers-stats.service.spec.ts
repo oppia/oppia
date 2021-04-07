@@ -20,8 +20,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from
+  'domain/exploration/answer-stats.model';
 import { AnswerStatsBackendDict } from
   'domain/exploration/visualization-info.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
@@ -38,7 +38,6 @@ import { States, StatesObjectFactory } from
 const joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', () => {
-  let answerStatsObjectFactory: AnswerStatsObjectFactory;
   let ruleObjectFactory: RuleObjectFactory;
   let stateTopAnswersStatsBackendApiService:
     StateTopAnswersStatsBackendApiService;
@@ -48,7 +47,6 @@ describe('StateTopAnswersStatsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateTopAnswersStatsBackendApiService = (
       TestBed.get(StateTopAnswersStatsBackendApiService));
@@ -66,7 +64,10 @@ describe('StateTopAnswersStatsService', () => {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Contains',
-          inputs: {x: ['hola']}
+          inputs: {x: {
+            contentId: 'rule_input',
+            normalizedStrSet: ['hola']
+          }}
         }],
         outcome: {
           dest: 'Me Llamo',
@@ -127,7 +128,7 @@ describe('StateTopAnswersStatsService', () => {
       stateName: string,
       answersStatsBackendDicts: AnswerStatsBackendDict[]): jasmine.Spy => {
     const answersStats = answersStatsBackendDicts.map(
-      a => answerStatsObjectFactory.createFromBackendDict(a));
+      a => AnswerStats.createFromBackendDict(a));
     return spyOn(stateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
       .and.returnValue(Promise.resolve(new StateTopAnswersStats(
         {[stateName]: answersStats}, {[stateName]: 'TextInput'})));
@@ -292,7 +293,18 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createNew('Contains', {x: ['adios']}));
+      ruleObjectFactory.createFromBackendDict(
+        {
+          rule_type: 'Contains',
+          inputs: {
+            x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['adios']
+            }
+          }
+        },
+        'TextInput'
+      ));
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
@@ -313,7 +325,18 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
-      ruleObjectFactory.createNew('Contains', {x: ['bonjour']})
+      ruleObjectFactory.createFromBackendDict(
+        {
+          rule_type: 'Contains',
+          inputs: {
+            x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['bonjour']
+            }
+          }
+        },
+        'TextInput'
+      )
     ];
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 

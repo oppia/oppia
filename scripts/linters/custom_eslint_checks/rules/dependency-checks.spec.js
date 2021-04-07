@@ -58,6 +58,56 @@ ruleTester.run('no-unused-dependency', rule, {
           }
         ]
       };
+    }`,
+    `function test() {
+      return {
+        controllers: [
+          '$http', '$translate', 'I18nLanguageCodeService',
+          'UserService', 'SUPPORTED_SITE_LANGUAGES',
+          function(
+              $http, $translate, I18nLanguageCodeService,
+              UserService, SUPPORTED_SITE_LANGUAGES) {
+            var ctrl = this;
+            // Changes the language of the translations.
+            var preferencesDataUrl = '/preferenceshandler/data';
+            var siteLanguageUrl = '/save_site_language';
+            ctrl.changeLanguage = function() {
+              $translate.use(ctrl.currentLanguageCode);
+              I18nLanguageCodeService.setI18nLanguageCode(
+                ctrl.currentLanguageCode);
+              UserService.getUserInfoAsync().then(function(userInfo) {
+                if (userInfo.isLoggedIn()) {
+                  $http.put(siteLanguageUrl, {
+                    site_language_code: ctrl.currentLanguageCode
+                  });
+                }
+              });
+            };
+            ctrl.$onInit = function() {
+              ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
+              ctrl.currentLanguageCode = (
+                $translate.proposedLanguage() || $translate.use());
+              I18nLanguageCodeService.setI18nLanguageCode(
+                ctrl.currentLanguageCode);
+            };
+          }
+        ]
+      };
+    }`,
+    `function test() {
+      return {
+        controller: [
+          (function() {
+            return true;
+          }), 'abc', 'abca'
+        ]
+      };
+    }`,
+    `function test() {
+        a =  [
+          '$http', '$translate', 'I18nLanguageCodeService',
+          'UserService', 'SUPPORTED_SITE_LANGUAGES'
+        ]
     }`
   ],
 

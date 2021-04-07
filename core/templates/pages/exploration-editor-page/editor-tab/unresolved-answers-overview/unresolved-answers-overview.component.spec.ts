@@ -18,13 +18,16 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EditabilityService } from 'services/editability.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Unresolved Answers Overview Component', function() {
   var $q = null;
@@ -42,7 +45,15 @@ describe('Unresolved Answers Overview Component', function() {
 
   var stateName = 'State1';
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(function() {
     editabilityService = TestBed.get(EditabilityService);
@@ -56,6 +67,9 @@ describe('Unresolved Answers Overview Component', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

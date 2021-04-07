@@ -16,20 +16,6 @@
  * @fileoverview Module for the practice session page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/ng-audio.import';
-import 'third-party-imports/ui-tree.import';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngAudio', 'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
-]);
-
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -39,6 +25,9 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { ContentLanguageSelectorComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -49,9 +38,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent
   ],
   providers: [

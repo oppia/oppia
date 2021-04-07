@@ -36,8 +36,7 @@ interface ClassroomPromosStatusBackendDict {
 
 interface ClassroomDataBackendDict {
   'name': string,
-  'public_topic_summary_dicts': TopicSummaryBackendDict[],
-  'private_topic_summary_dicts': TopicSummaryBackendDict[],
+  'topic_summary_dicts': TopicSummaryBackendDict[],
   'course_details': string,
   'topic_list_intro': string
 }
@@ -67,8 +66,7 @@ export class ClassroomBackendApiService {
       classroomDataUrl).toPromise().then(response => {
       this.classroomData = (
         ClassroomData.createFromBackendData(
-          response.name, response.public_topic_summary_dicts,
-          response.private_topic_summary_dicts, response.course_details,
+          response.name, response.topic_summary_dicts, response.course_details,
           response.topic_list_intro));
       if (successCallback) {
         successCallback(this.classroomData);

@@ -23,6 +23,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
+from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 import feconf
@@ -115,7 +116,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         opportunities = []
         for topic in topics_with_skills:
             for skill_id in topic.get_all_skill_ids():
-                if len(opportunities) == feconf.OPPORTUNITIES_PAGE_SIZE:
+                if len(opportunities) == constants.OPPORTUNITIES_PAGE_SIZE:
                     break
                 if skill_id in id_to_skill_opportunity_dict:
                     skill_opportunity_dict = (
@@ -199,19 +200,69 @@ class TranslatableTextHandler(base.BaseHandler):
         exp = exp_fetchers.get_exploration_by_id(exp_id)
         state_names_to_content_id_mapping = exp.get_translatable_text(
             language_code)
+        state_names_to_not_in_review_content_id_mapping = (
+            self._get_state_names_to_not_in_review_content_id_mapping(
+                state_names_to_content_id_mapping,
+                suggestion_services
+                .get_translation_suggestions_in_review_by_exploration(exp_id)
+            )
+        )
 
         self.values = {
             'state_names_to_content_id_mapping': (
-                state_names_to_content_id_mapping),
+                state_names_to_not_in_review_content_id_mapping),
             'version': exp.version
         }
 
         self.render_json(self.values)
 
+    def _get_state_names_to_not_in_review_content_id_mapping(
+            self, state_names_to_content_id_mapping, suggestions):
+        """Returns a copy of the supplied state_names_to_content_id_mapping
+        minus any contents found in suggestions.
+
+        Args:
+            state_names_to_content_id_mapping: dict(str, dict(str, str)). A dict
+                where state_name is the key and a dict with content_id as the
+                key and html content as value.
+            suggestions: list(Suggestion). A list of translation suggestions.
+
+        Returns:
+            dict(str, dict(str, str)). A dict where state_name is the key and a
+            dict with content_id as the key and html content as value.
+        """
+        final_mapping = {}
+        for state_name in state_names_to_content_id_mapping:
+            content_id_to_text = dict(
+                state_names_to_content_id_mapping[state_name])
+            for content_id in content_id_to_text.keys():
+                if self._content_in_review(state_name, content_id, suggestions):
+                    del content_id_to_text[content_id]
+            if content_id_to_text:
+                final_mapping[state_name] = content_id_to_text
+        return final_mapping
+
+    def _content_in_review(self, state_name, content_id, suggestions):
+        """Returns whether a suggestion exists in suggestions with a change dict
+        matching the supplied state_name and content_id.
+
+        Args:
+            state_name: str. Exploration state name.
+            content_id: str. Content ID.
+            suggestions: list(Suggestion). A list of translation suggestions.
+
+        Returns:
+            bool. True if suggestion exists in suggestions with a change dict
+            matching state_name and content_id, False otherwise.
+        """
+        return any(
+            s.change.state_name == state_name and
+            s.change.content_id == content_id for s in suggestions)
+
 
 class UserContributionRightsDataHandler(base.BaseHandler):
-    """Provides review rights of the logged in user in translation, voiceover
-    and question category on the contributor dashboard.
+    """Provides contribution rights of the logged in user in translation,
+    voiceover and question category on the contributor dashboard.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -232,7 +283,11 @@ class UserContributionRightsDataHandler(base.BaseHandler):
                 if contribution_rights else []),
             'can_review_questions': (
                 contribution_rights.can_review_questions
-                if contribution_rights else False)
+                if contribution_rights else False),
+            'can_suggest_questions': (
+                config_domain.CONTRIBUTOR_CAN_SUGGEST_QUESTIONS.value and
+                (contribution_rights.can_submit_questions
+                 if contribution_rights else False))
         })
 
 

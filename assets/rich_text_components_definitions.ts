@@ -17,7 +17,7 @@
  * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
-export = {
+export default {
   "Collapsible": {
     "backend_id": "Collapsible",
     "category": "Basic Input",
@@ -27,7 +27,6 @@ export = {
     "icon_data_url": "/rich_text_components/Collapsible/Collapsible.png",
     "is_complex": true,
     "requires_fs": false,
-    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "heading",
@@ -57,7 +56,6 @@ export = {
     "icon_data_url": "/rich_text_components/Image/Image.png",
     "is_complex": false,
     "requires_fs": true,
-    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "filepath",
@@ -83,7 +81,8 @@ export = {
           "id": "is_nonempty"
         }],
         "ui_config": {
-          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)"
+          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)",
+          "rows": 3
         }
       },
       "default_value": ""
@@ -98,7 +97,6 @@ export = {
     "icon_data_url": "/rich_text_components/Link/Link.png",
     "is_complex": false,
     "requires_fs": false,
-    "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "url",
@@ -126,7 +124,6 @@ export = {
     "icon_data_url": "/rich_text_components/Math/Math.png",
     "is_complex": false,
     "requires_fs": false,
-    "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "math_content",
@@ -150,7 +147,6 @@ export = {
     "icon_data_url": "/rich_text_components/Skillreview/Skillreview.png",
     "is_complex": false,
     "requires_fs": false,
-    "is_lesson_related": true,
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "text",
@@ -178,7 +174,6 @@ export = {
     "icon_data_url": "/rich_text_components/Svgdiagram/Svgdiagram.png",
     "is_complex": false,
     "requires_fs": true,
-    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "svg_filename",
@@ -212,7 +207,6 @@ export = {
     "icon_data_url": "/rich_text_components/Tabs/Tabs.png",
     "is_complex": true,
     "requires_fs": false,
-    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "tab_contents",
@@ -239,7 +233,6 @@ export = {
     "icon_data_url": "/rich_text_components/Video/Video.png",
     "is_complex": false,
     "requires_fs": false,
-    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "video_id",

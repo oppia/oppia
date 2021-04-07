@@ -23,6 +23,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import zipfile
 
 from core.tests import test_utils
 
@@ -82,6 +83,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen_error_call)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
+        def mock_ensure_directory_exists(unused_path):
+            pass
+
+        self.dir_exists_swap = self.swap(
+            common, 'ensure_directory_exists', mock_ensure_directory_exists)
+
     def test_tweak_yarn_executable(self):
         def mock_is_file(unused_filename):
             return True
@@ -114,13 +121,189 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
 
+    def test_buf_installation_on_linux(self):
+        check_mock_function_calls = {
+            'url_retrieve_is_called': False,
+            'recursive_chmod_is_called': False,
+            'extractall_is_called': False,
+        }
+
+        class MockZipFile(zipfile.ZipFile):
+            def __init__(self, path, mode): # pylint: disable=unused-argument, super-init-not-called
+                pass
+            def extractall(self, path): # pylint: disable=unused-argument
+                check_mock_function_calls['extractall_is_called'] = True
+
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+            # Check that correct platform is used bufbuild.
+            if 'bufbuild' in url:
+                self.assertTrue('Linux-x86_64' in url.split('/')[-1])
+                check_mock_function_calls['url_retrieve_is_called'] = True
+            elif 'protocolbuffers' in url:
+                self.assertTrue('linux' in url.split('/')[-1])
+                check_mock_function_calls['url_retrieve_is_called'] = True
+            else:
+                return
+        def mock_recursive_chmod(unused_fname, mode): # pylint: disable=unused-argument
+            self.assertEqual(mode, 0o744)
+            check_mock_function_calls['recursive_chmod_is_called'] = True
+        def mock_isfile(unused_fname):
+            return False
+        def mock_remove(unused_path):  # pylint: disable=unused-argument
+            return
+
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        recursive_chmod_swap = self.swap(
+            common, 'recursive_chmod', mock_recursive_chmod)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
+        remove_swap = self.swap(os, 'remove', mock_remove)
+
+        with os_name_swap, url_retrieve_swap, recursive_chmod_swap:
+            with self.dir_exists_swap, isfile_swap, zipfile_swap, remove_swap:
+                install_third_party_libs.install_buf_and_protoc()
+
+        self.assertTrue(
+            check_mock_function_calls['url_retrieve_is_called'])
+        self.assertTrue(check_mock_function_calls['extractall_is_called'])
+        self.assertTrue(
+            check_mock_function_calls['recursive_chmod_is_called'])
+
+    def test_buf_installation_on_mac(self):
+        check_mock_function_calls = {
+            'url_retrieve_is_called': False,
+            'recursive_chmod_is_called': False,
+            'extractall_is_called': False
+        }
+
+        class MockZipFile(zipfile.ZipFile):
+            def __init__(self, path, mode): # pylint: disable=unused-argument, super-init-not-called
+                pass
+            def extractall(self, path): # pylint: disable=unused-argument
+                check_mock_function_calls['extractall_is_called'] = True
+
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+            if 'bufbuild' in url:
+                self.assertTrue('Darwin-x86_64' in url.split('/')[-1])
+                check_mock_function_calls['url_retrieve_is_called'] = True
+            elif 'protocolbuffers' in url:
+                self.assertTrue('osx' in url.split('/')[-1])
+                check_mock_function_calls['url_retrieve_is_called'] = True
+            else:
+                return
+        def mock_recursive_chmod(unused_fname, mode): # pylint: disable=unused-argument
+            self.assertEqual(mode, 0o744)
+            check_mock_function_calls['recursive_chmod_is_called'] = True
+        def mock_isfile(unused_fname):
+            return False
+        def mock_remove(unused_path):  # pylint: disable=unused-argument
+            return
+
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        recursive_chmod_swap = self.swap(
+            common, 'recursive_chmod', mock_recursive_chmod)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
+        remove_swap = self.swap(os, 'remove', mock_remove)
+
+        with os_name_swap, url_retrieve_swap, recursive_chmod_swap:
+            with self.dir_exists_swap, isfile_swap, zipfile_swap, remove_swap:
+                install_third_party_libs.install_buf_and_protoc()
+
+        self.assertTrue(
+            check_mock_function_calls['url_retrieve_is_called'])
+        self.assertTrue(check_mock_function_calls['extractall_is_called'])
+        self.assertTrue(
+            check_mock_function_calls['recursive_chmod_is_called'])
+
+    def test_buf_is_not_reinstalled(self):
+        check_mock_functions_are_not_called = {
+            'url_retrieve_is_not_called': True,
+            'recursive_chmod_is_not_called': True,
+        }
+
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+            check_mock_functions_are_not_called[
+                'url_retrieve_is_not_called'] = False
+        def mock_recursive_chmod(unused_fname, mode): # pylint: disable=unused-argument
+            check_mock_functions_are_not_called[
+                'recursive_chmod_is_not_called'] = False
+        def mock_exists(unused_fname):
+            return True
+
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        recursive_chmod_swap = self.swap(
+            common, 'recursive_chmod', mock_recursive_chmod)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with url_retrieve_swap, recursive_chmod_swap:
+            with self.dir_exists_swap, exists_swap:
+                install_third_party_libs.install_buf_and_protoc()
+
+        self.assertTrue(
+            check_mock_functions_are_not_called['url_retrieve_is_not_called'])
+        self.assertTrue(
+            check_mock_functions_are_not_called[
+                'recursive_chmod_is_not_called'])
+
+    def test_installing_protoc_raises_exception_if_fails_to_extract(self):
+        check_mock_function_calls = {
+            'url_retrieve_is_called': False,
+            'recursive_chmod_is_called': False,
+            'extractall_is_called': False
+        }
+
+        class MockZipFile(zipfile.ZipFile):
+            def __init__(self, path, mode): # pylint: disable=unused-argument, super-init-not-called
+                pass
+            def extractall(self, path): # pylint: disable=unused-argument
+                check_mock_function_calls['extractall_is_called'] = True
+                raise Exception()
+
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+            check_mock_function_calls['url_retrieve_is_called'] = True
+        def mock_isfile(unused_fname):
+            return False
+
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
+
+        with os_name_swap, url_retrieve_swap:
+            with self.dir_exists_swap, isfile_swap, zipfile_swap:
+                with self.assertRaisesRegexp(
+                    Exception, 'Error installing protoc binary'):
+                    install_third_party_libs.install_buf_and_protoc()
+
+        self.assertTrue(
+            check_mock_function_calls['url_retrieve_is_called'])
+        self.assertTrue(check_mock_function_calls['extractall_is_called'])
+
+    def test_proto_file_compilation(self):
+        with self.Popen_swap:
+            install_third_party_libs.compile_protobuf_files(['mock_path'])
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
+
+    def test_proto_file_compilation_raises_exception_on_compile_errors(self):
+        with self.Popen_error_swap:
+            with self.assertRaisesRegexp(
+                Exception, 'Error compiling proto files at mock_path'):
+                install_third_party_libs.compile_protobuf_files(['mock_path'])
+
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
             'pip_install_is_called': False
         }
         def mock_exists(unused_path):
             return False
-        def mock_pip_install(unused_package, unused_version, unused_path):
+        def mock_pip_install(unused_versioned_package, unused_path):
             check_function_calls['pip_install_is_called'] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)

@@ -16,6 +16,7 @@
  * @fileoverview Component for the creator dashboard.
  */
 
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -24,10 +25,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.component.ts');
-
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
@@ -52,11 +49,11 @@ require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('creatorDashboardPage', {
   template: require('./creator-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$window', 'AlertsService',
+    '$http', '$q', '$rootScope', '$window', 'AlertsService',
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-    'ThreadMessageObjectFactory', 'ThreadStatusDisplayService',
+    'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
     'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -65,11 +62,11 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
     function(
-        $http, $q, $window, AlertsService,
+        $http, $q, $rootScope, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
-        ThreadMessageObjectFactory, ThreadStatusDisplayService,
+        ThreadStatusDisplayService,
         UrlInterpolationService, UserService,
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
         DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
@@ -174,7 +171,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           for (var i = 0; i < allThreads.length; i++) {
             if (allThreads[i].threadId === threadId) {
               allThreads[i].setMessages(response.data.messages.map(
-                m => ThreadMessageObjectFactory.createFromBackendDict(m)));
+                m => ThreadMessage.createFromBackendDict(m)));
               break;
             }
           }
@@ -257,10 +254,13 @@ angular.module('oppia').component('creatorDashboardPage', {
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.canCreateCollections = userInfo.canCreateCollections();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         var dashboardDataPromise = (
-          CreatorDashboardBackendApiService.fetchDashboardData());
+          CreatorDashboardBackendApiService.fetchDashboardDataAsync());
         dashboardDataPromise.then(
           function(response) {
             // The following condition is required for Karma testing. The

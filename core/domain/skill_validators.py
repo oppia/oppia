@@ -110,9 +110,11 @@ class SkillSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class SkillSnapshotContentModelValidator(
@@ -158,7 +160,12 @@ class SkillCommitLogEntryModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'skill_ids', skill_models.SkillModel, [item.skill_id])]
+                'skill_ids', skill_models.SkillModel, [item.skill_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class SkillSummaryModelValidator(

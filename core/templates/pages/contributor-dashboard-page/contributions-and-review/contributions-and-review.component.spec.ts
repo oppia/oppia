@@ -29,6 +29,7 @@ describe('Contributions and review component', function() {
   var $uibModal = null;
   var contextService = null;
   var contributionAndReviewService = null;
+  var contributionOpportunitiesService = null;
   var csrfTokenService = null;
   var misconceptionObjectFactory = null;
   var skillBackendApiService = null;
@@ -49,20 +50,24 @@ describe('Contributions and review component', function() {
       userService = $injector.get('UserService');
       contextService = $injector.get('ContextService');
       skillBackendApiService = $injector.get('SkillBackendApiService');
+      contributionOpportunitiesService = $injector.get(
+        'ContributionOpportunitiesService');
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
+        }));
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue($q.resolve({
           can_review_translation_for_language_codes: [{}],
           can_review_questions: true
         }));
       spyOn(
-        contributionAndReviewService, 'getUserCreatedTranslationSuggestions')
-        .and.callFake(callback => callback({
+        contributionAndReviewService,
+        'getUserCreatedTranslationSuggestionsAsync').and.returnValue(
+        Promise.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -78,8 +83,8 @@ describe('Contributions and review component', function() {
           }
         }));
       spyOn(
-        contributionAndReviewService, 'getReviewableQuestionSuggestions')
-        .and.callFake(callback => callback({
+        contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
+        .and.returnValue(Promise.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -179,65 +184,98 @@ describe('Contributions and review component', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
-      expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-      expect(ctrl.contributionSummaries).toEqual([{
-        id: 'suggestion_1',
-        heading: 'Question 1',
-        subheading: 'Skill description',
-        labelText: 'Awaiting review',
-        labelColor: '#eeeeee',
-        actionButtonTitle: 'Review'
-      }]);
-      expect(ctrl.contributionsDataLoading).toBe(false);
+    });
+
+    describe('ctrl.loadContributions', () => {
+      it('should load contributions correctly', () => {
+        ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+          expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
+          expect(opportunitiesDicts).toEqual([{
+            id: 'suggestion_1',
+            heading: 'Question 1',
+            subheading: 'Skill description',
+            labelText: 'Awaiting review',
+            labelColor: '#eeeeee',
+            actionButtonTitle: 'Review'
+          }]);
+          expect(more).toEqual(false);
+        });
+      });
+
+      it('should return empty list if tab is not initialized', () => {
+        ctrl.activeTabType = null;
+        ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+          expect(ctrl.contributions).toEqual({});
+          expect(opportunitiesDicts).toEqual([]);
+          expect(more).toEqual(false);
+        });
+      });
+
+      it('should return empty list if suggestion type is not initialized',
+        () => {
+          ctrl.activeTabType = null;
+          ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+            expect(ctrl.contributions).toEqual({});
+            expect(opportunitiesDicts).toEqual([]);
+            expect(more).toEqual(false);
+          });
+        });
     });
 
     it('should open show translation suggestion modal when clicking on' +
       ' suggestion', function() {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() => {
+          ctrl.loadContributions().then(() => {
+            spyOn($uibModal, 'open').and.callThrough();
+            ctrl.onClickViewSuggestion('suggestion_1');
+
+            expect($uibModal.open).toHaveBeenCalled();
+          });
+        });
+
       ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
       $scope.$apply();
-
-      spyOn($uibModal, 'open').and.callThrough();
-      ctrl.onClickViewSuggestion('suggestion_1');
-
-      expect($uibModal.open).toHaveBeenCalled();
     });
 
     it('should resolve suggestion when closing show suggestion modal',
       function() {
+        contributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.subscribe(() => {
+            ctrl.loadContributions().then(() => {
+              spyOn($uibModal, 'open').and.returnValue({
+                result: $q.resolve({
+                  action: 'add',
+                  reviewMessage: 'Review message',
+                  skillDifficulty: 'Easy'
+                })
+              });
+              ctrl.onClickViewSuggestion('suggestion_1');
+              $scope.$apply();
+
+              expect($uibModal.open).toHaveBeenCalled();
+            });
+          });
         ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
-
-        spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve({
-            action: 'add',
-            reviewMessage: 'Review message',
-            skillDifficulty: 'Easy'
-          })
-        });
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
-
-        expect($uibModal.open).toHaveBeenCalled();
-        expect(contributionAndReviewService.resolveSuggestionToExploration)
-          .toHaveBeenCalled();
       });
 
     it('should not resolve suggestion when dismissing show suggestion modal',
       function() {
+        contributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.subscribe(() => {
+            ctrl.loadContributions().then(() => {
+              spyOn($uibModal, 'open').and.returnValue({
+                result: $q.reject()
+              });
+              ctrl.onClickViewSuggestion('suggestion_1');
+              $scope.$apply();
+
+              expect($uibModal.open).toHaveBeenCalled();
+            });
+          });
         ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
-
-        spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
-
-        expect($uibModal.open).toHaveBeenCalled();
-        expect(contributionAndReviewService.resolveSuggestionToExploration)
-          .not.toHaveBeenCalled();
       });
   });
 
@@ -249,6 +287,8 @@ describe('Contributions and review component', function() {
       $uibModal = $injector.get('$uibModal');
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
+      contributionOpportunitiesService = $injector.get(
+        'ContributionOpportunitiesService');
       csrfTokenService = $injector.get('CsrfTokenService');
       userService = $injector.get('UserService');
       contextService = $injector.get('ContextService');
@@ -260,17 +300,19 @@ describe('Contributions and review component', function() {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
-          can_review_translation_for_language_codes: [],
-          can_review_questions: false
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
         }));
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false
+          }));
       spyOn(
-        contributionAndReviewService, 'getUserCreatedQuestionSuggestions')
-        .and.callFake(callback => callback({
+        contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
+        .and.returnValue($q.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -381,8 +423,9 @@ describe('Contributions and review component', function() {
           })
         }));
       spyOn(
-        contributionAndReviewService, 'getUserCreatedTranslationSuggestions')
-        .and.callFake(callback => callback({
+        contributionAndReviewService,
+        'getUserCreatedTranslationSuggestionsAsync')
+        .and.returnValue($q.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -397,7 +440,12 @@ describe('Contributions and review component', function() {
             details: null
           }
         }));
-
+      spyOn(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+        'emit').and.callThrough();
+      spyOn(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+        'subscribe').and.callThrough();
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {
         $scope: $scope,
@@ -408,25 +456,41 @@ describe('Contributions and review component', function() {
       $scope.$apply();
     }));
 
-    it('should show correct heading for translation suggestions',
-      function() {
-        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
-        $scope.$apply();
-        expect(ctrl.contributionSummaries).toEqual([{
-          id: 'suggestion_1',
-          heading: 'Tradução',
-          subheading: '[The corresponding opportunity has been deleted.]',
-          labelText: 'Awaiting review',
-          labelColor: '#eeeeee',
-          actionButtonTitle: 'View'
-        }]);
-      });
+    it('should show correct heading for translation suggestions', function() {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() => {
+          ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+            expect(opportunitiesDicts).toEqual([{
+              id: 'suggestion_1',
+              heading: 'Tradução',
+              subheading: '[The corresponding opportunity has been deleted.]',
+              labelText: 'Awaiting review',
+              labelColor: '#eeeeee',
+              actionButtonTitle: 'View'
+            }]);
+          });
+        });
 
-    it('should show correct heading for question suggestions',
-      function() {
-        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-        $scope.$apply();
-        expect(ctrl.contributionSummaries).toEqual([{
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
+          .subscribe).toHaveBeenCalled();
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
+          .emit).toHaveBeenCalled();
+    });
+
+    it('should show correct heading for question suggestions', function() {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() => {
+          ctrl.loadContributions();
+        });
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      $scope.$apply();
+
+      ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+        expect(opportunitiesDicts).toEqual([{
           id: 'suggestion_1',
           heading: 'Question 1',
           subheading: '[The corresponding opportunity has been deleted.]',
@@ -435,13 +499,17 @@ describe('Contributions and review component', function() {
           actionButtonTitle: 'View'
         }]);
       });
+    });
   });
+
   describe('when user is not allowed to review questions', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
+      contributionOpportunitiesService = $injector.get(
+        'ContributionOpportunitiesService');
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       csrfTokenService = $injector.get('CsrfTokenService');
@@ -455,17 +523,20 @@ describe('Contributions and review component', function() {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
-          can_review_translation_for_language_codes: [],
-          can_review_questions: false
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
         }));
+      spyOn(userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false,
+            can_suggest_questions: true
+          }));
       spyOn(
-        contributionAndReviewService, 'getUserCreatedQuestionSuggestions')
-        .and.callFake(callback => callback({
+        contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
+        .and.returnValue($q.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -577,8 +648,9 @@ describe('Contributions and review component', function() {
         }));
 
       spyOn(
-        contributionAndReviewService, 'getReviewableTranslationSuggestions')
-        .and.callFake(callback => callback({
+        contributionAndReviewService,
+        'getReviewableTranslationSuggestionsAsync')
+        .and.returnValue($q.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -604,6 +676,11 @@ describe('Contributions and review component', function() {
         ContextService: contextService,
         MisconceptionObjectFactory: misconceptionObjectFactory
       });
+
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() => {
+          ctrl.loadContributions();
+        });
       ctrl.$onInit();
       $scope.$apply();
     }));
@@ -615,71 +692,66 @@ describe('Contributions and review component', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(0);
-      expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-      expect(ctrl.contributionSummaries).toEqual([{
-        id: 'suggestion_1',
-        heading: 'Question 1',
-        subheading: undefined,
-        labelText: 'Accepted',
-        labelColor: '#8ed274',
-        actionButtonTitle: 'View'
-      }]);
-      expect(ctrl.contributionsDataLoading).toBe(false);
     });
 
-    it('should get translate contributions when switching to translation' +
+    it('should emit reload even when when switching to translation' +
       ' in review tab', function() {
+      spyOn(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+        'emit').and.callThrough();
+
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
       $scope.$apply();
 
-      expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-      expect(ctrl.contributionSummaries).toEqual([{
-        id: 'suggestion_1',
-        heading: 'Tradução',
-        subheading: 'Topic 1 / Story title / Chapter title',
-        labelText: 'Awaiting review',
-        labelColor: '#eeeeee',
-        actionButtonTitle: 'Review'
-      }]);
-      expect(ctrl.contributionsDataLoading).toBe(false);
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit)
+        .toHaveBeenCalled();
     });
 
     it('should open show view question modal when clicking on' +
       ' question suggestion', function() {
       spyOn($uibModal, 'open').and.callThrough();
-      ctrl.onClickViewSuggestion('suggestion_1');
-      $scope.$apply();
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
+      ctrl.loadContributions().then(function() {
+        ctrl.onClickViewSuggestion('suggestion_1');
+        $scope.$apply();
 
-      expect($uibModal.open).toHaveBeenCalled();
+        expect($uibModal.open).toHaveBeenCalled();
+      });
     });
 
     it('should resolve suggestion to skill when closing show question' +
       ' suggestion modal', function() {
-      expect(ctrl.contributionSummaries.length).toBe(1);
-
       $httpBackend.expectPUT(
         '/suggestionactionhandler/skill/1/suggestion_1').respond(200);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({})
       });
-      ctrl.onClickViewSuggestion('suggestion_1');
-      $scope.$apply();
-      $httpBackend.flush();
 
-      expect($uibModal.open).toHaveBeenCalled();
-      expect(ctrl.contributionSummaries.length).toBe(0);
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
+      ctrl.loadContributions().then(function() {
+        expect(Object.keys(ctrl.contributions).length).toBe(1);
+        ctrl.onClickViewSuggestion('suggestion_1');
+        $scope.$apply();
+        $httpBackend.flush();
+
+        expect($uibModal.open).toHaveBeenCalled();
+      });
     });
 
     it('should not resolve suggestion to skill when dismissing show question' +
       ' suggestion modal', function() {
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
       spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
-      ctrl.onClickViewSuggestion('suggestion_1');
-      $scope.$apply();
+      ctrl.loadContributions().then(function() {
+        ctrl.onClickViewSuggestion('suggestion_1');
+        $scope.$apply();
 
-      expect($uibModal.open).toHaveBeenCalled();
+        expect($uibModal.open).toHaveBeenCalled();
+      });
     });
 
     it('should return correctly check the active tab', function() {

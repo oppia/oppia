@@ -23,6 +23,9 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/external-save.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+ 'state-solution.service');
 
 import { Subscription } from 'rxjs';
 
@@ -56,11 +59,11 @@ angular.module('oppia').directive('solutionExplanationEditor', [
 
           ctrl.saveThisExplanation = function() {
             var contentHasChanged = (
-              StateSolutionService.displayed.explanation.getHtml() !==
-              StateSolutionService.savedMemento.explanation.getHtml());
+              StateSolutionService.displayed.explanation.html !==
+              StateSolutionService.savedMemento.explanation.html);
             if (contentHasChanged) {
               var solutionContentId = StateSolutionService.displayed.explanation
-                .getContentId();
+                .contentId;
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                 [solutionContentId]);
             }

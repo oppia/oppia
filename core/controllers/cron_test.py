@@ -23,11 +23,11 @@ import logging
 
 from constants import constants
 from core import jobs
-from core.controllers import cron
 from core.domain import config_services
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
@@ -41,8 +41,13 @@ import utils
 from mapreduce import model as mapreduce_model
 import webtest
 
-(job_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.suggestion])
+(
+    exp_models, job_models,
+    suggestion_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.job,
+    models.NAMES.suggestion, models.NAMES.user
+])
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
@@ -54,6 +59,9 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
 
 class CronJobTests(test_utils.GenericTestBase):
+
+    FIVE_WEEKS = datetime.timedelta(weeks=5)
+    NINE_WEEKS = datetime.timedelta(weeks=9)
 
     def setUp(self):
         super(CronJobTests, self).setUp()
@@ -221,7 +229,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'warning', _mock_logging_function)
         recency_msec_swap = self.swap(
-            cron, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
+            jobs, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -322,6 +330,62 @@ class CronJobTests(test_utils.GenericTestBase):
             ]
         )
 
+    def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        completed_activities_model = user_models.CompletedActivitiesModel(
+            id=admin_user_id,
+            exploration_ids=[],
+            collection_ids=[],
+            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
+            deleted=True
+        )
+        completed_activities_model.update_timestamps(
+            update_last_updated_time=False)
+        completed_activities_model.put()
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/models/cleanup')
+
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+
+    def test_run_cron_to_hard_delete_versioned_models_marked_as_deleted(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        with self.mock_datetime_utcnow(
+            datetime.datetime.utcnow() - self.NINE_WEEKS):
+            self.save_new_default_exploration('exp_id', admin_user_id)
+            exp_services.delete_exploration(admin_user_id, 'exp_id')
+
+        self.assertIsNotNone(exp_models.ExplorationModel.get_by_id('exp_id'))
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/models/cleanup')
+
+        self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
+
+    def test_run_cron_to_mark_old_models_as_deleted(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        user_query_model = user_models.UserQueryModel(
+            id='query_id',
+            user_ids=[],
+            submitter_id=admin_user_id,
+            query_status=feconf.USER_QUERY_STATUS_PROCESSING,
+            last_updated=datetime.datetime.utcnow() - self.FIVE_WEEKS
+        )
+        user_query_model.update_timestamps(update_last_updated_time=False)
+        user_query_model.put()
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/models/cleanup')
+
+        self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         test_utils.GenericTestBase):
@@ -346,8 +410,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description')
@@ -475,6 +539,27 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.reviewers_suggestion_email_infos[0][0],
             self.expected_reviewable_suggestion_email_info)
 
+    def test_email_not_sent_if_reviewer_ids_is_empty(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        config_services.set_property(
+            'committer_id',
+            'contributor_dashboard_reviewer_emails_is_enabled', True)
+        user_services.remove_translation_review_rights_in_language(
+            self.reviewer_id, self.language_code)
+
+        with self.can_send_emails, self.testapp_swap:
+            with self.swap(
+                email_manager,
+                'send_mail_to_notify_contributor_dashboard_reviewers',
+                self._mock_send_contributor_dashboard_reviewers_emails):
+                self.get_html_response(
+                    '/cron/mail/reviewers/contributor_dashboard_suggestions')
+
+        self.assertEqual(len(self.reviewer_ids), 0)
+        self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
+
+        self.logout()
+
 
 class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         test_utils.GenericTestBase):
@@ -496,8 +581,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -521,8 +606,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -596,9 +681,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             ) for suggestion in [suggestion_1, suggestion_2, suggestion_3]
         ]
         self.expected_suggestion_types_needing_reviewers = {
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
         }
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)

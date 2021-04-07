@@ -15,6 +15,14 @@
 /**
  * @fileoverview Controller for TrainingDataEditorPanelService modal.
  */
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 
 angular.module('oppia').controller(
   'TrainingDataEditorPanelServiceModalController', [
@@ -40,7 +48,7 @@ angular.module('oppia').controller(
         ResponsesService.getActiveAnswerGroupIndex());
       var FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput';
 
-      $scope.stateContent = _state.content.getHtml();
+      $scope.stateContent = _state.content.html;
       $scope.trainingData = [];
       $scope.answerGroupHasNonEmptyRules = (
         ResponsesService.getAnswerGroup(

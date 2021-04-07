@@ -23,8 +23,8 @@ import copy
 import json
 import re
 
+import android_validation_constants
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 from core.domain import user_services
@@ -54,6 +54,7 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
 TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
+TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB = 'page_title_fragment_for_web'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -117,7 +118,8 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
         TOPIC_PROPERTY_URL_FRAGMENT,
         TOPIC_PROPERTY_META_TAG_CONTENT,
-        TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED)
+        TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
+        TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -480,7 +482,8 @@ class Topic(python_utils.OBJECT):
             uncategorized_skill_ids, subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
             story_reference_schema_version, meta_tag_content,
-            practice_tab_is_displayed, created_on=None,
+            practice_tab_is_displayed, page_title_fragment_for_web,
+            created_on=None,
             last_updated=None):
         """Constructs a Topic domain object.
 
@@ -514,6 +517,8 @@ class Topic(python_utils.OBJECT):
             meta_tag_content: str. The meta tag content in the topic viewer
                 page.
             practice_tab_is_displayed: bool. Whether the practice tab is shown.
+            page_title_fragment_for_web: str. The page title fragment in the
+                topic viewer page.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -540,6 +545,7 @@ class Topic(python_utils.OBJECT):
         self.story_reference_schema_version = story_reference_schema_version
         self.meta_tag_content = meta_tag_content
         self.practice_tab_is_displayed = practice_tab_is_displayed
+        self.page_title_fragment_for_web = page_title_fragment_for_web
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -574,7 +580,8 @@ class Topic(python_utils.OBJECT):
             'story_reference_schema_version': (
                 self.story_reference_schema_version),
             'meta_tag_content': self.meta_tag_content,
-            'practice_tab_is_displayed': self.practice_tab_is_displayed
+            'practice_tab_is_displayed': self.practice_tab_is_displayed,
+            'page_title_fragment_for_web': self.page_title_fragment_for_web
         }
 
     def serialize(self):
@@ -648,6 +655,7 @@ class Topic(python_utils.OBJECT):
             topic_dict['story_reference_schema_version'],
             topic_dict['meta_tag_content'],
             topic_dict['practice_tab_is_displayed'],
+            topic_dict['page_title_fragment_for_web'],
             topic_created_on,
             topic_last_updated)
 
@@ -978,6 +986,8 @@ class Topic(python_utils.OBJECT):
                 'Practice tab is displayed property should be a boolean.'
                 'Received %s.' % self.practice_tab_is_displayed)
         utils.require_valid_meta_tag_content(self.meta_tag_content)
+        utils.require_valid_page_title_fragment_for_web(
+            self.page_title_fragment_for_web)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
@@ -1125,7 +1135,7 @@ class Topic(python_utils.OBJECT):
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False)
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
 
     @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
@@ -1290,6 +1300,16 @@ class Topic(python_utils.OBJECT):
                 topic.
         """
         self.meta_tag_content = new_meta_tag_content
+
+    def update_page_title_fragment_for_web(
+            self, new_page_title_fragment_for_web):
+        """Updates the page title fragment of a topic object.
+
+        Args:
+            new_page_title_fragment_for_web: str. The updated page title
+                fragment for the topic.
+        """
+        self.page_title_fragment_for_web = new_page_title_fragment_for_web
 
     def update_practice_tab_is_displayed(self, new_practice_tab_is_displayed):
         """Updates the language code of a topic object.
@@ -1651,8 +1671,9 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
-            thumbnail_filename, thumbnail_bg_color, url_fragment,
-            topic_model_created_on, topic_model_last_updated):
+            total_published_node_count, thumbnail_filename,
+            thumbnail_bg_color, url_fragment, topic_model_created_on,
+            topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -1671,6 +1692,8 @@ class TopicSummary(python_utils.OBJECT):
             subtopic_count: int. The number of subtopics in the topic.
             total_skill_count: int. The total number of skills in the topic
                 (including those that are uncategorized).
+            total_published_node_count: int. The total number of chapters
+                that are published and associated with the stories of the topic.
             thumbnail_filename: str. The filename for the topic thumbnail.
             thumbnail_bg_color: str. The background color for the thumbnail.
             url_fragment: str. The url fragment of the topic.
@@ -1690,6 +1713,7 @@ class TopicSummary(python_utils.OBJECT):
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
         self.total_skill_count = total_skill_count
+        self.total_published_node_count = total_published_node_count
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.topic_model_created_on = topic_model_created_on
@@ -1800,6 +1824,16 @@ class TopicSummary(python_utils.OBJECT):
                 'uncategorized_skill_count %s, received \'%s\'' % (
                     self.uncategorized_skill_count, self.total_skill_count))
 
+        if not isinstance(self.total_published_node_count, int):
+            raise utils.ValidationError(
+                'Expected total published node count to be an integer, '
+                'received \'%s\'' % self.total_published_node_count)
+
+        if self.total_published_node_count < 0:
+            raise utils.ValidationError(
+                'Expected total_published_node_count to be non-negative, '
+                'received \'%s\'' % self.total_published_node_count)
+
         if not isinstance(self.subtopic_count, int):
             raise utils.ValidationError(
                 'Expected subtopic count to be an integer, received \'%s\''
@@ -1828,6 +1862,7 @@ class TopicSummary(python_utils.OBJECT):
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
             'total_skill_count': self.total_skill_count,
+            'total_published_node_count': self.total_published_node_count,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'topic_model_created_on': utils.get_time_in_millisecs(

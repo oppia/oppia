@@ -16,131 +16,210 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-require('pages/splash-page/splash-page.component.ts');
+import { Pipe, EventEmitter } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from 'services/translate.service';
+import { LoaderService } from 'services/loader.service.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserService } from 'services/user.service';
+import { SplashPageComponent } from './splash-page.component';
+import { of } from 'rxjs';
 
-describe('Splash Page', function() {
-  var $scope = null, ctrl = null;
-  var $timeout = null;
-  var $q = null;
-  var UserService = null;
-  var LoaderService = null;
-  var loadingMessage = null;
-  var SiteAnalyticsService = null;
-  var subscriptions = [];
-  var windowRefMock = {
-    nativeWindow: {
-      location: ''
-    }
-  };
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+class MockTranslateService {
+  languageCode = 'es';
+  use(newLanguageCode: string): string {
+    this.languageCode = newLanguageCode;
+    return this.languageCode;
+  }
+}
+class MockI18nLanguageCodeService {
+  codeChangeEventEmitter = new EventEmitter<string>();
+  getCurrentI18nLanguageCode() {
+    return 'en';
+  }
+
+  get onI18nLanguageCodeChange() {
+    return this.codeChangeEventEmitter;
+  }
+}
+
+describe('Splash Page', () => {
+  const siteAnalyticsServiceStub = new SiteAnalyticsService(
+    new WindowRef());
+  let loaderService: LoaderService = null;
+  let userService: UserService;
+  let windowDimensionsService: WindowDimensionsService;
+  let resizeEvent = new Event('resize');
+  beforeEach(async() => {
+    TestBed.configureTestingModule({
+      declarations: [SplashPageComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        },
+        { provide: TranslateService, useClass: MockTranslateService },
+        { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
+        UrlInterpolationService,
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                href: ''
+              }
+            }
+          }
+        }
+      ]
+    }).compileComponents();
+  });
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRefMock);
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $timeout = $injector.get('$timeout');
-    $q = $injector.get('$q');
-    UserService = $injector.get('UserService');
-    LoaderService = $injector.get('LoaderService');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
-    loadingMessage = '';
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
-    ctrl = $componentController('splashPage', {
-      $rootScope: $scope
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
     });
-  }));
+    loaderService = TestBed.get(LoaderService);
+    userService = TestBed.get(UserService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
+  });
 
-  afterEach(function() {
-    for (let subscription of subscriptions) {
-      subscription.unsubscribe();
-    }
+  let component;
+  beforeEach(() => {
+    const splashPageComponent = TestBed.createComponent(SplashPageComponent);
+    component = splashPageComponent.componentInstance;
   });
 
   it('should get static image url', function() {
-    expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(
+    expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should get static subject image url', function() {
-    expect(ctrl.getStaticSubjectImageUrl('subject-file-name')).toBe(
-      '/assets/images/subjects/subject-file-name.svg');
-  });
-
-  it('should redirect to login page', function() {
-    var startLoginEventSpy = spyOn(
-      SiteAnalyticsService, 'registerStartLoginEvent').and.callThrough();
-    ctrl.onRedirectToLogin('/login');
-    $timeout.flush(150);
-
-    expect(windowRefMock.nativeWindow.location).toBe('/login');
-    expect(startLoginEventSpy).toHaveBeenCalled();
-  });
-
-  it('should redirect to library page', function() {
-    var clickBrowseLibraryButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+  it('should record analytics when Browse Lessons is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
-    ctrl.onClickBrowseLibraryButton();
-    $timeout.flush(150);
-
-    expect(windowRefMock.nativeWindow.location).toBe('/community-library');
-    expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
+    component.onClickBrowseLessonsButton();
+    expect(siteAnalyticsServiceStub.registerClickBrowseLessonsButtonEvent)
+      .toHaveBeenCalled();
   });
 
-  it('should redirect to create exploration page', function() {
-    var clickCreateExplorationButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickCreateExplorationButtonEvent')
+  it('should record analytics when Start Contributing is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickStartContributingButtonEvent')
       .and.callThrough();
-    ctrl.onClickCreateExplorationButton();
-    $timeout.flush(150);
-
-    expect(windowRefMock.nativeWindow.location).toBe(
-      '/creator-dashboard?mode=create');
-    expect(clickCreateExplorationButtonEventSpy).toHaveBeenCalled();
+    component.onClickStartContributingButton();
+    expect(siteAnalyticsServiceStub.registerClickStartContributingButtonEvent)
+      .toHaveBeenCalled();
   });
 
-  it('should evaluate if user is logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve({
-        isLoggedIn: function() {
-          return true;
-        }
-      });
-      return deferred.promise;
-    });
-
-    ctrl.$onInit();
-    expect(ctrl.userIsLoggedIn).toBe(null);
-    expect(loadingMessage).toBe('Loading');
-
-    $scope.$digest();
-    expect(ctrl.userIsLoggedIn).toBe(true);
-    expect(loadingMessage).toBe('');
+  it('should record analytics when Start Teaching is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickStartTeachingButtonEvent'
+    ).and.callThrough();
+    component.onClickStartTeachingButton();
+    expect(siteAnalyticsServiceStub.registerClickStartTeachingButtonEvent)
+      .toHaveBeenCalled();
   });
 
-  it('should evaluate if user is not logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve({
-        isLoggedIn: function() {
-          return false;
-        }
-      });
-      return deferred.promise;
-    });
+  it('should increment and decrement testimonial IDs correctly', function() {
+    component.ngOnInit();
+    expect(component.displayedTestimonialId).toBe(0);
+    component.incrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(1);
+    component.incrementDisplayedTestimonialId();
+    component.incrementDisplayedTestimonialId();
+    component.incrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(0);
 
-    ctrl.$onInit();
-    expect(ctrl.userIsLoggedIn).toBe(null);
-    expect(loadingMessage).toBe('Loading');
+    component.decrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(3);
+    component.decrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(2);
+  });
 
-    $scope.$digest();
-    expect(ctrl.userIsLoggedIn).toBe(false);
-    expect(loadingMessage).toBe('');
+  it('should get testimonials correctly', function() {
+    component.ngOnInit();
+    expect(component.getTestimonials().length).toBe(component.testimonialCount);
+  });
+
+  it('should evaluate if user is logged in', fakeAsync(() => {
+    const UserInfoObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject))
+    );
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
+
+  it('should evaluate if user is not logged in', fakeAsync(() => {
+    const UserInfoObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: false
+    };
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject))
+    );
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.userIsLoggedIn).toBe(false);
+  }));
+
+  it('should check if loader screen is working', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+    component.ngOnInit();
+    expect(loaderService.showLoadingScreen)
+      .toHaveBeenCalledWith('Loading');
+  }));
+
+  it('should set component properties when ngOnInit() is called', () => {
+    component.ngOnInit();
+    expect(component.displayedTestimonialId).toBe(0);
+    expect(component.testimonialCount).toBe(4);
+    expect(component.classroomUrl).toBe('/learn/math');
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
+    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
+    expect(component.isWindowNarrow).toBe(true);
   });
 });

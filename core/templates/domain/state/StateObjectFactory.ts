@@ -41,13 +41,15 @@ import {
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
-const constants = require('constants.ts');
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export interface StateBackendDict {
   'classifier_model_id': string;
   'content': SubtitledHtmlBackendDict;
   'interaction': InteractionBackendDict;
-  'param_changes': ParamChangeBackendDict[];
+  'param_changes': readonly ParamChangeBackendDict[];
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
   'written_translations': WrittenTranslationsBackendDict;
@@ -109,6 +111,33 @@ export class State {
     this.writtenTranslations = otherState.writtenTranslations;
     this.nextContentIdIndex = otherState.nextContentIdIndex;
   }
+
+  getRequiredWrittenTranslationContentIds(): Set<string> {
+    let interactionId = this.interaction.id;
+
+    let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
+
+    // As of now we do not delete interaction.hints when a user deletes
+    // interaction, so these hints' written translations are not counted in
+    // checking status of a state.
+    if (!interactionId ||
+      INTERACTION_SPECS[interactionId].is_linear ||
+      INTERACTION_SPECS[interactionId].is_terminal) {
+      allContentIds.forEach(contentId => {
+        if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
+          // eslint-disable-next-line dot-notation
+          allContentIds.delete(contentId);
+        }
+      });
+      // Excluding default_outcome content status as default outcome's
+      // content is left empty so the translation or voiceover is not
+      // required.
+      // eslint-disable-next-line dot-notation
+      allContentIds.delete('default_outcome');
+    }
+
+    return allContentIds;
+  }
 }
 
 @Injectable({
@@ -122,8 +151,12 @@ export class StateObjectFactory {
     private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
+  get NEW_STATE_TEMPLATE(): StateBackendDict {
+    return constants.NEW_STATE_TEMPLATE;
+  }
+
   createDefaultState(newStateName: string): State {
-    var newStateTemplate = constants.NEW_STATE_TEMPLATE;
+    var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
       content: newStateTemplate.content,

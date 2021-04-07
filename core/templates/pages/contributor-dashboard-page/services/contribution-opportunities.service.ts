@@ -16,100 +16,117 @@
  * @fileoverview A service for handling contribution opportunities in different
  * fields.
  */
+import { EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-opportunities-backend-api.service.ts');
+import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
+import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-angular.module('oppia').factory('ContributionOpportunitiesService', [
-  '$uibModal', 'ContributionOpportunitiesBackendApiService',
-  'UrlInterpolationService',
-  function(
-      $uibModal, ContributionOpportunitiesBackendApiService,
-      UrlInterpolationService) {
-    var skillOpportunitiesCursor = null;
-    var translationOpportunitiesCursor = null;
-    var voiceoverOpportunitiesCursor = null;
-    var moreSkillOpportunitiesAvailable = true;
-    var moreTranslationOpportunitiesAvailable = true;
-    var moreVoiceoverOpportunitiesAvailable = true;
+class SkillOpportunitiesDict {
+  opportunities: SkillOpportunity[];
+  more: boolean;
+}
 
-    var _getSkillOpportunities = function(cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-        cursor).then(({ opportunities, nextCursor, more }) => {
-        skillOpportunitiesCursor = nextCursor;
-        moreSkillOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
+class ExplorationOpportunitiesDict {
+  opportunities: ExplorationOpportunitySummary[];
+  more: boolean;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ContributionOpportunitiesService {
+  constructor(
+    private readonly contributionOpportunitiesBackendApiService:
+      ContributionOpportunitiesBackendApiService,
+      private readonly modalService: NgbModal) {}
+
+  public readonly reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+  public readonly removeOpportunitiesEventEmitter = new EventEmitter<void>();
+  private _skillOpportunitiesCursor: string = null;
+  private _translationOpportunitiesCursor: string = null;
+  private _voiceoverOpportunitiesCursor: string = null;
+  private _moreSkillOpportunitiesAvailable = true;
+  private _moreTranslationOpportunitiesAvailable = true;
+  private _moreVoiceoverOpportunitiesAvailable = true;
+
+  private _getSkillOpportunities(cursor: string):
+  Promise<SkillOpportunitiesDict> {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchSkillOpportunitiesAsync(cursor)
+      .then(({ opportunities, nextCursor, more }) => {
+        this._skillOpportunitiesCursor = nextCursor;
+        this._moreSkillOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
       });
-    };
-    var _getTranslationOpportunities = function(
-        languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
-        translationOpportunitiesCursor = nextCursor;
-        moreTranslationOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
+  }
+  private _getTranslationOpportunities(languageCode: string, cursor: string) {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) => {
+        this._translationOpportunitiesCursor = nextCursor;
+        this._moreTranslationOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
       });
-    };
-    var _getVoiceoverOpportunities = function(
-        languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        languageCode, cursor
-      ).then(function({ opportunities, nextCursor, more }) {
-        voiceoverOpportunitiesCursor = nextCursor;
-        moreVoiceoverOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
+  }
+  private _getVoiceoverOpportunities(languageCode: string, cursor: string) {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) => {
+        this._voiceoverOpportunitiesCursor = nextCursor;
+        this._moreVoiceoverOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
       });
-    };
+  }
+  showRequiresLoginModal(): void {
+    this.modalService.open(LoginRequiredModalContent);
+  }
 
-    var showRequiresLoginModal = function(argument) {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/community-dashboard-page/modal-templates/' +
-          'login-required-modal.directive.html'),
-        backdrop: 'static',
-        controller: [
-          '$controller', '$scope', '$uibModalInstance',
-          function($controller, $scope, $uibModalInstance) {
-            $controller('ConfirmOrCancelModalController', {
-              $scope: $scope,
-              $uibModalInstance: $uibModalInstance
-            });
-          }]
-      }).result.then(function() {}, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
-    };
+  async getSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+    return this._getSkillOpportunities('');
+  }
+  async getTranslationOpportunitiesAsync(languageCode: string):
+  Promise<ExplorationOpportunitiesDict> {
+    return this._getTranslationOpportunities(languageCode, '');
+  }
+  async getVoiceoverOpportunities(languageCode: string):
+  Promise<ExplorationOpportunitiesDict> {
+    return this._getVoiceoverOpportunities(languageCode, '');
+  }
+  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+    if (this._moreSkillOpportunitiesAvailable) {
+      return this._getSkillOpportunities(this._skillOpportunitiesCursor);
+    }
+  }
+  async getMoreTranslationOpportunitiesAsync(languageCode: string):
+  Promise<ExplorationOpportunitiesDict> {
+    if (this._moreTranslationOpportunitiesAvailable) {
+      return this._getTranslationOpportunities(
+        languageCode, this._translationOpportunitiesCursor);
+    }
+  }
+  async getMoreVoiceoverOpportunities(languageCode: string):
+  Promise<ExplorationOpportunitiesDict> {
+    if (this._moreVoiceoverOpportunitiesAvailable) {
+      return this._getVoiceoverOpportunities(
+        languageCode, this._voiceoverOpportunitiesCursor);
+    }
+  }
+}
 
-    return {
-      getSkillOpportunities: function(successCallback) {
-        _getSkillOpportunities('', successCallback);
-      },
-      getTranslationOpportunities: function(languageCode, successCallback) {
-        _getTranslationOpportunities(languageCode, '', successCallback);
-      },
-      getVoiceoverOpportunities: function(languageCode, successCallback) {
-        _getVoiceoverOpportunities(languageCode, '', successCallback);
-      },
-      getMoreSkillOpportunities: function(successCallback) {
-        if (moreSkillOpportunitiesAvailable) {
-          _getSkillOpportunities(skillOpportunitiesCursor, successCallback);
-        }
-      },
-      getMoreTranslationOpportunities: function(languageCode, successCallback) {
-        if (moreTranslationOpportunitiesAvailable) {
-          _getTranslationOpportunities(
-            languageCode, translationOpportunitiesCursor, successCallback);
-        }
-      },
-      getMoreVoiceoverOpportunities: function(languageCode, successCallback) {
-        if (moreVoiceoverOpportunitiesAvailable) {
-          _getVoiceoverOpportunities(
-            languageCode, voiceoverOpportunitiesCursor, successCallback);
-        }
-      },
-      showRequiresLoginModal: showRequiresLoginModal
-    };
-  }]);
+angular.module('oppia').factory(
+  'ContributionOpportunitiesService',
+  downgradeInjectable(ContributionOpportunitiesService));

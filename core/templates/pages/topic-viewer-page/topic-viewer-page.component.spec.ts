@@ -31,7 +31,7 @@ import { PageTitleService } from 'services/page-title.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
@@ -58,7 +58,7 @@ describe('Topic viewer page', () => {
       thumbnail_bg_color: '',
       description: 'Story Description',
       story_is_published: true,
-      pending_node_dicts: []
+      all_node_dicts: []
     }],
     additional_story_dicts: [],
     uncategorized_skill_ids: [],
@@ -66,7 +66,8 @@ describe('Topic viewer page', () => {
     degrees_of_mastery: {},
     skill_descriptions: {},
     practice_tab_is_displayed: true,
-    meta_tag_content: 'Topic Meta Tag'
+    meta_tag_content: 'Topic Meta Tag',
+    page_title_fragment_for_web: 'Topic page title'
   };
 
   beforeEach(() => {
@@ -109,7 +110,7 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.topicId).toBe('1');
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
     expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
-      `Learn ${topicName} | Topic Description | Oppia`);
+      `Learn ${topicName} | Topic page title | Oppia`);
     expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
       'Topic Meta Tag');
     expect(topicViewerPageComponent.topicDescription).toBe(

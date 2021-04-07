@@ -55,16 +55,16 @@ angular.module('oppia').directive('collectionPlayerPage', [
         '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$scope', 'AlertsService',
-        'GuestCollectionProgressService', 'LoaderService', 'PageTitleService',
-        'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
-        'UrlService', 'UserService',
+        '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
+        'AlertsService', 'GuestCollectionProgressService', 'LoaderService',
+        'PageTitleService', 'ReadOnlyCollectionBackendApiService',
+        'UrlInterpolationService', 'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $scope, AlertsService,
-            GuestCollectionProgressService, LoaderService, PageTitleService,
-            ReadOnlyCollectionBackendApiService, UrlInterpolationService,
-            UrlService, UserService,
+            $anchorScroll, $http, $location, $rootScope, $scope,
+            AlertsService, GuestCollectionProgressService, LoaderService,
+            PageTitleService, ReadOnlyCollectionBackendApiService,
+            UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -197,7 +197,8 @@ angular.module('oppia').directive('collectionPlayerPage', [
               iconParametersArray.push({
                 thumbnailIconUrl:
                   collectionNodes[i].getExplorationSummaryObject(
-                  ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+                  ).thumbnail_icon_url.replace(
+                    'subjects', 'inverted_subjects'),
                 left: x + 'px',
                 top: y + 'px',
                 thumbnailBgColor:
@@ -238,7 +239,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.collection', function(newValue) {
-              if (newValue !== null) {
+              if (
+                newValue !== null &&
+                ctrl.collection.getCollectionNodeCount()) {
                 ctrl.generatePathParameters();
               }
             }, true);
@@ -301,7 +304,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
             );
 
             // Load the collection the learner wants to view.
-            ReadOnlyCollectionBackendApiService.loadCollection(
+            ReadOnlyCollectionBackendApiService.loadCollectionAsync(
               ctrl.collectionId).then(
               function(collection) {
                 ctrl.collection = collection;
@@ -323,8 +326,8 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       GuestCollectionProgressService
                         .hasCompletedSomeExploration(ctrl.collectionId)) {
                     var completedExplorationIds = (
-                      GuestCollectionProgressService.getCompletedExplorationIds(
-                        ctrl.collection));
+                      GuestCollectionProgressService
+                        .getCompletedExplorationIds(ctrl.collection));
                     var nextExplorationId = (
                       GuestCollectionProgressService.getNextExplorationId(
                         ctrl.collection, completedExplorationIds));
@@ -338,10 +341,14 @@ angular.module('oppia').directive('collectionPlayerPage', [
                     ctrl.collectionPlaythrough.getNextExplorationId();
 
                   ctrl.isCompletedExploration = function(explorationId) {
-                    var completedExplorationIds = (
-                      ctrl.collectionPlaythrough.getCompletedExplorationIds());
-                    return completedExplorationIds.indexOf(explorationId) > -1;
+                    var completedExplorationIds = ctrl.collectionPlaythrough
+                      .getCompletedExplorationIds();
+                    return completedExplorationIds.indexOf(
+                      explorationId) > -1;
                   };
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
                 });
               },
               function() {

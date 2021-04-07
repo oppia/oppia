@@ -28,8 +28,6 @@ require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/skill-preview-tab/skill-preview-tab.component.ts');
 require(
-  'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
-require(
   'pages/skill-editor-page/questions-tab/skill-questions-tab.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -39,17 +37,23 @@ require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/window-ref.service');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
-    '$uibModal', 'BottomNavbarStatusService',
+    '$rootScope', '$uibModal', 'BottomNavbarStatusService',
     'SkillEditorRoutingService', 'SkillEditorStateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService', 'WindowRef',
+    'MAX_COMMIT_MESSAGE_LENGTH',
     function(
-        $uibModal, BottomNavbarStatusService,
+        $rootScope, $uibModal, BottomNavbarStatusService,
         SkillEditorRoutingService, SkillEditorStateService,
-        UndoRedoService, UrlInterpolationService, UrlService, WindowRef) {
+        UndoRedoService, UrlInterpolationService, UrlService, WindowRef,
+        MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
+      ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.getActiveTabName = function() {
         return SkillEditorRoutingService.getActiveTabName();
       };
@@ -104,6 +108,9 @@ angular.module('oppia').component('skillEditorPage', {
         ctrl.setUpBeforeUnload();
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
+        ctrl.directiveSubscriptions.add(
+          SkillEditorStateService.onSkillChange.subscribe(
+            () => $rootScope.$applyAsync()));
       };
     }
   ]

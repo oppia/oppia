@@ -45,6 +45,7 @@ require('services/context.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');
+require('services/stateful/focus-manager.service.ts');
 require('domain/question/question-backend-api.service.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -55,7 +56,7 @@ import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const topicConstants = require('constants.ts');
+import topicConstants from 'assets/constants';
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -66,24 +67,28 @@ angular.module('oppia').directive('topicEditorTab', [
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
-        'EntityCreationService', 'ImageUploadHelperService',
+        'EntityCreationService', 'FocusManagerService',
+        'ImageUploadHelperService',
         'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
         'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'WindowRef',
-        'MAX_CHARS_IN_META_TAG_CONTENT', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-        'MAX_CHARS_IN_TOPIC_NAME',
+        'MAX_CHARS_IN_META_TAG_CONTENT',
+        'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
+        'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         function(
             $rootScope, $scope, $uibModal, ContextService,
-            EntityCreationService, ImageUploadHelperService,
+            EntityCreationService, FocusManagerService,
+            ImageUploadHelperService,
             PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
             UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, WindowRef,
-            MAX_CHARS_IN_META_TAG_CONTENT, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME) {
+            MAX_CHARS_IN_META_TAG_CONTENT,
+            MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -92,7 +97,11 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
           $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
+          $scope.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
+            MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
           ctrl.initEditor = function() {
+            $scope.skillCreationIsAllowed = (
+              TopicEditorStateService.isSkillCreationAllowed());
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (
               TopicEditorStateService.getSkillQuestionCountDict());
@@ -101,9 +110,12 @@ angular.module('oppia').directive('topicEditorTab', [
             if (TopicEditorStateService.hasLoadedTopic()) {
               $scope.topicDataHasLoaded = true;
               $scope.$applyAsync();
+              FocusManagerService.setFocus('addStoryBtn');
             }
             $scope.editableName = $scope.topic.getName();
             $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
+            $scope.editablePageTitleFragmentForWeb = (
+              $scope.topic.getPageTitleFragmentForWeb());
             $scope.editablePracticeIsDisplayed = (
               $scope.topic.getPracticeTabIsDisplayed());
             $scope.initialTopicName = $scope.topic.getName();
@@ -171,7 +183,7 @@ angular.module('oppia').directive('topicEditorTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                   'rearrange-skills-in-subtopics-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               windowClass: 'rearrange-skills-modal',
               controller: 'RearrangeSkillsInSubtopicsModalController',
               controllerAs: '$ctrl',
@@ -300,6 +312,15 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          $scope.updateTopicPageTitleFragmentForWeb = function(
+              newTopicPageTitleFragmentForWeb) {
+            let currentValue = $scope.topic.getPageTitleFragmentForWeb();
+            if (newTopicPageTitleFragmentForWeb !== currentValue) {
+              TopicUpdateService.setPageTitleFragmentForWeb(
+                $scope.topic, newTopicPageTitleFragmentForWeb);
+            }
+          };
+
           $scope.updatePracticeTabIsDisplayed = function(
               newPracticeTabIsDisplayed) {
             if (
@@ -400,7 +421,7 @@ angular.module('oppia').directive('topicEditorTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                       'change-subtopic-assignment-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 subtopics: () => $scope.subtopics
               },
@@ -445,6 +466,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           ctrl.$onInit = function() {
+            FocusManagerService.setFocus('addStoryBtn');
             $scope.topicPreviewCardIsShown = false;
             $scope.SUBTOPIC_LIST = 'subtopic';
             $scope.SKILL_LIST = 'skill';

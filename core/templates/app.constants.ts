@@ -21,16 +21,16 @@ import commonConstants from 'assets/constants';
 export const AppConstants = {
   ...commonConstants,
   DEFAULT_TRANSLATIONS: {
-    I18N_LIBRARY_PAGE_TITLE: 'Library',
+    I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Library',
     I18N_LIBRARY_LOADING: 'Loading',
     I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
-    I18N_SIGNUP_PAGE_TITLE: 'Oppia',
+    I18N_SIGNUP_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Oppia',
     I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
     I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
     I18N_LIBRARY_LANGUAGES_EN: 'English',
     I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
     I18N_TOPNAV_SIGN_IN: 'Sign in',
-    I18N_SPLASH_PAGE_TITLE:
+    I18N_SPLASH_PAGE_TITLE_FRAGMENT_FOR_WEB:
       'Oppia | Free, Online and Interactive Lessons for Anyone',
     I18N_SIGNUP_REGISTRATION: 'Registration',
     I18N_SIGNUP_LOADING: 'Loading',
@@ -105,11 +105,14 @@ export const AppConstants = {
   // used to identify components, to generate content ids, and to determine what
   // type of content a given content id is associated with. If you wish to
   // change one of these, a state migration of all existing content ids is
-  // required.
+  // required. The component content type should be sufficiently small such that
+  // the commit messages that use the content type strings do not exceed 375
+  // characters (which is the maximum length of a commit message).
   COMPONENT_NAME_CONTENT: 'content',
   COMPONENT_NAME_FEEDBACK: 'feedback',
   COMPONENT_NAME_HINT: 'hint',
   COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS: 'ca',
+  COMPONENT_NAME_RULE_INPUT: 'rule_input',
   COMPONENT_NAME_SOLUTION: 'solution',
   COMPONENT_NAME_EXPLANATION: 'explanation',
   COMPONENT_NAME_WORKED_EXAMPLE: {

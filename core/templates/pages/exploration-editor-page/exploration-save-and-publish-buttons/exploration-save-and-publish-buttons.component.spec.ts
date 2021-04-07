@@ -28,9 +28,6 @@ import { StateInteractionIdService } from
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { EditabilityService } from 'services/editability.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -50,6 +47,8 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration save and publish buttons component', function() {
@@ -85,8 +84,6 @@ describe('Exploration save and publish buttons component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
     $provide.value(
       'ExplorationImprovementsTaskRegistryService',
@@ -112,6 +109,9 @@ describe('Exploration save and publish buttons component', function() {
     $provide.value(
       'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -149,18 +149,16 @@ describe('Exploration save and publish buttons component', function() {
     $scope.$apply();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should initialize $scope properties after controller initialization',
     function() {
       expect($scope.saveIsInProcess).toBe(false);
       expect($scope.publishIsInProcess).toBe(false);
       expect($scope.loadingDotsAreShown).toBe(false);
     });
-
-  it('should show publish button when user can publish and exploration' +
-    ' is private', function() {
-    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
-    expect($scope.showPublishButton()).toBe(true);
-  });
 
   it('should save exploration when saving changes', function() {
     $scope.saveChanges();
@@ -268,5 +266,45 @@ describe('Exploration save and publish buttons component', function() {
       .returnValue(false);
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
     expect($scope.isEditableOutsideTutorialMode()).toBe(false);
+  });
+
+  it('should display publish button when the exploration is unpublished',
+    function() {
+      $scope.explorationCanBePublished = false;
+
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
+      $scope.$apply();
+
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect($scope.explorationCanBePublished).toBe(true);
+    });
+
+  it('should fetch userExplorationPermissions when ' +
+    'showPublishExplorationModal is called', function() {
+    var userPermissions = {
+      canPublish: true
+    };
+    $scope.explorationCanBePublished = false;
+    spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
+      .returnValue($q.resolve(userPermissions));
+
+    $scope.showPublishExplorationModal();
+    $scope.$apply();
+
+    expect($scope.publishIsInProcess).toBe(false);
+    expect($scope.loadingDotsAreShown).toBe(false);
+    expect(userExplorationPermissionsService.fetchPermissionsAsync)
+      .toHaveBeenCalled();
+    expect($scope.explorationCanBePublished).toBe(true);
+  });
+
+  it('should unsubscribe when onDestroy runs', function() {
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+
+    ctrl.$onDestroy();
+
+    expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });

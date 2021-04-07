@@ -48,7 +48,7 @@ require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
-  '$controller', '$injector', '$scope', '$uibModalInstance',
+  '$controller', '$injector', '$scope', '$uibModal', '$uibModalInstance',
   'EditorFirstTimeEventsService',
   'InteractionDetailsCacheService', 'InteractionObjectFactory',
   'StateCustomizationArgsService', 'StateEditorService',
@@ -60,7 +60,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   'INTERACTION_SPECS',
   function(
-      $controller, $injector, $scope, $uibModalInstance,
+      $controller, $injector, $scope, $uibModal, $uibModalInstance,
       EditorFirstTimeEventsService,
       InteractionDetailsCacheService, InteractionObjectFactory,
       StateCustomizationArgsService, StateEditorService,
@@ -235,6 +235,27 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
     };
 
+    $scope.cancelWithConfirm = function() {
+      // Do nothing if the confirmation modal is already open.
+      if ($('.modal-title').text().includes('Confirmation Required')) {
+        return;
+      }
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration-editor-page/modal-templates/' +
+          'confirm-leave-modal.template.html'),
+        backdrop: 'static',
+        keyboard: false,
+        controller: 'ConfirmOrCancelModalController'
+      }).result.then(function() {
+        $scope.cancel();
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    };
+
     /**
      * The default values of SubtitledHtml and SubtitledUnicode objects in the
      * customization arguments have a null content_id. This function populates
@@ -258,8 +279,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         );
 
         if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
-          if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
-            (<SubtitledHtml|SubtitledUnicode>value).setContentId(
+          if ((<SubtitledHtml|SubtitledUnicode>value).contentId === null) {
+            (<SubtitledHtml|SubtitledUnicode>value).contentId = (
               `${contentIdPrefix}_${StateNextContentIdIndexService.displayed}`
             );
             StateNextContentIdIndexService.displayed += 1;
@@ -323,13 +344,13 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         if (schemaIsSubtitledHtml) {
           const subtitledHtmlValue = <SubtitledHtml> value;
           contentIdToContent[
-            subtitledHtmlValue.getContentId()
-          ] = subtitledHtmlValue.getHtml();
+            subtitledHtmlValue.contentId
+          ] = subtitledHtmlValue.html;
         } else if (schemaIsSubtitledUnicode) {
           const subtitledUnicodeValue = <SubtitledUnicode> value;
           contentIdToContent[
-            subtitledUnicodeValue.getContentId()
-          ] = subtitledUnicodeValue.getUnicode();
+            subtitledUnicodeValue.contentId
+          ] = subtitledUnicodeValue.unicode;
         } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (let i = 0; i < (<Object[]> value).length; i++) {
             traverseSchemaAndCollectContent(value[i], <Schema> schema.items);
@@ -374,6 +395,10 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       $scope.populateNullContentIds();
       EditorFirstTimeEventsService.registerFirstSaveInteractionEvent();
       $uibModalInstance.close();
+    };
+
+    $scope.getHyphenatedLowercaseCategoryName = function(categoryName) {
+      return categoryName && categoryName.replace(/\s/g, '-').toLowerCase();
     };
 
     $scope.init = function() {

@@ -117,7 +117,9 @@ def get_exploration_stats(exp_id, exp_version):
     return exploration_stats
 
 
-def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
+@transaction_services.run_in_transaction_wrapper
+def _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats. The model GET and PUT must be done in a transaction to avoid loss of
     updates that come in rapid succession.
@@ -140,6 +142,11 @@ def _update_stats_transactional(exp_id, exp_version, aggregated_stats):
 
     for state_name, stats in aggregated_stats['state_stats_mapping'].items():
         if state_name not in exp_stats.state_stats_mapping:
+            # Some events in the past seems to have 'undefined' state names
+            # passed from the frontend code. These are invalid and should be
+            # discarded.
+            if state_name == 'undefined':
+                return
             raise Exception(
                 'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
                 'does not exist' % (exp_id, exp_version, state_name))
@@ -159,8 +166,8 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    transaction_services.run_in_transaction(
-        _update_stats_transactional, exp_id, exp_version, aggregated_stats)
+    _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):
@@ -205,6 +212,7 @@ def get_stats_for_new_exp_version(
     Returns:
         ExplorationStats. The newly created exploration stats object.
     """
+    old_exp_stats = None
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
     exploration_stats = get_exploration_stats_by_id(
@@ -216,39 +224,138 @@ def get_stats_for_new_exp_version(
     # Handling reverts.
     if revert_to_version:
         old_exp_stats = get_exploration_stats_by_id(exp_id, revert_to_version)
+
+    return advance_version_of_exp_stats(
+        new_exp_version, exp_versions_diff, exploration_stats, old_exp_stats,
+        revert_to_version)
+
+
+def advance_version_of_exp_stats(
+        exp_version, exp_versions_diff, exp_stats,
+        reverted_exp_stats, revert_to_version):
+    """Makes required changes to the structure of ExplorationStatsModel of an
+    old exp_version and a new ExplorationStatsModel is created for the new
+    exp_version. Note: This function does not save the newly created model, it
+    returns it. Callers should explicitly save the model if required.
+
+    Args:
+        exp_version: int. Version of the exploration.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
+        exp_stats: ExplorationStats. The ExplorationStats model.
+        reverted_exp_stats: ExplorationStats|None. The reverted
+            ExplorationStats model.
+        revert_to_version: int|None. If the change is a revert, the version.
+            Otherwise, None.
+
+    Returns:
+        ExplorationStats. The newly created exploration stats object.
+    """
+
+    # Handling reverts.
+    if revert_to_version:
         # If the old exploration issues model doesn't exist, the current model
         # is carried over (this is a fallback case for some tests, and can never
         # happen in production.)
-        if old_exp_stats:
-            exploration_stats.num_starts_v2 = old_exp_stats.num_starts_v2
-            exploration_stats.num_actual_starts_v2 = (
-                old_exp_stats.num_actual_starts_v2)
-            exploration_stats.num_completions_v2 = (
-                old_exp_stats.num_completions_v2)
-            exploration_stats.state_stats_mapping = (
-                old_exp_stats.state_stats_mapping)
-        exploration_stats.exp_version = new_exp_version
+        if reverted_exp_stats:
+            exp_stats.num_starts_v2 = reverted_exp_stats.num_starts_v2
+            exp_stats.num_actual_starts_v2 = (
+                reverted_exp_stats.num_actual_starts_v2)
+            exp_stats.num_completions_v2 = (
+                reverted_exp_stats.num_completions_v2)
+            exp_stats.state_stats_mapping = (
+                reverted_exp_stats.state_stats_mapping)
+        exp_stats.exp_version = exp_version
 
-        return exploration_stats
+        return exp_stats
 
-    # Handling state deletions.
-    for state_name in exp_versions_diff.deleted_state_names:
-        exploration_stats.state_stats_mapping.pop(state_name)
+    new_state_name_stats_mapping = {}
 
-    # Handling state additions.
+    # Handle unchanged states.
+    unchanged_state_names = set(utils.compute_list_difference(
+        exp_stats.state_stats_mapping,
+        exp_versions_diff.deleted_state_names +
+        exp_versions_diff.new_to_old_state_names.values()))
+    for state_name in unchanged_state_names:
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[state_name].clone())
+
+    # Handle renamed states.
+    for state_name in exp_versions_diff.new_to_old_state_names:
+        old_state_name = exp_versions_diff.new_to_old_state_names[
+            state_name]
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[old_state_name].clone())
+
+    # Handle newly-added states.
     for state_name in exp_versions_diff.added_state_names:
-        exploration_stats.state_stats_mapping[state_name] = (
+        new_state_name_stats_mapping[state_name] = (
             stats_domain.StateStats.create_default())
 
-    # Handling state renames.
-    for new_state_name in exp_versions_diff.new_to_old_state_names:
-        exploration_stats.state_stats_mapping[new_state_name] = (
-            exploration_stats.state_stats_mapping.pop(
-                exp_versions_diff.new_to_old_state_names[new_state_name]))
+    exp_stats.state_stats_mapping = new_state_name_stats_mapping
+    exp_stats.exp_version = exp_version
 
-    exploration_stats.exp_version = new_exp_version
+    return exp_stats
 
-    return exploration_stats
+
+def assign_playthrough_to_corresponding_issue(
+        playthrough, exp_issues, issue_schema_version):
+    """Stores the given playthrough as a new model into its corresponding
+    exploration issue. When the corresponding exploration issue does not
+    exist, a new one is created.
+
+    Args:
+        playthrough: Playthrough. The playthrough domain object.
+        exp_issues: ExplorationIssues. The exploration issues domain object.
+        issue_schema_version: int. The version of the issue schema.
+
+    Returns:
+        bool. Whether the playthrough was stored successfully.
+    """
+    issue = _get_corresponding_exp_issue(
+        playthrough, exp_issues, issue_schema_version)
+    if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
+        issue.playthrough_ids.append(
+            stats_models.PlaythroughModel.create(
+                playthrough.exp_id, playthrough.exp_version,
+                playthrough.issue_type,
+                playthrough.issue_customization_args,
+                [action.to_dict() for action in playthrough.actions]))
+        return True
+    return False
+
+
+def _get_corresponding_exp_issue(
+        playthrough, exp_issues, issue_schema_version):
+    """Returns the unique exploration issue model expected to own the given
+    playthrough. If it does not exist yet, then it will be created.
+
+    Args:
+        playthrough: Playthrough. The playthrough domain object.
+        exp_issues: ExplorationIssues. The exploration issues domain object
+            which manages each individual exploration issue.
+        issue_schema_version: int. The version of the issue schema.
+
+    Returns:
+        ExplorationIssue. The corresponding exploration issue.
+    """
+    for issue in exp_issues.unresolved_issues:
+        if issue.issue_type == playthrough.issue_type:
+            issue_customization_args = issue.issue_customization_args
+            identifying_arg = (
+                feconf.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+                    issue.issue_type])
+            # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
+            # ordering of the list is important (i.e. [a, b, c] is different
+            # from [b, c, a]).
+            if (issue_customization_args[identifying_arg] ==
+                    playthrough.issue_customization_args[identifying_arg]):
+                return issue
+    issue = stats_domain.ExplorationIssue(
+        playthrough.issue_type, playthrough.issue_customization_args,
+        [], issue_schema_version, is_valid=True)
+    exp_issues.unresolved_issues.append(issue)
+    return issue
 
 
 def create_exp_issues_for_new_exploration(exp_id, exp_version):
@@ -334,11 +441,8 @@ def update_exp_issues_for_new_exp_version(
         playthrough_model.actions = [
             action.to_dict() for action in playthrough.actions]
 
-    # Run in transaction to help prevent data-races between operations that may
-    # update the playthroughs concurrently.
     stats_models.PlaythroughModel.update_timestamps_multi(playthrough_models)
-    transaction_services.run_in_transaction(
-        stats_models.PlaythroughModel.put_multi, playthrough_models)
+    stats_models.PlaythroughModel.put_multi(playthrough_models)
 
     for exp_issue in exp_issues.unresolved_issues:
         if 'state_names' in exp_issue.issue_customization_args:
@@ -601,6 +705,7 @@ def save_exp_issues_model(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain object.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _save_exp_issues_model_transactional():
         """Implementation to be run in a transaction."""
 
@@ -614,8 +719,7 @@ def save_exp_issues_model(exp_issues):
 
     # Run in transaction to help prevent data-races between concurrent learners
     # who may have a playthrough recorded at the same time.
-    transaction_services.run_in_transaction(
-        _save_exp_issues_model_transactional)
+    _save_exp_issues_model_transactional()
 
 
 def get_exploration_stats_multi(exp_version_references):
@@ -654,6 +758,7 @@ def delete_playthroughs_multi(playthrough_ids):
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
 
+    @transaction_services.run_in_transaction_wrapper
     def _delete_playthroughs_multi_transactional():
         """Implementation to be run in a transaction."""
         stats_models.PlaythroughModel.delete_multi(
@@ -661,8 +766,7 @@ def delete_playthroughs_multi(playthrough_ids):
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
-    transaction_services.run_in_transaction(
-        _delete_playthroughs_multi_transactional)
+    _delete_playthroughs_multi_transactional()
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):

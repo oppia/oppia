@@ -44,11 +44,9 @@ describe('Voiceover player', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createUser(
+    await users.createAndLoginUser(
       'testVoiceovers@voiceovers.com', 'testVoiceovers');
-    await users.login('testVoiceovers@voiceovers.com');
-    await workflow.createExploration();
-    await explorationEditorMainTab.exitTutorial();
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'This is the first card.'));
@@ -68,11 +66,6 @@ describe('Voiceover player', function() {
       'Testing if voiceovers work');
     await explorationEditorPage.saveChanges('Done.');
     await workflow.publishExploration();
-    await users.logout();
-  });
-
-  beforeEach(async function() {
-    await users.login('testVoiceovers@voiceovers.com');
   });
 
   it('should play voiceovers for multiple languages', async function() {
@@ -88,8 +81,8 @@ describe('Voiceover player', function() {
     await explorationPlayerPage.expectAudioToBePlaying();
   });
 
-  afterEach(async function() {
-    await users.logout();
+  afterAll(async function() {
     await general.checkForConsoleErrors(['The play()']);
+    await users.logout();
   });
 });

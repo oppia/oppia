@@ -16,18 +16,6 @@
  * @fileoverview Module for the admin page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -38,10 +26,15 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { AdminFeaturesTabComponent } from
   'pages/admin-page/features-tab/admin-features-tab.component';
+import { AdminNavbarComponent } from './navbar/admin-navbar.component';
+import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { OppiaAdminProdModeActivitiesTabComponent } from
+  './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 
 @NgModule({
   imports: [
@@ -51,12 +44,20 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminJobsTabComponent,
+    AdminNavbarComponent,
+    AdminDevModeActivitiesTabComponent
   ],
   entryComponents: [
+    OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent
+    AdminFeaturesTabComponent,
+    AdminJobsTabComponent,
+    AdminNavbarComponent,
+    AdminDevModeActivitiesTabComponent
   ],
   providers: [
     {

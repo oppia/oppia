@@ -16,6 +16,7 @@
  * @fileoverview Directive for uploading images.
  */
 
+require('./thumbnail-display.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
@@ -179,7 +180,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/custom-forms-directives/' +
                 'edit-thumbnail-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 allowedBgColors: () => allowedBgColors,
                 aspectRatio: () => aspectRatio,

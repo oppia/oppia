@@ -54,7 +54,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -118,99 +118,95 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
     def test_search_explorations(self):
         expected_query_string = 'a query string'
-        expected_cursor = 'cursor'
-        expected_sort = 'title'
-        expected_limit = 30
-        expected_result_cursor = 'rcursor'
+        expected_offset = '0'
+        expected_size = 30
+        expected_result_offset = '30'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, limit=20, sort='',
-                ids_only=False, retries=3):
+                query_string, index, categories, language_codes, offset=None,
+                size=20, ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
-            self.assertEqual(sort, expected_sort)
+            self.assertEqual(categories, [])
+            self.assertEqual(language_codes, [])
+            self.assertEqual(offset, expected_offset)
+            self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
-            return doc_ids, expected_result_cursor
+            return doc_ids, expected_result_offset
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, cursor = search_services.search_explorations(
-                expected_query_string,
-                expected_limit,
-                sort=expected_sort,
-                cursor=expected_cursor,
+            result, result_offset = search_services.search_explorations(
+                expected_query_string, [], [], expected_size,
+                offset=expected_offset,
             )
 
-        self.assertEqual(cursor, expected_result_cursor)
+        self.assertEqual(result_offset, expected_result_offset)
         self.assertEqual(result, doc_ids)
 
     def test_search_collections(self):
         expected_query_string = 'a query string'
-        expected_cursor = 'cursor'
-        expected_sort = 'title'
-        expected_limit = 30
-        expected_result_cursor = 'rcursor'
+        expected_offset = '0'
+        expected_size = 30
+        expected_result_offset = '30'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, limit=20, sort='',
-                ids_only=False, retries=3):
+                query_string, index, categories, language_codes, offset=None,
+                size=20, ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
-            self.assertEqual(sort, expected_sort)
+            self.assertEqual(categories, [])
+            self.assertEqual(language_codes, [])
+            self.assertEqual(offset, expected_offset)
+            self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
-            return doc_ids, expected_result_cursor
+            return doc_ids, expected_result_offset
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, cursor = search_services.search_collections(
-                expected_query_string,
-                expected_limit,
-                sort=expected_sort,
-                cursor=expected_cursor,
+            result, result_offset = search_services.search_collections(
+                expected_query_string, [], [], expected_size,
+                offset=expected_offset,
             )
 
-        self.assertEqual(cursor, expected_result_cursor)
+        self.assertEqual(result_offset, expected_result_offset)
         self.assertEqual(result, doc_ids)
 
     def test_demo_collections_are_added_to_search_index(self):
-        results = search_services.search_collections('Welcome', 2)[0]
+        results = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(results, [])
 
         collection_services.load_demo('0')
-        results = search_services.search_collections('Welcome', 2)[0]
+        results = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(results, ['0'])
 
     def test_demo_explorations_are_added_to_search_index(self):
-        results, _ = search_services.search_explorations('Welcome', 2)
+        results, _ = search_services.search_explorations('Welcome', [], [], 2)
         self.assertEqual(results, [])
 
         exp_services.load_demo('0')
-        results, _ = search_services.search_explorations('Welcome', 2)
+        results, _ = search_services.search_explorations('Welcome', [], [], 2)
         self.assertEqual(results, ['0'])
 
     def test_clear_exploration_search_index(self):
         exp_services.load_demo('0')
-        result = search_services.search_explorations('Welcome', 2)[0]
+        result = search_services.search_explorations('Welcome', [], [], 2)[0]
         self.assertEqual(result, ['0'])
         search_services.clear_exploration_search_index()
-        result = search_services.search_explorations('Welcome', 2)[0]
+        result = search_services.search_explorations('Welcome', [], [], 2)[0]
         self.assertEqual(result, [])
 
     def test_clear_collection_search_index(self):
         collection_services.load_demo('0')
-        result = search_services.search_collections('Welcome', 2)[0]
+        result = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(result, ['0'])
         search_services.clear_collection_search_index()
-        result = search_services.search_collections('Welcome', 2)[0]
+        result = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(result, [])
 
     def test_delete_explorations_from_search_index(self):

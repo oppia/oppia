@@ -22,6 +22,7 @@ import json
 from core import jobs_registry
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import email_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -30,12 +31,8 @@ from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.platform import models
+from core.domain import wipeout_service
 import python_utils
-
-(job_models, email_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.email])
-transaction_services = models.Registry.import_transaction_services()
 
 
 class UnsentFeedbackEmailHandler(base.BaseHandler):
@@ -49,8 +46,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
             # Model may not exist if user has already attended to the feedback.
             return
 
-        transaction_services.run_in_transaction(
-            feedback_services.update_feedback_email_retries, user_id)
+        feedback_services.update_feedback_email_retries_transactional(user_id)
 
         messages = {}
         for reference in references:
@@ -73,9 +69,8 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
                 }
 
         email_manager.send_feedback_message_email(user_id, messages)
-        transaction_services.run_in_transaction(
-            feedback_services.pop_feedback_message_references, user_id,
-            len(references))
+        feedback_services.pop_feedback_message_references_transactional(
+            user_id, len(references))
         self.render_json({})
 
 
@@ -111,15 +106,18 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         exploration = exp_fetchers.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
-        model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-            user_id, reference_dict['thread_id'])
-        reply_to_id = model.reply_to_id
+        feedback_thread_reply_info = (
+            email_services.get_feedback_thread_reply_info_by_user_and_thread(
+                user_id, reference_dict['thread_id']))
+        if feedback_thread_reply_info is None:
+            raise self.InvalidInputException(
+                'Feedback thread for current user and thread_id does not exist')
 
         subject = 'New Oppia message in "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, message.text, subject,
             exploration.title, reference_dict['entity_id'],
-            thread.subject, reply_to_id=reply_to_id)
+            thread.subject, reply_to_id=feedback_thread_reply_info.reply_to_id)
         self.render_json({})
 
 
@@ -181,12 +179,19 @@ class DeferredTasksHandler(base.BaseHandler):
     DEFERRED_TASK_FUNCTIONS = {
         taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
-        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS: (
-            exp_services.delete_explorations_from_subscribed_users),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: (
+            exp_services.delete_explorations_from_user_models),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: (
+            exp_services.delete_explorations_from_activities),
+        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: (
+            exp_services.regenerate_exploration_summary_with_new_contributor),
         taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
             stats_services.update_stats),
         taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
             question_services.untag_deleted_misconceptions),
+        taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
+            wipeout_service
+            .remove_user_from_activities_with_associated_rights_models)
     }
 
     def post(self):

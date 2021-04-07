@@ -61,13 +61,12 @@ angular.module('oppia').component('subtopicViewerPage', {
           UrlService.getSubtopicUrlFragmentFromLearnerUrl());
 
         LoaderService.showLoadingScreen('Loading');
-        SubtopicViewerBackendApiService.fetchSubtopicData(
+        SubtopicViewerBackendApiService.fetchSubtopicDataAsync(
           ctrl.topicUrlFragment,
           ctrl.classroomUrlFragment,
           ctrl.subtopicUrlFragment).then(
           function(subtopicDataObject) {
-            ctrl.pageContents = (
-              subtopicDataObject.getPageContents().getSubtitledHtml());
+            ctrl.pageContents = subtopicDataObject.getPageContents();
             ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
             ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
             ContextService.setCustomEntityContext(

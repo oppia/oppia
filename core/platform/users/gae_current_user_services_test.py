@@ -22,8 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform.users import gae_current_user_services
 from core.tests import test_utils
 
-from google.appengine.api import users
-
 
 class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
 
@@ -32,45 +30,3 @@ class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
             gae_current_user_services.create_login_url(''),
             'https://www.google.com/accounts/Login'
             '?continue=http%3A//localhost/signup%3Freturn_url%3D')
-
-    def test_get_current_user(self):
-        self.assertIsNone(gae_current_user_services.get_current_user())
-
-        with self.login_context(self.OWNER_EMAIL):
-            self.assertEqual(
-                gae_current_user_services.get_current_user(),
-                users.User(email=self.OWNER_EMAIL))
-
-        self.assertIsNone(gae_current_user_services.get_current_user())
-
-    def test_is_current_user_super_admin(self):
-        with self.login_context(self.OWNER_EMAIL):
-            self.assertFalse(
-                gae_current_user_services.is_current_user_super_admin())
-
-        with self.login_context(self.ADMIN_EMAIL, is_super_admin=True):
-            self.assertTrue(
-                gae_current_user_services.is_current_user_super_admin())
-
-        self.assertFalse(
-            gae_current_user_services.is_current_user_super_admin())
-
-    def test_get_current_gae_id(self):
-        self.assertIsNone(gae_current_user_services.get_current_gae_id())
-
-        with self.login_context(self.OWNER_EMAIL):
-            self.assertEqual(
-                gae_current_user_services.get_current_gae_id(),
-                self.get_gae_id_from_email(self.OWNER_EMAIL))
-
-        self.assertIsNone(gae_current_user_services.get_current_gae_id())
-
-    def test_get_current_user_email(self):
-        self.assertIsNone(gae_current_user_services.get_current_user_email())
-
-        with self.login_context(self.OWNER_EMAIL):
-            self.assertEqual(
-                gae_current_user_services.get_current_user_email(),
-                self.OWNER_EMAIL)
-
-        self.assertIsNone(gae_current_user_services.get_current_user_email())

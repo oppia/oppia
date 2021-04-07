@@ -35,6 +35,7 @@ describe('Classroom backend API service', function() {
     canonical_story_count: 4,
     subtopic_count: 5,
     total_skill_count: 20,
+    total_published_node_count: 3,
     uncategorized_skill_count: 5,
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#C6DCDA',
@@ -52,6 +53,7 @@ describe('Classroom backend API service', function() {
     canonical_story_count: 3,
     subtopic_count: 2,
     total_skill_count: 10,
+    total_published_node_count: 3,
     uncategorized_skill_count: 3,
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#C6DCDA',
@@ -66,8 +68,7 @@ describe('Classroom backend API service', function() {
 
   let responseDictionaries = {
     name: 'Math',
-    public_topic_summary_dicts: [firstTopicSummaryDict],
-    private_topic_summary_dicts: [secondTopicSummaryDict],
+    topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered'
   };
@@ -85,8 +86,7 @@ describe('Classroom backend API service', function() {
     sampleClassroomDataObject = (
       ClassroomData.createFromBackendData(
         responseDictionaries.name,
-        responseDictionaries.public_topic_summary_dicts,
-        responseDictionaries.private_topic_summary_dicts,
+        responseDictionaries.topic_summary_dicts,
         responseDictionaries.course_details,
         responseDictionaries.topic_list_intro));
   });

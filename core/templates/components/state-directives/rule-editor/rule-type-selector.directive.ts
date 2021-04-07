@@ -22,6 +22,9 @@ require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
 require('third-party-imports/select2.import.ts');
 
 angular.module('oppia').directive('ruleTypeSelector', [function() {
@@ -72,7 +75,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
             data: choices,
             // Suppress the search box.
             minimumResultsForSearch: -1,
-            width: '350px',
+            width: '100%',
             dropdownParent: $(select2Node).parent(),
             templateSelection: function(object) {
               return $filter('truncateAtFirstEllipsis')(object.text);

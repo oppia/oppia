@@ -33,8 +33,8 @@ export class ContextService {
     private urlService: UrlService) {}
 
   pageContext = null;
-  explorationIsLinkedToStory = false;
   explorationId = null;
+  explorationIsLinkedToStory = false;
   questionPlayerIsManuallySet = false;
   questionId = null;
   editorContext = null;
@@ -131,20 +131,12 @@ export class ContextService {
     return this.questionPlayerIsManuallySet;
   }
 
-  canEntityReferToSkills(): boolean {
-    return (
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
-      (
-        this.getPageContext() === (
-          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
-        this.explorationIsLinkedToStory
-      )
-    );
-  }
-
   setExplorationIsLinkedToStory(): void {
     this.explorationIsLinkedToStory = true;
+  }
+
+  isExplorationLinkedToStory(): boolean {
+    return this.explorationIsLinkedToStory;
   }
 
   isInExplorationContext(): boolean {
@@ -226,7 +218,8 @@ export class ContextService {
       let pathnameArray = this.urlService.getPathname().split('/');
       for (let i = 0; i < pathnameArray.length; i++) {
         if (pathnameArray[i] === 'explore' ||
-            pathnameArray[i] === 'create') {
+            pathnameArray[i] === 'create' ||
+            pathnameArray[i] === 'skill_editor') {
           this.explorationId = pathnameArray[i + 1];
           return pathnameArray[i + 1];
         }

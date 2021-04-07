@@ -92,6 +92,8 @@ describe('Add Or Update Solution Modal Controller', function() {
         StateInteractionIdService: stateInteractionIdService,
         StateSolutionService: stateSolutionService
       });
+      $scope.$onInit();
+      currentInteractionService.updateViewWithNewAnswer();
     }));
 
     it('should initialize $scope properties after controller is initialized',

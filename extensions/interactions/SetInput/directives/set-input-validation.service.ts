@@ -30,6 +30,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
   'domain/exploration/RuleObjectFactory';
+import { TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
 
 interface PreviousRule {
   answerGroupIndex: number;
@@ -82,7 +83,9 @@ export class SetInputValidationService {
    */
   private areSameRule(ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
-      this.areSameSet(<string[]>ruleA.inputs.x, <string[]>ruleB.inputs.x);
+      this.areSameSet(
+        (<TranslatableSetOfUnicodeString>ruleA.inputs.x).unicodeStrSet,
+        (<TranslatableSetOfUnicodeString>ruleB.inputs.x).unicodeStrSet);
   }
 
   getCustomizationArgsWarnings(
@@ -91,12 +94,12 @@ export class SetInputValidationService {
 
     let buttonText = (
       customizationArgs.buttonText && customizationArgs.buttonText.value);
-    if (!buttonText || !angular.isString(buttonText.getUnicode())) {
+    if (!buttonText || !angular.isString(buttonText.unicode)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Button text must be a string.'
       });
-    } else if (buttonText.getUnicode().length === 0) {
+    } else if (buttonText.unicode.length === 0) {
       warningsList.push({
         message: 'Label for this button should not be empty.',
         type: AppConstants.WARNING_TYPES.ERROR
@@ -139,8 +142,9 @@ export class SetInputValidationService {
                 depending on their rule types.
             */
             let isRuleCoveredByAnyPrevRule = false;
-            let ruleInput = <string[]>rule.inputs.x;
-            let prevRuleInput = <string[]>prevRule.rule.inputs.x;
+            let ruleInput = <TranslatableSetOfUnicodeString>rule.inputs.x;
+            let prevRuleInput = (
+              <TranslatableSetOfUnicodeString>prevRule.rule.inputs.x);
             switch (rule.type) {
               case 'Equals':
                 // An 'Equals' rule is made redundant by another only when
@@ -151,14 +155,16 @@ export class SetInputValidationService {
               case 'HasElementsIn':
               case 'IsDisjointFrom':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  ruleInput, prevRuleInput
+                  ruleInput.unicodeStrSet,
+                  prevRuleInput.unicodeStrSet
                 );
                 break;
               case 'IsSupersetOf':
               case 'HasElementsNotIn':
               case 'OmitsElementsIn':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  prevRuleInput, ruleInput
+                  prevRuleInput.unicodeStrSet,
+                  ruleInput.unicodeStrSet
                 );
                 break;
               default:

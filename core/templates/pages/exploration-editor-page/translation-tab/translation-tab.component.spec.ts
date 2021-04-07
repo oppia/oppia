@@ -23,9 +23,6 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { LoaderService } from 'services/loader.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -53,8 +50,14 @@ import { UserExplorationPermissionsService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
 import { ExternalSaveService } from 'services/external-save.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 import $ from 'jquery';
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 describe('Translation tab component', function() {
   var ctrl = null;
@@ -71,9 +74,11 @@ describe('Translation tab component', function() {
   var stateTutorialFirstTimeService = null;
   var userExplorationPermissionsService = null;
 
-  var openTranslationTutorialEmitter = new EventEmitter();
   var refreshTranslationTabEmitter = new EventEmitter();
   var enterTranslationForTheFirstTimeEmitter = new EventEmitter();
+
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -88,8 +93,6 @@ describe('Translation tab component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value(
       'ExplorationImprovementsTaskRegistryService',
       TestBed.get(ExplorationImprovementsTaskRegistryService));
@@ -115,6 +118,9 @@ describe('Translation tab component', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -131,8 +137,6 @@ describe('Translation tab component', function() {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
-    spyOnProperty(stateTutorialFirstTimeService, 'onOpenTranslationTutorial')
-      .and.returnValue(openTranslationTutorialEmitter);
     spyOnProperty(
       stateTutorialFirstTimeService, 'onEnterTranslationForTheFirstTime')
       .and.returnValue(enterTranslationForTheFirstTimeEmitter);
@@ -245,7 +249,7 @@ describe('Translation tab component', function() {
 
       expect($scope.isTranslationTabBusy).toBe(false);
       expect($scope.showTranslationTabSubDirectives).toBe(false);
-      expect($scope.translationTutorial).toBe(false);
+      expect($scope.tutorialInProgress).toBe(false);
     });
 
   it('should load translation tab data when translation tab page is' +
@@ -265,6 +269,56 @@ describe('Translation tab component', function() {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   });
 
+  it('should start tutorial if in tutorial mode on page load with' +
+    ' permissions', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve({
+        canVoiceover: true
+      }));
+    spyOn($scope, 'startTutorial').and.callThrough();
+
+    editabilityService.onStartTutorial();
+    ctrl.$onInit();
+    $scope.$apply();
+    $scope.initTranslationTab();
+    $scope.$apply();
+
+    expect(editabilityService.inTutorialMode()).toBe(true);
+    expect($scope.startTutorial).toHaveBeenCalled();
+    expect($scope.tutorialInProgress).toBe(true);
+  });
+
+  it('should not start tutorial if in tutorial mode on page load but' +
+    ' no permissions', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve(null));
+
+    editabilityService.onStartTutorial();
+    ctrl.$onInit();
+    $scope.$apply();
+    $scope.initTranslationTab();
+    $scope.$apply();
+
+    expect(editabilityService.inTutorialMode()).toBe(true);
+    expect($scope.tutorialInProgress).toBe(false);
+  });
+
+  it('should not start tutorial if not in tutorial mode on page load', () => {
+    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+      .returnValue($q.resolve({
+        canVoiceover: true
+      }));
+
+    editabilityService.onEndTutorial();
+    ctrl.$onInit();
+    $scope.$apply();
+    $scope.initTranslationTab();
+    $scope.$apply();
+
+    expect(editabilityService.inTutorialMode()).toBe(false);
+    expect($scope.tutorialInProgress).toBe(false);
+  });
+
   it('should finish tutorial on clicking the end tutorial button when' +
     ' it has already started', function() {
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
@@ -274,17 +328,18 @@ describe('Translation tab component', function() {
 
     ctrl.$onInit();
     $scope.$apply();
+    editabilityService.onStartTutorial();
+    $scope.$apply();
 
     spyOn(editabilityService, 'onEndTutorial');
     spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-    openTranslationTutorialEmitter.emit();
 
     $scope.onFinishTutorial();
 
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
       .toHaveBeenCalled();
-    expect($scope.translationTutorial).toBe(false);
+    expect($scope.tutorialInProgress).toBe(false);
   });
 
   it('should skip tutorial when the skip tutorial button is clicked',
@@ -296,49 +351,18 @@ describe('Translation tab component', function() {
 
       ctrl.$onInit();
       $scope.$apply();
+      editabilityService.onStartTutorial();
+      $scope.$apply();
 
       spyOn(editabilityService, 'onEndTutorial');
       spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-      openTranslationTutorialEmitter.emit();
 
       $scope.onSkipTutorial();
 
       expect(editabilityService.onEndTutorial).toHaveBeenCalled();
       expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
         .toHaveBeenCalled();
-      expect($scope.translationTutorial).toBe(false);
-    });
-
-  it('should start tutorial when translation tutorial modal is closed',
-    function() {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve({
-          canVoiceover: true
-        }));
-
-      ctrl.$onInit();
-      $scope.$apply();
-
-      spyOn(editabilityService, 'onStartTutorial');
-      openTranslationTutorialEmitter.emit();
-
-      expect($scope.translationTutorial).toBe(true);
-      expect(editabilityService.onStartTutorial).toHaveBeenCalled();
-    });
-
-  it('should not start tutorial when user has no permissions',
-    function() {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue($q.resolve(null));
-
-      ctrl.$onInit();
-      $scope.$apply();
-
-      spyOn(editabilityService, 'onStartTutorial');
-      openTranslationTutorialEmitter.emit();
-
-      expect($scope.translationTutorial).toBe(false);
-      expect(editabilityService.onStartTutorial).not.toHaveBeenCalled();
+      expect($scope.tutorialInProgress).toBe(false);
     });
 
   it('should start tutorial when welcome translation modal is closed',
@@ -351,7 +375,6 @@ describe('Translation tab component', function() {
       ctrl.$onInit();
       $scope.$apply();
 
-      spyOn(editabilityService, 'onStartTutorial');
       spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('exp1')
@@ -359,7 +382,6 @@ describe('Translation tab component', function() {
       enterTranslationForTheFirstTimeEmitter.emit();
       $scope.$apply();
 
-      expect(editabilityService.onStartTutorial).toHaveBeenCalled();
       expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
         .toHaveBeenCalled();
     });

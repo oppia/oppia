@@ -16,18 +16,21 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
 import { AlertsService } from 'services/alerts.service';
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service.ts';
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
-import { TestBed } from '@angular/core/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
@@ -39,6 +42,8 @@ describe('Create New Chapter Modal Controller', function() {
   var storyObjectFactory = null;
   var explorationIdValidationService = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
@@ -57,8 +62,12 @@ describe('Create New Chapter Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'StoryObjectFactory', new StoryObjectFactory(
-        new StoryContentsObjectFactory()));
+      'EditableStoryBackendApiService',
+      TestBed.get(
+        EditableStoryBackendApiService));
+    $provide.value(
+      'StoryObjectFactory',
+      new StoryObjectFactory(new StoryContentsObjectFactory()));
     $provide.value('AlertsService', new AlertsService(new LoggerService()));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {

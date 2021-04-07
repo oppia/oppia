@@ -430,8 +430,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         }
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID_1, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, 1,
             suggestion_models.STATUS_IN_REVIEW, self.editor_id, None,
             change_cmd, 'score category', thread_id, None)
 

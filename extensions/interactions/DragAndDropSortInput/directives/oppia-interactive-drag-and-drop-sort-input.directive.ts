@@ -44,14 +44,41 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
             $attrs, CurrentInteractionService) {
           var ctrl = this;
           var answers = [];
+
+          const getContentIdOfHtml = function(html) {
+            const {
+              choices
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'DragAndDropSortInput',
+              $attrs
+            );
+
+            return choices[ctrl.choices.indexOf(html)].contentId;
+          };
+
+          const getHtmlOfContentId = function(contentId) {
+            const {
+              choices
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'DragAndDropSortInput',
+              $attrs
+            );
+            for (let choice of choices) {
+              if (choice.contentId === contentId) {
+                return choice.html;
+              }
+            }
+          };
+
           ctrl.submitAnswer = function() {
             // Converting list of dicts to list of lists to make it consistent
-            // with the ListOfSetsOfHtmlStrings object.
+            // with the ListOfSetsOfTranslatableHtmlContentIds object.
             answers = [];
             for (var i = 0; i < ctrl.list.length; i++) {
-              answers.push([ctrl.list[i].title]);
+              answers.push([getContentIdOfHtml(ctrl.list[i].title)]);
               for (var j = 0; j < ctrl.list[i].items.length; j++) {
-                answers[i].push(ctrl.list[i].items[j].title);
+                answers[i].push(
+                  getContentIdOfHtml(ctrl.list[i].items[j].title));
               }
             }
 
@@ -66,7 +93,7 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               'DragAndDropSortInput',
               $attrs
             );
-            ctrl.choices = choices.map(choice => choice.getHtml());
+            ctrl.choices = choices.map(choice => choice.html);
 
             ctrl.list = [];
             ctrl.dataMaxDepth = 1;
@@ -80,9 +107,31 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               ctrl.dataMaxDepth = 1;
             }
 
-            // Make list of dicts from the list of choices.
-            for (var i = 0; i < ctrl.choices.length; i++) {
-              ctrl.list.push({title: ctrl.choices[i], items: []});
+            let savedSolution = (
+              $attrs.savedSolution !== undefined ?
+              JSON.parse($attrs.savedSolution) : []
+            );
+
+            if (savedSolution.length) {
+              // Pre populate with the saved solution, if present.
+              for (let contentIds of savedSolution) {
+                let item = {
+                  title: getHtmlOfContentId(contentIds[0]),
+                  items: []
+                };
+                for (let i = 1; i < contentIds.length; i++) {
+                  item.items.push({
+                    title: getHtmlOfContentId(contentIds[i]),
+                    items: []
+                  });
+                }
+                ctrl.list.push(item);
+              }
+            } else {
+              // Make list of dicts from the list of choices.
+              for (let choice of ctrl.choices) {
+                ctrl.list.push({title: choice, items: []});
+              }
             }
 
             ctrl.treeOptions = {
