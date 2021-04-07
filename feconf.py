@@ -1113,6 +1113,9 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+CLOUD_DATASTORE_EMULATOR_PORT = 8089
+
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
 
 # TODO(#11462): Delete this after Firebase authentication has been deployed.
