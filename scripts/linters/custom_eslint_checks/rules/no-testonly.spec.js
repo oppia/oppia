@@ -24,7 +24,8 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester();
 ruleTester.run('no-testonly', rule, {
   valid: [
-    'otherFunction()'
+    'otherFunction()',
+    'function testOnly(){}'
   ],
 
   invalid: [
