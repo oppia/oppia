@@ -38,8 +38,7 @@ angular.module('oppia').controller('TranslationModalController', [
   function (
     $controller, $scope, $uibModalInstance, AlertsService,
     CkEditorCopyContentService, ContextService, ImageLocalStorageService,
-    SiteAnalyticsService, TranslateTextService,
-    TranslationLanguageService,
+    SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
     opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
