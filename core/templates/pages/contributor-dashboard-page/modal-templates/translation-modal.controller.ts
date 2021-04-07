@@ -135,8 +135,8 @@ angular.module('oppia').controller('TranslationModalController',
 
       $scope.suggestTranslatedText = function() {
         if (!$scope.uploadingTranslation && !$scope.loadingData) {
-          SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-            'Translation');
+          SiteAnalyticsService.
+            registerContributorDashboardSubmitSuggestionEvent('Translation');
           $scope.uploadingTranslation = true;
           var imagesData = ImageLocalStorageService.getStoredImagesData();
           ImageLocalStorageService.flushStoredImagesData();
