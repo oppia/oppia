@@ -33,7 +33,7 @@ import re
 
 from core.platform import models
 import feconf
-from jobs import jobs_utils
+from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
 
@@ -61,7 +61,7 @@ class ValidateDeletedModel(beam.DoFn):
         Yields:
             ModelExpiredError. An error class for expired models.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
 
         expiration_date = (
             datetime.datetime.utcnow() -
@@ -100,7 +100,7 @@ class ValidateBaseModelId(beam.DoFn):
         Yields:
             ModelIdRegexError. An error class for models with invalid IDs.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
 
         if not re.match(self._pattern, model.id):
             yield audit_errors.ModelIdRegexError(model, self._pattern)
@@ -123,7 +123,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
         Yields:
             ModelInvalidCommitStatus. Error for commit_type validation.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
 
         expected_post_commit_is_private = (
             model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
@@ -148,7 +148,7 @@ class ValidateModelTimestamps(beam.DoFn):
             InconsistentTimestampsError. Error for models with inconsistent
             timestamps.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
         if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
             yield audit_errors.InconsistentTimestampsError(model)
 

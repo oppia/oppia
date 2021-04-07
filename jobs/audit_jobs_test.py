@@ -23,7 +23,7 @@ from core.platform import models
 import feconf
 from jobs import audit_jobs
 from jobs import job_options
-from jobs import jobs_test_utils
+from jobs import job_test_utils
 from jobs.transforms import base_model_audits
 from jobs.types import audit_errors
 
@@ -34,7 +34,7 @@ from apache_beam.testing import test_pipeline
     models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
 
 
-class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
+class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = audit_jobs.AuditAllStorageModelsJob
 

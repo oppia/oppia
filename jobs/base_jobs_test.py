@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 from jobs import base_jobs
-from jobs import jobs_test_utils
+from jobs import job_test_utils
 import python_utils
 
 
@@ -77,7 +77,7 @@ class JobMetaclassTests(test_utils.TestBase):
                     pass
 
 
-class JobBaseTests(jobs_test_utils.PipelinedTestBase):
+class JobBaseTests(job_test_utils.PipelinedTestBase):
 
     def test_run_raises_not_implemented_error(self):
         self.assertRaisesRegexp(

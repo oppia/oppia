@@ -23,7 +23,7 @@ import collections
 import inspect
 
 from core.platform import models
-from jobs import jobs_utils
+from jobs import job_utils
 from jobs.types import audit_errors
 import python_utils
 
@@ -77,7 +77,7 @@ class AuditsExisting(python_utils.OBJECT):
                 raise TypeError(
                     '%r is not a model registered in core.platform' % t)
         self._targeted_kinds = {
-            jobs_utils.get_model_kind(t) for t in self._targeted_model_types
+            job_utils.get_model_kind(t) for t in self._targeted_model_types
         }
 
     def __call__(self, do_fn_type):

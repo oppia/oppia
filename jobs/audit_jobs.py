@@ -20,7 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from jobs import base_jobs
-from jobs import jobs_utils
+from jobs import job_utils
 from jobs.transforms import audits_registry
 from jobs.transforms import base_model_audits
 import python_utils
@@ -63,7 +63,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
             # STORAGE, Partition is the clear winner regardless of the overhead
             # we'll see in unit tests.
             | 'Split models into parallelizable PCollections' >> beam.Partition(
-                lambda m, _, kinds: kinds.index(jobs_utils.get_model_kind(m)),
+                lambda m, _, kinds: kinds.index(job_utils.get_model_kind(m)),
                 # NOTE: Partition requires a hard-coded number of slices; it
                 # cannot be used with dynamic numbers generated in a pipeline.
                 # KIND_BY_INDEX is a constant tuple so that requirement is

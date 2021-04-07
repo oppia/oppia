@@ -20,13 +20,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
-from jobs import jobs_test_utils
+from jobs import job_test_utils
 from jobs.io import stub_io
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-class ModelIoStubTests(jobs_test_utils.PipelinedTestBase):
+class ModelIoStubTests(job_test_utils.PipelinedTestBase):
 
     def test_get_models_returns_nothing_when_stub_is_empty(self):
         stub = stub_io.ModelIoStub()

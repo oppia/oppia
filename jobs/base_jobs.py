@@ -129,7 +129,7 @@ class JobBase(python_utils.with_metaclass(JobMetaclass)):
                 return (
                     self.pipeline
                     | self.job_options.model_getter()
-                    | beam.GroupBy(jobs_utils.get_model_kind)
+                    | beam.GroupBy(job_utils.get_model_kind)
                     | beam.combiners.Count.PerElement()
                 )
 
