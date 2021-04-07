@@ -22,9 +22,6 @@ require(
 
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
 require(
-  'pages/contributor-dashboard-page/services/' +
-  'translated-text-backend-api.service.ts');
-require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
 require('services/alerts.service.ts');
@@ -34,17 +31,16 @@ require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
-  '$controller', '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
+  '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
-  'SiteAnalyticsService', 'TranslateTextService',
-  'TranslatedTextBackendApiService', 'TranslationLanguageService',
+  'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
   'opportunity', 'ENTITY_TYPE', 'TRANSLATION_TIPS',
-  function(
-      $controller, $rootScope, $scope, $uibModalInstance, AlertsService,
-      CkEditorCopyContentService, ContextService, ImageLocalStorageService,
-      SiteAnalyticsService, TranslateTextService,
-      TranslatedTextBackendApiService, TranslationLanguageService,
-      opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
+  function (
+    $controller, $scope, $uibModalInstance, AlertsService,
+    CkEditorCopyContentService, ContextService, ImageLocalStorageService,
+    SiteAnalyticsService, TranslateTextService,
+    TranslationLanguageService,
+    opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -86,44 +82,44 @@ angular.module('oppia').controller('TranslationModalController', [
     TranslateTextService.init(
       opportunity.id,
       TranslationLanguageService.getActiveLanguageCode(),
-      function() {
+      function () {
         var textAndAvailability = (
           TranslateTextService.getTextToTranslate());
         $scope.textToTranslate = textAndAvailability.text;
         $scope.moreAvailable = textAndAvailability.more;
         $scope.loadingData = false;
       });
-    TranslatedTextBackendApiService.getTranslationsAndContent(
-      opportunity.id,
-      TranslationLanguageService.getActiveLanguageCode()).then(
-      () => {
-        var TranslatedTextAndContent = (
-          TranslatedTextBackendApiService.getTranslationsAndContentLists());
-        $scope.translationsList = TranslatedTextAndContent.translations;
-        $scope.contentList = TranslatedTextAndContent.content;
-        if ($scope.translationsList.length > 0) {
-          $scope.noTranslationComplete = false;
-        }
-        if ($scope.translationsList.length > 10) {
-          $scope.translationsList.splice(10);
-          $scope.contentList.splice(10);
-        }
-        $scope.loadingTranslatedText = false;
-        $rootScope.$applyAsync();
-      }
-    );
-    $scope.onContentClick = function($event) {
+    $scope.loadCompletedTranslations = function() {
+      TranslateTextService.fetchCompletedTranslations(
+        opportunity.id,
+        TranslationLanguageService.getActiveLanguageCode(),
+        function () {
+          console.log("Called the completedTranslationsload function")
+          var completedTranslationsAndContent = 
+            TranslateTextService.getCompletedTranslationsText();
+            $scope.translationsList = completedTranslationsAndContent.translations;
+            $scope.contentList = completedTranslationsAndContent.content;
+            if ($scope.translationsList.length > 0) {
+              $scope.noTranslationComplete = false;
+            }
+            if ($scope.translationsList.length > 10) {
+              $scope.translationsList.splice(10);
+              $scope.contentList.splice(10);
+            }
+            $scope.loadingTranslatedText = false; 
+        });
+    }
+    $scope.onContentClick = function ($event) {
       if ($scope.isCopyModeActive()) {
         $event.stopPropagation();
       }
       CkEditorCopyContentService.broadcastCopy($event.target);
     };
-
-    $scope.isCopyModeActive = function() {
+    $scope.isCopyModeActive = function () {
       return CkEditorCopyContentService.copyModeActive;
     };
-
-    $scope.skipActiveTranslation = function() {
+    
+    $scope.skipActiveTranslation = function () {
       var textAndAvailability = (
         TranslateTextService.getTextToTranslate());
       $scope.textToTranslate = textAndAvailability.text;
@@ -131,14 +127,14 @@ angular.module('oppia').controller('TranslationModalController', [
       $scope.activeWrittenTranslation.html = '';
     };
 
-    $scope.returnToPreviousTranslation = function() {
+    $scope.returnToPreviousTranslation = function () {
       var textAndAvailability = (
         TranslateTextService.getPreviousTextToTranslate());
       $scope.textToTranslate = textAndAvailability.text;
       $scope.previousTranslationAvailable = textAndAvailability.more;
     };
 
-    $scope.suggestTranslatedText = function() {
+    $scope.suggestTranslatedText = function () {
       if (!$scope.uploadingTranslation && !$scope.loadingData) {
         SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
           'Translation');
@@ -149,7 +145,7 @@ angular.module('oppia').controller('TranslationModalController', [
         TranslateTextService.suggestTranslatedText(
           $scope.activeWrittenTranslation.html,
           TranslationLanguageService.getActiveLanguageCode(),
-          imagesData, function() {
+          imagesData, function () {
             AlertsService.addSuccessMessage(
               'Submitted translation for review.');
             if ($scope.moreAvailable) {
@@ -169,8 +165,10 @@ angular.module('oppia').controller('TranslationModalController', [
         $uibModalInstance.close();
       }
     };
-
-    $scope.toggleViewCompletedTranslationsModal = function() {
+    $scope.toggleViewCompletedTranslationsModal = function () {
+      if($scope.loadingTranslatedText){
+        $scope.loadCompletedTranslations();
+      }
       $scope.viewCompletedTranslationsModalOpen =
         !$scope.viewCompletedTranslationsModalOpen;
     };

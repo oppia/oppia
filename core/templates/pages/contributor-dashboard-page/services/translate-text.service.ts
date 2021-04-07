@@ -61,7 +61,8 @@ angular.module('oppia').factory('TranslateTextService', [
     var activeStateName = null;
     var activeContentId = null;
     var activeContentText = null;
-
+    var completedTranslations = [];
+    var completedTranslationsContent = [];
     const getNextText = function() {
       if (stateAndContent.length === 0) {
         return null;
@@ -193,6 +194,25 @@ angular.module('oppia').factory('TranslateTextService', [
             'Content-Type': undefined
           }
         }).then(successCallback, errorCallback);
+      },
+      fetchCompletedTranslations: function(
+        expId, languageCode, successCallback) {
+          $http.get('/getcompletedtranslationshandler', {
+            params: {
+              exp_id: expId,
+              language_code: languageCode
+            }
+          }).then(function(response) {
+            completedTranslations = response.data.translations;
+            completedTranslationsContent = response.data.content;
+            successCallback();
+          });
+      },
+      getCompletedTranslationsText: function() {
+        return {
+          translations: completedTranslations,
+          content: completedTranslationsContent
+        }
       }
     };
   }]);

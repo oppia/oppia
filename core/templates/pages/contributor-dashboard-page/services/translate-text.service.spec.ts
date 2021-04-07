@@ -140,5 +140,23 @@ describe('TranslateTextService', function() {
 
       expect(textAndAvailability).toEqual(textAndPreviousAvailability);
     });
+
+    it('should return the completed translations and content correctly', function() {
+      const expectTranslationsAndContent = {
+        translations: ['<p> Translation 1 </p>', '<p> Translation 2 </p>'],
+        content: ['<p> Content 1 </p>', '<p> Content 2 </p>']
+      }
+      $httpBackend.expect(
+        'GET', '/getcompletedtranslationshandler?exp_id=1&language_code=en')
+        .respond({
+          translations: ['<p> Translation 1 </p>', '<p> Translation 2 </p>'],
+          content: ['<p> Content 1 </p>', '<p> Content 2 </p>']
+        });
+      TranslateTextService.fetchCompletedTranslations('1','en', ()=>{});
+      $httpBackend.flush();
+
+      const completedTranslationsAndContent = TranslateTextService.getCompletedTranslationsText();
+      expect(completedTranslationsAndContent).toEqual(expectTranslationsAndContent);
+    })
   });
 });
