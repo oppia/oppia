@@ -11,12 +11,12 @@
       </i>
       <oppia-thumbnail-display ng-show="!thumbnailIsLoading"
                                [img-src]="editableThumbnailDataUrl"
-                               [classes]="['img-thumbnail', 'test-class-1']"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                                [background]="getBgColor()">
       </oppia-thumbnail-display>
       <oppia-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
-                               [img-src]="editableThumbnailDataUrl"
-                               [classes]="['img-thumbnail', 'test-class-2']"
+                               [img-src]="newThumbnailDataUrl"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                                [background]="localStorageBgcolor">
       </oppia-thumbnail-display>
     </div>

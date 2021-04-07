@@ -5,7 +5,7 @@
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
       <picture class="fx-row fx-main-center" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
-        <img ng-src="<[$ctrl.thumbnailUrl]>" alt="test1" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+        <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
       </picture>
     </div>
     <div class="topic-details" ng-style="{'background-color': $ctrl.getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !$ctrl.isPublished()}">
