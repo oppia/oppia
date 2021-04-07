@@ -32,7 +32,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
-NOT_FULLY_COVERED_FILENAMES = [
+NOT_FULLY_COVERED_FILENAMES = [model
     'admin-config-tab.directive.ts',
     'admin-misc-tab.directive.ts',
     'admin-page.directive.ts',
@@ -316,10 +316,10 @@ NOT_FULLY_COVERED_FILENAMES = [
     'student.ts',
     'subtitled-html-editor.directive.ts',
     'subtitled-unicode-editor.directive.ts',
-    'subtopic-preview-tab.component.ts',
-    'subtopic-summary-tile.directive.ts',
     'subtopic.model.ts',
     'subtopic-page.model.ts',
+    'subtopic-preview-tab.component.ts',
+    'subtopic-summary-tile.directive.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
     'summary-list-header.component.ts',
     'supplemental-card.directive.ts',
