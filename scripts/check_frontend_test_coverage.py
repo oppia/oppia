@@ -221,7 +221,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'parameterize-rule-description.filter.ts',
     'player-correctness-feedback-enabled.service.ts',
     'player-transcript.service.ts',
-    'png-sanitizer.service.ts',
     'pretest-question-backend-api.service.ts',
     'profile-link-image.component.ts',
     'profile-link-text.component.ts',
