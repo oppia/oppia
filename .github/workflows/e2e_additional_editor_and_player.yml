@@ -29,8 +29,6 @@ jobs:
         run: |
           python -m scripts.check_if_pr_is_low_risk ${{ github.event.pull_request.html_url }}
           echo "low_risk=${?}" >> $GITHUB_ENV
-      - name: Print Low-Risk Status
-        run: echo "${{ env.low_risk }}"
       - name: Install chrome
         if: ${{ env.low_risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
