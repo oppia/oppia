@@ -40,7 +40,7 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk', 'platform',
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk', 'platform',
     'google_appengine')
 
 _PARSER = argparse.ArgumentParser()
