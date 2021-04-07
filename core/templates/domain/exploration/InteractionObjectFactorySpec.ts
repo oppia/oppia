@@ -30,8 +30,8 @@ import { OutcomeObjectFactory } from
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory.ts';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 

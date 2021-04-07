@@ -33,8 +33,6 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SolutionValidityService } from
@@ -45,11 +43,7 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -60,6 +54,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -81,7 +76,6 @@ describe('Exploration editor tab component', function() {
   var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
   var stateEditorService = null;
-  var subtitledHtmlObjectFactory = null;
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
@@ -94,7 +88,6 @@ describe('Exploration editor tab component', function() {
     hintObjectFactory = TestBed.get(HintObjectFactory);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.get(SolutionObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
     focusManagerService = TestBed.get(FocusManagerService);
   });
 
@@ -113,9 +106,6 @@ describe('Exploration editor tab component', function() {
       'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
     $provide.value(
       'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      TestBed.get(RecordedVoiceoversObjectFactory));
     $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
     $provide.value(
@@ -125,11 +115,7 @@ describe('Exploration editor tab component', function() {
       TestBed.get(StateClassifierMappingService));
     $provide.value(
       'StateEditorService', TestBed.get(StateEditorService));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', TestBed.get(SubtitledHtmlObjectFactory));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
-    $provide.value(
-      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
       TestBed.get(WrittenTranslationObjectFactory));
@@ -388,12 +374,12 @@ describe('Exploration editor tab component', function() {
   it('should save state content', function() {
     stateEditorService.setActiveStateName('First State');
     expect(explorationStatesService.getState('First State').content).toEqual(
-      subtitledHtmlObjectFactory.createFromBackendDict({
+      SubtitledHtml.createFromBackendDict({
         content_id: 'content',
         html: 'First State Content'
       }));
 
-    var displayedValue = subtitledHtmlObjectFactory.createFromBackendDict({
+    var displayedValue = SubtitledHtml.createFromBackendDict({
       content_id: 'content',
       html: 'First State Content Changed'
     });

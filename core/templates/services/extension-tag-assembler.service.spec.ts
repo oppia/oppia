@@ -21,7 +21,7 @@ import { ExtensionTagAssemblerService } from
   './extension-tag-assembler.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 describe('Extension Tag Assembler Service', () => {
   let etas;

@@ -17,11 +17,8 @@
  * subtopic domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
-import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
+import { ShortSkillSummary } from
+  'domain/skill/ShortSkillSummary.model';
 
 import constants from 'assets/constants';
 
@@ -43,26 +40,24 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-  _skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
+  _skillSummary: ShortSkillSummary;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
       thumbnailFilename: string, thumbnailBgColor: string,
       urlFragment: string) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
-    this._skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
     this._urlFragment = urlFragment;
     this._skillSummaries = skillIds.map(
       (skillId) => {
-        return this._skillSummaryObjectFactory.create(
+        return ShortSkillSummary.create(
           skillId, skillIdToDescriptionMap[skillId]);
       });
   }
@@ -145,7 +140,7 @@ export class Subtopic {
 
   addSkill(skillId: string, skillDescription: string): boolean {
     if (!this.hasSkill(skillId)) {
-      this._skillSummaries.push(this._skillSummaryObjectFactory.create(
+      this._skillSummaries.push(ShortSkillSummary.create(
         skillId, skillDescription));
       return true;
     }
@@ -178,27 +173,19 @@ export class Subtopic {
   getThumbnailBgColor(): string {
     return this._thumbnailBgColor;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class SubtopicObjectFactory {
-  constructor(
-    private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
-
-  create(
+  static create(
       subtopicBackendDict: SubtopicBackendDict,
       skillIdToDescriptionMap: SkillIdToDescriptionMap): Subtopic {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
-      this.skillSummaryObjectFactory, subtopicBackendDict.thumbnail_filename,
+      subtopicBackendDict.thumbnail_filename,
       subtopicBackendDict.thumbnail_bg_color,
       subtopicBackendDict.url_fragment);
   }
 
-  createFromTitle(subtopicId: number, title: string): Subtopic {
+  static createFromTitle(subtopicId: number, title: string): Subtopic {
     return this.create({
       id: subtopicId,
       title: title,
@@ -209,6 +196,3 @@ export class SubtopicObjectFactory {
     }, {});
   }
 }
-
-angular.module('oppia').factory(
-  'SubtopicObjectFactory', downgradeInjectable(SubtopicObjectFactory));

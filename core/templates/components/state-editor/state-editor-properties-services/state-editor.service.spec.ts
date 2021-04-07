@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 describe('Editor state service', () => {
   let ecs: StateEditorService = null;

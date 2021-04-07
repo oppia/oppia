@@ -27,14 +27,12 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import {
   RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-  RecordedVoiceoversObjectFactory
-} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+  RecordedVoiceovers
+} from 'domain/exploration/RecordedVoiceovers.model';
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml
+} from 'domain/exploration/SubtitledHtml.model';
 import {
   WrittenTranslationsBackendDict,
   WrittenTranslations,
@@ -156,8 +154,6 @@ export class StateObjectFactory {
   constructor(
     private interactionObject: InteractionObjectFactory,
     private paramchangesObject: ParamChangesObjectFactory,
-    private recordedVoiceoversObject: RecordedVoiceoversObjectFactory,
-    private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
@@ -185,11 +181,11 @@ export class StateObjectFactory {
     return new State(
       stateName,
       stateDict.classifier_model_id,
-      this.subtitledHtmlObject.createFromBackendDict(stateDict.content),
+      SubtitledHtml.createFromBackendDict(stateDict.content),
       this.interactionObject.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(
         stateDict.param_changes),
-      this.recordedVoiceoversObject.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         stateDict.recorded_voiceovers),
       stateDict.solicit_answer_details,
       this.writtenTranslationsObject.createFromBackendDict(

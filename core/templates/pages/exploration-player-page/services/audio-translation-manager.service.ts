@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Voiceover } from
-  'domain/exploration/VoiceoverObjectFactory';
+  'domain/exploration/Voiceover.model';
 
 export interface AudioTranslations {
   [languageCode: string]: Voiceover

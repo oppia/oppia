@@ -22,9 +22,8 @@ import { Injectable } from '@angular/core';
 
 import {
   SubtitledHtml,
-  SubtitledHtmlBackendDict,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtmlBackendDict
+} from 'domain/exploration/SubtitledHtml.model';
 
 export interface HintBackendDict {
   'hint_content': SubtitledHtmlBackendDict;
@@ -47,17 +46,17 @@ export class Hint {
   providedIn: 'root'
 })
 export class HintObjectFactory {
-  constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
+  constructor() {}
 
   createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
     return new Hint(
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         hintBackendDict.hint_content));
   }
 
   createNew(hintContentId: string, hintContent: string): Hint {
     return new Hint(
-      this.subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         hintContent, hintContentId));
   }
 }

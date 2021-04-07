@@ -20,9 +20,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { RecordedVoiceovers } from
+  'domain/exploration/RecordedVoiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
@@ -44,7 +44,6 @@ describe('Content translation manager service', () => {
   let pts: PlayerTranscriptService;
   let scof: StateCardObjectFactory;
   let suof: SubtitledUnicodeObjectFactory;
-  let rvof: RecordedVoiceoversObjectFactory;
   let wtof: WrittenTranslationsObjectFactory;
 
   let writtenTranslations: WrittenTranslations;
@@ -56,7 +55,6 @@ describe('Content translation manager service', () => {
     pts = TestBed.get(PlayerTranscriptService);
     scof = TestBed.get(StateCardObjectFactory);
     suof = TestBed.get(SubtitledUnicodeObjectFactory);
-    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
     wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
     let defaultOutcomeDict = {
@@ -178,7 +176,7 @@ describe('Content translation manager service', () => {
         ehfs.getInteractionHtml(
           interaction.id, interaction.customizationArgs, true, null, null),
         interaction,
-        rvof.createEmpty(),
+        RecordedVoiceovers.createEmpty(),
         writtenTranslations,
         'content'
       )

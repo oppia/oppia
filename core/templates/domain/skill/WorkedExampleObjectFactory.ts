@@ -20,8 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import {
-  SubtitledHtml, SubtitledHtmlObjectFactory, SubtitledHtmlBackendDict
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml, SubtitledHtmlBackendDict
+} from 'domain/exploration/SubtitledHtml.model';
 
 export interface WorkedExampleBackendDict {
   question: SubtitledHtmlBackendDict,
@@ -57,15 +57,15 @@ export class WorkedExample {
   providedIn: 'root'
 })
 export class WorkedExampleObjectFactory {
-  constructor(
-      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
+  constructor() {}
+
 
   createFromBackendDict(
       workedExampleDict: WorkedExampleBackendDict): WorkedExample {
     return new WorkedExample(
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         workedExampleDict.question),
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         workedExampleDict.explanation)
     );
   }

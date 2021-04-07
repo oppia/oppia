@@ -18,7 +18,7 @@
 
 import { TestBed, async, ComponentFixture, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { Subtopic } from 'domain/topic/Subtopic.model';
 import { PracticeTabComponent } from './practice-tab.component';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
@@ -66,7 +66,6 @@ class MockQuestionBackendApiService {
 describe('Practice tab component', function() {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
-  let subtopicObjectFactory = null;
   let windowRef: MockWindowRef;
   let questionBackendApiService: MockQuestionBackendApiService;
 
@@ -89,15 +88,11 @@ describe('Practice tab component', function() {
   }));
 
   beforeEach(() => {
-    subtopicObjectFactory = TestBed.get(SubtopicObjectFactory);
-  });
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(PracticeTabComponent);
     component = fixture.componentInstance;
     component.topicName = 'Topic Name';
     component.subtopicsList = [
-      subtopicObjectFactory.create({
+      Subtopic.create({
         id: 1,
         title: 'Subtopic 1',
         skill_ids: ['1', '2'],
@@ -107,7 +102,7 @@ describe('Practice tab component', function() {
         1: 'First skill',
         2: 'Second skill'
       }),
-      subtopicObjectFactory.create({
+      Subtopic.create({
         id: 2,
         title: 'Subtopic 2',
         skill_ids: [],

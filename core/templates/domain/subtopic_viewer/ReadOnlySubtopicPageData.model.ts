@@ -17,16 +17,12 @@
  * subtopic data domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   SubtopicPageContentsBackendDict,
-  SubtopicPageContents,
-  SubtopicPageContentsObjectFactory
-} from 'domain/topic/SubtopicPageContentsObjectFactory';
-import { SubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
+  SubtopicPageContents
+} from 'domain/topic/SubtopicPageContents.model';
+import { SubtopicBackendDict, Subtopic } from
+  'domain/topic/Subtopic.model';
 
 export interface SubtopicDataBackendDict {
   'subtopic_title': string;
@@ -76,37 +72,23 @@ export class ReadOnlySubtopicPageData {
   getNextSubtopic(): Subtopic | null {
     return this.nextSubtopic;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ReadOnlySubtopicPageObjectFactory {
-  constructor(
-    private subtopicPageContentsObjectFactory:
-      SubtopicPageContentsObjectFactory,
-    private subtopicObjectFactory: SubtopicObjectFactory
-  ) {}
-
-  createFromBackendDict(subtopicDataBackendDict: SubtopicDataBackendDict):
-    ReadOnlySubtopicPageData {
+  static createFromBackendDict(
+      subtopicDataBackendDict: SubtopicDataBackendDict):
+  ReadOnlySubtopicPageData {
     let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (
-      this.subtopicObjectFactory
-        .create(subtopicDataBackendDict.next_subtopic_dict, {})
-    ) : null;
+    Subtopic
+      .create(subtopicDataBackendDict.next_subtopic_dict, {})
+  ) : null;
 
     return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.topic_name,
       subtopicDataBackendDict.subtopic_title,
-      this.subtopicPageContentsObjectFactory.createFromBackendDict(
+      SubtopicPageContents.createFromBackendDict(
         subtopicDataBackendDict.page_contents
       ),
       nextSubtopic
     );
   }
 }
-
-angular.module('oppia').factory(
-  'ReadOnlySubtopicPageObjectFactory',
-  downgradeInjectable(ReadOnlySubtopicPageObjectFactory));

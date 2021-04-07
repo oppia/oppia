@@ -25,7 +25,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -42,7 +42,7 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 

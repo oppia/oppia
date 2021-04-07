@@ -26,7 +26,7 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers, RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+  'domain/exploration/RecordedVoiceovers.model';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';

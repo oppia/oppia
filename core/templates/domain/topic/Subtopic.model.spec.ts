@@ -13,23 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SubtopicObjectFactory.
+ * @fileoverview Tests for Subtopic model.
  */
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { Subtopic } from 'domain/topic/Subtopic.model';
 
 describe('Subtopic object factory', () => {
-  let subtopicObjectFactory: SubtopicObjectFactory = null;
   var _sampleSubtopic = null;
   var skillIds = ['skill_1', 'skill_2'];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SubtopicObjectFactory]
+      providers: [Subtopic]
     });
-    subtopicObjectFactory = TestBed.get(SubtopicObjectFactory);
 
     var sampleSubtopicBackendObject = {
       id: 1,
@@ -43,7 +41,7 @@ describe('Subtopic object factory', () => {
       skill_1: 'Description 1',
       skill_2: 'Description 2'
     };
-    _sampleSubtopic = subtopicObjectFactory.create(
+    _sampleSubtopic = Subtopic.create(
       sampleSubtopicBackendObject, sampleSkillIdToDesriptionMap);
   });
 
@@ -72,7 +70,7 @@ describe('Subtopic object factory', () => {
 
   it('should be able to create a subtopic object with given title and id',
     () => {
-      var subtopic = subtopicObjectFactory.createFromTitle(2, 'Title2');
+      var subtopic = Subtopic.createFromTitle(2, 'Title2');
       expect(subtopic.getId()).toBe(2);
       expect(subtopic.getTitle()).toBe('Title2');
       expect(subtopic.getSkillSummaries()).toEqual([]);

@@ -16,27 +16,25 @@
  * @fileoverview Controller for create new subtopic modal controller.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/topic/topic-update.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/subtopic-validation-service.ts');
-require('domain/topic/SubtopicPageObjectFactory.ts');
 
 import createSubtopicConstants from 'assets/constants';
+import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
 
 angular.module('oppia').controller('CreateNewSubtopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  'SubtopicPageObjectFactory', 'SubtopicValidationService',
+  'SubtopicValidationService',
   'TopicEditorStateService', 'TopicUpdateService', 'WindowRef',
   'topic', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
   function(
       $controller, $scope, $uibModalInstance,
-      SubtopicPageObjectFactory, SubtopicValidationService,
+      SubtopicValidationService,
       TopicEditorStateService, TopicUpdateService, WindowRef,
       topic, MAX_CHARS_IN_SUBTOPIC_TITLE,
       MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
@@ -135,7 +133,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       TopicUpdateService.setSubtopicUrlFragment(
         ctrl.topic, ctrl.subtopicId, ctrl.editableUrlFragment);
 
-      ctrl.subtopicPage = SubtopicPageObjectFactory.createDefault(
+      ctrl.subtopicPage = SubtopicPage.createDefault(
         ctrl.topic.getId(), ctrl.subtopicId);
 
       var subtitledHtml = angular.copy(

@@ -18,8 +18,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
+import { ShortSkillSummary } from
+  'domain/skill/ShortSkillSummary.model';
 import { SkillDifficulty } from
   'domain/skill/skill-difficulty.model';
 
@@ -27,7 +27,6 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
   function() {
     var $scope = null;
     var $uibModalInstance = null;
-    var skillSummaryObjectFactory = null;
 
     var allSkillSummaries = [{
       id: '1',
@@ -49,10 +48,9 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     beforeEach(function() {
       TestBed.configureTestingModule({
         providers: [
-          ShortSkillSummaryObjectFactory
+          ShortSkillSummary
         ]
       });
-      skillSummaryObjectFactory = TestBed.get(ShortSkillSummaryObjectFactory);
     });
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -62,7 +60,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
         '$uibModalInstance', ['close', 'dismiss']);
 
       allSkillSummaries.map(summary => (
-        skillSummaryObjectFactory.create(summary.id, summary.description)));
+        ShortSkillSummary.create(summary.id, summary.description)));
 
       $scope = $rootScope.$new();
       $controller('QuestionsListSelectSkillAndDifficultyModalController', {

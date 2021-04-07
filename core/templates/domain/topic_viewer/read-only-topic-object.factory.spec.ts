@@ -18,19 +18,17 @@
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
+import { ShortSkillSummary } from
+  'domain/skill/ShortSkillSummary.model';
 import { StoryNode } from 'domain/story/story-node.model';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { Subtopic } from 'domain/topic/Subtopic.model';
 
 describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
 
   beforeEach(() => {
-    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
-      new ShortSkillSummaryObjectFactory());
+    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
 
     let nodeDict = {
       id: 'node_1',

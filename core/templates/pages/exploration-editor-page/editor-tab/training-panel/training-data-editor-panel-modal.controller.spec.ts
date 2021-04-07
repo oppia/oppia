@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
@@ -33,7 +34,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   var StateCustomizationArgsService = null;
   var TrainingModalService = null;
   var AlertsService = null;
-  var SubtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -63,7 +63,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'StateCustomizationArgsService');
       TrainingModalService = $injector.get('TrainingModalService');
       AlertsService = $injector.get('AlertsService');
-      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
       ExplorationStatesService.init({
         Hola: {
@@ -215,7 +214,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         '<oppia-response-text-input answer="&amp;quot;Answer2&' +
         'amp;quot;"></oppia-response-text-input>');
       expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtmlObjectFactory.createDefault('', 'feedback_1'));
+        SubtitledHtml.createDefault('', 'feedback_1'));
       expect($scope.newAnswerOutcomeDest).toBe('(try again)');
       expect($scope.newAnswerIsAlreadyResolved).toBe(true);
     });
@@ -229,7 +228,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         '<oppia-response-text-input answer="&amp;quot;Answer1&' +
         'amp;quot;"></oppia-response-text-input>');
       expect($scope.newAnswerFeedback).toEqual(
-        SubtitledHtmlObjectFactory.createDefault('', 'feedback_1'));
+        SubtitledHtml.createDefault('', 'feedback_1'));
       expect($scope.newAnswerOutcomeDest).toBe('(try again)');
       expect($scope.newAnswerIsAlreadyResolved).toBe(false);
       expect(addSuccessMessageSpy).toHaveBeenCalledWith(
@@ -267,7 +266,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'StateCustomizationArgsService');
       TrainingModalService = $injector.get('TrainingModalService');
       AlertsService = $injector.get('AlertsService');
-      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
       ExplorationStatesService.init({
         Hola: {
@@ -397,7 +395,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'StateCustomizationArgsService');
       TrainingModalService = $injector.get('TrainingModalService');
       AlertsService = $injector.get('AlertsService');
-      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
       ExplorationStatesService.init({
         Hola: {

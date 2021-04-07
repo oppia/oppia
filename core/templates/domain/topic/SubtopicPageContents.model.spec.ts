@@ -13,24 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SubtopicPageContentsObjectFactory.
+ * @fileoverview Tests for SubtopicPageContents Model.
  */
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtopicPageContents } from
+  'domain/topic/SubtopicPageContents.model';
+import { RecordedVoiceovers } from
+  'domain/exploration/RecordedVoiceovers.model';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtml.model';
 
 describe('Subtopic page contents object factory', () => {
-  let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
-    null;
-  let recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory = null;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
-
   const expectedDefaultObject = {
     subtitled_html: {
       html: '',
@@ -64,24 +59,18 @@ describe('Subtopic page contents object factory', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SubtopicPageContentsObjectFactory]
+      providers: [SubtopicPageContents]
     });
-
-    subtopicPageContentsObjectFactory = TestBed.get(
-      SubtopicPageContentsObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
   it('should be able to create a default object', () => {
-    const defaultObject = subtopicPageContentsObjectFactory.createDefault();
+    const defaultObject = SubtopicPageContents.createDefault();
     expect(defaultObject.toBackendDict()).toEqual(expectedDefaultObject);
   });
 
   it('should convert from a backend dictionary', () => {
     const sampleSubtopicPageContents = (
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
+      SubtopicPageContents.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml().html)
       .toEqual('test content');
@@ -99,13 +88,13 @@ describe('Subtopic page contents object factory', () => {
 
   it('should convert from a backend dictionary', () => {
     const sampleSubtopicPageContents = (
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
+      SubtopicPageContents.createFromBackendDict(backendDict));
     expect(sampleSubtopicPageContents.toBackendDict()).toEqual(backendDict);
   });
 
   it('should change html from subtitleHtml property in object', () => {
     const sampleSubtopicPageContents = (
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
+      SubtopicPageContents.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml().html)
       .toEqual('test content');
@@ -120,19 +109,19 @@ describe('Subtopic page contents object factory', () => {
 
   it('should change subtitled html in object', () => {
     const sampleSubtopicPageContents = (
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
+      SubtopicPageContents.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml()).toEqual(
-      subtitledHtmlObjectFactory.createFromBackendDict({
+      SubtitledHtml.createFromBackendDict({
         html: 'test content',
         content_id: 'content'
       }));
 
     sampleSubtopicPageContents.setSubtitledHtml(
-      subtitledHtmlObjectFactory.createDefault('new html content', 'new id'));
+      SubtitledHtml.createDefault('new html content', 'new id'));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml()).toEqual(
-      subtitledHtmlObjectFactory.createFromBackendDict({
+      SubtitledHtml.createFromBackendDict({
         html: 'new html content',
         content_id: 'new id'
       }));
@@ -140,7 +129,7 @@ describe('Subtopic page contents object factory', () => {
 
   it('should change recorded voiceovers in object', () => {
     const sampleSubtopicPageContents = (
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
+      SubtopicPageContents.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
       'content', 'en').toBackendDict()).toEqual({
@@ -151,7 +140,7 @@ describe('Subtopic page contents object factory', () => {
     });
 
     sampleSubtopicPageContents.setRecordedVoiceovers(
-      recordedVoiceoversObjectFactory.createFromBackendDict({
+      RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {

@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+
 /**
  * @fileoverview Directive for the skill review material editor.
  */
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
@@ -45,9 +46,9 @@ angular.module('oppia').directive('reviewMaterialEditor', [
         'review-material-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
+        'COMPONENT_NAME_EXPLANATION',
         function(
-            SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION) {
+            COMPONENT_NAME_EXPLANATION) {
           var ctrl = this;
           var explanationMemento = null;
 
@@ -65,7 +66,7 @@ angular.module('oppia').directive('reviewMaterialEditor', [
 
           ctrl.saveConceptCardExplanation = function() {
             ctrl.conceptCardExplanationEditorIsShown = false;
-            var explanationObject = SubtitledHtmlObjectFactory.createDefault(
+            var explanationObject = SubtitledHtml.createDefault(
               ctrl.editableExplanation, COMPONENT_NAME_EXPLANATION);
             ctrl.onSaveExplanation(explanationObject);
           };

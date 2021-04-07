@@ -22,14 +22,12 @@ import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import {
   RecordedVoiceovers,
-  RecordedVoiceOverBackendDict,
-  RecordedVoiceoversObjectFactory
-} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+  RecordedVoiceOverBackendDict
+} from 'domain/exploration/RecordedVoiceovers.model';
 import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+} from 'domain/exploration/SubtitledHtml.model';
 import {
   WorkedExample,
   WorkedExampleBackendDict,
@@ -129,9 +127,6 @@ export class ConceptCard {
 })
 export class ConceptCardObjectFactory {
   constructor(
-      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
-      private recordedVoiceoversObjectFactory:
-          RecordedVoiceoversObjectFactory,
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
   _generateWorkedExamplesFromBackendDict(
@@ -151,9 +146,9 @@ export class ConceptCardObjectFactory {
       }
     };
     return new ConceptCard(
-      this.subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
-      this.recordedVoiceoversObjectFactory.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         recordedVoiceoversDict)
     );
   }
@@ -161,11 +156,11 @@ export class ConceptCardObjectFactory {
   createFromBackendDict(
       conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         conceptCardBackendDict.explanation),
       this._generateWorkedExamplesFromBackendDict(
         conceptCardBackendDict.worked_examples),
-      this.recordedVoiceoversObjectFactory.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         conceptCardBackendDict.recorded_voiceovers));
   }
 }

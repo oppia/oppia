@@ -19,7 +19,7 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { Subtopic } from 'domain/topic/Subtopic.model';
 
 @Component({
   selector: 'subtopics-list',

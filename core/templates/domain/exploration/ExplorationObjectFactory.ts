@@ -35,7 +35,7 @@ import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
 import { Interaction } from
   'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+  'domain/exploration/RecordedVoiceovers.model';
 import { State } from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
@@ -45,7 +45,7 @@ import {
 } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from 'domain/exploration/Voiceover.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { ExplorationChange } from './exploration-draft.model';

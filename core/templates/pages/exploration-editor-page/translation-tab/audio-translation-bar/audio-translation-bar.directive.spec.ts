@@ -46,8 +46,8 @@ import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from
+  'domain/exploration/RecordedVoiceovers.model';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
@@ -79,7 +79,6 @@ describe('Audio translation bar directive', function() {
   var contextService = null;
   var editabilityService = null;
   var explorationStatesService = null;
-  var recordedVoiceoversObjectFactory = null;
   var siteAnalyticsService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
@@ -112,8 +111,6 @@ describe('Audio translation bar directive', function() {
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     editabilityService = TestBed.get(EditabilityService);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     stateRecordedVoiceoversService = TestBed.get(
       StateRecordedVoiceoversService);
@@ -196,7 +193,7 @@ describe('Audio translation bar directive', function() {
       mockShowTranslationTabBusyModalEventEmitter);
 
     stateRecordedVoiceoversService.init(
-      stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
+      stateName, RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {
@@ -755,7 +752,7 @@ describe('Audio translation bar directive', function() {
           canVoiceover: true
         }));
       stateRecordedVoiceoversService.init(
-        stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
+        stateName, RecordedVoiceovers.createFromBackendDict({
           voiceovers_mapping: {
             content: {
               en: {

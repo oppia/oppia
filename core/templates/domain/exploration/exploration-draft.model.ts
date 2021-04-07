@@ -21,8 +21,8 @@ import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFact
 import { ParamSpecBackendDict } from 'domain/exploration/ParamSpecObjectFactory';
 import { InteractionBackendDict } from 'domain/exploration/InteractionObjectFactory';
 import { WrittenTranslationsBackendDict } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { SubtitledHtmlBackendDict } from './SubtitledHtmlObjectFactory';
-import { RecordedVoiceOverBackendDict } from './RecordedVoiceoversObjectFactory';
+import { SubtitledHtmlBackendDict } from './SubtitledHtml.model';
+import { RecordedVoiceOverBackendDict } from './RecordedVoiceovers.model';
 
 export type ExplorationChange = (
   ExplorationChangeAddState |

@@ -22,8 +22,8 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from
+  'domain/exploration/Voiceover.model';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -33,8 +33,7 @@ import { SubtitledUnicode } from
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
-  let sof: StateObjectFactory, exploration: Exploration,
-    vof: VoiceoverObjectFactory;
+  let sof: StateObjectFactory, exploration: Exploration;
   let ssof: StatesObjectFactory;
   let iof: InteractionObjectFactory;
   let ls: LoggerService;
@@ -47,7 +46,6 @@ describe('Exploration object factory', () => {
     });
     eof = TestBed.get(ExplorationObjectFactory);
     sof = TestBed.get(StateObjectFactory);
-    vof = TestBed.get(VoiceoverObjectFactory);
     ssof = TestBed.get(StatesObjectFactory);
     iof = TestBed.get(InteractionObjectFactory);
     ls = TestBed.get(LoggerService);
@@ -184,13 +182,13 @@ describe('Exploration object factory', () => {
   it('should correctly get all audio translations by language code',
     () => {
       expect(exploration.getAllVoiceovers('hi-en')).toEqual({
-        'first state': [vof.createFromBackendDict({
+        'first state': [Voiceover.createFromBackendDict({
           filename: 'myfile3.mp3',
           file_size_bytes: 430000,
           needs_update: false,
           duration_secs: 2.1
         })],
-        'second state': [vof.createFromBackendDict({
+        'second state': [Voiceover.createFromBackendDict({
           filename: 'myfile2.mp3',
           file_size_bytes: 120000,
           needs_update: false,
@@ -198,7 +196,7 @@ describe('Exploration object factory', () => {
         })]
       });
       expect(exploration.getAllVoiceovers('en')).toEqual({
-        'first state': [vof.createFromBackendDict({
+        'first state': [Voiceover.createFromBackendDict({
           filename: 'myfile1.mp3',
           file_size_bytes: 210000,
           needs_update: false,
@@ -216,7 +214,7 @@ describe('Exploration object factory', () => {
   it('should correctly get the voiceovers from a language code in' +
     ' an exploration', () => {
     expect(exploration.getVoiceover('first state', 'en')).toEqual(
-      vof.createFromBackendDict({
+      Voiceover.createFromBackendDict({
         filename: 'myfile1.mp3',
         file_size_bytes: 210000,
         needs_update: false,
@@ -233,13 +231,13 @@ describe('Exploration object factory', () => {
 
   it('should correctly get all voiceovers from an exploration', () => {
     expect(exploration.getVoiceovers('first state')).toEqual({
-      en: vof.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'myfile1.mp3',
         file_size_bytes: 210000,
         needs_update: false,
         duration_secs: 4.3
       }),
-      'hi-en': vof.createFromBackendDict({
+      'hi-en': Voiceover.createFromBackendDict({
         filename: 'myfile3.mp3',
         file_size_bytes: 430000,
         needs_update: false,
@@ -248,7 +246,7 @@ describe('Exploration object factory', () => {
     });
 
     expect(exploration.getVoiceovers('second state')).toEqual({
-      'hi-en': vof.createFromBackendDict({
+      'hi-en': Voiceover.createFromBackendDict({
         filename: 'myfile2.mp3',
         file_size_bytes: 120000,
         needs_update: false,

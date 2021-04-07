@@ -24,6 +24,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
 import { EventEmitter } from '@angular/core';
+import { Subtopic } from 'domain/topic/Subtopic.model';
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 
 describe('Topic editor page', function() {
   var ctrl = null;
@@ -34,11 +36,9 @@ describe('Topic editor page', function() {
   var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
-  var SubtopicObjectFactory = null;
   var TopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var topic = null;
-  var ShortSkillSummaryObjectFactory = null;
 
   importAllAngularServices();
 
@@ -50,15 +50,12 @@ describe('Topic editor page', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
-    ShortSkillSummaryObjectFactory = $injector.get(
-      'ShortSkillSummaryObjectFactory');
 
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
-    var skillSummary = ShortSkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummary.create(
       'skill1', 'Addition');
     subtopic._skillSummaries = [skillSummary];
     topic = TopicObjectFactory.createInterstitialTopic();
