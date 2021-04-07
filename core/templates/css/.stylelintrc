@@ -22,5 +22,6 @@
         ignore: ["custom-elements"]
       }
     ],
+    "length-zero-no-unit": true
   }
 }
