@@ -25,6 +25,7 @@ from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_jobs_one_off
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
@@ -468,3 +469,82 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
         for x in output:
             self.assertRegexpMatches(
                 x, 'object has no attribute \'story_contents\'')
+
+
+class DeleteStoryCommitLogsOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the job that deletes commit logs that reference already deleted
+    stories.
+    """
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    STORY_ID = 'story_id'
+
+    def setUp(self):
+        super(DeleteStoryCommitLogsOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test story.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = 'topic_id'
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='Name',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'A title', 'DESCRIPTION', self.TOPIC_ID,
+            'title-one')
+        story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = story_jobs_one_off.DeleteStoryCommitLogsOneOffJob.create_new()
+        story_jobs_one_off.DeleteStoryCommitLogsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            story_jobs_one_off.DeleteStoryCommitLogsOneOffJob.get_output(job_id)
+        )
+        eval_output = [
+            ast.literal_eval(stringified_item)
+            for stringified_item in stringified_output
+        ]
+        return eval_output
+
+    def test_story_commits_get_deleted_when_parent_story_is_deleted(self):
+        story_models.StoryModel.delete_by_id(self.STORY_ID)
+
+        self.assertIsNone(
+            story_models.StoryModel.get_by_id(self.STORY_ID))
+
+        self.assertIsNotNone(
+            story_models.StoryCommitLogEntryModel.get(
+                'story-%s-1' % self.STORY_ID))
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS_DELETED', 1]])
+
+        self.assertIsNone(
+            story_models.StoryCommitLogEntryModel.get(
+                'story-%s-1' % self.STORY_ID, strict=False))
+
+    def test_story_commits_wont_get_deleted_when_parent_story_exists(self):
+        self.assertIsNotNone(
+            story_models.StoryCommitLogEntryModel.get(
+                'story-%s-1' % self.STORY_ID))
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS_NO_ACTION', 1]])
+
+        self.assertIsNotNone(
+            story_models.StoryCommitLogEntryModel.get(
+                'story-%s-1' % self.STORY_ID, strict=False))
