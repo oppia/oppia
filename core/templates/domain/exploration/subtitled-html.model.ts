@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of SubtitledHtml
+ * @fileoverview Model for creating new frontend instances of SubtitledHtml
  * domain objects.
  */
 

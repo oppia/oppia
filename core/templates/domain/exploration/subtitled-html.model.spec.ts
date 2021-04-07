@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the SubtitledHtml object factory.
+ * @fileoverview Unit tests for the subtitled-html model.
  */
 
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 
-describe('SubtitledHtml object factory', () => {
+describe('SubtitledHtml model', () => {
   let subtitledHtml: SubtitledHtml;
 
   beforeEach(() => {
