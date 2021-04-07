@@ -374,7 +374,7 @@ describe('Learner playlist Backend Api service ', () => {
 
     learnerPlaylistBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
-      activityId, activityTitle)
+      activityId, activityTitle);
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
