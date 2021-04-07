@@ -231,7 +231,7 @@ def urllib_unquote(content):
         import urllib.parse as urlparse_unquote
     except ImportError:
         import urllib as urlparse_unquote
-    return urlparse_unquote.unquote(content) # pylint: disable=disallowed-function-calls
+    return urlparse_unquote.unquote(content)
 
 
 def url_quote(content):
