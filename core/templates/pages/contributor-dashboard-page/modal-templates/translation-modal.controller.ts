@@ -33,13 +33,14 @@ require('services/site-analytics.service.ts');
 angular.module('oppia').controller('TranslationModalController',
   ['$controller', '$scope', '$uibModalInstance', 'AlertsService',
     'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
-    'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
-    'opportunity', 'ENTITY_TYPE', 'TRANSLATION_TIPS',
-  function(
-      $controller, $scope, $uibModalInstance, AlertsService,
-      CkEditorCopyContentService, ContextService, ImageLocalStorageService,
-      SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
-      opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
+    'SiteAnalyticsService', 'TranslateTextService',
+    'TranslationLanguageService', 'opportunity', 'ENTITY_TYPE',
+    'TRANSLATION_TIPS', function(
+        $controller, $scope, $uibModalInstance, AlertsService,
+        CkEditorCopyContentService, ContextService, ImageLocalStorageService,
+        SiteAnalyticsService, TranslateTextService,
+        TranslationLanguageService, opportunity, ENTITY_TYPE,
+        TRANSLATION_TIPS) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance
@@ -117,7 +118,7 @@ angular.module('oppia').controller('TranslationModalController',
       $scope.isCopyModeActive = function() {
         return CkEditorCopyContentService.copyModeActive;
       };
-      $scope.skipActiveTranslation = function () {
+      $scope.skipActiveTranslation = function() {
         var textAndAvailability = (
           TranslateTextService.getTextToTranslate());
         $scope.textToTranslate = textAndAvailability.text;
@@ -125,17 +126,17 @@ angular.module('oppia').controller('TranslationModalController',
         $scope.activeWrittenTranslation.html = '';
       };
 
-      $scope.returnToPreviousTranslation = function () {
-        var textAndAvailability =(
+      $scope.returnToPreviousTranslation = function() {
+        var textAndAvailability = (
           TranslateTextService.getPreviousTextToTranslate());
         $scope.textToTranslate = textAndAvailability.text;
         $scope.previousTranslationAvailable = textAndAvailability.more;
       };
 
-      $scope.suggestTranslatedText = function () {
+      $scope.suggestTranslatedText = function() {
         if (!$scope.uploadingTranslation && !$scope.loadingData) {
-          SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-            'Translation');
+          SiteAnalyticsService.
+            registerContributorDashboardSubmitSuggestionEvent('Translation');
           $scope.uploadingTranslation = true;
           var imagesData = ImageLocalStorageService.getStoredImagesData();
           ImageLocalStorageService.flushStoredImagesData();
@@ -143,7 +144,7 @@ angular.module('oppia').controller('TranslationModalController',
           TranslateTextService.suggestTranslatedText(
             $scope.activeWrittenTranslation.html,
             TranslationLanguageService.getActiveLanguageCode(),
-            imagesData, function () {
+            imagesData, function() {
               AlertsService.addSuccessMessage(
                 'Submitted translation for review.');
               if ($scope.moreAvailable) {
@@ -163,12 +164,12 @@ angular.module('oppia').controller('TranslationModalController',
           $uibModalInstance.close();
         }
       };
-      $scope.toggleViewCompletedTranslationsModal = function () {
-        if( $scope.loadingTranslatedText) {
+      $scope.toggleViewCompletedTranslationsModal = function() {
+        if ($scope.loadingTranslatedText) {
           $scope.loadCompletedTranslations();
         }
         $scope.viewCompletedTranslationsModalOpen =
           !$scope.viewCompletedTranslationsModalOpen;
       };
     }
-]);
+  ]);
