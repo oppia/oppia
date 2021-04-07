@@ -73,6 +73,7 @@ import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/f
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -99,6 +100,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbModalModule,
     FormsModule,
     MaterialModule,
+    ObjectComponentsModule,
     ...firebaseAuthModules,
   ],
 
@@ -179,6 +181,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ObjectComponentsModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,

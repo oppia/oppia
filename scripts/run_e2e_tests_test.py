@@ -1268,7 +1268,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 with on_ci_swap, cleanup_swap, exit_swap:
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
-    def test_no_reruns_off_ci(self):
+    def test_no_reruns_off_ci_fail(self):
 
         mock_portserver = MockProcessClass()
 
@@ -1318,6 +1318,58 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
         with register_swap, run_swap, is_test_output_flaky_swap:
+            with start_portserver_swap, cleanup_portserver_swap:
+                with on_ci_swap, cleanup_swap, exit_swap:
+                    run_e2e_tests.main(args=['--suite', 'mySuite'])
+
+    def test_no_reruns_off_ci_pass(self):
+
+        mock_portserver = MockProcessClass()
+
+        def mock_check_if_on_ci():
+            return False
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 0
+
+        def mock_report_pass(unused_suite_name):
+            raise AssertionError('Tried to Report Pass')
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup_portserver():
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_start_portserver():
+            return mock_portserver
+
+        start_portserver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_portserver', mock_start_portserver,
+            expected_args=[tuple()])
+        cleanup_portserver_swap = self.swap(
+            run_e2e_tests, 'cleanup_portserver',
+            mock_cleanup_portserver)
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup_portserver, mock_portserver)])
+        run_swap = self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests)
+        report_pass_swap = self.swap(
+            flake_checker, 'report_pass', mock_report_pass)
+        on_ci_swap = self.swap(
+            flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
+        cleanup_swap = self.swap(
+            run_e2e_tests, 'cleanup', mock_cleanup)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
+        with register_swap, run_swap, report_pass_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap:
                     run_e2e_tests.main(args=['--suite', 'mySuite'])

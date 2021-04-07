@@ -63,12 +63,6 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             parent_user_id=self.USER_ID
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            auth_models.UserAuthDetailsModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy_is_delete_at_end(self):
         self.assertEqual(
             auth_models.UserAuthDetailsModel.get_deletion_policy(),
