@@ -126,7 +126,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _validate_expired_reports_are_scrubbed(cls, item):
         """Validates that if the submitted_on of model is less than expiring (at
-        or past it's storage age of feconf.APP_FEEDBACK_REPORT_MAXIMUM_DAYS),
+        or past its storage age of feconf.APP_FEEDBACK_REPORT_MAXIMUM_DAYS),
         then the scrubbed_by field is non-None. This validation adds a buffer
         time of VALID_SCRUBBING_DATETIME_BUFFER to the maximum number of days a
         report can be stored, in case there is a delay in the cron runtime that
