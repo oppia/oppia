@@ -43,7 +43,7 @@ class TranslateEmulator(python_utils.OBJECT):
 
     def translate_text(self, text, source_language_code, target_language_code):
         """Returns the saved expected response for a given input. If no
-        response exists for the given input, returns an empty string.
+        response exists for the given input, returns a default response.
 
         For more information on ISO 639-1 see:
             https://www.w3schools.com/tags/ref_language_codes.asp
