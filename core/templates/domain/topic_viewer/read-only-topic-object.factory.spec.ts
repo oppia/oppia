@@ -18,10 +18,7 @@
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { ShortSkillSummary } from
-  'domain/skill/ShortSkillSummary.model';
 import { StoryNode } from 'domain/story/story-node.model';
-import { Subtopic } from 'domain/topic/Subtopic.model';
 
 describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ShortSkillSummary } from "domain/skill/ShortSkillSummary.model";
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 
 /**
  * @fileoverview Controller for question editor modal.
