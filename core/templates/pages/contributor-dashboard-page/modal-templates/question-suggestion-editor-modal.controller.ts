@@ -55,12 +55,12 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
     ContextService.setImageSaveDestinationToLocalStorage();
-    $scope.getDifficultyString = function(skillDifficulty) {
+    $scope.setDifficultyString = function(skillDifficulty) {
       $scope.skillDifficultyString = Object.entries(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
         entry => entry[1] === skillDifficulty)[0];
     };
-    $scope.getDifficultyString(skillDifficulty);
+    $scope.setDifficultyString(skillDifficulty);
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
@@ -98,7 +98,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       }).result.then(function(result) {
         if (AlertsService.warnings.length === 0) {
           $scope.skillDifficulty = result.skillDifficulty;
-          $scope.getDifficultyString($scope.skillDifficulty);
+          $scope.setDifficultyString($scope.skillDifficulty);
         }
       }, function() {
         // Note to developers:
