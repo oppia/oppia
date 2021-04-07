@@ -28,7 +28,7 @@ import { Rubric } from
   'domain/skill/rubric.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import constants from 'assets/constants';
 
 describe('Skill object factory', () => {

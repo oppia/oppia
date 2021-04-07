@@ -18,10 +18,9 @@
  * @fileoverview Controller for CreateNewSkillModal.
  */
 
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Rubric } from 'domain/skill/rubric.model';
 require('domain/utilities/url-interpolation.service.ts');
-require('domain/exploration/SubtitledHtml.model.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');

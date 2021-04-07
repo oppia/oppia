@@ -60,7 +60,7 @@ require('services/image-local-storage.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
-import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
 

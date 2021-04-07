@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SchemaConstants } from

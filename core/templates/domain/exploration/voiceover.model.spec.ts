@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Voiceover object factory.
+ * @fileoverview Unit tests for the voiceover-model.
  */
 
 import { Voiceover } from
-  'domain/exploration/Voiceover.model';
+  'domain/exploration/voiceover.model';
 
 describe('Voiceover object factory', () => {
   let voiceover: Voiceover;

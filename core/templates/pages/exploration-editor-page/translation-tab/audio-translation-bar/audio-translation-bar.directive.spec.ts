@@ -47,7 +47,7 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceovers.model';
+  'domain/exploration/recorded-voiceovers.model';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';

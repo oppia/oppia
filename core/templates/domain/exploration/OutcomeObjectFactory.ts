@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import {
   SubtitledHtmlBackendDict,
   SubtitledHtml
-} from 'domain/exploration/SubtitledHtml.model';
+} from 'domain/exploration/subtitled-html.model';
 import { ParamChangeBackendDict } from
   'domain/exploration/ParamChangeObjectFactory';
 

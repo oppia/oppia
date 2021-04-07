@@ -23,11 +23,11 @@ import { AppConstants } from 'app.constants';
 import {
   RecordedVoiceovers,
   RecordedVoiceOverBackendDict
-} from 'domain/exploration/RecordedVoiceovers.model';
+} from 'domain/exploration/recorded-voiceovers.model';
 import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,
-} from 'domain/exploration/SubtitledHtml.model';
+} from 'domain/exploration/subtitled-html.model';
 import {
   WorkedExample,
   WorkedExampleBackendDict,

@@ -18,7 +18,7 @@
  */
 
 import { ShortSkillSummary } from
-  'domain/skill/ShortSkillSummary.model';
+  'domain/skill/short-skill-summary.model';
 
 import constants from 'assets/constants';
 

@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import {
   ReadOnlySubtopicPageData,
   SubtopicDataBackendDict
-} from 'domain/subtopic_viewer/ReadOnlySubtopicPageData.model';
+} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';
 import { UrlInterpolationService } from

@@ -18,8 +18,8 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
-import { Subtopic } from 'domain/topic/Subtopic.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.

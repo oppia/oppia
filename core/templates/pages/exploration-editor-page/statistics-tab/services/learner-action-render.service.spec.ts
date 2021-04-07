@@ -29,7 +29,7 @@ import { LearnerActionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 
 require('pages/exploration-editor-page/services/exploration-states.service');
 require(

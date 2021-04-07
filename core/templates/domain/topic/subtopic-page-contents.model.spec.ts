@@ -19,11 +19,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { SubtopicPageContents } from
-  'domain/topic/SubtopicPageContents.model';
+  'domain/topic/subtopic-page-contents.model';
 import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceovers.model';
+  'domain/exploration/recorded-voiceovers.model';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 
 describe('Subtopic page contents object factory', () => {
   const expectedDefaultObject = {

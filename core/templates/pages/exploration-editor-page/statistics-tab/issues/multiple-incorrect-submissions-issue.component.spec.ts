@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { StateEditorRefreshService } from

@@ -31,11 +31,11 @@ import { Change, TopicChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
-import { ShortSkillSummary } from 'core/templates/domain/skill/ShortSkillSummary.model';
-import { SubtitledHtml } from 'core/templates/domain/exploration/SubtitledHtml.model';
-import { SubtopicPage } from 'core/templates/domain/topic/SubtopicPage.model';
-import { RecordedVoiceovers } from 'core/templates/domain/exploration/RecordedVoiceovers.model';
-import { Subtopic } from 'domain/topic/Subtopic.model';
+import { ShortSkillSummary } from 'core/templates/domain/skill/short-skill-summary.model';
+import { SubtitledHtml } from 'core/templates/domain/exploration/subtitled-html.model';
+import { SubtopicPage } from 'core/templates/domain/topic/subtopic-page.model';
+import { RecordedVoiceovers } from 'core/templates/domain/exploration/recorded-voiceovers.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
 type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;

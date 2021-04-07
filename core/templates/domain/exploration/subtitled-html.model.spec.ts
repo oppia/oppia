@@ -17,7 +17,7 @@
  */
 
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 
 describe('SubtitledHtml object factory', () => {
   let subtitledHtml: SubtitledHtml;

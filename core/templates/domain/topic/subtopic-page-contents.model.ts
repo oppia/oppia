@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * subtopic page data domain objects.
  */
 
@@ -22,12 +22,12 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
   RecordedVoiceOverBackendDict,
   RecordedVoiceovers
-} from 'domain/exploration/RecordedVoiceovers.model';
+} from 'domain/exploration/recorded-voiceovers.model';
 
 import {
   SubtitledHtmlBackendDict,
   SubtitledHtml
-} from 'domain/exploration/SubtitledHtml.model';
+} from 'domain/exploration/subtitled-html.model';
 
 export interface SubtopicPageContentsBackendDict {
   'subtitled_html': SubtitledHtmlBackendDict;

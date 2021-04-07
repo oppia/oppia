@@ -21,8 +21,8 @@ import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceovers.model';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from

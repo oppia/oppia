@@ -32,7 +32,7 @@ import { TranslatePipe } from 'filters/translate.pipe';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len

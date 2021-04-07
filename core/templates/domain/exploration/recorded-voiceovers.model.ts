@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of
+ * @fileoverview Model for creating new frontend instances of
  * RecordedVoiceovers domain objects.
  */
 export interface RecordedVoiceOverBackendDict {
@@ -33,7 +33,7 @@ export interface BindableVoiceovers {
 }
 
 import { VoiceoverBackendDict, Voiceover } from
-  'domain/exploration/Voiceover.model';
+  'domain/exploration/voiceover.model';
 export class RecordedVoiceovers {
   voiceoversMapping: VoiceoverMapping;
   constructor(
@@ -153,10 +153,10 @@ export class RecordedVoiceovers {
     });
 
     return new RecordedVoiceovers(
-      voiceoversMapping, Voiceover);
+      voiceoversMapping);
   }
 
   static createEmpty(): RecordedVoiceovers {
-    return new RecordedVoiceovers({}, Voiceover);
+    return new RecordedVoiceovers({});
   }
 }

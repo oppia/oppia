@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Create new skill modal controller.
  */
 
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Rubric } from 'domain/skill/rubric.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 

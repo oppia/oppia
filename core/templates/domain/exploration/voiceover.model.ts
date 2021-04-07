@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of
+ * @fileoverview Model for creating new frontend instances of
  * Voiceover domain objects.
  */
 export interface VoiceoverBackendDict {

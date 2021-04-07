@@ -18,9 +18,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
-import { Subtopic } from 'domain/topic/Subtopic.model';
-import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 

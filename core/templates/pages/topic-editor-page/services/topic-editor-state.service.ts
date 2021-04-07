@@ -32,7 +32,7 @@ import { EventEmitter } from '@angular/core';
 import { Rubric } from 'domain/skill/rubric.model';
 
 import { StorySummary } from 'domain/story/story-summary.model';
-import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 
 angular.module('oppia').factory('TopicEditorStateService', [

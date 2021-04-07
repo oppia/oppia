@@ -22,7 +22,7 @@ import { InteractionObjectFactory } from
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceovers.model';
+  'domain/exploration/recorded-voiceovers.model';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';

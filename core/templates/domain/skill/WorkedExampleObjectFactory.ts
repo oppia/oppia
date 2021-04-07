@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import {
   SubtitledHtml, SubtitledHtmlBackendDict
-} from 'domain/exploration/SubtitledHtml.model';
+} from 'domain/exploration/subtitled-html.model';
 
 export interface WorkedExampleBackendDict {
   question: SubtitledHtmlBackendDict,

@@ -24,7 +24,7 @@ import { ReadOnlyTopic } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { Subtopic, SkillIdToDescriptionMap } from
-  'domain/topic/Subtopic.model';
+  'domain/topic/subtopic.model';
 import { DegreesOfMastery } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from

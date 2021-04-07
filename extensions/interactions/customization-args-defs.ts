@@ -19,7 +19,7 @@
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { SubtitledHtmlBackendDict, SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 

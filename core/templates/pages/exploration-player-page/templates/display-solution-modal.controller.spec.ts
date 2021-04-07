@@ -25,7 +25,7 @@ import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceovers.model';
+  'domain/exploration/recorded-voiceovers.model';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { WrittenTranslationsObjectFactory } from

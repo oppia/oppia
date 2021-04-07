@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 describe('Subtopic object factory', () => {
   var _sampleSubtopic = null;

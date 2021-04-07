@@ -28,11 +28,11 @@ import { ParamChangesObjectFactory } from
 import {
   RecordedVoiceOverBackendDict,
   RecordedVoiceovers
-} from 'domain/exploration/RecordedVoiceovers.model';
+} from 'domain/exploration/recorded-voiceovers.model';
 import {
   SubtitledHtmlBackendDict,
   SubtitledHtml
-} from 'domain/exploration/SubtitledHtml.model';
+} from 'domain/exploration/subtitled-html.model';
 import {
   WrittenTranslationsBackendDict,
   WrittenTranslations,

@@ -34,7 +34,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {
   SubtitledHtml,
-} from 'domain/exploration/SubtitledHtml.model';
+} from 'domain/exploration/subtitled-html.model';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService = null;

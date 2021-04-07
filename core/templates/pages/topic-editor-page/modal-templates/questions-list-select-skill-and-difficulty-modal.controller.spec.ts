@@ -19,7 +19,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { ShortSkillSummary } from
-  'domain/skill/ShortSkillSummary.model';
+  'domain/skill/short-skill-summary.model';
 import { SkillDifficulty } from
   'domain/skill/skill-difficulty.model';
 

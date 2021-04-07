@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 

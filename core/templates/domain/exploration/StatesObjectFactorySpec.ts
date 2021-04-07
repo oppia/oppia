@@ -24,7 +24,7 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { Voiceover } from './Voiceover.model';
+import { Voiceover } from './voiceover.model';
 
 describe('States Object Factory', () => {
   let sof: StateObjectFactory = null;

@@ -26,11 +26,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { MisconceptionBackendDict } from
   'domain/skill/MisconceptionObjectFactory';
 import { RecordedVoiceOverBackendDict } from
-  'domain/exploration/RecordedVoiceovers.model';
+  'domain/exploration/recorded-voiceovers.model';
 import { StateBackendDict } from
   'domain/state/StateObjectFactory';
 import { SubtitledHtmlBackendDict } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { WorkedExampleBackendDict } from
   'domain/skill/WorkedExampleObjectFactory';
 import { Collection } from 'domain/collection/collection.model';
@@ -38,7 +38,7 @@ import { Question } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Story } from 'domain/story/StoryObjectFactory';
 import { Topic } from 'domain/topic/TopicObjectFactory';
-import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';

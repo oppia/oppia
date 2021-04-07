@@ -67,7 +67,7 @@ import {
 import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 
 export interface InteractionBackendDict {

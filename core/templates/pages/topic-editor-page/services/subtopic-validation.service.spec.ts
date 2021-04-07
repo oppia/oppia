@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 

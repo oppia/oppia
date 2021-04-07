@@ -26,7 +26,7 @@ import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ReadOnlySubtopicPageData } from
-  'domain/subtopic_viewer/ReadOnlySubtopicPageData.model';
+  'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {

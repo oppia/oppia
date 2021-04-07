@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 /**
  * @fileoverview Directive for the skill review material editor.

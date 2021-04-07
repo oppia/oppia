@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { Voiceover } from 'domain/exploration/Voiceover.model';
+import { Voiceover } from 'domain/exploration/voiceover.model';
 
 import { AudioTranslationManagerService, AudioTranslations } from
   'pages/exploration-player-page/services/audio-translation-manager.service';

@@ -29,7 +29,7 @@ import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {

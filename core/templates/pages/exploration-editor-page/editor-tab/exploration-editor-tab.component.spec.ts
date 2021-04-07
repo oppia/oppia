@@ -54,7 +54,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Exploration editor tab component', function() {
   var ctrl;

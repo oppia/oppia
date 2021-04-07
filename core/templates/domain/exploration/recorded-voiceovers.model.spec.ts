@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for RecordedVoiceovers object factory.
+ * @fileoverview Unit tests for recorded-voiceovers model.
  */
 
 import { TestBed } from '@angular/core/testing';
 
 import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceovers.model';
+  'domain/exploration/recorded-voiceovers.model';
 import { Voiceover } from
-  'domain/exploration/Voiceover.model';
+  'domain/exploration/voiceover.model';
 
 describe('RecordedVoiceovers object factory', () => {
   var rv = null;

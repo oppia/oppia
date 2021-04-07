@@ -33,7 +33,7 @@ import { StateInteractionIdService }
   // eslint-disable-next-line max-len
   from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 
 describe('Add Or Update Solution Modal Controller', function() {
   var $scope = null;

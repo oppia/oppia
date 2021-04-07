@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { ShortSkillSummary } from
-  'domain/skill/ShortSkillSummary.model';
+  'domain/skill/short-skill-summary.model';
 import {
   StoryReferenceBackendDict,
   StoryReference,
@@ -33,7 +33,7 @@ import {
   SkillIdToDescriptionMap,
   Subtopic,
   SubtopicBackendDict,
-} from 'domain/topic/Subtopic.model';
+} from 'domain/topic/subtopic.model';
 
 export interface TopicBackendDict {
   'id': string;

@@ -31,7 +31,7 @@ import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 

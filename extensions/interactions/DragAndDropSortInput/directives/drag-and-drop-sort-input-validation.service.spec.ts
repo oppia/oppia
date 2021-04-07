@@ -26,7 +26,7 @@ import { Outcome, OutcomeObjectFactory } from
 import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 
 import { AppConstants } from 'app.constants';
 import { DragAndDropSortInputCustomizationArgs } from

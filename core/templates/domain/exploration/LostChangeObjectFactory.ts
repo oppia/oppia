@@ -25,12 +25,12 @@ import isEqual from 'lodash/isEqual';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml, SubtitledHtmlBackendDict } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { ExplorationChange } from './exploration-draft.model';
 import { InteractionBackendDict } from './InteractionObjectFactory';
 import { ParamChangeBackendDict } from './ParamChangeObjectFactory';
 import { ParamSpecBackendDict } from './ParamSpecObjectFactory';
-import { RecordedVoiceOverBackendDict } from './RecordedVoiceovers.model';
+import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
 import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFactory';
 
 interface LostChangeValues {

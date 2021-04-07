@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
-import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');

@@ -19,16 +19,16 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-update.service.ts is upgraded to Angular 8.
 import { ShortSkillSummary } from
-  'domain/skill/ShortSkillSummary.model';
+  'domain/skill/short-skill-summary.model';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 // ^^^ This block is to be removed.
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicObjectFactory, TopicBackendDict} from 'domain/topic/TopicObjectFactory';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TestBed } from '@angular/core/testing';
-import { SubtopicPage } from './SubtopicPage.model';
-import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
+import { SubtopicPage } from './subtopic-page.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Topic update service', function() {
   let topicUpdateService: TopicUpdateService;

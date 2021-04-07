@@ -24,8 +24,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
 import { EventEmitter } from '@angular/core';
-import { Subtopic } from 'domain/topic/Subtopic.model';
-import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 describe('Topic editor page', function() {
   var ctrl = null;

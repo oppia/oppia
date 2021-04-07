@@ -34,7 +34,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import {
   DragAndDropAnswer,

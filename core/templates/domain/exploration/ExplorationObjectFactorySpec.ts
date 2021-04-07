@@ -23,7 +23,7 @@ import { CamelCaseToHyphensPipe } from
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { Voiceover } from
-  'domain/exploration/Voiceover.model';
+  'domain/exploration/voiceover.model';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';

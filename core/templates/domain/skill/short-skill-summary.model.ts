@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * skill summary domain objects.
  */
 

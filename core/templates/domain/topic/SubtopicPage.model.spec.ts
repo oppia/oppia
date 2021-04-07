@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SubtopicPage Model.
+ * @fileoverview Tests for subtopic-page Model.
  */
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 describe('Subtopic page Model', () => {
   beforeEach(() => {

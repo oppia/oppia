@@ -26,7 +26,7 @@ import { ExplorationHtmlFormatterService } from
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 

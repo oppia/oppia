@@ -39,7 +39,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 require('App.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');

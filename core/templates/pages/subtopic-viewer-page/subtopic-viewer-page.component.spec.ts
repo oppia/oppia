@@ -25,7 +25,7 @@ import { TestBed } from '@angular/core/testing';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { PageTitleService } from 'services/page-title.service';
-import { ReadOnlySubtopicPageData } from 'domain/subtopic_viewer/ReadOnlySubtopicPageData.model';
+import { ReadOnlySubtopicPageData } from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 
 require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');
 

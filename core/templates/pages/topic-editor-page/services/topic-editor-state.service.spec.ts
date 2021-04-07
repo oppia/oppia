@@ -21,7 +21,7 @@
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { SubtopicPage } from
-  'domain/topic/SubtopicPage.model';
+  'domain/topic/subtopic-page.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';

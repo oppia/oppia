@@ -44,7 +44,7 @@ require('services/generate-content-id.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('skillConceptCardEditor', [

@@ -32,7 +32,7 @@ import {
 import {
   ShortSkillSummary,
   ShortSkillSummaryBackendDict
-} from 'domain/skill/ShortSkillSummary.model';
+} from 'domain/skill/short-skill-summary.model';
 import { SkillSummary, SkillSummaryBackendDict } from
   'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardDomainConstants } from

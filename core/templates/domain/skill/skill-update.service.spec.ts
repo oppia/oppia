@@ -24,7 +24,7 @@ import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFact
 import { SkillContentsWorkedExamplesChange } from 'domain/editor/undo_redo/change.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WorkedExampleObjectFactory, WorkedExampleBackendDict } from 'domain/skill/WorkedExampleObjectFactory';
 

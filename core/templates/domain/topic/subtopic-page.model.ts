@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * subtopic page domain objects.
  */
 
@@ -21,7 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
   SubtopicPageContentsBackendDict,
   SubtopicPageContents
-} from 'domain/topic/SubtopicPageContents.model';
+} from 'domain/topic/subtopic-page-contents.model';
 
 export interface SubtopicPageBackendDict {
   'id': string;

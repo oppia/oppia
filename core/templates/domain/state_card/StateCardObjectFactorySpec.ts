@@ -28,8 +28,8 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
-import { Voiceover } from 'domain/exploration/Voiceover.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { Voiceover } from 'domain/exploration/voiceover.model';
 
 
 describe('State card object factory', () => {

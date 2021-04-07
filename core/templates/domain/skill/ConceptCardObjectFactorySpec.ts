@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+  'domain/exploration/subtitled-html.model';
 import { WorkedExampleObjectFactory } from
   'domain/skill/WorkedExampleObjectFactory';
 

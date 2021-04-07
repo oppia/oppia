@@ -24,7 +24,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/subtopic-validation-service.ts');
 
 import createSubtopicConstants from 'assets/constants';
-import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 angular.module('oppia').controller('CreateNewSubtopicModalController', [
   '$controller', '$scope', '$uibModalInstance',

@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';

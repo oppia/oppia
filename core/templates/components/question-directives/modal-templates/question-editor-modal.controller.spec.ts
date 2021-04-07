@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for QuestionEditorModalController.
  */
 
-import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Editor Modal Controller', function() {

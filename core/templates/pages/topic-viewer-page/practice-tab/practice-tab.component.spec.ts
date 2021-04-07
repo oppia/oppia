@@ -18,7 +18,7 @@
 
 import { TestBed, async, ComponentFixture, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
-import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 import { PracticeTabComponent } from './practice-tab.component';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
@@ -97,7 +97,8 @@ describe('Practice tab component', function() {
         title: 'Subtopic 1',
         skill_ids: ['1', '2'],
         thumbnail_filename: '',
-        thumbnail_bg_color: ''
+        thumbnail_bg_color: '',
+        url_fragment: ''
       }, {
         1: 'First skill',
         2: 'Second skill'
@@ -107,7 +108,11 @@ describe('Practice tab component', function() {
         title: 'Subtopic 2',
         skill_ids: [],
         thumbnail_filename: '',
-        thumbnail_bg_color: ''
+        thumbnail_bg_color: '',
+        url_fragment: ''
+      }, {
+        1: 'First skill',
+        2: 'Second skill'
       })
     ];
     fixture.detectChanges();

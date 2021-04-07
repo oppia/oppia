@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ShortSkillSummary Model.
+ * @fileoverview Tests for short-skill-summary Model.
  */
 
 import { ShortSkillSummary } from
-  'domain/skill/ShortSkillSummary.model';
+  'domain/skill/short-skill-summary.model';
 
 describe('Skill summary object factory', () => {
   it('should be able to create a skill summary object', () => {

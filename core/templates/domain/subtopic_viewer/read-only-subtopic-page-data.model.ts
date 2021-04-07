@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of frontend
+ * @fileoverview Model for creating instances of frontend
  * subtopic data domain objects.
  */
 
 import {
   SubtopicPageContentsBackendDict,
   SubtopicPageContents
-} from 'domain/topic/SubtopicPageContents.model';
+} from 'domain/topic/subtopic-page-contents.model';
 import { SubtopicBackendDict, Subtopic } from
-  'domain/topic/Subtopic.model';
+  'domain/topic/subtopic.model';
 
 export interface SubtopicDataBackendDict {
   'subtopic_title': string;
