@@ -2135,7 +2135,6 @@ class MetaclassChecker(checkers.BaseChecker):
             node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
         """
-
         if node.declared_metaclass() is None:
             return
         self.add_message('replace-disallowed-metaclass-usage', node=node)
