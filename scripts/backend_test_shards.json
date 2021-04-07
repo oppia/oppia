@@ -129,7 +129,7 @@
         "core.domain.fs_services_test",
         "core.domain.feedback_jobs_continuous_test",
         "core.domain.recommendations_services_test",
-        "core.domain.mailchimp_services_test"
+        "core.domain.bulk_email_manager_test"
     ],
     "6": [
         "core.domain.object_registry_test",

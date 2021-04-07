@@ -28,7 +28,7 @@ import re
 from constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
-from core.domain import mailchimp_services
+from core.domain import bulk_email_manager
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
@@ -1412,7 +1412,7 @@ def update_email_preferences(
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
 
-    mailchimp_services.add_or_update_mailchimp_user_status(
+    bulk_email_manager.add_or_update_mailchimp_user_status(
         user_id, get_email_from_user_id(user_id), can_receive_email_updates)
 
 

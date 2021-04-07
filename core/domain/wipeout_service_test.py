@@ -25,7 +25,7 @@ from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_services
-from core.domain import mailchimp_services
+from core.domain import bulk_email_manager
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -66,7 +66,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 def empty_function(*_):
     """Empty function to mock
-    mailchimp_services.permanently_delete_user_from_list which consists of just
+    bulk_email_manager.permanently_delete_user_from_list which consists of just
     an API call which is separately tested.
     """
     pass
@@ -91,10 +91,10 @@ def swapped_add_or_update_function(
 
 
 setattr(
-    mailchimp_services, 'permanently_delete_user_from_list',
+    bulk_email_manager, 'permanently_delete_user_from_list',
     empty_function)
 setattr(
-    mailchimp_services, 'add_or_update_mailchimp_user_status',
+    bulk_email_manager, 'add_or_update_mailchimp_user_status',
     swapped_add_or_update_function)
 
 
