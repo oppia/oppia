@@ -133,44 +133,44 @@ angular.module('oppia').controller('TranslationModalController',
         $scope.previousTranslationAvailable = textAndAvailability.more;
       };
 
-    $scope.suggestTranslatedText = function() {
-      if (!$scope.uploadingTranslation && !$scope.loadingData) {
-        SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-          'Translation');
-        $scope.uploadingTranslation = true;
-        var imagesData = ImageLocalStorageService.getStoredImagesData();
-        ImageLocalStorageService.flushStoredImagesData();
-        TranslateTextService.suggestTranslatedText(
-          $scope.activeWrittenTranslation.html,
-          TranslationLanguageService.getActiveLanguageCode(),
-          imagesData, function() {
-            AlertsService.addSuccessMessage(
-              'Submitted translation for review.');
-            if ($scope.moreAvailable) {
-              var textAndAvailability = (
-                TranslateTextService.getTextToTranslate());
-              $scope.textToTranslate = textAndAvailability.text;
-              $scope.moreAvailable = textAndAvailability.more;
-            }
-            $scope.previousTranslationAvailable = true;
-            $scope.activeWrittenTranslation.html = '';
-            $scope.uploadingTranslation = false;
-          }, () => {
-            ContextService.resetImageSaveDestination();
-            $uibModalInstance.close();
-          });
-      }
-      if (!$scope.moreAvailable) {
-        ContextService.resetImageSaveDestination();
-        $uibModalInstance.close();
-      }
-    };
-    $scope.toggleViewCompletedTranslationsModal = function() {
-      if ($scope.loadingTranslatedText) {
-        $scope.loadCompletedTranslations();
-      }
-      $scope.viewCompletedTranslationsModalOpen =
-        !$scope.viewCompletedTranslationsModalOpen;
-    };
-  }
-]);
+      $scope.suggestTranslatedText = function() {
+        if (!$scope.uploadingTranslation && !$scope.loadingData) {
+          SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+            'Translation');
+          $scope.uploadingTranslation = true;
+          var imagesData = ImageLocalStorageService.getStoredImagesData();
+          ImageLocalStorageService.flushStoredImagesData();
+          TranslateTextService.suggestTranslatedText(
+            $scope.activeWrittenTranslation.html,
+            TranslationLanguageService.getActiveLanguageCode(),
+            imagesData, function() {
+              AlertsService.addSuccessMessage(
+                'Submitted translation for review.');
+              if ($scope.moreAvailable) {
+                var textAndAvailability = (
+                  TranslateTextService.getTextToTranslate());
+                $scope.textToTranslate = textAndAvailability.text;
+                $scope.moreAvailable = textAndAvailability.more;
+              }
+              $scope.previousTranslationAvailable = true;
+              $scope.activeWrittenTranslation.html = '';
+              $scope.uploadingTranslation = false;
+            }, () => {
+              ContextService.resetImageSaveDestination();
+              $uibModalInstance.close();
+            });
+        }
+        if (!$scope.moreAvailable) {
+          ContextService.resetImageSaveDestination();
+          $uibModalInstance.close();
+        }
+      };
+      $scope.toggleViewCompletedTranslationsModal = function() {
+        if ($scope.loadingTranslatedText) {
+          $scope.loadCompletedTranslations();
+        }
+        $scope.viewCompletedTranslationsModalOpen =
+          !$scope.viewCompletedTranslationsModalOpen;
+      };
+    }
+  ]);
