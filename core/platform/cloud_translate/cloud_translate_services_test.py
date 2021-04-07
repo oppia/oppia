@@ -27,27 +27,27 @@ class CloudTranslateServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_translate_services."""
 
     def test_translate_text_with_invalid_source_language_raises_error(self):
-        # Hindi (hi) is not a whitelisted language code
         with self.assertRaisesRegexp(
+            # Hindi (hi) is not a whitelisted language code.
             ValueError, 'Invalid language code: hi'):
             cloud_translate_services.translate_text(
                 'hello world', 'hi', 'es')
 
     def test_translate_text_with_invalid_target_language_raises_error(self):
-        # Hindi (hi) is not a whitelisted language code
         with self.assertRaisesRegexp(
+            # Hindi (hi) is not a whitelisted language code.
             ValueError, 'Invalid language code: hi'):
             cloud_translate_services.translate_text(
                 'hello world', 'en', 'hi')
 
     def test_translate_text_with_same_source_target_language_doesnt_call_api(
-        self):
+            self):
         def mock_translate_call(
                 text, source_language, target_language):
             self.assertEqual(text, 'hello world')
             self.assertEqual(source_language, 'en')
             self.assertEqual(target_language, 'en')
-            self.fail('mock api called')
+            self.fail(msg='mock api called')
 
         with self.swap(
             cloud_translate_services.CLIENT, 'translate', mock_translate_call):

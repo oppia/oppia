@@ -17,8 +17,7 @@
 """Tests interface for storage model switching."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals
-from core.platform.cloud_translate import cloud_translate_emulator  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -310,7 +309,7 @@ class RegistryUnitTest(test_utils.TestBase):
             self.assertEqual(
                 self.registry_instance.import_cloud_translate_services(),
                 cloud_translate_services)
-        from core.platform.cloud_translate import cloud_translate_services
+        from core.platform.cloud_translate import cloud_translate_emulator
         self.assertEqual(
             self.registry_instance.import_cloud_translate_services(),
             cloud_translate_emulator)
