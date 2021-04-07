@@ -125,7 +125,6 @@ class TransactionTests(test_utils.GenericTestBase):
     def test_returns_none_from_void_callback(self):
         def do_nothing():
             """Does nothing."""
-
             pass
 
         self.assertIsNone(gae_datastore_services.transaction(do_nothing))
@@ -133,7 +132,6 @@ class TransactionTests(test_utils.GenericTestBase):
     def test_raises_exception_from_callback(self):
         def raise_exception():
             """Raises an Exception."""
-
             raise Exception('uh-oh!')
 
         with self.assertRaisesRegexp(Exception, 'uh-oh!'):

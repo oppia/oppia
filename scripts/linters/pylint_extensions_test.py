@@ -3445,9 +3445,10 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+
     def test_empty_line_below_function_definition_without_doc_raises_error(
         self):
-        node_empty_line_below_function_def = astroid.scoped_nodes.Function(
+            node_empty_line_below_function_def = astroid.scoped_nodes.Function(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()

@@ -1375,7 +1375,6 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-
         try:
             imported_module = node.do_import_module(node.modname)
         except astroid.AstroidBuildingException:
@@ -1460,7 +1459,6 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node for a function or method
                 definition in the AST.
         """
-
         args_list = [args.name for args in node.args.args]
         if 'self' in args_list and args_list[0] != 'self':
             self.add_message('function-args-order-self', node=node)
@@ -1607,7 +1605,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-
         file_content = read_from_node(node)
         file_length = len(file_content)
 
@@ -1929,7 +1926,6 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
         Args:
             node: astroid.node.Compare. A node indicating comparison.
         """
-
         ops = node.ops
         for operator, operand in ops:
             if operator != '!=':
@@ -2144,8 +2140,8 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
 
         if next_line_after_func_declaration.startswith(
             (b'"""', b'\"\"\"', b'\'\'\'', b'\'', b'"')):
-               doc_length = len(node.doc.split(b'\n'))
-               line_number += doc_length
+            doc_length = len(node.doc.split(b'\n'))
+            line_number += doc_length
         line_after_function_def = linecache.getline(
             node.root().file, line_number + 1).strip()
         if len(line_after_function_def) == 0:

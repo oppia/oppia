@@ -76,7 +76,6 @@ class DescriptionLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_description_length_limit(self):
         """Checks description length."""
-
         # Creating a new story.
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', self.DESCRIPTION, self.TOPIC_ID,

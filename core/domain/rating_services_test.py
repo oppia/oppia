@@ -40,7 +40,6 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
     def test_rating_assignation(self):
         """Check ratings are correctly assigned to an exploration."""
-
         exp_services.save_new_exploration(
             self.EXP_ID,
             exp_domain.Exploration.create_default_exploration(self.EXP_ID))
@@ -87,7 +86,6 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
     def test_time_of_ratings_recorded(self):
         """Check that the time a rating is given is recorded correctly."""
-
         time_allowed_for_computation = datetime.timedelta(seconds=10)
 
         exp_services.save_new_exploration(
@@ -111,7 +109,6 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
     def test_rating_assignations_do_not_conflict(self):
         """Check that ratings of different explorations are independant."""
-
         exp_id_a = 'exp_id_A'
         exp_id_b = 'exp_id_B'
 

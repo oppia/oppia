@@ -93,7 +93,6 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
-
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
             len(list(specs_dict.keys())),

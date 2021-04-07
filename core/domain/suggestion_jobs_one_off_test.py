@@ -1068,7 +1068,6 @@ class PopulateContributionStatsOneOffJobTests(
 
     def _create_edit_state_content_suggestion(self):
         """Creates an "edit state content" suggestion."""
-
         edit_state_content_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,

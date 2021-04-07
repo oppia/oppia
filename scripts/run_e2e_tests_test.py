@@ -1255,12 +1255,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 with on_ci_swap, cleanup_swap, exit_swap:
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
-<<<<<<< HEAD
     def test_no_reruns_off_ci(self):
-=======
-    def test_no_reruns_off_ci_fail(self):
-
->>>>>>> upstream/develop
+        
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():

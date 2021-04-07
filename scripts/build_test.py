@@ -169,7 +169,6 @@ class BuildTests(test_utils.GenericTestBase):
         """Test _compare_file_count raises exception when there is a
         mismatched file count between 2 dirs list.
         """
-
         # Test when both lists contain single directory.
         build.ensure_directory_exists(EMPTY_DIR)
         source_dir_file_count = build.get_file_count(EMPTY_DIR)

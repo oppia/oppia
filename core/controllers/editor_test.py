@@ -115,7 +115,6 @@ class EditorTests(BaseEditorControllerTests):
 
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
-
         # Check that non-editors can access, but not edit, the editor page.
         response = self.get_html_response('/create/0')
         self.assertIn(
@@ -137,7 +136,6 @@ class EditorTests(BaseEditorControllerTests):
 
     def test_new_state_template(self):
         """Test the validity of the NEW_STATE_TEMPLATE."""
-
         exploration = exp_fetchers.get_exploration_by_id('0')
         exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.states[
@@ -1329,7 +1327,6 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
 
     def test_user_banning(self):
         """Test that banned users are banned."""
-
         exp_id = '0'
         exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
@@ -1731,7 +1728,6 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
     def test_user_exploration_emails_handler(self):
         """Test user exploration emails handler."""
-
         # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
@@ -2795,7 +2791,6 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         """Test that rights handler returns the correct rights of a user
         for an exploration.
         """
-
         self.login(self.EDITOR_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
