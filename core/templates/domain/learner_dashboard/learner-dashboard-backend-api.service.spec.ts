@@ -251,13 +251,13 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updated_status = null;
-    let updated_subject = null;
+    let updatedStatus = null;
+    let updatedSubject = null;
     let text = 'Sending message';
     let url = '/threadhandler/exploration.4.Wfafsafd';
     let payload = {
-      updated_status: updated_status,
-      updated_subject: updated_subject,
+      updated_status: updatedStatus,
+      updated_subject: updatedSubject,
       text: text
     };
 
@@ -284,13 +284,13 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updated_status = null;
-    let updated_subject = null;
+    let updatedStatus = null;
+    let updatedSubject = null;
     let text = 'Sending message';
     let invalidUrl = '/invalidUrl';
     let payload = {
-      updated_status: updated_status,
-      updated_subject: updated_subject,
+      updated_status: updatedStatus,
+      updated_subject: updatedSubject,
       text: text
     };
     learnerDashboardBackendApiService.addNewMessageAsync(
@@ -320,13 +320,13 @@ describe('Learner Dashboard Backend API Service', () => {
 
     let url = '/threadhandler/exploration.4.Wfafsafd';
     let result = [{
-        author_picture_data_url:
-          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA",
-        author_username: "User",
-        created_on_msecs: 1617712024611.706,
-        message_id: 1,
-        text: "test",
-        updated_status: null
+      author_picture_data_url:
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
+      author_username: 'User',
+      created_on_msecs: 1617712024611.706,
+      message_id: 1,
+      text: 'test',
+      updated_status: null
     }];
 
     learnerDashboardBackendApiService.onClickThreadAsync(
@@ -339,16 +339,16 @@ describe('Learner Dashboard Backend API Service', () => {
 
     req.flush(
       {
-      message_summary_list: [{
-        author_picture_data_url:
-          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA",
-        author_username: "User",
-        created_on_msecs: 1617712024611.706,
-        message_id: 1,
-        text: "test",
-        updated_status: null
-      }]
-    },
+        message_summary_list: [{
+          author_picture_data_url:
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA',
+          author_username: 'User',
+          created_on_msecs: 1617712024611.706,
+          message_id: 1,
+          text: 'test',
+          updated_status: null
+        }]
+      },
       { status: 200, statusText: 'Success.'});
     flushMicrotasks();
 

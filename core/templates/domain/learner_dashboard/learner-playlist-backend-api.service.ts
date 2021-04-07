@@ -136,15 +136,15 @@ export class LearnerPlaylistBackendApiService {
       // eslint-disable-next-line dot-notation
       this.http.delete<void>(playlistUrl).toPromise();
       this.removeActivityModalStatus = 'removed';
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-        this.removeActivityModalStatus = 'canceled';
-      });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+      this.removeActivityModalStatus = 'canceled';
+    });
 
     return new Promise((resolve, reject) => {
-      if(this.removeActivityModalStatus === 'removed') {
+      if (this.removeActivityModalStatus === 'removed') {
         resolve();
       }
     });

@@ -61,7 +61,7 @@ describe('PngSanitizerService', () => {
     'SafeResourceUrl', () => {
     expect(pngSanitizerService.getTrustedPngResourceUrl(safePng))
       .toBe(safePng);
-    });
+  });
 
   it('should return null when a invalid PNG is requested as' +
     'SafeResourceUrl', () => {
