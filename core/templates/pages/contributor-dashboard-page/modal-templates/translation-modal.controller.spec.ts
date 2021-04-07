@@ -283,10 +283,10 @@ describe('Translation Modal Controller', function() {
           '<p> Translation 9 </p>', '<p> Translation 10 </p>']);
       expect($scope.contentList).toEqual(
         ['<p> Content 1 </p>', '<p> Content 2 </p>',
-        '<p> Content 3 </p>', '<p> Content 4 </p>',
-        '<p> Content 5 </p>', '<p> Content 6 </p>',
-        '<p> Content 7 </p>', '<p> Content 8 </p>',
-        '<p> Content 9 </p>', '<p> Content 10 </p>']);
+          '<p> Content 3 </p>', '<p> Content 4 </p>',
+          '<p> Content 5 </p>', '<p> Content 6 </p>',
+          '<p> Content 7 </p>', '<p> Content 8 </p>',
+          '<p> Content 9 </p>', '<p> Content 10 </p>']);
     });
 
   it('should toggle the view completed translations when clicked',
@@ -295,4 +295,4 @@ describe('Translation Modal Controller', function() {
       $scope.toggleViewCompletedTranslationsModal();
       expect($scope.viewCompletedTranslationsModalOpen).toBe(expectedValue);
     });
-  });
+});

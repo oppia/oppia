@@ -146,7 +146,7 @@ describe('TranslateTextService', function() {
         const expectTranslationsAndContent = {
           translations: ['<p> Translation 1 </p>', '<p> Translation 2 </p>'],
           content: ['<p> Content 1 </p>', '<p> Content 2 </p>']
-        }
+        };
         $httpBackend.expect(
           'GET', '/getcompletedtranslationshandler?exp_id=1&language_code=en')
           .respond({

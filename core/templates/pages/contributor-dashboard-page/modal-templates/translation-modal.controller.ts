@@ -31,144 +31,144 @@ require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('TranslationModalController',
-[ '$controller', '$scope', '$uibModalInstance', 'AlertsService',
-  'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
-  'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'ENTITY_TYPE', 'TRANSLATION_TIPS',
+  ['$controller', '$scope', '$uibModalInstance', 'AlertsService',
+    'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
+    'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
+    'opportunity', 'ENTITY_TYPE', 'TRANSLATION_TIPS',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
       opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
-    // We need to set the context here so that the rte fetches
-    // images for the given ENTITY_TYPE and targetId.
-    ContextService.setCustomEntityContext(
-      ENTITY_TYPE.EXPLORATION, opportunity.id);
+      $controller('ConfirmOrCancelModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance
+      });
+      // We need to set the context here so that the rte fetches
+      // images for the given ENTITY_TYPE and targetId.
+      ContextService.setCustomEntityContext(
+        ENTITY_TYPE.EXPLORATION, opportunity.id);
 
-    ContextService.setImageSaveDestinationToLocalStorage();
-    $scope.uploadingTranslation = false;
-    $scope.activeWrittenTranslation = {};
-    $scope.activeWrittenTranslation.html = '';
-    $scope.activeLanguageCode =
-      TranslationLanguageService.getActiveLanguageCode();
-    $scope.HTML_SCHEMA = {
-      type: 'html',
-      ui_config: {
-        hide_complex_extensions: 'true',
-        language: TranslationLanguageService.getActiveLanguageCode(),
-        languageDirection: (
-          TranslationLanguageService.getActiveLanguageDirection())
-      }
-    };
-    $scope.subheading = opportunity.subheading;
-    $scope.heading = opportunity.heading;
-    $scope.loadingData = true;
-    $scope.moreAvailable = false;
-    $scope.previousTranslationAvailable = false;
-    $scope.textToTranslate = '';
-    $scope.viewCompletedTranslationsModalOpen = false;
-    $scope.translationsList = [];
-    $scope.contentList = [];
-    $scope.loadingTranslatedText = true;
-    $scope.noTranslationComplete = true;
-    $scope.TRANSLATION_TIPS = TRANSLATION_TIPS;
-    $scope.languageDescription = (
-      TranslationLanguageService.getActiveLanguageDescription());
-    TranslateTextService.init(
-      opportunity.id,
-      TranslationLanguageService.getActiveLanguageCode(),
-      function() {
+      ContextService.setImageSaveDestinationToLocalStorage();
+      $scope.uploadingTranslation = false;
+      $scope.activeWrittenTranslation = {};
+      $scope.activeWrittenTranslation.html = '';
+      $scope.activeLanguageCode =
+        TranslationLanguageService.getActiveLanguageCode();
+      $scope.HTML_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          hide_complex_extensions: 'true',
+          language: TranslationLanguageService.getActiveLanguageCode(),
+          languageDirection: (
+            TranslationLanguageService.getActiveLanguageDirection())
+        }
+      };
+      $scope.subheading = opportunity.subheading;
+      $scope.heading = opportunity.heading;
+      $scope.loadingData = true;
+      $scope.moreAvailable = false;
+      $scope.previousTranslationAvailable = false;
+      $scope.textToTranslate = '';
+      $scope.viewCompletedTranslationsModalOpen = false;
+      $scope.translationsList = [];
+      $scope.contentList = [];
+      $scope.loadingTranslatedText = true;
+      $scope.noTranslationComplete = true;
+      $scope.TRANSLATION_TIPS = TRANSLATION_TIPS;
+      $scope.languageDescription = (
+        TranslationLanguageService.getActiveLanguageDescription());
+      TranslateTextService.init(
+        opportunity.id,
+        TranslationLanguageService.getActiveLanguageCode(),
+        function() {
+          var textAndAvailability = (
+            TranslateTextService.getTextToTranslate());
+          $scope.textToTranslate = textAndAvailability.text;
+          $scope.moreAvailable = textAndAvailability.more;
+          $scope.loadingData = false;
+        });
+      $scope.loadCompletedTranslations = function() {
+        TranslateTextService.fetchCompletedTranslations(
+          opportunity.id,
+          TranslationLanguageService.getActiveLanguageCode(),
+          function() {
+            var completedTranslationsAndContent =
+              TranslateTextService.getCompletedTranslationsText();
+            $scope.translationsList =
+              completedTranslationsAndContent.translations;
+            $scope.contentList = completedTranslationsAndContent.content;
+            if ($scope.translationsList.length > 0) {
+              $scope.noTranslationComplete = false;
+            }
+            if ($scope.translationsList.length > 10) {
+              $scope.translationsList.splice(10);
+              $scope.contentList.splice(10);
+            }
+            $scope.loadingTranslatedText = false;
+          });
+      };
+      $scope.onContentClick = function($event) {
+        if ($scope.isCopyModeActive()) {
+          $event.stopPropagation();
+        }
+        CkEditorCopyContentService.broadcastCopy($event.target);
+      };
+      $scope.isCopyModeActive = function() {
+        return CkEditorCopyContentService.copyModeActive;
+      };
+      $scope.skipActiveTranslation = function () {
         var textAndAvailability = (
           TranslateTextService.getTextToTranslate());
         $scope.textToTranslate = textAndAvailability.text;
         $scope.moreAvailable = textAndAvailability.more;
-        $scope.loadingData = false;
-      });
-    $scope.loadCompletedTranslations = function() {
-      TranslateTextService.fetchCompletedTranslations(
-        opportunity.id,
-        TranslationLanguageService.getActiveLanguageCode(),
-        function() {
-          var completedTranslationsAndContent =
-            TranslateTextService.getCompletedTranslationsText();
-          $scope.translationsList =
-            completedTranslationsAndContent.translations;
-          $scope.contentList = completedTranslationsAndContent.content;
-          if ($scope.translationsList.length > 0) {
-            $scope.noTranslationComplete = false;
-          }
-          if ($scope.translationsList.length > 10) {
-            $scope.translationsList.splice(10);
-            $scope.contentList.splice(10);
-          }
-          $scope.loadingTranslatedText = false;
-        });
-    };
-    $scope.onContentClick = function($event) {
-      if ($scope.isCopyModeActive()) {
-        $event.stopPropagation();
-      }
-      CkEditorCopyContentService.broadcastCopy($event.target);
-    };
-    $scope.isCopyModeActive = function() {
-      return CkEditorCopyContentService.copyModeActive;
-    };
-    $scope.skipActiveTranslation = function () {
-      var textAndAvailability = (
-        TranslateTextService.getTextToTranslate());
-      $scope.textToTranslate = textAndAvailability.text;
-      $scope.moreAvailable = textAndAvailability.more;
-      $scope.activeWrittenTranslation.html = '';
-    };
+        $scope.activeWrittenTranslation.html = '';
+      };
 
-    $scope.returnToPreviousTranslation = function () {
-      var textAndAvailability =(
-        TranslateTextService.getPreviousTextToTranslate());
-      $scope.textToTranslate = textAndAvailability.text;
-      $scope.previousTranslationAvailable = textAndAvailability.more;
-    };
+      $scope.returnToPreviousTranslation = function () {
+        var textAndAvailability =(
+          TranslateTextService.getPreviousTextToTranslate());
+        $scope.textToTranslate = textAndAvailability.text;
+        $scope.previousTranslationAvailable = textAndAvailability.more;
+      };
 
-    $scope.suggestTranslatedText = function () {
-      if (!$scope.uploadingTranslation && !$scope.loadingData) {
-        SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-          'Translation');
-        $scope.uploadingTranslation = true;
-        var imagesData = ImageLocalStorageService.getStoredImagesData();
-        ImageLocalStorageService.flushStoredImagesData();
-        ContextService.resetImageSaveDestination();
-        TranslateTextService.suggestTranslatedText(
-          $scope.activeWrittenTranslation.html,
-          TranslationLanguageService.getActiveLanguageCode(),
-          imagesData, function () {
-            AlertsService.addSuccessMessage(
-              'Submitted translation for review.');
-            if ($scope.moreAvailable) {
-              var textAndAvailability = (
-                TranslateTextService.getTextToTranslate());
-              $scope.textToTranslate = textAndAvailability.text;
-              $scope.moreAvailable = textAndAvailability.more;
-            }
-            $scope.previousTranslationAvailable = true;
-            $scope.activeWrittenTranslation.html = '';
-            $scope.uploadingTranslation = false;
-          }, () => {
-            $uibModalInstance.close();
-          });
-      }
-      if (!$scope.moreAvailable) {
-        $uibModalInstance.close();
-      }
-    };
-    $scope.toggleViewCompletedTranslationsModal = function () {
-      if( $scope.loadingTranslatedText) {
-        $scope.loadCompletedTranslations();
-      }
-      $scope.viewCompletedTranslationsModalOpen =
-        !$scope.viewCompletedTranslationsModalOpen;
-    };
-  }
+      $scope.suggestTranslatedText = function () {
+        if (!$scope.uploadingTranslation && !$scope.loadingData) {
+          SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+            'Translation');
+          $scope.uploadingTranslation = true;
+          var imagesData = ImageLocalStorageService.getStoredImagesData();
+          ImageLocalStorageService.flushStoredImagesData();
+          ContextService.resetImageSaveDestination();
+          TranslateTextService.suggestTranslatedText(
+            $scope.activeWrittenTranslation.html,
+            TranslationLanguageService.getActiveLanguageCode(),
+            imagesData, function () {
+              AlertsService.addSuccessMessage(
+                'Submitted translation for review.');
+              if ($scope.moreAvailable) {
+                var textAndAvailability = (
+                  TranslateTextService.getTextToTranslate());
+                $scope.textToTranslate = textAndAvailability.text;
+                $scope.moreAvailable = textAndAvailability.more;
+              }
+              $scope.previousTranslationAvailable = true;
+              $scope.activeWrittenTranslation.html = '';
+              $scope.uploadingTranslation = false;
+            }, () => {
+              $uibModalInstance.close();
+            });
+        }
+        if (!$scope.moreAvailable) {
+          $uibModalInstance.close();
+        }
+      };
+      $scope.toggleViewCompletedTranslationsModal = function () {
+        if( $scope.loadingTranslatedText) {
+          $scope.loadCompletedTranslations();
+        }
+        $scope.viewCompletedTranslationsModalOpen =
+          !$scope.viewCompletedTranslationsModalOpen;
+      };
+    }
 ]);

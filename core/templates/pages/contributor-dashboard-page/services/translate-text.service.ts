@@ -197,16 +197,16 @@ angular.module('oppia').factory('TranslateTextService', [
       },
       fetchCompletedTranslations: function(
           expId, languageCode, successCallback) {
-            $http.get('/getcompletedtranslationshandler', {
-              params: {
-                exp_id: expId,
-                language_code: languageCode
-              }
-            }).then(function(response) {
-              completedTranslations = response.data.translations;
-              completedTranslationsContent = response.data.content;
-              successCallback();
-            });
+          $http.get('/getcompletedtranslationshandler', {
+            params: {
+              exp_id: expId,
+              language_code: languageCode
+            }
+          }).then(function(response) {
+            completedTranslations = response.data.translations;
+            completedTranslationsContent = response.data.content;
+            successCallback();
+        });
       },
       getCompletedTranslationsText: function() {
         return {
