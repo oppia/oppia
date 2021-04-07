@@ -21,7 +21,7 @@ import { MathEquationInputRulesService } from
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 
 describe('Math equation input rules service', () => {
-  let meirs: MathEquationInputRulesService = null;
+  let meirs: MathEquationInputRulesService;
   let inputString, positionOfTerms;
 
   beforeEach(() => {

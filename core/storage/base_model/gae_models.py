@@ -137,13 +137,6 @@ class BaseModel(datastore_services.Model):
         pass
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role for all the classes will be Exploration
-        editor by default. The subclasses may override this value if needed.
-        """
-        return feconf.ROLE_ID_EXPLORATION_EDITOR
-
-    @staticmethod
     def get_deletion_policy():
         """This method should be implemented by subclasses.
 

@@ -24,7 +24,12 @@ import {
   StateObjectFactory,
   State
 } from 'domain/state/StateObjectFactory';
+<<<<<<< HEAD
 import { Voiceover } from 'domain/exploration/Voiceover.model';
+=======
+import { AppConstants } from 'app.constants';
+import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+>>>>>>> upstream/develop
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
@@ -47,11 +52,6 @@ export interface WrittenTranslationObjectsDict {
 }
 
 const MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5;
-
-// TODO(#11581): Add rule translation support for TextInput and SetInput
-// interactions. The array below should be emptied or removed afterwards.
-const INTERACTIONS_THAT_ARE_CURRENTLY_UNTRANSLATABLE = [
-  'TextInput', 'SetInput'];
 
 const WRITTEN_TRANSLATIONS_KEY = 'writtenTranslations';
 const RECORDED_VOICEOVERS_KEY = 'recordedVoiceovers';
@@ -180,21 +180,13 @@ export class States {
 
   areWrittenTranslationsDisplayable(languageCode: string): boolean {
     // A language's translations are ready to be displayed if there are less
-    // than five missing or update-needed translations.
+    // than five missing or update-needed translations. In addition, all
+    // rule-related translations must be present.
     let translationsNeedingUpdate = 0;
     let translationsMissing = 0;
 
     for (const stateName in this._states) {
       const state = this._states[stateName];
-
-      // If there are any TextInput or SetInput interactions, disable switching
-      // languages.
-      if (
-        INTERACTIONS_THAT_ARE_CURRENTLY_UNTRANSLATABLE.includes(
-          state.interaction.id)
-      ) {
-        return false;
-      }
 
       const requiredContentIds = (
         state.getRequiredWrittenTranslationContentIds());
@@ -210,6 +202,10 @@ export class States {
             contentId, languageCode));
         if (writtenTranslation === undefined) {
           translationsMissing += 1;
+          if (contentId.startsWith(AppConstants.COMPONENT_NAME_RULE_INPUT)) {
+            // Rule-related translations cannot be missing.
+            return false;
+          }
         } else if (writtenTranslation.needsUpdate) {
           translationsNeedingUpdate += 1;
         }
