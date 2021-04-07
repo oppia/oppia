@@ -66,18 +66,22 @@ class ExplorationConversionError(Exception):
     pass
 
 
-def create_enum(*sequential, **names):
+def create_enum(*sequential):
     """Creates a enumerated constant.
 
     Args:
         *sequential: *. Sequence List to generate the enumerations.
-        **names: *. Names of the enumerration.
 
     Returns:
         dict. Dictionary containing the enumerated constants.
     """
-    enums = dict(python_utils.ZIP(sequential, sequential), **names)
-    return type(b'Enum', (), enums)
+    enums = dict(python_utils.ZIP(sequential, sequential))
+    try:
+        from enum import Enum
+        print(enums)
+        return Enum('Test', enums)
+    except ImportError:
+        return type(b'Enum', (), enums)
 
 
 def get_file_contents(filepath, raw_bytes=False, mode='r'):

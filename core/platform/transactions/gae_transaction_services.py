@@ -19,8 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from google.appengine.ext import ndb
+from google.cloud import datastore
 
+db = datastore.Client()
 
 def run_in_transaction(fn, *args, **kwargs):
     """Runs a function in a transaction. Either all of the operations in
@@ -41,10 +42,10 @@ def run_in_transaction(fn, *args, **kwargs):
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
-    return ndb.transaction(
+    return db.transaction(
         lambda: fn(*args, **kwargs),
         xg=True,
-        propagation=ndb.TransactionOptions.ALLOWED,
+        propagation=db.TransactionOptions.ALLOWED,
     )
 
 
@@ -62,4 +63,4 @@ def toplevel_wrapper(*args, **kwargs):
     Returns:
         app. The entire app toplevel.
     """
-    return ndb.toplevel(*args, **kwargs)
+    return db.toplevel(*args, **kwargs)
