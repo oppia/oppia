@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 })
 export class StateNameService {
   private stateNameEditorIsShown: boolean = false;
-  private savedMemento: string = null;
+  private savedMemento: string | null = null;
 
   /**
    * @return {boolean} Whether the state name editor is shown.
@@ -42,14 +42,14 @@ export class StateNameService {
   /**
    * @param {string} value - Memento of the state name to be set to.
    */
-  setStateNameSavedMemento(stateName: string): void {
+  setStateNameSavedMemento(stateName: string | null): void {
     this.savedMemento = stateName;
   }
 
   /**
    * @return {string} The state name's saved memento.
    */
-  getStateNameSavedMemento(): string {
+  getStateNameSavedMemento(): string | null {
     return this.savedMemento;
   }
 
