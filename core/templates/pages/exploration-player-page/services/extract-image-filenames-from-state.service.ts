@@ -220,7 +220,7 @@ export class ExtractImageFilenamesFromStateService {
           // We have the attribute of filepath in oppia-noninteractive-image
           // tag. But it actually contains the filename only. We use the
           // variable filename instead of filepath since in the end we are
-          // retrieving the filenames in the exploration. 
+          // retrieving the filenames in the exploration.
           let filename = JSON.parse(
             this.htmlEscaperService.escapedStrToUnescapedStr(
               imageTagList[i].getAttribute('filepath-with-value')));
