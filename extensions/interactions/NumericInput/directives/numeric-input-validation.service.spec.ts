@@ -120,7 +120,6 @@ describe('NumericInputValidationService', () => {
         tol: 1
       }
     }, 'NumericInput');
-
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
@@ -170,6 +169,19 @@ describe('NumericInputValidationService', () => {
     }]);
   });
 
+  it('should catch redundant rules in separate answer groups', () => {
+    answerGroups[1] = cloneDeep(answerGroups[0]);
+    answerGroups[0].rules = [betweenNegativeOneAndOneRule];
+    answerGroups[1].rules = [equalsZeroRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, {}, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 2 will never be matched ' +
+        'because it is made redundant by rule 1 from answer group 1.'
+    }]);
+  });
+
   it('should catch redundant rules caused by greater/less than range',
     () => {
       var warnings: Warning[];
@@ -191,8 +203,8 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
-  it('should catch redundant rules caused by greater/less than or equal range',
-    () => {
+    it('should catch redundant rules caused by greater/less than or equal range',
+      () => {
       var warnings: Warning[];
       answerGroups[0].rules = [lessThanOrEqualToOneRule, equalsZeroRule];
       warnings = validatorService.getAllWarnings(
@@ -214,8 +226,8 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
-  it('should catch redundant rules caused by within tolerance range',
-    () => {
+    it('should catch redundant rules caused by within tolerance range',
+      () => {
       answerGroups[0].rules = [zeroWithinToleranceOfOneRule, equalsZeroRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
@@ -226,18 +238,6 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
-  it('should catch redundant rules in separate answer groups', () => {
-    answerGroups[1] = cloneDeep(answerGroups[0]);
-    answerGroups[0].rules = [betweenNegativeOneAndOneRule];
-    answerGroups[1].rules = [equalsZeroRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 2 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
-    }]);
-  });
 
   it('should generate errors in the given input', () => {
     expect(validatorService.getErrorString(undefined)).toEqual(
