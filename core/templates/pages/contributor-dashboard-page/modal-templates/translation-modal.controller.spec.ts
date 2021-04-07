@@ -228,22 +228,22 @@ describe('Translation Modal Controller', function() {
       .returnValue('English');
     spyOn(TranslationLanguageService, 'getActiveLanguageCode').and
       .returnValue('en');
-    
-    getCompletedTranslationsTextSpy = spyOn(TranslateTextService, 'getCompletedTranslationsText');
+    getCompletedTranslationsTextSpy = spyOn(TranslateTextService,
+      'getCompletedTranslationsText');
     getCompletedTranslationsTextSpy.and.returnValue({
       translations: ['<p> Translation 1 </p>', '<p> Translation 2 </p>',
-      '<p> Translation 3 </p>', '<p> Translation 4 </p>',
-      '<p> Translation 5 </p>', '<p> Translation 6 </p>',
-      '<p> Translation 7 </p>', '<p> Translation 8 </p>',
-      '<p> Translation 9 </p>', '<p> Translation 10 </p>',
-      '<p> Translation 11 </p>', '<p> Translation 12 </p>'],
+        '<p> Translation 3 </p>', '<p> Translation 4 </p>',
+        '<p> Translation 5 </p>', '<p> Translation 6 </p>',
+        '<p> Translation 7 </p>', '<p> Translation 8 </p>',
+        '<p> Translation 9 </p>', '<p> Translation 10 </p>',
+        '<p> Translation 11 </p>', '<p> Translation 12 </p>'],
       content: ['<p> Content 1 </p>', '<p> Content 2 </p>',
-      '<p> Content 3 </p>', '<p> Content 4 </p>',
-      '<p> Content 5 </p>', '<p> Content 6 </p>',
-      '<p> Content 7 </p>', '<p> Content 8 </p>',
-      '<p> Content 9 </p>', '<p> Content 10 </p>',
-      '<p> Content 11 </p>', '<p> Content 12 </p>']
-    })
+        '<p> Content 3 </p>', '<p> Content 4 </p>',
+        '<p> Content 5 </p>', '<p> Content 6 </p>',
+        '<p> Content 7 </p>', '<p> Content 8 </p>',
+        '<p> Content 9 </p>', '<p> Content 10 </p>',
+        '<p> Content 11 </p>', '<p> Content 12 </p>']
+    });
     $httpBackend.expect(
       'GET', '/getcompletedtranslationshandler?exp_id=1&language_code=en')
       .respond({
@@ -260,23 +260,23 @@ describe('Translation Modal Controller', function() {
   }));
 
   it('should correctly fetch the translations and corresponding content',
-  function() {
-    getCompletedTranslationsTextSpy.and.returnValue({
-      translations: ['<p>First Translation </p>'],
-      content: ['<p>First Content</p>']
-    })
-    $scope.loadCompletedTranslations();
-    $httpBackend.flush();
-    expect($scope.translationsList).toEqual(['<p>First Translation </p>']);
-    expect($scope.contentList).toEqual(['<p>First Content</p>']);
-  });
+    function() {
+      getCompletedTranslationsTextSpy.and.returnValue({
+        translations: ['<p>First Translation </p>'],
+        content: ['<p>First Content</p>']
+      });
+      $scope.loadCompletedTranslations();
+      $httpBackend.flush();
+      expect($scope.translationsList).toEqual(['<p>First Translation </p>']);
+      expect($scope.contentList).toEqual(['<p>First Content</p>']);
+    });
 
   it('should display only first ten translations',
     function() {
-      
       $scope.loadCompletedTranslations();
       $httpBackend.flush();
-      expect($scope.translationsList).toEqual(['<p> Translation 1 </p>', '<p> Translation 2 </p>',
+      expect($scope.translationsList).toEqual(
+        ['<p> Translation 1 </p>', '<p> Translation 2 </p>',
         '<p> Translation 3 </p>', '<p> Translation 4 </p>',
         '<p> Translation 5 </p>', '<p> Translation 6 </p>',
         '<p> Translation 7 </p>', '<p> Translation 8 </p>',
@@ -288,10 +288,10 @@ describe('Translation Modal Controller', function() {
         '<p> Content 9 </p>', '<p> Content 10 </p>']);
     });
 
-    it('should toggle the view completed translations when clicked', 
-  function() {
-    let expectedValue = !$scope.viewCompletedTranslationsModalOpen;
-    $scope.toggleViewCompletedTranslationsModal();
-    expect($scope.viewCompletedTranslationsModalOpen).toBe(expectedValue);
-  })
-});
+  it('should toggle the view completed translations when clicked',
+    function() {
+      let expectedValue = !$scope.viewCompletedTranslationsModalOpen;
+      $scope.toggleViewCompletedTranslationsModal();
+      expect($scope.viewCompletedTranslationsModalOpen).toBe(expectedValue);
+    });
+  });
