@@ -17,7 +17,8 @@
 """Tests interface for storage model switching."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals
+from core.platform.cloud_translate import cloud_translate_emulator  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -304,10 +305,15 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_cloud_translate_services(self):
         """Tests import cloud translate services function."""
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            from core.platform.cloud_translate import cloud_translate_services
+            self.assertEqual(
+                self.registry_instance.import_cloud_translate_services(),
+                cloud_translate_services)
         from core.platform.cloud_translate import cloud_translate_services
         self.assertEqual(
             self.registry_instance.import_cloud_translate_services(),
-            cloud_translate_services)
+            cloud_translate_emulator)
 
     def test_import_search_services(self):
         """Tests import search services function."""

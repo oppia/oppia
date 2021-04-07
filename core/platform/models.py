@@ -307,8 +307,12 @@ class _Gae(Platform):
         Returns:
             module. The cloud_translate_services module.
         """
-        from core.platform.cloud_translate import cloud_translate_services
-        return cloud_translate_services
+        if constants.EMULATOR_MODE:
+            from core.platform.cloud_translate import cloud_translate_emulator
+            return cloud_translate_emulator
+        else:
+            from core.platform.cloud_translate import cloud_translate_services
+            return cloud_translate_services
 
     NAME = 'gae'
 

@@ -30,6 +30,10 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
         super(CloudTranslateEmulatorUnitTests, self).setUp()
         self.emulator = cloud_translate_emulator.TranslateEmulator()
 
+    def test_init_prepopulates_responses(self):
+        self.assertDictEqual(self.emulator.expected_responses,
+            cloud_translate_emulator.PREGENERATED_TRANSLATIONS)
+
     def test_translate_text_with_invalid_source_language_raises_error(self):
         with self.assertRaisesRegexp(
             ValueError, 'Invalid language code: invalid'):
@@ -43,12 +47,14 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
                 'hello world', 'en', 'invalid')
 
     def test_translate_text_with_valid_input_returns_expected_output(self):
-        self.emulator.add_expected_response(
-            'en', 'es', 'hello world', 'hola mundo')
+        # 'hello world' is a prepopulated translation
         translated_text = self.emulator.translate_text(
             'hello world', 'en', 'es')
-        self.assertEqual('hola mundo', translated_text)
+        self.assertEqual('Hola Mundo', translated_text)
 
-    def test_translate_text_without_translation_returns_empty_string(self):
+    def test_translate_text_without_translation_returns_default_string(self):
         translated_text = self.emulator.translate_text('some text', 'en', 'es')
-        self.assertEqual('', translated_text)
+        self.assertEqual('Default translation. (See core/platform/'\
+            'cloud_translate/cloud_translate_emulator.py for details)',
+            translated_text)
+

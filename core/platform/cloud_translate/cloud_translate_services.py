@@ -31,14 +31,15 @@ from google.cloud import translate_v2 as translate
 
 CLIENT = translate.Client()
 
+LANGUAGE_CODE_WHITELIST = ('en', 'es', 'fr', 'zh')
 
 def translate_text(text, source_language, target_language):
     """Translates text into the target language.
 
     Args:
         text: str. The text to be translated.
-        source_language: str. A valid 2 letter ISO 639-1 language code.
-        target_language: str. A valid 2 letter ISO 639-1 language code.
+        source_language: str. A whitelisted ISO 639-1 language code.
+        target_language: str. A whitelisted ISO 639-1 language code.
 
     For more information on ISO 639-1 see:
     https://www.w3schools.com/tags/ref_language_codes.asp
@@ -46,12 +47,14 @@ def translate_text(text, source_language, target_language):
     Returns:
         str. The translated text.
     """
-    if not utils.is_valid_language_code(source_language):
+    if source_language not in LANGUAGE_CODE_WHITELIST:
         raise ValueError('Invalid language code: %s' % source_language)
-    if not utils.is_valid_language_code(target_language):
+    if target_language not in LANGUAGE_CODE_WHITELIST:
         raise ValueError('Invalid language code: %s' % target_language)
+    if source_language == target_language:
+        return text
 
     result = CLIENT.translate(
         text, target_language=target_language, source_language=source_language)
-    translated_text = result.get('translatedText')
+    translated_text = result['translatedText']
     return translated_text
