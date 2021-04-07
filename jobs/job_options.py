@@ -35,12 +35,14 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
             'from the datastore.'),
     }
 
-    def __init__(self, runtime_type_check=False, **job_options):
+    def __init__(self, flags=None, **job_options):
         """Initializes a new JobOptions instance.
 
         Args:
-            runtime_type_check: bool. FOR TESTING ONLY! Enable type checking at
-                pipeline execution time. NOTE: Only respected by DirectRunner.
+            flags: dict(str:str)|None. Command-line flags for customizing a
+                pipeline. Although Oppia doesn't use command-line flags to
+                control jobs or pipelines, we still need to pass the value
+                (unmodified) because PipelineOptions, a parent class, needs it.
             **job_options: dict(str: *). One of the options defined in the class
                 JOB_OPTIONS dict.
         """
@@ -49,8 +51,9 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
             unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError('Unsupported option(s): %s' % unsupported_options)
         super(JobOptions, self).__init__(
-            runtime_type_check=runtime_type_check,
-            # GoogleCloudOptions: implementation details.
+            # PipelineOptions: implementation detail.
+            flags=flags,
+            # GoogleCloudOptions: implementation detail.
             project=feconf.OPPIA_PROJECT_ID,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             # TODO(#11475): Figure out what these values should be. We can't run
