@@ -29,12 +29,10 @@ import apache_beam as beam
 
 AUDIT_DO_FN_TYPES_BY_KIND = audits_registry.get_audit_do_fn_types_by_kind()
 KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
-AUDIT_DO_FN_TYPES_BY_INDEX = (
-    tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind] for kind in KIND_BY_INDEX))
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):
-    """Runs a comprehensive audit on every model in storage."""
+    """Runs a comprehensive audit on every model in the datastore."""
 
     def run(self):
         """Returns a PCollection of audit errors aggregated from all models."""
@@ -51,14 +49,15 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         models_of_kind_by_index = (
             existing_models
             # NOTE: Partition returns a statically-sized list of PCollections.
-            # Creating partitions can be wasteful when there are only a few
-            # items, like in our unit tests. In exchange, we can take advantage
-            # of the high parallelizability of PCollections, which are designed
-            # for huge datasets and parallel processing.
+            # Creating partitions is wasteful when there are less items than
+            # there are partitions, like in our unit tests. In exchange, in
+            # production the job will be able to take advantage of the high
+            # parallelizability of PCollections, which are designed for enormous
+            # datasets and parallel processing.
             #
             # Alternatively, we could have used GroupBy. However, that returns
-            # an _iterable_ over the groups instead of a PCollection, and so it
-            # is vulnerable to out-of-memory errors.
+            # an _iterable_ of items rather than a PCollection, and so it is
+            # vulnerable to out-of-memory errors.
             #
             # Since this job is concerned with running audits on EVERY MODEL IN
             # STORAGE, Partition is the clear winner regardless of the overhead
@@ -67,25 +66,53 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 lambda m, _, kinds: kinds.index(jobs_utils.get_model_kind(m)),
                 # NOTE: Partition requires a hard-coded number of slices; it
                 # cannot be used with dynamic numbers generated in a pipeline.
-                # The KIND_BY_INDEX is a constant tuple, so it satisfies that
-                # requirement.
+                # KIND_BY_INDEX is a constant tuple so that requirement is
+                # satisfied in this case.
                 len(KIND_BY_INDEX), KIND_BY_INDEX)
         )
 
-        audit_do_fn_args = python_utils.ZIP(
-            AUDIT_DO_FN_TYPES_BY_INDEX, KIND_BY_INDEX, models_of_kind_by_index)
-
-        audit_error_pcolls = []
-        for do_fn_types, model_kind, models_of_kind in audit_do_fn_args:
-            for do_fn_type in do_fn_types:
-                label = 'Running %s on %s' % (do_fn_type.__name__, model_kind)
-                audit_error_pcolls.append(
-                    models_of_kind | label >> beam.ParDo(do_fn_type()))
-
-        audit_error_pcolls.append(
+        audit_error_pcolls = [
             deleted_models
-            | 'Run ValidateDeletedModel on deleted models' >> (
+            | 'Apply ValidateDeletedModel on deleted models' >> (
                 beam.ParDo(base_model_audits.ValidateDeletedModel()))
-        )
+        ]
 
-        return audit_error_pcolls | 'Combine all audit errors' >> beam.Flatten()
+        model_groups = python_utils.ZIP(KIND_BY_INDEX, models_of_kind_by_index)
+        for kind, models_of_kind in model_groups:
+            # NOTE: Using extend() instead of append() because ApplyAuditDoFns
+            # produces an iterable of PCollections rather than a single one.
+            # NOTE: Label is missing because ApplyAuditDoFns labels itself.
+            audit_error_pcolls.extend(models_of_kind | ApplyAuditDoFns(kind))
+
+        return audit_error_pcolls | 'Combine audit results' >> beam.Flatten()
+
+
+class ApplyAuditDoFns(beam.PTransform):
+    """Runs every Audit DoFn targeting the models of a specific kind."""
+
+    def __init__(self, kind):
+        """Initializes a new ApplyAuditDoFns instance.
+
+        Args:
+            kind: str. The kind of models this PTransform will receive.
+        """
+        super(ApplyAuditDoFns, self).__init__(
+            label='Apply every Audit DoFn targeting %s' % kind)
+        self._kind = kind
+        self._do_fn_types = tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind])
+
+    def expand(self, models_of_kind):
+        """Returns audit errors from every Audit DoFn targeting the models.
+
+        Args:
+            models_of_kind: PCollection. Models of self._kind.
+
+        Returns:
+            iterable(PCollection). A chain of PCollections. Each individual one
+            is the result of a specific DoFn, and is labeled as such.
+        """
+        return (
+            models_of_kind
+            | 'Apply %s on %s' % (f.__name__, self._kind) >> beam.ParDo(f())
+            for f in self._do_fn_types
+        )
