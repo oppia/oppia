@@ -228,8 +228,8 @@ describe('Translation Modal Controller', function() {
       .returnValue('English');
     spyOn(TranslationLanguageService, 'getActiveLanguageCode').and
       .returnValue('en');
-    getCompletedTranslationsTextSpy = spyOn(TranslateTextService,
-      'getCompletedTranslationsText');
+    getCompletedTranslationsTextSpy = spyOn(
+      TranslateTextService, 'getCompletedTranslationsText');
     getCompletedTranslationsTextSpy.and.returnValue({
       translations: ['<p> Translation 1 </p>', '<p> Translation 2 </p>',
         '<p> Translation 3 </p>', '<p> Translation 4 </p>',
@@ -277,11 +277,12 @@ describe('Translation Modal Controller', function() {
       $httpBackend.flush();
       expect($scope.translationsList).toEqual(
         ['<p> Translation 1 </p>', '<p> Translation 2 </p>',
-        '<p> Translation 3 </p>', '<p> Translation 4 </p>',
-        '<p> Translation 5 </p>', '<p> Translation 6 </p>',
-        '<p> Translation 7 </p>', '<p> Translation 8 </p>',
-        '<p> Translation 9 </p>', '<p> Translation 10 </p>']);
-      expect($scope.contentList).toEqual(['<p> Content 1 </p>', '<p> Content 2 </p>',
+          '<p> Translation 3 </p>', '<p> Translation 4 </p>',
+          '<p> Translation 5 </p>', '<p> Translation 6 </p>',
+          '<p> Translation 7 </p>', '<p> Translation 8 </p>',
+          '<p> Translation 9 </p>', '<p> Translation 10 </p>']);
+      expect($scope.contentList).toEqual(
+        ['<p> Content 1 </p>', '<p> Content 2 </p>',
         '<p> Content 3 </p>', '<p> Content 4 </p>',
         '<p> Content 5 </p>', '<p> Content 6 </p>',
         '<p> Content 7 </p>', '<p> Content 8 </p>',

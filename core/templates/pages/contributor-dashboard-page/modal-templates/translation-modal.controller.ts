@@ -30,16 +30,16 @@ require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/image-local-storage.service.ts');
 require('services/site-analytics.service.ts');
 
-angular.module('oppia').controller('TranslationModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'AlertsService',
+angular.module('oppia').controller('TranslationModalController',
+[ '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
   'opportunity', 'ENTITY_TYPE', 'TRANSLATION_TIPS',
-  function (
-    $controller, $scope, $uibModalInstance, AlertsService,
-    CkEditorCopyContentService, ContextService, ImageLocalStorageService,
-    SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
-    opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
+  function(
+      $controller, $scope, $uibModalInstance, AlertsService,
+      CkEditorCopyContentService, ContextService, ImageLocalStorageService,
+      SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
+      opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -81,7 +81,7 @@ angular.module('oppia').controller('TranslationModalController', [
     TranslateTextService.init(
       opportunity.id,
       TranslationLanguageService.getActiveLanguageCode(),
-      function () {
+      function() {
         var textAndAvailability = (
           TranslateTextService.getTextToTranslate());
         $scope.textToTranslate = textAndAvailability.text;
@@ -92,32 +92,31 @@ angular.module('oppia').controller('TranslationModalController', [
       TranslateTextService.fetchCompletedTranslations(
         opportunity.id,
         TranslationLanguageService.getActiveLanguageCode(),
-        function () {
-          console.log("Called the completedTranslationsload function")
-          var completedTranslationsAndContent = 
+        function() {
+          var completedTranslationsAndContent =
             TranslateTextService.getCompletedTranslationsText();
-            $scope.translationsList = completedTranslationsAndContent.translations;
-            $scope.contentList = completedTranslationsAndContent.content;
-            if ($scope.translationsList.length > 0) {
-              $scope.noTranslationComplete = false;
-            }
-            if ($scope.translationsList.length > 10) {
-              $scope.translationsList.splice(10);
-              $scope.contentList.splice(10);
-            }
-            $scope.loadingTranslatedText = false; 
+          $scope.translationsList =
+            completedTranslationsAndContent.translations;
+          $scope.contentList = completedTranslationsAndContent.content;
+          if ($scope.translationsList.length > 0) {
+            $scope.noTranslationComplete = false;
+          }
+          if ($scope.translationsList.length > 10) {
+            $scope.translationsList.splice(10);
+            $scope.contentList.splice(10);
+          }
+          $scope.loadingTranslatedText = false;
         });
-    }
-    $scope.onContentClick = function ($event) {
+    };
+    $scope.onContentClick = function($event) {
       if ($scope.isCopyModeActive()) {
         $event.stopPropagation();
       }
       CkEditorCopyContentService.broadcastCopy($event.target);
     };
-    $scope.isCopyModeActive = function () {
+    $scope.isCopyModeActive = function() {
       return CkEditorCopyContentService.copyModeActive;
     };
-    
     $scope.skipActiveTranslation = function () {
       var textAndAvailability = (
         TranslateTextService.getTextToTranslate());
@@ -127,7 +126,7 @@ angular.module('oppia').controller('TranslationModalController', [
     };
 
     $scope.returnToPreviousTranslation = function () {
-      var textAndAvailability = (
+      var textAndAvailability =(
         TranslateTextService.getPreviousTextToTranslate());
       $scope.textToTranslate = textAndAvailability.text;
       $scope.previousTranslationAvailable = textAndAvailability.more;
@@ -165,7 +164,7 @@ angular.module('oppia').controller('TranslationModalController', [
       }
     };
     $scope.toggleViewCompletedTranslationsModal = function () {
-      if($scope.loadingTranslatedText){
+      if( $scope.loadingTranslatedText) {
         $scope.loadCompletedTranslations();
       }
       $scope.viewCompletedTranslationsModalOpen =
