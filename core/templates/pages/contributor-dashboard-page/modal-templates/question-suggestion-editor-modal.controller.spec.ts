@@ -262,12 +262,12 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.skillDifficultyString).toBe('Medium');
     });
 
-    it('should get the correct skill diffuclty string', function() {
-      $scope.getDifficultyString(0.6);
+    it('should get the correct skill difficulty string', function() {
+      $scope.setDifficultyString(0.6);
       expect($scope.skillDifficultyString).toBe('Medium');
-      $scope.getDifficultyString(0.9);
+      $scope.setDifficultyString(0.9);
       expect($scope.skillDifficultyString).toBe('Hard');
-      $scope.getDifficultyString(0.3);
+      $scope.setDifficultyString(0.3);
       expect($scope.skillDifficultyString).toBe('Easy');
     });
 
