@@ -18,6 +18,9 @@
  */
 
 require(
+  'pages/exploration-player-page/services/' +
+  'learner-view-info-backend-api.service');
+require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.component.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
@@ -47,14 +50,16 @@ angular.module('oppia').directive('learnerViewInfo', [
       template: require('./learner-view-info.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$rootScope', '$uibModal', 'ContextService',
+        '$log', '$rootScope', '$uibModal', 'ContextService',
+        'LearnerViewInfoBackendApiService',
         'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-        'UrlService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'UrlService',
         'TOPIC_VIEWER_STORY_URL_TEMPLATE',
         function(
-            $http, $log, $rootScope, $uibModal, ContextService,
+            $log, $rootScope, $uibModal, ContextService,
+            LearnerViewInfoBackendApiService,
             ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-            UrlService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+            UrlService,
             TOPIC_VIEWER_STORY_URL_TEMPLATE
         ) {
           var ctrl = this;
@@ -63,22 +68,24 @@ angular.module('oppia').directive('learnerViewInfo', [
           ctrl.directiveSubscriptions = new Subscription();
 
           ctrl.showInformationCard = function() {
+            let stringifiedExpIds = JSON.stringify(
+              [explorationId]);
+            let includePrivateExplorations = JSON.stringify(true);
             if (expInfo) {
               openInformationCardModal();
             } else {
-              $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-                params: {
-                  stringified_exp_ids: JSON.stringify([explorationId]),
-                  include_private_explorations: JSON.stringify(
-                    true)
-                }
-              }).then(function(response) {
-                expInfo = response.data.summaries[0];
+              LearnerViewInfoBackendApiService.fetchLearnerInfo(
+                stringifiedExpIds,
+                includePrivateExplorations
+              ).then(function(response) {
+                expInfo = response.summaries[0];
                 openInformationCardModal();
+                $rootScope.$applyAsync();
               }, function() {
                 $log.error(
                   'Information card failed to load for exploration ' +
                   explorationId);
+                $rootScope.$applyAsync();
               });
             }
           };
