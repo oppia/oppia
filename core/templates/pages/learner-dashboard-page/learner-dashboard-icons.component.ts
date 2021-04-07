@@ -97,12 +97,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
         return (
-          /* eslint-disable-next-line max-len */
           this.learnerDashboardActivityIds.belongsToExplorationPlaylist(
             this.activityId));
       } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
         return (
-          /* eslint-disable-next-line max-len */
           this.learnerDashboardActivityIds.belongsToCollectionPlaylist(
             this.activityId));
       }
@@ -114,12 +112,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
         return (
-          // eslint-disable-next-line max-len
           this.learnerDashboardActivityIds.belongsToCompletedExplorations(
             this.activityId));
       } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
         return (
-          // eslint-disable-next-line max-len
           this.learnerDashboardActivityIds.belongsToCompletedCollections(
             this.activityId));
       }
@@ -131,12 +127,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
     if (this.learnerDashboardActivityIds) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
         return (
-          // eslint-disable-next-line max-len
           this.learnerDashboardActivityIds.belongsToIncompleteExplorations(
             this.activityId));
       } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
         return (
-          // eslint-disable-next-line max-len
           this.learnerDashboardActivityIds.belongsToIncompleteCollections(
             this.activityId));
       }
@@ -149,11 +143,9 @@ export class LearnerDashboardIconsComponent implements OnInit {
         activityId, activityType));
     if (isSuccessfullyAdded) {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
-        /* eslint-disable-next-line max-len */
         this.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
           activityId);
       } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
-        /* eslint-disable-next-line max-len */
         this.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
           activityId);
       }

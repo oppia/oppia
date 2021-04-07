@@ -33,7 +33,7 @@ export class RemoveActivityModalComponent implements OnInit {
   @Input() subsectionName: string;
   @Input() activityId: string;
   @Input() activityTitle: string;
-  removeFromLearnerPlaylistUrl: string;
+  removeActivityUrl: string;
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -70,7 +70,7 @@ export class RemoveActivityModalComponent implements OnInit {
       throw new Error('Section name is not valid.');
     }
 
-    this.removeFromLearnerPlaylistUrl = (
+    this.removeActivityUrl = (
       this.urlInterpolationService.interpolateUrl(
         removeActivityUrlPrefix +
         '<activityType>/<activityId>', {
@@ -80,7 +80,7 @@ export class RemoveActivityModalComponent implements OnInit {
   }
 
   remove(): void {
-    this.activeModal.close(this.removeFromLearnerPlaylistUrl);
+    this.activeModal.close(this.removeActivityUrl);
   }
 
   cancel(): void {

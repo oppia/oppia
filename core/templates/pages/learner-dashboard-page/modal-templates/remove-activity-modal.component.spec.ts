@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for for learnerPlaylistModal.
+ * @fileoverview Unit tests for for RemoveActivityModalComponent.
  */
 
 import { Pipe } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
+
+import { RemoveActivityModalComponent } from './remove-activity-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Pipe({name: 'translate'})
@@ -45,17 +46,21 @@ class MockUrlInterpolationService {
   }
 }
 
-describe('Learner Playlist Modal Component', function() {
-  let component: LearnerPlaylistModalComponent;
-  let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
+describe('Remove Activity Modal Component', function() {
+  let component: RemoveActivityModalComponent;
+  let fixture: ComponentFixture<RemoveActivityModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [LearnerPlaylistModalComponent, MockTranslatePipe],
+      declarations: [
+        RemoveActivityModalComponent,
+        MockTranslatePipe
+      ],
       providers: [
         {
-          provide: NgbActiveModal, useClass: MockActiveModal
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
         },
         {
           provide: UrlInterpolationService,
@@ -66,33 +71,190 @@ describe('Learner Playlist Modal Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LearnerPlaylistModalComponent);
+    fixture = TestBed.createComponent(RemoveActivityModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    component.activityId = '0';
-    component.activityTitle = 'Title';
-    // A component . activityType = 'exploration';.
-    component.removeFromLearnerPlaylistUrl = (
-      '/learnerplaylistactivityhandler/exploration/0');
-    fixture.detectChanges();
   });
-
 
   it('should remove exploration in learner playlist when clicking on' +
-    'remove button', fakeAsync(() => {
+    ' remove button', fakeAsync(() => {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    component.removeFromLearnerPlaylistUrl = (
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
       '/learnerplaylistactivityhandler/exploration/0');
+
     component.remove();
     flushMicrotasks();
+    fixture.detectChanges();
+
     expect(closeSpy).toHaveBeenCalledWith(
-      component.removeFromLearnerPlaylistUrl);
-  }));
+      '/learnerplaylistactivityhandler/exploration/0');
+  }
+  ));
 
   it('should not remove exploration in learner playlist' +
-    'when clicking on cancel button', () => {
+    ' when clicking on cancel button', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnerplaylistactivityhandler/exploration/0');
+
     component.cancel();
+    flushMicrotasks();
+    fixture.detectChanges();
+
     expect(dismissSpy).toHaveBeenCalled();
-  });
+  }
+  ));
+
+  it('should remove collection in learner playlist when clicking on' +
+    ' remove button', fakeAsync(() => {
+    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnerplaylistactivityhandler/colleciton/0');
+
+    component.remove();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(closeSpy).toHaveBeenCalledWith(
+      '/learnerplaylistactivityhandler/colleciton/0');
+  }
+  ));
+
+  it('should not remove collection in learner playlist' +
+    ' when clicking on cancel button', fakeAsync(() => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnerplaylistactivityhandler/colleciton/0');
+
+    component.cancel();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(dismissSpy).toHaveBeenCalled();
+  }
+  ));
+
+  it('should remove exploration in incomplete playlist when clicking on' +
+    ' remove button', fakeAsync(() => {
+    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnerincompleteactivityhandler/exploration/0');
+
+    component.remove();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(closeSpy).toHaveBeenCalledWith(
+      '/learnerincompleteactivityhandler/exploration/0');
+  }
+  ));
+
+  it('should not remove exploration in incomplete playlist' +
+    ' when clicking on cancel button', fakeAsync(() => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnerincompleteactivityhandler/exploration/0');
+
+    component.cancel();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(dismissSpy).toHaveBeenCalled();
+  }
+  ));
+
+  it('should remove collection in incomplete playlist when clicking on' +
+    ' remove button', fakeAsync(() => {
+    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnerincompleteactivityhandler/colleciton/0');
+
+    component.remove();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(closeSpy).toHaveBeenCalledWith(
+      '/learnerincompleteactivityhandler/colleciton/0');
+  }
+  ));
+
+  it('should not remove collection in incomplete playlist' +
+    ' when clicking on cancel button', fakeAsync(() => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    component.subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnerincompleteactivityhandler/colleciton/0');
+
+    component.cancel();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(dismissSpy).toHaveBeenCalled();
+  }
+  ));
+
+  it('should throw error if given section name is' +
+    ' not valid', fakeAsync(() => {
+    component.sectionNameI18nId = 'InvalidSection';
+    component.subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Section name is not valid.');
+  }
+  ));
+
+  it('should throw error if given section name is' +
+    ' not valid', fakeAsync(() => {
+    component.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    component.subsectionName = 'InvalidSubSection';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Subsection name is not valid.');
+  }
+  ));
 });
