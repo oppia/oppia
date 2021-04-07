@@ -1256,7 +1256,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_no_reruns_off_ci(self):
-        
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1310,7 +1309,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_no_reruns_off_ci_pass(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():

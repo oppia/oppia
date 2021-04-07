@@ -2135,11 +2135,10 @@ class DisallowBlankLinesBelowFunctionDefinitionChecker(checkers.BaseChecker):
             if ':' in line:
                 line_number += i
                 break
-        next_line_after_func_declaration = linecache.getline(
+        line_after_func_declaration = linecache.getline(
             node.root().file, line_number + 1).strip()
 
-        if next_line_after_func_declaration.startswith(
-            (b'"""', b'\"\"\"', b'\'\'\'', b'\'', b'"')):
+        if line_after_func_declaration.startswith((b'"""', b'\'\'\'', b'\'', b'"')):
             doc_length = len(node.doc.split(b'\n'))
             line_number += doc_length
         line_after_function_def = linecache.getline(
