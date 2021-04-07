@@ -3473,7 +3473,7 @@ class DisallowBlankLinesBelowFunctionDefinitionCheckerTests(unittest.TestCase):
             node=node_empty_line_below_function_def)
 
         with self.checker_test_object.assertAddsMessages(message):
-                temp_file.close()
+            temp_file.close()
 
     def test_empty_line_below_function_definition_with_args_raises_error(self):
         node_empty_line_below_function_def = astroid.scoped_nodes.Function(
