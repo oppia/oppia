@@ -61,11 +61,11 @@ from jobs import job_options
 import python_utils
 
 
-class JobMetaclass(type):
+class _JobMetaclass(type):
     """Metaclass for all of Oppia's Apache Beam jobs.
 
     This class keeps track of the complete list of jobs. The list can be read
-    with the JobMetaclass.get_all_jobs() class method.
+    with the _JobMetaclass.get_all_jobs() class method.
 
     THIS CLASS IS AN IMPLEMENTATION DETAIL, DO NOT USE IT DIRECTLY. All user
     code should simply inherit from the JobBase class, found below.
@@ -74,13 +74,13 @@ class JobMetaclass(type):
     _JOB_REGISTRY = {}
 
     def __new__(mcs, name, bases, namespace):
-        """Creates a new job class with type `JobMetaclass`.
+        """Creates a new job class with type `_JobMetaclass`.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
 
         This metaclass adds jobs to the _JOB_REGISTRY dict, keyed by name, as
         they are created. We use the registry to reject jobs with duplicate
-        names and to provide the convenient: JobMetaclass.get_all_jobs().
+        names and to provide the convenient: _JobMetaclass.get_all_jobs().
 
         We use a metaclass instead of other alternatives (like decorators or a
         manual list), because metaclasses cannot be forgotten to be used,
@@ -88,7 +88,7 @@ class JobMetaclass(type):
         from third party linters to be enforced.
 
         Args:
-            mcs: JobMetaclass. The metaclass.
+            mcs: _JobMetaclass. The metaclass.
             name: str. The name of the class.
             bases: tuple(type). The sequence of base classes for the new class.
             namespace: dict(str: *). The namespace of the class. This is where
@@ -97,7 +97,7 @@ class JobMetaclass(type):
         Returns:
             class. The new class instance.
         """
-        job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
+        job_cls = super(_JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
         if name in mcs._JOB_REGISTRY:
             collision = mcs._JOB_REGISTRY[name]
             raise TypeError('%s name is already used by %s.%s' % (
@@ -111,16 +111,15 @@ class JobMetaclass(type):
         """Returns all jobs that have inherited from the JobBase class.
 
         Args:
-            mcs: JobMetaclass. The metaclass.
+            mcs: _JobMetaclass. The metaclass.
 
         Returns:
-            dict(str: class). The classes that have been created with this
-            metaclass, keyed by their name.
+            list(class). The classes that have inherited from JobBase.
         """
         return list(mcs._JOB_REGISTRY.values())
 
 
-class JobBase(python_utils.with_metaclass(JobMetaclass)):
+class JobBase(python_utils.with_metaclass(_JobMetaclass)):
     """The base class for all of Oppia's Apache Beam jobs.
 
     Example:

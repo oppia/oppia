@@ -205,6 +205,7 @@
         "jobs.io.stub_io_test",
         "jobs.job_options_test",
         "jobs.job_utils_test",
+        "jobs.registry_test",
         "jobs.transforms.audits_registry_test",
         "jobs.transforms.base_model_audits_test",
         "jobs.transforms.user_audits_test",

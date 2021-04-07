@@ -35,7 +35,17 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
     """Runs a comprehensive audit on every model in the datastore."""
 
     def run(self):
-        """Returns a PCollection of audit errors aggregated from all models."""
+        """Returns a PCollection of audit errors aggregated from all models.
+
+        Returns:
+            PCollection. A PCollection of audit errors discovered during the
+            audit.
+
+        Raises:
+            ValueError. When the `model_getter` option, which should be the type
+                of PTransform we will use to fetch models from the datastore, is
+                None.
+        """
         if self.job_options.model_getter is None:
             raise ValueError('JobOptions.model_getter must not be None')
 
@@ -49,7 +59,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         models_of_kind_by_index = (
             existing_models
             # NOTE: Partition returns a statically-sized list of PCollections.
-            # Creating partitions is wasteful when there are less items than
+            # Creating partitions is wasteful when there are fewer items than
             # there are partitions, like in our unit tests. In exchange, in
             # production the job will be able to take advantage of the high
             # parallelizability of PCollections, which are designed for enormous
@@ -103,6 +113,9 @@ class ApplyAuditDoFns(beam.PTransform):
 
     def expand(self, models_of_kind):
         """Returns audit errors from every Audit DoFn targeting the models.
+
+        This is the method that PTransform requires us to override when
+        implementing custom transforms.
 
         Args:
             models_of_kind: PCollection. Models of self._kind.
