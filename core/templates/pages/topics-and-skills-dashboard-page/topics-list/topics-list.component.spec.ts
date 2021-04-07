@@ -18,9 +18,9 @@
 
 import { CommonModule } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -33,24 +33,24 @@ describe('Topics List Component', () => {
   let componentInstance: TopicsListComponent;
   let urlInterpolationService: UrlInterpolationService;
   let alertsService: AlertsService;
+  let editableTopicBackendApiService: EditableTopicBackendApiService;
+  let topicsAndSkillsDashboardBackendApiService:
+  TopicsAndSkillsDashboardBackendApiService;
+  const topicId: string = 'topicId';
+  const topicName: string = 'topic_name';
 
-  class MockEditabeleBackendApiService {
-    deleteTopic(topicId: string): object {
-      return {
-        then: (
-            successCallback: (status: number) => void,
-            errorCallback: (error: string) => void
-        ) => {
-          successCallback(123);
-        }
-      };
-    }
+  class MockNgbRef {
+    componentInstance = {
+      topiceName: ''
+    };
+
+    result: Promise<void> = Promise.resolve();
   }
 
-  class MockTopicsAndSkillsDashboardBackendApiService {
-    onTopicsAndSkillsDashboardReinitialized = {
-      emit(): void {}
-    };
+  class MockNgbModal {
+    open(content, options): MockNgbRef {
+      return new MockNgbRef();
+    }
   }
 
   beforeEach(waitForAsync(() => {
@@ -68,15 +68,13 @@ describe('Topics List Component', () => {
       ],
       providers: [
         AlertsService,
+        EditableTopicBackendApiService,
+        TopicsAndSkillsDashboardBackendApiService,
+        UrlInterpolationService,
         {
-          provide: EditableTopicBackendApiService,
-          useClass: MockEditabeleBackendApiService
-        },
-        {
-          provide: TopicsAndSkillsDashboardBackendApiService,
-          useClass: MockTopicsAndSkillsDashboardBackendApiService
-        },
-        UrlInterpolationService
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
       ]
     }).compileComponents();
   }));
@@ -90,6 +88,16 @@ describe('Topics List Component', () => {
     alertsService = TestBed.inject(AlertsService);
     alertsService = (alertsService as unknown) as
       jasmine.SpyObj<AlertsService>;
+    editableTopicBackendApiService = TestBed
+      .inject(EditableTopicBackendApiService);
+    editableTopicBackendApiService = (
+      editableTopicBackendApiService as unknown) as
+      jasmine.SpyObj<EditableTopicBackendApiService>;
+    topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService);
+    topicsAndSkillsDashboardBackendApiService = (
+      topicsAndSkillsDashboardBackendApiService as unknown) as
+      jasmine.SpyObj<TopicsAndSkillsDashboardBackendApiService>;
   });
 
   it('should create', () => {
@@ -136,4 +144,39 @@ describe('Topics List Component', () => {
     expect(componentInstance.getSerialNumberForTopic(topicIndex))
       .toEqual(expectedSerialNumber);
   });
+
+  it('should delete topic', fakeAsync(() => {
+    spyOn(editableTopicBackendApiService, 'deleteTopic').and
+      .returnValue(Promise.resolve(123));
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized, 'emit');
+    componentInstance.deleteTopic(topicId, topicName);
+    tick();
+    expect(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized.emit).toHaveBeenCalled();
+  }));
+
+  it('should handle error when deleting topic', fakeAsync(() => {
+    spyOn(editableTopicBackendApiService, 'deleteTopic').and
+      .returnValue(Promise.reject(''));
+    spyOn(
+      alertsService, 'addWarning');
+    componentInstance.deleteTopic(topicId, topicName);
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when deleting the topic.');
+  }));
+
+  it('should handle error when deleting topic and show error message',
+    fakeAsync(() => {
+      const errorMessage: string = 'error_message';
+      spyOn(editableTopicBackendApiService, 'deleteTopic').and
+        .returnValue(Promise.reject(errorMessage));
+      spyOn(alertsService, 'addWarning');
+      componentInstance.deleteTopic(topicId, topicName);
+      tick();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(errorMessage);
+    }));
 });
