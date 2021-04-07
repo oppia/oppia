@@ -201,6 +201,12 @@ angular.module('oppia').component('settingsTab', {
 
       ctrl.saveExplorationTitle = function() {
         ExplorationTitleService.saveDisplayedValue();
+        if (!ctrl.isTitlePresent()) {
+          ctrl.rolesSaveButtonEnabled = false;
+          ctrl.errorMessage = (
+            'Please provide a title before inviting.');
+          return;
+        }
       };
 
       ctrl.saveExplorationCategory = function() {
@@ -450,7 +456,6 @@ angular.module('oppia').component('settingsTab', {
           ctrl.errorMessage = '';
           return;
         }
-
         if (!ctrl.isTitlePresent()) {
           ctrl.rolesSaveButtonEnabled = false;
           ctrl.errorMessage = (
