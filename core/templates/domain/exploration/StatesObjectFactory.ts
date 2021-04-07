@@ -24,12 +24,8 @@ import {
   StateObjectFactory,
   State
 } from 'domain/state/StateObjectFactory';
-<<<<<<< HEAD
-import { Voiceover } from 'domain/exploration/Voiceover.model';
-=======
 import { AppConstants } from 'app.constants';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
->>>>>>> upstream/develop
+import { Voiceover } from 'domain/exploration/Voiceover.model';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 

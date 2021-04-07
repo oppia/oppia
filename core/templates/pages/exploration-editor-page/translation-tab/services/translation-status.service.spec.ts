@@ -42,6 +42,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -69,6 +71,10 @@ describe('Translation status service', function() {
       }
     });
     $provide.value('AngularNameService', new AngularNameService());
+    $provide.value(
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(),
+        new RuleObjectFactory()));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
@@ -137,6 +143,7 @@ describe('Translation status service', function() {
       ess = $injector.get('ExplorationStatesService');
       ttams = $injector.get('TranslationTabActiveModeService');
       tls = $injector.get('TranslationLanguageService');
+      srvs = $injector.get('StateRecordedVoiceoversService');
       swts = $injector.get('StateWrittenTranslationsService');
 
       statesWithAudioDict = {

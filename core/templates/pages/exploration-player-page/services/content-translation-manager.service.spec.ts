@@ -441,7 +441,7 @@ describe('Content translation manager service', () => {
           newInteraction.id, newInteraction.customizationArgs, true, null,
           null),
         newInteraction,
-        rvof.createEmpty(),
+        RecordedVoiceovers.createEmpty(),
         newWrittenTranslations,
         'content'
       )

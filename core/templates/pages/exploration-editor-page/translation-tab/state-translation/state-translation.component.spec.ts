@@ -1046,7 +1046,7 @@ describe('State translation component', function() {
         }
       });
       stateRecordedVoiceoversService.init(
-        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+        'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -1268,7 +1268,7 @@ describe('State translation component', function() {
         'Introduction');
       explorationStatesService.init(explorationState2);
       stateRecordedVoiceoversService.init(
-        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+        'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
