@@ -39,7 +39,6 @@ class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
     JOB_CLASS = audit_jobs.AuditAllStorageModelsJob
 
     VALID_USER_ID = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
-    maxDiff = None
 
     def test_empty_storage(self):
         self.assert_job_output_is_empty()
