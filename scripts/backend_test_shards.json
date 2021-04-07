@@ -202,7 +202,7 @@
         "jobs.audit_jobs_test",
         "jobs.base_jobs_test",
         "jobs.decorators.audit_decorators_test",
-        "jobs.io.test_io_test",
+        "jobs.io.stub_io_test",
         "jobs.job_options_test",
         "jobs.jobs_utils_test",
         "jobs.transforms.audits_registry_test",

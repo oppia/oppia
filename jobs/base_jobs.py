@@ -124,7 +124,7 @@ class JobBase(python_utils.with_metaclass(JobMetaclass)):
     """The base class for all of Oppia's Apache Beam jobs.
 
     Example:
-        class FooJob(JobBase):
+        class CountAllModelsJob(JobBase):
             def run(self):
                 return (
                     self.pipeline
@@ -133,12 +133,11 @@ class JobBase(python_utils.with_metaclass(JobMetaclass)):
                     | beam.combiners.Count.PerElement()
                 )
 
-        runner = runners.DataflowRunner()
         options = job_options.JobOptions(model_getter=model_io.GetModels)
-        with pipeline.Pipeline(runner=runner, options=options) as p:
-            job = FooJob(p)
+        with pipeline.Pipeline(options=options) as p:
+            count_all_models_job = CountAllModelsJob(p)
             beam_testing_util.assert_that(
-                job.run(),
+                count_all_models_job.run(),
                 beam_testing_util.equal_to([
                     ('BaseModel', 1),
                 ]))

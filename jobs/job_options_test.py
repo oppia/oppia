@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 from jobs import job_options
-from jobs.io import test_io
+from jobs.io import stub_io
 
 
 class JobOptionsTests(test_utils.TestBase):
@@ -32,7 +32,7 @@ class JobOptionsTests(test_utils.TestBase):
         self.assertIsNone(options.model_getter)
 
     def test_overwritten_values(self):
-        model_io_stub = test_io.ModelIoStub()
+        model_io_stub = stub_io.ModelIoStub()
         get_models = model_io_stub.get_models
 
         options = job_options.JobOptions(model_getter=get_models)

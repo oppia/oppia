@@ -24,7 +24,7 @@ import datetime
 from core.tests import test_utils
 from jobs import base_jobs
 from jobs import job_options
-from jobs.io import test_io
+from jobs.io import stub_io
 
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
@@ -111,7 +111,7 @@ class JobTestBase(PipelinedTestBase):
 
     def __init__(self, *args, **kwargs):
         super(JobTestBase, self).__init__(*args, **kwargs)
-        self.model_io_stub = test_io.ModelIoStub()
+        self.model_io_stub = stub_io.ModelIoStub()
         self.pipeline.options.view_as(job_options.JobOptions).model_getter = (
             self.model_io_stub.get_models)
 

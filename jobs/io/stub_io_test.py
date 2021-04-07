@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.io.test_io."""
+"""Unit tests for jobs.io.stub_io."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from jobs import jobs_test_utils
-from jobs.io import test_io
+from jobs.io import stub_io
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -29,12 +29,12 @@ from jobs.io import test_io
 class ModelIoStubTests(jobs_test_utils.PipelinedTestBase):
 
     def test_get_models_returns_nothing_when_stub_is_empty(self):
-        stub = test_io.ModelIoStub()
+        stub = stub_io.ModelIoStub()
 
         self.assert_pcoll_empty(self.pipeline | stub.get_models())
 
     def test_get_models(self):
-        stub = test_io.ModelIoStub()
+        stub = stub_io.ModelIoStub()
         test_models = [
             base_models.BaseModel(
                 id='a', created_on=self.NOW, last_updated=self.NOW),
