@@ -49,7 +49,7 @@ class JobMetaclassTests(test_utils.TestBase):
             def __init__(self):
                 pass
 
-        self.assertEqual(MockJobMetaclass.get_jobs(), {})
+        self.assertEqual(MockJobMetaclass.get_all_jobs(), [])
 
     def test_puts_non_base_classes_in_registry(self):
         class FooJob(python_utils.with_metaclass(MockJobMetaclass)):
@@ -58,7 +58,7 @@ class JobMetaclassTests(test_utils.TestBase):
             def __init__(self):
                 pass
 
-        self.assertEqual(MockJobMetaclass.get_jobs(), {'FooJob': FooJob})
+        self.assertEqual(MockJobMetaclass.get_all_jobs(), [FooJob])
 
     def test_raises_type_error_for_jobs_with_duplicate_names(self):
         class FooJob(python_utils.with_metaclass(MockJobMetaclass)):

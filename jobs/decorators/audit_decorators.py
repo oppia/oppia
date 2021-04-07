@@ -67,17 +67,17 @@ class AuditsExisting(python_utils.OBJECT):
         """
         if not model_types:
             raise ValueError('Must target at least one model')
-        self._targeted_models = set()
-        for m in model_types:
-            if m in _MODEL_TYPES_BY_BASE_CLASS:
-                self._targeted_models.update(_MODEL_TYPES_BY_BASE_CLASS[m])
-            elif m in _ALL_MODEL_TYPES:
-                self._targeted_models.add(m)
+        self._targeted_model_types = set()
+        for t in model_types:
+            if t in _MODEL_TYPES_BY_BASE_CLASS:
+                self._targeted_model_types.update(_MODEL_TYPES_BY_BASE_CLASS[t])
+            elif t in _ALL_MODEL_TYPES:
+                self._targeted_model_types.add(t)
             else:
                 raise TypeError(
-                    '%r is not a model registered in core.platform' % m)
+                    '%r is not a model registered in core.platform' % t)
         self._targeted_kinds = {
-            jobs_utils.get_model_kind(m) for m in self._targeted_models
+            jobs_utils.get_model_kind(t) for t in self._targeted_model_types
         }
 
     def __call__(self, do_fn_type):
@@ -107,15 +107,15 @@ class AuditsExisting(python_utils.OBJECT):
         for kind in self._targeted_kinds:
             registered_do_fn_types = self._DO_FN_TYPES_BY_KIND[kind]
             if any(issubclass(r, do_fn_type) for r in registered_do_fn_types):
-                # Always keep the most-derived DoFn type.
-                continue
+                continue # Always keep the most-derived DoFn type.
             registered_do_fn_types -= base_types_of_do_fn_type
             registered_do_fn_types.add(do_fn_type)
 
         # Decorate the DoFn with type constraints that raise an error when args
         # or return values have the wrong type.
         with_input_types, with_output_types = (
-            typehints.with_input_types(typehints.Union[self._targeted_models]),
+            typehints.with_input_types(
+                typehints.Union[self._targeted_model_types]),
             typehints.with_output_types(audit_errors.BaseAuditError))
         return with_input_types(with_output_types(do_fn_type))
 

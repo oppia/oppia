@@ -65,20 +65,27 @@ class JobMetaclass(type):
     """Metaclass for all of Oppia's Apache Beam jobs.
 
     This class keeps track of the complete list of jobs. The list can be read
-    with the JobMetaclass.get_jobs() class method.
+    with the JobMetaclass.get_all_jobs() class method.
+
+    THIS CLASS IS AN IMPLEMENTATION DETAIL, DO NOT USE IT DIRECTLY. All user
+    code should simply inherit from the JobBase class, found below.
     """
 
     _JOB_REGISTRY = {}
 
     def __new__(mcs, name, bases, namespace):
-        """Creates a new class with type `AuditDoFnMetaclass`.
+        """Creates a new job class with type `JobMetaclass`.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
 
-        This metaclass adds jobs to the job registry as they are created to
-        ensure there are no jobs with duplicate names and to provide a
-        convenient place to query for the full list of all jobs:
-        JobMetaclass.get_jobs().
+        This metaclass adds jobs to the _JOB_REGISTRY dict, keyed by name, as
+        they are created. We use the registry to reject jobs with duplicate
+        names and to provide the convenient: JobMetaclass.get_all_jobs().
+
+        We use a metaclass instead of other alternatives (like decorators or a
+        manual list), because metaclasses cannot be forgotten to be used,
+        whereas the other alternatives can, and because they do not need help
+        from third party linters to be enforced.
 
         Args:
             mcs: JobMetaclass. The metaclass.
@@ -100,7 +107,7 @@ class JobMetaclass(type):
         return job_cls
 
     @classmethod
-    def get_jobs(mcs):
+    def get_all_jobs(mcs):
         """Returns all jobs that have inherited from the JobBase class.
 
         Args:
@@ -110,11 +117,32 @@ class JobMetaclass(type):
             dict(str: class). The classes that have been created with this
             metaclass, keyed by their name.
         """
-        return dict(mcs._JOB_REGISTRY)
+        return list(mcs._JOB_REGISTRY.values())
 
 
 class JobBase(python_utils.with_metaclass(JobMetaclass)):
-    """The base class for all of Oppia's Apache Beam jobs."""
+    """The base class for all of Oppia's Apache Beam jobs.
+
+    Example:
+        class FooJob(JobBase):
+            def run(self):
+                return (
+                    self.pipeline
+                    | self.job_options.model_getter()
+                    | beam.GroupBy(jobs_utils.get_model_kind)
+                    | beam.combiners.Count.PerElement()
+                )
+
+        runner = runners.DataflowRunner()
+        options = job_options.JobOptions(model_getter=model_io.GetModels)
+        with pipeline.Pipeline(runner=runner, options=options) as p:
+            job = FooJob(p)
+            beam_testing_util.assert_that(
+                job.run(),
+                beam_testing_util.equal_to([
+                    ('BaseModel', 1),
+                ]))
+    """
 
     def __init__(self, pipeline):
         """Initializes a new job.

@@ -26,31 +26,37 @@ from apache_beam.options import pipeline_options
 
 
 class JobOptions(pipeline_options.GoogleCloudOptions):
-    """Option class for configuring the behavior of Oppia jobs.
+    """Option class for configuring the behavior of Oppia jobs."""
 
-    Instances of this class should only change the arguments created in the
-    `_add_argparse_args` method:
-        model_getter: type(PTransform). The type of PTransform the pipeline
-            should use to fetch models from the datastore.
-    """
+    JOB_OPTIONS = {
+        'model_getter': (
+            beam.PTransform,
+            'The type of PTransform the pipeline should use to fetch models '
+            'from the datastore.'),
+    }
 
-    def __init__(self, model_getter=None, **kwargs):
+    def __init__(self, runtime_type_check=False, **job_options):
         """Initializes a new JobOptions instance.
 
         Args:
-            model_getter: type(PTransform). The type of PTransform the pipeline
-                should use to fetch models from the datastore.
-            **kwargs: dict(str: *). Downstream arguments for the base classes.
+            runtime_type_check: bool. FOR TESTING ONLY! Enable type checking at
+                pipeline execution time. NOTE: Only respected by DirectRunner.
+            **job_options: dict(str: *). One of the options defined in the class
+                JOB_OPTIONS dict.
         """
+        unsupported_options = set(job_options).difference(self.JOB_OPTIONS)
+        if unsupported_options:
+            unsupported_options = ', '.join(sorted(unsupported_options))
+            raise ValueError('Unsupported option(s): %s' % unsupported_options)
         super(JobOptions, self).__init__(
-            model_getter=model_getter,
-            # GoogleCloudOptions arguments.
+            runtime_type_check=runtime_type_check,
+            # GoogleCloudOptions: implementation details.
             project=feconf.OPPIA_PROJECT_ID,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             # TODO(#11475): Figure out what these values should be. We can't run
             # unit tests on DataflowRunner unless they have a valid GCS path.
             temp_location='gs://todo/todo', staging_location='gs://todo/todo',
-            **kwargs)
+            **job_options)
 
     @classmethod
     def _add_argparse_args(cls, parser):
@@ -59,10 +65,6 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
         Args:
             parser: argparse.ArgumentParser. An ArgumentParser instance.
         """
-        parser.add_argument(
-            '--model_getter', help=(
-                'The type of PTransform the pipeline should use to fetch '
-                'models from the datastore.'),
-            # TODO(#11475): Assign a proper default value after we have access
-            # to Cloud NDB PTransforms.
-            type=beam.PTransform)
+        for option_name, (option_type, option_doc) in cls.JOB_OPTIONS.items():
+            parser.add_argument(
+                '--%s' % option_name, help=option_doc, type=option_type)

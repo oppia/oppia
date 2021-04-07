@@ -38,3 +38,8 @@ class JobOptionsTests(test_utils.TestBase):
         options = job_options.JobOptions(model_getter=get_models)
 
         self.assertIs(options.model_getter, get_models)
+
+    def test_unsupported_values(self):
+        self.assertRaisesRegexp(
+            ValueError, r'Unsupported option\(s\): a, b',
+            lambda: job_options.JobOptions(a=1, b=2))
