@@ -18,7 +18,7 @@
 
 import { CommonModule } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { NgbModal, NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -145,38 +145,41 @@ describe('Topics List Component', () => {
       .toEqual(expectedSerialNumber);
   });
 
-  it('should delete topic', fakeAsync(() => {
+  it('should delete topic', () => {
     spyOn(editableTopicBackendApiService, 'deleteTopic').and
       .returnValue(Promise.resolve(123));
     spyOn(
       topicsAndSkillsDashboardBackendApiService
         .onTopicsAndSkillsDashboardReinitialized, 'emit');
     componentInstance.deleteTopic(topicId, topicName);
-    tick();
-    expect(
-      topicsAndSkillsDashboardBackendApiService
-        .onTopicsAndSkillsDashboardReinitialized.emit).toHaveBeenCalled();
-  }));
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(
+        topicsAndSkillsDashboardBackendApiService
+          .onTopicsAndSkillsDashboardReinitialized.emit).toHaveBeenCalled();
+    });
+  });
 
-  it('should handle error when deleting topic', fakeAsync(() => {
+  it('should handle error when deleting topic', () => {
     spyOn(editableTopicBackendApiService, 'deleteTopic').and
       .returnValue(Promise.reject(''));
     spyOn(
       alertsService, 'addWarning');
     componentInstance.deleteTopic(topicId, topicName);
-    tick();
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'There was an error when deleting the topic.');
-  }));
+    fixture.whenStable().then(() => {
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'There was an error when deleting the topic.');
+    });
+  });
 
-  it('should handle error when deleting topic and show error message',
-    fakeAsync(() => {
-      const errorMessage: string = 'error_message';
-      spyOn(editableTopicBackendApiService, 'deleteTopic').and
-        .returnValue(Promise.reject(errorMessage));
-      spyOn(alertsService, 'addWarning');
-      componentInstance.deleteTopic(topicId, topicName);
-      tick();
+  it('should handle error when deleting topic and show error message', () => {
+    const errorMessage: string = 'error_message';
+    spyOn(editableTopicBackendApiService, 'deleteTopic').and
+      .returnValue(Promise.reject(errorMessage));
+    spyOn(alertsService, 'addWarning');
+    componentInstance.deleteTopic(topicId, topicName);
+    fixture.whenStable().then(() => {
       expect(alertsService.addWarning).toHaveBeenCalledWith(errorMessage);
-    }));
+    });
+  });
 });
