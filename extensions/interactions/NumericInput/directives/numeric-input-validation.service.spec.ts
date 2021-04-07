@@ -137,7 +137,7 @@ describe('NumericInputValidationService', () => {
 
   it('should raise warning for IsInclusivelyBetween rule ' +
   'caused by incorrect range',
-    () => {
+  () => {
     answerGroups[0].rules = [betweenFourAndTwoRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
