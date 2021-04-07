@@ -33,13 +33,14 @@ export class ContextService {
     private urlService: UrlService) {}
 
   pageContext = null;
-  explorationIsLinkedToStory = false;
   explorationId = null;
+  explorationIsLinkedToStory = false;
   questionPlayerIsManuallySet = false;
-  contributorDashboardQuestionEditorIsOpen = false;
   questionId = null;
   editorContext = null;
   customEntityContext = null;
+  // Depending on this value, new images can be either saved in the localStorage
+  // or uploaded directly to the datastore.
   imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
@@ -130,35 +131,6 @@ export class ContextService {
 
   getQuestionPlayerIsManuallySet(): boolean {
     return this.questionPlayerIsManuallySet;
-  }
-
-  setContributorDashboardQuestionEditorIsOpen(): void {
-    this.contributorDashboardQuestionEditorIsOpen = true;
-  }
-
-  clearContributorDashboardQuestionEditorIsOpen(): void {
-    this.contributorDashboardQuestionEditorIsOpen = false;
-  }
-
-  getContributorDashboardQuestionEditorIsOpen(): boolean {
-    return this.contributorDashboardQuestionEditorIsOpen;
-  }
-
-  canEntityReferToSkills(): boolean {
-    return (
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
-      (
-        this.getPageContext() === (
-          ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD) &&
-          this.getContributorDashboardQuestionEditorIsOpen()
-      ) ||
-      (
-        this.getPageContext() === (
-          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
-        this.explorationIsLinkedToStory
-      )
-    );
   }
 
   setExplorationIsLinkedToStory(): void {
@@ -309,9 +281,7 @@ export class ContextService {
     return (allowedPageContext.includes(currentPageContext));
   }
 
-  // Sets the current context to save images in local storage. Depending on this
-  // value, new images can be either saved in the localStorage or uploaded
-  // directly to the datastore.
+  // Sets the current context to save images to the server.
   resetImageSaveDestination(): void {
     this.imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
   }

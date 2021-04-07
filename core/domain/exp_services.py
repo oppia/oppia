@@ -796,11 +796,15 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
+    # Remove from activities.
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
-def delete_explorations_from_subscribed_users(exploration_ids):
+def delete_explorations_from_user_models(exploration_ids):
     """Remove explorations from all subscribers' exploration_ids.
 
     Args:
@@ -818,6 +822,69 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     user_models.UserSubscriptionsModel.update_timestamps_multi(
         subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
+
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_all().filter(
+            user_models.ExplorationUserDataModel.exploration_id.IN(
+                exploration_ids
+            )
+        ).fetch()
+    )
+    user_models.ExplorationUserDataModel.delete_multi(exp_user_data_models)
+
+    user_contributions_models = (
+        user_models.UserContributionsModel.get_all().filter(
+            datastore_services.any_of(
+                user_models.UserContributionsModel.created_exploration_ids.IN(
+                    exploration_ids
+                ),
+                user_models.UserContributionsModel.edited_exploration_ids.IN(
+                    exploration_ids
+                )
+            )
+        ).fetch()
+    )
+    for model in user_contributions_models:
+        model.created_exploration_ids = [
+            exp_id for exp_id in model.created_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+        model.edited_exploration_ids = [
+            exp_id for exp_id in model.edited_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+    user_models.UserContributionsModel.update_timestamps_multi(
+        user_contributions_models)
+    user_models.UserContributionsModel.put_multi(user_contributions_models)
+
+
+def delete_explorations_from_activities(exploration_ids):
+    """Remove explorations from exploration_ids field in completed and
+    incomplete activities models.
+
+    Args:
+        exploration_ids: list(str). The ids of the explorations to delete.
+    """
+    if not exploration_ids:
+        return
+
+    model_classes = (
+        user_models.CompletedActivitiesModel,
+        user_models.IncompleteActivitiesModel,
+    )
+    all_entities = []
+    for model_class in model_classes:
+        entities = model_class.query(
+            model_class.exploration_ids.IN(exploration_ids)
+        ).fetch()
+        for model in entities:
+            model.exploration_ids = [
+                id_ for id_ in model.exploration_ids
+                if id_ not in exploration_ids
+            ]
+        all_entities.extend(entities)
+    datastore_services.update_timestamps_multi(all_entities)
+    datastore_services.put_multi(all_entities)
 
 
 # Operations on exploration snapshots.
@@ -1995,14 +2062,26 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
             try:
                 prev_interaction_id = (
-                    prev_exp.state_interaction_ids_dict[state_name])
+                    prev_exp.state_interaction_ids_dict[prev_state_name]
+                    if prev_state_name in prev_exp.state_interaction_ids_dict
+                    else None)
                 current_interaction_id = (
                     exp.state_interaction_ids_dict[state_name])
-                exp_stats_list[i].state_stats_mapping[state_name] = (
-                    prev_exp_stats.state_stats_mapping[
-                        prev_state_name].clone()
-                    if current_interaction_id == prev_interaction_id else
-                    stats_domain.StateStats.create_default())
+                # In early schema versions of ExplorationModel, the END
+                # card was a persistant, implicit state present in every
+                # exploration. The snapshots of these old explorations have
+                # since been migrated but they do not have corresponding state
+                # stats models for the END state. So for such versions, a
+                # default state stats model should be created.
+                if current_interaction_id != prev_interaction_id or (
+                        current_interaction_id == 'EndExploration' and
+                        prev_state_name == 'END'):
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default())
+                else:
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        prev_exp_stats.state_stats_mapping[
+                            prev_state_name].clone())
                 missing_state_stats.append(
                     'StateStats(exp_id=%r, exp_version=%r, '
                     'state_name=%r)' % (exp_id, exp.version, state_name))

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import learner_progress_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
@@ -390,6 +391,52 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
+
+    def test_unpublished_exploration_is_removed_from_completed_activities(self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='A title', category='A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id_f, self.EXP_ID)
+
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id_f),
+            [self.EXP_ID]
+        )
+
+        rights_manager.unpublish_exploration(self.user_admin, self.EXP_ID)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id_f),
+            []
+        )
+
+    def test_unpublished_exploration_is_removed_from_incomplete_activities(
+            self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='A title', category='A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id_e, self.EXP_ID, 'state', 1)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id_e),
+            [self.EXP_ID]
+        )
+
+        rights_manager.unpublish_exploration(self.user_admin, self.EXP_ID)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id_e),
+            []
+        )
 
     def test_can_only_delete_unpublished_explorations(self):
         exp = exp_domain.Exploration.create_default_exploration(
