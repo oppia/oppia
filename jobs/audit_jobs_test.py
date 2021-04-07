@@ -39,6 +39,7 @@ class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
     JOB_CLASS = audit_jobs.AuditAllStorageModelsJob
 
     VALID_USER_ID = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
+    maxDiff = None
 
     def test_empty_storage(self):
         self.assert_job_output_is_empty()
@@ -90,7 +91,7 @@ class AuditAllStorageModelsJobTests(jobs_test_utils.JobTestBase):
         self.assert_job_output_is([
             audit_errors.ModelIdRegexError(
                 base_model_with_invalid_id,
-                base_model_audits.BASE_MODEL_ID_REGEX.pattern),
+                base_model_audits.BASE_MODEL_ID_PATTERN),
             audit_errors.ModelMutatedDuringJobError(
                 base_model_with_invalid_timestamps),
             audit_errors.InconsistentTimestampsError(

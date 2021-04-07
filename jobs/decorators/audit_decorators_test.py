@@ -36,25 +36,25 @@ base_models, exp_models = models.Registry.import_models(
 class MockAuditsExisting(audit_decorators.AuditsExisting):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
-    # Overrides the real value of _AUDITS_BY_KIND for the unit tests.
-    _AUDITS_BY_KIND = collections.defaultdict(set)
+    # Overrides the real value of _DO_FN_TYPES_BY_KIND for the unit tests.
+    _DO_FN_TYPES_BY_KIND = collections.defaultdict(set)
 
     @classmethod
-    def get_audits(cls, kind):
-        """Test-only helper method for getting a specific set of audits.
+    def get_audit_do_fn_types(cls, kind):
+        """Test-only helper for getting the DoFns of a specific kind of a model.
 
         Args:
-            kind: str. The kind of model to filter by.
+            kind: str. The kind of model.
 
         Returns:
-            set(DoFn). The set of audits.
+            frozenset(type(DoFn)). The set of audits.
         """
-        return list(cls._AUDITS_BY_KIND[kind])
+        return frozenset(cls._DO_FN_TYPES_BY_KIND[kind])
 
     @classmethod
     def clear(cls):
         """Test-only helper method for clearing the decorator."""
-        cls._AUDITS_BY_KIND.clear()
+        cls._DO_FN_TYPES_BY_KIND.clear()
 
 
 class DoFn(beam.DoFn):
@@ -102,7 +102,61 @@ class AuditsExistingTests(test_utils.TestBase):
         MockAuditsExisting.clear()
 
     def test_has_no_do_fns_by_default(self):
-        self.assertEqual(MockAuditsExisting.get_audits_by_kind(), {})
+        self.assertEqual(MockAuditsExisting.get_audit_do_fn_types_by_kind(), {})
+
+    def test_targets_every_subclass_when_a_base_model_is_targeted(self):
+        self.assertIs(MockAuditsExisting(base_models.BaseModel)(DoFn), DoFn)
+
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types_by_kind().items(),
+            [(cls.__name__, {DoFn}) for cls in [base_models.BaseModel] + (
+                models.Registry.get_all_storage_model_classes())
+            ])
+
+    def test_replaces_base_do_fn_when_derived_do_fn_is_added_later(self):
+        MockAuditsExisting(base_models.BaseModel)(DoFn)
+        MockAuditsExisting(base_models.BaseModel)(UnrelatedDoFn)
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
+            [DoFn, UnrelatedDoFn])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
+            [DoFn, UnrelatedDoFn])
+
+        MockAuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
+            [DoFn, UnrelatedDoFn])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
+            [DerivedDoFn, UnrelatedDoFn])
+
+    def test_keeps_derived_do_fn_when_base_do_fn_is_added_later(self):
+        MockAuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
+        MockAuditsExisting(exp_models.ExplorationModel)(UnrelatedDoFn)
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
+            [])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
+            [DerivedDoFn, UnrelatedDoFn])
+
+        MockAuditsExisting(base_models.BaseModel)(DoFn)
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'),
+            [DoFn])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
+            [DerivedDoFn, UnrelatedDoFn])
+
+    def test_does_not_register_duplicate_do_fns(self):
+        MockAuditsExisting(base_models.BaseModel)(DoFn)
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
+
+        MockAuditsExisting(base_models.BaseModel)(DoFn)
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
 
     def test_raises_value_error_when_given_no_args(self):
         self.assertRaisesRegexp(
@@ -118,56 +172,3 @@ class AuditsExistingTests(test_utils.TestBase):
         self.assertRaisesRegexp(
             TypeError, '%r is not a subclass of DoFn' % NotDoFn,
             lambda: MockAuditsExisting(base_models.BaseModel)(NotDoFn))
-
-    def test_targets_every_subclass_when_a_base_model_is_targeted(self):
-        self.assertIs(MockAuditsExisting(base_models.BaseModel)(DoFn), DoFn)
-
-        self.assertItemsEqual(MockAuditsExisting.get_audits_by_kind().items(), [
-            (cls.__name__, {DoFn}) for cls in [base_models.BaseModel] + (
-                models.Registry.get_all_storage_model_classes())
-        ])
-
-    def test_replaces_base_do_fn_when_derived_do_fn_is_added_later(self):
-        MockAuditsExisting(base_models.BaseModel)(DoFn)
-        MockAuditsExisting(base_models.BaseModel)(UnrelatedDoFn)
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('BaseModel'),
-            [DoFn, UnrelatedDoFn])
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('ExplorationModel'),
-            [DoFn, UnrelatedDoFn])
-
-        MockAuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('BaseModel'),
-            [DoFn, UnrelatedDoFn])
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('ExplorationModel'),
-            [DerivedDoFn, UnrelatedDoFn])
-
-    def test_keeps_derived_do_fn_when_base_do_fn_is_added_later(self):
-        MockAuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
-        MockAuditsExisting(exp_models.ExplorationModel)(UnrelatedDoFn)
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('BaseModel'),
-            [])
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('ExplorationModel'),
-            [DerivedDoFn, UnrelatedDoFn])
-
-        MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('BaseModel'),
-            [DoFn])
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('ExplorationModel'),
-            [DerivedDoFn, UnrelatedDoFn])
-
-    def test_does_not_register_duplicate_do_fns(self):
-        MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('BaseModel'), [DoFn])
-
-        MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(
-            MockAuditsExisting.get_audits('BaseModel'), [DoFn])

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Decorators for assigning DoFn classes to specific storage models."""
+"""Decorators for assigning DoFn types to specific storage models."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -30,14 +30,14 @@ import python_utils
 import apache_beam as beam
 from apache_beam import typehints
 
-_ALL_MODEL_CLASSES = frozenset(models.Registry.get_all_storage_model_classes())
-_ALL_BASE_MODEL_CLASSES = frozenset(
+_ALL_MODEL_TYPES = frozenset(models.Registry.get_all_storage_model_classes())
+_ALL_BASE_MODEL_TYPES = frozenset(
     models.Registry.get_storage_model_classes([models.NAMES.base_model]))
 
-_MODEL_CLASSES_BY_BASE_CLASS = {
+_MODEL_TYPES_BY_BASE_CLASS = {
     base_class: frozenset({base_class}).union(
-        cls for cls in _ALL_MODEL_CLASSES if issubclass(cls, base_class))
-    for base_class in _ALL_BASE_MODEL_CLASSES
+        t for t in _ALL_MODEL_TYPES if issubclass(t, base_class))
+    for base_class in _ALL_BASE_MODEL_TYPES
 }
 
 
@@ -52,77 +52,82 @@ class AuditsExisting(python_utils.OBJECT):
     and only if ValidateExplorationModelId inherits from ValidateModelId.
     """
 
-    _AUDITS_BY_KIND = collections.defaultdict(set)
+    _DO_FN_TYPES_BY_KIND = collections.defaultdict(set)
 
-    def __init__(self, *model_classes):
-        """Initializes the decorator to target the given models.
+    def __init__(self, *model_types):
+        """Initializes the decorator to target the given types of models.
 
         Args:
-            *model_classes: tuple(class). The models the decorator will target.
-                If an argument is a base class, all of its subclasses will be
+            *model_types: tuple(class). The models the decorator will target. If
+                an argument is a base class, all of its subclasses will be
                 targeted as well.
 
         Raises:
             TypeError. When a non-model type is provided.
         """
-        if not model_classes:
+        if not model_types:
             raise ValueError('Must target at least one model')
         self._targeted_models = set()
-        for cls in model_classes:
-            if cls in _MODEL_CLASSES_BY_BASE_CLASS:
-                self._targeted_models.update(_MODEL_CLASSES_BY_BASE_CLASS[cls])
-            elif cls in _ALL_MODEL_CLASSES:
-                self._targeted_models.add(cls)
+        for m in model_types:
+            if m in _MODEL_TYPES_BY_BASE_CLASS:
+                self._targeted_models.update(_MODEL_TYPES_BY_BASE_CLASS[m])
+            elif m in _ALL_MODEL_TYPES:
+                self._targeted_models.add(m)
             else:
                 raise TypeError(
-                    '%r is not a model registered in core.platform' % cls)
+                    '%r is not a model registered in core.platform' % m)
+        self._targeted_kinds = {
+            jobs_utils.get_model_kind(m) for m in self._targeted_models
+        }
 
-    def __call__(self, new_class):
+    def __call__(self, do_fn_type):
         """Decorator which registers the given DoFn to the targeted models.
 
         This decorator also installs type constraints on the DoFn to guard it
         from invalid argument types.
 
         Args:
-            new_class: DoFn. The new audting DoFn class to decorate.
+            do_fn_type: type(DoFn). The new audting DoFn class to decorate.
 
         Returns:
-            DoFn. The decorated class.
+            type(DoFn). The decorated DoFn.
 
         Raises:
-            TypeError. When the new class is not a DoFn.
+            TypeError. When the new type is not a DoFn.
         """
-        if not issubclass(new_class, beam.DoFn):
-            raise TypeError('%r is not a subclass of DoFn' % new_class)
+        if not issubclass(do_fn_type, beam.DoFn):
+            raise TypeError('%r is not a subclass of DoFn' % do_fn_type)
 
         # The "mro" (method resolution order) of a class is the list of types
         # the class is derived from, including itself, in the order they are
         # searched for methods and attributes.
         # To learn more, see: https://stackoverflow.com/a/2010732/4859885.
-        base_classes_of_new_class = set(inspect.getmro(new_class))
+        base_types_of_do_fn_type = set(inspect.getmro(do_fn_type))
 
-        for cls in self._targeted_models:
-            kind = jobs_utils.get_model_kind(cls)
-            registered_classes = self._AUDITS_BY_KIND[kind]
-            if any(issubclass(c, new_class) for c in registered_classes):
-                # Always keep the most-derived audit type.
+        for kind in self._targeted_kinds:
+            registered_do_fn_types = self._DO_FN_TYPES_BY_KIND[kind]
+            if any(issubclass(r, do_fn_type) for r in registered_do_fn_types):
+                # Always keep the most-derived DoFn type.
                 continue
-            registered_classes -= base_classes_of_new_class
-            registered_classes.add(new_class)
+            registered_do_fn_types -= base_types_of_do_fn_type
+            registered_do_fn_types.add(do_fn_type)
 
         # Decorate the DoFn with type constraints that raise an error when args
         # or return values have the wrong type.
         with_input_types, with_output_types = (
             typehints.with_input_types(typehints.Union[self._targeted_models]),
             typehints.with_output_types(audit_errors.BaseAuditError))
-        return with_input_types(with_output_types(new_class))
+        return with_input_types(with_output_types(do_fn_type))
 
     @classmethod
-    def get_audits_by_kind(cls):
-        """Returns the sets of DoFns targeting a kind of model.
+    def get_audit_do_fn_types_by_kind(cls):
+        """Returns the sets of audit DoFns targeting a kind of model.
 
         Returns:
-            dict(str: set(DoFn)). DoFn classes, keyed by the kind of model they
-            have targeted.
+            dict(str: frozenset(type(DoFn))). DoFn types, keyed by the kind of
+            model they have targeted.
         """
-        return dict(cls._AUDITS_BY_KIND)
+        return {
+            kind: frozenset(do_fn_types)
+            for kind, do_fn_types in cls._DO_FN_TYPES_BY_KIND.items()
+        }

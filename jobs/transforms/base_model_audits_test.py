@@ -101,7 +101,7 @@ class ValidateModelIdTests(jobs_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             audit_errors.ModelIdRegexError(
                 invalid_id_model,
-                base_model_audits.BASE_MODEL_ID_REGEX.pattern),
+                base_model_audits.BASE_MODEL_ID_PATTERN),
         ])
 
 

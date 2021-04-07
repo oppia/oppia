@@ -41,15 +41,15 @@ import apache_beam as beam
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-BASE_MODEL_ID_REGEX = re.compile('^[A-Za-z0-9-_]{1,%s}$')
+BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
 class ValidateDeletedModel(beam.DoFn):
     """DoFn to check whether models marked for deletion are stale.
 
-    Deleted models do not use a decorator for registration. This DoFn must be
-    called explicitly by runners.
+    Doesn't use the AuditsExisting decorator because it audits deleted models,
+    not existing ones.
     """
 
     def process(self, input_model):
@@ -76,14 +76,19 @@ class ValidateBaseModelId(beam.DoFn):
     """DoFn to validate model ids.
 
     IMPORTANT: Models with special ID checks should derive from this class and
-    override __init__ to assign a different value to self._regex, or replace the
-    process() method entirely. Be sure to decorate the new class with a specific
-    model type.
+    override __init__() to assign a different value to self._regex, or replace
+    the process() method entirely. Be sure to decorate the new class with that
+    specific model type.
     """
 
     def __init__(self):
         super(ValidateBaseModelId, self).__init__()
-        self._regex = BASE_MODEL_ID_REGEX
+        # IMPORTANT: Only picklable objects can be stored on DoFns! This is
+        # because DoFns are serialized with pickle when run on a pipeline (and
+        # might be run on many different machines). Any other types assigned to
+        # self, like compiled re patterns, ARE LOST AFTER DESERIALIZATION!
+        # https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled
+        self._pattern = BASE_MODEL_ID_PATTERN
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
@@ -97,8 +102,8 @@ class ValidateBaseModelId(beam.DoFn):
         """
         model = jobs_utils.clone_model(input_model)
 
-        if not self._regex.match(model.id):
-            yield audit_errors.ModelIdRegexError(model, self._regex.pattern)
+        if not re.match(self._pattern, model.id):
+            yield audit_errors.ModelIdRegexError(model, self._pattern)
 
 
 @audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
@@ -128,8 +133,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
 
 @audit_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelTimestamps(beam.DoFn):
-    """DoFn to check whether created_on and last_updated timestamps are
-    valid.
+    """DoFn to check whether created_on and last_updated timestamps are valid.
     """
 
     def process(self, input_model):

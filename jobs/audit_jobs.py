@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import itertools
-
 from jobs import base_jobs
 from jobs import jobs_utils
 from jobs.transforms import audits_registry
@@ -29,9 +27,10 @@ import python_utils
 
 import apache_beam as beam
 
-AUDIT_DO_FNS_BY_KIND = audits_registry.get_audits_by_kind()
-KIND_BY_INDEX = tuple(AUDIT_DO_FNS_BY_KIND.keys())
-AUDIT_DO_FNS_BY_INDEX = tuple(AUDIT_DO_FNS_BY_KIND[k] for k in KIND_BY_INDEX)
+AUDIT_DO_FN_TYPES_BY_KIND = audits_registry.get_audit_do_fn_types_by_kind()
+KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
+AUDIT_DO_FN_TYPES_BY_INDEX = (
+    tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind] for kind in KIND_BY_INDEX))
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):
@@ -66,18 +65,22 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
             # we'll see in unit tests.
             | 'Split models into parallelizable PCollections' >> beam.Partition(
                 lambda m, _, kinds: kinds.index(jobs_utils.get_model_kind(m)),
-                # NOTE: Partition requires a hard-coded number of slices, it
+                # NOTE: Partition requires a hard-coded number of slices; it
                 # cannot be used with dynamic numbers generated in a pipeline.
                 # The KIND_BY_INDEX is a constant tuple, so it satisfies that
                 # requirement.
                 len(KIND_BY_INDEX), KIND_BY_INDEX)
         )
 
-        audit_error_pcolls = list(itertools.chain.from_iterable(
-            (self._run_do_fn(do_fn, model_kind, models) for do_fn in do_fns)
-            for do_fns, model_kind, models in python_utils.ZIP(
-                AUDIT_DO_FNS_BY_INDEX, KIND_BY_INDEX, models_of_kind_by_index)
-            if do_fns and models))
+        audit_do_fn_args = python_utils.ZIP(
+            AUDIT_DO_FN_TYPES_BY_INDEX, KIND_BY_INDEX, models_of_kind_by_index)
+
+        audit_error_pcolls = []
+        for do_fn_types, model_kind, models_of_kind in audit_do_fn_args:
+            for do_fn_type in do_fn_types:
+                label = 'Running %s on %s' % (do_fn_type.__name__, model_kind)
+                audit_error_pcolls.append(
+                    models_of_kind | label >> beam.ParDo(do_fn_type()))
 
         audit_error_pcolls.append(
             deleted_models
@@ -86,17 +89,3 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         )
 
         return audit_error_pcolls | 'Combine all audit errors' >> beam.Flatten()
-
-    def _run_do_fn(self, do_fn, model_kind, models):
-        """Runs a DoFn over the specified kind of models.
-
-        Args:
-            do_fn: DoFn. The type of DoFn to run.
-            model_kind: str. The kind of model the DoFn is processing.
-            models: PCollection. The models for the DoFn to process.
-
-        Returns:
-            PCollection. The result of the DoFn, a PCollection of audit errors.
-        """
-        label = 'Running %s on %s' % (do_fn.__name__, model_kind)
-        return models | label >> beam.ParDo(do_fn())

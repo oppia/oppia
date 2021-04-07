@@ -30,13 +30,14 @@ class GetAuditsByKindTests(test_utils.TestBase):
         unique_obj = object()
 
         @classmethod
-        def get_audits_by_kind_mock(unused_cls):
+        def get_audit_do_fn_types_by_kind_mock(unused_cls):
             """Returns the unique_obj."""
             return unique_obj
 
-        get_audits_by_kind_swap = self.swap(
-            audit_decorators.AuditsExisting, 'get_audits_by_kind',
-            get_audits_by_kind_mock)
+        get_audit_do_fn_types_by_kind_swap = self.swap(
+            audit_decorators.AuditsExisting, 'get_audit_do_fn_types_by_kind',
+            get_audit_do_fn_types_by_kind_mock)
 
-        with get_audits_by_kind_swap:
-            self.assertIs(audits_registry.get_audits_by_kind(), unique_obj)
+        with get_audit_do_fn_types_by_kind_swap:
+            self.assertIs(
+                audits_registry.get_audit_do_fn_types_by_kind(), unique_obj)

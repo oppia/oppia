@@ -19,7 +19,7 @@
 This module imports all of the "jobs.transforms.*_audits" modules so that their
 AuditsExisting decorators are executed. Doing so ensures that the decorated
 DoFns are added to AuditsExisting's internal registry, which we delegate to in
-the get_audits_by_kind() function.
+the get_audit_do_fn_types_by_kind() function.
 
 TODO(#11475): Add lint checks that ensure all "jobs.transforms.*_audits" modules
 are imported into this file.
@@ -33,11 +33,11 @@ from jobs.transforms import base_model_audits  # pylint: disable=unused-import
 from jobs.transforms import user_audits  # pylint: disable=unused-import
 
 
-def get_audits_by_kind():
+def get_audit_do_fn_types_by_kind():
     """Returns the set of DoFns targeting each kind of model.
 
     Returns:
         dict(str: set(DoFn)). DoFn classes, keyed by the kind of model they have
         targeted.
     """
-    return audit_decorators.AuditsExisting.get_audits_by_kind()
+    return audit_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()

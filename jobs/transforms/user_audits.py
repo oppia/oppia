@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import re
-
 from core.platform import models
 import feconf
 from jobs.decorators import audit_decorators
@@ -35,4 +33,9 @@ class ValidateUserModelId(base_model_audits.ValidateBaseModelId):
 
     def __init__(self):
         super(ValidateUserModelId, self).__init__()
-        self._regex = re.compile(feconf.USER_ID_REGEX)
+        # IMPORTANT: Only picklable objects can be stored on DoFns! This is
+        # because DoFns are serialized with pickle when run on a pipeline (and
+        # might be run on many different machines). Any other types assigned to
+        # self, like compiled re patterns, ARE LOST AFTER DESERIALIZATION!
+        # https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled
+        self._pattern = feconf.USER_ID_REGEX
