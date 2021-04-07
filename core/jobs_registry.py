@@ -154,6 +154,9 @@ ONE_OFF_JOB_MANAGERS = [
 # to show controls on the admin dashboard.
 AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.AppFeedbackReportModelAuditOneOffJob,
+    prod_validation_jobs_one_off.AppFeedbackReportTicketModelAuditOneOffJob,
+    prod_validation_jobs_one_off.AppFeedbackReportStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
