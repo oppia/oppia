@@ -36,15 +36,36 @@ class CustomEvent extends EventWithMessage<string> {
 
 describe('Event Bus Group', () => {
   let eventbusGroup: EventBusGroup;
+  let eventBusService: EventBusService;
 
   beforeEach(() => {
-    eventbusGroup = new EventBusGroup(TestBed.inject(EventBusService));
+    eventBusService = TestBed.inject(EventBusService);
+    eventbusGroup = new EventBusGroup(eventBusService);
   });
 
   it('should listen to an event', waitForAsync(() => {
     let value = '';
     eventbusGroup.on(CustomEvent, event => value = event.message);
     eventbusGroup.emit(new CustomEvent('Event'));
+    eventbusGroup.unsubscribe();
     expect(value).toBe('Event');
   }));
+
+  it('should throw uncaught errors', waitForAsync(() => {
+    let errorMessage = '';
+    spyOn(eventBusService, 'errorHandler').and.callFake((error: Error) => {
+      errorMessage = error.message;
+    });
+    eventbusGroup.on(CustomEvent, _ => {
+      throw new Error('Random Error');
+    });
+    eventbusGroup.emit(new CustomEvent('Event'));
+    expect(errorMessage).toBe('Random Error');
+    eventbusGroup.unsubscribe();
+  }));
+
+  it('should throw error', () => {
+    expect(() => eventBusService.errorHandler(
+      new Error('Random'))).toThrowError('Error in event bus\nRandom');
+  });
 });

@@ -29,10 +29,15 @@ type NewableType<T> = new(...args) => T;
   providedIn: 'root'
 })
 export class EventBusService {
- // Subjects are used for the event passing mechanism.
- subject$ = new Subject<BaseEvent>();
+  // Subjects are used for the event passing mechanism.
+  subject$ = new Subject<BaseEvent>();
 
- /**
+  errorHandler(error: Error): void {
+    error.message = 'Error in event bus\n' + error.message;
+    throw error;
+  }
+
+  /**
   * This function will listen to messages of specific event types as specified
   * by the first param.
   * @param eventType The event that is to be listened for.
@@ -41,31 +46,31 @@ export class EventBusService {
   *
   * @returns A subscription to the event asked for.
   */
- on<T extends BaseEvent>(
-     eventType: NewableType<T>,
-     action: (event: T) => void,
-     callbackContext = null): Subscription {
-   return this.subject$.pipe(filter((event: T): boolean => {
-     return (event instanceof eventType);
-   }
-   )).subscribe(
-     (event: T): void => {
-       try {
-         action.call(callbackContext, event);
-       } catch (error) {
-         // Handle the error
-       }
-     }
-   );
- }
+  on<T extends BaseEvent>(
+      eventType: NewableType<T>,
+      action: (event: T) => void,
+      callbackContext = null): Subscription {
+    return this.subject$.pipe(filter((event: T): boolean => {
+      return (event instanceof eventType);
+    }
+    )).subscribe(
+      (event: T): void => {
+        try {
+          action.call(callbackContext, event);
+        } catch (error) {
+          this.errorHandler(error);
+        }
+      }
+    );
+  }
 
- /**
+  /**
   * A function to trigger a particular event.
   * @param event OppiaEvent that we want to trigger.
   */
- emit<T extends BaseEvent>(event: T): void {
-   this.subject$.next(event);
- }
+  emit<T extends BaseEvent>(event: T): void {
+    this.subject$.next(event);
+  }
 }
 
 angular.module('oppia').factory(
