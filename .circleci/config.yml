@@ -195,42 +195,6 @@ jobs:
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
       - upload_screenshots
 
-  e2e_miscellaneous_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - check_release_changelog_update_branch
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Set up python by installing protobuf and enum
-          command: pip install enum34==1.1.10 protobuf==3.13.0
-      - install_chrome
-      - run:
-          name: Run e2e file upload features test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadFeatures" --prod_env
-      - run:
-          name: Run e2e play voiceovers test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env
-      - run:
-          name: Run e2e file upload extensions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env
-      - run:
-          name: Run e2e contributor dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
-      # Feature Gating test suites must run in non-production environment because
-      # the dummy_feature being used must not be enabled in production environment.
-      - run:
-          name: Run e2e feature gating test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
-      - upload_screenshots
-
   e2e_new_structure_tests:
     <<: *job_defaults
     steps:
