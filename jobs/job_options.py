@@ -51,9 +51,9 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
             unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError('Unsupported option(s): %s' % unsupported_options)
         super(JobOptions, self).__init__(
-            # PipelineOptions: implementation detail.
+            # Needed by PipelineOptions superclass.
             flags=flags,
-            # GoogleCloudOptions: implementation detail.
+            # Needed by GoogleCloudOptions superclass.
             project=feconf.OPPIA_PROJECT_ID,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             # TODO(#11475): Figure out what these values should be. We can't run

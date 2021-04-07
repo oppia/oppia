@@ -58,6 +58,10 @@ def clone_model(model, **new_values):
 def get_model_kind(item):
     """Returns the "kind", a globally unique identifier, of the given item.
 
+    NOTE: A model's kind is usually, but not always, the same as a model's class
+    name. This function will always return the correct value for "kind", even if
+    it is different from the class's name.
+
     Args:
         item: base_models.Model|cloud_datastore_types.Entity. The item to
             inspect.
