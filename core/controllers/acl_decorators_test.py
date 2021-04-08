@@ -1765,7 +1765,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 expected_status_int=400)
         self.assertEqual(
             response['error'], 'Invalid format for suggestion_id. ' +
-                'It must contain 3 parts separated by \'.\'')
+            'It must contain 3 parts separated by \'.\'')
         self.logout()
 
     def test_suggestions_with_no_suggestions_are_rejected(self):
@@ -1773,7 +1773,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % 'exploration.exp1.' +
-                    'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
+                'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
                 expected_status_int=404)
         self.logout()
 
