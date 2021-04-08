@@ -19,10 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import re
 
 from core.platform import models
-import datetime
 import feconf
 from jobs import jobs_utils
 from jobs.decorators import audit_decorators
@@ -49,6 +49,7 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
     four weeks ago, these models should be deleted.
 
     """
+
     def process(self, input_model):
         """Function that checks if a model is old enough to mark them deleted.
 
@@ -60,7 +61,7 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
         """
         model = jobs_utils.clone_model(input_model)
         date_four_weeks_ago = (
-                datetime.datetime.utcnow() -
-                feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
+            datetime.datetime.utcnow() -
+            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
         if model.last_updated < date_four_weeks_ago:
             yield audit_errors.ModelExpiringError(model)

@@ -67,7 +67,8 @@ class ValidateUserModelIdTests(jobs_test_base.JobsTestBase):
         self.assert_pcoll_equal(output, [])
 
 
-class ValidateOldModelsMarkedDeletedTest(jobs_test_base.JobsTestBase):
+class ValidateOldModelsMarkedDeletedTests(jobs_test_base.JobsTestBase):
+
     NOW = datetime.datetime.utcnow()
     VALID_USER_ID = 'test_user'
     SUBMITTER_ID = 'submitter_id'
@@ -80,11 +81,13 @@ class ValidateOldModelsMarkedDeletedTest(jobs_test_base.JobsTestBase):
             last_updated=self.NOW - datetime.timedelta(weeks=5)
         )
         output = (
-                self.pipeline
-                | beam.Create([model])
-                | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
         )
-        self.assert_pcoll_equal(output, [audit_errors.ModelExpiringError(model)])
+        self.assert_pcoll_equal(output, [
+            audit_errors.ModelExpiringError(model)
+        ])
 
     def test_model_not_marked_as_deleted_recently(self):
         model = user_models.UserQueryModel(
@@ -94,8 +97,8 @@ class ValidateOldModelsMarkedDeletedTest(jobs_test_base.JobsTestBase):
             last_updated=self.NOW - datetime.timedelta(weeks=1)
         )
         output = (
-                self.pipeline
-                | beam.Create([model])
-                | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [])
