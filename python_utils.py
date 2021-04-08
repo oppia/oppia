@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import inspect
 import io
 import os
 import sys
@@ -76,7 +77,7 @@ def string_io(buffer_value=b''):
     return StringIO(buffer_value) # pylint: disable=disallowed-function-calls
 
 
-def get_args_of_function(function_node, args_to_ignore):
+def get_args_of_function_node(function_node, args_to_ignore):
     """Extracts the arguments from a function definition.
 
     Args:
@@ -385,13 +386,12 @@ def divide(number1, number2):
     return past.utils.old_div(number1, number2)
 
 
-def with_metaclass(class1, class2):
-    """This function makes a dummy metaclass for one level of class
-    instantiation that replaces itself with the actual metaclass.
+def with_metaclass(meta, *bases):
+    """Python 2 & 3 helper for installing metaclasses.
 
-    Use it like this::
+    Example:
 
-        class BaseForm():
+        class BaseForm(python_utils.OBJECT):
             pass
 
         class FormType(type):
@@ -401,13 +401,18 @@ def with_metaclass(class1, class2):
             pass
 
     Args:
-        class1: class. The metaclass.
-        class2: class. The baseclass.
+        meta: type. The metaclass to install on the derived class.
+        *bases: tuple(class). The base classes to install on the derived class.
+            When empty, `object` will be the sole base class.
 
     Returns:
-        class. The base class with a metaclass.
+        class. A proxy class that mutates the classes which inherit from it to
+        install the input meta class and inherit from the input base classes.
+        The proxy class itself does not actually become one of the base classes.
     """
-    return future.utils.with_metaclass(class1, class2)
+    if not bases:
+        bases = (OBJECT,)
+    return future.utils.with_metaclass(meta, *bases)
 
 
 def convert_to_bytes(string_to_convert):
@@ -487,3 +492,24 @@ def reraise_exception():
 def is_string(value):
     """Returns whether value has a string type."""
     return isinstance(value, six.string_types)
+
+
+def get_args_of_function(func):
+    """Returns the argument names of the function.
+
+    Args:
+        func: function. The function to inspect.
+
+    Returns:
+        list(str). The names of the function's arguments.
+
+    Raises:
+        TypeError. The input argument is not a function.
+    """
+    try:
+        # Python 3.
+        return [p.name for p in inspect.signature(func).parameters
+                if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
+    except AttributeError:
+        # Python 2.
+        return inspect.getargspec(func).args

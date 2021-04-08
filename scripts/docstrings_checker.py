@@ -237,7 +237,8 @@ class ASTDocStringChecker(python_utils.OBJECT):
         """
         # Ignore self and cls args.
         args_to_ignore = ['self', 'cls']
-        return python_utils.get_args_of_function(function_node, args_to_ignore)
+        return python_utils.get_args_of_function_node(
+            function_node, args_to_ignore)
 
     @classmethod
     def build_regex_from_args(cls, function_args):

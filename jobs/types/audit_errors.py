@@ -87,7 +87,7 @@ class BaseAuditError(python_utils.OBJECT):
             self.__class__.__name__, model_name, quoted_model_id, message)
 
     def __repr__(self):
-        return self.message
+        return '\'%s\'' % self.message.replace('\'', r'\'')
 
     def __eq__(self, other):
         return (

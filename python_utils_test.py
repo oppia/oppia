@@ -38,13 +38,13 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     Python 3.
     """
 
-    def test_get_args_of_function(self):
+    def test_get_args_of_function_node(self):
         function_txt = b"""def _mock_function(arg1, arg2):
                       pass"""
 
         ast_node = ast.walk(ast.parse(function_txt))
         function_node = [n for n in ast_node if isinstance(n, ast.FunctionDef)]
-        args_list = python_utils.get_args_of_function(function_node[0], [])
+        args_list = python_utils.get_args_of_function_node(function_node[0], [])
         self.assertEqual(args_list, ['arg1', 'arg2'])
 
     def test_open_file(self):
@@ -123,6 +123,22 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
         self.assertTrue(isinstance(Form, FormType1))
         self.assertFalse(isinstance(Form, FormType2))
+        self.assertTrue(issubclass(Form, BaseForm))
+
+    def test_with_metaclass_without_bases(self):
+        class FormType(type):
+            """Test metaclass."""
+
+            pass
+
+        class Form(python_utils.with_metaclass(FormType)): # pylint: disable=inherit-non-class
+            """Test class."""
+
+            def __init__(self):
+                pass
+
+        self.assertTrue(isinstance(Form, FormType))
+        self.assertTrue(issubclass(Form, python_utils.OBJECT))
 
     def test_convert_to_bytes(self):
         string1 = 'Home'
@@ -232,6 +248,13 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertTrue(python_utils.is_string('abc'))
         self.assertFalse(python_utils.is_string(123))
         self.assertFalse(python_utils.is_string(['a', 'b', 'c']))
+
+    def test_get_args_of_function(self):
+        def func(a, b, *c, **d): # pylint: disable=unused-argument
+            """Does nothing."""
+            pass
+        self.assertEqual(
+            python_utils.get_args_of_function(func), ['a', 'b'])
 
 
 @unittest.skipUnless(
