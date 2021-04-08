@@ -1758,8 +1758,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
-        self.assertEqual(query_models[0].created_collection, False)
-        self.assertEqual(query_models[0].used_logic_proof_interaction, False)
+        self.assertFalse(query_models[0].created_collection)
+        self.assertFalse(query_models[0].used_logic_proof_interaction)
 
         # Fetch both entities.
         query_models, _, _ = user_models.UserQueryModel.fetch_page(
@@ -1774,8 +1774,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
-        self.assertEqual(query_models[0].created_collection, False)
-        self.assertEqual(query_models[0].used_logic_proof_interaction, False)
+        self.assertFalse(query_models[0].created_collection)
+        self.assertFalse(query_models[0].used_logic_proof_interaction)
 
         self.assertEqual(query_models[1].submitter_id, self.USER_ID_1)
         self.assertEqual(query_models[1].id, self.QUERY_1_ID)
@@ -1785,8 +1785,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[1].edited_at_least_n_exps, 2)
         self.assertEqual(query_models[1].edited_fewer_than_n_exps, 5)
         self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
-        self.assertEqual(query_models[1].created_collection, True)
-        self.assertEqual(query_models[1].used_logic_proof_interaction, True)
+        self.assertTrue(query_models[1].created_collection)
+        self.assertTrue(query_models[1].used_logic_proof_interaction)
 
 
 class UserBulkEmailsModelTests(test_utils.GenericTestBase):

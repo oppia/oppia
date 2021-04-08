@@ -188,7 +188,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_not_logged_in_last_n_days(self):
         user_query_1_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'has_not_logged_in_for_n_days': 6
+                'has_not_logged_in_for_n_days': 6,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_1_id)
 
@@ -199,7 +201,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
 
         user_query_2_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'has_not_logged_in_for_n_days': 2
+                'has_not_logged_in_for_n_days': 2,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_2_id)
 
@@ -215,7 +219,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
 
         user_query_3_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'has_not_logged_in_for_n_days': 6
+                'has_not_logged_in_for_n_days': 6,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_3_id)
 
@@ -228,7 +234,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         number_of_days = 3
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'inactive_in_last_n_days': number_of_days
+                'inactive_in_last_n_days': number_of_days,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_id)
 
@@ -243,7 +251,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_created_at_least_n_exps(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'created_at_least_n_exps': 1
+                'created_at_least_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_id)
 
@@ -254,7 +264,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_created_fewer_than_n_exps(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'created_fewer_than_n_exps': 1
+                'created_fewer_than_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_id)
 
@@ -264,7 +276,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_edited_at_least_n_exps(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'edited_at_least_n_exps': 1
+                'edited_at_least_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_id)
 
@@ -276,7 +290,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_edited_fewer_than_n_exps(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'edited_fewer_than_n_exps': 1
+                'edited_fewer_than_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_id)
 
@@ -286,7 +302,8 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_created_collection(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'created_collection': True
+                'created_collection': True,
+                'used_logic_proof_interaction': False
             })
         self._run_one_off_job(user_query_id)
 
@@ -296,7 +313,8 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_user_has_used_logic_proof_interaction(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'used_logic_proof_interaction': True
+                'used_logic_proof_interaction': True,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_id)
 
@@ -306,20 +324,26 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_combination_of_query_params(self):
         user_query_1_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'created_at_least_n_exps': 1
+                'created_at_least_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_1_id)
 
         user_query_2_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'edited_at_least_n_exps': 1
+                'edited_at_least_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_2_id)
 
         user_query_3_id = user_query_services.save_new_user_query(
             self.submitter_id, {
                 'created_at_least_n_exps': 1,
-                'edited_at_least_n_exps': 1
+                'edited_at_least_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False,
             })
         self._run_one_off_job(user_query_3_id)
 
@@ -349,7 +373,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_that_correct_email_is_sent_upon_completion(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'edited_fewer_than_n_exps': 1
+                'edited_fewer_than_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
 
         self._run_one_off_job(user_query_id)
@@ -397,7 +423,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_that_correct_email_is_sent_upon_failure(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'edited_fewer_than_n_exps': 1
+                'edited_fewer_than_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
 
         self._run_one_off_job_resulting_in_failure(user_query_id)
@@ -443,7 +471,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     def test_that_user_unsubscribed_from_emails_is_skipped(self):
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, {
-                'created_at_least_n_exps': 1
+                'created_at_least_n_exps': 1,
+                'used_logic_proof_interaction': False,
+                'created_collection': False
             })
         self._run_one_off_job(user_query_id)
 
