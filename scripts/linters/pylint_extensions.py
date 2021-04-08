@@ -2137,7 +2137,7 @@ class DisallowDunderMetaclassChecker(checkers.BaseChecker):
         file_content = read_from_node(node)
         for (line_num, line) in enumerate(file_content):
             line = line.strip()
-            if '__metaclass__' in line and '=' in line:
+            if '__metaclass__' in line and '=' in line: # pylint: disable=no-dunder-metaclass
                 self.add_message('no-dunder-metaclass', line=line_num + 1)
 
 
