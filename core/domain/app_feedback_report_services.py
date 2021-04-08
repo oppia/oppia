@@ -71,12 +71,11 @@ def _save_report_stats_instance(report_stats):
 
 def get_report_from_model(report_model):
     """Create and return a domain object AppFeedbackReport given a model loaded
-    from the the dasta.
+    from the the data.
 
     Args:
         report_model: AppFeedbackReportModel. The model loaded from the
             datastore.
-
     Returns:
         AppFeedbackReport. An AppFeedbackReport domain object corresponding to
         the given model.
@@ -85,10 +84,88 @@ def get_report_from_model(report_model):
         app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
         return _get_android_report_from_model(report_model)
     else:
-        return  _get_web_report_from_model(report_model)
+        return _get_web_report_from_model(report_model)
+
+
+def get_ticket_from_model(ticket_model):
+    """Create and return a domain object AppFeedbackReportTicket given a model
+    loaded from the the data.
+
+    Args:
+        ticket_model: AppFeedbackReportTicketModel. The model loaded from the
+            datastore.
+    Returns:
+        AppFeedbackReportTicket. An AppFeedbackReportTicket domain object
+        corresponding to the given model.
+    """
+    reports = []
+    for report_id in ticket_model.report_ids:
+        report_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id))
+        reports.append(get_report_from_model(report_model))
+
+    return app_feedback_report_domain.AppFeedbackReportTicket(
+        ticket_model.id, ticket_model.ticket_name,
+        ticket_model.github_issue_repo_name, ticket_model.github_issue_number,
+        ticket_model.archived, ticket_model.newest_report_timestamp, reports)
+
+
+def get_report_stats_from_model(stats_model):
+    """Create and return a domain object AppFeedbackReportDailyStats given a
+    model loaded from the the data.
+
+    Args:
+        report_model: AppFeedbackReportStatsModel. The model loaded from the
+            datastore.
+    Returns:
+        AppFeedbackReportDailyStats. An AppFeedbackReportDailyStats domain
+        object corresponding tothe given model.
+    """
+    ticket = app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+        stats_model.ticket_id)
+    param_stats = _get_stats_dict_from_json(stats_model.daily_param_stats)
+    app_feedback_report_domain.AppFeedbackReportDailyStats(
+        stats_model.id, ticket, stats_model.platform,
+        stats_model.stats_tracking_date, stats_model.total_reports_submitted,
+        param_stats)
+
+
+def _get_stats_dict_from_json(daily_param_stats):
+    """Create and return a dict representing the AppFeedbackReportDailyStats
+    domain object's daily_param_stats.
+
+    Args:
+        daily_param_stats: dict. The stats data from the model.
+    Returns:
+        dict. A dict mapping param names to ReportStatsParameterValueCounts
+        domain objects.
+    """
+    stats_dict = dict()
+    for parameter_name in app_feedback_report_domain.ALLOWED_STATS_PARAMETERS:
+        # For each parameter possible, create a
+        # ReportStatsParameterValueCounts domain object of possible values
+        # to the number of reports with that value.
+        parameter_counts = [
+            parameter_value: value_count
+            for (parameter_value, value_count) in (
+                daily_param_stats[parameter_name)]
+        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
+            parameter_counts)
+        stats_dict[parameter_name] = counts_obj
+    return stats_dict
 
 
 def _get_android_report_from_model(android_report_model):
+    """Creates a domain object that represents an android feedback report from
+    the model given.
+
+    Args:
+        android_report_model: AppFeedbackReportModel. The model to convert to a
+            domain object.
+    Returns:
+        AppFeedbackReport. The corresponding AppFeedbackReport domain object.
+    """
     if android_report_model.android_report_info_schema_version < (
         feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
         raise NotImplementedError(
@@ -126,6 +203,16 @@ def _get_android_report_from_model(android_report_model):
 
 
 def _get_web_report_from_model(web_report_model):
+    """Creates a domain object that represents a web feedback report from
+    the model given.
+
+    Args:
+        web_report_model: AppFeedbackReportModel. The model to convert to a
+            domain object.
+    Raises:
+        NotImplementedError. The domain object for web reports has not been
+            defined yet.
+    """
     if web_report_model.android_report_info_schema_version < (
         feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
         raise NotImplementedError(
@@ -166,6 +253,7 @@ def scrub_all_unscrubbed_expiring_reports():
         scrub_app_feedback_reports(
             model_entity.id, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
+
 def get_all_expiring_reports_to_scrub():
     """Fetches the reports that are expiring and must be scrubbed.
 
@@ -175,6 +263,7 @@ def get_all_expiring_reports_to_scrub():
     """
     model_class = app_feedback_report_models.AppFeedbackReportModel
     return model_class.get_all_unscrubbed_expiring_reports()
+
 
 def scrub_report(report_id, scrubbed_by):
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing
@@ -237,9 +326,6 @@ def _scrub_report_info(report_info_dict):
         if key not in app_feedback_report_models.REPORT_INFO_TO_REDACT:
             new_report_info[key] = report_info_dict[key]
     return new_report_info
-
-
-# def is_ex
 
 
 # // Called when an admin triages reports; updates the assigned ticket in the

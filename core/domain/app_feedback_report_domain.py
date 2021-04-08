@@ -76,7 +76,7 @@ ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
     CATEGORY.issue_language_audio, CATEGORY.issue_language_text,
     CATEGORY.issue_topics, CATEGORY.issue_profile, CATEGORY.issue_other]
-ALLLOWED_ANDROID_STATS_PARAMETERS = [
+ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.all_submitted_reports,
     STATS_PARAMETER_NAMES.report_type,
     STATS_PARAMETER_NAMES.country_locale_code,
@@ -780,7 +780,7 @@ class LessonPlayerEntryPoint(EntryPoint):
             self.exploration_id, self.story_id)
     
     @classmethod
-    def require_valid_entry_point_name(cls, entry_point_name)
+    def require_valid_entry_point_name(cls, entry_point_name):
         """Validates this LessonPlayerEntryPoint name.
 
         Args:
@@ -866,7 +866,7 @@ class RevisionCardEntryPoint(EntryPoint):
                     self.subtopic_id))
     
     @classmethod
-    def require_valid_entry_point_name(cls, entry_point_name)
+    def require_valid_entry_point_name(cls, entry_point_name):
         """Validates this RevisionCardEntryPoint name.
 
         Args:
@@ -1076,12 +1076,10 @@ class AndroidAppContext(AppContext):
             raise utils.ValidationError(
                 'account_is_profile_admin field should be a '
                 'boolean, received: %r' % self.account_is_profile_admin)
-        if self.event_logs is None or not isinstance(
-            self.event_logs, list)):
+        if self.event_logs is None or not isinstance(self.event_logs, list):
             raise utils.ValidationError(
                 'Should have an event log list, received: %r' % self.event_logs)
-        if self.logcat_logs is None or not isinstance(
-            self.logcat_logs, list)):
+        if self.logcat_logs is None or not isinstance(self.logcat_logs, list):
             raise utils.ValidationError(
                 'Should have a logcat lots list, received: %r' % (
                     self.logcat_logs))
@@ -1112,13 +1110,16 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
     """Domain object for a single ticket created for feedback reports."""
 
     def __init__(
-        self, id, platform, report_submitted_timestamp, ticket_id, scrubbed_by,
-        user_supplied_feedback, device_system_context, app_context):
+            self, ticket_id, ticket_name, platform, github_issue_repo_name,
+            github_issue_number, archived, newest_report_creation_timestamp,
+            reports):
         """Constructs a AppFeedbackReportTicket domain object.
 
         Args:
             ticket_id: str. The unique ID of the ticket.
             ticket_name: str. The user-readable name given to this ticket.
+            platform: str. The platform that the reports in this ticket apply
+                to; must be one of PLATFORM_CHOICES.
             newest_report_creation_timestamp: datetime.datetime. Timestamp in
                 UTC of the newest submitted report that is in this ticket.
             reports: list(AppFeedbackReport). The list of AppFeedbackReport
@@ -1126,6 +1127,10 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         """
         self.ticket_id = ticket_id
         self.ticket_name = ticket_name
+        self.platform = platform
+        self.github_issue_repo_name = github_issue_repo_name
+        self.github_issue_number = github_issue_number
+        self.archived = archived
         self.newest_report_creation_timestamp = newest_report_creation_timestamp
         self.reports = reports
 
@@ -1140,6 +1145,10 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         return {
             'ticket_id': self.ticket_id,
             'ticket_name': self.ticket_name,
+            'platform': self.platform,
+            'github_issue_repo_name': self.github_issue_repo_name,
+            'github_issue_number': self.github_issue_number,
+            'archived': self.archived,
             'newest_report_creation_timestamp': (
                 self.newest_report_creation_timestamp.isoformat()),
             'reports': [report.report_id for report in self.reports]
@@ -1155,10 +1164,22 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         
         self.require_valid_ticket_id(self.ticket_id)
         self.require_valid_ticket_name(self.ticket_name)
+        AppFeedbackReport.require_valid_platform(self.platform)
+        if self.github_issue_repo_name is not None:
+            self.require_valid_github_repo(self.github_issue_repo_name)
+        if not isinstance(self.github_issue_number, int) or (
+            self.github_issue_number < 1):
+            raise utils.ValidationError(
+                'The Github issue number name must be a positive integer, '
+                'received: %r' % self.github_issue_number)
+        if not isinstance(self.archived, bool):
+            raise utils.ValidationError(
+                'The ticket archived status must be a boolean, received: %r' % (
+                    self.archived))
         AppFeedbackReport.require_valid_report_datetime(
             self.newest_report_creation_timestamp)
         self.require_valid_reports(self.reports)
-    
+
     @classmethod
     def require_valid_ticket_id(cls, ticket_id):
         """Checks whether the ticket id is a valid one.
@@ -1219,6 +1240,28 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         for report in reports_list:
             report.validate()
 
+    @classmethod
+    def require_valid_github_repo(cls, repo_name):
+        """Checks whether the reports in this ticket are valid.
+
+        Args:
+            repo_name: str. The name of the repo associated with the Github
+                issue. 
+        Raises:
+            ValidationError. The repo name is invalid.
+        """
+        if not isinstance(self.github_issue_repo_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'The Github repo name should be a string, received: %s' % (
+                    self.github_issue_repo_name))
+        if self.github_issue_repo_name not in (
+            app_feedback_report_models.GITHUB_REPO_CHOICES):
+            raise utils.ValidationError(
+                'The Github repo %s is invalid, must be one of %s.' % (
+                    self.github_issue_repo_name,
+                    app_feedback_report_models.GITHUB_REPO_CHOICE))
+        if self.github_issue_number is not
+
 
 class AppFeedbackReportDailyStats(python_utils.OBJECT):
     """Domain object for report statistics on a single day for a specific
@@ -1226,14 +1269,15 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
     """
 
     def __init__(
-        self, id, platform, ticket_id, stats_tracking_date,
+        self, id, ticket, platform, stats_tracking_date,
         total_reports_submitted, daily_param_stats):
         """Constructs a AppFeedbackReportDailyStats domain object.
 
         Args:
             stats_id: str. The unique ID for ths stats instance.
-            ticket_id: str. The unique ID of the ticket that this object is
-                aggregating stats on.
+            platform: str. The platform these report stats are aggregating for. 
+            ticket: AppFeedbackReportTicket. The AppFeedbackReportTicket domain
+                object associated with this ticket.
             stats_tracking_date: datetime.date. The date that this object is
                 aggregating stats on, in UTC.
             total_reports_submitted: int. The total number of reports submitted
@@ -1243,7 +1287,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
                 enums, while values are ReportStatsParameterValueCounts objects.
         """
         self.stats_id = stats_id
-        self.ticket_id = ticket_id
+        self.ticket = ticket
         self.platform = platform
         self.stats_tracking_date = stats_tracking_date
         self.total_reports_submitted = total_reports_submitted
@@ -1259,10 +1303,10 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
         """
         return {
             'stats_id': self.stats_id,
-            'ticket_id': self.ticket_id,
-            'platofmr': self.platform,
+            'ticket': self.ticket.to_dict(),
+            'platform': self.platform,
             'stats_tracking_date': self.stats_tracking_date.isoformat(),
-            'total_reports_submitted': self.total_reports_submitted.
+            'total_reports_submitted': self.total_reports_submitted,
             'daily_param_stats': {
                 param_name: param_count.to_dict()
                 for (param_name, param_value_counts) in (
@@ -1278,8 +1322,8 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
                 AppFeedbackReportDailyStats are not valid.
         """
         self.require_valid_stats_id(self.stats_id)
-        AppFeedbackReportTicket.require_valid_ticket_id(self.ticket_id)
-        AppFeedbackReportTicket.require_valid_ticket_name(self.ticket_name)
+        self.ticket.validate()
+        AppFeedbackReport.require_valid_platform(self.platform)
         AppFeedbackReport.require_valid_report_datetime(
             self.stats_tracking_date)
         if not isinstance(self.total_reports_submitted, int):
@@ -1336,8 +1380,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
     value.
     """
 
-    def __init__(
-        self, parameter_value_counts):
+    def __init__(self, parameter_value_counts):
         """Constructs a ReportStatsParameterValueCounts domain object.
 
         Args:

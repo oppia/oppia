@@ -25,7 +25,7 @@ from core.domain import app_feedback_report_services
 import feconf
 
 
-class IncomingAndroidFeedbackReportsHandler(base.BaseHandler):
+class IncomingAppFeedbackReportHandler(base.BaseHandler):
     """Handles incoming feedback reports from the Android app."""
 
     @acl_decorators.open_access
@@ -36,6 +36,7 @@ class IncomingAndroidFeedbackReportsHandler(base.BaseHandler):
         the feedback report.
         """
         if not self._validate_incoming_request(self.payload.headers):
+            raise 
             pass
 
         report_dict = self.payload.get('report')
@@ -56,3 +57,7 @@ class IncomingAndroidFeedbackReportsHandler(base.BaseHandler):
             return False
         return True
 
+
+class UnauthorizedRequestException(Exception):
+    """Error class for an unauthorized request."""
+    pass

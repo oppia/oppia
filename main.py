@@ -857,7 +857,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
-        incoming_app_feedback_report.IncomingAndroidFeedbackReportsHandler),
+        incoming_app_feedback_report.IncomingAppFeedbackReportHandler),
 ]
 
 # Adding redirects for topic landing pages.

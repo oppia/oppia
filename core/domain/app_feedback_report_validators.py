@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import base_model_validators
+from core.domain import app_feedback_report_services
 from core.platform import models
 import feconf
 import utils
@@ -47,6 +48,10 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
             item.platform, int(submitted_on_msec),
             base_models.ID_LENGTH)
         return regex_string
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return app_feedback_report_services.get_report_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -213,6 +218,10 @@ class AppFeedbackReportTicketModelValidator(
         return regex_string
 
     @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return app_feedback_report_services.get_ticket_from_model(item)
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
@@ -303,6 +312,10 @@ class AppFeedbackReportStatsModelValidator(
         regex_string = '^%s\\:%s\\:%s' % (
             item.platform, item.ticket_id, item.stats_tracking_date.isoformat())
         return regex_string
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return app_feedback_report_services.get_stats_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
