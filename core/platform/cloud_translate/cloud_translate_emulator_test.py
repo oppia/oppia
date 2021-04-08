@@ -31,7 +31,7 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
         self.emulator = cloud_translate_emulator.CloudTranslateEmulator()
 
     def test_init_prepopulates_responses(self):
-        self.assertDictEqual(
+        self.assertEqual(
             self.emulator.expected_responses,
             self.emulator.PREGENERATED_TRANSLATIONS)
 
