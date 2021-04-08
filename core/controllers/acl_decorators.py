@@ -2763,8 +2763,8 @@ def can_update_suggestions(handler):
     Returns:
         function. The newly decorated function that has common checks and
         permissions specified by passed in decorator. Users with rights
-            to accept translations andthe user who created a particular
-            translation are allowed to perform this action.
+        to accept translations andthe user who created a particular
+        translation are allowed to perform this action.
 
     Raises:
         NotLoggedInException. The user is not logged in.
