@@ -824,7 +824,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, self.translator_id, change_dict, 'description')
-        accepted_suggestion = suggestion_services.accept_suggestion(
+        suggestion_services.accept_suggestion(
             suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
         )
 
@@ -835,7 +835,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'trnaslation_html': '<p>Test Trans</p>'
             }, csrf_token=csrf_token, expected_status_int=500)
         self.assertEqual(
-            response['error'], 'The suggestion with id %s has already been accepted' % (suggestion.suggestion_id))
+            response['error'], 'The suggestion with id %s ' +
+            'has already been accepted' % (suggestion.suggestion_id))
         self.logout()
 
 

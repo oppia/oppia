@@ -55,7 +55,7 @@ angular.module('oppia').controller(
         html: ''
       };
 
-      $scope. updateSuggestion = function() {
+      $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
         ContributionAndReviewService.updateTranslationSuggestion(
@@ -86,7 +86,7 @@ angular.module('oppia').controller(
         var stateName = $scope.activeSuggestion.change.state_name;
         var contentType = contentId.split('_')[0];
 
-        var commitMessage =  `${contentType} section of "${stateName}" card`;
+        var commitMessage = `${contentType} section of "${stateName}" card`;
         if ($scope.translationUpdated) {
           commitMessage = commitMessage + '(With Edits)';
         }
@@ -148,7 +148,7 @@ angular.module('oppia').controller(
       $scope.acceptAndReviewNext = function() {
         $scope.finalCommitMessage = generateCommitMessage();
         if ($scope.translationUpdated) {
-          $scope.reviewMessage = $scope.reviewMessage + ': This suggestion'+
+          $scope.reviewMessage = $scope.reviewMessage + ': This suggestion' +
             ' was submitted with reviewer edits.';
         }
         $scope.resolvingSuggestion = true;

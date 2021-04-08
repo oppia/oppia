@@ -31,7 +31,6 @@ from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import role_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_services
@@ -1687,7 +1686,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.login(self.author_email)
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
-                self.exploration_id, self.author_id, ['State 1', 'State 2', 'State 3'],
+                self.exploration_id, self.author_id, [
+                    'State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(

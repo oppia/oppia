@@ -35,7 +35,6 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -414,7 +413,8 @@ def accept_suggestion(
 
 
 def update_translation_suggestion(suggestion_id, translation_html):
-    """Updates the change.translation_html of a suggestion with the given suggestion_id.
+    """Updates the change.translation_html of a suggestion with the 
+        given suggestion_id.
 
     Args:
         suggestion_id: str. The id of the suggestion to be accepted.

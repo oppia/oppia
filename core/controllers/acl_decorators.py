@@ -2752,6 +2752,7 @@ def get_decorator_for_accepting_suggestion(decorator):
 
     return generate_decorator_for_handler
 
+
 def can_update_suggestions(handler):
     """Function that generates a decorator for a given handler.
 
@@ -2819,6 +2820,7 @@ def can_update_suggestions(handler):
 
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion
+
 
 def can_view_reviewable_suggestions(handler):
     """Decorator to check whether user can view the list of suggestions that

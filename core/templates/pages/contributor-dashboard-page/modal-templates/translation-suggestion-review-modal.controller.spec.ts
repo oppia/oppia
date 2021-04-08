@@ -151,7 +151,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.resolveSuggestionToExploration)
         .toHaveBeenCalledWith(
-          '1', 'suggestion_1', 'accept', 'Review message example: '+
+          '1', 'suggestion_1', 'accept', 'Review message example: ' +
           'This suggestion was submitted with reviewer edits.',
           'hint section of "StateName" card(With Edits)',
           $scope.showNextItemToReview,
@@ -286,7 +286,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
             successCallback();
           });
 
-        $scope. updateSuggestion();
+        $scope.updateSuggestion();
 
         expect(contributionAndReviewService.updateTranslationSuggestion)
           .toHaveBeenCalledWith(

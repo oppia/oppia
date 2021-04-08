@@ -94,7 +94,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.NORMAL_USER_EMAIL)
         self.save_new_valid_exploration(
             self.target_id, self.author_id, category='Algebra')
-        
+
     def assert_suggestion_status(self, suggestion_id, status):
         """Assert the status of the suggestion with suggestion_id."""
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -774,18 +774,19 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         }
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
-                self.target_id, self.author_id, ['State 1', 'State 2', 'State 3'],
+                self.target_id, self.author_id, [
+                    'State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
         exploration.states['State 1'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services._save_exploration(self.author_id, exploration, '', [])  
+        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, 1, self.author_id, change_dict, 'description')
-        observed_suggestion = suggestion_services.get_suggestion_by_id(
+        suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
 
         suggestion_services.update_translation_suggestion(

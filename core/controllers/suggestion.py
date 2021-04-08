@@ -164,7 +164,7 @@ class SuggestionHandler(base.BaseHandler):
             )
 
         suggestion_services.update_translation_suggestion(
-                suggestion_id, self.payload.get('translation_html'))
+            suggestion_id, self.payload.get('translation_html'))
         self.render_json(self.values)
 
 
