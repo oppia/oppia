@@ -14,19 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides translate_text functionality from Google Cloud Translate."""
+"""Provides translate_text functionality from the cloud translate emulator."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# To use cloud translate in a local dev environment, use
-# cloud_translate_emulator.
-from google.cloud import translate_v2 as translate
+from core.platform.cloud_translate import cloud_translate_emulator
+from core.platform.cloud_translate import cloud_translate_services
 
-CLIENT = translate.Client()
-
-# List of languages with adequate Google Translate accuracy.
-LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
+CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
 def translate_text(text, source_language, target_language):
@@ -43,14 +39,11 @@ def translate_text(text, source_language, target_language):
     Returns:
         str. The translated text.
     """
-    if source_language not in LANGUAGE_CODE_ALLOWLIST:
+    if source_language not in cloud_translate_services.LANGUAGE_CODE_ALLOWLIST:
         raise ValueError('Invalid language code: %s' % source_language)
-    if target_language not in LANGUAGE_CODE_ALLOWLIST:
+    if target_language not in cloud_translate_services.LANGUAGE_CODE_ALLOWLIST:
         raise ValueError('Invalid language code: %s' % target_language)
     if source_language == target_language:
         return text
 
-    result = CLIENT.translate(
-        text, target_language=target_language, source_language=source_language)
-    translated_text = result['translatedText']
-    return translated_text
+    return CLIENT.translate(text, source_language, target_language)

@@ -214,6 +214,7 @@
     "11": [
         "core.platform.taskqueue.cloud_taskqueue_services_test",
         "core.platform.cloud_translate.cloud_translate_services_test",
+        "core.platform.cloud_translate.dev_mode_cloud_translate_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
         "scripts.regenerate_requirements_test",

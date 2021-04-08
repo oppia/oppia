@@ -309,10 +309,11 @@ class RegistryUnitTest(test_utils.TestBase):
             self.assertEqual(
                 self.registry_instance.import_cloud_translate_services(),
                 cloud_translate_services)
-        from core.platform.cloud_translate import cloud_translate_emulator
+        from core.platform.cloud_translate import (
+            dev_mode_cloud_translate_services)
         self.assertEqual(
             self.registry_instance.import_cloud_translate_services(),
-            cloud_translate_emulator)
+            dev_mode_cloud_translate_services)
 
     def test_import_search_services(self):
         """Tests import search services function."""
