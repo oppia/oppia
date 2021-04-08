@@ -207,8 +207,8 @@ class RelationshipsOf(python_utils.OBJECT):
         the IDs of other models.
 
         Returns:
-            dict(str: dict(str: set(str))). Property relationships keyed by the
-            kind of model the properties belong to. For each property, the
+            dict(str: dict(str: tuple(str))). Property relationships keyed by
+            the kind of model the properties belong to. For each property, the
             corresponding set refers to the kinds of models which should exist
             in storage with the same ID.
         """
@@ -223,7 +223,7 @@ class RelationshipsOf(python_utils.OBJECT):
         }
 
     def _validate_model_type(self, model_type):
-        """Returns the same model class if it is valid.
+        """Returns the kind of the model type if it is valid.
 
         Args:
             model_type: BaseModel. A subclass of BaseModel.
@@ -256,7 +256,7 @@ class RelationshipsOf(python_utils.OBJECT):
                 self._dependent_model_type.
         """
         if prop is base_models.BaseModel.id:
-            # BaseModel.id is a Python @property, not an Property, but we still
+            # BaseModel.id is a Python @property, not a Property, but we still
             # want to support it.
             return 'id'
 
@@ -271,7 +271,7 @@ class RelationshipsOf(python_utils.OBJECT):
         expected_prop = getattr(self._dependent_model_type, prop_name)
         if prop is not expected_prop:
             raise ValueError('%s=%r is not %s.%s=%r' % (
-                prop_name, prop, self._dependent_model_type.__name__,
-                prop_name, expected_prop))
+                prop_name, prop,
+                self._dependent_model_type.__name__, prop_name, expected_prop))
 
         return prop_name

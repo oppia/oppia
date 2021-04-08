@@ -48,10 +48,10 @@ def get_property_relationships_by_kind():
     """Returns the property relationships between models.
 
     Returns:
-        dict(str: dict(str: set(str))). Property relationships keyed by the kind
-        of model the properties belong to. For each property, the corresponding
-        set refers to the kinds of models which should exist in storage with the
-        same ID.
+        dict(str: dict(str: tuple(str))). Property relationships keyed by the
+        kind of model the properties belong to. For each property, the
+        corresponding set refers to the kinds of models which should exist in
+        storage with the same ID.
     """
     return (
         audit_decorators.RelationshipsOf.get_property_relationships_by_kind())

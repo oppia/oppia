@@ -49,18 +49,18 @@ class ValidateUserIdByFirebaseAuthIdModelId(
 
 @audit_decorators.RelationshipsOf(auth_models.UserAuthDetailsModel)
 def user_auth_details_model_relationships(model):
-    """Yields how the properties of the model relates to the ID of others."""
+    """Yields how the properties of the model relate to the IDs of others."""
     yield model.firebase_auth_id, [auth_models.UserIdByFirebaseAuthIdModel]
     yield model.gae_id, [auth_models.UserIdentifiersModel]
 
 
 @audit_decorators.RelationshipsOf(auth_models.UserIdByFirebaseAuthIdModel)
 def user_id_by_firebase_auth_id_model_relationships(model):
-    """Yields how the properties of the model relates to the ID of others."""
+    """Yields how the properties of the model relate to the IDs of others."""
     yield model.user_id, [auth_models.UserAuthDetailsModel]
 
 
 @audit_decorators.RelationshipsOf(auth_models.UserIdentifiersModel)
 def user_identifiers_model_relationships(model):
-    """Yields how the properties of the model relates to the ID of others."""
+    """Yields how the properties of the model relate to the IDs of others."""
     yield model.user_id, [auth_models.UserAuthDetailsModel]

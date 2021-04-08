@@ -228,7 +228,10 @@ def decorate_beam_errors():
         except (SyntaxError, ValueError):
             raise AssertionError(msg)
 
-        error_lines = ['failed %s' % match.group('context'), '']
+        error_lines = [
+            'failed %s' % match.group('context'),
+            '',
+        ]
         if unexpected:
             error_lines.append('Unexpected:')
             error_lines.extend('    %r' % item for item in unexpected)
