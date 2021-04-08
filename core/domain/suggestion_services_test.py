@@ -94,7 +94,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.NORMAL_USER_EMAIL)
         self.save_new_valid_exploration(
             self.target_id, self.author_id, category='Algebra')
-
+        
     def assert_suggestion_status(self, suggestion_id, status):
         """Assert the status of the suggestion with suggestion_id."""
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -762,6 +762,40 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         can_resubmit = suggestion_services.check_can_resubmit_suggestion(
             self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
+
+    def test_translation_update(self):
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'state_name': 'State 1',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                self.target_id, self.author_id, ['State 1', 'State 2', 'State 3'],
+                ['TextInput'], category='Algebra'))
+        self.old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['State 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exp_services._save_exploration(self.author_id, exploration, '', [])  
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, 1, self.author_id, change_dict, 'description')
+        observed_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, '<p>Test Translation</p>')
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(
+            updated_suggestion.change.translation_html,
+            '<p>Test Translation</p>')
 
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
@@ -1578,50 +1612,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
-
-    def test_translation_update(self):
-        self.create_translation_suggestion_associated_with_exp(
-            self.EXP_ID, self.author_id)
-        suggestions = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
-
-        suggestion_services.update_suggestion(
-            suggestions[0].suggestion_id, '<p>Test Translation</p>')
-
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestions[0].suggestion_id)
-        self.assertEqual(
-            updated_suggestion.change.translation_html,
-            '<p>Test Translation</p>')
-
-    def test_translation_update_not_existing_exception(self):
-        self.create_translation_suggestion_associated_with_exp(
-            self.EXP_ID, self.author_id)
-        suggestions = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
-        suggestion_services.accept_suggestion(
-            suggestions[0].suggestion_id, self.reviewer_id, 'Done', 'Accepted'
-        )
-        expected_exception_regexp = (
-            'The suggestion with id %s has already been accepted/'
-            'rejected.' % (suggestions[0].suggestion_id)
-        )
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_exception_regexp):
-            suggestion_services.update_suggestion(
-                suggestions[0].suggestion_id, '<p>Test Translation</p>')
-
-    def test_translation_update_already_hadled_exception(self):
-        expected_exception_regexp = (
-            'You cannot change the suggestion with id %s because it does not '
-            'exist.' % ('sug-1')
-        )
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_exception_regexp):
-            suggestion_services.update_suggestion(
-                'sug-1', '<p>Test Translation</p>')
 
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):

@@ -43,9 +43,8 @@ angular.module('oppia').controller(
       $scope.activeSuggestion = suggestionIdToSuggestion[
         $scope.activeSuggestionId];
       $scope.subheading = subheading;
-      $scope.isEditing = false;
-      $scope.isTranslationUpdated = false;
-      $scope.isAccpeted = false;
+      $scope.startedEditing = false;
+      $scope.translationUpdated = false;
       $scope.HTML_SCHEMA = {
         type: 'html',
         ui_config: {
@@ -56,20 +55,20 @@ angular.module('oppia').controller(
         html: ''
       };
 
-      $scope.updateTranslate = function() {
+      $scope. updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
-        ContributionAndReviewService.updateTranslation(
+        ContributionAndReviewService.updateTranslationSuggestion(
           suggestionId,
           updatedTranslation,
           (success) => {
             $scope.translationHtml = updatedTranslation;
-            $scope.isTranslationUpdated = true;
+            $scope.translationUpdated = true;
             ContributionOpportunitiesService.
               reloadOpportunitiesEventEmitter.emit();
           },
-          $scope.showError);
-        $scope.isEditing = false;
+          $scope.showTranslationSuggestionUpdateError);
+        $scope.startedEditing = false;
       };
 
       delete suggestionIdToSuggestion[initialSuggestionId];
@@ -87,7 +86,12 @@ angular.module('oppia').controller(
         var stateName = $scope.activeSuggestion.change.state_name;
         var contentType = contentId.split('_')[0];
 
-        return `${contentType} section of "${stateName}" card`;
+        var commitMessage =  `${contentType} section of "${stateName}" card`;
+        if ($scope.translationUpdated) {
+          commitMessage = commitMessage + '(With Edits)';
+        }
+
+        return commitMessage;
       };
 
       var _getThreadHandlerUrl = function(suggestionId) {
@@ -143,8 +147,9 @@ angular.module('oppia').controller(
 
       $scope.acceptAndReviewNext = function() {
         $scope.finalCommitMessage = generateCommitMessage();
-        if ($scope.isTranslationUpdated) {
-          $scope.finalCommitMessage = $scope.finalCommitMessage + '-With Edits';
+        if ($scope.translationUpdated) {
+          $scope.reviewMessage = $scope.reviewMessage + ': This suggestion'+
+            ' was submitted with reviewer edits.';
         }
         $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
@@ -172,12 +177,12 @@ angular.module('oppia').controller(
           generateCommitMessage(), $scope.showNextItemToReview);
       };
 
-      $scope.editTranslate = function() {
-        $scope.isEditing = true;
+      $scope.editSuggestion = function() {
+        $scope.startedEditing = true;
       };
 
       $scope.cancelEdit = function() {
-        $scope.isEditing = false;
+        $scope.startedEditing = false;
         $scope.editedContent.html = $scope.translationHtml;
       };
 
@@ -185,8 +190,7 @@ angular.module('oppia').controller(
         $uibModalInstance.close(resolvedSuggestionIds);
       };
 
-      $scope.showError = function(error) {
-        $scope.rejectAndReviewNext('Invalid Suggestion');
+      $scope.showTranslationSuggestionUpdateError = function(error) {
         AlertsService.clearWarnings();
         AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
       };

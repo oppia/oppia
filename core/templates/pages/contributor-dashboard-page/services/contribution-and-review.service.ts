@@ -123,17 +123,16 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));
       },
-      updateTranslation: function(
+      updateTranslationSuggestion: function(
           suggestionId, translationHtml,
           onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
           _UPDATE_TRANSLATION_HANDLER_URL, {
             suggestion_id: suggestionId
           });
-        const putData = {
+        return $http.put(url, {
           translation_html: translationHtml
-        };
-        return $http.put(url, putData).then(function() {
+        }).then(function() {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));
       }

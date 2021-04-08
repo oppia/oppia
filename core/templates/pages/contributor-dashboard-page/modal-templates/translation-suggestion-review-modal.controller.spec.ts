@@ -112,7 +112,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       spyOn(AlertsService, 'clearWarnings');
       spyOn(AlertsService, 'addWarning');
 
-      $scope.showError(error);
+      $scope.showTranslationSuggestionUpdateError(error);
 
       expect(AlertsService.clearWarnings).toHaveBeenCalled();
       expect(
@@ -138,26 +138,27 @@ describe('Translation Suggestion Review Modal Controller', function() {
         });
 
       $scope.reviewMessage = 'Review message example';
-      $scope.isTranslationUpdated = true;
+      $scope.translationUpdated = true;
       $scope.acceptAndReviewNext();
 
       expect($scope.activeSuggestionId).toBe('suggestion_2');
       expect($scope.activeSuggestion).toEqual(suggestion2);
       expect($scope.reviewable).toBe(reviewable);
       expect($scope.reviewMessage).toBe('');
-      expect($scope.finalCommitMessage).toContain('-With Edits');
+      expect($scope.finalCommitMessage).toContain('(With Edits)');
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.resolveSuggestionToExploration)
         .toHaveBeenCalledWith(
-          '1', 'suggestion_1', 'accept', 'Review message example',
-          'hint section of "StateName" card-With Edits',
+          '1', 'suggestion_1', 'accept', 'Review message example: '+
+          'This suggestion was submitted with reviewer edits.',
+          'hint section of "StateName" card(With Edits)',
           $scope.showNextItemToReview,
           jasmine.any(Function));
 
       $scope.reviewMessage = 'Review message example 2';
-      $scope.isTranslationUpdated = false;
+      $scope.translationUpdated = false;
       $scope.acceptAndReviewNext();
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
@@ -263,14 +264,14 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     it('should open the translation editor when the edit button is clicked',
       function() {
-        $scope.editTranslate();
-        expect($scope.isEditing).toBe(true);
+        $scope.editSuggestion();
+        expect($scope.startedEditing).toBe(true);
       });
 
     it('should close the translation editor when the cancel button is clicked',
       function() {
         $scope.cancelEdit();
-        expect($scope.isEditing).toBe(false);
+        expect($scope.startedEditing).toBe(false);
       });
 
     it('should update translation when the update button is clicked',
@@ -278,16 +279,16 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
         $scope.editedContent.html = '<p>Test</p>';
 
-        spyOn(contributionAndReviewService, 'updateTranslation')
+        spyOn(contributionAndReviewService, 'updateTranslationSuggestion')
           .and.callFake((
               suggestionId, updatedTranslation,
               successCallback, errorCallback) => {
             successCallback();
           });
 
-        $scope.updateTranslate();
+        $scope. updateSuggestion();
 
-        expect(contributionAndReviewService.updateTranslation)
+        expect(contributionAndReviewService.updateTranslationSuggestion)
           .toHaveBeenCalledWith(
             'suggestion_1', '<p>Test</p>', jasmine.any(Function),
             jasmine.any(Function));

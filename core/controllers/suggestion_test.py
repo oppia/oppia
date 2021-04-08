@@ -768,11 +768,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
 
-    def test_update_translation(self):
-
-        # Test reviewer can accept successfully.
-        self.login(self.REVIEWER_EMAIL)
-
+    def test_update_translation_updates_translation_suggestion_change(self):
+        self.login(self.TRANSLATOR_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -795,24 +792,50 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
-
         self.assertEqual(
             updated_suggestion.change.translation_html,
             '<p>Test Trans</p>')
         self.logout()
 
-    def test_update_translation_exception(self):
-
-        # Test reviewer can accept successfully.
+    def test_update_translation_invalid_suggestion_id_exception(self):
         self.login(self.REVIEWER_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/translation/%s' % (
+        response = self.put_json('%s/translation/%s' % (
             feconf.SUGGESTION_URL_PREFIX,
             'suggestion-1'), {
                 'trnaslation_html': '<p>Test Trans</p>'
             }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'No suggestion found with given suggestion id')
+        self.logout()
 
+    def test_update_translation_already_accepted_suggestion_exception(self):
+        self.login(self.TRANSLATOR_EMAIL)
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'state_name': 'State 1',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, self.translator_id, change_dict, 'description')
+        accepted_suggestion = suggestion_services.accept_suggestion(
+            suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
+        )
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json('%s/translation/%s' % (
+            feconf.SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'trnaslation_html': '<p>Test Trans</p>'
+            }, csrf_token=csrf_token, expected_status_int=500)
+        self.assertEqual(
+            response['error'], 'The suggestion with id %s has already been accepted' % (suggestion.suggestion_id))
         self.logout()
 
 

@@ -21,7 +21,7 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
-describe('Contributions and review component', function() {
+fdescribe('Contributions and review component', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
@@ -40,7 +40,7 @@ describe('Contributions and review component', function() {
 
   importAllAngularServices();
 
-  describe('when user is allowed to review questions', function() {
+  fdescribe('when user is allowed to review questions', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
@@ -177,7 +177,7 @@ describe('Contributions and review component', function() {
       $scope.$apply();
     }));
 
-    it('should initialize $scope properties after controller is' +
+    fit('should initialize $scope properties after controller is' +
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('reviews');
       expect(ctrl.activeSuggestionType).toBe('add_question');
@@ -186,8 +186,8 @@ describe('Contributions and review component', function() {
       expect(ctrl.reviewTabs.length).toEqual(2);
     });
 
-    describe('ctrl.loadContributions', () => {
-      it('should load contributions correctly', () => {
+    fdescribe('ctrl.loadContributions', () => {
+      fit('should load contributions correctly', () => {
         ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
           expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
           expect(opportunitiesDicts).toEqual([{
@@ -202,7 +202,7 @@ describe('Contributions and review component', function() {
         });
       });
 
-      it('should return empty list if tab is not initialized', () => {
+      fit('should return empty list if tab is not initialized', () => {
         ctrl.activeTabType = null;
         ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
           expect(ctrl.contributions).toEqual({});
@@ -211,7 +211,7 @@ describe('Contributions and review component', function() {
         });
       });
 
-      it('should return empty list if suggestion type is not initialized',
+      fit('should return empty list if suggestion type is not initialized',
         () => {
           ctrl.activeTabType = null;
           ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
@@ -222,7 +222,7 @@ describe('Contributions and review component', function() {
         });
     });
 
-    it('should open show translation suggestion modal when clicking on' +
+    fit('should open show translation suggestion modal when clicking on' +
       ' suggestion', function() {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
@@ -238,7 +238,7 @@ describe('Contributions and review component', function() {
       $scope.$apply();
     });
 
-    it('should resolve suggestion when closing show suggestion modal',
+    fit('should resolve suggestion when closing show suggestion modal',
       function() {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
@@ -260,7 +260,7 @@ describe('Contributions and review component', function() {
         $scope.$apply();
       });
 
-    it('should not resolve suggestion when dismissing show suggestion modal',
+    fit('should not resolve suggestion when dismissing show suggestion modal',
       function() {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
@@ -279,7 +279,7 @@ describe('Contributions and review component', function() {
       });
   });
 
-  describe('for the suggestion related to deleted opportunity', function() {
+  fdescribe('for the suggestion related to deleted opportunity', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
@@ -456,7 +456,7 @@ describe('Contributions and review component', function() {
       $scope.$apply();
     }));
 
-    it('should show correct heading for translation suggestions', function() {
+    fit('should show correct heading for translation suggestions', function() {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
           ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
@@ -480,7 +480,7 @@ describe('Contributions and review component', function() {
           .emit).toHaveBeenCalled();
     });
 
-    it('should show correct heading for question suggestions', function() {
+    fit('should show correct heading for question suggestions', function() {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
           ctrl.loadContributions();
@@ -502,7 +502,7 @@ describe('Contributions and review component', function() {
     });
   });
 
-  describe('when user is not allowed to review questions', function() {
+  fdescribe('when user is not allowed to review questions', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
@@ -685,7 +685,7 @@ describe('Contributions and review component', function() {
       $scope.$apply();
     }));
 
-    it('should initialize $scope properties after controller is' +
+    fit('should initialize $scope properties after controller is' +
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('contributions');
       expect(ctrl.activeSuggestionType).toBe('add_question');
@@ -694,7 +694,7 @@ describe('Contributions and review component', function() {
       expect(ctrl.reviewTabs.length).toEqual(0);
     });
 
-    it('should emit reload even when when switching to translation' +
+    fit('should emit reload even when when switching to translation' +
       ' in review tab', function() {
       spyOn(
         contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
@@ -708,7 +708,7 @@ describe('Contributions and review component', function() {
         .toHaveBeenCalled();
     });
 
-    it('should open show view question modal when clicking on' +
+    fit('should open show view question modal when clicking on' +
       ' question suggestion', function() {
       spyOn($uibModal, 'open').and.callThrough();
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
@@ -720,7 +720,7 @@ describe('Contributions and review component', function() {
       });
     });
 
-    it('should resolve suggestion to skill when closing show question' +
+    fit('should resolve suggestion to skill when closing show question' +
       ' suggestion modal', function() {
       $httpBackend.expectPUT(
         '/suggestionactionhandler/skill/1/suggestion_1').respond(200);
@@ -739,7 +739,7 @@ describe('Contributions and review component', function() {
       });
     });
 
-    it('should not resolve suggestion to skill when dismissing show question' +
+    fit('should not resolve suggestion to skill when dismissing show question' +
       ' suggestion modal', function() {
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
       spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill');
@@ -754,7 +754,7 @@ describe('Contributions and review component', function() {
       });
     });
 
-    it('should return correctly check the active tab', function() {
+    fit('should return correctly check the active tab', function() {
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
       ctrl.isActiveTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
 

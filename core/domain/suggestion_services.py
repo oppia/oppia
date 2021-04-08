@@ -413,33 +413,18 @@ def accept_suggestion(
         _update_user_proficiency(user_proficiency)
 
 
-def update_suggestion(suggestion_id, translation_html):
-    """Updates a suggestion with the given suggestion_id and translation_html.
+def update_translation_suggestion(suggestion_id, translation_html):
+    """Updates the change.translation_html of a suggestion with the given suggestion_id.
 
     Args:
         suggestion_id: str. The id of the suggestion to be accepted.
         translation_html: str. The new translation html.
 
-    Raises:
-        Exception. The suggestion is already handled.
-        Exception. The suggestion is not valid.
-
     Returns:
-        _update_suggestion(suggestion). Updates the suggestion.
+        Suggestion. The updated suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
-
-    if suggestion is None:
-        raise utils.ValidationError(
-            'You cannot change the suggestion with id %s because it does '
-            'not exist.' % (suggestion_id)
-        )
-    if suggestion.is_handled:
-        raise utils.ValidationError(
-            'The suggestion with id %s has already been accepted/'
-            'rejected.' % (suggestion_id)
-        )
 
     suggestion.change.translation_html = translation_html
 

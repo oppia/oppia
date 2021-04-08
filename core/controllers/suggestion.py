@@ -148,13 +148,23 @@ class SuggestionHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
-    @acl_decorators.can_suggest_changes
+    @acl_decorators.can_update_suggestions
     def put(self, suggestion_id):
-        try:
-            suggestion_services.update_suggestion(
+        """Handles POST requests.
+
+        Raises:
+            ValidationError. The suggestion is already handled.
+            ValidationError. The suggestion is not valid.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.status == 'accepted':
+            raise utils.ValidationError(
+                'The suggestion with id %s has already been accepted'
+                % (suggestion_id)
+            )
+
+        suggestion_services.update_translation_suggestion(
                 suggestion_id, self.payload.get('translation_html'))
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
         self.render_json(self.values)
 
 

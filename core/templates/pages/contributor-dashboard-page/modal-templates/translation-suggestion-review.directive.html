@@ -10,6 +10,9 @@
 </div>
 
 <div class="modal-body">
+  <div class="oppia-suggestion-review-edit-button-container">
+    <button class="btn btn-secondary" ng-if="!startedEditing && status === 'review'" ng-click="editSuggestion()">Edit</button>
+  </div>
   <section class="oppia-suggestion-review-container">
     <div class="oppia-suggestion-review-panel-container float-left">
       <strong>Content to translate:</strong>
@@ -22,15 +25,14 @@
       <strong> Translation:</strong>
       <div class="oppia-suggestion-review-panel">
         <div>
-          <angular-html-bind html-data="translationHtml" ng-if="!isEditing">
+          <angular-html-bind html-data="translationHtml" ng-if="!startedEditing">
           </angular-html-bind>
-          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent.html" ng-if="isEditing">
+          <schema-based-editor schema="HTML_SCHEMA" local-value="editedContent.html" ng-if="startedEditing">
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">
-          <button class="btn btn-secondary" ng-if="isEditing" ng-click="cancelEdit()">Cancel</button>
-          <button class="btn btn-success" ng-if="isEditing" ng-click="updateTranslate()">Update</button>
-          <button class="btn btn-secondary" ng-if="!isEditing && status === 'review'" ng-click="editTranslate()">Edit</button>
+          <button class="btn btn-secondary" ng-if="startedEditing" ng-click="cancelEdit()">Cancel</button>
+          <button class="btn btn-success" ng-if="startedEditing" ng-click="updateSuggestion()">Update</button>
         </div>
       </div>
     </div>
@@ -74,8 +76,13 @@
   .oppia-suggestion-resolve-button {
     min-width: 165px;
   }
+  .oppia-suggestion-review-edit-button-container {
+    display:flex;
+    justify-content: flex-end;
+  }
   .oppia-translation-review-edit-buttons {
     margin-top: 10px;
+    margin-left: 10px;
   }
   /* From 1023px onwards, the modal text branches to the next line.
      The use of line height ensures that alternate lines of the
