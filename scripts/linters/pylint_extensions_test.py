@@ -3274,12 +3274,12 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(def_node)
 
 
-class MetaclassCheckerTests(unittest.TestCase):
+class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
     def test_wrong_metaclass_usage_raises_error(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.MetaclassChecker)
+            pylint_extensions.DisallowDunderMetaclassChecker)
         checker_test_object.setup_method()
 
         metaclass_node = astroid.extract_node(
@@ -3297,7 +3297,7 @@ class MetaclassCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='replace-disallowed-metaclass-usage',
+                msg_id='no-dunder-metaclass',
                 node=metaclass_node
             )
         ):
@@ -3306,7 +3306,7 @@ class MetaclassCheckerTests(unittest.TestCase):
     def test_no_metaclass_usage_raises_no_error(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.MetaclassChecker)
+            pylint_extensions.DisallowDunderMetaclassChecker)
         checker_test_object.setup_method()
 
         metaclass_node = astroid.extract_node(
@@ -3322,7 +3322,7 @@ class MetaclassCheckerTests(unittest.TestCase):
     def test_correct_metaclass_usage_raises_no_error(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.MetaclassChecker)
+            pylint_extensions.DisallowDunderMetaclassChecker)
         checker_test_object.setup_method()
 
         metaclass_node = astroid.extract_node(

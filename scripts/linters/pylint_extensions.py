@@ -2109,7 +2109,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
-class MetaclassChecker(checkers.BaseChecker):
+class DisallowDunderMetaclassChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "__metaclass__" and
     enforcing use of "python_utils.with_metaclass()" instead.
     """
@@ -2121,7 +2121,7 @@ class MetaclassChecker(checkers.BaseChecker):
     msgs = {
         'C0034': (
             'Please use python_utils.with_metaclass() instead of __metaclass__',
-            'metaclass',
+            'no-dunder-metaclass',
             'Enforce usage of python_utils.with_metaclass()'
             'instead of __metaclass__'
         )
@@ -2137,7 +2137,7 @@ class MetaclassChecker(checkers.BaseChecker):
         """
         if node.declared_metaclass() is None:
             return
-        self.add_message('replace-disallowed-metaclass-usage', node=node)
+        self.add_message('no-dunder-metaclass', node=node)
 
 
 def register(linter):
@@ -2162,4 +2162,4 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
-    linter.register_checker(MetaclassChecker(linter))
+    linter.register_checker(DisallowDunderMetaclassChecker(linter))
