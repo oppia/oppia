@@ -214,9 +214,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteExplorations !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS' | translate"
-                  translate-values="{numberNonexistent: numberNonexistentIncompleteExplorations}"
-                  translate-interpolation="messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentIncompleteExplorations}: messageformat">
             </span>
             &#9785;
           </span>
@@ -248,8 +246,9 @@
                  *ngIf="(tile.toggle || checkMobileView())"
                  aria-hidden="true"
                  (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                 uib-tooltip="Remove"
-                 tooltip-placement="top">
+                 ngbTooltip="Remove"
+                 container="body"
+                 placement="top">
               </i>
               <exploration-summary-tile [getExplorationId]="tile.id"
                                         [getExplorationTitle]="tile.title"
@@ -282,9 +281,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCompletedExplorations !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS' | translate"
-                  translate-values="{numberNonexistent: numberNonexistentCompletedExplorations}"
-                  translate-interpolation="messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentCompletedExplorations}: messageformat">
             </span>
             &#9785;
           </span>
@@ -334,9 +331,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentExplorationsFromPlaylist !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST' | translate"
-                  translate-values="{numberNonexistent: numberNonexistentExplorationsFromPlaylist}"
-                  translate-interpolation="messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentExplorationsFromPlaylist}">
             </span>
             &#9785;
           </span>
@@ -352,16 +347,19 @@
               </a>
             </div>
           </mat-card>
-          <ng-container *ngFor="let tile of explorationPlaylist; let i = index; trackBy: i">
-            <div class="oppia-exploration-summary-tile-container event-item"
+          
+          <ng-container *ngIf="explorationPlaylist.length !== 0">
+            <div *ngFor="let tile of explorationPlaylist; let i = index; trackBy: i"
+                 class="oppia-exploration-summary-tile-container"
                  (mouseenter)="tile.toggle = !tile.toggle "
                  (mouseleave)="tile.toggle = !tile.toggle">
               <i class="remove-icon fa fa-times"
-                 *ngIf="tile.toggle || checkMobileView()"
+                 *ngIf="(tile.toggle || checkMobileView())"
                  aria-hidden="true"
                  (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                 uib-tooltip="Remove"
-                 tooltip-placement="top">
+                 ngbTooltip="Remove"
+                 container="body"
+                 placement="top">
               </i>
               <exploration-summary-tile [getExplorationId]="tile.id"
                                         [getExplorationTitle]="tile.title"
@@ -372,8 +370,7 @@
                                         [getNumViews]="tile.numViews"
                                         [getThumbnailIconUrl]="tile.thumbnailIconUrl"
                                         [getThumbnailBgColor]="tile.thumbnailBgColor"
-                                        class="oppia-exploration-summary-tile protractor-test-exp-summary-tile"
-                                        [isPlaylistTile]="true">
+                                        class="oppia-exploration-summary-tile protractor-test-exp-summary-tile">
               </exploration-summary-tile>
             </div>
           </ng-container>
@@ -382,9 +379,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteCollections !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS' | translate"
-                  translate-values="{numberNonexistent: numberNonexistentIncompleteCollections}"
-                  translate-interpolation="messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentIncompleteCollections}: messageformat">
             </span>
             &#9785;
           </span>
@@ -414,8 +409,9 @@
                *ngIf="(tile.toggle || checkMobileView())"
                aria-hidden="true"
                (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-               uib-tooltip="Remove"
-               tooltip-placement="top">
+               ngbTooltip="Remove"
+               container="body"
+               placement="top">
             </i>
             <collection-summary-tile
                                      [getCollectionId]="tile.id"
@@ -446,9 +442,7 @@
           </span>
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCollectionsFromPlaylist !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST' | translate"
-                  translate-values="{numberNonexistent: numberNonexistentCollectionsFromPlaylist}"
-                  translate-interpolation="messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentCollectionsFromPlaylist}: messageformat">
             </span>
             &#9785;
           </span>
@@ -473,8 +467,9 @@
                *ngIf="(tile.toggle || checkMobileView())"
                aria-hidden="true"
                (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-               uib-tooltip="Remove"
-               tooltip-placement="top">
+               ngbTooltip="Remove"
+               container="body"
+               placement="top">
             </i>
             <collection-summary-tile [getCollectionId]="tile.id"
                                      [getCollectionTitle]="tile.title"
@@ -491,8 +486,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="completedToIncompleteCollections.length !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate"
-                  translate-values="{numberMoved: completedToIncompleteCollections.length}">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
             </span>
             <span>
               <ul>
@@ -503,9 +497,7 @@
 
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCompletedCollections !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS' | translate"
-                  translate-values="{numberNonexistent: numberNonexistentCompletedCollections}"
-                  translate-interpolation="messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentCompletedCollections}: messageformat">
             </span>
             &#9785;
           </span>
@@ -575,9 +567,9 @@
               <span class="oppia-subscription-card-summary text-dark">
                 <div class="oppia-subscription-name">
                   <strong class="protractor-test-subscription-name"
-                          popover-append-to-body
-                          popover-trigger="showUsernamePopover(subscription.username)"
-                          ng-attr-uib-popover="subscription.username">
+                          container="body"
+                          triggers="showUsernamePopover(subscription.username)"
+                          ngbPopover="subscription.username">
                     {{subscription.username| truncate:10}}
                   </strong>
                 </div>
@@ -647,8 +639,7 @@
                 </span>
                 <span *ngIf="thread.lastMessageText">{{thread.lastMessageText | truncate:50}}</span>
                 <span *ngIf="!thread.lastMessageText && thread.totalMessageCount !== 1">
-                  <i [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate"
-                     translate-values="{threadStatus: getHumanReadableStatus(thread.status)}">
+                  <i [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(thread.status)}">
                   </i>
                 </span>
                 <span *ngIf="!thread.lastMessageText && thread.totalMessageCount === 1">
@@ -712,8 +703,7 @@
                       </span>
                       <span class="oppia-updated-status"
                             *ngIf="message.messageId !== 0 && message.updatedStatus">
-                        <em [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate"
-                            translate-values="{threadStatus: getHumanReadableStatus(message.updatedStatus)}">
+                        <em [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(message.updatedStatus)}">
                         </em>
                       </span>
                     </div>
@@ -1086,7 +1076,7 @@
     height: 145px;
   }
   .oppia-exploration-summary-tile {
-    height: 145px;
+    height: 100%;
   }
   .oppia-subscription-container
   .oppia-dashboard-view-suggestion-button {
@@ -1293,5 +1283,4 @@
     padding: 0;
     width: 191px;
   }
-
 </style>

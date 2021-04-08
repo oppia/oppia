@@ -2,9 +2,9 @@
    *ngIf="isAddToPlaylistIconShown"
    [hidden]="!(canActivityBeAddedToLearnerPlaylist(activityId) && !isContainerNarrow)" (click)="addToLearnerPlaylist(activityId, activityType)"
    (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)"
-   [ngStyle]="{'z-index':1000}"
    aria-hidden="true"
    ngbTooltip="{{'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate}}"
+   container="body"
    placement="left">
 </i>
 <div *ngIf="canActivityBeAddedToLearnerPlaylist(activityId) && isContainerNarrow" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
@@ -19,21 +19,20 @@
    *ngIf="belongsToLearnerPlaylist()"
    (click)="removeFromLearnerPlaylist(activityId, activityTitle, activityType)"
    aria-hidden="true"
-   [ngStyle]="{'z-index':1000}"
    (mouseleave)="enablePlaylistTooltip()"
    ngbTooltip="{{'I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate}}"
+   container="body"
    placement="left">
 </i>
 <i class="oppia-learner-dashboard-icon far fa-check-circle"
    *ngIf="belongsToCompletedActivities()"
-   [ngStyle]="{'z-index':1000}"
    aria-hidden="true"
    ngbTooltip="{{'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate}}"
+   container="body"
    placement="left">
 </i>
 <i class="oppia-learner-dashboard-icon fas fa-spinner"
    *ngIf="belongsToIncompleteActivities()"
-   [ngStyle]="{'z-index':1000}"
    aria-hidden="true"
    ngbTooltip="{{'I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate}}"
    container="body"
@@ -41,12 +40,11 @@
    placement="left">
 </i>
 <style>
-  learner-dashboard-icons .library-incomplete-activity-tooltip .tooltip-inner {
+  .library-incomplete-activity-tooltip .tooltip-inner {
     max-width: none;
     white-space: nowrap;
-    z-index: 100000000;
   }
-  learner-dashboard-icons .oppia-dropdown-menu {
+  .oppia-dropdown-menu {
     left: -150px;
     top: 0;
   }
