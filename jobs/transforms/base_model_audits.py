@@ -39,8 +39,7 @@ from jobs.types import audit_errors
 
 import apache_beam as beam
 
-(base_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
