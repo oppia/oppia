@@ -19,9 +19,6 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      - e2e_miscellaneous_tests:
-          requires:
-            - e2e_navigation_and_misc
       - e2e_new_structure_tests:
           requires:
             - e2e_navigation_and_misc
