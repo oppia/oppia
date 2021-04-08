@@ -1426,7 +1426,14 @@ class Voiceover(python_utils.OBJECT):
 
 
 class WrittenTranslation(python_utils.OBJECT):
-    """Value object representing a written translation for a content."""
+    """Value object representing a written translation for a content.
+
+    Here, "content" could mean a string or a list of strings. The latter arises,
+    for example, in the case where we are checking for equality of a learner's
+    answer against a given set of strings. In such cases, the number of strings
+    in the translation of the original object may not be the same as the number
+    of strings in the original object.
+    """
 
     DATA_FORMAT_HTML = 'html'
     DATA_FORMAT_UNICODE_STRING = 'unicode'

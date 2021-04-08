@@ -140,15 +140,6 @@ export class State {
       allContentIds.delete('default_outcome');
     }
 
-    // TODO(#11581): Add rule translation support for TextInput and SetInput
-    // interactions. Delete below when completed.
-    allContentIds.forEach(contentId => {
-      if (contentId.indexOf(AppConstants.COMPONENT_NAME_RULE_INPUT) === 0) {
-        // eslint-disable-next-line dot-notation
-        allContentIds.delete(contentId);
-      }
-    });
-
     return allContentIds;
   }
 }
