@@ -23,26 +23,32 @@ from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 
 import feconf
+import utils
 
 
-class IncomingAppFeedbackReportHandler(base.BaseHandler):
-    """Handles incoming feedback reports from the app."""
+class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
+    """Handles incoming android feedback reports from the app."""
 
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests.
 
-        Verifies the incoming message based on the request header and stores
-        the feedback report.
+        Verifies that the incoming message is from Oppia Android based on the
+        request header and stores the feedback report.
         """
         if not self._validate_incoming_request(self.payload.headers):
-            raise 
-            pass
+            raise UnauthorizedRequestException(
+                'The incoming request does not have valid authentication for '
+                'Oppia Android.')
 
         report_dict = self.payload.get('report')
         if not report_dict:
-            raise self.InvalidInputException(
-                'A report must be sent.')
+            raise utils.InvalidInputException(
+                'A report must be sent in the request.')
+        
+        report_obj = (
+            app_feedback_report_service.create_android_report_from_json(
+                report_dict))
         
         # check schema version and migrate
         # create report stats domain object

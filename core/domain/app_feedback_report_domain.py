@@ -94,19 +94,20 @@ class AppFeedbackReport(python_utils.OBJECT):
     """Domain object for a single feedback report."""
 
     def __init__(
-            self, report_id, platform, submitted_on_timestamp, ticket_id,
-            scrubbed_by, user_supplied_feedback, device_system_context,
-            app_context):
+            self, schema_version, report_id, platform, submitted_on_timestamp,
+            ticket_id, scrubbed_by, user_supplied_feedback,
+            device_system_context, app_context):
         """Constructs a AppFeedbackReport domain object.
 
         Args:
+            schema_version: int. The schema version of this feedback report.
             report_id: str. The unique ID of the report.
             platform: str. The platform this report is for.
             submitted_on_timestamp: datetime.datetime: Timestamp in seconds
                 since epoch (in UTC) of when the report was submitted by the
                 user.
-            ticket_id: str. The unique ID that this ticket is assigned to; None
-                if not ticketed.
+            ticket_id: str|None. The unique ID that this ticket is assigned to;
+                None if this report is not yet ticketed.
             scrubbed_by: str. The unique ID of the user that scrubbed this
                 report, or feconf.REPORT_SCRUBBER_BOT_ID if scrubbed by the
                 cron job.
@@ -118,6 +119,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             app_context: AppContext. An object representing the user's Oppia
                 app state when they submitted the report.
         """
+        self.schema_version = schema_version
         self.report_id = report_id
         self.platform = platform
         self.submitted_on_timestamp = submitted_on_timestamp
@@ -134,6 +136,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             dict. A dict, mapping all fields of AppFeedbackReport instance.
         """
         return {
+            'schema_version': self.schema_version,
             'report_id': self.report_id,
             'platform': self.platform,
             'submitted_on_timestamp': utils.get_human_readable_time_string(
@@ -154,6 +157,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             NotImplementedError. The full validation for web report domain
                 objects is not implemented yet.
         """
+        self.require_valid_schema_version(self.platform, self.schema_version)
         self.require_valid_platform(self.platform)
 
         if self.scrubbed_by is not None:
@@ -180,6 +184,35 @@ class AppFeedbackReport(python_utils.OBJECT):
         self.device_system_context.validate()
 
         self.app_context.validate()
+
+    @classmethod
+    def require_valid_schema_version(cls, platform, schema_version):
+        """Checks whether the report schema version is valid for the given
+        platform.
+
+        Args:
+            platformm: str. The platform to validate the schema version for.
+            schema_version: int. The schema version to validate.
+
+        Raises:
+            ValidationError. No schema version supplied.
+            ValidationError. The schema version is not supported.
+        """
+        minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
+        current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
+        if platform == app_feedback_report_models.PLATFORM_WEB:
+            minimum_schema = feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION
+            current_schema = feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION
+        if not isinstance(schema_version, int) or schema_version <= 0:
+            raise utils.ValidationError(
+                'The report schema version %r is invalid, expected an integer '
+                'in [%d, %d].' % minimum_schema, current_schema)
+        if not minimum_schema <= schema_version <= current_schema:
+            raise utils.ValidationError(
+                'The supported report schema versions for %s reports are '
+                '[%d, %d], received: %d.' % (
+                    platform, minimum_schema, current_schema, schema_version))
+
 
     @classmethod
     def require_valid_platform(cls, platform):
@@ -736,7 +769,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
 class LessonPlayerEntryPoint(EntryPoint):
     """Domain object for the lesson player entry point."""
 
-    def __init__(self):
+    def __init__(self, topic_id, story_id, exploration_id):
         """Constructs an LessonPlayerEntryPoint domain object.
 
         Args:
@@ -824,7 +857,7 @@ class LessonPlayerEntryPoint(EntryPoint):
 class RevisionCardEntryPoint(EntryPoint):
     """Domain object for the Android revision card entry point."""
 
-    def __init__(self):
+    def __init__(self, topic_id, subtopic_id):
         """Constructs an RevisionCardEntryPoint domain object.
         
         Args:
@@ -1260,7 +1293,6 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                 'The Github repo %s is invalid, must be one of %s.' % (
                     self.github_issue_repo_name,
                     app_feedback_report_models.GITHUB_REPO_CHOICE))
-        if self.github_issue_number is not
 
 
 class AppFeedbackReportDailyStats(python_utils.OBJECT):

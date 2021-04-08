@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core.domain import app_feedback_report_domain
 from core.model import app_feedback_report_models
 from core.platform import models
@@ -30,6 +32,97 @@ import utils
     [models.NAMES.app_feedback_report])
 transaction_services = models.Registry.import_transaction_services()
 
+PLATFORM_ANDROID = (
+    app_feedback_report_models.AppFeedbackReportModel.PLATFORM_CHOICE_ANDROID)
+
+
+def create_android_report_from_json(report_json):
+    """Creates an AppFeedbackReport domain object instance from the incoming
+    JSON request.
+
+    Args:
+        report_json: dict. The JSON for the app feedback report.
+    Return:
+        AppFeedbackReport. The domain object for an Android feedback report.
+    """
+    user_supplied_feedback_json = report_json['user_supplied_feedback']
+    user_supplied_feedback_obj = (
+        app_feedback_report_domain.UserSuppliedFeedback(
+            user_supplied_feedback_json['report_type'],
+            user_supplied_feedback_json['category'],
+            user_supplied_feedback_json['user_feedback_selected_items']
+            user_supplied_feedback_json['user_feedback_other_text_input']))
+
+    system_context_json = report_json['system_context']
+    device_context_json = report_json['device_context']
+    device_system_context_obj = (
+        app_feedback_report_domain.AndroidDeviceSystemContext(
+            system_context_json['platform_version'], 
+            system_context_json['package_version_code'],
+            system_context_json['android_device_country_locale_code'],
+            system_context_json['android_device_language_locale_code'],
+            device_context_json['android_device_model'],
+            device_context_json['android_sdk_version'],
+            device_context_json['build_fingerprint'],
+            device_context_json['network_type']))
+
+    app_context_json = report_json['app_context']
+    entry_point_obj = _get_entry_point_from_json(
+        app_context_json['entry_point'])
+    app_context_obj = app_feedback_report_domain.AndroidAppContext(
+        entry_point_obj, app_context_json['text_language_code'],
+        app_context_json['audio_language_code'], app_context_json['text_size'],
+        app_context_json['only_allows_wifi_download_and_update'],
+        app_context_json['automatically_update_topics'],
+        app_context_json['account_is_profile_admin'],
+        app_context_json['event_logs'], app_context_json['logcat_logs'])
+
+    report_datetime = datetime.datetime(
+        second=report_json['report_submission_timestamp_sec'],
+        tzinfo=datetime.timezone(
+            offset=report_json['report_submission_utc_offset']))
+    report_id = app_feedback_report_models.AppFeedbackReportModel.generate_id(
+        PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'])
+    return app_feedback_report_domain.AppFeedbackReport(
+        report_id, report_json['android_report_info_schema_version'],
+        PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'],
+        None, None, user_supplied_feedback_obj, device_system_context_obj,
+        app_context_obj)
+
+
+def _get_entry_point_from_json(entry_point_json):
+    """Saves an incoming report and updates the aggregate report stats with the
+    new report's data.
+
+    Args:
+        entry_point_json: dict. The JSON data of the entry point.
+    Returns:
+        EntryPoint. The EntryPoint domain object representing the entry point.
+    Raises:
+        InvalidInputException. The given entry point is invalid.
+    """
+    entry_point_name = entry_point_json['entry_point_name']
+    if entry_point_name == (
+        app_feedback_report_domain.ENTRY_POINT.navigation_drawer):
+        return app_feedback_report_domain.NavigationDrawerEntryPoint()
+    elif entry_point_name == (
+        app_feedback_report_domain.ENTRY_POINT.lesson_player):
+        return app_feedback_report_domain.LessonPlayerEntryPoint(
+            entry_point_json['entry_point_topic_id'],
+            entry_point_json['entry_point_story_id'],
+            entry_point_json['entry_point_exploration_id'])
+    elif entry_point_name == (
+        app_feedback_report_domain.ENTRY_POINT.revision_card):
+        return app_feedback_report_domain.RevisionCardEntryPoint(
+            entry_point_json['entry_point_topic_id'],
+            entry_point_json['entry_point_subtopic_id'])
+    elif entry_point_name == (
+        app_feedback_report_domain.ENTRY_POINT.crash):
+        return app_feedback_report_domain.CrashEntryPoint()
+    else:
+        raise utils.InvalidInputException(
+            'The given entry point %d is invalid.' % entry_point_name)
+
 
 def save_incoming_report(report, report_stats):
     """Saves an incoming report and updates the aggregate report stats with the
@@ -40,11 +133,11 @@ def save_incoming_report(report, report_stats):
         report_stats: AppFeedbackReportStats. AppFeedbackReportStats domain
             object.
     """
-    _save_report_instance(report)
-    _save_report_stats_instance(report_stats)
+    _save_new_feedback_report_instance(report)
+    _save_new_report_stats_instance(report_stats)
 
 
-def _save_report_instance(report):
+def _save_new_feedback_report_instance(report):
     """Creates and stores a new AppFeedbackReportModel instance.
 
     Args:
@@ -61,7 +154,7 @@ def _save_report_instance(report):
         user_supplied_feedback.category,)
 
 
-def _save_report_stats_instance(report_stats):
+def _save_new_report_stats_instance(report_stats):
     """Creates and stores a new AppFeedbackReportModel instance.
 
     Args:

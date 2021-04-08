@@ -127,7 +127,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH,
             self.AUDIO_LANGUAGE_CODE_ENGLISH, self.ANDROID_REPORT_INFO,
-            None))
+            None)
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
@@ -294,18 +294,15 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
             'many collisions.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
-                app_feedback_report_models.AppFeedbackReportTicketModel,
-                'get_by_id', types.MethodType(
-                    lambda x, y: True,
-                    app_feedback_report_models.AppFeedbackReportTicketModel)):
+            with self.swap(model_class, 'get_by_id', types.MethodType(
+                lambda x, y: True, model_class)):
                 ticket_id = model_class.generate_id(self.TICKET_NAME)
-                    model_class.create(
-                        entity_id=ticket_id, ticket_name=self.TICKET_NAME,
-                        platform=self.PLATFORM, github_issue_repo_name=None,
-                        github_issue_number=None,
-                        newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
-                        report_ids=self.REPORT_IDS)
+                model_class.create(
+                    entity_id=ticket_id, ticket_name=self.TICKET_NAME,
+                    platform=self.PLATFORM, github_issue_repo_name=None,
+                    github_issue_number=None,
+                    newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
+                    report_ids=self.REPORT_IDS)
 
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportTicketModel()
