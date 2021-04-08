@@ -41,7 +41,8 @@ import utils
 
 import apache_beam as beam
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models,) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
@@ -323,12 +324,8 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         models.
 
         Args:
-            item: datastore_services.Model. A domain object to
+            input_model: datastore_services.Model. A domain object to
                 validate.
-            get_model_domain_object: function. A function to fetch
-                domain object.
-            get_domain_object_validation_type: function. A function to fetch
-                the validation type of the domain object.
 
         Yields:
             ModelDomainObjectValidateError. Error for domain object validation.
@@ -339,10 +336,6 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                 input_model)
             if domain_object is None:
                 return
-            print("hello")
-            print("hello")
-            print("hello")
-            print(validation_type)
             if validation_type == VALIDATION_MODE_NEUTRAL:
                 domain_object.validate()
             elif validation_type == VALIDATION_MODE_STRICT:

@@ -28,11 +28,13 @@ import apache_beam as beam
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+
 class MockDomainObject(base_models.BaseModel):
 
     def validate(self, strict=True):
         """Mock validate function."""
         pass
+
 
 class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
 
@@ -155,27 +157,38 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         ])
 
 
-class MockValidateModelDomainObjectInstances(base_model_audits.ValidateModelDomainObjectInstances):
+class MockValidateModelDomainObjectInstancesWithNeutral(
+        base_model_audits.ValidateModelDomainObjectInstances):
     def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
         return MockDomainObject()
 
-
-class MockValidateModelDomainObjectInstancesWithNeutral(MockValidateModelDomainObjectInstances):    
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
         return 'neutral'
 
 
-class MockValidateModelDomainObjectInstancesWithStrict(MockValidateModelDomainObjectInstances):
+class MockValidateModelDomainObjectInstancesWithStrict(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+        return MockDomainObject()
+
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
         return 'strict'
 
 
-class MockValidateModelDomainObjectInstancesWithNonStrict(MockValidateModelDomainObjectInstances):
+class MockValidateModelDomainObjectInstancesWithNonStrict(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+        return MockDomainObject()
+
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
         return 'non-strict'
 
 
-class MockValidateModelDomainObjectInstancesWithInvalid(MockValidateModelDomainObjectInstances):
+class MockValidateModelDomainObjectInstancesWithInvalid(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+        return MockDomainObject()
+
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
         return 'invalid'
 
@@ -183,7 +196,7 @@ class MockValidateModelDomainObjectInstancesWithInvalid(MockValidateModelDomainO
 class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
 
     def test_validation_type_for_domain_object(
-        self):
+            self):
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -199,7 +212,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_validation_type_for_domain_object_with_neutral_type(
-        self):
+            self):
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -215,7 +228,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_validation_type_for_domain_object_with_strict_type(
-        self):
+            self):
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
@@ -231,23 +244,23 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_validation_type_for_domain_object_with_non_strict_type(
-        self):
-            model = base_models.BaseModel(
-                id='mock-123',
-                deleted=False,
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW)
+            self):
+        model = base_models.BaseModel(
+            id='mock-123',
+            deleted=False,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW)
 
-            output = (
-                self.pipeline
-                | beam.Create([model])
-                | beam.ParDo(
-                    MockValidateModelDomainObjectInstancesWithNonStrict()))
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(
+                MockValidateModelDomainObjectInstancesWithNonStrict()))
 
-            self.assert_pcoll_equal(output, [])
+        self.assert_pcoll_equal(output, [])
 
     def test_error_is_raised_with_invalid_validation_type_for_domain_object(
-        self):
+            self):
         model = base_models.BaseModel(
             id='mock-123',
             deleted=False,
