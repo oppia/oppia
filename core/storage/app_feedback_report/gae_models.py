@@ -41,6 +41,12 @@ REPORT_ID_DELIMITER = '.'
 TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 
+# IDs to use for stats model entities tracking all reports and all unticketed
+# reports.
+ALL_ANDROID_REPORTS_STATS_TICKET_ID = 'all_android_reports_stats_ticket_id'
+UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
+    'unticketed_android_reports_stats_ticket_id')
+
 
 class AppFeedbackReportModel(base_models.BaseModel):
     """Model for storing feedback reports sent from learners.
@@ -139,7 +145,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, platform, submitted_on, report_type, category,
+            cls, entity_id, platform, submitted_on, report_type, category,
             platform_version, android_device_country_locale_code,
             android_sdk_version, android_device_model, entry_point,
             entry_point_topic_id, entry_point_story_id,
@@ -149,6 +155,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
+            entity_id: str. The ID used for this entity.
             platform: str. The platform the report is submitted on.
             submitted_on: datetime.datetime. The date and time the report was
                 submitted, in the user's local time zone.
@@ -185,7 +192,6 @@ class AppFeedbackReportModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        entity_id = cls._generate_id(platform, submitted_on)
         android_schema_version = None
         web_schema_version = None
         if platform == PLATFORM_CHOICE_ANDROID:
@@ -217,7 +223,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def _generate_id(cls, platform, submitted_on_datetime):
+    def generate_id(cls, platform, submitted_on_datetime):
         """Generates key for the instance of AppFeedbackReportModel class in the
         required format with the arguments provided.
 
@@ -391,12 +397,13 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, ticket_name, platform, github_issue_repo_name,
+            cls, entity_id, ticket_name, platform, github_issue_repo_name,
             github_issue_number, newest_report_timestamp, report_ids):
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
         Args:
+            entity_id: str. The ID used for this entity.
             ticket_name: str. The name assigned to the ticket by the moderator.
             github_issue_repo_name: str. The name of the Github repo with the
                 associated Github issue for this ticket.
@@ -411,9 +418,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             AppFeedbackReportModel. The newly created AppFeedbackReportModel
             instance.
         """
-        ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
-            id=ticket_id, ticket_name=ticket_name, platform=platform,
+            id=entity_id, ticket_name=ticket_name, platform=platform,
             github_issue_repo_name=github_issue_repo_name,
             github_issue_number=github_issue_number, archived=False,
             newest_report_timestamp=newest_report_timestamp,
@@ -422,10 +428,10 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         # the id.
         ticket_entity.update_timestamps()
         ticket_entity.put()
-        return ticket_id
+        return entity_id
 
     @classmethod
-    def _generate_id(cls, ticket_name):
+    def generate_id(cls, ticket_name):
         """Generates key for the instance of AppFeedbackReportTicketModel
         class in the required format with the arguments provided.
 
@@ -530,12 +536,13 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, platform, ticket_id, stats_tracking_date,
+            cls, entity_id, platform, ticket_id, stats_tracking_date,
             total_reports_submitted, daily_param_stats):
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 
         Args:
+            entity_id: str. The ID used for this entity.
             ticket_id: str. The ID for the ticket these stats aggregate on.
             platform: str. The platform the stats are aggregating for.
             stats_tracking_date: datetime.date. The date in UTC that this entity
@@ -550,7 +557,6 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             AppFeedbackReportStatsModel. The newly created
             AppFeedbackReportStatsModel instance.
         """
-        entity_id = cls._generate_id(platform, ticket_id, stats_tracking_date)
         stats_entity = cls(
             id=entity_id, ticket_id=ticket_id, platform=platform,
             stats_tracking_date=stats_tracking_date,
@@ -563,7 +569,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def _generate_id(cls, platform, ticket_id, stats_tracking_date):
+    def generate_id(cls, platform, ticket_id, stats_tracking_date):
         """Generates key for the instance of AppFeedbackReportStatsModel
         class in the required format with the arguments provided.
 

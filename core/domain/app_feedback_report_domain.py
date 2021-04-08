@@ -94,7 +94,7 @@ class AppFeedbackReport(python_utils.OBJECT):
     """Domain object for a single feedback report."""
 
     def __init__(
-            self, report_id, platform, report_submitted_timestamp, ticket_id,
+            self, report_id, platform, submitted_on_timestamp, ticket_id,
             scrubbed_by, user_supplied_feedback, device_system_context,
             app_context):
         """Constructs a AppFeedbackReport domain object.
@@ -102,7 +102,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         Args:
             report_id: str. The unique ID of the report.
             platform: str. The platform this report is for.
-            report_submitted_timestamp: datetime.datetime: Timestamp in seconds
+            submitted_on_timestamp: datetime.datetime: Timestamp in seconds
                 since epoch (in UTC) of when the report was submitted by the
                 user.
             ticket_id: str. The unique ID that this ticket is assigned to; None
@@ -120,7 +120,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         """
         self.report_id = report_id
         self.platform = platform
-        self.report_submitted_timestamp = report_submitted_timestamp
+        self.submitted_on_timestamp = submitted_on_timestamp
         self.ticket_id = ticket_id
         self.scrubbed_by = scrubbed_by
         self.user_supplied_feedback = user_supplied_feedback
@@ -136,8 +136,8 @@ class AppFeedbackReport(python_utils.OBJECT):
         return {
             'report_id': self.report_id,
             'platform': self.platform,
-            'report_submitted_timestamp': (
-                self.report_submitted_timestamp.second),
+            'submitted_on_timestamp': utils.get_human_readable_time_string(
+                utils.get_time_in_millisecs(self.submitted_on_timestamp)),
             'ticket_id': self.ticket_id,
             'scrubbed_by': self.scrubbed_by,
             'user_supplied_feedback': self.user_supplied_feedback.to_dict(),
@@ -162,7 +162,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         if self.ticket_id is not None:
             AppFeedbackReportTicket.validate_ticket_id(self.ticket_id)
 
-        self.require_valid_report_datetime(self.report_submitted_timestamp)
+        self.require_valid_report_datetime(self.submitted_on_timestamp)
 
         self.user_supplied_feedback.validate()
 

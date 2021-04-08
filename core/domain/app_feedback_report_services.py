@@ -50,10 +50,15 @@ def _save_report_instance(report):
     Args:
         report: AppFeedbackReport. AppFeedbackReport domain object.
     """
-    # report.validate()
-    # model_entity_id = app_feedback_report_models.AppFeedbackReportModel.create(
-
-    # )
+    report.validate()
+    user_supplied_feedback = report.user_supplied_feedback
+    model_entity_id = (
+        app_feedback_report_models.AppFeedbackReportModel.generate_id(
+            report.platform, 
+        )
+    app_feedback_report_models.AppFeedbackReportModel.create(
+        report.platform, report.submitted_on_timestamp,
+        user_supplied_feedback.category,)
 
 
 def _save_report_stats_instance(report_stats):
@@ -61,12 +66,11 @@ def _save_report_stats_instance(report_stats):
 
     Args:
         report: AppFeedbackReport. AppFeedbackReport domain object.
-    """
-    # report_stats.validate()
-    # stats_entity_id = (
-    #     app_feedback_report_models.AppFeedbackReportStatsModel.create(
-
-    # ))
+    # """
+    report_stats.validate()
+    stats_entity_id = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            report_stats.platform, report_stats.))
 
 
 def get_report_from_model(report_model):

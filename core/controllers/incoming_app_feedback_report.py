@@ -26,7 +26,7 @@ import feconf
 
 
 class IncomingAppFeedbackReportHandler(base.BaseHandler):
-    """Handles incoming feedback reports from the Android app."""
+    """Handles incoming feedback reports from the app."""
 
     @acl_decorators.open_access
     def post(self):
@@ -40,7 +40,10 @@ class IncomingAppFeedbackReportHandler(base.BaseHandler):
             pass
 
         report_dict = self.payload.get('report')
-        # Create report domain object
+        if not report_dict:
+            raise self.InvalidInputException(
+                'A report must be sent.')
+        
         # check schema version and migrate
         # create report stats domain object
         app_feedback_report_services.save_incoming_report(report, report_stats)

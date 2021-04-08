@@ -117,15 +117,17 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
     def test_create_and_get_android_report_model(self):
         report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.create(
-                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2,
-                self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-                self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-                self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-                self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
-                self.TEXT_LANGUAGE_CODE_ENGLISH,
-                self.AUDIO_LANGUAGE_CODE_ENGLISH, self.ANDROID_REPORT_INFO,
-                None))
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2))
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            report_id, self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2,
+            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
+            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.TEXT_LANGUAGE_CODE_ENGLISH,
+            self.AUDIO_LANGUAGE_CODE_ENGLISH, self.ANDROID_REPORT_INFO,
+            None))
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
@@ -139,14 +141,16 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
     def test_create_and_get_web_report_model(self):
         report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.create(
-                self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2,
-                self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-                self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-                self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-                self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
-                self.TEXT_LANGUAGE_CODE_ENGLISH,
-                self.AUDIO_LANGUAGE_CODE_ENGLISH, None, self.WEB_REPORT_INFO))
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2))
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            report_id, self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2,
+            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
+            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            None, self.WEB_REPORT_INFO)
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
@@ -159,6 +163,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(report_model.android_report_info, None)
 
     def test_create_raises_exception_by_mocking_collision(self):
+        model_class = app_feedback_report_models.AppFeedbackReportModel
         # Test Exception for AppFeedbackReportModel.
         with self.assertRaisesRegexp(
             Exception, 'The id generator for AppFeedbackReportModel is '
@@ -170,8 +175,11 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 'get_by_id', types.MethodType(
                     lambda x, y: True,
                     app_feedback_report_models.AppFeedbackReportModel)):
-                app_feedback_report_models.AppFeedbackReportModel.create(
-                    self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_1,
+                report_id = model_class.generate_id(
+                    self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2)
+                model_class.create(
+                    report_id, self.PLATFORM_ANDROID,
+                    self.REPORT_SUBMITTED_TIMESTAMP_1,
                     self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
                     self.PLATFORM_VERSION,
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
@@ -257,11 +265,14 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
     def test_create_and_get_ticket_model(self):
         ticket_id = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                ticket_name=self.TICKET_NAME, platform=self.PLATFORM,
-                github_issue_repo_name=None, github_issue_number=None,
-                newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
-                report_ids=self.REPORT_IDS))
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                self.TICKET_NAME))
+        app_feedback_report_models.AppFeedbackReportTicketModel.create(
+            entity_id=ticket_id, ticket_name=self.TICKET_NAME,
+            platform=self.PLATFORM, github_issue_repo_name=None,
+            github_issue_number=None,
+            newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
+            report_ids=self.REPORT_IDS)
 
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get(
@@ -275,6 +286,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         self.assertEqual(ticket_model.report_ids, self.REPORT_IDS)
 
     def test_create_raises_exception_by_mocking_collision(self):
+        model_class = app_feedback_report_models.AppFeedbackReportTicketModel
         # Test Exception for AppFeedbackReportTicketModel.
         with self.assertRaisesRegexp(
             Exception,
@@ -287,11 +299,13 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
                 'get_by_id', types.MethodType(
                     lambda x, y: True,
                     app_feedback_report_models.AppFeedbackReportTicketModel)):
-                app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                    ticket_name=self.TICKET_NAME, platform=self.PLATFORM,
-                    github_issue_repo_name=None, github_issue_number=None,
-                    newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
-                    report_ids=self.REPORT_IDS)
+                ticket_id = model_class.generate_id(self.TICKET_NAME)
+                    model_class.create(
+                        entity_id=ticket_id, ticket_name=self.TICKET_NAME,
+                        platform=self.PLATFORM, github_issue_repo_name=None,
+                        github_issue_number=None,
+                        newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
+                        report_ids=self.REPORT_IDS)
 
     def test_get_deletion_policy(self):
         model = app_feedback_report_models.AppFeedbackReportTicketModel()
@@ -324,12 +338,15 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
 
     def test_create_and_get_stats_model(self):
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.create(
-                platform='android',
-                ticket_id=self.TICKET_ID,
-                stats_tracking_date=self.STATS_DATE,
-                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
-                daily_param_stats=self.DAILY_STATS))
+            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+                'android', self.TICKET_ID, self.STATS_DATE))
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            entity_id=entity_id,
+            platform='android',
+            ticket_id=self.TICKET_ID,
+            stats_tracking_date=self.STATS_DATE,
+            total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+            daily_param_stats=self.DAILY_STATS)
 
         stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get(
@@ -345,6 +362,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         self.assertEqual(stats_model.daily_param_stats, self.DAILY_STATS)
 
     def test_create_raises_exception_by_mocking_collision(self):
+        model_class = app_feedback_report_models.AppFeedbackReportStatsModel
         # Test Exception for AppFeedbackReportStatsModel.
         with self.assertRaisesRegexp(
             Exception,
@@ -352,12 +370,11 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             'many collisions.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
-                app_feedback_report_models.AppFeedbackReportStatsModel,
-                'get_by_id', types.MethodType(
-                    lambda x, y: True,
-                    app_feedback_report_models.AppFeedbackReportStatsModel)):
-                app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            with self.swap(model_class, 'get_by_id', types.MethodType(
+                    lambda x, y: True, model_class)):
+                entity_id = model_class.generate_id(
+                        'android', self.TICKET_ID, self.STATS_DATE)
+                model_class.create(
                     platform='android',
                     ticket_id=self.TICKET_ID,
                     total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
@@ -366,12 +383,15 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
 
     def test_get_stats_for_ticket(self):
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.create(
-                platform='android',
-                ticket_id=self.TICKET_ID,
-                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
-                stats_tracking_date=self.STATS_DATE,
-                daily_param_stats=self.DAILY_STATS))
+            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+                'android', self.TICKET_ID, self.STATS_DATE))
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            entity_id=entity_id,
+            platform='android',
+            ticket_id=self.TICKET_ID,
+            total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+            stats_tracking_date=self.STATS_DATE,
+            daily_param_stats=self.DAILY_STATS)
         expected_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get(
                 entity_id))

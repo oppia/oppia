@@ -81,25 +81,28 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.create(
-                platform=self.PLATFORM_ANDROID,
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
-                android_device_country_locale_code=(
-                    self.COUNTRY_LOCALE_CODE_INDIA),
-                android_sdk_version=self.ANDROID_SDK_VERSION,
-                android_device_model=self.ANDROID_DEVICE_MODEL,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
-                entry_point_topic_id=None,
-                entry_point_story_id=None,
-                entry_point_exploration_id=None,
-                entry_point_subtopic_id=None,
-                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                android_report_info=self.ANDROID_REPORT_INFO,
-                web_report_info=None))
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            entity_id=self.report_id,
+            platform=self.PLATFORM_ANDROID,
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=(
+                self.COUNTRY_LOCALE_CODE_INDIA),
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point_topic_id=None,
+            entry_point_story_id=None,
+            entry_point_exploration_id=None,
+            entry_point_subtopic_id=None,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            web_report_info=None))
 
         self.expected_successful_validation_output = [
             u'[u\'fully-validated AppFeedbackReportModel\', 1]']
@@ -254,22 +257,25 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_web_schema_version_greater_than_current_schema_fails(
             self):
         web_report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.create(
-                platform=self.PLATFORM_WEB,
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
-                android_device_country_locale_code=None,
-                android_device_model=self.ANDROID_DEVICE_MODEL,
-                android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
-                entry_point_topic_id=None, entry_point_story_id=None,
-                entry_point_exploration_id=None, entry_point_subtopic_id=None,
-                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                android_report_info=None,
-                web_report_info={}))
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP))
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            entity_id=web_report_id,
+            platform=self.PLATFORM_WEB,
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=None,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point_topic_id=None, entry_point_story_id=None,
+            entry_point_exploration_id=None, entry_point_subtopic_id=None,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=None,
+            web_report_info={})
         web_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 web_report_id))
@@ -292,22 +298,25 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_web_schema_version_less_than_min_schema_fails(self):
         web_report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.create(
-                platform=self.PLATFORM_WEB,
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
-                android_device_country_locale_code=None,
-                android_device_model=self.ANDROID_DEVICE_MODEL,
-                android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
-                entry_point_topic_id=None, entry_point_story_id=None,
-                entry_point_exploration_id=None, entry_point_subtopic_id=None,
-                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                android_report_info=None,
-                web_report_info={}))
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP))
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            entity_id=web_report_id,
+            platform=self.PLATFORM_WEB,
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=None,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point_topic_id=None, entry_point_story_id=None,
+            entry_point_exploration_id=None, entry_point_subtopic_id=None,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=None,
+            web_report_info={})
         web_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 web_report_id))
@@ -419,7 +428,11 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         invalid_datetime = datetime.datetime.utcnow() - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
             invalid_datetime_buffer)
-        model_id = app_feedback_report_models.AppFeedbackReportModel.create(
+        model_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            entity_id=model_id,
             platform=self.PLATFORM_ANDROID,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             report_type=self.REPORT_TYPE_SUGGESTION,
@@ -518,11 +531,14 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
 
         self.ticket_id = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                ticket_name=self.TICKET_NAME, platform=self.PLATFORM_ANDROID,
-                github_issue_repo_name=None, github_issue_number=None,
-                newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
-                report_ids=self.REPORT_IDS_LIST))
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                self.TICKET_NAME))
+        app_feedback_report_models.AppFeedbackReportTicketModel.create(
+            entity_id=self.ticket_id,
+            ticket_name=self.TICKET_NAME, platform=self.PLATFORM_ANDROID,
+            github_issue_repo_name=None, github_issue_number=None,
+            newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_ids=self.REPORT_IDS_LIST)
         app_feedback_report_models.AppFeedbackReportModel(
             id=self.REPORT_ID,
             platform=self.PLATFORM_ANDROID,
@@ -685,13 +701,15 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
 
         self.entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.create(
-                platform=self.PLATFORM_ANDROID,
-                ticket_id=self.TICKET_ID,
-                stats_tracking_date=self.STATS_DATE,
-                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
-                daily_param_stats=self.DAILY_STATS
-            ))
+            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+                self.PLATFORM_ANDROID, self.TICKET_ID, self.STATS_DATE))
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            entity_id=self.entity_id,
+            platform=self.PLATFORM_ANDROID,
+            ticket_id=self.TICKET_ID,
+            stats_tracking_date=self.STATS_DATE,
+            total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+            daily_param_stats=self.DAILY_STATS)
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id=self.TICKET_ID, ticket_name='example ticket',
             platform=self.PLATFORM_ANDROID,
@@ -781,12 +799,15 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME -
             datetime.timedelta(days=1))
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.create(
-                platform=self.PLATFORM_ANDROID,
-                ticket_id=self.TICKET_ID,
-                stats_tracking_date=invalid_datetime.date(),
-                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
-                daily_param_stats=self.DAILY_STATS))
+            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+                self.PLATFORM_ANDROID, self.TICKET_ID, invalid_datetime.date()))
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            entity_id=entity_id,
+            platform=self.PLATFORM_ANDROID,
+            ticket_id=self.TICKET_ID,
+            stats_tracking_date=invalid_datetime.date(),
+            total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+            daily_param_stats=self.DAILY_STATS)
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
@@ -804,12 +825,15 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_validation_with_invalid_external_references_ids_fails(self):
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.create(
-                platform=self.PLATFORM_ANDROID,
-                ticket_id='invalid_ticket_id',
-                stats_tracking_date=self.STATS_DATE,
-                total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
-                daily_param_stats=self.DAILY_STATS))
+            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+                self.PLATFORM_ANDROID, 'invalid_ticket_id', self.STATS_DATE))
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            entity_id=entity_id,
+            platform=self.PLATFORM_ANDROID,
+            ticket_id='invalid_ticket_id',
+            stats_tracking_date=self.STATS_DATE,
+            total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+            daily_param_stats=self.DAILY_STATS)
         model_entity = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
