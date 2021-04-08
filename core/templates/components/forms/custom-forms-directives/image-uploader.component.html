@@ -1,0 +1,121 @@
+<div class="image-uploader-drop-area" [ngClass]="{'image-uploader-is-active': backgroundWhileUploading}" #dropArea>
+  <div class="image-uploader-text">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
+  <span *ngIf="errorMessage"
+        class="image-uploader-error-message protractor-test-upload-error">
+    <i class="material-icons">&#xE002;</i>
+    {{ errorMessage }}
+  </span>
+  <span class="image-uploader-license-warning">
+    Before uploading images, please ensure that they are<br>
+    compatible with the <a href="/about#license" target="_blank" rel="noopener">license terms</a> of the site.<br>
+    Please do not upload watermarked images.
+  </span>
+  <label for="image-file-input" class="image-uploader-upload-label-button">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
+  <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
+  <input type="file" id="image-file-input" (click)="this.value = null"
+         (change)="handleFile()"
+         class="image-uploader-file-input protractor-test-photo-upload-input"
+         [ngClass]="fileInputClassName" #imageInput>
+</div>
+<style>
+  .image-uploader-license-warning {
+    background-color: rgba(225, 250, 89, 0.41);
+    border: 1px solid rgba(200, 230, 59, 0.41);
+    border-radius: 6px;
+    bottom: 8px;
+    font-size: 12px;
+    font-style: italic;
+    left: 8px;
+    padding: 4px 6px;
+    position: absolute;
+    text-align: left;
+  }
+
+  .image-uploader-drop-area {
+    background: #eee;
+    color: black;
+    font-size: 16px;
+    height: 200px;
+    padding-top: 74px;
+    position: relative;
+    text-align: center;
+    width: 100%;
+  }
+
+  .image-uploader-text {
+    display: block;
+    font-size: 16px;
+    line-height: 28px;
+    margin-bottom: 12px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .image-uploader-is-active {
+    background-color: #bbb;
+  }
+
+  .image-uploader-file-input {
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 0.1px;
+    z-index: -1;
+  }
+
+  label.image-uploader-upload-label-button {
+    background: grey;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #F2F2F2), color-stop(1, #BFBFBF));
+    background-image: -o-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: -moz-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: -webkit-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: -ms-linear-gradient(bottom, #F2F2F2 0%, #BFBFBF 100%);
+    background-image: linear-gradient(to bottom, #F2F2F2 0%, #BFBFBF 100%);
+    border: solid #707070 1px;
+    border-radius: 2px;
+    bottom: 6px;
+    cursor: default;
+    display: inline;
+    font-size: 16px;
+    font-weight: normal;
+    padding: 4px 8px;
+    position: absolute;
+    right: 8px;
+    text-align: center;
+  }
+
+  label.image-uploader-upload-label-button:hover {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #EAF6FD), color-stop(1, #A7D8F5));
+    background-image: -o-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
+    background-image: -moz-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
+    background-image: -webkit-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
+    background-image: -ms-linear-gradient(bottom, #EAF6FD 0%, #A7D8F5 100%);
+    background-image: linear-gradient(to bottom, #EAF6FD 0%, #A7D8F5 100%);
+    border: #3c7fb1 solid 1px;
+    cursor: pointer;
+  }
+
+  label.image-uploader-upload-label-button:active {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #E5F4FC), color-stop(0.5, #C4E5F6), color-stop(0.51, #98D0EF), color-stop(1, #68B3DB));
+    background-image: -o-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
+    background-image: -moz-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
+    background-image: -webkit-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
+    background-image: -ms-linear-gradient(bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
+    background-image: linear-gradient(to bottom, #E5F4FC 0%, #C4E5F6 50%, #98D0EF 51%, #68B3DB 100%);
+    border: solid #2c628b 1px;
+    padding: 4px 8px;
+  }
+
+  .image-uploader-error-message {
+    color: red;
+    display: inline-block;
+    font-size: 16;
+    padding: 4px;
+  }
+
+  .image-uploader-error-message i {
+    font-size: 16px;
+    margin-right: 4px;
+  }
+</style>
