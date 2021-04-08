@@ -36,9 +36,9 @@ class Registry(python_utils.OBJECT):
     """Registry of all platform parameters."""
 
     DEFAULT_VALUE_BY_TYPE_DICT = {
-        DATA_TYPES.bool: False,
-        DATA_TYPES.number: 0,
-        DATA_TYPES.string: '',
+        DATA_TYPES.bool.value: False,
+        DATA_TYPES.number.value: 0,
+        DATA_TYPES.string.value: '',
     }
 
     # The keys of parameter_registry are the property names, and the values
@@ -99,7 +99,7 @@ class Registry(python_utils.OBJECT):
             PlatformParameter. The created feature flag.
         """
         return cls.create_platform_parameter(
-            name, description, DATA_TYPES.bool,
+            name, description, DATA_TYPES.bool.value,
             is_feature=True, feature_stage=stage)
 
     @classmethod

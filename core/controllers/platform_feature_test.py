@@ -47,10 +47,12 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
         self.dev_feature = registry.Registry.create_platform_parameter(
             'parameter_a', 'parameter for test', 'bool',
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.dev)
+            is_feature=True,
+            feature_stage=param_domain.FEATURE_STAGES.dev.value)
         self.prod_feature = registry.Registry.create_platform_parameter(
             'parameter_b', 'parameter for test', 'bool',
-            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
+            is_feature=True,
+            feature_stage=param_domain.FEATURE_STAGES.prod.value)
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
@@ -58,7 +60,9 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [['=', param_domain.SERVER_MODES.dev]]
+                            'conditions': [
+                                ['=', param_domain.SERVER_MODES.dev.value]
+                            ]
                         }
                     ],
                     'value_when_matched': True
@@ -141,7 +145,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
     def tearDown(self):
         feature_services.update_feature_flag_rules(
-            param_list.PARAM_NAMES.dummy_feature, self.user_id,
+            param_list.PARAM_NAMES.dummy_feature.value, self.user_id,
             'clear rule', []
         )
 
@@ -150,7 +154,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def _set_dummy_feature_status_for_mode(self, is_enabled, mode):
         """Enables the dummy_feature for the dev environment."""
         feature_services.update_feature_flag_rules(
-            param_list.PARAM_NAMES.dummy_feature, self.user_id,
+            param_list.PARAM_NAMES.dummy_feature.value, self.user_id,
             'update rule for testing purpose',
             [{
                 'value_when_matched': is_enabled,
@@ -167,20 +171,20 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
         """
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
-            [param_list.PARAM_NAMES.dummy_feature])
+            [param_list.PARAM_NAMES.dummy_feature.value])
 
         feature = registry.Registry.parameter_registry.get(
-            param_list.PARAM_NAMES.dummy_feature)
+            param_list.PARAM_NAMES.dummy_feature.value)
         return self.swap(feature, '_feature_stage', stage)
 
     def test_get_with_dummy_feature_enabled_in_dev_returns_ok(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
         dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.dev)
+            param_domain.FEATURE_STAGES.dev.value)
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.SERVER_MODES.dev
+                True, param_domain.SERVER_MODES.dev.value
             )
 
             result = self.get_json(
@@ -191,11 +195,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_disabled_in_dev_raises_404(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', True)
         dummy_feature_dev_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.dev)
+            param_domain.FEATURE_STAGES.dev.value)
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.SERVER_MODES.dev
+                False, param_domain.SERVER_MODES.dev.value
             )
             self.get_json(
                 '/platform_feature_dummy_handler',
@@ -205,11 +209,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_enabled_in_prod_returns_ok(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.prod)
+            param_domain.FEATURE_STAGES.prod.value)
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.SERVER_MODES.prod
+                True, param_domain.SERVER_MODES.prod.value
             )
 
             result = self.get_json(
@@ -220,11 +224,11 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
     def test_get_with_dummy_feature_disabled_in_prod_raises_404(self):
         dev_mode_ctx = self.swap(constants, 'DEV_MODE', False)
         dummy_feature_prod_stage_context = self._mock_dummy_feature_stage(
-            param_domain.FEATURE_STAGES.prod)
+            param_domain.FEATURE_STAGES.prod.value)
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.SERVER_MODES.prod
+                False, param_domain.SERVER_MODES.prod.value
             )
             self.get_json(
                 '/platform_feature_dummy_handler',

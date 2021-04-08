@@ -513,3 +513,26 @@ def get_args_of_function(func):
     except AttributeError:
         # Python 2.
         return inspect.getargspec(func).args
+
+def create_enum(*sequential):
+    """Creates a enumerated constant.
+
+    Args:
+        *sequential: *. Sequence List to generate the enumerations.
+
+    Returns:
+        dict. Dictionary containing the enumerated constants.
+    """
+    enums = dict(ZIP(sequential, sequential))
+    try:
+        from enum import Enum # pylint: disable=import-only-modules
+        return Enum('Enum', enums)
+    except ImportError:
+        _enums = {}
+        for name, value in enums.items():
+            _value = {
+                'name': name,
+                'value': value
+            }
+            _enums[name] = type(b'Enum', (), _value)
+        return type(b'Enum', (), _enums)

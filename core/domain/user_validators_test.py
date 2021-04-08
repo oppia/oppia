@@ -3061,7 +3061,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_incorrect_keys_in_activity_mappings(self):
         self.model_instance.pseudonymizable_entity_mappings = {
-            models.NAMES.audit: {'some_id': 'id'}
+            models.NAMES.audit.value: {'some_id': 'id'}
         }
         self.model_instance.update_timestamps()
         self.model_instance.put()

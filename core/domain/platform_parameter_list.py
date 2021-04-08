@@ -21,25 +21,25 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-import utils
+import python_utils
 
 Registry = registry.Registry
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
 DATA_TYPES = platform_parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 
-PARAM_NAMES = utils.create_enum( # pylint: disable=invalid-name
+PARAM_NAMES = python_utils.create_enum( # pylint: disable=invalid-name
     'dummy_feature', 'dummy_parameter')
 
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
-    PARAM_NAMES.dummy_feature,
+    PARAM_NAMES.dummy_feature.value,
     'This is a dummy feature flag.',
-    FEATURE_STAGES.dev,
+    FEATURE_STAGES.dev.value,
 )
 
 Registry.create_platform_parameter(
-    PARAM_NAMES.dummy_parameter,
+    PARAM_NAMES.dummy_parameter.value,
     'This is a dummy platform parameter.',
-    DATA_TYPES.string
+    DATA_TYPES.string.value
 )

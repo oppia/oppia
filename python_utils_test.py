@@ -256,6 +256,15 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             python_utils.get_args_of_function(func), ['a', 'b'])
 
+    def test_create_enum_method(self):
+        """Test create_enum method."""
+        enums = python_utils.create_enum('first', 'second', 'third')
+        self.assertEqual(enums.first.value, 'first')
+        self.assertEqual(enums.second.value, 'second')
+        self.assertEqual(enums.third.value, 'third')
+        with self.assertRaisesRegexp(AttributeError, 'fourth'):
+            getattr(enums, 'fourth')
+
 
 @unittest.skipUnless(
     sys.version[0] == '2', 'Test cases for ensuring Python 2 behavior only')
