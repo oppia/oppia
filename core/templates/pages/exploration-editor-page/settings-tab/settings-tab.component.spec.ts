@@ -665,20 +665,6 @@ describe('Settings Tab Component', () => {
     });
 
     describe('on calling onRolesFormUsernameBlur', function() {
-      it('should disable save button when newMemberUsername is empty', () => {
-        ctrl.rolesSaveButtonEnabled = true;
-        explorationTitleService.init('New title');
-        ctrl.saveExplorationTitle();
-        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-          .and.returnValue(false);
-
-        ctrl.newMemberUsername = '';
-
-        ctrl.onRolesFormUsernameBlur();
-
-        expect(ctrl.rolesSaveButtonEnabled).toBe(false);
-      });
-
       it('should disable save button when exploration title is empty', () => {
         ctrl.newMemberUsername = 'newUser';
         ctrl.rolesSaveButtonEnabled = true;
@@ -687,8 +673,6 @@ describe('Settings Tab Component', () => {
 
         explorationTitleService.init('');
         ctrl.saveExplorationTitle();
-
-        ctrl.onRolesFormUsernameBlur();
 
         expect(ctrl.rolesSaveButtonEnabled).toBe(false);
         expect(ctrl.errorMessage).toBe(

@@ -206,6 +206,10 @@ angular.module('oppia').component('settingsTab', {
           ctrl.errorMessage = (
             'Please provide a title before inviting.');
           return;
+        } else {
+          ctrl.rolesSaveButtonEnabled = true;
+          ctrl.errorMessage = ('');
+          return;
         }
       };
 
@@ -450,18 +454,6 @@ angular.module('oppia').component('settingsTab', {
       ctrl.onRolesFormUsernameBlur = function() {
         ctrl.rolesSaveButtonEnabled = true;
         ctrl.errorMessage = '';
-
-        if (!ctrl.newMemberUsername) {
-          ctrl.rolesSaveButtonEnabled = false;
-          ctrl.errorMessage = '';
-          return;
-        }
-        if (!ctrl.isTitlePresent()) {
-          ctrl.rolesSaveButtonEnabled = false;
-          ctrl.errorMessage = (
-            'Please provide a title before inviting.');
-          return;
-        }
 
         if (ctrl.newMemberUsername === ctrl.loggedInUser) {
           ctrl.rolesSaveButtonEnabled = false;
