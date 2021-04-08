@@ -10,7 +10,8 @@ on:
       - release-*
 
 jobs:
-  lint:
+  run_tests:
+    name: Run Tests for Custom ESLint Checks
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:

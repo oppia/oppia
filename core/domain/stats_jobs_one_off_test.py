@@ -1641,7 +1641,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                 base_models.BaseCommitLogEntryModel):
 
             @classmethod
-            def _get_instance_id(cls, exp_id, exp_version):
+            def get_instance_id(cls, exp_id, exp_version):
                 return 'exploration-%s-%s' % (exp_id, exp_version)
 
             def put(self):
@@ -1907,14 +1907,14 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         ])
 
     def test_no_error_when_exploration_can_not_update_schema(self):
-        old_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 24)
+        old_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
 
         with old_schema:
             self.save_new_default_exploration('ID', 'owner_id')
 
-        new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 25)
+        new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
         schema_update_failure = self.swap(
-            exp_domain.Exploration, '_convert_states_v24_dict_to_v25_dict',
+            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
             classmethod(lambda *_: python_utils.divide(1, 0)))
 
         with new_schema, schema_update_failure:

@@ -95,21 +95,6 @@ class SeedFirebaseHandler(webapp2.RequestHandler):
             self.redirect('/')
 
 
-class LogoutPage(webapp2.RequestHandler):
-    """Class which handles the logout URL."""
-
-    def get(self):
-        """Logs the user out, and returns them to a specified follow-up
-        page (or the home page if no follow-up page is specified).
-        """
-
-        auth_services.destroy_auth_session(self.response)
-        url_to_redirect_to = (
-            python_utils.convert_to_bytes(
-                self.request.get('redirect_url', '/')))
-        self.redirect(url_to_redirect_to)
-
-
 class UserFacingExceptions(python_utils.OBJECT):
     """This class contains all the exception class definitions used."""
 
@@ -237,7 +222,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.values['is_moderator'] = (
             user_services.is_at_least_moderator(self.user_id))
@@ -312,12 +297,13 @@ class BaseHandler(webapp2.RequestHandler):
         super(BaseHandler, self).dispatch()
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """Base method to handle GET requests.
-
-        Raises:
-            PageNotFoundException. Page not found error (error code 404).
-        """
-        raise self.PageNotFoundException
+        """Base method to handle GET requests."""
+        logging.warning('Invalid URL requested: %s', self.request.uri)
+        self.error(404)
+        self._render_exception(
+            404, {
+                'error': 'Could not find the page %s.' % self.request.uri})
+        return
 
     def post(self, *args):  # pylint: disable=unused-argument
         """Base method to handle POST requests.

@@ -33,6 +33,8 @@ var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
 
+var emailInput = '.protractor-test-sign-in-email-input';
+var signInButton = '.protractor-test-sign-in-button';
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
 var registerUser = '.protractor-test-register-user:not([disabled])';
@@ -80,17 +82,13 @@ var roleSelect = '.protractor-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {
-  page.on('dialog', async dialog => {
-    if (dialog.message() === 'Please enter the email address to sign-in with') {
-      await dialog.accept('testadmin@example.com');
-    } else {
-      await dialog.dismiss();
-    }
-  });
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
       ADMIN_URL, { waitUntil: networkIdle});
+    await page.waitForSelector(emailInput, {visible: true});
+    await page.type(emailInput, 'testadmin@example.com');
+    await page.click(signInButton);
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, {visible: true});

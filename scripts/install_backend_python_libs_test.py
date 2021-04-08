@@ -82,11 +82,11 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     THIRD_PARTY_DATA_DIRECTORY_FILE_PATH = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'data', 'third_party')
 
-    TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
+    REQUIREMENTS_TEST_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'requirements_test.txt')
-    TEST_REQUIREMENTS_INVALID_GIT_TXT_FILE_PATH = os.path.join(
+    INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH,
-        'requirements_invalid_git_test.txt')
+        'invalid_git_requirements_test.txt')
 
     def setUp(self):
         super(InstallBackendPythonLibsTests, self).setUp()
@@ -156,7 +156,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_Popen_error = self.swap(
             subprocess, 'Popen', mock_check_call_error)
 
-    def get_git_requirement_string(self, name, sha1_piece):
+    def get_git_version_string(self, name, sha1_piece):
         """Utility function for constructing a GitHub URL for testing.
 
         Args:
@@ -170,10 +170,28 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
 
+    def test_wrong_pip_version_raises_import_error(self):
+        import pip
+
+        with self.swap_Popen, self.swap(pip, '__version__', '20.2.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [
+            ['pip', 'install', 'pip==20.3.4'],
+        ])
+
+    def test_correct_pip_version_does_nothing(self):
+        import pip
+
+        with self.swap_check_call, self.swap(pip, '__version__', '20.3.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [])
+
     def test_invalid_git_dependency_raises_an_exception(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
-            self.TEST_REQUIREMENTS_INVALID_GIT_TXT_FILE_PATH)
+            self.INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         with swap_requirements:
             self.assertRaisesRegexp(
@@ -183,7 +201,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_multiple_discrepancies_returns_correct_mismatches(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
-            self.TEST_REQUIREMENTS_TXT_FILE_PATH)
+            self.REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         def mock_find_distributions(paths): # pylint: disable=unused-argument
             return [
@@ -212,12 +230,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'dependency3': (u'3.1.5', None),
                 u'dependency4': (u'0.3.0.1', None),
                 u'dependency5': (
-                    self.get_git_requirement_string('dependency5', 'a'),
-                    self.get_git_requirement_string('dependency5', 'b')),
+                    self.get_git_version_string('dependency5', 'a'),
+                    self.get_git_version_string('dependency5', 'b')),
                 u'dependency6': (
-                    None, self.get_git_requirement_string('dependency6', 'z')),
+                    None, self.get_git_version_string('dependency6', 'z')),
                 u'dependency7': (
-                    self.get_git_requirement_string('dependency7', 'b'), None),
+                    self.get_git_version_string('dependency7', 'b'), None),
             })
 
     def test_library_removal_runs_correct_commands(self):
@@ -274,10 +292,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'flask': (u'1.1.0.1', u'1.1.1.0'),
                 u'six': (u'1.15.0', None),
                 u'git-dep1': (
-                    self.get_git_requirement_string('git-dep1', 'a'),
-                    self.get_git_requirement_string('git-dep1', 'b')),
+                    self.get_git_version_string('git-dep1', 'a'),
+                    self.get_git_version_string('git-dep1', 'b')),
                 u'git-dep2': (
-                    self.get_git_requirement_string('git-dep2', 'a'), None),
+                    self.get_git_version_string('git-dep2', 'a'), None),
             }
 
         def mock_validate_metadata_directories():
@@ -300,14 +318,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 [
                     'pip', 'install',
                     '%s#egg=git-dep1' % (
-                        self.get_git_requirement_string('git-dep1', 'a')),
+                        self.get_git_version_string('git-dep1', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install',
                     '%s#egg=git-dep2' % (
-                        self.get_git_requirement_string('git-dep2', 'a')),
+                        self.get_git_version_string('git-dep2', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
@@ -466,13 +484,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 install_backend_python_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
-        self.assertEqual(
-            print_statements,
-            [
-                'Regenerating "requirements.txt" file...',
-                'All third-party Python libraries are already installed '
-                'correctly.'
-            ])
+        self.assertEqual(print_statements, [
+            'Checking if pip is installed on the local machine',
+            'Regenerating "requirements.txt" file...',
+            'All third-party Python libraries are already installed '
+            'correctly.'
+        ])
 
     def test_library_version_change_is_handled_correctly(self):
         directory_names = [

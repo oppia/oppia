@@ -126,6 +126,10 @@ class ActivityRights(python_utils.OBJECT):
                 'A user cannot be both a voice artist and a viewer: %s' %
                 voice_artist_viewer)
 
+        if not self.community_owned and len(self.owner_ids) == 0:
+            raise utils.ValidationError(
+                'Activity should have atleast one owner.')
+
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
 
@@ -230,6 +234,49 @@ class ActivityRights(python_utils.OBJECT):
             bool. Whether the activity is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
+
+    def assign_new_role(self, user_id, new_role):
+        """Assigns new role to user and removes previous role if present.
+
+        Args:
+            user_id: str. The ID of the user.
+            new_role: str. The role of the user.
+
+        Returns:
+            str. The previous role of the user.
+        """
+        old_role = ROLE_NONE
+        if new_role == ROLE_VIEWER:
+            if self.status != ACTIVITY_STATUS_PRIVATE:
+                raise Exception(
+                    'Public explorations can be viewed by anyone.')
+
+        for role, user_ids in python_utils.ZIP(
+                [ROLE_OWNER, ROLE_EDITOR, ROLE_VIEWER, ROLE_VOICE_ARTIST],
+                [self.owner_ids, self.editor_ids, self.viewer_ids,
+                 self.voice_artist_ids]):
+            if user_id in user_ids:
+                user_ids.remove(user_id)
+                old_role = role
+
+            if new_role == role and old_role != new_role:
+                user_ids.append(user_id)
+
+        if old_role == new_role:
+            if old_role == ROLE_OWNER:
+                raise Exception(
+                    'This user already owns this exploration.')
+            elif old_role == ROLE_EDITOR:
+                raise Exception(
+                    'This user already can edit this exploration.')
+            elif old_role == ROLE_VOICE_ARTIST:
+                raise Exception(
+                    'This user already can voiceover this exploration.')
+            elif old_role == ROLE_VIEWER:
+                raise Exception(
+                    'This user already can view this exploration.')
+
+        return old_role
 
 
 class ExplorationRightsChange(change_domain.BaseChange):

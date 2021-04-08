@@ -26,6 +26,10 @@ var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
 var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
+  // The Firebase Admin SDK stores all emails in lower case. To ensure that the
+  // developer email used to sign in is consistent with these accounts, we
+  // manually change them to lower case.
+  email = email.toLowerCase();
   var user = await FirebaseAdmin.auth().createUser({
     email: email,
     emailVerified: true,
@@ -52,24 +56,25 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
 // When manual navigation is enabled, the function will explicitly redirect the
 // browser to the login page. If disabled, then the function will assume that
 // the browser is already on the login page.
-var login = async function(email, manualNavigation = true) {
-  if (manualNavigation) {
-    // Use of element and action is not reliable, because we do not always begin
-    // on an Angular page. To forgive callers from non-Angular pages (e.g., the
-    // very first function call of a test), we use browser.driver instead.
-    // The full url is necessary.
-    await browser.driver.get(
-      general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+var login = async function(email, useManualNavigation = true) {
+  if (useManualNavigation) {
+    await browser.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   }
 
-  await general.acceptPrompt(email);
+  var emailInput = element(by.css('.protractor-test-sign-in-email-input'));
+  await action.sendKeys('Email input', emailInput, email);
+
+  var signInButton = element(by.css('.protractor-test-sign-in-button'));
+  await action.click('Sign in button', signInButton);
 
   await waitFor.pageToFullyLoad();
 };
 
 var logout = async function() {
-  await browser.driver.get(
-    general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+  await browser.get(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+  // Wait for logout page to load.
+  await waitFor.pageToFullyLoad();
+  // Wait for redirection to occur.
   await waitFor.pageToFullyLoad();
 };
 
@@ -88,9 +93,9 @@ var _completeSignup = async function(username) {
 };
 
 var createAndLoginUser = async function(
-    email, username, manualNavigation = true) {
+    email, username, useManualNavigation = true) {
   await _createFirebaseAccount(email);
-  await login(email, manualNavigation);
+  await login(email, useManualNavigation);
   await _completeSignup(username);
 };
 

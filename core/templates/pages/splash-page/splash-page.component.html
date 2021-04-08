@@ -84,8 +84,8 @@
       </picture>
     </div>
     <div class="oppia-splash-section-four-left">
-      <h3 [innerHTML]="'I18N_SPLASH_FOR_STUDENTS' | translate"></h3>
-      <h2 [innerHTML]="'I18N_SPLASH_STUDENTS_TITLE' | translate"></h2>
+      <h2 [innerHTML]="'I18N_SPLASH_FOR_STUDENTS' | translate"></h2>
+      <h3 [innerHTML]="'I18N_SPLASH_STUDENTS_TITLE' | translate"></h3>
       <p [innerHTML]="'I18N_SPLASH_STUDENTS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
         <button type="submit"
@@ -113,8 +113,8 @@
     </div>
     <div class="oppia-splash-section-five-left">
       <div>
-        <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
-        <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
+        <p class="testimonial-quote-details" [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></p>
+        <p class="testimonial-student-details" [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></p>
       </div>
       <div class="splash-arrows-container">
         <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
@@ -143,8 +143,8 @@
       </picture>
     </div>
     <div class="oppia-splash-section-six-right">
-      <h3 [innerHTML]="'I18N_SPLASH_FOR_TEACHERS' | translate"></h3>
-      <h2 [innerHTML]="'I18N_SPLASH_TEACHERS_TITLE' | translate"></h2>
+      <h2 [innerHTML]="'I18N_SPLASH_FOR_TEACHERS' | translate"></h2>
+      <h3 [innerHTML]="'I18N_SPLASH_TEACHERS_TITLE' | translate"></h3>
       <p [innerHTML]="'I18N_SPLASH_TEACHERS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
         <button type="submit"
@@ -164,8 +164,8 @@
       </picture>
     </div>
     <div class="oppia-splash-section-seven-left">
-      <h3 [innerHTML]="'I18N_SPLASH_FOR_VOLUNTEERS' | translate"></h3>
-      <h2 [innerHTML]="'I18N_SPLASH_VOLUNTEERS_TITLE' | translate"></h2>
+      <h2 [innerHTML]="'I18N_SPLASH_FOR_VOLUNTEERS' | translate"></h2>
+      <h3 [innerHTML]="'I18N_SPLASH_VOLUNTEERS_TITLE' | translate"></h3>
       <p [innerHTML]="'I18N_SPLASH_VOLUNTEERS_CONTENT' | translate"></p>
       <div class="oppia-splash-button-container">
         <button type="submit"
@@ -432,23 +432,28 @@
     color: #6d6d6d;
   }
 
-  .splash-page .oppia-splash-section-four-left h3,
-  .splash-page .oppia-splash-section-five-left h3,
-  .splash-page .oppia-splash-section-six-right h3,
-  .splash-page .oppia-splash-section-seven-left h3 {
-    color: #6d6d6d;
-  }
-
   .splash-page .oppia-splash-section-four-left h2,
-  .splash-page .oppia-splash-section-five-left h2,
+  .splash-page .oppia-splash-section-five-left .testimonial-student-details,
   .splash-page .oppia-splash-section-six-right h2,
   .splash-page .oppia-splash-section-seven-left h2 {
+    color: #6d6d6d;
+    font-size: 1.17em;
+    font-weight: bold;
+    line-height: 1.1;
+  }
+
+  .splash-page .oppia-splash-section-four-left h3,
+  .splash-page .oppia-splash-section-five-left .testimonial-quote-details,
+  .splash-page .oppia-splash-section-six-right h3,
+  .splash-page .oppia-splash-section-seven-left h3 {
     color: #094142;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 2.1em;
+    font-weight: 400;
+    line-height: 1.2;
   }
 
-  .splash-page .oppia-splash-section-five-left h2 {
+  .splash-page .oppia-splash-section-five-left .testimonial-quote-details {
     line-height: 1.75em;
   }
 
@@ -647,10 +652,10 @@
       width: auto;
     }
 
-    .splash-page .oppia-splash-section-four-left h2,
-    .splash-page .oppia-splash-section-five-left h2,
-    .splash-page .oppia-splash-section-six-right h2,
-    .splash-page .oppia-splash-section-seven-left h2 {
+    .splash-page .oppia-splash-section-four-left h3,
+    .splash-page .oppia-splash-section-five-left .testimonial-quote-details,
+    .splash-page .oppia-splash-section-six-right h3,
+    .splash-page .oppia-splash-section-seven-left h3 {
       font-size: 1.5em;
     }
 

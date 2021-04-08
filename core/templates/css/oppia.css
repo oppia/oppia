@@ -583,7 +583,7 @@ p:last-child {
 .oppia-rte p {
   line-height: 1.2;
   margin-bottom: 18px;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
@@ -1763,7 +1763,7 @@ pre.oppia-pre-wrapped-text {
   font-weight: 500;
   letter-spacing: 0.7px;
   margin-left: 5px;
-  margin-right: 0px;
+  margin-right: 0;
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
@@ -1919,7 +1919,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rte p:last-child {
-  margin: 0px;
+  margin: 0;
 }
 
 .oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
@@ -2011,8 +2011,16 @@ pre.oppia-pre-wrapped-text {
   transition: all 200ms;
 }
 
+.oppia-editable-section .oppia-editor-edit-icon:focus,
 .oppia-editable-section:hover .oppia-editor-edit-icon {
   opacity: 0.8;
+}
+
+.oppia-autofocus:focus {
+  border: 1px solid #66afe9;
+  -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 8px rgb(102 175 233 / 60%);
+  -moz-box-shadow: inset 0 1px 1px #00000013,0 0 8px #66afe999;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 8px rgb(102 175 233 / 60%);
 }
 
 .oppia-click-to-start-editing {
