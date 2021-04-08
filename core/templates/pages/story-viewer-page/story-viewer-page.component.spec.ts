@@ -366,6 +366,7 @@ describe('Story Viewer Page component', () => {
         'Learn Topic 1 | Story | Oppia');
       expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
         'Story meta tag content');
+      // @ts-ignore
       expect(component.pathIconParameters).toEqual([{
         thumbnailIconUrl: 'thumbnail-url',
         left: '225px',
