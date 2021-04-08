@@ -258,8 +258,8 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     def test_create_and_get_ticket_model(self):
         ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
-                github_issue_number=None,
+                ticket_name=self.TICKET_NAME, platform=self.PLATFORM,
+                github_issue_repo_name=None, github_issue_number=None,
                 newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
                 report_ids=self.REPORT_IDS))
 
@@ -268,6 +268,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
                 ticket_id))
 
         self.assertEqual(ticket_model.id, ticket_id)
+        self.assertEqual(ticket_model.platform, self.PLATFORM)
         self.assertEqual(
             ticket_model.newest_report_timestamp, self.NEWEST_REPORT_TIMESTAMP)
         self.assertEqual(ticket_model.ticket_name, self.TICKET_NAME)
@@ -287,8 +288,8 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     app_feedback_report_models.AppFeedbackReportTicketModel)):
                 app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                    ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
-                    github_issue_number=None,
+                    ticket_name=self.TICKET_NAME, platform=self.PLATFORM,
+                    github_issue_repo_name=None, github_issue_number=None,
                     newest_report_timestamp=self.NEWEST_REPORT_TIMESTAMP,
                     report_ids=self.REPORT_IDS)
 

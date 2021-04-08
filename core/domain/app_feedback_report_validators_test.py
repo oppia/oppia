@@ -120,6 +120,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity.put()
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id=self.TICKET_ID, ticket_name='example ticket',
+            platform=self.PLATFORM_ANDROID,
             github_issue_repo_name=None, github_issue_number=None,
             archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
@@ -151,6 +152,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_validation_with_deleted_external_references_fails(self):
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id=self.TICKET_ID, ticket_name='example ticket',
+            platform=self.PLATFORM_ANDROID,
             github_issue_repo_name=None, github_issue_number=None,
             archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
@@ -517,8 +519,8 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.create(
-                ticket_name=self.TICKET_NAME, github_issue_repo_name=None,
-                github_issue_number=None,
+                ticket_name=self.TICKET_NAME, platform=self.PLATFORM_ANDROID,
+                github_issue_repo_name=None, github_issue_number=None,
                 newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
                 report_ids=self.REPORT_IDS_LIST))
         app_feedback_report_models.AppFeedbackReportModel(
@@ -553,6 +555,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_validation_with_invalid_id_fails(self):
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id='invalid_entity_id', ticket_name=self.TICKET_NAME,
+            platform=self.PLATFORM_ANDROID,
             github_issue_repo_name=None, github_issue_number=None,
             archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
@@ -691,6 +694,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             ))
         app_feedback_report_models.AppFeedbackReportTicketModel(
             id=self.TICKET_ID, ticket_name='example ticket',
+            platform=self.PLATFORM_ANDROID,
             github_issue_repo_name=None, github_issue_number=None,
             archived=False,
             newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,

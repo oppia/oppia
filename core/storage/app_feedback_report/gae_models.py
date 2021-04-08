@@ -371,6 +371,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     # A name for the ticket given by the maintainer, limited to 100 characters.
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
+    # The platform that the reports in this ticket pertain to.
+    platform = datastore_services.StringProperty(required=True, indexed=True)
     # The Github repository that has the associated issue for this ticket. The
     # possible values correspond to GITHUB_REPO_CHOICES.
     github_issue_repo_name = datastore_services.StringProperty(
@@ -389,8 +391,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, ticket_name, github_issue_repo_name, github_issue_number,
-            newest_report_timestamp, report_ids):
+            cls, ticket_name, platform, github_issue_repo_name,
+            github_issue_number, newest_report_timestamp, report_ids):
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
@@ -411,7 +413,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         """
         ticket_id = cls._generate_id(ticket_name)
         ticket_entity = cls(
-            id=ticket_id, ticket_name=ticket_name,
+            id=ticket_id, ticket_name=ticket_name, platform=platform,
             github_issue_repo_name=github_issue_repo_name,
             github_issue_number=github_issue_number, archived=False,
             newest_report_timestamp=newest_report_timestamp,
@@ -465,6 +467,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'platform': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'github_issue_repo_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'github_issue_number': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'archived': base_models.EXPORT_POLICY.NOT_APPLICABLE,
