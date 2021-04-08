@@ -146,14 +146,9 @@ jobs:
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
       - run:
-          name: Run e2e navigation test
-          command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-      - check_release_changelog_update_branch
-      - run:
           name: Run e2e admin page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --suite="adminPage" --prod_env
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -185,14 +180,6 @@ jobs:
           name: Run e2e library test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
-      - run:
-          name: Run e2e collections test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
-      - run:
-          name: Run e2e accessibility page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
       - upload_screenshots
 
   e2e_new_structure_tests:
@@ -215,10 +202,6 @@ jobs:
           name: Run e2e topics and story editor
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
-      - run:
-          name: Run e2e classroom page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
       - run:
           name: Run e2e topic and story editor test
           command: |
