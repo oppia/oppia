@@ -1492,7 +1492,7 @@ class PendingDeletionRequestModelValidator(
             name.value for name in models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES]
         for module_name in item.pseudonymizable_entity_mappings.keys():
             if module_name not in allowed_keys:
-                incorrect_keys.append(module_name.value)
+                incorrect_keys.append(module_name)
 
         if incorrect_keys:
             cls._add_error(
