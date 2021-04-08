@@ -2771,7 +2771,8 @@ def can_update_suggestions(handler):
         UnauthorizedUserException. The user does not have credentials to
             edit this suggestion.
         InvalidInputException. The submitted suggestion id is not valid.
-        PageNotFoundException. A suggestion is not found with the given suggestion id.
+        PageNotFoundException. A suggestion is not found with the given
+            suggestion id.
     """
     def test_can_update_suggestion(
             self, suggestion_id, **kwargs):
@@ -2791,7 +2792,8 @@ def can_update_suggestions(handler):
             UnauthorizedUserException. The user does not have credentials to
                 edit this suggestion.
             InvalidInputException. The submitted suggestion id is not valid.
-            PageNotFoundException. A suggestion is not found with the given suggestion id.
+            PageNotFoundException. A suggestion is not found with the given
+                suggestion id.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
