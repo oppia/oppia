@@ -2114,7 +2114,7 @@ class DisallowDunderMetaclassChecker(checkers.BaseChecker):
     enforcing use of "python_utils.with_metaclass()" instead.
     """
 
-    __implements__ = interfaces.IAstroidChecker
+    __implements__ = interfaces.IRawChecker
 
     name = 'no-dunder-metaclass'
     priority = -1
@@ -2127,17 +2127,18 @@ class DisallowDunderMetaclassChecker(checkers.BaseChecker):
         )
     }
 
-    def visit_classdef(self, node):
-        """Visit each class definition in a module and check if there is a
-        __metaclass__ present.
+    def process_module(self, node):
+        """Process moodule to check if __metaclass__ is being used instead of
+        python_utils.with_metaclass()
 
         Args:
-            node: astroid.nodes.ClassDef. Node for a class definition
-                in the AST.
+            node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        if node.declared_metaclass() is None:
-            return
-        self.add_message('no-dunder-metaclass', node=node)
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            line = line.strip()
+            if '__metaclass__' in line and '=' in line:
+                self.add_message('no-dunder-metaclass', line=line_num + 1)
 
 
 def register(linter):

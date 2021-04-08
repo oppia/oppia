@@ -3276,67 +3276,89 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
 class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
+    def setUp(self):
+        super(DisallowDunderMetaclassCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowDunderMetaclassChecker)
+        self.checker_test_object.setup_method()
+
     def test_wrong_metaclass_usage_raises_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
+        node_with_wrong_metaclass_usage = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                class FakeClass(python_utils.OBJECT):
+                    def __init__(self, fake_arg):
+                        self.fake_arg = fake_arg
+                    def fake_method(self, name):
+                        yield (name, name)
+                class MyObject:"""
+                """    __metaclass__ = FakeClass""" # pylint: disable=no-dunder-metaclass
+                """       def __init__(self, fake_arg):
+                        self.fake_arg = fake_arg
+                """)
+        node_with_wrong_metaclass_usage.file = filename
+        node_with_wrong_metaclass_usage.path = filename
 
-        metaclass_node = astroid.extract_node(
-            """
-            class FakeClass(python_utils.OBJECT):
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-                def fake_method(self, name):
-                    yield (name, name)
-            class MyObject: #@
-                __metaclass__ = FakeClass
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
+        self.checker_test_object.checker.process_module(
+            node_with_wrong_metaclass_usage)
 
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='no-dunder-metaclass',
-                node=metaclass_node
-            )
-        ):
-            checker_test_object.checker.visit_classdef(metaclass_node)
+        message = testutils.Message(
+            msg_id='no-dunder-metaclass', line=7)
 
-    def test_no_metaclass_usage_raises_no_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
-
-        metaclass_node = astroid.extract_node(
-            """
-            class MyObject: #@
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
-
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(metaclass_node)
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
 
     def test_correct_metaclass_usage_raises_no_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowDunderMetaclassChecker)
-        checker_test_object.setup_method()
+        node_with_correct_metaclass_usage = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                class FakeClass(python_utils.OBJECT):
+                    def __init__(self, fake_arg):
+                        self.fake_arg = fake_arg
+                    def fake_method(self, name):
+                        yield (name, name)
+                class MyObject(python_utils.with_metaclass(FakeClass)):
+                    def __init__(self, fake_arg):
+                        self.fake_arg = fake_arg
+                """)
+        node_with_correct_metaclass_usage.file = filename
+        node_with_correct_metaclass_usage.path = filename
 
-        metaclass_node = astroid.extract_node(
-            """
-            class FakeClass(python_utils.OBJECT):
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-                def fake_method(self, name):
-                    yield (name, name)
-            class MyObject: #@
-                python_utils.with_metaclass(FakeClass)
-                def __init__(self, fake_arg):
-                    self.fake_arg = fake_arg
-            """)
+        self.checker_test_object.checker.process_module(
+            node_with_correct_metaclass_usage)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(metaclass_node)
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_no_metaclass_usage_raises_no_error(self):
+        node_with_no_metaclass_usage = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                class MyObject:
+                    def __init__(self, fake_arg):
+                        self.fake_arg = fake_arg
+                """)
+        node_with_no_metaclass_usage.file = filename
+        node_with_no_metaclass_usage.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_metaclass_usage)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
