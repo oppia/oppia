@@ -2116,7 +2116,7 @@ class DisallowDunderMetaclassChecker(checkers.BaseChecker):
 
     __implements__ = interfaces.IAstroidChecker
 
-    name = 'replace-disallowed-metaclass-usage'
+    name = 'no-dunder-metaclass'
     priority = -1
     msgs = {
         'C0034': (
