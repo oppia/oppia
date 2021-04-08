@@ -31,6 +31,9 @@ ruleTester.run('protractor-practices', rule, {
     code:
     `action.click(elem);
     browser.action.sleep();`,
+  },
+  {
+    code: 'browser.switchTo()'
   }],
 
   invalid: [
@@ -42,6 +45,16 @@ ruleTester.run('protractor-practices', rule, {
       errors: [{
         message: 'Please do not use browser.sleep() in protractor files',
         type: 'CallExpression',
+      }],
+    }, {
+      code:
+      `it('should test a feature', function() {
+        browser.switchTo().activeElement();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.switchTo().activeElement()' +
+          ' in protractor files',
+        type: 'MemberExpression',
       }],
     },
   ]

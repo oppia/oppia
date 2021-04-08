@@ -31,7 +31,10 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowSleep: 'Please do not use browser.sleep() in protractor files'
+      disallowSleep: 'Please do not use browser.sleep() in protractor files',
+      disallowActiveElement: (
+        'Please do not use browser.switchTo().activeElement()' +
+        ' in protractor files')
     },
   },
 
@@ -50,10 +53,20 @@ module.exports = {
         });
       }
     };
+    var activeElementSelector = (
+      'MemberExpression[property.name=activeElement]' +
+      '[object.callee.property.name=switchTo]' +
+      '[object.callee.object.name=browser]');
 
     return {
       CallExpression: function(node) {
         checkSleepCall(node);
+      },
+      [activeElementSelector]: function(node) {
+        context.report({
+          node: node,
+          messageId: 'disallowActiveElement'
+        });
       }
     };
   }
