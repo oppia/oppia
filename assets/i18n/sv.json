@@ -139,6 +139,7 @@
 	"I18N_FOOTER_PRIVACY_POLICY": "Integritetspolicy",
 	"I18N_FOOTER_TEACH": "Undervisa med Oppia",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "UNDERVISA/STUDERA",
+	"I18N_FOOTER_TEACH_PAGE": "För föräldrar/lärare",
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Användarvillkor",
 	"I18N_FORMS_TYPE_NUMBER": "Skriv en siffra",
 	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Ange ett tal som är minst <[minValue]>.",
