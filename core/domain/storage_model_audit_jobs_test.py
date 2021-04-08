@@ -61,7 +61,7 @@ class StorageModelAuditJobsTest(test_utils.GenericTestBase):
         # __dict__ property which can be iterated.
         for name in models.NAMES:
             if '__' not in name.value:
-                all_model_module_names.append(name.value)
+                all_model_module_names.append(name)
 
         names_of_ndb_model_subclasses = []
         for module_name in all_model_module_names:
@@ -69,7 +69,7 @@ class StorageModelAuditJobsTest(test_utils.GenericTestBase):
             # for base models. The audit jobs for subclasses of base models
             # cover the test cases for base models, so extra audit jobs
             # for base models are not required.
-            if module_name == 'base_model':
+            if module_name.value == 'base_model':
                 continue
             (module, ) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):

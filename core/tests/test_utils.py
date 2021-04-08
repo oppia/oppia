@@ -185,7 +185,7 @@ def get_storage_model_module_names():
     # __dict__ property which can be iterated over.
     for name in models.NAMES:
         if '__' not in name.value:
-            yield name.value
+            yield name
 
 
 def get_storage_model_classes():
