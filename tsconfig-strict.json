@@ -32,6 +32,8 @@
     }
   },
   "files": [
+    "core/templates/components/state-editor/state-editor-properties-services/state-name.service.ts",
+    "core/templates/components/state-editor/state-editor-properties-services/state-name.service.spec.ts",
     "core/templates/domain/admin/computation-data.model.ts",
     "core/templates/domain/admin/computation-data.model.spec.ts",
     "core/templates/domain/classifier/answer-classification-result.model.ts",
@@ -62,6 +64,8 @@
     "core/templates/domain/skill/assigned-skill.model.spec.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.spec.ts",
+    "core/templates/domain/story/story-node.model.ts",
+    "core/templates/domain/story/story-node.model.spec.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.spec.ts",
     "core/templates/domain/utilities/audio-file.model.ts",
@@ -87,6 +91,8 @@
     "core/templates/pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.spec.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
+    "core/templates/pages/exploration-editor-page/services/state-editor-refresh.service.ts",
+    "core/templates/pages/exploration-editor-page/services/state-editor-refresh.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/audio-translation-manager.service.ts",
     "core/templates/pages/exploration-player-page/services/audio-translation-manager.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/learner-params.service.ts",
@@ -121,6 +127,8 @@
     "core/templates/services/loader.service.spec.ts",
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
+    "core/templates/services/schema-form-submitted.service.ts",
+    "core/templates/services/schema-form-submitted.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
     "core/templates/services/stateful/background-mask.service.spec.ts",
     "extensions/classifiers/count-vectorizer.service.ts",
@@ -140,10 +148,14 @@
     "extensions/interactions/ItemSelectionInput/directives/item-selection-input-rules.service.spec.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
+    "extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.ts",
+    "extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.ts",
     "extensions/interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service.spec.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.ts",
-    "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts"
+    "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts",
+    "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
+    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
   ],
   "include": ["typings/*.ts"]
 }

@@ -71,6 +71,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { StoryViewerNavbarBreadcrumbComponent } from 'pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
 import { StoryViewerNavbarPreLogoActionComponent } from 'pages/story-viewer-page/navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
@@ -99,6 +100,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    ObjectComponentsModule,
     ...firebaseAuthModules,
   ],
 
@@ -173,6 +175,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ObjectComponentsModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioFileUploaderComponent,
