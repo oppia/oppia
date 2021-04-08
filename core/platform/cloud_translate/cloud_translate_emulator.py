@@ -31,6 +31,10 @@ class CloudTranslateEmulator(python_utils.OBJECT):
     environment without access to the Cloud Translate API. Expected responses
     must be passed in before using this emulator for testing. See
     PREGENERATED_TRANSLATIONS above for some prepopulated responses.
+
+    This class uses ISO 639-1 compliant language codes to specify languages.
+    To learn more about ISO 639-1, see:
+        https://www.w3schools.com/tags/ref_language_codes.asp
     """
 
     PREGENERATED_TRANSLATIONS = {
@@ -69,13 +73,10 @@ class CloudTranslateEmulator(python_utils.OBJECT):
         """Returns the saved expected response for a given input. If no
         response exists for the given input, returns a default response.
 
-        For more information on ISO 639-1 see:
-            https://www.w3schools.com/tags/ref_language_codes.asp
-
         Args:
             text: str. The text to be translated.
-            source_language_code: str. A allowlisted ISO 639-1 language code.
-            target_language_code: str. A allowlisted ISO 639-1 language code.
+            source_language_code: str. An allowlisted language code.
+            target_language_code: str. An allowlisted language code.
 
         Raises:
             ValueError. Invalid source language code.
@@ -85,9 +86,11 @@ class CloudTranslateEmulator(python_utils.OBJECT):
             str. The translated text.
         """
         if not utils.is_valid_language_code(source_language_code):
-            raise ValueError('Invalid language code: %s' % source_language_code)
+            raise ValueError(
+                'Invalid source language code: %s' % source_language_code)
         if not utils.is_valid_language_code(target_language_code):
-            raise ValueError('Invalid language code: %s' % target_language_code)
+            raise ValueError(
+                'Invalid target language code: %s' % target_language_code)
 
         key = (source_language_code, target_language_code, text)
         return self.expected_responses.get(key, self.DEFAULT_RESPONSE)
@@ -97,12 +100,9 @@ class CloudTranslateEmulator(python_utils.OBJECT):
             response):
         """Adds an expected response for a given set of inputs.
 
-        For more information on ISO 639-1 see:
-            https://www.w3schools.com/tags/ref_language_codes.asp
-
         Args:
-            source_language_code: str. A allowlisted ISO 639-1 language code.
-            target_language_code: str. A allowlisted ISO 639-1 language code.
+            source_language_code: str. An allowlisted language code.
+            target_language_code: str. An allowlisted language code.
             source_text: str. The text to translate.
             response: str. The expected response for the given inputs.
         """

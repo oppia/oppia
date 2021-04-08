@@ -40,9 +40,9 @@ def translate_text(text, source_language, target_language):
         str. The translated text.
     """
     if source_language not in cloud_translate_services.LANGUAGE_CODE_ALLOWLIST:
-        raise ValueError('Invalid language code: %s' % source_language)
+        raise ValueError('Invalid source language code: %s' % source_language)
     if target_language not in cloud_translate_services.LANGUAGE_CODE_ALLOWLIST:
-        raise ValueError('Invalid language code: %s' % target_language)
+        raise ValueError('Invalid target language code: %s' % target_language)
     if source_language == target_language:
         return text
 

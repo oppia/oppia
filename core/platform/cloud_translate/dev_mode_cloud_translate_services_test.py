@@ -29,14 +29,14 @@ class DevModeCloudTranslateServicesUnitTests(test_utils.TestBase):
     def test_translate_text_with_invalid_source_language_raises_error(self):
         with self.assertRaisesRegexp(
             # Hindi (hi) is not a allowlisted language code.
-            ValueError, 'Invalid language code: hi'):
+            ValueError, 'Invalid source language code: hi'):
             dev_mode_cloud_translate_services.translate_text(
                 'hello world', 'hi', 'es')
 
     def test_translate_text_with_invalid_target_language_raises_error(self):
         with self.assertRaisesRegexp(
             # Hindi (hi) is not a allowlisted language code.
-            ValueError, 'Invalid language code: hi'):
+            ValueError, 'Invalid target language code: hi'):
             dev_mode_cloud_translate_services.translate_text(
                 'hello world', 'en', 'hi')
 

@@ -32,21 +32,22 @@ LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
 def translate_text(text, source_language, target_language):
     """Translates text into the target language.
 
-    For more information on ISO 639-1 see:
+    This method uses ISO 639-1 compliant language codes to specify languages.
+    To learn more about ISO 639-1, see:
         https://www.w3schools.com/tags/ref_language_codes.asp
 
     Args:
         text: str. The text to be translated.
-        source_language: str. An allowlisted ISO 639-1 language code.
-        target_language: str. An allowlisted ISO 639-1 language code.
+        source_language: str. An allowlisted language code.
+        target_language: str. An allowlisted language code.
 
     Returns:
         str. The translated text.
     """
     if source_language not in LANGUAGE_CODE_ALLOWLIST:
-        raise ValueError('Invalid language code: %s' % source_language)
+        raise ValueError('Invalid source language code: %s' % source_language)
     if target_language not in LANGUAGE_CODE_ALLOWLIST:
-        raise ValueError('Invalid language code: %s' % target_language)
+        raise ValueError('Invalid target language code: %s' % target_language)
     if source_language == target_language:
         return text
 
