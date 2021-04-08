@@ -129,13 +129,13 @@ export class StoryViewerPageComponent implements OnInit {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.isLoggedIn = userInfo.isLoggedIn();
     });
-    this.loaderService.showLoadingScreen('Loading');
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.classroomUrlFragment = (
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     this.storyUrlFragment = (
       this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    this.loaderService.showLoadingScreen('Loading');
     this.storyViewerBackendApiService.fetchStoryDataAsync(
       this.topicUrlFragment,
       this.classroomUrlFragment,
@@ -152,17 +152,12 @@ export class StoryViewerPageComponent implements OnInit {
         this.storyTitle = storyDataDict.title;
         this.storyDescription = storyDataDict.description;
 
-        // this.storyViewerBackendApiService.onSendStoryData.emit({
-        //   topicName: this.topicName,
-        //   storyTitle: this.storyTitle
-        // });
-
         this.loaderService.hideLoadingScreen();
         this.pathIconParameters = this.generatePathIconParameters();
       },
       (errorResponse) => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+        let errorCodes = AppConstants.FATAL_ERROR_CODES;
+        if (errorCodes.indexOf(errorResponse.status) !== -1) {
           this.alertsService.addWarning('Failed to get dashboard data');
         }
       }

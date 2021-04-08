@@ -16,13 +16,12 @@
  * @fileoverview Unit tests for storyViewerPage.
  */
 
-import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoryNode } from 'domain/story/story-node.model';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { Pipe } from '@angular/core';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
@@ -32,12 +31,12 @@ import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
- @Pipe({name: 'translate'})
+@Pipe({name: 'translate'})
 class MockTranslatePipe {
-   transform(value: string): string {
-     return value;
-   }
- }
+  transform(value: string): string {
+    return value;
+  }
+}
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -48,71 +47,48 @@ class MockAssetsBackendApiService {
 describe('Story Viewer Page component', () => {
   let httpTestingController = null;
   let component: StoryViewerPageComponent;
-  let fixture: ComponentFixture<StoryViewerPageComponent>;
   let alertsService = null;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let urlService: UrlService = null;
   let userService: UserService = null;
-  let pageTitleService: PageTitleService = null;
+  let pageTitleService = null;
   let windowRef: WindowRef;
-  let storyPlaythrough: StoryPlaythrough;
-
+  let _samplePlaythroughObject = null;
+  const UserInfoObject = {
+    is_moderator: false,
+    is_admin: false,
+    is_super_admin: false,
+    is_topic_manager: false,
+    can_create_collections: true,
+    preferred_site_language_code: null,
+    username: 'tester',
+    email: 'test@test.com',
+    user_is_logged_in: false
+  };
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
+      declarations: [StoryViewerPageComponent, MockTranslatePipe],
       imports: [HttpClientTestingModule],
-      declarations: [
-        StoryViewerPageComponent,
-        MockTranslatePipe
-      ],
       providers: [
-        {
-          provide: userService,
-          useClass: UserService
-        },
         {
           provide: assetsBackendApiService,
           useClass: MockAssetsBackendApiService
-        },
-        {
-          provide: urlService,
-          useClass: UrlService
-        },
-        {
-          provide: pageTitleService,
-          useClass: PageTitleService
-        },
-        { provide: StoryViewerBackendApiService,
-          useValue: {
-            fetchStoryDataAsync: () => (
-              new Promise((resolve) => {
-                resolve(
-                  StoryPlaythrough.createFromBackendDict({
-                    story_id: 'id',
-                    story_nodes: [],
-                    story_title: 'title',
-                    story_description: 'description',
-                    topic_name: 'topic_1',
-                    meta_tag_content: 'this is a meta tag content'
-                  }));
-              })
-            )
-          }
-        },
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents().then(() => {
-      fixture = TestBed.createComponent(
-        StoryViewerPageComponent);
-      component = fixture.componentInstance;
-    });
+    }).compileComponents();
     httpTestingController = TestBed.get(HttpTestingController);
     pageTitleService = TestBed.get(PageTitleService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-    storyViewerBackendApiService =
-      TestBed.get(StoryViewerBackendApiService);
+    urlService = TestBed.get(UrlService);
+    userService = TestBed.get(UserService);
+    alertsService = TestBed.get(AlertsService);
+    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
     windowRef = TestBed.get(WindowRef);
+    let fixture = TestBed.createComponent(StoryViewerPageComponent);
+    component = fixture.componentInstance;
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         reload: ()=>{},
@@ -122,116 +98,108 @@ describe('Story Viewer Page component', () => {
   }));
 
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
-    userService = TestBed.get(UserService);
-    alertsService = TestBed.get(AlertsService);
-
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and
       .returnValue('thumbnail-url');
-
-    const UserInfoObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: false
-    };
-
-    storyPlaythrough = StoryPlaythrough.createFromBackendDict({
-      story_nodes: [{
-        id: 'node_1',
-        title: 'Title 1',
-        description: 'Description 1',
-        destination_node_ids: [],
-        prerequisite_skill_ids: ['skill_1'],
-        acquired_skill_ids: ['skill_2'],
-        outline: 'Outline',
-        outline_is_finalized: false,
-        exploration_id: null,
-        exp_summary_dict: {
-          category: 'Welcome',
-          created_on_msec: 1564183471833.675,
-          community_owned: true,
-          thumbnail_bg_color: '#992a2b',
-          title: 'Welcome to Oppia!',
-          num_views: 14897,
-          tags: [],
-          last_updated_msec: 1571653541705.924,
-          human_readable_contributors_summary: {},
-          status: 'public',
-          language_code: 'en',
-          objective: "become familiar with Oppia's capabilities",
-          thumbnail_icon_url: '/subjects/Welcome.svg',
-          ratings: {
-            1: 1,
-            2: 1,
-            3: 3,
-            4: 24,
-            5: 46
-          },
-          id: '0',
-          activity_type: 'exploration'
-        },
-        completed: true,
-        thumbnail_bg_color: '#fff',
-        thumbnail_filename: 'story.svg'
-      }, {
-        id: 'node_2',
-        title: 'Title 2',
-        description: 'Description 2',
-        destination_node_ids: [],
-        prerequisite_skill_ids: ['skill_1'],
-        acquired_skill_ids: ['skill_2'],
-        outline: 'Outline',
-        outline_is_finalized: false,
-        exploration_id: null,
-        exp_summary_dict: {
-          category: 'Welcome',
-          created_on_msec: 1564183471833.675,
-          community_owned: true,
-          thumbnail_bg_color: '#992a2b',
-          title: 'Welcome to Oppia! 2',
-          num_views: 14897,
-          tags: [],
-          last_updated_msec: 1571653541705.924,
-          human_readable_contributors_summary: {},
-          status: 'public',
-          language_code: 'en',
-          objective: "become familiar with Oppia's capabilities 2",
-          thumbnail_icon_url: '/subjects/Welcome.svg',
-          ratings: {
-            1: 1,
-            2: 1,
-            3: 3,
-            4: 24,
-            5: 46
-          },
-          id: '0',
-          activity_type: 'exploration'
-        },
-        completed: false,
-        thumbnail_bg_color: '#000',
-        thumbnail_filename: 'story.svg'
-      }],
-      story_title: 'Story Title 1',
-      story_description: 'Story Description 1',
-      topic_name: 'Topic 1',
-      meta_tag_content: 'Story Meta Tag Content'
-    } as StoryPlaythroughBackendDict);
-
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       UserInfo.createFromBackendDict(UserInfoObject))
     );
   });
 
+  beforeEach(() => {
+    var firstSampleReadOnlyStoryNodeBackendDict = {
+      id: 'node_1',
+      description: 'description',
+      title: 'Title 1',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: 'exp_id',
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: 'Title',
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
+      },
+      completed: true,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename'
+    };
+    var secondSampleReadOnlyStoryNodeBackendDict = {
+      id: 'node_2',
+      description: 'description',
+      title: 'Title 2',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: ['node_3'],
+      outline: 'Outline',
+      exploration_id: 'exp_id',
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: 'Title',
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
+      },
+      completed: false,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename',
+    };
+    var storyPlaythroughBackendObject = {
+      story_id: 'qwerty',
+      story_nodes: [
+        firstSampleReadOnlyStoryNodeBackendDict,
+        secondSampleReadOnlyStoryNodeBackendDict],
+      story_title: 'Story',
+      story_description: 'Description',
+      topic_name: 'Topic 1',
+      meta_tag_content: 'Story meta tag content'
+    };
+    _samplePlaythroughObject =
+      StoryPlaythrough.createFromBackendDict(
+        storyPlaythroughBackendObject);
+  });
+
   afterEach(() => {
     httpTestingController.verify();
   });
-
 
 
   it('should get complete exploration url when clicking on svg element',
@@ -284,17 +252,17 @@ describe('Story Viewer Page component', () => {
   it('should show story\'s chapters when story has chapters',
     () => {
       component.storyPlaythroughObject = {
-        id: 'id',
+        id: '1',
         nodes: [],
         title: 'title',
         description: 'description',
-        topicName: 'topicName',
-        metaTagContent: 'meta tag content',
+        topicName: 'topic_name',
+        metaTagContent: 'this is meta tag content',
         getInitialNode() {
           return null;
         },
         getStoryNodeCount(): number {
-          return null;
+          return 2;
         },
         getStoryNodes() {
           return null;
@@ -302,17 +270,17 @@ describe('Story Viewer Page component', () => {
         hasFinishedStory() {
           return null;
         },
-        getNextPendingNodeId() {
+        getNextPendingNodeId(): string {
           return null;
         },
-        hasStartedStory() {
+        hasStartedStory(): boolean {
           return null;
         },
-        getStoryId() {
-          return null;
+        getStoryId(): string {
+          return this.id;
         },
-        getMetaTagContent() {
-          return null;
+        getMetaTagContent(): string {
+          return this.metaTagContent;
         }
       };
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -324,9 +292,12 @@ describe('Story Viewer Page component', () => {
         'story');
       spyOn(
         storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
-        Promise.resolve(storyPlaythrough));
+        Promise.resolve(_samplePlaythroughObject));
 
-      component.ngOnInit();
+      expect(
+        _samplePlaythroughObject.getStoryNodes()[0].getId()).toEqual('node_1');
+      expect(
+        _samplePlaythroughObject.getStoryNodes()[1].getId()).toEqual('node_2');
 
       expect(component.showChapters()).toBeTrue();
     });
@@ -349,27 +320,59 @@ describe('Story Viewer Page component', () => {
     expect(reloadSpy).toHaveBeenCalled();
   }));
 
-  // it('should show warnings when fetching story data fails',
-  //   fakeAsync(() => {
-  //     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-  //       'topic');
-  //     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-  //       .and.returnValue('math');
-  //     spyOn(
-  //       urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
-  //       'story');
-  //     spyOn(alertsService, 'addWarning').and.callThrough();
-  //     component.ngOnInit();
+  it('should show warnings when fetching story data fails',
+    fakeAsync(() => {
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('math');
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic');
+      spyOn(
+        urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        'story');
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.reject(
+          {
+            status: 404
+          }));
+      spyOn(alertsService, 'addWarning').and.callThrough();
+      component.ngOnInit();
+      flushMicrotasks();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to get dashboard data');
+    }));
 
-  //     let req = httpTestingController.expectOne(
-  //       '/learn/math/topic/story');
+  it('should get path icon parameters after story data is loaded',
+    fakeAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('math');
+      spyOn(
+        urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        'story');
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(_samplePlaythroughObject));
 
-  //     let errorObject = { status: 404, statusText: 'Not Found' };
-  //     req.flush({ error: errorObject }, errorObject);
+      spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+      spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
 
-  //     flushMicrotasks();
-  //     expect(alertsService.addWarning).toHaveBeenCalledWith(
-  //       'Failed to get dashboard data');
-  //     expect(component.pathIconParameters).toEqual([]);
-  //   }));
+      component.ngOnInit();
+
+      flushMicrotasks();
+
+      expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+        'Learn Topic 1 | Story | Oppia');
+      expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
+        'Story meta tag content');
+      expect(component.pathIconParameters).toEqual([{
+        thumbnailIconUrl: 'thumbnail-url',
+        left: '225px',
+        top: '35px',
+        thumbnailBgColor: '#bb8b2f'
+      }, {
+        thumbnailIconUrl: 'thumbnail-url',
+        thumbnailBgColor: '#bb8b2f' }]);
+    }));
 });
