@@ -33,33 +33,36 @@ class CloudTranslateEmulator(python_utils.OBJECT):
     PREGENERATED_TRANSLATIONS above for some prepopulated responses.
     """
 
+    PREGENERATED_TRANSLATIONS = {
+        (u'en', u'pt', u'hello world'): u'Ol\xe1 Mundo',
+        (u'en', u'pt', u'CONTINUE'): u'PROSSEGUIR',
+        (u'en', u'es', u'Please continue.'): u'Por favor continua.',
+        (u'en', u'fr', u'CONTINUE'): u'CONTINUEZ',
+        (u'en', u'fr', u'Please continue.'):
+            u'Continuez s&#39;il vous pla\xeet.',
+        (u'en', u'es', u'CONTINUE'): u'SEGUIR',
+        (u'en', u'zh', u'hello world'): u'\u4f60\u597d\u4e16\u754c',
+        (u'en', u'es', u'Correct!'): u'\xa1Correcto!',
+        (u'en', u'zh', u'Correct!'): u'\u6b63\u786e\u7684\uff01',
+        (u'en', u'zh', u'CONTINUE'): u'\u7ee7\u7eed',
+        (u'en', u'zh', u'Please continue.'): u'\u8bf7\u7ee7\u7eed\u3002',
+        (u'en', u'fr', u'Correct!'): u'Correct!',
+        (u'en', u'pt', u'Correct!'): u'Correto!',
+        (u'en', u'es', u'hello world'): u'Hola Mundo',
+        (u'en', u'pt', u'Please continue.'): u'Por favor continue.',
+        (u'en', u'fr', u'hello world'): u'Bonjour le monde'
+    }
+
+    DEFAULT_RESPONSE = (
+        'Default translation for emulator mode. (See core/platform/'
+        'cloud_translate/cloud_translate_emulator.py for details)'
+    )
+
     def __init__(self):
-        """Initializes the emulator with no expected responses."""
-        self.DEFAULT_RESPONSE = (
-            'Default translation for emulator mode. (See core/platform/'
-            'cloud_translate/cloud_translate_emulator.py for details)')
+        """Initializes the emulator with pregenerated responses."""
 
         # Pre-generated translations for the following phrases:
         # ('hello world', 'CONTINUE', 'Please continue.', 'Correct!')
-        self.PREGENERATED_TRANSLATIONS = {
-            (u'en', u'pt', u'hello world'): u'Ol\xe1 Mundo',
-            (u'en', u'pt', u'CONTINUE'): u'PROSSEGUIR',
-            (u'en', u'es', u'Please continue.'): u'Por favor continua.',
-            (u'en', u'fr', u'CONTINUE'): u'CONTINUEZ',
-            (u'en', u'fr', u'Please continue.'):
-                u'Continuez s&#39;il vous pla\xeet.',
-            (u'en', u'es', u'CONTINUE'): u'SEGUIR',
-            (u'en', u'zh', u'hello world'): u'\u4f60\u597d\u4e16\u754c',
-            (u'en', u'es', u'Correct!'): u'\xa1Correcto!',
-            (u'en', u'zh', u'Correct!'): u'\u6b63\u786e\u7684\uff01',
-            (u'en', u'zh', u'CONTINUE'): u'\u7ee7\u7eed',
-            (u'en', u'zh', u'Please continue.'): u'\u8bf7\u7ee7\u7eed\u3002',
-            (u'en', u'fr', u'Correct!'): u'Correct!',
-            (u'en', u'pt', u'Correct!'): u'Correto!',
-            (u'en', u'es', u'hello world'): u'Hola Mundo',
-            (u'en', u'pt', u'Please continue.'): u'Por favor continue.',
-            (u'en', u'fr', u'hello world'): u'Bonjour le monde'
-            }
         self.expected_responses = self.PREGENERATED_TRANSLATIONS
 
     def translate(self, text, source_language_code, target_language_code):
