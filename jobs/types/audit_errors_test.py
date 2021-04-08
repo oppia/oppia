@@ -65,7 +65,8 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_message(self):
         error = FooError(self.model)
 
-        self.assertEqual(error.message, 'FooError in BaseModel(id="123"): foo')
+        self.assertEqual(
+            error.message, 'FooError in BaseModel(id=\'123\'): foo')
 
     def test_message_raises_not_implemented_error_if_not_assigned_a_value(self):
         class ErrorWithoutMessage(audit_errors.BaseAuditError):
@@ -96,14 +97,14 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'ErrorWithUpdateMessageMethod in BaseModel(id="123"): initial '
+            'ErrorWithUpdateMessageMethod in BaseModel(id=\'123\'): initial '
             'message')
         self.assertRaisesRegexp(
             TypeError, 'self.message must be assigned to exactly once',
             error.update_message)
         self.assertEqual(
             error.message,
-            'ErrorWithUpdateMessageMethod in BaseModel(id="123"): initial '
+            'ErrorWithUpdateMessageMethod in BaseModel(id=\'123\'): initial '
             'message')
 
     def test_message_raises_type_error_if_assigned_a_non_string_value(self):
@@ -133,10 +134,10 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_str(self):
         self.assertEqual(
             repr(FooError(self.model)),
-            '\'FooError in BaseModel(id="123"): foo\'')
+            'u"FooError in BaseModel(id=\'123\'): foo"')
         self.assertEqual(
             python_utils.UNICODE(FooError(self.model)),
-            '\'FooError in BaseModel(id="123"): foo\'')
+            'u"FooError in BaseModel(id=\'123\'): foo"')
 
     def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))
@@ -188,8 +189,9 @@ class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'InconsistentTimestampsError in BaseModel(id="123"): created_on=%r '
-            'is later than last_updated=%r' % (self.NOW, self.YEAR_AGO))
+            'InconsistentTimestampsError in BaseModel(id=\'123\'): '
+            'created_on=%r is later than last_updated=%r' % (
+                self.NOW, self.YEAR_AGO))
 
 
 class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
@@ -208,7 +210,7 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id=\'123\'): '
             'post_commit_status="private" but post_commit_is_private=False')
 
     def test_message_for_public_post_commit_status(self):
@@ -225,7 +227,7 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id=\'123\'): '
             'post_commit_status="public" but post_commit_is_private=True')
 
 
@@ -240,7 +242,7 @@ class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'ModelMutatedDuringJobError in BaseModel(id="123"): '
+            'ModelMutatedDuringJobError in BaseModel(id=\'123\'): '
             'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
 
@@ -256,8 +258,8 @@ class ModelIdRegexErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            r'ModelIdRegexError in BaseModel(id="?!\""): id does not '
-            r'match the expected regex="[abc]{3}"')
+            'ModelIdRegexError in BaseModel(id=\'?!"\'): id does not '
+            'match the expected regex=u\'[abc]{3}\'')
 
 
 class ModelExpiredErrorTests(AuditErrorsTestBase):
@@ -272,6 +274,19 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'ModelExpiredError in BaseModel(id="123"): deleted=True when older '
-            'than %d days' % (
+            'ModelExpiredError in BaseModel(id=\'123\'): deleted=True when '
+            'older than %d days' % (
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
+
+
+class ModelRelationshipErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        error = audit_errors.ModelRelationshipError(
+            'FooModel', '123', 'bar_id', 'BarModel', '123')
+
+        self.assertEqual(
+            error.message,
+            'ModelRelationshipError in FooModel(id=\'123\'): '
+            'FooModel.bar_id=\'123\' should correspond to the ID of an '
+            'existing BarModel, but no such model exists')

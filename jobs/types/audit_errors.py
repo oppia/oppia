@@ -19,8 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
 import feconf
+from jobs import job_utils
 import python_utils
 
 
@@ -32,14 +32,26 @@ class BaseAuditError(python_utils.OBJECT):
 
     # BaseAuditError and its subclasses will hold exactly one attribute to
     # minimize their memory footprint.
-    __slots__ = '_message',
+    __slots__ = ('_message',)
 
-    def __init__(self, model):
-        model_name = model.__class__.__name__
-        quoted_model_id = json.dumps(model.id)
+    def __init__(self, model_or_kind, model_id=None):
+        """Initializes a new audit error.
+
+        Args:
+            model_or_kind: Model|bytes. If model_id is not provided, then this
+                is a model (type: BaseModel).
+                Otherwise, this is a model's kind (type: bytes).
+            model_id: bytes|None. The model's ID, or None when model_or_kind is
+                a model.
+        """
+        if model_id is not None:
+            model_kind = model_or_kind
+        else:
+            model_id = job_utils.get_model_id(model_or_kind)
+            model_kind = job_utils.get_model_kind(model_or_kind)
         # At first, self._message is a tuple of model identifiers that will be
         # used to annotate the _actual_ message provided by subclasses.
-        self._message = (model_name, quoted_model_id)
+        self._message = (model_kind, model_id)
 
     def __getstate__(self):
         """Called by pickle to get the value that uniquely defines self."""
@@ -82,12 +94,12 @@ class BaseAuditError(python_utils.OBJECT):
             raise TypeError('self.message must be a string')
         if not message:
             raise ValueError('self.message must be a non-empty string')
-        model_name, quoted_model_id = self._message
-        self._message = '%s in %s(id=%s): %s' % (
-            self.__class__.__name__, model_name, quoted_model_id, message)
+        model_kind, model_id = self._message
+        self._message = '%s in %s(id=%r): %s' % (
+            self.__class__.__name__, model_kind, model_id, message)
 
     def __repr__(self):
-        return '\'%s\'' % self.message.replace('\'', r'\'')
+        return repr(self.message)
 
     def __eq__(self, other):
         return (
@@ -137,8 +149,7 @@ class ModelIdRegexError(BaseAuditError):
 
     def __init__(self, model, regex_string):
         super(ModelIdRegexError, self).__init__(model)
-        quoted_regex = json.dumps(regex_string)
-        self.message = 'id does not match the expected regex=%s' % quoted_regex
+        self.message = 'id does not match the expected regex=%r' % regex_string
 
 
 class ModelExpiredError(BaseAuditError):
@@ -148,3 +159,36 @@ class ModelExpiredError(BaseAuditError):
         super(ModelExpiredError, self).__init__(model)
         self.message = 'deleted=True when older than %s days' % (
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+
+
+class ModelRelationshipError(BaseAuditError):
+    """Error class for models with invalid relationships."""
+
+    def __init__(
+            self, model_kind, model_id, property_name,
+            expected_model_kind, expected_model_id):
+        """Initializes a new ModelRelationshipError.
+
+        Args:
+            model_kind: str. The kind of model which holds a property defining
+                a relationship.
+            model_id: bytes. The ID of the specific model with a relationship
+                error.
+            property_name: str. The property which refers to the ID of another
+                kind of model.
+            expected_model_kind: str. The kind of model the property refers
+                to.
+            expected_model_id: bytes. The ID of the specific model that the
+                property refers to. NOTE: This is the same value as the
+                property.
+        """
+        # NOTE: IDs are converted to bytes because that's always how they're
+        # read from the datastore.
+        super(ModelRelationshipError, self).__init__(
+            model_kind, model_id=python_utils.convert_to_bytes(model_id))
+        self.message = (
+            '%s.%s=%r should correspond to the ID of an existing %s, '
+            'but no such model exists' % (
+                model_kind, property_name,
+                python_utils.convert_to_bytes(expected_model_id),
+                expected_model_kind))

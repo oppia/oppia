@@ -32,6 +32,8 @@ import apache_beam as beam
 base_models, exp_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration])
 
+datastore_services = models.Registry.import_datastore_services()
+
 
 class MockAuditsExisting(audit_decorators.AuditsExisting):
     """Subclassed with overrides to avoid modifying the real decorator."""
@@ -93,6 +95,21 @@ class FooModel(base_models.BaseModel):
     """A model that is not registered in core.platform."""
 
     pass
+
+
+class BarModel(base_models.BaseModel):
+    """A model that holds a reference to a FooModel ID."""
+
+    BAR_CONSTANT = 1
+
+    foo_id = datastore_services.StringProperty()
+
+
+class BazModel(base_models.BaseModel):
+    """A model that holds a reference to a BarModel ID and a FooModel ID."""
+
+    foo_id = datastore_services.StringProperty()
+    bar_id = datastore_services.StringProperty()
 
 
 class AuditsExistingTests(test_utils.TestBase):
@@ -172,3 +189,85 @@ class AuditsExistingTests(test_utils.TestBase):
         self.assertRaisesRegexp(
             TypeError, '%r is not a subclass of DoFn' % NotDoFn,
             lambda: MockAuditsExisting(base_models.BaseModel)(NotDoFn))
+
+
+class MockRelationshipsOf(audit_decorators.RelationshipsOf):
+    """Subclassed with overrides to avoid modifying the real decorator."""
+
+    # Overrides the real value for the unit tests.
+    _PROPERTY_RELATIONSHIPS_BY_MODEL_KIND = (
+        collections.defaultdict(lambda: collections.defaultdict(set)))
+
+    @classmethod
+    def clear(cls):
+        """Test-only helper method for clearing the decorator."""
+        cls._PROPERTY_RELATIONSHIPS_BY_MODEL_KIND.clear()
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def tearDown(self):
+        super(RelationshipsOfTests, self).tearDown()
+        MockRelationshipsOf.clear()
+
+    def test_has_no_relationships_by_default(self):
+        self.assertEqual(
+            MockRelationshipsOf.get_property_relationships_by_kind(), {})
+
+    def test_valid_relationship_generator(self):
+        @MockRelationshipsOf(BarModel)
+        def bar_model_relationships(model): # pylint: disable=unused-variable
+            """Defines the relationships of BarModel."""
+            yield model.foo_id, [FooModel]
+
+        self.assertEqual(
+            MockRelationshipsOf.get_property_relationships_by_kind(),
+            {'BarModel': {'foo_id': ('FooModel',)}})
+
+    def test_accepts_id_as_property(self):
+        @MockRelationshipsOf(BarModel)
+        def bar_model_relationships(model): # pylint: disable=unused-variable
+            """Defines the relationships of BarModel."""
+            yield model.id, [BazModel]
+
+        self.assertEqual(
+            MockRelationshipsOf.get_property_relationships_by_kind(),
+            {'BarModel': {'id': ('BazModel',)}})
+
+    def test_rejects_values_that_are_not_types(self):
+        foo_model = FooModel()
+
+        with self.assertRaisesRegexp(TypeError, 'is an instance, not a type'):
+            MockRelationshipsOf(foo_model)
+
+    def test_rejects_types_that_are_not_models(self):
+        with self.assertRaisesRegexp(TypeError, 'not a subclass of BaseModel'):
+            MockRelationshipsOf(int)
+
+    def test_rejects_non_property_types(self):
+        with self.assertRaisesRegexp(TypeError, 'int is not a Property'):
+            @MockRelationshipsOf(BarModel)
+            def bar_model_relationships(model): # pylint: disable=unused-variable
+                """Defines the relationships of BarModel."""
+                yield model.BAR_CONSTANT, [FooModel]
+
+    def test_rejects_property_from_different_class(self):
+        with self.assertRaisesRegexp(TypeError, 'BarModel.bar_id not found'):
+            @MockRelationshipsOf(BarModel)
+            def bar_model_relationships(unused_model): # pylint: disable=unused-variable
+                """Defines the relationships of BarModel."""
+                yield BazModel.bar_id, [BarModel]
+
+    def test_rejects_property_from_different_class_with_same_name(self):
+        with self.assertRaisesRegexp(ValueError, 'is not BarModel.foo_id'):
+            @MockRelationshipsOf(BarModel)
+            def bar_model_relationships(unused_model): # pylint: disable=unused-variable
+                """Defines the relationships of BarModel."""
+                yield BazModel.foo_id, [FooModel]
+
+    def test_rejects_relationship_generator_with_wrong_name(self):
+        with self.assertRaisesRegexp(ValueError, 'Please rename the function'):
+            @MockRelationshipsOf(BarModel)
+            def unused_bar_model_relationships(unused_model):
+                """Defines the relationships of BarModel."""
+                yield BarModel.foo_id, [FooModel]

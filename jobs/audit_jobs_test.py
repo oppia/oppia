@@ -30,8 +30,8 @@ from jobs.types import audit_errors
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 
-(base_models, user_models) = (
-    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
+(auth_models, base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.auth, models.NAMES.base_model, models.NAMES.user])
 
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
@@ -53,31 +53,18 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
             audit_jobs.AuditAllStorageModelsJob(pipeline).run)
 
     def test_base_model_audits(self):
-        base_model_with_invalid_id = base_models.BaseModel(
-            id='123@?!*',
-            deleted=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        base_model_with_invalid_timestamps = base_models.BaseModel(
-            id='124',
-            deleted=False,
-            created_on=self.NOW,
-            last_updated=self.YEAR_LATER)
-        base_model_with_inconsistent_timestamps = base_models.BaseModel(
-            id='125',
-            deleted=False,
-            created_on=self.YEAR_LATER,
-            last_updated=self.YEAR_AGO)
-        expired_base_model = base_models.BaseModel(
-            id='126',
-            deleted=True,
-            created_on=self.YEAR_AGO,
-            last_updated=self.YEAR_AGO)
-        valid_base_model = base_models.BaseModel(
-            id='127',
-            deleted=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
+        base_model_with_invalid_id = self.new_model(
+            base_models.BaseModel, id='123@?!*', deleted=False)
+        base_model_with_invalid_timestamps = self.new_model(
+            base_models.BaseModel, id='124', deleted=False,
+            created_on=self.NOW, last_updated=self.YEAR_LATER)
+        base_model_with_inconsistent_timestamps = self.new_model(
+            base_models.BaseModel, id='125', deleted=False,
+            created_on=self.YEAR_LATER, last_updated=self.YEAR_AGO)
+        expired_base_model = self.new_model(
+            base_models.BaseModel, id='126', deleted=True)
+        valid_base_model = self.new_model(
+            base_models.BaseModel, id='127', deleted=False)
 
         self.model_io_stub.put_multi([
             base_model_with_invalid_id,
@@ -99,12 +86,12 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_user_audits(self):
-        user_settings_model_with_invalid_id = user_models.UserSettingsModel(
-            id='128', email='a@a.com', created_on=self.NOW,
-            last_updated=self.NOW)
-        user_settings_model_with_valid_id = user_models.UserSettingsModel(
-            id=self.VALID_USER_ID, email='a@a.com', created_on=self.NOW,
-            last_updated=self.NOW)
+        user_settings_model_with_invalid_id = self.new_model(
+            user_models.UserSettingsModel,
+            id='128', email='a@a.com')
+        user_settings_model_with_valid_id = self.new_model(
+            user_models.UserSettingsModel,
+            id=self.VALID_USER_ID, email='a@a.com')
 
         self.model_io_stub.put_multi([
             user_settings_model_with_invalid_id,
@@ -114,4 +101,64 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             audit_errors.ModelIdRegexError(
                 user_settings_model_with_invalid_id, feconf.USER_ID_REGEX),
+        ])
+
+    def test_missing_relationship(self):
+        self.model_io_stub.put_multi([
+            # UserEmailPreferencesModel.id -> UserSettingsModel.id.
+            self.new_model(
+                user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
+            # UserSettingsModel missing.
+        ])
+
+        self.assert_job_output_is([
+            audit_errors.ModelRelationshipError(
+                'UserEmailPreferencesModel', self.VALID_USER_ID, 'id',
+                'UserSettingsModel', self.VALID_USER_ID),
+        ])
+
+    def test_present_relationships(self):
+        self.model_io_stub.put_multi([
+            self.new_model(
+                user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
+            self.new_model(
+                user_models.UserSettingsModel,
+                id=self.VALID_USER_ID, email='a@a.com'),
+        ])
+
+        self.assert_job_output_is_empty()
+
+    def test_web_of_relationships(self):
+        self.model_io_stub.put_multi([
+            self.new_model(
+                auth_models.UserAuthDetailsModel,
+                id=self.VALID_USER_ID, firebase_auth_id='abc', gae_id='123'),
+            self.new_model(
+                auth_models.UserIdByFirebaseAuthIdModel,
+                id='abc', user_id=self.VALID_USER_ID),
+            self.new_model(
+                auth_models.UserIdentifiersModel,
+                id='123', user_id=self.VALID_USER_ID),
+        ])
+
+        self.assert_job_output_is_empty()
+
+    def test_ignored_relationships(self):
+        self.model_io_stub.put_multi([
+            self.new_model(
+                auth_models.UserAuthDetailsModel, id=self.VALID_USER_ID,
+                # Value is not None, so UserIdentifiersModel must exist.
+                gae_id='abc',
+                # Value is None, so missing UserIdByFirebaseAuthIdModel is OK.
+                firebase_auth_id=None),
+            self.new_model(
+                auth_models.UserIdentifiersModel, user_id=self.VALID_USER_ID,
+                # Should be gae_id='abc', so error will occur.
+                id='123'),
+        ])
+
+        self.assert_job_output_is([
+            audit_errors.ModelRelationshipError(
+                'UserAuthDetailsModel', self.VALID_USER_ID, 'gae_id',
+                'UserIdentifiersModel', 'abc'),
         ])

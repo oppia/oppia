@@ -29,6 +29,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from jobs.decorators import audit_decorators
+from jobs.transforms import auth_audits  # pylint: disable=unused-import
 from jobs.transforms import base_model_audits  # pylint: disable=unused-import
 from jobs.transforms import user_audits  # pylint: disable=unused-import
 
@@ -41,3 +42,16 @@ def get_audit_do_fn_types_by_kind():
         targeted.
     """
     return audit_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
+
+
+def get_property_relationships_by_kind():
+    """Returns the property relationships between models.
+
+    Returns:
+        dict(str: dict(str: set(str))). Property relationships keyed by the kind
+        of model the properties belong to. For each property, the corresponding
+        set refers to the kinds of models which should exist in storage with the
+        same ID.
+    """
+    return (
+        audit_decorators.RelationshipsOf.get_property_relationships_by_kind())
