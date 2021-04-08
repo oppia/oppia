@@ -262,6 +262,15 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.skillDifficultyString).toBe('Medium');
     });
 
+    it('should set the correct skill difficulty string', function() {
+      $scope.setDifficultyString(0.6);
+      expect($scope.skillDifficultyString).toBe('Medium');
+      $scope.setDifficultyString(0.9);
+      expect($scope.skillDifficultyString).toBe('Hard');
+      $scope.setDifficultyString(0.3);
+      expect($scope.skillDifficultyString).toBe('Easy');
+    });
+
     it('should dismiss modal if cancel button is clicked', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
