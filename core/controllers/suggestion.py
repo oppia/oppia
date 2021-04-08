@@ -154,7 +154,6 @@ class SuggestionHandler(base.BaseHandler):
 
         Raises:
             ValidationError. The suggestion is already handled.
-            ValidationError. The suggestion is not valid.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.status == 'accepted':

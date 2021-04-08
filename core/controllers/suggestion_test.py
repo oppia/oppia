@@ -797,18 +797,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '<p>Test Trans</p>')
         self.logout()
 
-    def test_update_translation_invalid_suggestion_id_exception(self):
-        self.login(self.REVIEWER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json('%s/translation/%s' % (
-            feconf.SUGGESTION_URL_PREFIX,
-            'suggestion-1'), {
-                'trnaslation_html': '<p>Test Trans</p>'
-            }, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'No suggestion found with given suggestion id')
-        self.logout()
-
     def test_update_translation_already_accepted_suggestion_exception(self):
         self.login(self.TRANSLATOR_EMAIL)
         change_dict = {
@@ -835,8 +823,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'trnaslation_html': '<p>Test Trans</p>'
             }, csrf_token=csrf_token, expected_status_int=500)
         self.assertEqual(
-            response['error'], 'The suggestion with id %s ' +
-            'has already been accepted' % (suggestion.suggestion_id))
+            response['error'],
+            'The suggestion with id %s has already been accepted' % (
+                suggestion.suggestion_id))
         self.logout()
 
 
