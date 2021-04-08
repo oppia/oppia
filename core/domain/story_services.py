@@ -43,6 +43,7 @@ import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
+transaction_services = models.Registry.import_transaction_services()
 
 
 def get_new_story_id():
@@ -652,24 +653,29 @@ def delete_story(committer_id, story_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    story_model = story_models.StoryModel.get(story_id)
-    story = story_fetchers.get_story_from_model(story_model)
-    exp_ids = story.story_contents.get_all_linked_exp_ids()
-    story_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
-        force_deletion=force_deletion)
-    exp_ids_to_be_removed = []
-    for node in story.story_contents.nodes:
-        exp_ids_to_be_removed.append(node.exploration_id)
 
-    exploration_context_models_to_be_deleted = (
-        exp_models.ExplorationContextModel.get_multi(
-            exp_ids_to_be_removed))
-    exploration_context_models_to_be_deleted = [
-        model for model in exploration_context_models_to_be_deleted
-        if model is not None]
+    story_model = story_models.StoryModel.get(story_id, strict=False)
+    if story_model is not None:
+        story = story_fetchers.get_story_from_model(story_model)
+        exp_ids = story.story_contents.get_all_linked_exp_ids()
+        story_model.delete(
+            committer_id,
+            feconf.COMMIT_MESSAGE_STORY_DELETED,
+            force_deletion=force_deletion
+        )
+        # Reject the suggestions related to the exploration used in
+        # the story.
+        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+            exp_ids)
+
+    exploration_context_models = (
+        exp_models.ExplorationContextModel.get_all().filter(
+            exp_models.ExplorationContextModel.story_id == story_id
+        ).fetch()
+    )
     exp_models.ExplorationContextModel.delete_multi(
-        exploration_context_models_to_be_deleted)
+        exploration_context_models
+    )
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
@@ -680,11 +686,9 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # force_deletion is True or not).
     delete_story_summary(story_id)
 
-    # Delete the opportunities available and reject the suggestions related to
-    # the exploration used in the story.
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
-        exp_ids)
+    # Delete the opportunities available.
+    opportunity_services.delete_exp_opportunities_corresponding_to_story(
+        story_id)
 
 
 def delete_story_summary(story_id):

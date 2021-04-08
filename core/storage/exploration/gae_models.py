@@ -46,6 +46,119 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to explorations.
+
+    A new instance of this model is created and saved every time a commit to
+    ExplorationModel or ExplorationRightsModel occurs.
+
+    The id for this model is of the form
+    'exploration-[exploration_id]-[version]'.
+    """
+
+    # The id of the exploration being edited.
+    exploration_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
+        """
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_multi(cls, exp_id, exp_versions):
+        """Gets the ExplorationCommitLogEntryModels for the given exploration
+        id and exploration versions.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            exp_versions: list(int). The versions of the exploration.
+
+        Returns:
+            list(ExplorationCommitLogEntryModel). The list of
+            ExplorationCommitLogEntryModel instances which matches the given
+            exp_id and exp_versions.
+        """
+        instance_ids = [cls.get_instance_id(exp_id, exp_version)
+                        for exp_version in exp_versions]
+
+        return super(ExplorationCommitLogEntryModel, cls).get_multi(
+            instance_ids)
+
+    @classmethod
+    def get_instance_id(cls, exp_id, exp_version):
+        """Returns ID of the exploration commit log entry model.
+
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
+
+        Returns:
+            str. A string containing exploration ID and
+            exploration version.
+        """
+        return 'exploration-%s-%s' % (exp_id, exp_version)
+
+    @classmethod
+    def get_all_non_private_commits(
+            cls, page_size, urlsafe_start_cursor, max_age=None):
+        """Fetches a list of all the non-private commits sorted by their
+        last updated attribute.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+            max_age: datetime.timedelta. The maximum time duration within which
+                commits are needed.
+
+        Returns:
+            3-tuple of (results, cursor, more). Created no earlier than the
+            max_age before the current time where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this will
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+
+        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
+            raise ValueError(
+                'max_age must be a datetime.timedelta instance or None.')
+
+        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
+        if max_age:
+            query = query.filter(
+                cls.last_updated >= datetime.datetime.utcnow() - max_age)
+        return cls._fetch_page_sorted_by_last_updated(
+            query, page_size, urlsafe_start_cursor)
+
+
 class ExplorationModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia exploration.
 
@@ -55,6 +168,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = ExplorationCommitLogEntryModel
     ALLOW_REVERT = True
 
     # What this exploration is called.
@@ -618,119 +732,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'voiced_exploration_ids': voiced_exploration_ids,
             'viewable_exploration_ids': viewable_exploration_ids
         }
-
-
-class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to explorations.
-
-    A new instance of this model is created and saved every time a commit to
-    ExplorationModel or ExplorationRightsModel occurs.
-
-    The id for this model is of the form
-    'exploration-[exploration_id]-[version]'.
-    """
-
-    # The id of the exploration being edited.
-    exploration_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
-
-    @staticmethod
-    def get_deletion_policy():
-        """Model contains data to pseudonymize or delete corresponding
-        to a user: user_id field.
-        """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
-
-    @staticmethod
-    def get_model_association_to_user():
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user. This
-        model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    @classmethod
-    def get_multi(cls, exp_id, exp_versions):
-        """Gets the ExplorationCommitLogEntryModels for the given exploration
-        id and exploration versions.
-
-        Args:
-            exp_id: str. The id of the exploration.
-            exp_versions: list(int). The versions of the exploration.
-
-        Returns:
-            list(ExplorationCommitLogEntryModel). The list of
-            ExplorationCommitLogEntryModel instances which matches the given
-            exp_id and exp_versions.
-        """
-        instance_ids = [cls._get_instance_id(exp_id, exp_version)
-                        for exp_version in exp_versions]
-
-        return super(ExplorationCommitLogEntryModel, cls).get_multi(
-            instance_ids)
-
-    @classmethod
-    def _get_instance_id(cls, exp_id, exp_version):
-        """Returns ID of the exploration commit log entry model.
-
-        Args:
-            exp_id: str. The exploration id whose states are mapped.
-            exp_version: int. The version of the exploration.
-
-        Returns:
-            str. A string containing exploration ID and
-            exploration version.
-        """
-        return 'exploration-%s-%s' % (exp_id, exp_version)
-
-    @classmethod
-    def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        """Fetches a list of all the non-private commits sorted by their
-        last updated attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-            max_age: datetime.timedelta. The maximum time duration within which
-                commits are needed.
-
-        Returns:
-            3-tuple of (results, cursor, more). Created no earlier than the
-            max_age before the current time where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this will
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-
-        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError(
-                'max_age must be a datetime.timedelta instance or None.')
-
-        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
-        if max_age:
-            query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age)
-        return cls._fetch_page_sorted_by_last_updated(
-            query, page_size, urlsafe_start_cursor)
 
 
 class ExpSummaryModel(base_models.BaseModel):
