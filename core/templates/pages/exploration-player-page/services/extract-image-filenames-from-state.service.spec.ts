@@ -654,6 +654,127 @@ describe('Extracting Image file names in the state service', () => {
             }
           },
           classifier_model_id: null
+        },
+        'State 7': {
+          param_changes: [],
+          content: {
+            content_id: 'content',
+            html: '<p><oppia-noninteractive-image filepath-with-value=\"' +
+                  '&amp;quot;s7Image.png&amp;quot;\">' +
+                  '</oppia-noninteractive-image>' +
+                  '<oppia-noninteractive-collapsible content-with-value=' +
+                  '\"&amp;quot;&amp;lt;p&amp;gt;Content.&amp;lt;/p&amp;' +
+                  'gt;&amp;lt;oppia-noninteractive-image ' +
+                  'filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;' +
+                  's7CollapsibleImage.png&amp;amp;amp;quot;\\&amp;quot;' +
+                  '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;' +
+                  '&amp;quot;\"></oppia-noninteractive-collapsible>' +
+                  '<oppia-noninteractive-tabs tab_contents-with-value=\"' +
+                  '[{&amp;quot;title&amp;quot;:&amp;quot;Title1&amp;' +
+                  'quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p' +
+                  '&amp;gt;Content1&amp;lt;/p&amp;gt;&amp;quot;},' +
+                  '{&amp;quot;title&amp;quot;:&amp;quot;Title2&amp;quot;' +
+                  ',&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;' +
+                  'gt;Content2&amp;lt;/p&amp;gt;&amp;lt;' +
+                  'oppia-noninteractive-image filepath-with-value=\\' +
+                  '&amp;quot;&amp;amp;amp;quot;s7TabImage.png&amp;amp;' +
+                  'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/' +
+                  'oppia-noninteractive-image&amp;gt;&amp;quot;}]\">' +
+                  '</oppia-noninteractive-tabs></p>'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
+          interaction: {
+            id: 'ItemSelectionInput',
+            default_outcome: {
+              feedback: {
+                content_id: 'content',
+                html: '<p>Try again!</p>'
+              },
+              dest: 'State 4',
+              param_changes: []
+            },
+            confirmed_unclassifies_answers: [],
+            customization_args: {
+              minAllowableSelectionCount: {
+                value: 1
+              },
+              maxAllowableSelectionCount: {
+                value: 2
+              },
+              choices: {
+                value: [{
+                  content_id: 'ca_choices_3',
+                  html: '<p>Choice 1</p>'
+                }, {
+                  content_id: 'ca_choices_4',
+                  html: '<p>Choice 2</p>'
+                }]
+              }
+            },
+            hints: [],
+            solution: null,
+            answer_groups: [
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: 'State 7',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: 'It is choice number 1.'
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {
+                    x: [
+                      '<p>Choice 1</p>'
+                    ]
+                  }
+                }],
+              },
+              {
+                labelled_as_correct: true,
+                outcome: {
+                  dest: 'State 1',
+                  feedback: {
+                    content_id: 'feedback_2',
+                    html: 'It is choice number 2'
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {
+                    x: [
+                      '<p>Choice 2</p>'
+                    ]
+                  }
+                }],
+              }
+            ]
+          },
+          next_content_id_index: 5,
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          }
         }
       },
       param_specs: {},
@@ -671,6 +792,7 @@ describe('Extracting Image file names in the state service', () => {
         's6Hint1.png', 's6SolutionExplanation.png',
         'mathImg_20207261338jhi1j6rvob_height_1d34' +
         '5_width_3d124_vertical_0d124.svg'],
+      'State 7': ['s7Image.png', 's7CollapsibleImage.png', 's7TabImage.png'],
       Introduction: ['sIMultipleChoice1.png', 'sIMultipleChoice2.png',
         'sIOutcomeFeedback.png']
     };

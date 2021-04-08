@@ -179,16 +179,53 @@ export class ExtractImageFilenamesFromStateService {
       let dummyDocument = (
         new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
-      let imageTagList = dummyDocument.getElementsByTagName(
-        'oppia-noninteractive-image');
-      for (let i = 0; i < imageTagList.length; i++) {
-        // We have the attribute of filepath in oppia-noninteractive-image tag.
-        // But it actually contains the filename only. We use the variable
-        // filename instead of filepath since in the end we are retrieving the
-        // filenames in the exploration.
-        let filename = JSON.parse(
-          imageTagList[i].getAttribute('filepath-with-value'));
-        filenames.push(filename);
+      let imageTagLists = [];
+
+      // Add images that are in the base content (not embedded).
+      imageTagLists.push(
+        dummyDocument.getElementsByTagName(
+          'oppia-noninteractive-image'));
+
+      // Add images that are embedded in collapsibles.
+      let collapsibleTagList = dummyDocument.getElementsByTagName(
+        'oppia-noninteractive-collapsible');
+      for (let i = 0; i < collapsibleTagList.length; i++) {
+        let contentWithValue = JSON.parse(
+          collapsibleTagList[i].getAttribute('content-with-value'));
+        let collapsibleDocument = (
+          new DOMParser().parseFromString(contentWithValue, 'text/html'));
+        imageTagLists.push(
+          collapsibleDocument.getElementsByTagName(
+            'oppia-noninteractive-image'));
+      }
+
+      // Add images that are embedded in tabs.
+      let tabsTagList = dummyDocument.getElementsByTagName(
+        'oppia-noninteractive-tabs');
+      for (let i = 0; i < tabsTagList.length; i++) {
+        let contentsWithValue = JSON.parse(
+          tabsTagList[i].getAttribute('tab_contents-with-value'));
+        for (let contentWithValue of contentsWithValue) {
+          let tabDocument = (
+            new DOMParser().parseFromString(
+              contentWithValue.content, 'text/html'));
+          imageTagLists.push(
+            tabDocument.getElementsByTagName(
+              'oppia-noninteractive-image'));
+        }
+      }
+
+      for (let imageTagList of imageTagLists) {
+        for (let i = 0; i < imageTagList.length; i++) {
+          // We have the attribute of filepath in oppia-noninteractive-image
+          // tag. But it actually contains the filename only. We use the
+          // variable filename instead of filepath since in the end we are
+          // retrieving the filenames in the exploration.
+          let filename = JSON.parse(
+            this.htmlEscaperService.escapedStrToUnescapedStr(
+              imageTagList[i].getAttribute('filepath-with-value')));
+          filenames.push(filename);
+        }
       }
       return filenames;
     }
