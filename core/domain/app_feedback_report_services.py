@@ -270,7 +270,7 @@ def scrub_all_unscrubbed_expiring_reports(scrubber_by):
     """
     models_to_scrub = get_all_expiring_reports_to_scrub()
     for model_entity in models_to_scrub:
-        scrub_single_app_feedback_reports(model_entity.id, scrubbed_by)
+        scrub_single_app_feedback_report(model_entity.id, scrubbed_by)
 
 
 def get_all_expiring_reports_to_scrub():
@@ -284,7 +284,7 @@ def get_all_expiring_reports_to_scrub():
     return model_class.get_all_unscrubbed_expiring_reports()
 
 
-def scrub_single_app_feedback_reports(report_id, scrubbed_by):
+def scrub_single_app_feedback_report(report_id, scrubbed_by):
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing
     any user-entered input in the entity.
 
