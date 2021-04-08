@@ -87,7 +87,7 @@ class CloudTranslateEmulator(python_utils.OBJECT):
             raise ValueError('Invalid language code: %s' % target_language_code)
 
         key = (source_language_code, target_language_code, text)
-        return self.expected_responses.get(key, default=self.DEFAULT_RESPONSE)
+        return self.expected_responses.get(key, self.DEFAULT_RESPONSE)
 
     def add_expected_response(
             self, source_language_code, target_language_code, source_text,

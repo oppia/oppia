@@ -28,12 +28,12 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
 
     def setUp(self):
         super(CloudTranslateEmulatorUnitTests, self).setUp()
-        self.emulator = cloud_translate_emulator.TranslateEmulator()
+        self.emulator = cloud_translate_emulator.CloudTranslateEmulator()
 
     def test_init_prepopulates_responses(self):
         self.assertDictEqual(
             self.emulator.expected_responses,
-            cloud_translate_emulator.PREGENERATED_TRANSLATIONS)
+            self.emulator.PREGENERATED_TRANSLATIONS)
 
     def test_translate_with_invalid_source_language_raises_error(self):
         with self.assertRaisesRegexp(
