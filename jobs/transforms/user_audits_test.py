@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for user_audits."""
+"""Unit tests for jobs.transforms.user_audits."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -23,7 +23,7 @@ import datetime
 
 from core.platform import models
 import feconf
-from jobs import jobs_test_base
+from jobs import job_test_utils
 from jobs.transforms import user_audits
 from jobs.types import audit_errors
 
@@ -32,7 +32,7 @@ import apache_beam as beam
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class ValidateUserModelIdTests(jobs_test_base.JobsTestBase):
+class ValidateUserModelIdTests(job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
 
@@ -67,7 +67,7 @@ class ValidateUserModelIdTests(jobs_test_base.JobsTestBase):
         self.assert_pcoll_equal(output, [])
 
 
-class ValidateOldModelsMarkedDeletedTests(jobs_test_base.JobsTestBase):
+class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
     VALID_USER_ID = 'test_user'
