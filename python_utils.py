@@ -514,6 +514,7 @@ def get_args_of_function(func):
         # Python 2.
         return inspect.getargspec(func).args
 
+
 def create_enum(*sequential):
     """Creates a enumerated constant.
 
