@@ -22,13 +22,16 @@ import copy
 import datetime
 import imghdr
 
+from constants import constants
 from core import jobs
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import image_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -1122,3 +1125,180 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class DeleteNonExistentExpsFromUserModelsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that removes explorations that do not exist or that are private from
+    completed and incomplete activities models and from user
+    subscriptions model.
+
+    This job will only be used in the April 2021 release to fix the errors on
+    the prod server. The errors exist because the activity models were not
+    properly updated when the explorations were deleted.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            DeleteNonExistentExpsFromUserModelsOneOffJob, cls
+        ).enqueue(job_id, shard_count=16)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            user_models.CompletedActivitiesModel,
+            user_models.IncompleteActivitiesModel,
+            user_models.UserSubscriptionsModel
+        ]
+
+    @staticmethod
+    def map(model):
+        class_name = model.__class__.__name__
+        exploration_ids = model.exploration_ids
+        exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
+            model.exploration_ids)
+        existing_exploration_ids = [
+            exp_id for exp_id, exp_rights_model
+            in python_utils.ZIP(exploration_ids, exp_rights_models)
+            if exp_rights_model is not None
+        ]
+
+        changed = False
+        if len(existing_exploration_ids) < len(exploration_ids):
+            changed = True
+            yield ('REMOVED_DELETED_EXPS - %s' % class_name, 1)
+
+        if isinstance(model, (
+                user_models.CompletedActivitiesModel,
+                user_models.IncompleteActivitiesModel
+        )):
+            public_exploration_ids = [
+                exp_id for exp_id, exp_rights_model
+                in python_utils.ZIP(exploration_ids, exp_rights_models)
+                if exp_rights_model is not None and
+                exp_rights_model.status == constants.ACTIVITY_STATUS_PUBLIC
+            ]
+
+            if len(public_exploration_ids) < len(existing_exploration_ids):
+                changed = True
+                yield ('REMOVED_PRIVATE_EXPS - %s' % class_name, 1)
+        else:
+            public_exploration_ids = existing_exploration_ids
+
+        if changed:
+            model.exploration_ids = public_exploration_ids
+            model.update_timestamps(update_last_updated_time=False)
+            model.put()
+
+        yield ('SUCCESS - %s' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class DeleteNonExistentExpUserDataOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes exploration user data models that do not have
+    existing explorations.
+
+    This job will only be used in the April 2021 release to fix the errors on
+    the prod server. The errors exist because the exploration user data models
+    were not properly deleted when the explorations were deleted.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            DeleteNonExistentExpUserDataOneOffJob, cls
+        ).enqueue(job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationUserDataModel]
+
+    @staticmethod
+    def map(model):
+        exp_model = exp_models.ExplorationModel.get(
+            model.exploration_id, strict=False)
+        if exp_model is None:
+            # By using delete_exploration we combine a few things, we delete
+            # the ExplorationUserDataModels, also we delete any other models
+            # that still exist for the exploration ID, and finally we verify
+            # that the delete_exploration works correctly.
+            exp_services.delete_exploration(
+                feconf.SYSTEM_COMMITTER_ID,
+                model.exploration_id,
+                force_deletion=True
+            )
+            yield ('SUCCESS_DELETED_EXPLORATION', 1)
+        else:
+            yield ('SUCCESS_KEPT', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class DeleteNonExistentExpUserContributionsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that removes deleted explorations from UserContributionsModels.
+
+    This job will only be used in the April 2021 release to fix the errors on
+    the prod server. The errors exist because the contributions models were not
+    properly updated when the explorations were deleted.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            DeleteNonExistentExpUserContributionsOneOffJob, cls
+        ).enqueue(job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserContributionsModel]
+
+    @staticmethod
+    def map(model):
+        created_exp_models = exp_models.ExplorationModel.get_multi(
+            model.created_exploration_ids)
+        existing_created_exp_ids = [
+            exp_id for exp_id, exp_model
+            in python_utils.ZIP(
+                model.created_exploration_ids, created_exp_models
+            ) if exp_model is not None
+        ]
+
+        changed = False
+        if len(existing_created_exp_ids) < len(model.created_exploration_ids):
+            changed = True
+            yield ('REMOVED_CREATED_DELETED_EXPS', 1)
+
+        edited_exp_models = exp_models.ExplorationModel.get_multi(
+            model.edited_exploration_ids)
+        existing_edited_exp_ids = [
+            exp_id for exp_id, exp_model
+            in python_utils.ZIP(
+                model.edited_exploration_ids, edited_exp_models
+            ) if exp_model is not None
+        ]
+
+        if len(existing_edited_exp_ids) < len(model.edited_exploration_ids):
+            changed = True
+            yield ('REMOVED_EDITED_DELETED_EXPS', 1)
+
+        if changed:
+            model.created_exploration_ids = existing_created_exp_ids
+            model.edited_exploration_ids = existing_edited_exp_ids
+            model.update_timestamps(update_last_updated_time=False)
+            model.put()
+
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
