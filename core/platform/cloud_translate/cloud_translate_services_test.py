@@ -28,14 +28,14 @@ class CloudTranslateServicesUnitTests(test_utils.TestBase):
 
     def test_translate_text_with_invalid_source_language_raises_error(self):
         with self.assertRaisesRegexp(
-            # Hindi (hi) is not a whitelisted language code.
+            # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid language code: hi'):
             cloud_translate_services.translate_text(
                 'hello world', 'hi', 'es')
 
     def test_translate_text_with_invalid_target_language_raises_error(self):
         with self.assertRaisesRegexp(
-            # Hindi (hi) is not a whitelisted language code.
+            # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid language code: hi'):
             cloud_translate_services.translate_text(
                 'hello world', 'en', 'hi')
