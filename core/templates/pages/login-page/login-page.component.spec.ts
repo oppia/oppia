@@ -17,9 +17,16 @@
  */
 
 import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
 import { LoginPageComponent } from './login-page.component';
 
 class MockWindowRef {
@@ -60,141 +67,248 @@ class PendingPromise<T = void> {
 }
 
 describe('Login Page', () => {
-  let redirectResultPromise: PendingPromise;
   let alertsService: jasmine.SpyObj<AlertsService>;
   let authService: jasmine.SpyObj<AuthService>;
+  let loaderService: jasmine.SpyObj<LoaderService>;
   let windowRef: MockWindowRef;
-  let alertSpy: jasmine.Spy;
 
-  let component: LoginPageComponent;
+  let loginPageComponent: LoginPageComponent;
   let fixture: ComponentFixture<LoginPageComponent>;
 
   const spyOnHandleRedirectResultAsync = () => {
-    const pending = new PendingPromise();
+    const pending = new PendingPromise<boolean>();
     authService.handleRedirectResultAsync.and.returnValue(pending.promise);
     return pending;
   };
 
+  const spyOnSignInWithEmail = () => {
+    const pending = new PendingPromise();
+    authService.signInWithEmail.and.returnValue(pending.promise);
+    return pending;
+  };
+
   beforeEach(() => {
-    alertSpy = spyOn(window, 'alert');
-    alertsService = (
-      jasmine.createSpyObj<AlertsService>('AlertsService', ['addWarning']));
+    alertsService = jasmine.createSpyObj<AlertsService>('AlertsService', [
+      'addWarning',
+    ]);
     authService = jasmine.createSpyObj<AuthService>('AuthService', {
-      handleRedirectResultAsync: Promise.resolve(),
+      handleRedirectResultAsync: Promise.resolve(false),
       signInWithRedirectAsync: Promise.resolve(),
+      signInWithEmail: Promise.resolve(),
     });
+    loaderService = jasmine.createSpyObj<LoaderService>('LoaderService', [
+      'showLoadingScreen',
+      'hideLoadingScreen',
+    ]);
     windowRef = new MockWindowRef();
 
     TestBed.configureTestingModule({
+      imports: [
+        MatAutocompleteModule,
+        MatCardModule,
+        MatButtonModule,
+        MatInputModule,
+        MatFormFieldModule,
+        ReactiveFormsModule,
+      ],
       declarations: [LoginPageComponent],
       providers: [
         { provide: AlertsService, useValue: alertsService },
         { provide: AuthService, useValue: authService },
+        { provide: LoaderService, useValue: loaderService },
         { provide: WindowRef, useValue: windowRef },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginPageComponent);
-    component = fixture.componentInstance;
+    loginPageComponent = fixture.componentInstance;
   });
 
   it('should be enabled by default', () => {
-    expect(LoginPageComponent.isEnabled).toBeTrue();
+    expect(loginPageComponent.enabled).toBeTrue();
   });
 
-  it('should redirect to sign-up after successful redirect', fakeAsync(() => {
-    redirectResultPromise = spyOnHandleRedirectResultAsync();
+  it('should be in emulator mode by default', () => {
+    expect(loginPageComponent.emulatorModeIsEnabled).toBeTrue();
+  });
 
-    component.ngOnInit();
+  it('should redirect immediately if login page disabled', fakeAsync(() => {
+    spyOnProperty(loginPageComponent, 'enabled', 'get').and.returnValue(false);
 
-    expect(windowRef.location).toBeNull();
-
-    redirectResultPromise.resolve();
-    flushMicrotasks();
-
-    expect(windowRef.location).toEqual('/signup?return_url=/');
-
-    flush();
-  }));
-
-  it('should acknowledge a user pending account deletion', fakeAsync(() => {
-    redirectResultPromise = spyOnHandleRedirectResultAsync();
-
-    component.ngOnInit();
-
-    expect(windowRef.location).toBeNull();
-
-    redirectResultPromise.reject({code: 'auth/user-disabled', message: '!'});
-    flushMicrotasks();
-
-    expect(windowRef.location).toEqual('/pending-account-deletion');
-
-    flush();
-  }));
-
-  it('should redirect to home page after failed login', fakeAsync(() => {
-    redirectResultPromise = spyOnHandleRedirectResultAsync();
-
-    component.ngOnInit();
-
-    expect(windowRef.location).toBeNull();
-
-    redirectResultPromise.reject({code: 'auth/unknown-error', message: '?'});
-
-    // An error should have appeared, but redirect will not happen immediately.
-    flushMicrotasks();
-    expect(windowRef.location).toBeNull();
-    expect(alertsService.addWarning).toHaveBeenCalledWith('?');
-
-    // The user will be given 2 seconds to acknowledge the warning.
-    tick(2000);
-    expect(windowRef.location).toEqual('/');
-
-    flush();
-  }));
-
-  it('should redirect to auth service when not logged in', fakeAsync(() => {
-    redirectResultPromise = spyOnHandleRedirectResultAsync();
-
-    component.ngOnInit();
-
-    expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
-
-    redirectResultPromise.reject(null);
-    flushMicrotasks();
-
-    expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
-
-    flush();
-  }));
-
-  it('should redirect to given url', fakeAsync(() => {
-    redirectResultPromise = spyOnHandleRedirectResultAsync();
-    windowRef.searchParams = '?return_url=/admin';
-
-    component.ngOnInit();
-
-    expect(windowRef.location).toBeNull();
-
-    redirectResultPromise.resolve();
-    flushMicrotasks();
-
-    expect(windowRef.location).toEqual('/signup?return_url=/admin');
-
-    flush();
-  }));
-
-  it('should redirect immediately if login page is disabled', fakeAsync(() => {
-    spyOnProperty(LoginPageComponent, 'isEnabled', 'get')
-      .and.returnValue(false);
-
-    component.ngOnInit();
+    loginPageComponent.ngOnInit();
     flush();
 
-    expect(alertSpy).toHaveBeenCalledWith(
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Sign-in is temporarily disabled. Please try again later.');
     expect(windowRef.location).toEqual('/');
     expect(authService.handleRedirectResultAsync).not.toHaveBeenCalled();
     expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
   }));
+
+  describe('Emulator mode', function() {
+    beforeEach(() => {
+      this.email = 'a@a.com';
+      spyOnProperty(loginPageComponent, 'emulatorModeIsEnabled', 'get')
+        .and.returnValue(true);
+    });
+
+    it('should not handle redirect results', fakeAsync(() => {
+      loginPageComponent.ngOnInit();
+
+      expect(loaderService.showLoadingScreen).not.toHaveBeenCalled();
+      expect(authService.handleRedirectResultAsync).not.toHaveBeenCalled();
+    }));
+
+    it('should redirect to sign up after successful sign in', fakeAsync(() => {
+      const signInPromise = spyOnSignInWithEmail();
+
+      loginPageComponent.onClickSignInButtonAsync(this.email);
+
+      flushMicrotasks();
+
+      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+      expect(authService.signInWithEmail).toHaveBeenCalled();
+      expect(windowRef.location).toBeNull();
+
+      signInPromise.resolve();
+      flush();
+
+      expect(windowRef.location).toEqual('/signup?return_url=/');
+    }));
+
+    it('should acknowledge a user pending account deletion', fakeAsync(() => {
+      const signInPromise = spyOnSignInWithEmail();
+
+      loginPageComponent.onClickSignInButtonAsync(this.email);
+
+      expect(windowRef.location).toBeNull();
+
+      signInPromise.reject({code: 'auth/user-disabled', message: '!'});
+      flushMicrotasks();
+
+      expect(windowRef.location).toEqual('/pending-account-deletion');
+
+      flush();
+    }));
+
+    it('should add a warning message when signin fails', fakeAsync(() => {
+      const signInPromise = spyOnSignInWithEmail();
+
+      loginPageComponent.onClickSignInButtonAsync(this.email);
+
+      expect(windowRef.location).toBeNull();
+
+      signInPromise.reject({code: 'auth/unknown-error', message: '?'});
+      flush();
+
+      expect(windowRef.location).toBeNull();
+      expect(alertsService.addWarning).toHaveBeenCalledWith('?');
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+
+      flush();
+    }));
+
+    it('should redirect to given url', fakeAsync(() => {
+      const signInPromise = spyOnSignInWithEmail();
+      windowRef.searchParams = '?return_url=/admin';
+
+      loginPageComponent.onClickSignInButtonAsync(this.email);
+
+      expect(windowRef.location).toBeNull();
+
+      signInPromise.resolve();
+      flushMicrotasks();
+
+      expect(windowRef.location).toEqual('/signup?return_url=/admin');
+
+      flush();
+    }));
+  });
+
+  describe('Production mode', () => {
+    beforeEach(() => {
+      spyOnProperty(loginPageComponent, 'emulatorModeIsEnabled', 'get')
+        .and.returnValue(false);
+    });
+
+    it('should redirect to sign-up after successful redirect', fakeAsync(() => {
+      const redirectResultPromise = spyOnHandleRedirectResultAsync();
+
+      loginPageComponent.ngOnInit();
+
+      expect(windowRef.location).toBeNull();
+
+      redirectResultPromise.resolve(true);
+      flushMicrotasks();
+
+      expect(windowRef.location).toEqual('/signup?return_url=/');
+
+      flush();
+    }));
+
+    it('should acknowledge a user pending account deletion', fakeAsync(() => {
+      const redirectResultPromise = spyOnHandleRedirectResultAsync();
+
+      loginPageComponent.ngOnInit();
+
+      expect(windowRef.location).toBeNull();
+
+      redirectResultPromise.reject({code: 'auth/user-disabled', message: '!'});
+      flushMicrotasks();
+
+      expect(windowRef.location).toEqual('/pending-account-deletion');
+
+      flush();
+    }));
+
+    it('should redirect to home page after failed login', fakeAsync(() => {
+      const redirectResultPromise = spyOnHandleRedirectResultAsync();
+
+      loginPageComponent.ngOnInit();
+
+      expect(windowRef.location).toBeNull();
+
+      redirectResultPromise.reject({code: 'auth/unknown-error', message: '?'});
+
+      // An error should have appeared, but it will not redirect immediately.
+      flushMicrotasks();
+      expect(windowRef.location).toBeNull();
+      expect(alertsService.addWarning).toHaveBeenCalledWith('?');
+
+      // The user will be given 2 seconds to acknowledge the warning.
+      tick(2000);
+      expect(windowRef.location).toEqual('/');
+
+      flush();
+    }));
+
+    it('should redirect to auth service when not logged in', fakeAsync(() => {
+      const redirectResultPromise = spyOnHandleRedirectResultAsync();
+
+      loginPageComponent.ngOnInit();
+
+      expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
+
+      redirectResultPromise.resolve(null);
+      flushMicrotasks();
+
+      expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
+
+      flush();
+    }));
+
+    it('should redirect to given url', fakeAsync(() => {
+      const redirectResultPromise = spyOnHandleRedirectResultAsync();
+      windowRef.searchParams = '?return_url=/admin';
+
+      loginPageComponent.ngOnInit();
+
+      expect(windowRef.location).toBeNull();
+
+      redirectResultPromise.resolve(true);
+      flushMicrotasks();
+
+      expect(windowRef.location).toEqual('/signup?return_url=/admin');
+    }));
+  });
 });

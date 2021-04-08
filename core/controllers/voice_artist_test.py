@@ -41,7 +41,7 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
 
 class VoiceArtistTest(BaseVoiceArtistControllerTests):

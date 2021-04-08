@@ -63,12 +63,10 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
   }
 
   const browserLogs = await browser.manage().logs().get('browser');
-  const fatalErrors = browserLogs.filter(browserLog => {
-    return (
-      browserLog.level.value > CONSOLE_LOG_THRESHOLD &&
-      errorsToIgnore.every(e => browserLog.message.match(e) === null));
-  });
-  expect(fatalErrors).toEqual([]);
+  const browserErrors = browserLogs.filter(logEntry => (
+    logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+    errorsToIgnore.every(e => logEntry.message.match(e) === null)));
+  expect(browserErrors).toEqual([]);
 };
 
 var isInDevMode = function() {

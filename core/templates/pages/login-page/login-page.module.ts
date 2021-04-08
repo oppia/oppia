@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,69 +16,103 @@
  * @fileoverview Module for the login page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { LoginPageComponent } from './login-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
+import firebase from 'firebase/app';
+
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { LoginPageComponent } from 'pages/login-page/login-page.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+
+class FirebaseErrorFilterHandler extends ErrorHandler {
+  // AngularFire throws duplicate errors because it uses setTimeout() to manage
+  // promises internally. Errors thrown from those setTimeout() calls are not
+  // accessible to our code. Because of this, even though LoginPageComponent
+  // catches errors thrown by AngularFire, their duplicates are treated as
+  // "Unhandled Promise Rejections" and result in top-level error messages.
+  //
+  // To prevent these errors from interfering with end-to-end tests and from
+  // polluting the server, we ignore the following list of EXPECTED error codes.
+  private static readonly EXPECTED_ERROR_CODES = [
+    // Users pending deletion have their Firebase accounts disabled. When they
+    // try to sign in anyway, we redirect them to the /pending-account-deletion
+    // page.
+    'auth/user-disabled',
+    // In emulator mode we use signInWithEmailAndPassword() and, if that throws
+    // an 'auth/user-not-found' error, createUserWithEmailAndPassword() for
+    // convenience. In production mode we use signInWithRedirect(), which
+    // doesn't throw 'auth/user-not-found' because it handles both signing in
+    // and creating users in the same way.
+    'auth/user-not-found',
+  ];
+
+  handleError(error: firebase.auth.Error): void {
+    if (FirebaseErrorFilterHandler.EXPECTED_ERROR_CODES.includes(error.code)) {
+      return;
+    }
+    super.handleError(error);
+  }
+}
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    MatAutocompleteModule,
+    MatCardModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    SharedComponentsModule,
   ],
   declarations: [
     LoginPageComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
   ],
   entryComponents: [
     LoginPageComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
+    },
+    {
+      provide: ErrorHandler,
+      useClass: FirebaseErrorFilterHandler,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 class LoginPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(LoginPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFn);
-
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia').requires.push(downgradedModule);
+angular.module('oppia').requires.push(downgradeModule(providers => {
+  return platformBrowserDynamic(providers).bootstrapModule(LoginPageModule);
+}));
 
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
+  component: OppiaAngularRootComponent,
+}) as angular.IDirectiveFactory);

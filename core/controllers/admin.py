@@ -722,7 +722,7 @@ class AdminRoleHandler(base.BaseHandler):
             username=username)
 
         if topic_id:
-            user = user_services.UserActionsInfo(user_id)
+            user = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)
@@ -730,18 +730,19 @@ class AdminRoleHandler(base.BaseHandler):
         self.render_json({})
 
 
-class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
+class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
     """Handler for granting a user super admin privileges."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def put(self):
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
 
-        username = self.request.get('username', None)
+        username = self.payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
 
@@ -752,14 +753,8 @@ class AdminGrantSuperAdminPrivilegesHandler(base.BaseHandler):
         auth_services.grant_super_admin_privileges(user_id)
         self.render_json(self.values)
 
-
-class AdminRevokeSuperAdminPrivilegesHandler(base.BaseHandler):
-    """Handler for revoking a user's super admin privileges."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def delete(self):
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
@@ -1152,7 +1147,7 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
 class DeleteUserHandler(base.BaseHandler):
     """Handler for deleting a user with specific ID."""
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_delete_any_user
     def delete(self):
         user_id = self.request.get('user_id', None)
         username = self.request.get('username', None)

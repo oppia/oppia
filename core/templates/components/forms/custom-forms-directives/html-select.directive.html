@@ -35,7 +35,7 @@
   }
   .oppia-html-select .oppia-html-select-selection {
     height: 30px;
-    min-width: 350px;
+    min-width: 24rem;
     overflow: hidden;
     padding-right: 10px;
     position: relative;
@@ -64,5 +64,29 @@
   .oppia-html-select .oppia-dropdown-menu-text {
     white-space: normal;
     word-wrap: break-word;
+  }
+  @media only screen and (max-width: 1023px) {
+    .oppia-html-select .oppia-html-select-selection {
+    height: 30px;
+    min-width: 12rem;
+    overflow: hidden;
+    padding-right: 10px;
+    position: relative;
+    text-align: end;
+    text-decoration: none;
+    width: 80%;
+  }
+  }
+  @media only screen and (max-width: 767px) {
+    .oppia-html-select .oppia-html-select-selection {
+    height: 30px;
+    min-width: 12rem;
+    overflow: hidden;
+    padding-right: 10px;
+    position: relative;
+    text-align: end;
+    text-decoration: none;
+    width: 80%;
+  }
   }
 </style>

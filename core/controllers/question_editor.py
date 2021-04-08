@@ -153,42 +153,28 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         """Updates the QuestionSkillLink models with respect to the given
         question.
         """
-        if self.payload.get('action') == 'update_difficulty':
-            new_difficulty = self.payload.get('new_difficulty')
-            skill_id = self.payload.get('skill_id')
-            if skill_id is None:
-                raise self.InvalidInputException(
-                    'The \'skill_id\' field is missing in payload')
-            if new_difficulty is None:
-                raise self.InvalidInputException(
-                    'The \'new_difficulty\' field is missing in payload')
-            question_services.update_question_skill_link_difficulty(
-                question_id, skill_id, float(new_difficulty))
-        elif self.payload.get('action') == 'edit_links':
-            difficulty = self.payload.get('difficulty')
-            skill_ids_task_list = self.payload.get('skill_ids_task_list')
-            if skill_ids_task_list is None:
-                raise self.InvalidInputException(
-                    'Missing fields \'skill_ids_task_list\'in payload')
+        skill_ids_task_list = self.payload.get('skill_ids_task_list')
+        if skill_ids_task_list is None:
+            raise self.InvalidInputException(
+                'Missing fields \'skill_ids_task_list\'in payload')
 
-            for task_dict in skill_ids_task_list:
-                if not 'id' in task_dict:
-                    raise self.InvalidInputException(
-                        'Missing skill ID for edit_links.')
-                if task_dict['task'] == 'remove':
-                    question_services.delete_question_skill_link(
-                        self.user_id, question_id, task_dict['id'])
-                elif task_dict['task'] == 'add':
-                    if difficulty is None:
-                        raise self.InvalidInputException(
-                            'Missing field \'difficulty\' in payload')
-                    question_services.create_new_question_skill_link(
-                        self.user_id, question_id, task_dict['id'], difficulty)
-                else:
-                    raise self.InvalidInputException(
-                        'Invalid task for edit_links.')
-        else:
-            raise self.InvalidInputException('Invalid action in payload.')
+        for task_dict in skill_ids_task_list:
+            if not 'id' in task_dict:
+                raise self.InvalidInputException(
+                    'Missing skill ID.')
+            if task_dict['task'] == 'remove':
+                question_services.delete_question_skill_link(
+                    self.user_id, question_id, task_dict['id'])
+            elif task_dict['task'] == 'add':
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id, task_dict['id'],
+                    task_dict['difficulty'])
+            elif task_dict['task'] == 'update_difficulty':
+                question_services.update_question_skill_link_difficulty(
+                    question_id, task_dict['id'],
+                    float(task_dict['difficulty']))
+            else:
+                raise self.InvalidInputException('Invalid task.')
 
         self.render_json(self.values)
 

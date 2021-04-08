@@ -50,11 +50,6 @@ class UserAuthDetailsModel(base_models.BaseModel):
         datastore_services.StringProperty(indexed=True, default=None))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id, gae_id,
         firebase_auth_id, and parent_user_id fields.

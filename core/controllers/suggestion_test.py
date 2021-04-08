@@ -83,7 +83,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
@@ -1403,7 +1403,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.reviewer_id = self.editor_id
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
@@ -1558,7 +1558,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
