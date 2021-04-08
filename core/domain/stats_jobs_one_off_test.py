@@ -1907,14 +1907,14 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         ])
 
     def test_no_error_when_exploration_can_not_update_schema(self):
-        old_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        old_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
 
         with old_schema:
             self.save_new_default_exploration('ID', 'owner_id')
 
-        new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 43)
         schema_update_failure = self.swap(
-            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
+            exp_domain.Exploration, '_convert_states_v42_dict_to_v43_dict',
             classmethod(lambda *_: python_utils.divide(1, 0)))
 
         with new_schema, schema_update_failure:

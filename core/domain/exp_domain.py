@@ -1661,6 +1661,22 @@ class Exploration(python_utils.OBJECT):
                                         choices))
 
         return states_dict
+    
+    @classmethod
+    def _convert_states_v42_dict_to_v43_dict(cls, states_dict):
+        """Converts from version 42 to 43. Version 43 contains
+        linked skil id.
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_dict['linked_skill_id'] = None
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -1693,8 +1709,28 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 47
-    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
+    CURRENT_EXP_SCHEMA_VERSION = 48
+    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 47
+
+    @classmethod
+    def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
+        """Converts a v47 exploration dict into a v48 exploration dict.
+        Version 48 contains linked skill id to exploration state.
+        
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v47.
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v48."""
+
+        exploration_dict['schema_version'] = 48
+
+        exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 43
+
+        return exploration_dict
 
     @classmethod
     def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
@@ -1759,6 +1795,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
                 exploration_dict)
             exploration_schema_version = 47
+
+        if exploration_schema_version == 47:
+            exploration_dict = cls._convert_v47_dict_to_v48_dict(
+                exploration_dict)
+            exploration_schema_version = 48
 
         return exploration_dict
 

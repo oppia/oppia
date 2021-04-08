@@ -118,7 +118,7 @@ angular.module('oppia').directive('stateSkillEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
-                'modal-templates/delete-skill-modal.template.html'),
+                'modal-templates/delete-state-skill-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {

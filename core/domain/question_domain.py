@@ -1033,6 +1033,24 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v42_dict_to_v43_dict(cls, question_state_dict):
+        """Converts from version 42 to 43. Version 43 contains
+        linked skil id.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        question_state_dict['linked_skill_id'] = None
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

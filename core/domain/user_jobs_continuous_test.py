@@ -144,11 +144,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_ignores_automated_exploration_commits(self):
-        swap_states_schema_41 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
-        swap_exp_schema_46 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
-        with swap_states_schema_41, swap_exp_schema_46:
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        with swap_states_schema_42, swap_exp_schema_47:
             exploration = exp_domain.Exploration.create_default_exploration(
                 EXP_ID, title=EXP_TITLE)
             exp_services.save_new_exploration(USER_ID, exploration)

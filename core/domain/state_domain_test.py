@@ -974,6 +974,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'linked_skill_id': None,
             'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {

@@ -61,8 +61,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service');
+require('services/context.service')
 
-import { state } from '@angular/animations';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateEditor', [
@@ -94,14 +94,14 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$scope', 'StateContentService', 'StateSkillService',
+        '$scope', 'ContextService', 'StateContentService', 'StateSkillService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
         'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $scope, StateContentService, StateSkillService,
+            $scope, ContextService, StateContentService, StateSkillService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,
@@ -136,6 +136,7 @@ angular.module('oppia').directive('stateEditor', [
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
+            $scope.explorationIsLinkedToStory = ContextService.isExplorationLinkedToStory();
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {

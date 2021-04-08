@@ -2209,7 +2209,7 @@ title: Title
         """Test that a schema version that is too big is detected."""
         with self.assertRaisesRegexp(
             Exception,
-            'Sorry, we can only process v46 to v[0-9]+ exploration YAML files '
+            'Sorry, we can only process v47 to v[0-9]+ exploration YAML files '
             'at present.'):
             exp_domain.Exploration.from_yaml(
                 'bad_exp', self.YAML_CONTENT_INVALID_SCHEMA_VERSION)
@@ -2905,6 +2905,7 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -2939,6 +2940,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -3097,6 +3099,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             """Gets the default state dict of the exploration."""
             return {
+                'linked_skill_id': None,
                 'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
