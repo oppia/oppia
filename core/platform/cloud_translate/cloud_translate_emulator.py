@@ -30,7 +30,7 @@ class CloudTranslateEmulator(python_utils.OBJECT):
     API. This emulator can be used in backend testing, or a local dev
     environment without access to the Cloud Translate API. Expected responses
     must be passed in before using this emulator for testing. See
-    PREGENERATED_TRANSLATIONS above for some prepopulated responses.
+    PREGENERATED_TRANSLATIONS below for some prepopulated responses.
 
     This class uses ISO 639-1 compliant language codes to specify languages.
     To learn more about ISO 639-1, see:

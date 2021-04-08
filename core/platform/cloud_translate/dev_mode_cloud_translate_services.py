@@ -36,6 +36,10 @@ def translate_text(text, source_language, target_language):
         source_language: str. An allowlisted ISO 639-1 language code.
         target_language: str. An allowlisted ISO 639-1 language code.
 
+    Raises:
+        ValueError. Invalid source language code.
+        ValueError. Invalid target language code.
+
     Returns:
         str. The translated text.
     """

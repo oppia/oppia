@@ -41,6 +41,10 @@ def translate_text(text, source_language, target_language):
         source_language: str. An allowlisted language code.
         target_language: str. An allowlisted language code.
 
+    Raises:
+        ValueError. Invalid source language code.
+        ValueError. Invalid target language code.
+
     Returns:
         str. The translated text.
     """
