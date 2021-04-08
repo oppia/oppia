@@ -149,7 +149,7 @@ def _get_stats_dict_from_json(daily_param_stats):
         parameter_counts = [
             parameter_value: value_count
             for (parameter_value, value_count) in (
-                daily_param_stats[parameter_name)]
+                daily_param_stats[parameter_name])]
         counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
             parameter_counts)
         stats_dict[parameter_name] = counts_obj
@@ -224,6 +224,25 @@ def _get_web_report_from_model(web_report_model):
 
 def _get_entry_point(
         entry_point_name, topic_id, story_id, exploration_id, subtopic_id):
+    """Creates a domain object that represents an entry point to the feedback
+    reporting feature.
+
+    Args:
+        entry_point_name: str. The name of the entry point that corresponds to
+            an ENTRY_POINT enum.
+        topic_id: str|None. The ID of the topic that is being played when the
+            report was initiated or None if the entry point is not from a topic.
+        story_id: str|None. The ID of the story that is being played when the
+            report was initiated or None if the entry point is not from a story.
+        exploration_id: str|None. The ID of the exploration that is being played
+            when the report was initiated or None if there was no active
+            exploration when the report was started.
+        subtopic_id: int|None. The ID of the subtopic that is being played when
+            the report was initiated or None if there was no active subtopic
+            when the report was started.
+    Returns:
+        AppFeedbackReport. The corresponding AppFeedbackReport domain object.
+    """
     if entry_point_name == (
         app_feedback_report_domain.ENTRY_POINT.navigation_drawer):
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
@@ -241,17 +260,17 @@ def _get_entry_point(
         raise utils.InvalidInputException(
             "Received unexpected entry point type.")
 
-def scrub_all_unscrubbed_expiring_reports():
+def scrub_all_unscrubbed_expiring_reports(scrubber_by):
     """Fetches the reports that are expiring and must be scrubbed.
 
-    Returns:
-        list(str). The IDs for AppFeedbackReportModel entities that need to be
-        scrubbed.
+    Args:
+        scrubbed_by: str. The ID of the user initiating scrubbing or
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
+            job.
     """
     models_to_scrub = get_all_expiring_reports_to_scrub()
     for model_entity in models_to_scrub:
-        scrub_app_feedback_reports(
-            model_entity.id, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+        scrub_single_app_feedback_reports(model_entity.id, scrubbed_by)
 
 
 def get_all_expiring_reports_to_scrub():
@@ -265,7 +284,7 @@ def get_all_expiring_reports_to_scrub():
     return model_class.get_all_unscrubbed_expiring_reports()
 
 
-def scrub_report(report_id, scrubbed_by):
+def scrub_single_app_feedback_reports(report_id, scrubbed_by):
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing
     any user-entered input in the entity.
 
@@ -276,11 +295,11 @@ def scrub_report(report_id, scrubbed_by):
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
             job.
     """
-    _scrub_report_in_transaction(report_id, scrubbed_by)
+    _scrub_single_report_in_transaction(report_id, scrubbed_by)
 
 
 @transaction_services.run_in_transaction_wrapper
-def _scrub_report_in_transaction(report_id, scrubbed_by):
+def _scrub_single_report_in_transaction(report_id, scrubbed_by):
     """See scrub_report for general documentation of what this method does.
     It's only safe to call this method from within a transaction.
 
@@ -299,11 +318,11 @@ def _scrub_report_in_transaction(report_id, scrubbed_by):
             'exist.')
     if report_entity.platform == (
             app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
-        scrubbed_report_info = _scrub_report_info(
+        scrubbed_report_info = _scrub_report_info_dict(
             report_entity.android_report_info)
         report_entity.android_report_info = scrubbed_report_info
     else:
-        scrubbed_report_info = _scrub_report_info(
+        scrubbed_report_info = _scrub_report_info_dict(
             report_entity.web_report_info)
         report_entity.web_report_info = scrubbed_report_info
     report_entity.scrubbed_by = scrubbed_by
@@ -311,7 +330,7 @@ def _scrub_report_in_transaction(report_id, scrubbed_by):
     report_entity.put()
 
 
-def _scrub_report_info(report_info_dict):
+def _scrub_report_info_dict(report_info_dict):
     """Scrubs the dictionary of any fields that contains input directly from
     the user.
 
@@ -337,10 +356,6 @@ def _scrub_report_info(report_info_dict):
 # // AppFeedbackReportTicketModel and the relevant tickets in the
 # // AppFeedbackReportModel (both occurs in a transaction)>
 # def edit_ticket_name(ticket_id)
-
-# // Called when an maintainer needs to scrub a report or if the report is expiring
-# // (occurs in a transaction)
-# def scrub_report(report_id)
 
 # // Fetches and processes the next batch of reports maintainers want to view and
 # // returns a list of FeedbackReports.

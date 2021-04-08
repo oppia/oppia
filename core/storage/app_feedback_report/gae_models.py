@@ -102,7 +102,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=True)
     entry_point_exploration_id = datastore_services.StringProperty(
         required=False, indexed=True)
-    entry_point_subtopic_id = datastore_services.StringProperty(
+    entry_point_subtopic_id = datastore_services.IntegerProperty(
         required=False, indexed=True)
     # The text language on Oppia set by the user in its ISO-639 language code;
     # this is set by the user in Oppia's app preferences on all platforms.
@@ -169,7 +169,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 the type of entry point used.
             entry_point_exploration_id: str|None. The current exploration ID
                 depending on the type of entry point used.
-            entry_point_subtopic_id: str|None. The current subtopic ID depending
+            entry_point_subtopic_id: int|None. The current subtopic ID depending
                 on the type of entry point used.
             text_language_code: str. The ISO-639 language code for the text
                 language set by the user on the Oppia app.

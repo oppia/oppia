@@ -283,4 +283,5 @@ class CronAppFeedbackReportsScrubberHandler(base.BaseHandler):
         created_on field at least feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS
         before tthe date this services is called.
         """
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
