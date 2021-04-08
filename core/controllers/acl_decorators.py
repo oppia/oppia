@@ -2754,19 +2754,24 @@ def get_decorator_for_accepting_suggestion(decorator):
 
 
 def can_update_suggestions(handler):
-    """Function that generates a decorator for a given handler.
+    """Decorator to check whether user can update the suggestions that
+    they are allowed to review.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that has common checks and
-        permissions specified by passed in decorator.
+        permissions specified by passed in decorator. Users with rights
+            to accept translations andthe user who created a particular
+            translation are allowed to perform this action.
 
     Raises:
         NotLoggedInException. The user is not logged in.
         UnauthorizedUserException. The user does not have credentials to
             edit this suggestion.
+        InvalidInputException. The submitted suggestion id is not valid.
+        PageNotFoundException. A suggestion is not found with the given suggestion id.
     """
     def test_can_update_suggestion(
             self, suggestion_id, **kwargs):
@@ -2783,6 +2788,10 @@ def can_update_suggestions(handler):
 
         Raises:
             NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                edit this suggestion.
+            InvalidInputException. The submitted suggestion id is not valid.
+            PageNotFoundException. A suggestion is not found with the given suggestion id.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -2814,7 +2823,7 @@ def can_update_suggestions(handler):
             return handler(self, suggestion_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to resubmit this suggestion.')
+                'You are not allowed to update the suggestion.')
 
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion

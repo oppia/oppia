@@ -763,7 +763,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
 
-    def test_update_translation_updates_translation_suggestion_change(self):
+    def test_update_translation_suggestion_to_change_translation_html(self):
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',

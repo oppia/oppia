@@ -1746,7 +1746,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.suggestion_id, expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'You do not have credentials to resubmit this suggestion.')
+            'You are not allowed to update the suggestion.')
         self.logout()
 
     def test_guest_cannot_update_suggestion(self):

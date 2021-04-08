@@ -10,19 +10,21 @@
 </div>
 
 <div class="modal-body">
-  <div class="oppia-suggestion-review-edit-button-container">
-    <button class="btn btn-secondary" ng-if="!startedEditing && status === 'review'" ng-click="editSuggestion()">Edit</button>
-  </div>
   <section class="oppia-suggestion-review-container">
     <div class="oppia-suggestion-review-panel-container float-left">
-      <strong>Content to translate:</strong>
+      <div class="oppia-suggestion-review-panel-header-container">
+        <strong>Content to translate:</strong>
+      </div>
       <div class="oppia-suggestion-review-panel">
         <angular-html-bind html-data="contentHtml">
         </angular-html-bind>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
-      <strong> Translation:</strong>
+      <div class="oppia-suggestion-review-panel-header-container">
+        <strong> Translation:</strong>
+        <button class="btn btn-sm btn-secondary float-right" ng-if="!startedEditing && status === 'review'" ng-click="editSuggestion()">Edit</button>
+      </div>
       <div class="oppia-suggestion-review-panel">
         <div>
           <angular-html-bind html-data="translationHtml" ng-if="!startedEditing">
@@ -68,6 +70,7 @@
   }
   .oppia-suggestion-review-panel {
     border: 1px solid #ccc;
+    height: 88%;
   }
   .oppia-suggestion-review-message {
     margin-left: 10px;
@@ -76,9 +79,8 @@
   .oppia-suggestion-resolve-button {
     min-width: 165px;
   }
-  .oppia-suggestion-review-edit-button-container {
-    display: flex;
-    justify-content: flex-end;
+  .oppia-suggestion-review-panel-header-container {
+    height: 12%;
   }
   .oppia-translation-review-edit-buttons {
     margin-left: 10px;

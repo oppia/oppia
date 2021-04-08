@@ -148,9 +148,11 @@ class SuggestionHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
+    # TODO(#11735): Currently, only handles the translation suggestion
+    #updates. This needs to update to generally handle the suggestions.
     @acl_decorators.can_update_suggestions
     def put(self, suggestion_id):
-        """Handles POST requests.
+        """Handles PUT requests.
 
         Raises:
             ValidationError. The suggestion is already handled.

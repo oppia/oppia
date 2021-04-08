@@ -88,7 +88,7 @@ angular.module('oppia').controller(
 
         var commitMessage = `${contentType} section of "${stateName}" card`;
         if ($scope.translationUpdated) {
-          commitMessage = commitMessage + '(With Edits)';
+          commitMessage = commitMessage + ' (With Edits)';
         }
 
         return commitMessage;
