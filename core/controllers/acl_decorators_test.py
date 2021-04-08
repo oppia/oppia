@@ -1760,18 +1760,21 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_suggestions_with_invalid_suggestion_id_cannot_be_updated(self):
         self.login(self.reviewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % 'suggestion-id',
-            expected_status_int=400)
-        self.assertEqual(response['error'], "Invalid format for " +
-            "suggestion_id. It must contain 3 parts separated by '.'")
+            response = self.get_json(
+                '/mock/%s' % 'suggestion-id',
+                expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid format for suggestion_id. ' +
+                'It must contain 3 parts separated by \'.\'')
         self.logout()
 
     def test_suggestions_with_no_suggestions_are_rejected(self):
         self.login(self.reviewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % 
-            'exploration.exp1.WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
-            expected_status_int=404)
+            self.get_json(
+                '/mock/%s' % 'exploration.exp1.' +
+                    'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
+                expected_status_int=404)
         self.logout()
 
 
