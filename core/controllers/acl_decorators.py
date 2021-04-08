@@ -2816,8 +2816,6 @@ def can_update_suggestions(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to resubmit this suggestion.')
 
-        return handler(self, suggestion_id, **kwargs)
-
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion
 
