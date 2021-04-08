@@ -763,7 +763,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
 
-    def test_translation_update(self):
+    def test_update_translation_updates_translation_suggestion_change(self):
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -777,10 +777,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.author_id, [
                     'State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
-        self.old_content = state_domain.SubtitledHtml(
+        old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
         exploration.states['State 1'].update_content(
-            state_domain.SubtitledHtml.from_dict(self.old_content))
+            state_domain.SubtitledHtml.from_dict(old_content))
         exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,

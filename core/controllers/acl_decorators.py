@@ -2810,7 +2810,7 @@ def can_update_suggestions(handler):
                 return handler(self, suggestion_id, **kwargs)
 
         if suggestion_services.check_can_resubmit_suggestion(
-            suggestion_id, self.user_id):
+                suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(

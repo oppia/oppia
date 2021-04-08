@@ -413,7 +413,7 @@ def accept_suggestion(
 
 
 def update_translation_suggestion(suggestion_id, translation_html):
-    """Updates the change.translation_html of a suggestion with the 
+    """Updates the change.translation_html of a suggestion with the
         given suggestion_id.
 
     Args:
