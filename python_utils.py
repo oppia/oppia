@@ -323,8 +323,7 @@ def url_retrieve(source_url, filename=None):
         urllib.request.URLopener.version = (
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
             'Gecko/20100101 Firefox/47.0')
-        return urllib.request.urlretrieve(
-            source_url, filename=filename, context=context)
+        return urllib.request.urlretrieve(source_url, filename=filename)
     except ImportError:
         import urllib
 

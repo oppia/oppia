@@ -272,6 +272,15 @@ env_variables:
 # with the Firebase emulator. THIS MUST NOT BE DEPLOYED TO PRODUCTION. We
 # protect against this in the build script.
   FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
+# These environment variables allows Cloud NDB services to communicate with the
+# Cloud Datastore Emulator. THESE MUST NOT BE DEPLOYED TO PRODUCTION! We strip
+# them from the deployed app.yaml in scripts.build.
+  DATASTORE_DATASET: "dev-project-id"
+  DATASTORE_EMULATOR_HOST: "localhost:8089"
+  DATASTORE_EMULATOR_HOST_PATH: "localhost:8089/datastore"
+  DATASTORE_HOST: "http://localhost:8089"
+  DATASTORE_PROJECT_ID: "dev-project-id"
+  DATASTORE_USE_PROJECT_ID_AS_APP_ID: "true"
 
 skip_files:
 # .pyc and .pyo files

@@ -24,19 +24,3 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import feconf
 import utils
-
-from google.appengine.api import users
-
-
-def create_login_url(slug):
-    """Creates a login url.
-
-    Args:
-        slug: str. The URL to redirect to after login.
-
-    Returns:
-        str. The correct login URL that includes the page to redirect to.
-    """
-    return users.create_login_url(
-        dest_url=utils.set_url_query_parameter(
-            feconf.SIGNUP_URL, 'return_url', slug))

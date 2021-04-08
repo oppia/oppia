@@ -233,8 +233,8 @@ class _Gae(Platform):
         Returns:
             module. The gae_datastore_services module.
         """
-        from core.platform.datastore import gae_datastore_services
-        return gae_datastore_services
+        from core.platform.datastore import cloud_datastore_services
+        return cloud_datastore_services
 
     @classmethod
     def import_app_identity_services(cls):

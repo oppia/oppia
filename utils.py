@@ -80,8 +80,7 @@ def create_enum(*sequential):
     enums = dict(python_utils.ZIP(sequential, sequential))
     try:
         from enum import Enum
-        print(enums)
-        return Enum('Test', enums)
+        return Enum('Enum', enums)
     except ImportError:
         return type(b'Enum', (), enums)
 

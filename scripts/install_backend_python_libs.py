@@ -298,13 +298,13 @@ def _rectify_third_party_directory(mismatches):
         if not directory_version:
             _install_library(
                 normalized_library_name,
-                python_utils.convert_to_bytes(requirements_version))
+                str(requirements_version))
         # The currently installed library version is not equal to the required
         # 'requirements.txt' version.
         elif requirements_version != directory_version:
             _install_library(
                 normalized_library_name,
-                python_utils.convert_to_bytes(requirements_version))
+                str(requirements_version))
             _remove_metadata(
                 normalized_library_name,
                 python_utils.convert_to_bytes(directory_version))

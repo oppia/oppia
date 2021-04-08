@@ -100,7 +100,7 @@ GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
 DEV_APPSERVER_PATH = (
-    os.path.join(GOOGLE_APP_ENGINE_SDK_HOME, 'dev_appserver.py'))
+    os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
@@ -141,7 +141,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 120
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
@@ -894,7 +894,7 @@ def managed_dev_appserver(
         psutil.Process. The dev_appserver process.
     """
     dev_appserver_args = [
-        CURRENT_PYTHON_BIN,
+        'python',
         DEV_APPSERVER_PATH,
         '--host', host,
         '--port', port,

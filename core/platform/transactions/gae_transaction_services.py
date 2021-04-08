@@ -21,7 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
-from google.appengine.ext import ndb
+from google.cloud import datastore
+client = datastore.Client()
 
 
 def run_in_transaction_wrapper(fn):
@@ -41,7 +42,7 @@ def run_in_transaction_wrapper(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         """Wrapper for the transaction."""
-        return ndb.transaction(
+        return client.transaction(
             lambda: fn(*args, **kwargs),
             xg=True,
             propagation=ndb.TransactionOptions.ALLOWED,
@@ -64,4 +65,4 @@ def toplevel_wrapper(*args, **kwargs):
     Returns:
         app. The entire app toplevel.
     """
-    return db.toplevel(*args, **kwargs)
+    return client.toplevel(*args, **kwargs)
