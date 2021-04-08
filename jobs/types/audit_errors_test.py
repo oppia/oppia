@@ -29,8 +29,7 @@ from jobs import job_utils
 from jobs.types import audit_errors
 import python_utils
 
-(base_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class FooError(audit_errors.BaseAuditError):

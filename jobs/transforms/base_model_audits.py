@@ -36,8 +36,6 @@ import feconf
 from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
-import python_utils
-import utils
 
 import apache_beam as beam
 
@@ -50,123 +48,6 @@ MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
 VALIDATION_MODE_NON_STRICT = 'non-strict'
-
-
-class ExternalModelFetcherDetails(python_utils.OBJECT):
-    """Value object providing the class and ids to fetch an external model.
-    NOTE TO DEVELOPERS: For UserSettingsModel, use the
-    UserSettingsModelFetcherDetails class instead of this one.
-    """
-
-    def __init__(self, field_name, model_class, model_ids):
-        """Initializes an ExternalModelFetcherDetails domain object.
-
-        Args:
-            field_name: str. A specific name used as an identifier by the
-                storage model which is used to identify the external model
-                reference. For example: 'exp_ids': ExplorationModel, exp_ids
-                is the field name to identify the external model
-                ExplorationModel.
-            model_class: ClassObject. The external model class.
-            model_ids: list(str). The list of external model ids to fetch the
-                external models.
-
-        Raises:
-            Exception. This class was used instead of
-                UserSettingsModelFetcherDetails for the UserSettingsModel.
-        """
-        if model_class == user_models.UserSettingsModel:
-            raise Exception(
-                'When fetching instances of UserSettingsModel, please use ' +
-                'UserSettingsModelFetcherDetails instead of ' +
-                'ExternalModelFetcherDetails')
-        validated_model_ids = []
-        model_id_errors = []
-        for model_id in model_ids:
-            if not model_id:
-                model_id_errors.append(
-                    'A model id in the field \'%s\' '
-                    'is empty' % field_name)
-            else:
-                validated_model_ids.append(model_id)
-        self.field_name = field_name
-        self.model_class = model_class
-        self.model_ids = validated_model_ids
-        self.model_id_errors = model_id_errors
-
-
-class UserSettingsModelFetcherDetails(python_utils.OBJECT):
-    """Value object providing ids to fetch the user settings model."""
-
-    def __init__(
-            self, field_name, model_ids,
-            may_contain_system_ids, may_contain_pseudonymous_ids):
-        """Initializes the UserSettingsModelFetcherDetails domain object.
-
-        Args:
-            field_name: str. A specific name used as an identifier by the
-                storage model which is used to identify the user settings model
-                reference. For example: `'committer_id': UserSettingsModel`
-                means that committer_id is a field which contains a user_id
-                used to identify the external model UserSettingsModel.
-            model_ids: list(str). The list of user settings model IDs for which
-                to fetch the UserSettingsModels.
-            may_contain_system_ids: bool. Whether the model IDs contain
-                system IDs which should be omitted before attempting to fetch
-                the corresponding models. Set may_contain_system_ids to True if
-                and only if this field can contain admin or bot IDs.
-            may_contain_pseudonymous_ids: bool. Whether the model ids contain
-                pseudonymous IDs which should be omitted before attempting to
-                fetch the corresponding models. Set may_contain_pseudonymous_ids
-                to True if and only if this field can contain user IDs that
-                are pseudonymized as part of Wipeout. In other words, these
-                fields can only be in models that have LOCALLY_PSEUDONYMIZE as
-                their DELETION_POLICY.
-        """
-        model_id_errors = []
-        validated_model_ids = []
-        for model_id in model_ids:
-            if model_id in feconf.SYSTEM_USERS.values():
-                if not may_contain_system_ids:
-                    model_id_errors.append(
-                        'The field \'%s\' should not contain '
-                        'system IDs' % field_name)
-            elif utils.is_pseudonymous_id(model_id):
-                if not may_contain_pseudonymous_ids:
-                    model_id_errors.append(
-                        'The field \'%s\' should not contain '
-                        'pseudonymous IDs' % field_name)
-            elif not utils.is_user_id_valid(
-                    model_id,
-                    allow_system_user_id=False,
-                    allow_pseudonymous_id=False
-            ):
-                model_id_errors.append(
-                    'The user id %s in the field \'%s\' is '
-                    'invalid' % (model_id, field_name))
-            else:
-                validated_model_ids.append(model_id)
-        self.field_name = field_name
-        self.model_class = user_models.UserSettingsModel
-        self.model_ids = validated_model_ids
-        self.model_id_errors = model_id_errors
-
-
-class ExternalModelReference(python_utils.OBJECT):
-    """Value object representing an external model linked to a storage model."""
-
-    def __init__(
-            self, model_class, model_id, model_instance):
-        """Initializes an ExternalModelReference domain object.
-
-        Args:
-            model_class: ClassObject. The model class.
-            model_id: str. The id of the model.
-            model_instance: datastore_services.Model. The gae model object.
-        """
-        self.model_class = model_class
-        self.model_id = model_id
-        self.model_instance = model_instance
 
 
 class ValidateDeletedModel(beam.DoFn):
