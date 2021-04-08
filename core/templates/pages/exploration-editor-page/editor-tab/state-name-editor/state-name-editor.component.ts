@@ -52,9 +52,6 @@ angular.module('oppia').component('stateNameEditor', {
 
       ctrl.initStateNameEditor = function() {
         StateNameService.init();
-        if (ctrl.TabName === 'main') {
-          FocusManagerService.setFocus('oppiaEditableSection');
-        }
       };
 
       ctrl.openStateNameEditor = function() {
