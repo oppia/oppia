@@ -366,6 +366,10 @@ describe('Story Viewer Page component', () => {
         'Learn Topic 1 | Story | Oppia');
       expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
         'Story meta tag content');
+      // This throws "Type '{ thumbnailIconUrl: string;
+      // left: string; top: string; thumbnailBgColor: string; }' is not
+      // assignable to type 'ExpectedRecursive<string>'."We need to do that
+      // in order to test the component
       // @ts-ignore
       expect(component.pathIconParameters).toEqual([{
         thumbnailIconUrl: 'thumbnail-url',
