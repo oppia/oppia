@@ -62,7 +62,9 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': 2
+                    'edited_fewer_than_n_exps': 2,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -79,6 +81,8 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(query_model.edited_fewer_than_n_exps, 2)
         self.assertIsNone(query_model.edited_at_least_n_exps)
         self.assertIsNone(query_model.created_fewer_than_n_exps)
+        self.assertFalse(query_model.used_logic_proof_interaction)
+        self.assertFalse(query_model.created_collection)
         self.assertEqual(query_model.submitter_id, self.submitter_id)
 
         # Check that MR job has been enqueued.
@@ -498,7 +502,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -601,7 +607,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         query_models = user_models.UserQueryModel.query().fetch()
 
@@ -676,7 +684,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -725,7 +735,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -769,7 +781,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -831,7 +845,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
