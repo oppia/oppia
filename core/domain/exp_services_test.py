@@ -81,6 +81,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
     EXP_0_ID = 'An_exploration_0_id'
     EXP_1_ID = 'An_exploration_1_id'
+    EXP_2_ID = 'An_exploration_2_id'
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
@@ -818,6 +819,120 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIsNone(
             opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
                 self.EXP_1_ID))
+
+    def test_activities_of_deleted_explorations_are_deleted(self):
+        """Test that opportunity summary for deleted explorations are correctly
+        deleted.
+        """
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        user_models.CompletedActivitiesModel(
+            id=self.editor_id,
+            exploration_ids=[self.EXP_0_ID],
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        user_models.IncompleteActivitiesModel(
+            id=self.owner_id,
+            exploration_ids=[self.EXP_1_ID],
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get(
+                self.editor_id, strict=False
+            ).exploration_ids,
+            []
+        )
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get(
+                self.owner_id, strict=False
+            ).exploration_ids,
+            []
+        )
+
+    def test_user_data_of_deleted_explorations_are_deleted(self):
+        """Test that user data for deleted explorations are deleted."""
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_0_ID),
+            user_id=self.owner_id,
+            exploration_id=self.EXP_0_ID,
+        ).put()
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % ('other_user_id', self.EXP_0_ID),
+            user_id='other_user_id',
+            exploration_id=self.EXP_0_ID,
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_1_ID),
+            user_id=self.owner_id,
+            exploration_id=self.EXP_1_ID,
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+        self.process_and_flush_pending_tasks()
+
+        # The user data model has been purged from the backend.
+        self.assertIsNone(
+            user_models.ExplorationUserDataModel.get(
+                self.owner_id, self.EXP_0_ID))
+        self.assertIsNone(
+            user_models.ExplorationUserDataModel.get(
+                'other_user_id', self.EXP_0_ID))
+        self.assertIsNone(
+            user_models.ExplorationUserDataModel.get(
+                self.owner_id, self.EXP_1_ID))
+
+    def test_deleted_explorations_are_removed_from_user_contributions(self):
+        """Test that user data for deleted explorations are deleted."""
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        user_models.UserContributionsModel(
+            id=self.owner_id,
+            created_exploration_ids=[self.EXP_0_ID, self.EXP_2_ID],
+        ).put()
+        user_models.UserContributionsModel(
+            id='user_id',
+            edited_exploration_ids=[self.EXP_0_ID, self.EXP_2_ID],
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        user_models.UserContributionsModel(
+            id='other_user_id',
+            created_exploration_ids=[self.EXP_0_ID, self.EXP_2_ID],
+            edited_exploration_ids=[self.EXP_1_ID],
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                self.owner_id
+            ).created_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                'user_id'
+            ).edited_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                'other_user_id'
+            ).created_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                'other_user_id'
+            ).edited_exploration_ids,
+            []
+        )
 
     def test_feedbacks_belonging_to_exploration_are_deleted(self):
         """Tests that feedbacks belonging to exploration are deleted."""
