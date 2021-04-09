@@ -49,12 +49,7 @@ class ValidateUserModelId(base_model_audits.ValidateBaseModelId):
 
 @audit_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateOldModelsMarkedDeleted(beam.DoFn):
-    """DoFn to validate old models and mark them for deletion
-
-    Validate that there are no models that were last updated more than
-    four weeks ago, these models should be deleted.
-
-    """
+    """DoFn to validate old models and mark them for deletion"""
 
     def process(self, input_model):
         """Function that checks if a model is old enough to mark them deleted.
@@ -66,8 +61,8 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
             ModelExpiringError. An error class for expiring models.
         """
         model = job_utils.clone_model(input_model)
-        date_four_weeks_ago = (
+        expiration_date = (
             datetime.datetime.utcnow() -
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
-        if model.last_updated < date_four_weeks_ago:
+        if model.last_updated < expiration_date:
             yield audit_errors.ModelExpiringError(model)
