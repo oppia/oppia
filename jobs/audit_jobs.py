@@ -108,7 +108,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         )
 
         existing_key_count_pcolls = []
-        expected_key_error_pcolls = []
+        missing_key_error_pcolls = []
         audit_error_pcolls = [
             deleted_models
             | 'Apply ValidateDeletedModel on deleted models' >> (
@@ -124,19 +124,19 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                     models_of_kind | GetExistingModelKeyCounts(kind))
 
             if kind in ID_PROPERTY_TARGETS_BY_MODEL_KIND:
-                expected_key_error_pcolls.extend(
-                    models_of_kind | GetExpectedModelKeyErrors(kind))
+                missing_key_error_pcolls.extend(
+                    models_of_kind | GetMissingModelKeyErrors(kind))
 
         existing_key_counts = (
             existing_key_count_pcolls
             | 'Flatten PCollections of existing key counts' >> beam.Flatten()
         )
-        expected_key_errors = (
-            expected_key_error_pcolls
-            | 'Flatten PCollections of expected key errors' >> beam.Flatten()
+        missing_key_errors = (
+            missing_key_error_pcolls
+            | 'Flatten PCollections of missing key errors' >> beam.Flatten()
         )
         audit_error_pcolls.append(
-            (existing_key_counts, expected_key_errors)
+            (existing_key_counts, missing_key_errors)
             | 'Group counts and errors by key' >> beam.CoGroupByKey()
             | 'Filter keys without any errors' >> (
                 beam.FlatMapTuple(self._get_model_relationship_errors))
@@ -229,7 +229,7 @@ class GetExistingModelKeyCounts(beam.PTransform):
         )
 
 
-class GetExpectedModelKeyErrors(beam.PTransform):
+class GetMissingModelKeyErrors(beam.PTransform):
     """Returns PCollection of (key, error) pairs for each referenced model."""
 
     def __init__(self, kind):
@@ -238,7 +238,7 @@ class GetExpectedModelKeyErrors(beam.PTransform):
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetExpectedModelKeyErrors, self).__init__(
+        super(GetMissingModelKeyErrors, self).__init__(
             label='Generate (key, error)s from the ID properties in %s' % kind)
         self._id_property_targets = ID_PROPERTY_TARGETS_BY_MODEL_KIND[kind]
 
@@ -257,12 +257,12 @@ class GetExpectedModelKeyErrors(beam.PTransform):
         return (
             models_of_kind
             | 'Generate errors from %s' % id_property >> beam.FlatMap(
-                self._generate_expected_model_errors, id_property, target_kinds)
+                self._generate_missing_key_errors, id_property, target_kinds)
 
             for id_property, target_kinds in self._id_property_targets
         )
 
-    def _generate_expected_model_errors(self, model, id_property, target_kinds):
+    def _generate_missing_key_errors(self, model, id_property, target_kinds):
         """Yields all model keys referenced by the given model's properties.
 
         Args:
