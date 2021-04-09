@@ -71,6 +71,7 @@ export class GuppyInitializationService {
         }
         initialValue = initialValue.replace(/abs\(/g, 'absolutevalue(');
         initialValue = initialValue.replace(/sqrt\(/g, 'squareroot(');
+        console.log(guppyInstance);
         guppyInstance.import_text(initialValue);
         guppyInstance.engine.end();
         guppyInstance.render(true);
