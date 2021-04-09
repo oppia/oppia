@@ -151,9 +151,18 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on field ticket_id having value '
                 'invalid_ticket_id, expected model AppFeedbackReportTicketModel'
                 ' with id invalid_ticket_id but it doesn\'t exist"]]') % (
-                    model_entity.id)]
+                    model_entity.id),
+                    
+            (
+                u'[u\'failed validation check for domain object check '
+                'of AppFeedbackReportModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error The ticket id invalid_ticket_id is invalid\']]') % (
+                    model_entity.id)
+
+            )]
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_validation_with_deleted_external_references_fails(self):
         app_feedback_report_models.AppFeedbackReportTicketModel(

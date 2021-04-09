@@ -181,7 +181,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             self.require_valid_scrubber_id(self.scrubbed_by)
 
         if self.ticket_id is not None:
-            AppFeedbackReportTicket.validate_ticket_id(self.ticket_id)
+            AppFeedbackReportTicket.require_valid_ticket_id(self.ticket_id)
 
         self.require_valid_report_datetime(self.submitted_on_timestamp)
 
