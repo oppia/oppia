@@ -457,6 +457,7 @@
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
 /core/domain/job_validators*.py @vojtechjelinek
+/core/domain/subtopic_validators*.py @vojtechjelinek
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
 /core/jobs*.py @brianrodri
