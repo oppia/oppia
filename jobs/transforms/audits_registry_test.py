@@ -43,7 +43,7 @@ class GetAuditsByKindTests(test_utils.TestBase):
                 audits_registry.get_audit_do_fn_types_by_kind(), unique_obj)
 
 
-class GetIdPropertyTargetsByKind(test_utils.TestBase):
+class GetIdPropertyTargetsByKindTests(test_utils.TestBase):
 
     def test_returns_value_from_decorator(self):
         unique_obj = object()
@@ -64,7 +64,7 @@ class GetIdPropertyTargetsByKind(test_utils.TestBase):
                 unique_obj)
 
 
-class GetModelKindsTargetedByIdProperties(test_utils.TestBase):
+class GetModelKindsTargetedByIdPropertiesTests(test_utils.TestBase):
 
     def test_returns_value_from_decorator(self):
         unique_obj = object()

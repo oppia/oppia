@@ -226,7 +226,8 @@ class RelationshipsOfTests(test_utils.TestBase):
         self.assertEqual(
             MockRelationshipsOf.get_id_property_targets_by_kind(), {
                 b'BarModel': (
-                    (model_property.ModelProperty(BarModel, BarModel.foo_id),
+                    (
+                        model_property.ModelProperty(BarModel, BarModel.foo_id),
                         (b'FooModel',)),
                 ),
             })
@@ -244,7 +245,8 @@ class RelationshipsOfTests(test_utils.TestBase):
         self.assertEqual(
             MockRelationshipsOf.get_id_property_targets_by_kind(), {
                 b'BarModel': (
-                    (model_property.ModelProperty(BarModel, BarModel.id),
+                    (
+                        model_property.ModelProperty(BarModel, BarModel.id),
                         (b'BazModel',)),
                 ),
             })

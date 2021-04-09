@@ -59,8 +59,10 @@ def get_model_kind(model):
     """Returns the "kind" of the given model.
 
     NOTE: A model's kind is usually, but not always, the same as a model's class
-    name. This function will always return the correct value for "kind", even
-    when it is different from the class's name.
+    name. Specifically, the kind is different when a model overwrites the
+    _get_kind() class method. Although Oppia never does this, the Apache Beam
+    framework uses "kind" to refer to models extensively, so we follow the same
+    convention and take special care to always return the correct value.
 
     Args:
         model: base_models.Model|cloud_datastore_types.Entity. The model to
@@ -76,9 +78,10 @@ def get_model_kind(model):
             isinstance(model, type) and
             issubclass(model, base_models.BaseModel)):
         return model._get_kind() # pylint: disable=protected-access
-    if isinstance(model, cloud_datastore_types.Entity):
+    elif isinstance(model, cloud_datastore_types.Entity):
         return model.kind
-    raise TypeError('%r is not a model type or instance' % model)
+    else:
+        raise TypeError('%r is not a model type or instance' % model)
 
 
 def get_model_property(model, property_name):
@@ -97,11 +100,12 @@ def get_model_property(model, property_name):
     """
     if property_name == 'id':
         return get_model_id(model)
-    if isinstance(model, base_models.BaseModel):
+    elif isinstance(model, base_models.BaseModel):
         return getattr(model, property_name)
-    if isinstance(model, cloud_datastore_types.Entity):
+    elif isinstance(model, cloud_datastore_types.Entity):
         return model.get(property_name)
-    raise TypeError('%r is not a model instance' % model)
+    else:
+        raise TypeError('%r is not a model instance' % model)
 
 
 def get_model_id(model):
@@ -119,6 +123,7 @@ def get_model_id(model):
     """
     if isinstance(model, base_models.BaseModel):
         return model.id
-    if isinstance(model, cloud_datastore_types.Entity):
+    elif isinstance(model, cloud_datastore_types.Entity):
         return model.key.id_or_name
-    raise TypeError('%r is not a model instance' % model)
+    else:
+        raise TypeError('%r is not a model instance' % model)

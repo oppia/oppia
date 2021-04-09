@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import itertools
 
 from jobs import base_jobs
 from jobs import job_utils
@@ -139,8 +138,8 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         audit_error_pcolls.append(
             (existing_key_counts, expected_key_errors)
             | 'Group counts and errors by key' >> beam.CoGroupByKey()
-            | 'Filter keys without any errors' >> beam.FlatMapTuple(
-                self._get_model_relationship_errors)
+            | 'Filter keys without any errors' >> (
+                beam.FlatMapTuple(self._get_model_relationship_errors))
         )
 
         return audit_error_pcolls | 'Combine audit results' >> beam.Flatten()
@@ -274,16 +273,14 @@ class GetExpectedModelKeyErrors(beam.PTransform):
                 targets.
 
         Yields:
-            tuple(tuple(str, str), ModelRelationshipError). The key for a
-            referenced model (kind: str, ID: str), and the error that should be
-            reported when the key does not exist.
+            tuple(ModelKey, ModelRelationshipError). The key for a targeted
+            model and the error to report when the key doesn't exist.
         """
         for property_value in id_property.yield_value_from_model(model):
             if property_value is None:
                 continue
-            model_id, target_id = (
-                job_utils.get_model_id(model),
-                python_utils.convert_to_bytes(property_value))
+            model_id = job_utils.get_model_id(model)
+            target_id = python_utils.convert_to_bytes(property_value)
             for target_kind in target_kinds:
                 error = audit_errors.ModelRelationshipError(
                     id_property, model_id, target_kind, target_id)

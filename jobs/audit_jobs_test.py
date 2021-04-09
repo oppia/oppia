@@ -104,7 +104,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
                 user_settings_model_with_invalid_id, feconf.USER_ID_REGEX),
         ])
 
-    def test_missing_relationship(self):
+    def test_reports_error_when_id_property_target_does_not_exist(self):
         self.model_io_stub.put_multi([
             # UserEmailPreferencesModel.id -> UserSettingsModel.id.
             self.new_model(
@@ -120,7 +120,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
                 self.VALID_USER_ID, 'UserSettingsModel', self.VALID_USER_ID),
         ])
 
-    def test_present_relationships(self):
+    def test_empty_when_id_property_target_exists(self):
         self.model_io_stub.put_multi([
             self.new_model(
                 user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
@@ -131,7 +131,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is_empty()
 
-    def test_web_of_relationships(self):
+    def test_empty_when_web_of_id_property_targets_exist(self):
         self.model_io_stub.put_multi([
             self.new_model(
                 auth_models.UserAuthDetailsModel,
@@ -146,7 +146,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is_empty()
 
-    def test_ignored_relationships(self):
+    def test_reports_missing_id_property_target_even_if_sibling_property_is_valid(self): # pylint: disable=line-too-long
         self.model_io_stub.put_multi([
             self.new_model(
                 auth_models.UserAuthDetailsModel, id=self.VALID_USER_ID,

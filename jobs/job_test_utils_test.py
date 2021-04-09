@@ -26,6 +26,19 @@ import python_utils
 from apache_beam.testing import util as beam_testing_util
 
 
+class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
+
+    def test_flush_pipeline_strict_raises_runtime_error_after_second_call(self):
+        self.flush_pipeline(strict=True)
+        self.assertRaisesRegexp(
+            RuntimeError, 'must be called exactly once',
+            lambda: self.flush_pipeline(strict=True))
+
+    def test_flush_pipeline_not_strict_does_not_raise(self):
+        self.flush_pipeline(strict=False)
+        self.flush_pipeline(strict=False)
+
+
 class DecorateBeamErrorsTests(test_utils.TestBase):
 
     def assert_error_is_decorated(self, actual_msg, decorated_msg):

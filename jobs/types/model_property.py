@@ -19,16 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import itertools
-
 from core.platform import models
-import feconf
 from jobs import job_utils
 import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-datastore_services  = models.Registry.import_datastore_services()
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ModelProperty(python_utils.OBJECT):
@@ -61,7 +58,7 @@ class ModelProperty(python_utils.OBJECT):
         elif not isinstance(property_obj, datastore_services.Property):
             raise TypeError('%r is not a property' % property_obj)
         elif not any(
-                property_obj is p for p in model_class._properties.values()):
+                property_obj is p for p in model_class._properties.values()): # pylint: disable=protected-access
             raise ValueError('%r is not in properties of model' % property_obj)
 
         self._model_class = model_class
@@ -85,7 +82,7 @@ class ModelProperty(python_utils.OBJECT):
         """
         return (
             'id' if self._property_obj is self._model_class.id else
-            self._property_obj._name)
+            self._property_obj._name) # pylint: disable=protected-access
 
     def yield_value_from_model(self, model):
         """Yields the value(s) of the property from the given model.
@@ -121,15 +118,15 @@ class ModelProperty(python_utils.OBJECT):
         """
         return (
             self._property_obj is not self._model_class.id and
-            self._property_obj._repeated)
+            self._property_obj._repeated) # pylint: disable=protected-access
 
     def __getstate__(self):
         """Called by pickle to get the value that uniquely defines self.
 
         Returns:
             tuple(class, bytes). The model class and the name of the property.
-                We can't return the property object itself because it isn't
-                picklable.
+            We can't return the property object itself because it isn't
+            picklable.
         """
         return (self._model_class, self.property_name)
 
@@ -143,15 +140,16 @@ class ModelProperty(python_utils.OBJECT):
         self._model_class, property_name = state
         self._property_obj = (
             self._model_class.id if property_name == 'id' else
-            self._model_class._properties[property_name])
+            self._model_class._properties[property_name]) # pylint: disable=protected-access
 
     def __str__(self):
         return '%s.%s' % (self.model_kind, self.property_name)
 
     def __eq__(self, other):
         return (
-            (self._model_class is other._model_class and
-                self._property_obj is other._property_obj)
+            (
+                self._model_class is other._model_class and # pylint: disable=protected-access
+                self._property_obj is other._property_obj) # pylint: disable=protected-access
             if self.__class__ is other.__class__ else NotImplemented)
 
     def __ne__(self, other):
