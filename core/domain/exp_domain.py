@@ -1710,7 +1710,7 @@ class Exploration(python_utils.OBJECT):
     # definitions, this version number must be changed and a migration process
     # put in place.
     CURRENT_EXP_SCHEMA_VERSION = 48
-    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 47
+    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
     def _convert_v47_dict_to_v48_dict(cls, exploration_dict):

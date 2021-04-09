@@ -177,14 +177,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': 'new value'
-            })
-        ]
-        draft_change_list_2_v42 = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
-                'property_name': 'content',
-                'new_value': 'new value'
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -193,12 +185,20 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': None
             })
         ]
+        draft_change_list_2_v42 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
         # Migrate exploration to state schema version 43.
         self.create_and_migrate_new_exploration('42', '43')
         migrated_draft_change_list_1_v43 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_1_v42, 1, 2, self.EXP_ID))
-        # Verify that changes which include answer groups are
+        # Verify that changes which include linked skill id are
         # not upgraded to v42.
         self.assertIsNone(migrated_draft_change_list_1_v43)
 

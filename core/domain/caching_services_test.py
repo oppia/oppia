@@ -171,7 +171,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id": "ca_placeholder'
         '_0"}}}, "confirmed_unclassified_answers": [], "id": "TextInput", "hint'
         's": [{"hint_content": {"content_id": "hint_3", "html": "<p>This is a c'
-        'opyright character \\u00a9.</p>"}}]}, "linked_skill_id":null, "recorded_voiceovers": {"voiceov'
+        'opyright character \\u00a9.</p>"}}]}, "linked_skill_id": null, "recorded_voiceovers": {"voiceov'
         'ers_mapping": {"feedback_2": {}, "rule_input_4": {}, "content'
         '": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, '
         '"classifier_model_id": null, "content": {"content_id": "content", "htm'
