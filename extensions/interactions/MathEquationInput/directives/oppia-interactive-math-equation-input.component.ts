@@ -82,7 +82,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
         GuppyConfigurationService.changeDivSymbol(
-          JSON.parse($attrs.useFractionForDivisionWithValue));
+          JSON.parse($attrs.useFractionForDivisionWithValue || 'false'));
         GuppyInitializationService.init(
           'guppy-div-learner',
           MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,

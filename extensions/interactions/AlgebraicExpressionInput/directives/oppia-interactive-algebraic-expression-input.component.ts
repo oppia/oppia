@@ -90,7 +90,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
-      JSON.parse(this.useFractionForDivisionWithValue));
+      JSON.parse(this.useFractionForDivisionWithValue || 'false'));
     this.guppyInitializationService.setCustomOskLetters(
       this.htmlEscaperService.escapedJsonToObj(
         this.customOskLettersWithValue) as string[]
