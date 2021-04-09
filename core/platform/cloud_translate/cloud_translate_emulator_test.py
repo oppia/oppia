@@ -53,3 +53,18 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
     def test_translate_without_translation_returns_default_string(self):
         translated = self.emulator.translate('some text', 'en', 'es')
         self.assertEqual(self.emulator.DEFAULT_RESPONSE, translated)
+
+    def test_add_expected_response_adds_retrievable_response(self):
+        self.emulator.add_expected_response(
+            'en', 'es', 'text', 'translation')
+        self.assertEqual(
+            'translation', self.emulator.translate('text', 'en', 'es'))
+
+    def test_add_expected_response_updates_existing_response(self):
+        self.emulator.add_expected_response(
+            'en', 'es', 'text to translate', 'fake translation unchanged')
+        self.emulator.add_expected_response(
+            'en', 'es', 'text to translate', 'new fake translation')
+        self.assertEqual(
+            'new fake translation',
+            self.emulator.translate('text to translate', 'en', 'es'))
