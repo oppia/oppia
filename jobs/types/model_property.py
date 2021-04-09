@@ -68,7 +68,7 @@ class ModelProperty(python_utils.OBJECT):
         self._property_obj = property_obj
 
     @property
-    def kind(self):
+    def model_kind(self):
         """Returns the kind of model this instance refers to.
 
         Returns:
@@ -103,7 +103,8 @@ class ModelProperty(python_utils.OBJECT):
             TypeError. When the argument is not a model.
         """
         if not isinstance(model, self._model_class):
-            raise TypeError('%r is not an instance of %s' % (model, self.kind))
+            raise TypeError('%r is not an instance of %s' % (
+                model, self.model_kind))
         value = job_utils.get_model_property(model, self.property_name)
         if self._is_repeated_property:
             for v in value:
@@ -143,7 +144,7 @@ class ModelProperty(python_utils.OBJECT):
         self._property_obj = self._model_class._properties[property_name]
 
     def __str__(self):
-        return '%s.%s' % (self.kind, self.property_name)
+        return '%s.%s' % (self.model_kind, self.property_name)
 
     def __eq__(self, other):
         return (

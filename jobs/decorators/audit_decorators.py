@@ -21,11 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import inspect
+import itertools
 import re
 
 from core.platform import models
 from jobs import job_utils
 from jobs.types import audit_errors
+from jobs.types import model_property
 import python_utils
 
 import apache_beam as beam
@@ -145,8 +147,8 @@ class RelationshipsOf(python_utils.OBJECT):
     relationships between model properties and the IDs of related models.
 
     The name of the function is enforced so that code reads intuitively:
-        "Relationships Of [MODEL_TYPE]
-        "define model_type_relationships(model):
+        "Relationships Of [MODEL_CLASS]
+        "define model_relationships(model):
             yield model.property, [RELATED_MODELS...]
 
     This naming convention is enforced by the decorator.
@@ -159,47 +161,40 @@ class RelationshipsOf(python_utils.OBJECT):
             yield model.gae_id, [UserIdentifiersModel]
     """
 
-    _PROPERTY_RELATIONSHIPS_BY_MODEL_KIND = (
-        collections.defaultdict(lambda: collections.defaultdict(set)))
+    _ID_PROPERTY_TARGETS = collections.defaultdict(set)
 
-    def __init__(self, dependent_model_type):
+    def __init__(self, model_class):
         """Initializes a new RelationshipsOf decorator.
 
         Args:
-            dependent_model_type: class. A subclass of BaseModel.
+            model_class: class. A subclass of BaseModel.
         """
-        self._kind = self._validate_model_type(dependent_model_type)
-        self._dependent_model_type = dependent_model_type
-        self._related_model_kinds_by_prop_name = (
-            self._PROPERTY_RELATIONSHIPS_BY_MODEL_KIND[self._kind])
+        self._model_kind = self._get_model_kind(model_class)
+        self._model_class = model_class
 
-    def __call__(self, relationship_generator):
-        """Registers the property relationships of self._kind yielded by
+    def __call__(self, model_relationships):
+        """Registers the property relationships of self._model_kind yielded by
         the generator.
 
         See RelationshipsOf's docstring for a usage example.
 
         Args:
-            relationship_generator:
-                generator(class -> tuple(Property, list(class))). Should yield
-                (Property, list(class)) tuples, where the properties are from
-                the model class given to the generator as an argument.
+            model_relationships: callable. Expected to yield tuples with types
+                (Property, list(class)), where the properties are from the
+                self._model_class passed in to the function as an argument.
 
         Returns:
             generator. The same object.
         """
-        # https://stackoverflow.com/a/1176023/4859885.
-        camel_case_kind = re.sub(r'(?<!^)(?=[A-Z])', '_', self._kind).lower()
-        expected_name = '%s_relationships' % camel_case_kind
-        if relationship_generator.__name__ != expected_name:
-            raise ValueError('Please rename the function to %s' % expected_name)
-        for prop, related_models in (
-                relationship_generator(self._dependent_model_type)):
-            prop_name = self._validate_property(prop)
-            self._related_model_kinds_by_prop_name[prop_name].update(
-                self._validate_model_type(m)
-                for m in related_models if m is not self._dependent_model_type)
-        return relationship_generator
+        self._validate_name_of_model_relationships(model_relationships)
+        for property_obj, corresponding_models in (
+                model_relationships(self._model_class)):
+            id_property = (
+                model_property.ModelProperty(self._model_class, property_obj))
+            self._ID_PROPERTY_TARGETS[id_property].update(
+                self._get_model_kind(m)
+                for m in corresponding_models if m is not self._model_class)
+        return model_relationships
 
     @classmethod
     def get_property_relationships_by_kind(cls):
@@ -212,21 +207,23 @@ class RelationshipsOf(python_utils.OBJECT):
             corresponding set refers to the kinds of models which should exist
             in storage with the same ID.
         """
+        id_properties_by_model_kind = itertools.groupby(
+            sorted(cls._ID_PROPERTY_TARGETS, key=lambda p: p.model_kind),
+            key=lambda p: p.model_kind)
         return {
-            dependent_model_kind: {
-                prop_name: tuple(related_model_kinds)
-                for prop_name, related_model_kinds in
-                related_model_kinds_by_prop_name.items()
+            model_kind: {
+                id_property.property_name: (
+                    tuple(cls._ID_PROPERTY_TARGETS[id_property]))
+                for id_property in id_properties
             }
-            for dependent_model_kind, related_model_kinds_by_prop_name in (
-                cls._PROPERTY_RELATIONSHIPS_BY_MODEL_KIND.items())
+            for model_kind, id_properties in id_properties_by_model_kind
         }
 
-    def _validate_model_type(self, model_type):
-        """Returns the kind of the model type if it is valid.
+    def _get_model_kind(self, model_class):
+        """Returns the kind of the model class.
 
         Args:
-            model_type: BaseModel. A subclass of BaseModel.
+            model_class: BaseModel. A subclass of BaseModel.
 
         Returns:
             str. The model's kind.
@@ -234,44 +231,27 @@ class RelationshipsOf(python_utils.OBJECT):
         Raises:
             TypeError. The model class is not a subclass of BaseModel.
         """
-        if not isinstance(model_type, type):
-            raise TypeError('%r is an instance, not a type' % model_type)
-        if not issubclass(model_type, base_models.BaseModel):
+        if not isinstance(model_class, type):
+            raise TypeError('%r is an instance, not a type' % model_class)
+        if not issubclass(model_class, base_models.BaseModel):
             raise TypeError(
-                '%s is not a subclass of BaseModel' % model_type.__name__)
-        return job_utils.get_model_kind(model_type)
+                '%s is not a subclass of BaseModel' % model_class.__name__)
+        return job_utils.get_model_kind(model_class)
 
-    def _validate_property(self, prop):
-        """Returns the name of the property if it is valid.
+    def _validate_name_of_model_relationships(self, model_relationships):
+        """Checks that the model_relationships function has the expected name.
 
         Args:
-            prop: datastore_services.Property. A property.
-
-        Returns:
-            str. The name of the property.
+            model_relationships: callable. The function to validate.
 
         Raises:
-            TypeError. The property has the wrong type.
-            ValueError. The property is not installed on
-                self._dependent_model_type.
+            ValueError. The function is named incorrectly.
         """
-        if prop is base_models.BaseModel.id:
-            # BaseModel.id is a Python @property, not a Property, but we still
-            # want to support it.
-            return 'id'
-
-        if not isinstance(prop, datastore_services.Property):
-            raise TypeError('%s is not a Property' % type(prop).__name__)
-
-        prop_name = prop._name # pylint: disable=protected-access
-        if not hasattr(self._dependent_model_type, prop_name):
-            raise TypeError('%s.%s not found' % (
-                self._dependent_model_type.__name__, prop_name))
-
-        expected_prop = getattr(self._dependent_model_type, prop_name)
-        if prop is not expected_prop:
-            raise ValueError('%s=%r is not %s.%s=%r' % (
-                prop_name, prop,
-                self._dependent_model_type.__name__, prop_name, expected_prop))
-
-        return prop_name
+        lower_snake_case_model_kind = (
+            # Source: https://stackoverflow.com/a/1176023/4859885.
+            re.sub(r'(?<!^)(?=[A-Z])', '_', self._model_kind).lower())
+        expected_name = '%s_relationships' % lower_snake_case_model_kind
+        actual_name = model_relationships.__name__
+        if actual_name != expected_name:
+            raise ValueError('Please rename the function from "%s" to "%s"' % (
+                actual_name, expected_name))

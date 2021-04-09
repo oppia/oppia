@@ -195,13 +195,12 @@ class MockRelationshipsOf(audit_decorators.RelationshipsOf):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value for the unit tests.
-    _PROPERTY_RELATIONSHIPS_BY_MODEL_KIND = (
-        collections.defaultdict(lambda: collections.defaultdict(set)))
+    _ID_PROPERTY_TARGETS = collections.defaultdict(set)
 
     @classmethod
     def clear(cls):
         """Test-only helper method for clearing the decorator."""
-        cls._PROPERTY_RELATIONSHIPS_BY_MODEL_KIND.clear()
+        cls._ID_PROPERTY_TARGETS.clear()
 
 
 class RelationshipsOfTests(test_utils.TestBase):
@@ -243,27 +242,6 @@ class RelationshipsOfTests(test_utils.TestBase):
     def test_rejects_types_that_are_not_models(self):
         with self.assertRaisesRegexp(TypeError, 'not a subclass of BaseModel'):
             MockRelationshipsOf(int)
-
-    def test_rejects_non_property_types(self):
-        with self.assertRaisesRegexp(TypeError, 'int is not a Property'):
-            @MockRelationshipsOf(BarModel)
-            def bar_model_relationships(model): # pylint: disable=unused-variable
-                """Defines the relationships of BarModel."""
-                yield model.BAR_CONSTANT, [FooModel]
-
-    def test_rejects_property_from_different_class(self):
-        with self.assertRaisesRegexp(TypeError, 'BarModel.bar_id not found'):
-            @MockRelationshipsOf(BarModel)
-            def bar_model_relationships(unused_model): # pylint: disable=unused-variable
-                """Defines the relationships of BarModel."""
-                yield BazModel.bar_id, [BarModel]
-
-    def test_rejects_property_from_different_class_with_same_name(self):
-        with self.assertRaisesRegexp(ValueError, 'is not BarModel.foo_id'):
-            @MockRelationshipsOf(BarModel)
-            def bar_model_relationships(unused_model): # pylint: disable=unused-variable
-                """Defines the relationships of BarModel."""
-                yield BazModel.foo_id, [FooModel]
 
     def test_rejects_relationship_generator_with_wrong_name(self):
         with self.assertRaisesRegexp(ValueError, 'Please rename the function'):

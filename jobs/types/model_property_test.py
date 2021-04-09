@@ -87,7 +87,7 @@ class ModelPropertyTests(test_utils.TestBase):
                 SubclassOfBaseModel, SubclassOfNdbModel.value)
 
     def test_kind(self):
-        self.assertEqual(self.model_property.kind, 'SubclassOfBaseModel')
+        self.assertEqual(self.model_property.model_kind, 'SubclassOfBaseModel')
 
     def test_property_name(self):
         self.assertEqual(self.model_property.property_name, 'value')
