@@ -41,7 +41,7 @@ export class EventBusService {
   * This function will listen to messages of specific event types as specified
   * by the first param.
   * @param eventType The event that is to be listened for.
-  * @param action The action that is to be run when the event occurs
+  * @param action The action that is to be run when the event occurs.
   * @param callbackContext Callback context if any.
   *
   * @returns A subscription to the event asked for.
