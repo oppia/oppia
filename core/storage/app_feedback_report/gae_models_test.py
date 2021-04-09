@@ -335,7 +335,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
 
     def test_create_and_get_stats_model(self):
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_id(
                 'android', self.TICKET_ID, self.STATS_DATE))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             entity_id=entity_id,
@@ -346,7 +346,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             daily_param_stats=self.DAILY_STATS)
 
         stats_model = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.get(
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
 
         self.assertEqual(stats_model.id, '%s:%s:%s' % (
@@ -358,29 +358,17 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             stats_model.total_reports_submitted, self.TOTAL_REPORTS_SUBMITTED)
         self.assertEqual(stats_model.daily_param_stats, self.DAILY_STATS)
 
-    def test_create_raises_exception_by_mocking_collision(self):
-        model_class = app_feedback_report_models.AppFeedbackReportStatsModel
-        # Test Exception for AppFeedbackReportStatsModel.
-        with self.assertRaisesRegexp(
-            Exception,
-            'The id generator for AppFeedbackReportStatsModel is producing too '
-            'many collisions.'
-        ):
-            # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(model_class, 'get_by_id', types.MethodType(
-                    lambda x, y: True, model_class)):
-                entity_id = model_class.generate_id(
-                        'android', self.TICKET_ID, self.STATS_DATE)
-                model_class.create(
-                    platform='android',
-                    ticket_id=self.TICKET_ID,
-                    total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
-                    stats_tracking_date=self.STATS_DATE,
-                    daily_param_stats=self.DAILY_STATS)
+    def test_get_id_on_same_ticket_produces_same_id(self):
+        entity_id = model_class.calculate_id(
+                'android', self.TICKET_ID, self.STATS_DATE)
+        entity_id_copy = model_class.calculate_id(
+                'android', self.TICKET_ID, self.STATS_DATE)
+
+        assertEqual(entity_id, entity_id_copy)
 
     def test_get_stats_for_ticket(self):
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 'android', self.TICKET_ID, self.STATS_DATE))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             entity_id=entity_id,
@@ -390,7 +378,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             stats_tracking_date=self.STATS_DATE,
             daily_param_stats=self.DAILY_STATS)
         expected_stats_model = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.get(
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
 
         stats_model_class = (
@@ -408,7 +396,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_lowest_supported_role(self):
-        model = app_feedback_report_models.AppFeedbackReportStatsModel
+        model = app_feedback_report_models.AppFeedbackReportStatsModel()
         self.assertEqual(
             model.get_lowest_supported_role(),
             feconf.ROLE_ID_MODERATOR)

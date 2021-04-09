@@ -46,7 +46,7 @@ FEEDBACK_OPTIONS = utils.create_enum()
 ENTRY_POINT = utils.create_enum(
     'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
 STATS_PARAMETER_NAMES = utils.create_enum(
-    'all_submitted_reports', 'report_type', 'country_locale_code',
+    'all_submitted_reports', 'platform', 'report_type', 'country_locale_code',
     'entry_point_name', 'text_language_code', 'audio_language_code',
     'sdk_version', 'version_name')
 
@@ -719,6 +719,89 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                 'Invalid network type, received: %s.' % network_type)
 
 
+class AppContext(python_utils.OBJECT):
+    """Domain object for the Oppia app information of the user's Oppia instance
+    at the time they submitted the report.
+    """
+
+    def __init__(self, entry_point, text_language_code, audio_language_code):
+        """Constructs an AppContext domain object.
+
+        Args:
+            entry_point: EntryPoint. An object representing The entry point that
+                the user used to initiate the report.
+            text_language_code: str. The ISO-639 code for the text language set
+                in the app
+            audio_language_code: str. The ISO-639 code for the audio language
+                set in the app
+        """
+        self.entry_point = entry_point
+        self.text_language_code = text_language_code
+        self.audio_language_code = audio_language_code
+
+    def to_dict():
+        """Returns a dict representing this AppContext domain object. Subclasses
+        should override this to propertly format any additional properties.
+
+        Returns:
+            dict. A dict, mapping all fields of AppContext instance.
+        """
+        return {
+            'entry_point': self.entry_point.to_dict(),
+            'text_language_code': self.text_language_code,
+            'audio_language_code': self.audio_language_code
+        }
+
+    @classmethod
+    def validate():
+        """Validates this AppContext domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                AppContext are not valid.
+        """
+        self.entry_point.validate()
+        self.require_valid_language_code('text', self.text_language_code)
+        self.require_valid_language_code('audio', self.audio_language_code)
+
+    @classmethod
+    def require_valid_language_code(self, language_type, language_code):
+        """Checks that the language code is valid
+
+        Args:
+            language_type: str. The type of language code being validates,
+                either 'text' or 'audio'.
+            language_code: str. The language code being validated, as determined
+                by the Oppia app.
+        Raises:
+            ValidationError. The given code is not valid.
+        """
+        if language_code is None:
+            raise utils.ValidationError(
+                'No app %s language code supplied.' % language_type)
+        if not isinstance(language_code, int):
+            raise utils.ValidationError(
+                'Expected the app\'s %s language code to be a string, '
+                'received: %r' % language_type, language_code)
+        if not self._match_language_code_string(language_code):
+            raise utils.ValidationError(
+                'The app\'s %s language code is not a valid string, '
+                'received: %s.' % language_type, language_code)
+
+    @classmethod
+    def _match_language_code_string(cls, code):
+        """Helper that checks whether the given language code is a valid code.
+
+        Args:
+            code: str. The language code set on the app.
+        Raises:
+            bool. Whether the given code is valid. Valid codes are alphabetic
+            string that may contain a number of single hyphens.
+        """
+        regex_string = r'\w+(?:-\w+)+'
+        return re.compile(regex_string).match(code)
+
+
 class EntryPoint(python_utils.OBJECT):
     """Domain object for the entry point used to initiate the feedback report.
     """
@@ -935,89 +1018,6 @@ class CrashEntryPoint(EntryPoint):
         return {
             'entry_point_name': self.entry_point_name
         }
-
-
-class AppContext(python_utils.OBJECT):
-    """Domain object for the Oppia app information of the user's Oppia instance
-    at the time they submitted the report.
-    """
-
-    def __init__(self, entry_point, text_language_code, audio_language_code):
-        """Constructs an AppContext domain object.
-
-        Args:
-            entry_point: EntryPoint. An object representing The entry point that
-                the user used to initiate the report.
-            text_language_code: str. The ISO-639 code for the text language set
-                in the app
-            audio_language_code: str. The ISO-639 code for the audio language
-                set in the app
-        """
-        self.entry_point = entry_point
-        self.text_language_code = text_language_code
-        self.audio_language_code = audio_language_code
-
-    def to_dict():
-        """Returns a dict representing this AppContext domain object. Subclasses
-        should override this to propertly format any additional properties.
-
-        Returns:
-            dict. A dict, mapping all fields of AppContext instance.
-        """
-        return {
-            'entry_point': self.entry_point.to_dict(),
-            'text_language_code': self.text_language_code,
-            'audio_language_code': self.audio_language_code
-        }
-
-    @classmethod
-    def validate():
-        """Validates this AppContext domain object.
-
-        Raises:
-            ValidationError. One or more attributes of the
-                AppContext are not valid.
-        """
-        self.entry_point.validate()
-        self.require_valid_language_code('text', self.text_language_code)
-        self.require_valid_language_code('audio', self.audio_language_code)
-
-    @classmethod
-    def require_valid_language_code(self, language_type, language_code):
-        """Checks that the language code is valid
-
-        Args:
-            language_type: str. The type of language code being validates,
-                either 'text' or 'audio'.
-            language_code: str. The language code being validated, as determined
-                by the Oppia app.
-        Raises:
-            ValidationError. The given code is not valid.
-        """
-        if language_code is None:
-            raise utils.ValidationError(
-                'No app %s language code supplied.' % language_type)
-        if not isinstance(language_code, int):
-            raise utils.ValidationError(
-                'Expected the app\'s %s language code to be a string, '
-                'received: %r' % language_type, language_code)
-        if not self._match_language_code_string(language_code):
-            raise utils.ValidationError(
-                'The app\'s %s language code is not a valid string, '
-                'received: %s.' % language_type, language_code)
-
-    @classmethod
-    def _match_language_code_string(cls, code):
-        """Helper that checks whether the given language code is a valid code.
-
-        Args:
-            code: str. The language code set on the app.
-        Raises:
-            bool. Whether the given code is valid. Valid codes are alphabetic
-            string that may contain a number of single hyphens.
-        """
-        regex_string = r'\w+(?:-\w+)+'
-        return re.compile(regex_string).match(code)
 
 
 class AndroidAppContext(AppContext):

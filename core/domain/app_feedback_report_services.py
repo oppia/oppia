@@ -77,17 +77,21 @@ def create_android_report_from_json(report_json):
         app_context_json['account_is_profile_admin'],
         app_context_json['event_logs'], app_context_json['logcat_logs'])
 
-    report_datetime = datetime.datetime(
-        second=report_json['report_submission_timestamp_sec'],
-        tzinfo=datetime.timezone(
+    report_datetime = datetime.datetime.utcfromtimestamp(
+        timestamp=report_json['report_submission_timestamp_sec'],
+        tz=datetime.timezone(
             offset=report_json['report_submission_utc_offset']))
     report_id = app_feedback_report_models.AppFeedbackReportModel.generate_id(
         PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'])
-    return app_feedback_report_domain.AppFeedbackReport(
+
+    report_obj = app_feedback_report_domain.AppFeedbackReport(
         report_id, report_json['android_report_info_schema_version'],
         PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'],
         None, None, user_supplied_feedback_obj, device_system_context_obj,
         app_context_obj)
+    _save_new_report_stats(report_obj)
+
+    return report_obj
 
 
 def _get_entry_point_from_json(entry_point_json):
@@ -124,46 +128,146 @@ def _get_entry_point_from_json(entry_point_json):
             'The given entry point %d is invalid.' % entry_point_name)
 
 
-def save_incoming_report(report, report_stats):
-    """Saves an incoming report and updates the aggregate report stats with the
-    new report's data.
+def store_incoming_report_stats(report_obj):
+    """Adds a new report's stats to the aggregate stats model.
 
     Args:
-        report: AppFeedbackReport. AppFeedbackReport domain object.
-        report_stats: AppFeedbackReportStats. AppFeedbackReportStats domain
-            object.
+        report_obj: AppFeedbackReport. AppFeedbackReport domain object.
     """
-    _save_new_feedback_report_instance(report)
-    _save_new_report_stats_instance(report_stats)
+    if report_obj.platform == model_class.PLATFORM_CHOICE_WEB:
+        raise NotImplementedError(
+            'Stats aggregation for incoming web reports have not been '
+            'implemented yet.')
+    else:
+        platform = PLATFORM_ANDROID
+        model_class = app_feedback_report_models
+        unticketed_id = (
+            model_class.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
+        all_reports_id = model_class.ALL_ANDROID_REPORTS_STATS_TICKET_ID
+
+        stats_date = report_obj.submitted_on_timestamp.date()
+        unticketed_stats_entity_id = (
+            app_feedback_report_models.AppFeedbackReportStats.calculate_id(
+                platform, unticketed_id, stats_date))
+        all_reports_entity_id = (
+            app_feedback_report_models.AppFeedbackReportStats.calculate_id(
+                platform, all_reports_id, stats_date))
+
+    # Add new report to the stats models for unticketed reports and all reports.
+    _add_incoming_report_to_stats_model(
+        unticketed_stats_entity_id, platform, date)
+    _add_incoming_report_to_stats_model(all_reports_entity_id, platform, date)
 
 
-def _save_new_feedback_report_instance(report):
-    """Creates and stores a new AppFeedbackReportModel instance.
+def _add_incoming_report_to_stats_model(
+        stats_entity_id, platform, date, report_obj):
+    """Adds a new report's stats to the stats model.
 
     Args:
-        report: AppFeedbackReport. AppFeedbackReport domain object.
+        stats_entity_id: str. The ID of the model to add stats to.
+        platform: str. The platform of the report being aggregated.
+        date: datetime.date. The date of the stats.
+        report_obj: AppFeedbackReport. AppFeedbackReport domain object.
     """
-    report.validate()
-    user_supplied_feedback = report.user_supplied_feedback
-    model_entity_id = (
-        app_feedback_report_models.AppFeedbackReportModel.generate_id(
-            report.platform, 
-        )
-    app_feedback_report_models.AppFeedbackReportModel.create(
-        report.platform, report.submitted_on_timestamp,
-        user_supplied_feedback.category,)
+    stats_model = (
+        app_feedback_report_models.AppFeedbackReportStats.get_by_id(
+            stats_entity_id))
+    parameter_names = app_feedback_report_domain.STATS_PARAMETER_NAMES
+
+    # The stats we want to aggregate on.
+    report_type = report_obj.user_supplied_feedback.report_type
+    country_locale_code = (
+        report_obj.device_system_context.country_locale_code)
+    entry_point_name = report_obj.app_context.entry_point.entry_point_name
+    text_language_code = report_obj.app_context.text_language_code
+    audio_language_code = report_obj.app_context.audio_language_code
+    sdk_version = report_obj.device_system_context.sdk_version
+    version_name = report_obj.device_system_context.version_name
+
+    if stats_model is None:
+        # Create new stats model entity. These are the individual report fields
+        # that we will want to splice aggregate stats by and they will each have
+        # a count of 1 since this is the first report added for this entity.
+        stats_dict = {
+            parameter_names.report_type: {
+                report_type: 1 
+            },
+            parameter_names.country_locale_code:{
+                country_locale_code: 1
+            },
+            parameter_names.entry_point_name: {
+                entry_point_name: 1
+            },
+            parameter_names.text_language_code: {
+               text_language_code: 1
+            },
+            parameter_names.audio_language_code: {
+                audio_language_code: 1
+            },
+            parameter_names.sdk_version: {
+                sdk_version: 1
+            },
+            parameter_names.version_name: {
+                version_name: 1
+            }
+        }
+        app_feedback_report_models.AppFeedbackReportStats.create(
+            stats_entity_id, PLATFORM_ANDROID, unticketed_id, stats_date, 1,
+            stat_dict)
+    else:
+        # Add report to existing stats model.
+        stats_dict = stats_model.daily_param_stats
+        _add_stats_count_for_parameter_value_to_stats_dict(
+            stats_dict, parameter_names.report_type, report_type)
+
+        stats_dict[parameter_names.country_locale_code][country_locale_code] = (
+            _calculate_new_stats_count_for_parameter(
+                stats_dict[parameter_names.country_locale_code][
+                    country_locale_code]))
+        stats_dict[parameter_names.entry_point_name][entry_point_name] = (
+            _calculate_new_stats_count_for_parameter(
+                stats_dict[parameter_names.entry_point_name][entry_point_name]))
+        stats_dict[parameter_names.audio_language_code][audio_language_code] = (
+            _calculate_new_stats_count_for_parameter(
+                stats_dict[parameter_names.audio_language_code][
+                    audio_language_code]))
+        stats_dict[parameter_names.text_language_code][text_language_code] = (
+            _calculate_new_stats_count_for_parameter(
+                stats_dict[parameter_names.text_language_code][
+                    text_language_code]))
+        stats_dict[parameter_names.sdk_version][sdk_version] = (
+            _calculate_new_stats_count_for_parameter(
+                stats_dict[parameter_names.sdk_version][sdk_version]))
+        stats_dict[parameter_names.version_name][version_name] = (
+            _calculate_new_stats_count_for_parameter(
+                stats_dict[parameter_names.version_name][version_name]))
+
+        stats_model.daily_param_stats = stats_dict
+        stats_model.total_reports_submitted += 1
+        if (
+            report_obj.submitted_on_datetime > 
+            stats_model.newest_report_creation_timestamp):
+            stats_model.newest_report_creation_timestamp = (
+                report_obj.submitted_on_datetime)
+
+        stats_model.update_timestamps()
+        stats_model.put()
 
 
-def _save_new_report_stats_instance(report_stats):
-    """Creates and stores a new AppFeedbackReportModel instance.
+def _calculate_new_stats_count_for_parameter(current_count):
+    """Helper to increment or initialize the stats count for a parameter.
 
     Args:
-        report: AppFeedbackReport. AppFeedbackReport domain object.
-    # """
-    report_stats.validate()
-    stats_entity_id = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.create(
-            report_stats.platform, report_stats.))
+        current_count: int|None. The current report count for a given report, or
+            None of there are no reports that satisfied the given value.
+    Returns:
+        int. The new report count to put into the stats dict for a single
+        parameter value.
+    """
+    if current_count is None:
+        return 1
+    else:
+        return current_count + 1
 
 
 def get_report_from_model(report_model):

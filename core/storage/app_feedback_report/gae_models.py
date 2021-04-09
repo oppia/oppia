@@ -378,7 +378,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # A name for the ticket given by the maintainer, limited to 100 characters.
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
     # The platform that the reports in this ticket pertain to.
-    platform = datastore_services.StringProperty(required=True, indexed=True)
+    platform = datastore_services.StringProperty(
+        required=True, indexed=True, choices=PLATFORM_CHOICES)
     # The Github repository that has the associated issue for this ticket. The
     # possible values correspond to GITHUB_REPO_CHOICES.
     github_issue_repo_name = datastore_services.StringProperty(
@@ -569,8 +570,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def generate_id(cls, platform, ticket_id, stats_tracking_date):
-        """Generates key for the instance of AppFeedbackReportStatsModel
+    def calculate_id(cls, platform, ticket_id, stats_tracking_date):
+        """Gets the key for the instance of AppFeedbackReportStatsModel
         class in the required format with the arguments provided.
 
         Args:
@@ -579,18 +580,10 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             stats_tracking_date: date. The date these stats are tracking on.
 
         Returns:
-            str. The generated ID for this entity of the form
+            str. The ID for this entity of the form
             '[platform]:[ticket_id]:[stats_date in YYYY-MM-DD]'.
         """
-        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
-            new_id = '%s:%s:%s' % (
-                platform, ticket_id,
-                stats_tracking_date.isoformat())
-            if not cls.get_by_id(new_id):
-                return new_id
-        raise Exception(
-            'The id generator for AppFeedbackReportStatsModel is producing too '
-            'many collisions.')
+        return '%s:%s:%s' % platform, ticket_id, stats_tracking_date.isoformat()
 
     @classmethod
     def get_stats_for_ticket(cls, ticket_id):

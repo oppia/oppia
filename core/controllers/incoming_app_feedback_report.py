@@ -49,10 +49,9 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         report_obj = (
             app_feedback_report_service.create_android_report_from_json(
                 report_dict))
-        
-        # check schema version and migrate
-        # create report stats domain object
-        app_feedback_report_services.save_incoming_report(report, report_stats)
+        report_obj.validate()
+
+        app_feedback_report_service.store_incoming_report_stats(report_obj)
 
     def _validate_incoming_request(self, headers):
         api_key = headers['api_key']
