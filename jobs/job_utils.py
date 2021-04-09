@@ -14,14 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helper functions for beam validators and one-off jobs.
-
-The clone function should be used in every beam function since beam
-functions require all input to be immutable.
-"""
+"""Helper functions for beam validators and one-off jobs."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+from core.platform import models
+
+from google.cloud import datastore as cloud_datastore_types
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 def clone_model(model, **new_values):
@@ -30,6 +32,11 @@ def clone_model(model, **new_values):
     The cloned entity will have exactly the same property values as the
     original entity, except where overridden. By default, it will have no
     parent entity or key name, unless supplied.
+
+    IMPORTANT: This function should be used in EVERY DoFn, beacse one of Apache
+    Beam's invariants is that all input values are IMMUTABLE.
+    TODO(#12449): Use a metaclass to wrap DoFn.process() with a function that
+    clones inputs, so that contributors don't need to remember to.
 
     Args:
         model: datastore_services.Model. Model to clone.
@@ -46,3 +53,29 @@ def clone_model(model, **new_values):
     props = {k: v.__get__(model, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
     props.update(new_values)
     return cls(id=model_id, **props)
+
+
+def get_model_kind(item):
+    """Returns the "kind", a globally unique identifier, of the given item.
+
+    NOTE: A model's kind is usually, but not always, the same as a model's class
+    name. This function will always return the correct value for "kind", even if
+    it is different from the class's name.
+
+    Args:
+        item: base_models.Model|cloud_datastore_types.Entity. The item to
+            inspect.
+
+    Returns:
+        str. The item's kind.
+
+    Raises:
+        TypeError. When the argument is not a model.
+    """
+    if isinstance(item, base_models.BaseModel) or (
+            isinstance(item, type) and issubclass(item, base_models.BaseModel)):
+        return item._get_kind() # pylint: disable=protected-access
+    elif isinstance(item, cloud_datastore_types.Entity):
+        return item.kind
+    else:
+        raise TypeError('%r is not a model type' % type(item).__name__)
