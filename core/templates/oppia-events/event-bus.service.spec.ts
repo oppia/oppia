@@ -55,8 +55,7 @@ describe('Event Bus Group', () => {
   it('should throw uncaught errors', waitForAsync(() => {
     spyOn(Subject.prototype, 'subscribe').and.callFake(
       (f) => {
-        expect(() => f()).toThrow(new Error(
-          'Error in event bus\nRandom Error'));
+        expect(() => f()).toThrowError('Error in event bus\nRandom Error');
         return new Subscription();
       }
     );
