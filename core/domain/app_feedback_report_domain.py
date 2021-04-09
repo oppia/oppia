@@ -183,8 +183,6 @@ class AppFeedbackReport(python_utils.OBJECT):
         if self.ticket_id is not None:
             AppFeedbackReportTicket.require_valid_ticket_id(self.ticket_id)
 
-        self.require_valid_report_datetime(self.submitted_on_timestamp)
-
         self.user_supplied_feedback.validate()
 
         if self.platform == PLATFORM_ANDROID and not isinstance(
@@ -250,7 +248,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                     app_feedback_report_models.PLATFORM_CHOICES, platform))
 
     @classmethod
-    def require_valid_scrubber_id(scrubber_id):
+    def require_valid_scrubber_id(cls, scrubber_id):
         """Checks whether the scrubbed_by user is valid.
 
         Args:
@@ -266,21 +264,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                     scrubber_id))
         if not utils.is_user_id_valid(scrubber_id):
             raise utils.ValidationError(
-                'The scrubber_by user id %r is invalid.' % scrubber_id)
-
-    @classmethod
-    def require_valid_report_datetime(cls, submission_datetime):
-        """Checks whether the report submission datetime is a valid one.
-
-        Args:
-            submission_datetime: datetime.datetime. The datetime of that the
-                report was submitted by the user.
-        """
-        if submission_datetime < feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME:
-            raise utils.ValidationError(
-                'Report submission timestamp %s should be later than '
-                '%s' % (submission_datetime.isoformat(), (
-                    feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.isoformat())))
+                'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
 
 class UserSuppliedFeedback(python_utils.OBJECT):
@@ -1248,8 +1232,6 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The ticket archived status must be a boolean, received: %r' % (
                     self.archived))
-        AppFeedbackReport.require_valid_report_datetime(
-            self.newest_report_creation_timestamp)
         self.require_valid_reports(self.reports)
 
     @classmethod
@@ -1393,8 +1375,6 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
         self.require_valid_stats_id(self.stats_id)
         self.ticket.validate()
         AppFeedbackReport.require_valid_platform(self.platform)
-        AppFeedbackReport.require_valid_report_datetime(
-            self.stats_tracking_date)
         if not isinstance(self.total_reports_submitted, int):
             raise utils.ValidationError(
                 'The total number of submitted reports should be an int, '

@@ -39,6 +39,8 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
 
     USER_1_EMAIL = 'some@email.com'
     USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'user@email.com'
+    USER_2_USERNAME = 'username2'
     # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
     # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
@@ -83,6 +85,8 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         super(AppFeedbackReportModelValidatorTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
@@ -152,15 +156,12 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                 'invalid_ticket_id, expected model AppFeedbackReportTicketModel'
                 ' with id invalid_ticket_id but it doesn\'t exist"]]') % (
                     model_entity.id),
-                    
             (
                 u'[u\'failed validation check for domain object check '
                 'of AppFeedbackReportModel\', '
                 '[u\'Entity id %s: Entity fails domain validation with the '
                 'error The ticket id invalid_ticket_id is invalid\']]') % (
-                    model_entity.id)
-
-            )]
+                    model_entity.id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -223,12 +224,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_with_android_schema_version_greater_than_current_schema_fails(
+    def test_model_android_schema_version_greater_than_current_schema_fails(
             self):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.report_id))
-        model_entity.android_report_info_schema_version = 2
+        model_entity.android_report_info_schema_version = (
+            feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION + 1)
         model_entity.update_timestamps()
         model_entity.put()
 
@@ -241,15 +243,26 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.id,
                     model_entity.android_report_info_schema_version,
                     feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION,
-                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)]
+                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION),
+            (
+                u'[u\'failed validation check for domain object check of '
+                'AppFeedbackReportModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error The supported report schema versions for %s reports '
+                'are [%d, %d], received: %d.\']]') % (
+                    model_entity.id, model_entity.platform,
+                    feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION,
+                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION,
+                    model_entity.android_report_info_schema_version)]
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_android_schema_version_less_than_min_schema_fails(self):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.report_id))
-        model_entity.android_report_info_schema_version = 0
+        model_entity.android_report_info_schema_version = (
+            feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION - 1)
         model_entity.update_timestamps()
         model_entity.put()
 
@@ -262,9 +275,15 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     model_entity.id,
                     model_entity.android_report_info_schema_version,
                     feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION,
-                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)]
+                    feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION),
+            (
+                u'[u\'failed validation check for domain object check of '
+                'AppFeedbackReportModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error Android app feedback report migrations must be added for'
+                ' new report schemas implemented.\']]') % model_entity.id]
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_web_schema_version_greater_than_current_schema_fails(
             self):
@@ -305,6 +324,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     web_entity.id, web_entity.web_report_info_schema_version,
                     feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
                     feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+        expected_output.append(
+            (
+                u'[u\'failed validation check for domain object check of '
+                'AppFeedbackReportModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error Web app feedback report domain objects must be '
+                'defined.\']]') % web_entity.id)
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -346,6 +372,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
                     web_entity.id, web_entity.web_report_info_schema_version,
                     feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION,
                     feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION))
+        expected_output.append(
+            (
+                u'[u\'failed validation check for domain object check of '
+                'AppFeedbackReportModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error Web app feedback report domain objects must be '
+                'defined.\']]') % web_entity.id)
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -380,8 +413,8 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.report_id))
-        # Add a scrubber user so that it passes the scrubbing validation.
-        model_entity.scrubbed_by = 'scrubber_user'
+        # Add a scrubber user so that it passes the model's scrubber validation.
+        model_entity.scrubbed_by = self.user_2_id
         model_entity.created_on = (
             feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME -
             datetime.timedelta(days=4))

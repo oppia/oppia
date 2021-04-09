@@ -437,13 +437,13 @@ def _get_web_report_from_model(web_report_model):
         NotImplementedError. The domain object for web reports has not been
             defined yet.
     """
+    raise NotImplementedError(
+        'Web app feedback report domain objects must be defined.')
     if web_report_model.android_report_info_schema_version < (
         feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
         raise NotImplementedError(
             'Web app feedback report migrations must be added for new '
             'report schemas implemented.')
-    raise NotImplementedError(
-        'Web app feedback report domain objects must be defined.')
 
 
 def _get_entry_point(
