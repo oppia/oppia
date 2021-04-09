@@ -175,7 +175,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         for predicate in predicates:
             value = getattr(query_model, predicate['backend_attr'])
-            if value is not predicate['default_value']:
+            if value != predicate['default_value']:
                 query_criteria_satisfied = getattr(
                     job_class,
                     '_is_%s_query_satisfied' % predicate['backend_id'])(
