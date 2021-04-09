@@ -16,7 +16,7 @@
  * @fileoverview Directives for the outcome feedback editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { SubtitledHtmlObjectFactory } from
@@ -30,11 +30,10 @@ import { ContextService } from 'services/context.service';
   templateUrl: './outcome-feedback-editor.component.html',
 })
 export class OutcomeFeedbackEditorComponent implements OnInit {
-  @Input() outcome: string;
+  @Input() outcome: any;
   OUTCOME_FEEDBACK_SCHEMA: object;
   constructor(
-    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
-    private urlInterpolationService: UrlInterpolationService,
+    private readonly changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService) {}
 
   ngOnInit(): void {
@@ -45,6 +44,13 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
           this.contextService.getEntityType() === 'question')
       }
     };
+  }
+
+  updateHtml($event: string): void {
+    if ($event !== this.outcome.feedback._html) {
+      this.outcome.feedback._html = $event;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   getSchema(): object {
