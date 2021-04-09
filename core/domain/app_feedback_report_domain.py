@@ -49,6 +49,11 @@ STATS_PARAMETER_NAMES = utils.create_enum(
     'all_submitted_reports', 'platform', 'report_type', 'country_locale_code',
     'entry_point_name', 'text_language_code', 'audio_language_code',
     'sdk_version', 'version_name')
+FILTER_FIELD_NAMES = utils.create_enum(
+    'platform', 'report_type', 'entry_point', 'submitted_on',
+    'android_device_model', 'sdk_version', 'text_language_code',
+    'audio_language_code', 'platform_version',
+    'android_device_country_locale_code')
 
 MINIMUM_ANDROID_SDK_VERSION = 2
 ANDROID_TEXT_SIZE = utils.create_enum('small', 'medium', 'large', 'extra_large')

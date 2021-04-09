@@ -548,6 +548,24 @@ def _scrub_report_info_dict(report_info_dict):
     return new_report_info
 
 
+def get_all_filter_options():
+    """Fetches all the possible values that moderators can filter reports or
+    tickets by.
+
+    Returns:
+        list(AppFeedbackReportFilter). A list of filters and the possible values
+        they can have.
+    """
+    filter_list = list()
+    filter_names = app_feedback_report_models.FILTER_FIELD_NAMES
+    for filter_name in filter_names:
+        filter_values = app_feedback_report_models.AppFeedbackReportModel.query(
+            projection=[filter_name], distinct=True)
+        filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(
+            filter_name, filter_values))
+    return filter_list
+
+
 # // Called when an admin triages reports; updates the assigned ticket in the
 # // AppFeedbackReportModel and modifies the AppFeedbackReportStatsModel so that
 # // aggregates are accurate (occurs in a transaction)
