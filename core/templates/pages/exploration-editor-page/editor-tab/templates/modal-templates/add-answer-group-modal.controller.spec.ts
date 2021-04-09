@@ -110,7 +110,7 @@ describe('Add Answer Group Modal Controller', function() {
     $scope.updateAnswerGroupFeedback({
       feedback: feedback
     });
-
+    TestBed.inject(StateEditorService).onObjectFormValidityChange.emit(false);
     expect($scope.feedbackEditorIsOpen).toBe(true);
     expect($scope.tmpOutcome.feedback).toBe(feedback);
   });

@@ -25,7 +25,7 @@ import pickle
 from core.platform import models
 from core.tests import test_utils as core_test_utils
 import feconf
-from jobs import jobs_utils
+from jobs import job_utils
 from jobs.types import audit_errors
 import python_utils
 
@@ -132,10 +132,11 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
 
     def test_str(self):
         self.assertEqual(
-            repr(FooError(self.model)), 'FooError in BaseModel(id="123"): foo')
+            repr(FooError(self.model)),
+            '\'FooError in BaseModel(id="123"): foo\'')
         self.assertEqual(
             python_utils.UNICODE(FooError(self.model)),
-            'FooError in BaseModel(id="123"): foo')
+            '\'FooError in BaseModel(id="123"): foo\'')
 
     def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))
@@ -143,17 +144,17 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_equality_between_same_types_and_same_values(self):
         self.assertEqual(
             FooError(self.model),
-            FooError(jobs_utils.clone_model(self.model)))
+            FooError(job_utils.clone_model(self.model)))
 
     def test_equality_between_same_types_and_different_values(self):
         self.assertNotEqual(
             FooError(self.model),
-            FooError(jobs_utils.clone_model(self.model, id='987')))
+            FooError(job_utils.clone_model(self.model, id='987')))
 
     def test_hashable(self):
         set_of_errors = {
             FooError(self.model),
-            FooError(jobs_utils.clone_model(self.model)),
+            FooError(job_utils.clone_model(self.model)),
         }
         self.assertEqual(len(set_of_errors), 1)
 

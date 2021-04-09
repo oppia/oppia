@@ -94,6 +94,12 @@ export default {
 
   "TASK_TARGET_TYPE_STATE": "state",
 
+  // Roles in exploration.
+  "ROLE_OWNER": "owner",
+  "ROLE_EDITOR": "editor",
+  "ROLE_VOICE_ARTIST": "voice artist",
+  "ROLE_VIEWER": "viewer",
+
   // Regex to validate the format of Math rich-text component SVGs. If this is
   // changed in the future, the existing filenames on the server should be
   // handled as well.
