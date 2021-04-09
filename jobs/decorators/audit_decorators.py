@@ -197,27 +197,34 @@ class RelationshipsOf(python_utils.OBJECT):
         return model_relationships
 
     @classmethod
-    def get_property_relationships_by_kind(cls):
-        """Returns dict encoding how a model's properties correspond to
-        the IDs of other models.
+    def get_id_property_targets_by_kind(cls):
+        """Returns all registered ID properties and the models they target,
+        keyed by the kind of models the ID properties belong to.
 
         Returns:
-            dict(str: dict(str: tuple(str))). Property relationships keyed by
-            the kind of model the properties belong to. For each property, the
-            corresponding set refers to the kinds of models which should exist
-            in storage with the same ID.
+            dict(str, tuple(tuple(ModelProperty, tuple(str)))). Model kinds
+            mapped to the ID properties they own and the kinds of models
+            targeted by the ID property.
         """
-        id_properties_by_model_kind = itertools.groupby(
-            sorted(cls._ID_PROPERTY_TARGETS, key=lambda p: p.model_kind),
-            key=lambda p: p.model_kind)
+        by_kind = lambda id_property: id_property.model_kind
+        id_property_targets_by_kind = itertools.groupby(
+            sorted(cls._ID_PROPERTY_TARGETS.keys(), key=by_kind), key=by_kind)
         return {
-            model_kind: {
-                id_property.property_name: (
-                    tuple(cls._ID_PROPERTY_TARGETS[id_property]))
-                for id_property in id_properties
-            }
-            for model_kind, id_properties in id_properties_by_model_kind
+            model_kind: tuple(
+                (id_property, tuple(cls._ID_PROPERTY_TARGETS[id_property]))
+                for id_property in id_properties)
+            for model_kind, id_properties in id_property_targets_by_kind
         }
+
+    @classmethod
+    def get_model_kinds_targeted_by_id_properties(cls):
+        """Returns all of the model kinds that are targeted by ID properties.
+
+        Returns:
+            set(str). All model kinds targeted by one or more ID properties.
+        """
+        return set(
+            itertools.chain.from_iterable(cls._ID_PROPERTY_TARGETS.values()))
 
     def _get_model_kind(self, model_class):
         """Returns the kind of the model class.

@@ -141,7 +141,9 @@ class ModelProperty(python_utils.OBJECT):
                 property.
         """
         self._model_class, property_name = state
-        self._property_obj = self._model_class._properties[property_name]
+        self._property_obj = (
+            self._model_class.id if property_name == 'id' else
+            self._model_class._properties[property_name])
 
     def __str__(self):
         return '%s.%s' % (self.model_kind, self.property_name)

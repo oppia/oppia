@@ -43,22 +43,43 @@ class GetAuditsByKindTests(test_utils.TestBase):
                 audits_registry.get_audit_do_fn_types_by_kind(), unique_obj)
 
 
-class GetPropertyRelationshipsByKindTests(test_utils.TestBase):
+class GetIdPropertyTargetsByKind(test_utils.TestBase):
 
     def test_returns_value_from_decorator(self):
         unique_obj = object()
 
         @classmethod
-        def get_property_relationships_by_kind_mock(unused_cls):
+        def get_id_property_targets_by_kind_mock(unused_cls):
             """Returns the unique_obj."""
             return unique_obj
 
-        get_property_relationships_by_kind_swap = self.swap(
+        get_id_property_targets_by_kind_swap = self.swap(
             audit_decorators.RelationshipsOf,
-            'get_property_relationships_by_kind',
-            get_property_relationships_by_kind_mock)
+            'get_id_property_targets_by_kind',
+            get_id_property_targets_by_kind_mock)
 
-        with get_property_relationships_by_kind_swap:
+        with get_id_property_targets_by_kind_swap:
             self.assertIs(
-                audits_registry.get_property_relationships_by_kind(),
+                audits_registry.get_id_property_targets_by_kind(),
+                unique_obj)
+
+
+class GetModelKindsTargetedByIdProperties(test_utils.TestBase):
+
+    def test_returns_value_from_decorator(self):
+        unique_obj = object()
+
+        @classmethod
+        def get_model_kinds_targeted_by_id_properties_mock(unused_cls):
+            """Returns the unique_obj."""
+            return unique_obj
+
+        get_model_kinds_targeted_by_id_properties_swap = self.swap(
+            audit_decorators.RelationshipsOf,
+            'get_model_kinds_targeted_by_id_properties',
+            get_model_kinds_targeted_by_id_properties_mock)
+
+        with get_model_kinds_targeted_by_id_properties_swap:
+            self.assertIs(
+                audits_registry.get_model_kinds_targeted_by_id_properties(),
                 unique_obj)

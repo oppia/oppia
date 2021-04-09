@@ -27,9 +27,24 @@ from core.tests import test_utils as core_test_utils
 import feconf
 from jobs import job_utils
 from jobs.types import audit_errors
+from jobs.types import model_property
 import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+datastore_services = models.Registry.import_datastore_services()
+
+
+class FooModel(base_models.BaseModel):
+    """A model with an id property targeting a BarModel."""
+
+    bar_id = datastore_services.StringProperty()
+
+
+class BarModel(base_models.BaseModel):
+    """A model with a simple string property named "value"."""
+
+    value = datastore_services.StringProperty()
 
 
 class FooError(audit_errors.BaseAuditError):
@@ -283,7 +298,8 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
         error = audit_errors.ModelRelationshipError(
-            'FooModel', '123', 'bar_id', 'BarModel', '123')
+            model_property.ModelProperty(FooModel, FooModel.bar_id), '123',
+            'BarModel', '123')
 
         self.assertEqual(
             error.message,

@@ -26,6 +26,7 @@ from jobs import job_options
 from jobs import job_test_utils
 from jobs.transforms import base_model_audits
 from jobs.types import audit_errors
+from jobs.types import model_property
 
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
@@ -113,8 +114,10 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             audit_errors.ModelRelationshipError(
-                'UserEmailPreferencesModel', self.VALID_USER_ID, 'id',
-                'UserSettingsModel', self.VALID_USER_ID),
+                model_property.ModelProperty(
+                    user_models.UserEmailPreferencesModel,
+                    user_models.UserEmailPreferencesModel.id),
+                self.VALID_USER_ID, 'UserSettingsModel', self.VALID_USER_ID),
         ])
 
     def test_present_relationships(self):
@@ -159,6 +162,8 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             audit_errors.ModelRelationshipError(
-                'UserAuthDetailsModel', self.VALID_USER_ID, 'gae_id',
-                'UserIdentifiersModel', 'abc'),
+                model_property.ModelProperty(
+                    auth_models.UserAuthDetailsModel,
+                    auth_models.UserAuthDetailsModel.gae_id),
+                self.VALID_USER_ID, 'UserIdentifiersModel', 'abc'),
         ])

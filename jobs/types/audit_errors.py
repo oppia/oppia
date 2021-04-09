@@ -164,31 +164,24 @@ class ModelExpiredError(BaseAuditError):
 class ModelRelationshipError(BaseAuditError):
     """Error class for models with invalid relationships."""
 
-    def __init__(
-            self, model_kind, model_id, property_name,
-            expected_model_kind, expected_model_id):
+    def __init__(self, id_property, model_id, target_kind, target_id):
         """Initializes a new ModelRelationshipError.
 
         Args:
-            model_kind: str. The kind of model which holds a property defining
-                a relationship.
-            model_id: bytes. The ID of the specific model with a relationship
-                error.
-            property_name: str. The property which refers to the ID of another
-                kind of model.
-            expected_model_kind: str. The kind of model the property refers
-                to.
-            expected_model_id: bytes. The ID of the specific model that the
-                property refers to. NOTE: This is the same value as the
-                property.
+            id_property: ModelProperty. The property referring to the ID of the
+                target model.
+            model_id: bytes. The ID of the model with problematic ID property.
+            target_kind: str. The kind of model the property refers to.
+            target_id: bytes. The ID of the specific model that the property
+                refers to. NOTE: This is the value of the ID property.
         """
-        # NOTE: IDs are converted to bytes because that's always how they're
-        # read from the datastore.
+        # NOTE: IDs are converted to bytes because that's how they're read from
+        # and written to the datastore.
         super(ModelRelationshipError, self).__init__(
-            model_kind, model_id=python_utils.convert_to_bytes(model_id))
+            id_property.model_kind,
+            model_id=python_utils.convert_to_bytes(model_id))
         self.message = (
-            '%s.%s=%r should correspond to the ID of an existing %s, '
+            '%s=%r should correspond to the ID of an existing %s, '
             'but no such model exists' % (
-                model_kind, property_name,
-                python_utils.convert_to_bytes(expected_model_id),
-                expected_model_kind))
+                id_property, python_utils.convert_to_bytes(target_id),
+                target_kind))

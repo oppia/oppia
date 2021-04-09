@@ -44,14 +44,23 @@ def get_audit_do_fn_types_by_kind():
     return audit_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
 
 
-def get_property_relationships_by_kind():
-    """Returns the property relationships between models.
+def get_id_property_targets_by_kind():
+    """Returns all registered ID properties and the models they target, keyed by
+    the kind of models the ID properties belong to.
 
     Returns:
-        dict(str: dict(str: tuple(str))). Property relationships keyed by the
-        kind of model the properties belong to. For each property, the
-        corresponding set refers to the kinds of models which should exist in
-        storage with the same ID.
+        dict(str, dict(ModelProperty, tuple(str))). Model kinds mapped to the ID
+        properties they own and the kinds of models targeted by the ID property.
+    """
+    return audit_decorators.RelationshipsOf.get_id_property_targets_by_kind()
+
+
+def get_model_kinds_targeted_by_id_properties():
+    """Returns all of the model kinds that are targeted by ID properties.
+
+    Returns:
+        set(str). All model kinds targeted by one or more ID properties.
     """
     return (
-        audit_decorators.RelationshipsOf.get_property_relationships_by_kind())
+        audit_decorators.RelationshipsOf
+        .get_model_kinds_targeted_by_id_properties())

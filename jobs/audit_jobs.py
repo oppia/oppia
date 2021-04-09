@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import itertools
 
 from jobs import base_jobs
@@ -33,10 +34,28 @@ import apache_beam as beam
 AUDIT_DO_FN_TYPES_BY_KIND = audits_registry.get_audit_do_fn_types_by_kind()
 KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 
-PROP_REFERENCES_BY_KIND = audits_registry.get_property_relationships_by_kind()
-KINDS_REFERENCED_BY_PROPS = tuple(itertools.chain.from_iterable(
-    itertools.chain.from_iterable(referenced_kinds_by_prop_name.values())
-    for referenced_kinds_by_prop_name in PROP_REFERENCES_BY_KIND.values()))
+ID_PROPERTY_TARGETS_BY_MODEL_KIND = (
+    audits_registry.get_id_property_targets_by_kind())
+MODEL_KINDS_TARGETED_BY_ID_PROPERTIES = (
+    audits_registry.get_model_kinds_targeted_by_id_properties())
+
+
+class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
+    """Helper class for wrapping a (model kind, model ID) pair."""
+
+    @classmethod
+    def from_model(cls, model):
+        """Creates a model key from the given model.
+
+        Args:
+            model: Model. The model to create a key for.
+
+        Returns:
+            ModelKey. The corresponding model key.
+        """
+        return cls(
+            model_kind=job_utils.get_model_kind(model),
+            model_id=job_utils.get_model_id(model))
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):
@@ -89,8 +108,8 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
                 len(KIND_BY_INDEX), KIND_BY_INDEX)
         )
 
-        existing_key_pcolls = []
-        errors_by_expected_key_pcolls = []
+        existing_key_count_pcolls = []
+        expected_key_error_pcolls = []
         audit_error_pcolls = [
             deleted_models
             | 'Apply ValidateDeletedModel on deleted models' >> (
@@ -101,24 +120,24 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         for kind, models_of_kind in model_groups:
             audit_error_pcolls.extend(models_of_kind | ApplyAuditDoFns(kind))
 
-            if kind in KINDS_REFERENCED_BY_PROPS:
-                existing_key_pcolls.append(
-                    models_of_kind | GetExistingModelKeys(kind))
+            if kind in MODEL_KINDS_TARGETED_BY_ID_PROPERTIES:
+                existing_key_count_pcolls.append(
+                    models_of_kind | GetExistingModelKeyCounts(kind))
 
-            if kind in PROP_REFERENCES_BY_KIND:
-                errors_by_expected_key_pcolls.extend(
-                    models_of_kind | GetErrorsByExpectedModelKey(kind))
+            if kind in ID_PROPERTY_TARGETS_BY_MODEL_KIND:
+                expected_key_error_pcolls.extend(
+                    models_of_kind | GetExpectedModelKeyErrors(kind))
 
-        counts_by_existing_key = (
-            existing_key_pcolls
-            | 'Flatten PCollections of actual keys' >> beam.Flatten()
+        existing_key_counts = (
+            existing_key_count_pcolls
+            | 'Flatten PCollections of existing key counts' >> beam.Flatten()
         )
-        errors_by_expected_key = (
-            errors_by_expected_key_pcolls
-            | 'Flatten PCollections of expected keys' >> beam.Flatten()
+        expected_key_errors = (
+            expected_key_error_pcolls
+            | 'Flatten PCollections of expected key errors' >> beam.Flatten()
         )
         audit_error_pcolls.append(
-            (counts_by_existing_key, errors_by_expected_key)
+            (existing_key_counts, expected_key_errors)
             | 'Group counts and errors by key' >> beam.CoGroupByKey()
             | 'Filter keys without any errors' >> beam.FlatMapTuple(
                 self._get_model_relationship_errors)
@@ -126,19 +145,22 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
 
         return audit_error_pcolls | 'Combine audit results' >> beam.Flatten()
 
-    def _get_model_relationship_errors(self, unused_key, counts_and_errors):
-        """Returns errors associated with the given model key.
+    def _get_model_relationship_errors(
+            self, unused_join_key, counts_and_errors):
+        """Returns errors associated with the given model key if it's missing.
 
         Args:
-            unused_key: tuple(str, str). A (model kind, model id) pair.
-            counts_and_errors: tuple(list(int), list(*)). A pair of details
-                corresponding to the key. The first element is the count of keys
-                discovered in the datastore. The second element is a list of
-                errors that should be raised if the count is 0.
+            unused_join_key: ModelKey. The key the counts and errors were joined
+                by.
+            counts_and_errors: tuple(list(int), list(ModelRelationshipError)).
+                The join results. The first element is a list of counts
+                corresponding to the number of keys discovered in the datastore.
+                The second element is the list of errors that should be reported
+                when their sum is 0.
 
         Returns:
-            list(*). A list of errors for the given key. If the model exists
-            (sum(counts) > 0), then the errors will always be empty.
+            list(ModelRelationshipError). A list of errors for the given key.
+            Only non-empty when the sum of counts is 0.
         """
         counts, errors = counts_and_errors
         return errors if sum(counts) == 0 else []
@@ -178,7 +200,7 @@ class ApplyAuditDoFns(beam.PTransform):
         )
 
 
-class GetExistingModelKeys(beam.PTransform):
+class GetExistingModelKeyCounts(beam.PTransform):
     """Returns PCollection of (key, count) pairs for each input model."""
 
     def __init__(self, kind):
@@ -187,8 +209,8 @@ class GetExistingModelKeys(beam.PTransform):
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetExistingModelKeys, self).__init__(
-            label='Generate keys for all existing %ss' % kind)
+        super(GetExistingModelKeyCounts, self).__init__(
+            label='Generate (key, count)s for all existing %ss' % kind)
         self._kind = kind
 
     def expand(self, models_of_kind):
@@ -198,17 +220,17 @@ class GetExistingModelKeys(beam.PTransform):
             models_of_kind: PCollection. The input models.
 
         Returns:
-            PCollection. A (key, count) pair for each input model. The key is a
-            tuple of (kind: str, ID: str), and the count is always be 1.
+            PCollection. The (ModelKey, int) pairs correponding to the input
+            models and their counts (always 1).
         """
         return (
             models_of_kind
             | 'Generate (key, count) for %ss' % self._kind >> beam.Map(
-                lambda model: ((self._kind, job_utils.get_model_id(model)), 1))
+                lambda model: (ModelKey.from_model(model), 1))
         )
 
 
-class GetErrorsByExpectedModelKey(beam.PTransform):
+class GetExpectedModelKeyErrors(beam.PTransform):
     """Returns PCollection of (key, error) pairs for each referenced model."""
 
     def __init__(self, kind):
@@ -217,55 +239,52 @@ class GetErrorsByExpectedModelKey(beam.PTransform):
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetErrorsByExpectedModelKey, self).__init__(
-            label='Generate (key, error)s for models that %s depends on' % kind)
-        self._kind = kind
-        self._prop_references = tuple(PROP_REFERENCES_BY_KIND[kind].items())
+        super(GetExpectedModelKeyErrors, self).__init__(
+            label='Generate (key, error)s from the ID properties in %s' % kind)
+        self._id_property_targets = ID_PROPERTY_TARGETS_BY_MODEL_KIND[kind]
 
     def expand(self, models_of_kind):
-        """Returns PCollection of (key, error) pairs for each referenced model.
+        """Returns PCollections of (key, error) pairs targeted by the models.
 
         Args:
-            models_of_kind: PCollection. The models to inspect for property
-                references.
+            models_of_kind: PCollection. The input models.
 
-        Yields:
-            PCollection. The (key, ModelRelationshipError) pairs of all models
-            referenced by a specific property on the input models. The key is a
-            (kind: str, ID: str) pair.
+        Returns:
+            iterable(PCollection). The (ModelKey, ModelRelationshipError) pairs
+            corresponding to the models targeted by the ID properties on the
+            input models, and the error that should be reported when they are
+            missing.
         """
-        for prop_name, referenced_kinds in self._prop_references:
-            yield (
-                models_of_kind
-                | 'Generate errors from %s.%s' % (self._kind, prop_name) >> (
-                    beam.FlatMap(
-                        self._generate_expected_model_errors, prop_name,
-                        referenced_kinds))
-            )
+        return (
+            models_of_kind
+            | 'Generate errors from %s' % id_property >> beam.FlatMap(
+                self._generate_expected_model_errors, id_property, target_kinds)
 
-    def _generate_expected_model_errors(
-            self, model, prop_name, referenced_kinds):
+            for id_property, target_kinds in self._id_property_targets
+        )
+
+    def _generate_expected_model_errors(self, model, id_property, target_kinds):
         """Yields all model keys referenced by the given model's properties.
 
         Args:
-            model: Model. An individual input model.
-            prop_name: str. The property that holds the ID of another model.
-            referenced_kinds: tuple(str). The kinds of models that are expected
-                to correspond to the ID.
+            model: Model. The input model.
+            id_property: str. The property that holds the ID(s) of the targeted
+                model(s).
+            target_kinds: tuple(str). The kinds of models that the ID property
+                targets.
 
         Yields:
             tuple(tuple(str, str), ModelRelationshipError). The key for a
             referenced model (kind: str, ID: str), and the error that should be
-            reported if the key does not exist.
+            reported when the key does not exist.
         """
-        prop_value = job_utils.get_model_property(model, prop_name)
-        if prop_value is None:
-            return
-        model_id, referenced_id = (
-            job_utils.get_model_id(model),
-            # IDs need to be in bytes to compare equal to an actual model's ID.
-            python_utils.convert_to_bytes(prop_value))
-        for referenced_kind in referenced_kinds:
-            error = audit_errors.ModelRelationshipError(
-                self._kind, model_id, prop_name, referenced_kind, referenced_id)
-            yield ((referenced_kind, referenced_id), error)
+        for property_value in id_property.yield_value_from_model(model):
+            if property_value is None:
+                continue
+            model_id, target_id = (
+                job_utils.get_model_id(model),
+                python_utils.convert_to_bytes(property_value))
+            for target_kind in target_kinds:
+                error = audit_errors.ModelRelationshipError(
+                    id_property, model_id, target_kind, target_id)
+                yield (ModelKey(target_kind, target_id), error)

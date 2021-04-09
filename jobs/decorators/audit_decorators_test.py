@@ -25,6 +25,7 @@ import re
 from core.platform import models
 from core.tests import test_utils
 from jobs.decorators import audit_decorators
+from jobs.types import model_property
 import python_utils
 
 import apache_beam as beam
@@ -211,7 +212,10 @@ class RelationshipsOfTests(test_utils.TestBase):
 
     def test_has_no_relationships_by_default(self):
         self.assertEqual(
-            MockRelationshipsOf.get_property_relationships_by_kind(), {})
+            MockRelationshipsOf.get_id_property_targets_by_kind(), {})
+        self.assertEqual(
+            MockRelationshipsOf.get_model_kinds_targeted_by_id_properties(),
+            set())
 
     def test_valid_relationship_generator(self):
         @MockRelationshipsOf(BarModel)
@@ -220,8 +224,16 @@ class RelationshipsOfTests(test_utils.TestBase):
             yield model.foo_id, [FooModel]
 
         self.assertEqual(
-            MockRelationshipsOf.get_property_relationships_by_kind(),
-            {'BarModel': {'foo_id': ('FooModel',)}})
+            MockRelationshipsOf.get_id_property_targets_by_kind(), {
+                b'BarModel': (
+                    (model_property.ModelProperty(BarModel, BarModel.foo_id),
+                        (b'FooModel',)),
+                ),
+            })
+        self.assertEqual(
+            MockRelationshipsOf.get_model_kinds_targeted_by_id_properties(), {
+                b'FooModel',
+            })
 
     def test_accepts_id_as_property(self):
         @MockRelationshipsOf(BarModel)
@@ -230,8 +242,16 @@ class RelationshipsOfTests(test_utils.TestBase):
             yield model.id, [BazModel]
 
         self.assertEqual(
-            MockRelationshipsOf.get_property_relationships_by_kind(),
-            {'BarModel': {'id': ('BazModel',)}})
+            MockRelationshipsOf.get_id_property_targets_by_kind(), {
+                b'BarModel': (
+                    (model_property.ModelProperty(BarModel, BarModel.id),
+                        (b'BazModel',)),
+                ),
+            })
+        self.assertEqual(
+            MockRelationshipsOf.get_model_kinds_targeted_by_id_properties(), {
+                b'BazModel',
+            })
 
     def test_rejects_values_that_are_not_types(self):
         foo_model = FooModel()
