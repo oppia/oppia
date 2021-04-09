@@ -1609,7 +1609,7 @@ class Exploration(python_utils.OBJECT):
                         'value': {
                             'content_id': 'ca_placeholder_0',
                             'unicode_str': (
-                                'Type input greater than or eual to zero..')
+                                'Type input greater than or eual to zero.')
                         }
                     }
                 })
