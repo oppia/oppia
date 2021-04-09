@@ -666,20 +666,21 @@ def _save_ticket(ticket):
     """Saves the ticket to persistent storage.
 
     Returns:
-        ticket: AppFeedbackReportTicket. The domain object for a ticket to save
-            in storage.
+        ticket: AppFeedbackReportTicket. The domain object to save to storage.
     """
     ticket_model = app_feedback_report_models.AppFeedbackReportTicket.get_by_id(
         ticket.id)
     ticket_model.ticket_name = ticket.ticket_name
+    ticket_model.platform = ticket.platform
+    ticket_model.github_issue_repo_name = ticket.github_issue_repo_name
+    ticket_model.github_issue_number = ticket.github_issue_number
+    ticket_model.archived = ticket.archived
+    ticket_model.newest_report_timestamp = (
+        ticket.newest_report_creation_timestamp)
+    ticket_model.report_ids = [report.id for report in ticket.reports]
     ticket_model.update_timestamps()
     ticket_model.put()
 
-
-# // Called when updates a ticket name. Updates the entity in the
-# // AppFeedbackReportTicketModel and the relevant tickets in the
-# // AppFeedbackReportModel (both occurs in a transaction)>
-# def edit_ticket_name(ticket_id)
 
 # // Fetches and processes the next batch of reports maintainers want to view and
 # // returns a list of FeedbackReports.
@@ -694,13 +695,6 @@ def _save_ticket(ticket):
 # // Fetches and processes a list of FeedbackReportDailyStats to display in the
 # // dashboard
 # def get_stats(ticket_id, splice_val): list<FeedbackReportDailyStats>
-
-# // Calculates all the possible filters values that can be applied to the current
-# // set of reports based on the storage models. This will fetch from the
-# // AndroidFeedbackReportModel based on the a constant
-# // ALLOWED_ANDROID_REPORT_FILTERS
-# def get_all_filter_options() : FeedbackReportFilter
-
 
 
 # def _scrub_single_report_in_transaction(report_id, scrubbed_by):
