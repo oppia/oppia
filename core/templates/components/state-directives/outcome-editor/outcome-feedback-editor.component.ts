@@ -19,10 +19,6 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
 
 @Component({
@@ -30,7 +26,7 @@ import { ContextService } from 'services/context.service';
   templateUrl: './outcome-feedback-editor.component.html',
 })
 export class OutcomeFeedbackEditorComponent implements OnInit {
-  @Input() outcome: any;
+  @Input() outcome;
   OUTCOME_FEEDBACK_SCHEMA: object;
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
