@@ -811,7 +811,9 @@ class EntryPoint(python_utils.OBJECT):
     """Domain object for the entry point used to initiate the feedback report.
     """
 
-    def __init__(self, entry_point_name):
+    def __init__(
+            self, entry_point_name, topic_id=None, story_id=None,
+            exploration_id=None, subtopic_id=None):
         """Constructs an EntryPoint domain object.
 
         Args:
@@ -819,6 +821,10 @@ class EntryPoint(python_utils.OBJECT):
                 used, corresponding to an ENTRY_POINT enum.
         """
         self.entry_point_name = entry_point_name
+        self.topic_id = topic_id
+        self.story_id = story_id
+        self.exploration_id = exploration_id
+        self.subtopic_id = subtopic_id
 
     def to_dict():
         """Returns a dict representing this NavigationDrawerEntryPoint domain
@@ -839,7 +845,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
     def __init__(self):
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super(NavigationDrawerEntryPoint, self).__init__(
-            ENTRY_POINT.navigation_drawer)
+            entry_point_name=ENTRY_POINT.navigation_drawer)
 
     def to_dict():
         """Returns a dict representing this NavigationDrawerEntryPoint domain
@@ -868,10 +874,9 @@ class LessonPlayerEntryPoint(EntryPoint):
             exploration_id: str. The unique ID for the current exploration the
                 user is playing when intiating the report.
         """
-        super(LessonPlayerEntryPoint, self).__init__(ENTRY_POINT.lesson_player)
-        self.topic_id = topic_id
-        self.story_id = story_id
-        self.exploration_id = exploration_id
+        super(LessonPlayerEntryPoint, self).__init__(
+            entry_point_name=ENTRY_POINT.lesson_player, topic_id=topic_id,
+            story_id=story_id, exploration_id=exploration_id)
 
     def to_dict():
         """Returns a dict representing this LessonPlayerEntryPoint domain
@@ -954,9 +959,9 @@ class RevisionCardEntryPoint(EntryPoint):
             subtopic_id: int. The ID for the current subtopic the user is
                 reviewing when intiating the report.
         """
-        super(RevisionCardEntryPoint, self).__init__(ENTRY_POINT.revision_card)
-        self.topic_id = topic_id
-        self.subtopic_id = subtopic_id
+        super(RevisionCardEntryPoint, self).__init__(
+            entry_point_name=ENTRY_POINT.revision_card, topic_id=topic_id,
+            subtopic_id=subtopic_id)
 
     def to_dict():
         """Returns a dict representing this RevisionCardEntryPoint domain

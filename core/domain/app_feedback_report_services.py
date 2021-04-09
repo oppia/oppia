@@ -84,12 +84,13 @@ def create_android_report_from_json(report_json):
     report_id = app_feedback_report_models.AppFeedbackReportModel.generate_id(
         PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'])
 
+
     report_obj = app_feedback_report_domain.AppFeedbackReport(
         report_id, report_json['android_report_info_schema_version'],
         PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'],
         None, None, user_supplied_feedback_obj, device_system_context_obj,
         app_context_obj)
-    _save_new_report_stats(report_obj)
+    _save_android_app_feedback_report(report_obj)
 
     return report_obj
 
@@ -179,7 +180,6 @@ def _add_report_to_stats_model_in_transaction(
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
     """
     parameter_names = app_feedback_report_domain.STATS_PARAMETER_NAMES
-
     # The stats we want to aggregate on.
     report_type = report_obj.user_supplied_feedback.report_type
     country_locale_code = (
@@ -331,14 +331,14 @@ def get_report_stats_from_model(stats_model):
     """
     ticket = app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
         stats_model.ticket_id)
-    param_stats = update_stats_dict_from_json(stats_model.daily_param_stats)
+    param_stats = _create_app_daily_stats_from_model_json(stats_model.daily_param_stats)
     app_feedback_report_domain.AppFeedbackReportDailyStats(
         stats_model.id, ticket, stats_model.platform,
         stats_model.stats_tracking_date, stats_model.total_reports_submitted,
         param_stats)
 
 
-def update_stats_dict_from_json(daily_param_stats):
+def _create_app_daily_stats_from_model_json(daily_param_stats):
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
@@ -495,7 +495,7 @@ def get_all_expiring_reports_to_scrub():
         get_report_from_model(model_entity) for model_entity in model_entities]
 
 
-def scrub_single_app_feedback_report(report_id, scrubbed_by):
+def scrub_single_app_feedback_report(report, scrubbed_by):
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing
     any user-entered input in the entity.
 
@@ -511,7 +511,62 @@ def scrub_single_app_feedback_report(report_id, scrubbed_by):
     if report.platform == PLATFORM_ANDROID:
         report.app_context.event_logs = None
         report.app_context.logcat_logs = None
-    _scrub_single_report_in_transaction(report.id, scrubbed_by)
+        _save_android_app_feedback_report(report)
+    else:
+        raise NotImplementedError(
+            'Saving web report entities to persistent storage has not been '
+            'implemented yet.')
+
+
+def _save_android_app_feedback_report(report):
+    """Saves the AppFeedbackReport domain object in persistence storage.
+
+    Args:
+        report: AppFeedbackReport. The domain object of the report to save.
+    """
+    user_supplied_feedback = report.user_supplied_feedback
+    device_system_context = report.device_system_context
+    app_context = report.app_context
+    entry_point = app_context.entry_point
+
+    android_report_info = {
+        'user_feedback_selected_items': (
+            user_supplied_feedback.user_feedback_selected_items),
+        'user_feedback_other_text_input': (
+            user_supplied_feedback.user_feedback_other_text_input),
+        'event_logs': app_context.event_logs,
+        'logcat_logs': app_context.logcat_logs,
+        'package_version_code': device_system_context.package_version_code,
+        'android_device_language_locale_code': (
+            device_system_context.device_language_locale_code),
+        'build_fingerprint': device_system_context.build_fingerprint,
+        'network_type': device_system_context.network_type,
+        'text_size': app_context.text_size,
+        'download_and_update_only_on_wifi': (
+            app_context.only_allows_wifi_download_and_update),
+        'automatically_update_topics': app_context.automatically_update_topics,
+        'account_is_profile_admin': app_context.account_is_profile_admin
+    }
+
+    model_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+        report.id)
+
+    if model_entity is None:
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            report.id, report.platform, report.submitted_on_timestamp,
+            user_supplied_feedback.category, device_system_context.version_name,
+            app_context.device_country_locale_code,
+            device_system_context.sdk_version,
+            device_system_context.device_model,
+            entry_point.entry_point_name, entry_point.topic_id,
+            entry_point.story_id, entry_point.exploration_id,
+            entry_point.subtopic_id, app_context.text_language_code,
+            app_context.audio_language_code, android_report_info, None)
+    else:
+        model_entity.scrubbed_by = report.scrubbed_by
+        model_entity.android_report_info = android_report_info
+        model_entity.update_timestamps()
+        model_entity.put()
 
 
 @transaction_services.run_in_transaction_wrapper
