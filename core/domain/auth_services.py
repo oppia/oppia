@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import auth_domain
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
@@ -225,3 +226,28 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
     """
     platform_auth_services.associate_multi_auth_ids_with_user_ids(
         auth_id_user_id_pairs)
+
+
+def grant_super_admin_privileges(user_id):
+    """Grants the user super admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to promote to super admin.
+    """
+    firebase_auth_services.grant_super_admin_privileges(user_id)
+
+
+def revoke_super_admin_privileges(user_id):
+    """Revokes the user's super admin privileges.
+
+    Args:
+        user_id: str. The Oppia user ID to revoke privileges from.
+    """
+    firebase_auth_services.revoke_super_admin_privileges(user_id)
+
+
+# TODO(#11462): Delete this handler once the Firebase migration logic is
+# rollback-safe and all backup data is using post-migration data.
+def seed_firebase():
+    """Prepares Oppia and Firebase to run the SeedFirebaseOneOffJob."""
+    firebase_auth_services.seed_firebase()

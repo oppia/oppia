@@ -82,6 +82,10 @@
 /buf.gen.yaml @oppia/ml
 
 
+# App Feedback Reporting project
+/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
+
+
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep
@@ -291,8 +295,9 @@
 /core/domain/expression_parser*.py @iamprayush
 /core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
-/core/domain/obj_services*.py @iamprayush
+/core/domain/object_registry*.py @iamprayush
 /core/domain/rules_registry*.py @aks681
+/core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
@@ -436,10 +441,7 @@
 
 
 # Infrastructure.
-/jobs/__init__.py @brianrodri
-/jobs/base_model_*.py @brianrodri
-/jobs/jobs_utils.py @brianrodri
-/jobs/jobs_utils_test.py @brianrodri
+/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -466,6 +468,8 @@
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
+/core/templates/pages/login-page/ @brianrodri
+/core/templates/pages/logout-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
 /core/templates/services/app.service*.ts @srijanreddy98
@@ -477,6 +481,7 @@
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
 /redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
+/.firebase.json @brianrodri
 
 
 # Miscellaneous.
