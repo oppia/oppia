@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,16 +20,29 @@
  * followed by the name of the arg.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+
+@Component({
+  selector: 'oppia-response-algebraic-expression-input',
+  templateUrl: './algebraic-expression-input-response.component.html',
+  styleUrls: []
+})
+export class ResponseAlgebraicExpressionInputComponent implements OnInit {
+  @Input() answer: string = '';
+  escapedAnswer: string = '';
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    this.escapedAnswer = (
+      this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
+  }
+}
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').component('oppiaResponseAlgebraicExpressionInput', {
-  template: require('./algebraic-expression-input-response.component.html'),
-  controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
-      const ctrl = this;
-      ctrl.$onInit = function() {
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      };
-    }
-  ]
-});
+angular.module('oppia').directive(
+  'oppiaResponseAlgebraicExpressionInput', downgradeComponent({
+    component: ResponseAlgebraicExpressionInputComponent
+  }) as angular.IDirectiveFactory);

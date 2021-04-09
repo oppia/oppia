@@ -27,23 +27,28 @@ import subprocess
 import sys
 import time
 
+from constants import constants
+import feconf
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
 
+
 MAX_RETRY_COUNT = 3
 RERUN_NON_FLAKY = True
 WEB_DRIVER_PORT = 4444
-GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
+GOOGLE_APP_ENGINE_PORT = 9001
+ELASTICSEARCH_SERVER_PORT = 9200
+PORTS_USED_BY_OPPIA_PROCESSES = [
+    OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT, ELASTICSEARCH_SERVER_PORT]
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 # Path relative to current working directory where portserver socket
 # file will be created.
-PORTSERVER_SOCKET_FILEPATH = os.path.join(
-    os.getcwd(), 'portserver.socket')
+PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
 KILL_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
@@ -136,7 +141,11 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--deparallelize_terser',
-    help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env. '
+         'This flag is required for tests to run on CircleCI, since CircleCI '
+         'sometimes flakes when parallelism is used. It is not required in the '
+         'local dev environment. See https://discuss.circleci.com/t/'
+         'build-fails-with-error-spawn-enomem/30537/10',
     action='store_true')
 
 _PARSER.add_argument(
@@ -178,12 +187,14 @@ def cleanup():
     """
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
+    elasticsearch_path = '%s/' % common.ES_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
-        '.*%s.*' % re.escape(webdriver_download_path)
+        '.*%s.*' % re.escape(webdriver_download_path),
+        '.*%s.*' % re.escape(elasticsearch_path),
     ]
     for p in SUBPROCESSES:
         _kill_process(p)
@@ -194,6 +205,12 @@ def cleanup():
     build.set_constants_to_default()
     common.stop_redis_server()
 
+    for port in PORTS_USED_BY_OPPIA_PROCESSES:
+        if not common.wait_for_port_to_not_be_in_use(port):
+            raise RuntimeError(
+                'Port {} failed to close within {} seconds.'.format(
+                    port, common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -202,16 +219,14 @@ def is_oppia_server_already_running():
     Returns:
         bool. Whether there is a running Oppia instance.
     """
-    running = False
-    for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
-        if common.is_port_open(port):
+    for port in PORTS_USED_BY_OPPIA_PROCESSES:
+        if common.is_port_in_use(port):
             python_utils.PRINT(
                 'There is already a server running on localhost:%s.'
                 'Please terminate it before running the end-to-end tests.'
                 'Exiting.' % port)
-            running = True
-            break
-    return running
+            return True
+    return False
 
 
 def run_webpack_compilation(source_maps=False):
@@ -410,27 +425,6 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_app_engine_server(dev_mode_setting, log_level):
-    """Start the Google App Engine server.
-
-    Args:
-        dev_mode_setting: bool. Represents whether to run the related commands
-            in dev mode.
-        log_level: str. The log level for the google app engine server.
-    """
-    app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
-
-    p = subprocess.Popen(
-        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=%s '
-        '--log_level=%s --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
-            GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
-        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
-        shell=True)
-    SUBPROCESSES.append(p)
-
-
 def get_chrome_driver_version():
     """Fetches the latest supported version of chromedriver depending on the
     Chrome version.
@@ -541,38 +535,56 @@ def run_tests(args):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
-    start_google_app_engine_server(dev_mode, args.server_log_level)
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+    managed_dev_appserver = common.managed_dev_appserver(
+        'app.yaml' if args.prod_env else 'app_dev.yaml',
+        port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
+        clear_datastore=True, skip_sdk_update_check=True,
+        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
-    common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
-    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    python_utils.PRINT(
-        'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
-        'core/tests/protractor.conf.js, you can view screenshots'
-        'of the failed tests in ../protractor-screenshots/')
-    commands = [common.NODE_BIN_PATH]
-    if args.debug_mode:
-        commands.append('--inspect-brk')
-    # This flag ensures tests fail if waitFor calls time out.
-    commands.append('--unhandled-rejections=strict')
-    commands.append(PROTRACTOR_BIN_PATH)
-    commands.extend(get_e2e_test_parameters(
-        args.sharding_instances, args.suite, dev_mode))
+    with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_elasticsearch_dev_server())
+        if constants.EMULATOR_MODE:
+            stack.enter_context(common.managed_firebase_auth_emulator())
+        stack.enter_context(managed_dev_appserver)
 
-    p = subprocess.Popen(commands, stdout=subprocess.PIPE)
-    output_lines = []
-    while True:
-        nextline = p.stdout.readline()
-        if len(nextline) == 0 and p.poll() is not None:
-            break
-        if isinstance(nextline, str):
-            # This is a failsafe line in case we get non-unicode input,
-            # but the tests provide all strings as unicode.
-            nextline = nextline.decode('utf-8')  # pragma: nocover
-        output_lines.append(nextline.rstrip())
-        # Replaces non-ASCII characters with '?'.
-        sys.stdout.write(nextline.encode('ascii', errors='replace'))
+        python_utils.PRINT('Waiting for servers to come up...')
 
-    return output_lines, p.returncode
+        # Wait for the servers to come up.
+        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
+        common.wait_for_port_to_be_in_use(WEB_DRIVER_PORT)
+        common.wait_for_port_to_be_in_use(GOOGLE_APP_ENGINE_PORT)
+        python_utils.PRINT('Servers have come up.')
+        python_utils.PRINT(
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
+            'core/tests/protractor.conf.js, you can view screenshots '
+            'of the failed tests in ../protractor-screenshots/')
+
+        commands = [common.NODE_BIN_PATH]
+        if args.debug_mode:
+            commands.append('--inspect-brk')
+        # This flag ensures tests fail if waitFor calls time out.
+        commands.append('--unhandled-rejections=strict')
+        commands.append(PROTRACTOR_BIN_PATH)
+        commands.extend(get_e2e_test_parameters(
+            args.sharding_instances, args.suite, dev_mode))
+
+        p = subprocess.Popen(commands, stdout=subprocess.PIPE)
+        output_lines = []
+        while True:
+            nextline = p.stdout.readline()
+            if len(nextline) == 0 and p.poll() is not None:
+                break
+            if isinstance(nextline, str):
+                # This is a failsafe line in case we get non-unicode input,
+                # but the tests provide all strings as unicode.
+                nextline = nextline.decode('utf-8')  # pragma: nocover
+            output_lines.append(nextline.rstrip())
+            # Replaces non-ASCII characters with '?'.
+            sys.stdout.write(nextline.encode('ascii', errors='replace'))
+
+        return output_lines, p.returncode
 
 
 def main(args=None):
@@ -585,13 +597,13 @@ def main(args=None):
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
         output, return_code = run_tests(parsed_args)
-        # Don't rerun passing tests.
-        if return_code == 0:
-            flake_checker.report_pass(parsed_args.suite)
-            break
         # Don't rerun off of CI.
         if not flake_checker.check_if_on_ci():
             python_utils.PRINT('No reruns because not running on CI.')
+            break
+        # Don't rerun passing tests.
+        if return_code == 0:
+            flake_checker.report_pass(parsed_args.suite)
             break
         flaky = flake_checker.is_test_output_flaky(
             output, parsed_args.suite)

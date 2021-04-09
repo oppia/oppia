@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import types
 
 from constants import constants
@@ -87,12 +88,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             r'The export_data\(\) method is missing from the '
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
-
-    def test_get_lowest_supported_role_is_exploration_editor(self):
-        self.assertEqual(
-            base_models.BaseModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_EXPLORATION_EDITOR
-        )
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
@@ -174,40 +169,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # OK, update_timestamps called before put.
         model.put()
 
-    def test_put_async(self):
-        model = base_models.BaseModel()
-        self.assertIsNone(model.created_on)
-        self.assertIsNone(model.last_updated)
-
-        # Field last_updated will get updated anyway because it is None.
-        model.update_timestamps(update_last_updated_time=False)
-        future = model.put_async()
-        future.get_result()
-        model_id = model.id
-        self.assertIsNotNone(
-            base_models.BaseModel.get_by_id(model_id).created_on)
-        self.assertIsNotNone(
-            base_models.BaseModel.get_by_id(model_id).last_updated)
-        last_updated = model.last_updated
-
-        # Field last_updated won't get updated because update_last_updated_time
-        # is set to False and last_updated already has some value.
-        model.update_timestamps(update_last_updated_time=False)
-        future = model.put_async()
-        future.get_result()
-        self.assertEqual(
-            base_models.BaseModel.get_by_id(model_id).last_updated,
-            last_updated)
-
-        # Field last_updated will get updated because update_last_updated_time
-        # is set to True (by default).
-        model.update_timestamps()
-        future = model.put_async()
-        future.get_result()
-        self.assertNotEqual(
-            base_models.BaseModel.get_by_id(model_id).last_updated,
-            last_updated)
-
     def test_put_multi(self):
         models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
         for model in models_1:
@@ -242,51 +203,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         models_3 = base_models.BaseModel.get_multi(model_ids)
         base_models.BaseModel.update_timestamps_multi(models_3)
         base_models.BaseModel.put_multi(models_3)
-        for model_id, last_updated in python_utils.ZIP(
-                model_ids, last_updated_values):
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertNotEqual(model.last_updated, last_updated)
-
-    def test_put_multi_async(self):
-        models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
-        for model in models_1:
-            self.assertIsNone(model.created_on)
-            self.assertIsNone(model.last_updated)
-
-        # Field last_updated will get updated anyway because it is None.
-        base_models.BaseModel.update_timestamps_multi(
-            models_1, update_last_updated_time=False)
-        futures = base_models.BaseModel.put_multi_async(models_1)
-        for future in futures:
-            future.get_result()
-        model_ids = [model.id for model in models_1]
-        last_updated_values = []
-        for model_id in model_ids:
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertIsNotNone(model.created_on)
-            self.assertIsNotNone(model.last_updated)
-            last_updated_values.append(model.last_updated)
-
-        # Field last_updated won't get updated because update_last_updated_time
-        # is set to False and last_updated already has some value.
-        models_2 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.update_timestamps_multi(
-            models_1, update_last_updated_time=False)
-        futures = base_models.BaseModel.put_multi_async(models_2)
-        for future in futures:
-            future.get_result()
-        for model_id, last_updated in python_utils.ZIP(
-                model_ids, last_updated_values):
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertEqual(model.last_updated, last_updated)
-
-        # Field last_updated will get updated because update_last_updated_time
-        # is set to True (by default).
-        models_3 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.update_timestamps_multi(models_1)
-        futures = base_models.BaseModel.put_multi_async(models_3)
-        for future in futures:
-            future.get_result()
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)
@@ -357,6 +273,93 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         base_models.BaseModel.get_new_id({'a': 'b'})
 
 
+class TestBaseHumanMaintainedModel(base_models.BaseHumanMaintainedModel):
+    """Model that inherits the BaseHumanMaintainedModel for testing."""
+
+    pass
+
+
+class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
+    """Test the generic base human maintained model."""
+
+    MODEL_ID = 'model1'
+
+    def setUp(self):
+        super(BaseHumanMaintainedModelTests, self).setUp()
+        self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
+        def mock_put(self):
+            self._last_updated_timestamp_is_fresh = True
+            self.last_updated_by_human = datetime.datetime.utcnow()
+
+            # These if conditions can be removed once the auto_now property
+            # is set True to these attributes.
+            if self.created_on is None:
+                self.created_on = datetime.datetime.utcnow()
+
+            if self.last_updated is None:
+                self.last_updated = datetime.datetime.utcnow()
+
+            super(base_models.BaseHumanMaintainedModel, self).put()
+
+        with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
+            self.model_instance.put()
+
+    def test_put(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError, 'Use put_for_human or put_for_bot instead'):
+            self.model_instance.put()
+
+    def test_put_for_human(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.update_timestamps()
+        self.model_instance.put_for_human()
+
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_for_bot(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+        self.model_instance.update_timestamps()
+        self.model_instance.put_for_bot()
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_multi(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Use put_multi_for_human or put_multi_for_bot instead'):
+            TestBaseHumanMaintainedModel.put_multi([])
+
+    def test_put_multi_for_human(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_for_human(
+            [self.model_instance])
+
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+    def test_put_multi_for_bot(self):
+        previous_last_updated_by_human = (
+            self.model_instance.last_updated_by_human)
+
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_for_bot(
+            [self.model_instance])
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
+
+
 class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Model that inherits the BaseSnapshotMetadataModel for testing."""
 
@@ -369,11 +372,29 @@ class TestSnapshotContentModel(base_models.BaseSnapshotContentModel):
     pass
 
 
+class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Model that inherits the BaseCommitLogEntryModel for testing."""
+
+    @classmethod
+    def get_instance_id(cls, target_entity_id, version):
+        """A function that returns the id of the log in BaseCommitLogEntryModel.
+
+        Args:
+            target_entity_id: str. The id of the mock entity used.
+            version: int. The version of the model after the commit.
+
+        Returns:
+            str. The commit id with the target entity id and version number.
+        """
+        return 'entity-%s-%s' % (target_entity_id, version)
+
+
 class TestVersionedModel(base_models.VersionedModel):
     """Model that inherits the VersionedModel for testing."""
 
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = TestCommitLogEntryModel
 
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
@@ -383,12 +404,17 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
             base_models.BaseCommitLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
+    def test_get_model_association_to_user_is_not_corresponding_to_user(self):
+        self.assertEqual(
+            base_models.BaseCommitLogEntryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_base_class_get_instance_id_raises_not_implemented_error(self):
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _get_instance_id\(\) method is missing from the '
+            r'The get_instance_id\(\) method is missing from the '
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseCommitLogEntryModel.get_commit('id', 1)
 
@@ -483,23 +509,6 @@ class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
         model1.update_timestamps()
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
-
-
-class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Model that inherits the BaseCommitLogEntryModel for testing."""
-
-    @classmethod
-    def _get_instance_id(cls, target_entity_id, version):
-        """A function that returns the id of the log in BaseCommitLogEntryModel.
-
-        Args:
-            target_entity_id: str. The id of the mock entity used.
-            version: int. The version of the model after the commit.
-
-        Returns:
-            str. The commit id with the target entity id and version number.
-        """
-        return 'entity-%s-%s' % (target_entity_id, version)
 
 
 class CommitLogEntryModelTests(test_utils.GenericTestBase):

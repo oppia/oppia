@@ -56,7 +56,7 @@ describe('Exploration stats service', function() {
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
@@ -72,11 +72,11 @@ describe('Exploration stats service', function() {
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
-    explorationStatsService.getExplorationStats('eid')
+    explorationStatsService.getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
     flushMicrotasks();
 

@@ -50,7 +50,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
         var availableAudioLanguages = (
-          recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
+          recordedVoiceovers.getLanguageCodes(contentId));
         if (availableAudioLanguages.indexOf(languageCode) !== -1) {
           var voiceover = recordedVoiceovers.getVoiceover(
             contentId, languageCode);
@@ -61,7 +61,7 @@ angular.module('oppia').component('stateTranslationEditor', {
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/components/forms/forms-templates/' +
               'mark-audio-as-needing-update-modal.directive.html'),
-            backdrop: true,
+            backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
             recordedVoiceovers.toggleNeedsUpdateAttribute(
@@ -89,6 +89,16 @@ angular.module('oppia').component('stateTranslationEditor', {
         contentId = (
           TranslationTabActiveContentIdService.getActiveContentId());
         languageCode = TranslationLanguageService.getActiveLanguageCode();
+
+        $scope.HTML_SCHEMA = {
+          type: 'html',
+          ui_config: {
+            language: TranslationLanguageService.getActiveLanguageCode(),
+            languageDirection: (
+              TranslationLanguageService.getActiveLanguageDirection())
+          }
+        };
+
         if (StateWrittenTranslationsService.displayed.hasWrittenTranslation(
           contentId, languageCode)) {
           $scope.activeWrittenTranslation = (
@@ -135,8 +145,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
-              WrittenTranslationObjectFactory
-                .createNew($scope.dataFormat, ''));
+              WrittenTranslationObjectFactory.createNew($scope.dataFormat));
           }
         }
       };
@@ -163,14 +172,23 @@ angular.module('oppia').component('stateTranslationEditor', {
         StateWrittenTranslationsService.restoreFromMemento();
         initEditor();
       };
+
       ctrl.$onInit = function() {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
-        $scope.HTML_SCHEMA = {
-          type: 'html'
-        };
+
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
+        };
+
+        $scope.SET_OF_STRINGS_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          validators: [{
+            id: 'is_uniquified'
+          }]
         };
 
         ctrl.directiveSubscriptions.add(

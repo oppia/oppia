@@ -140,7 +140,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
 
       var subtitledHtml = angular.copy(
         ctrl.subtopicPage.getPageContents().getSubtitledHtml());
-      subtitledHtml.setHtml(ctrl.htmlData);
+      subtitledHtml.html = ctrl.htmlData;
       TopicUpdateService.setSubtopicPageContentsHtml(
         ctrl.subtopicPage, ctrl.subtopicId, subtitledHtml);
       ctrl.subtopicPage.getPageContents().setHtml(ctrl.htmlData);

@@ -22,10 +22,10 @@ require(
 
 angular.module('oppia').controller('ExplorationSaveModalController', [
   '$controller', '$scope', '$uibModalInstance',
-  'diffData', 'isExplorationPrivate',
+  'diffData', 'isExplorationPrivate', 'MAX_COMMIT_MESSAGE_LENGTH',
   function(
       $controller, $scope, $uibModalInstance,
-      diffData, isExplorationPrivate) {
+      diffData, isExplorationPrivate, MAX_COMMIT_MESSAGE_LENGTH) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -40,5 +40,6 @@ angular.module('oppia').controller('ExplorationSaveModalController', [
 
     $scope.earlierVersionHeader = 'Last saved';
     $scope.laterVersionHeader = 'New changes';
+    $scope.MAX_COMMIT_MESSAGE_LENGTH = String(MAX_COMMIT_MESSAGE_LENGTH);
   }
 ]);

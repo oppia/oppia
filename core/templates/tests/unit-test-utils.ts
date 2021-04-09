@@ -17,27 +17,28 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, NgModule } from '@angular/core';
-import { NgZone, PlatformRef, Type } from '@angular/core';
+import { Component, NgModule, NgZone, PlatformRef, Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 
 import { angularServices } from 'services/angular-services.index';
+
 
 declare var angular: ng.IAngularStatic;
 
 export const importAllAngularServices = (): void => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [{provide: AngularFireAuth, useValue: null}],
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    for (let servicePair of angularServices) {
-      $provide.value(
-        servicePair[0], TestBed.get(servicePair[1]));
+    for (let [serviceName, serviceType] of angularServices) {
+      $provide.value(serviceName, TestBed.inject(serviceType));
     }
   }));
 };

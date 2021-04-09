@@ -34,6 +34,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+import contextlib2
 from mapreduce import input_readers
 
 (base_models, exp_models, stats_models, job_models) = (
@@ -222,37 +223,34 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             MockJobManagerOne.register_failure(job_id, 'error')
 
     def test_failing_jobs(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         # Mocks GoogleCloudStorageInputReader() to fail a job.
         _mock_input_reader = lambda _, __: python_utils.divide(1, 0)
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
-        assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception,
-            r'Invalid status code change for job '
-            r'MockJobManagerOne-\w+-\w+: from new to failed')
 
         job_id = MockJobManagerOne.create_new()
         store_map_reduce_results = jobs.StoreMapReduceResults()
 
-        with input_reader_swap, assert_raises_context_manager, logging_swap:
+        with contextlib2.ExitStack() as stack:
+            captured_logs = stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            stack.enter_context(input_reader_swap)
+            stack.enter_context(
+                self.assertRaisesRegexp(
+                    Exception,
+                    r'Invalid status code change for job '
+                    r'MockJobManagerOne-\w+-\w+: from new to failed'
+                )
+            )
+
             store_map_reduce_results.run(
                 job_id, 'core.jobs_test.MockJobManagerOne', 'output')
 
-        expected_log_message = 'Job %s failed at' % job_id
-
         # The first log message is ignored as it is the traceback.
-        self.assertEqual(len(observed_log_messages), 2)
+        self.assertEqual(len(captured_logs), 1)
         self.assertTrue(
-            observed_log_messages[1].startswith(expected_log_message))
+            captured_logs[0].startswith('Job %s failed at' % job_id))
 
     def test_register_failure(self):
         job_id = MockJobManagerOne.create_new()
@@ -705,6 +703,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
 
+        @transaction_services.run_in_transaction_wrapper
         def _increment_counter():
             """Increments the count, if the realtime model corresponding to the
             active real-time model id exists.
@@ -717,7 +716,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
                 id=realtime_model_id, count=1,
                 realtime_layer=active_realtime_layer).put()
 
-        transaction_services.run_in_transaction(_increment_counter)
+        _increment_counter()
 
     # Public query method.
     @classmethod
@@ -893,13 +892,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
 
-            # Enqueue the batch computation. (It is running on 0 events).
-            StartExplorationEventCounter._kickoff_batch_job()  # pylint: disable=protected-access
-            # Record an event while this job is in the queue. Simulate
-            # this by directly calling on_incoming_event(), because using
-            # StartExplorationEventHandler.record() would just put the event
-            # in the task queue, which we don't want to flush yet.
-            event_services.StartExplorationEventHandler._handle_event(  # pylint: disable=protected-access
+            # We will be handling the event for recording exploration start
+            # events by calling StartExplorationEventLogEntryModel. This
+            # will record an event while this job is in this queue.
+            stats_models.StartExplorationEventLogEntryModel.create(
                 self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id',
                 {}, feconf.PLAY_TYPE_NORMAL)
             StartExplorationEventCounter.on_incoming_event(

@@ -26,6 +26,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
@@ -41,7 +43,7 @@ import { SolutionValidityService } from
 import { State } from 'domain/state/StateObjectFactory';
 
 export interface AnswerChoice {
-  val: string | number;
+  val: string | number | SubtitledHtml;
   label: string;
 }
 
@@ -62,6 +64,7 @@ export class StateEditorService {
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
+  private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -197,7 +200,7 @@ export class StateEditorService {
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
       return (<MultipleChoiceInputCustomizationArgs> customizationArgs)
-        .choices.value.map((val, ind) => ({ val: ind, label: val.getHtml() }));
+        .choices.value.map((val, ind) => ({ val: ind, label: val.html }));
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
@@ -211,17 +214,17 @@ export class StateEditorService {
         });
       }
       return _answerChoices;
-    } else if (interactionId === 'ItemSelectionInput') {
+    } else if (
+      interactionId === 'ItemSelectionInput' ||
+      interactionId === 'DragAndDropSortInput'
+    ) {
       return (
-        <ItemSelectionInputCustomizationArgs> customizationArgs)
+        <
+          ItemSelectionInputCustomizationArgs|
+          DragAndDropSortInputCustomizationArgs
+        > customizationArgs)
         .choices.value.map(val => (
-          { val: val.getHtml(), label: val.getHtml() }
-        ));
-    } else if (interactionId === 'DragAndDropSortInput') {
-      return (
-        <DragAndDropSortInputCustomizationArgs> customizationArgs)
-        .choices.value.map(val => (
-          { val: val.getHtml(), label: val.getHtml() }
+          { val: val.contentId, label: val.html}
         ));
     } else {
       return null;
@@ -309,6 +312,10 @@ export class StateEditorService {
 
   get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
     return this._handleCustomArgsUpdateEventEmitter;
+  }
+
+  get onObjectFormValidityChange(): EventEmitter<boolean> {
+    return this._objectFormValidityChangeEventEmitter;
   }
 }
 

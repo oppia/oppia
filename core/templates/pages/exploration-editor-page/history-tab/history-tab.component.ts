@@ -40,14 +40,16 @@ import cloneDeep from 'lodash/cloneDeep';
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$http', '$log', '$uibModal', 'CompareVersionsService',
+    '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'LoaderService', 'RouterService', 'UrlInterpolationService',
+    'LoaderService', 'RouterService',
+    'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
-        $http, $log, $uibModal, CompareVersionsService,
+        $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        LoaderService, RouterService, UrlInterpolationService,
+        LoaderService, RouterService,
+        UrlInterpolationService,
         VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -127,6 +129,8 @@ angular.module('oppia').component('historyTab', {
                     DateTimeFormatService
                       .getLocaleDateTimeHourString(
                         explorationSnapshots[i].created_on_ms)),
+                  tooltipText: DateTimeFormatService.getDateTimeInWords(
+                    explorationSnapshots[i].created_on_ms),
                   commitMessage: explorationSnapshots[i].commit_message,
                   versionNumber: explorationSnapshots[i].version_number
                 };
@@ -140,7 +144,9 @@ angular.module('oppia').component('historyTab', {
               ctrl.totalExplorationVersionMetadata.reverse();
               LoaderService.hideLoadingScreen();
               ctrl.changeItemsPerPage();
+              $rootScope.$applyAsync();
             });
+          $rootScope.$applyAsync();
         });
       };
 

@@ -30,6 +30,7 @@ from core.domain import feedback_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -241,7 +242,7 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -445,7 +446,7 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -652,7 +653,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -778,7 +779,13 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_private_exploration(self):
-        rights_manager.unpublish_exploration(self.owner, '0')
+        exp_rights_model = exp_models.ExplorationRightsModel.get('0')
+        exp_rights_model.status = constants.ACTIVITY_STATUS_PRIVATE
+        exp_rights_model.update_timestamps()
+        exp_rights_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Make exploration private',
+            [{'cmd': rights_domain.CMD_CHANGE_EXPLORATION_STATUS}])
         expected_output = [
             (
                 u'[u\'failed validation check for public exploration check '
@@ -824,7 +831,7 @@ class LearnerPlaylistModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -1058,11 +1065,11 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.save_new_valid_exploration(
             'exp0', self.owner_id, end_state_name='End')
@@ -1080,6 +1087,8 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'property_name': 'objective',
                 'new_value': 'The objective'
             })], 'Test edit 2')
+        self.process_and_flush_pending_tasks()
+
         rights_manager.publish_exploration(self.owner, 'exp0')
         rights_manager.publish_exploration(self.owner, 'exp1')
 
@@ -1185,183 +1194,6 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(UserAuthDetailsModelValidatorTests, self).setUp()
-
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
-
-        # Note: There will be a total of 2 UserSettingsModels (hence 2
-        # UserAuthDetailsModels too) even though only one user signs up in the
-        # test since superadmin signup is also done in
-        # test_utils.AuditJobsTestBase.
-        self.model_instance = user_models.UserAuthDetailsModel.get_by_id(
-            self.user_id)
-        self.job_class = (
-            prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob)
-
-    def test_audit_standard_operation_passes(self):
-        expected_output = [
-            u'[u\'fully-validated UserAuthDetailsModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_audit_with_created_on_greater_than_last_updated_fails(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of UserAuthDetailsModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.user_id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            ), u'[u\'fully-validated UserAuthDetailsModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_audit_with_last_updated_greater_than_current_time_fails(self):
-        user_models.UserAuthDetailsModel.get_by_id(
-            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'UserAuthDetailsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.user_id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_audit_with_missing_user_settings_model_fails(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_settings_ids '
-                'field check of UserAuthDetailsModel\', '
-                '[u"Entity id %s: based on '
-                'field user_settings_ids having value '
-                '%s, expected model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserAuthDetailsModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_audit_with_missing_user_identifiers_model_fails(self):
-        user_models.UserIdentifiersModel.get_by_user_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_identifiers_ids '
-                'field check of UserAuthDetailsModel\', '
-                '[u"Entity id %s: based on '
-                'field user_identifiers_ids having value '
-                '%s, expected model UserIdentifiersModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.gae_id, self.gae_id),
-            u'[u\'fully-validated UserAuthDetailsModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
-class UserIdentifiersModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(UserIdentifiersModelValidatorTests, self).setUp()
-
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
-
-        # Note: There will be a total of 2 UserSettingsModels (hence 2
-        # UserAuthDetailsModels too) even though only one user signs up in the
-        # test since superadmin signup is also done in
-        # test_utils.AuditJobsTestBase.
-        self.model_instance = user_models.UserIdentifiersModel.get_by_id(
-            self.gae_id)
-        self.job_class = (
-            prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob)
-
-    def test_audit_standard_operation_passes(self):
-        expected_output = [
-            u'[u\'fully-validated UserIdentifiersModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_audit_with_created_on_greater_than_last_updated_fails(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of UserIdentifiersModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.gae_id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            ), u'[u\'fully-validated UserIdentifiersModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_audit_with_last_updated_greater_than_current_time_fails(self):
-        user_models.UserIdentifiersModel.get_by_id(
-            self.get_gae_id_from_email('tmpsuperadmin@example.com')
-        ).delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'UserIdentifiersModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.gae_id, self.model_instance.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
-
-    def test_audit_with_missing_user_settings_model_fails(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_settings_ids '
-                'field check of UserIdentifiersModel\', '
-                '[u"Entity id %s: based on '
-                'field user_settings_ids having value '
-                '%s, expected model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.gae_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserIdentifiersModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_audit_with_missing_user_auth_details_model_fails(self):
-        user_models.UserAuthDetailsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_auth_details_ids '
-                'field check of UserIdentifiersModel\', '
-                '[u"Entity id %s: based on '
-                'field user_auth_details_ids having value '
-                '%s, expected model UserAuthDetailsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.gae_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserIdentifiersModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-
 class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -1440,7 +1272,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -1990,7 +1822,7 @@ class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
         self.save_new_valid_exploration(
             'exp0', self.user_id, end_state_name='End')
@@ -2191,7 +2023,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -2325,7 +2157,13 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
-        rights_manager.unpublish_exploration(self.owner, '0')
+        exp_rights_model = exp_models.ExplorationRightsModel.get('0')
+        exp_rights_model.status = constants.ACTIVITY_STATUS_PRIVATE
+        exp_rights_model.update_timestamps()
+        exp_rights_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Make exploration private',
+            [{'cmd': rights_domain.CMD_CHANGE_EXPLORATION_STATUS}])
         expected_output = [
             (
                 u'[u\'failed validation check for public exploration check '
@@ -2381,7 +2219,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -2528,7 +2366,13 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
-        rights_manager.unpublish_exploration(self.owner, '1')
+        exp_rights_model = exp_models.ExplorationRightsModel.get('1')
+        exp_rights_model.status = constants.ACTIVITY_STATUS_PRIVATE
+        exp_rights_model.update_timestamps()
+        exp_rights_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Make exploration private',
+            [{'cmd': rights_domain.CMD_CHANGE_EXPLORATION_STATUS}])
         expected_output = [(
             u'[u\'failed validation check for explorations in completed '
             'node check of StoryProgressModel\', [u"Entity id %s: '
@@ -2577,21 +2421,25 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.query_id = user_query_services.save_new_query_model(
-            self.admin_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+        self.user_query_id = user_query_services.save_new_user_query(
+            self.admin_id, {
+                'inactive_in_last_n_days': 10,
+                'created_at_least_n_exps': 5,
+                'has_not_logged_in_for_n_days': 30
+            })
 
         self.model_instance = user_models.UserQueryModel.get_by_id(
-            self.query_id)
+            self.user_query_id)
         self.model_instance.user_ids = [self.owner_id, self.user_id]
         self.model_instance.update_timestamps()
         self.model_instance.put()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             user_query_services.send_email_to_qualified_users(
-                self.query_id, 'subject', 'body',
+                self.user_query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
+        self.model_instance = user_models.UserQueryModel.get_by_id(
+            self.user_query_id)
         self.sent_mail_id = self.model_instance.sent_email_model_id
 
         self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
@@ -2618,7 +2466,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
-                self.query_id, self.model_instance.created_on,
+                self.user_query_id, self.model_instance.created_on,
                 self.model_instance.last_updated
             )]
         self.run_job_and_check_output(
@@ -2630,7 +2478,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             'UserQueryModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
-        ) % (self.query_id, self.model_instance.last_updated)]
+        ) % (self.user_query_id, self.model_instance.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
@@ -2647,8 +2495,9 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expected model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.query_id, self.user_id, self.user_id)]
+                'with id %s but it doesn\'t exist"]]'
+            ) % (self.user_query_id, self.user_id, self.user_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2661,8 +2510,9 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on '
                 'field sent_email_model_ids having value '
                 '%s, expected model BulkEmailModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.query_id, self.sent_mail_id, self.sent_mail_id)]
+                'with id %s but it doesn\'t exist"]]'
+            ) % (self.user_query_id, self.sent_mail_id, self.sent_mail_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2672,12 +2522,14 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model.recipient_ids.append('invalid')
         bulk_email_model.update_timestamps()
         bulk_email_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for recipient check of '
-            'UserQueryModel\', [u"Entity id %s: Email model %s '
-            'for query has following extra recipients [u\'invalid\'] '
-            'which are not qualified as per the query"]]') % (
-                self.query_id, self.sent_mail_id)]
+        expected_output = [
+            (
+                u'[u\'failed validation check for recipient check of '
+                'UserQueryModel\', [u"Entity id %s: Email model %s '
+                'for query has following extra recipients [u\'invalid\'] '
+                'which are not qualified as per the query"]]'
+            ) % (self.user_query_id, self.sent_mail_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2687,22 +2539,26 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         bulk_email_model.sender_id = 'invalid'
         bulk_email_model.update_timestamps()
         bulk_email_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for sender check of '
-            'UserQueryModel\', [u\'Entity id %s: Sender id invalid in '
-            'email model with id %s does not match submitter id '
-            '%s of query\']]') % (
-                self.query_id, self.sent_mail_id, self.admin_id)]
+        expected_output = [
+            (
+                u'[u\'failed validation check for sender check of '
+                'UserQueryModel\', [u\'Entity id %s: Sender id invalid in '
+                'email model with id %s does not match submitter id '
+                '%s of query\']]'
+            ) % (self.user_query_id, self.sent_mail_id, self.admin_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
     def test_missing_user_bulk_email_model(self):
         user_models.UserBulkEmailsModel.get_by_id(self.owner_id).delete()
-        expected_output = [(
-            u'[u\'failed validation check for user bulk email check of '
-            'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
-            'is missing for recipient with id %s\']]') % (
-                self.query_id, self.owner_id)]
+        expected_output = [
+            (
+                u'[u\'failed validation check for user bulk email check of '
+                'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
+                'is missing for recipient with id %s\']]'
+            ) % (self.user_query_id, self.owner_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2716,7 +2572,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             '[u\'failed validation check for entity stale check of '
             'UserQueryModel\', [u\'Entity id %s: '
-            'Model older than 4 weeks\']]') % self.query_id]
+            'Model older than 4 weeks\']]') % self.user_query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2728,7 +2584,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [(
             '[u\'failed validation check for entity stale check of '
             'UserQueryModel\', [u\'Entity id %s: '
-            'Archived model not marked as deleted\']]') % self.query_id]
+            'Archived model not marked as deleted\']]') % self.user_query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2746,23 +2602,27 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.query_id = user_query_services.save_new_query_model(
-            self.admin_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+        self.user_query_id = user_query_services.save_new_user_query(
+            self.admin_id, {
+                'inactive_in_last_n_days': 10,
+                'created_at_least_n_exps': 5,
+                'has_not_logged_in_for_n_days': 30
+            })
 
         query_model = user_models.UserQueryModel.get_by_id(
-            self.query_id)
+            self.user_query_id)
         query_model.user_ids = [self.owner_id, self.user_id]
         query_model.update_timestamps()
         query_model.put()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             user_query_services.send_email_to_qualified_users(
-                self.query_id, 'subject', 'body',
+                self.user_query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.model_instance = user_models.UserBulkEmailsModel.get_by_id(
             self.user_id)
+        query_model = user_models.UserQueryModel.get_by_id(
+            self.user_query_id)
         self.sent_mail_id = query_model.sent_email_model_id
         self.job_class = (
             prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob)
@@ -3125,7 +2985,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
         user_services.update_user_role(
             self.user_id, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_actions = user_services.UserActionsInfo(self.user_id)
+        self.user_actions = user_services.get_user_actions_info(self.user_id)
 
         wipeout_service.pre_delete_user(self.user_id)
         self.process_and_flush_pending_mapreduce_tasks()

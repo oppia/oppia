@@ -22,11 +22,15 @@ require(
 
 angular.module('oppia').controller('CollectionEditorSaveModalController', [
   '$controller', '$scope', '$uibModalInstance', 'isPrivate',
-  function($controller, $scope, $uibModalInstance, isPrivate) {
+  'MAX_COMMIT_MESSAGE_LENGTH',
+  function(
+      $controller, $scope, $uibModalInstance, isPrivate,
+      MAX_COMMIT_MESSAGE_LENGTH) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
     $scope.isCollectionPrivate = isPrivate;
+    $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
   }
 ]);

@@ -46,7 +46,6 @@ describe('Create New Chapter Modal Controller', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

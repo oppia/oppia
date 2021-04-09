@@ -67,6 +67,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       current: [],
       others: []
     };
+    var _skillCreationIsAllowed = false;
     var _classroomUrlFragment = 'staging';
     var _storySummariesInitializedEventEmitter = new EventEmitter();
     var _subtopicPageLoadedEventEmitter = new EventEmitter();
@@ -131,6 +132,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
     };
     var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
       for (var skillId in skillIdToRubricsObject) {
+        // Skips deleted skills.
+        if (!skillIdToRubricsObject[skillId]) {
+          continue;
+        }
         var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
           return RubricObjectFactory.createFromBackendDict(rubric);
         });
@@ -178,43 +183,44 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       loadTopic: function(topicId) {
         _topicIsLoading = true;
-        EditableTopicBackendApiService.fetchTopic(
-          topicId).then(
-          function(newBackendTopicObject) {
-            _skillQuestionCountDict = (
-              newBackendTopicObject.skillQuestionCountDict);
-            _updateGroupedSkillSummaries(
-              newBackendTopicObject.groupedSkillSummaries);
-            _updateTopic(
-              newBackendTopicObject.topicDict,
-              newBackendTopicObject.skillIdToDescriptionDict
-            );
-            _updateGroupedSkillSummaries(
-              newBackendTopicObject.groupedSkillSummaries);
-            _updateSkillIdToRubricsObject(
-              newBackendTopicObject.skillIdToRubricsDict);
-            _updateClassroomUrlFragment(
-              newBackendTopicObject.classroomUrlFragment);
-            EditableTopicBackendApiService.fetchStories(topicId).then(
-              function(canonicalStorySummaries) {
-                _setCanonicalStorySummaries(canonicalStorySummaries);
-                $rootScope.$applyAsync();
-              });
-          },
-          function(error) {
-            AlertsService.addWarning(
-              error || 'There was an error when loading the topic.');
-            _topicIsLoading = false;
-          });
-        TopicRightsBackendApiService.fetchTopicRights(
-          topicId).then(function(newBackendTopicRightsObject) {
+        let topicDataPromise = EditableTopicBackendApiService.fetchTopic(
+          topicId);
+        let storyDataPromise = EditableTopicBackendApiService.fetchStories(
+          topicId);
+        let topicRightsPromise = TopicRightsBackendApiService.fetchTopicRights(
+          topicId);
+        Promise.all([
+          topicDataPromise,
+          storyDataPromise,
+          topicRightsPromise
+        ]).then(([
+          newBackendTopicObject,
+          canonicalStorySummaries,
+          newBackendTopicRightsObject
+        ]) => {
+          _skillCreationIsAllowed = (
+            newBackendTopicObject.skillCreationIsAllowed);
+          _skillQuestionCountDict = (
+            newBackendTopicObject.skillQuestionCountDict);
+          _updateGroupedSkillSummaries(
+            newBackendTopicObject.groupedSkillSummaries);
+          _updateTopic(
+            newBackendTopicObject.topicDict,
+            newBackendTopicObject.skillIdToDescriptionDict
+          );
+          _updateGroupedSkillSummaries(
+            newBackendTopicObject.groupedSkillSummaries);
+          _updateSkillIdToRubricsObject(
+            newBackendTopicObject.skillIdToRubricsDict);
+          _updateClassroomUrlFragment(
+            newBackendTopicObject.classroomUrlFragment);
           _updateTopicRights(newBackendTopicRightsObject);
+          _setCanonicalStorySummaries(canonicalStorySummaries);
           _topicIsLoading = false;
           $rootScope.$applyAsync();
-        }, function(error) {
+        }, (error) => {
           AlertsService.addWarning(
-            error ||
-            'There was an error when loading the topic rights.');
+            error || 'There was an error when loading the topic editor.');
           _topicIsLoading = false;
         });
       },
@@ -295,6 +301,13 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       getTopic: function() {
         return _topic;
+      },
+
+      /**
+       * Returns whether the user can create a skill via the topic editor.
+       */
+      isSkillCreationAllowed: function() {
+        return _skillCreationIsAllowed;
       },
 
       getCanonicalStorySummaries: function() {

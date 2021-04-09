@@ -121,10 +121,10 @@ class ExplorationHandler(EditorHandler):
         commit_message = self.payload.get('commit_message')
 
         if (commit_message is not None and
-                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_list_dict = self.payload.get('change_list')
 
@@ -232,7 +232,9 @@ class ExplorationRightsHandler(EditorHandler):
             if new_member_id is None:
                 raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
-
+            if new_member_id == self.user_id:
+                raise self.InvalidInputException(
+                    'Users are not allowed to assign other roles to themselves')
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
@@ -257,6 +259,25 @@ class ExplorationRightsHandler(EditorHandler):
             raise self.InvalidInputException(
                 'No change was made to this exploration.')
 
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                exploration_id).to_dict()
+        })
+
+    @acl_decorators.can_modify_exploration_roles
+    def delete(self, exploration_id):
+        """Deletes user roles from the exploration."""
+        username = self.request.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        if self.user.user_id == user_id:
+            raise self.InvalidInputException(
+                'Sorry, users cannot remove their own roles.')
+
+        rights_manager.deassign_role_for_exploration(
+            self.user, exploration_id, user_id)
         self.render_json({
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict()
@@ -558,7 +579,7 @@ class FetchIssuesHandler(EditorHandler):
                 unresolved_issues.append(issue)
         exp_issues.unresolved_issues = unresolved_issues
         exp_issues_dict = exp_issues.to_dict()
-        self.render_json(exp_issues_dict['unresolved_issues'])
+        self.render_json(exp_issues_dict)
 
 
 class FetchPlaythroughHandler(EditorHandler):

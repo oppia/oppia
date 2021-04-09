@@ -65,6 +65,13 @@ describe('Contributor dashboard page', function() {
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
     await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
+    await adminPage.editConfigProperty(
+      'Whether the contributor can suggest questions for skill opportunities.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true);
+      });
+    await adminPage.assignQuestionContributor('user0');
+    await adminPage.assignQuestionContributor('user1');
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
@@ -110,6 +117,9 @@ describe('Contributor dashboard page', function() {
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', ['correct']);
     await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
@@ -146,6 +156,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(1);
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       'Question 1', SKILL_DESCRIPTIONS[0], 'Accepted', null);
+    await users.logout();
   });
 
   it('should allow reviewer to reject question suggestions', async function() {
@@ -168,6 +179,9 @@ describe('Contributor dashboard page', function() {
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', ['correct']);
     await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
@@ -204,7 +218,8 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(2);
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      'Question 1', SKILL_DESCRIPTIONS[0], 'Rejected', null);
+      'Question 1', SKILL_DESCRIPTIONS[0], 'Revisions Requested', null);
+    await users.logout();
   });
 
   afterEach(async function() {
@@ -212,7 +227,7 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-describe('Admin page contributor reviewer form', function() {
+describe('Admin page contribution rights form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var contributorDashboardPage = null;
@@ -222,7 +237,6 @@ describe('Admin page contributor reviewer form', function() {
   var voiceoverReviewerEmail = 'voiceartist@contributor.com';
   var questionReviewerUsername = 'questionreviewer';
   var questionReviewerEmail = 'questionreviewer@contributor.com';
-  var ADMIN_EMAIL = 'adminToAssignReviewer@adminTab.com';
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
@@ -232,15 +246,20 @@ describe('Admin page contributor reviewer form', function() {
       translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
-    await users.createAdmin(ADMIN_EMAIL, 'assignReviewer');
-  });
-
-  beforeEach(async function() {
-    await users.login(ADMIN_EMAIL, true);
+    await users.createAndLoginAdminUser(
+      'primaryAdmin@adminTab.com', 'primary');
+    await adminPage.editConfigProperty(
+      'Whether the contributor can suggest questions for skill opportunities.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true);
+      });
+    await users.logout();
   });
 
   it('should allow admin to add translation reviewer', async function() {
-    await adminPage.get();
+    await users.createAndLoginAdminUser(
+      'adminToAssignTranslationReviewer@adminTab.com',
+      'assignTranslationReviewer');
     await adminPage.assignTranslationReviewer(
       translationReviewerUsername, HINDI_LANGUAGE);
     await adminPage.expectUserToBeTranslationReviewer(
@@ -255,7 +274,8 @@ describe('Admin page contributor reviewer form', function() {
   });
 
   it('should allow admin to add voiceover reviewer', async function() {
-    await adminPage.get();
+    await users.createAndLoginAdminUser(
+      'adminToAssignVoiceoverReviewer@adminTab.com', 'assignVoiceoverReviewer');
     await adminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
     await adminPage.expectUserToBeVoiceoverReviewer(
@@ -270,7 +290,8 @@ describe('Admin page contributor reviewer form', function() {
   });
 
   it('should allow admin to add question reviewer', async function() {
-    await adminPage.get();
+    await users.createAndLoginAdminUser(
+      'adminToAssignQuestionReviewer@adminTab.com', 'assignQuestionReviewer');
     await adminPage.assignQuestionReviewer(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
     await users.logout();
@@ -278,6 +299,18 @@ describe('Admin page contributor reviewer form', function() {
     await users.login(questionReviewerEmail);
     await contributorDashboardPage.get();
     await contributorDashboardPage.expectUserToBeQuestionReviewer();
+    await users.logout();
+  });
+
+  it('should allow admin to add question contributor', async function() {
+    await users.createAndLoginAdminUser(
+      'adminToAddQuestionContributor@adminTab.com', 'addQuestionContributor');
+    await adminPage.assignQuestionContributor(questionReviewerUsername);
+    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
+
+    // Confirm rights persist on page reload.
+    await browser.refresh();
+    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
     await users.logout();
   });
 

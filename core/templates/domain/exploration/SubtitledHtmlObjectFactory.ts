@@ -30,26 +30,10 @@ export class SubtitledHtml {
   // A null content_id indicates that the SubtitledHtml has been created
   // but not saved. Before the SubtitledHtml object is saved into a State,
   // the content_id should be set to a string.
-  _contentId: string | null;
-  constructor(html: string, contentId: string | null) {
+  _contentId: string;
+  constructor(html: string, contentId: string) {
     this._html = html;
     this._contentId = contentId;
-  }
-
-  getHtml(): string {
-    return this._html;
-  }
-
-  getContentId(): string {
-    return this._contentId;
-  }
-
-  setHtml(newHtml: string): void {
-    this._html = newHtml;
-  }
-
-  setContentId(newContentId: string): void {
-    this._contentId = newContentId;
   }
 
   toBackendDict(): SubtitledHtmlBackendDict {
@@ -61,6 +45,22 @@ export class SubtitledHtml {
 
   isEmpty(): boolean {
     return !this._html;
+  }
+
+  get contentId(): string {
+    return this._contentId;
+  }
+
+  set contentId(contentId: string) {
+    this._contentId = contentId;
+  }
+
+  get html(): string {
+    return this._html;
+  }
+
+  set html(html: string) {
+    this._html = html;
   }
 }
 

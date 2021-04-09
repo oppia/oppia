@@ -42,6 +42,44 @@ describe('Fraction Object Factory', () => {
     expect(createdFraction.toDict()).toEqual(fractionObject);
   });
 
+  it('should equate two fractions', () => {
+    const fractionObject = {
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 0,
+      denominator: 1
+    };
+    let createdFraction = fraction.fromDict(fractionObject);
+    let createdFraction2 = fraction.fromDict(fractionObject);
+    expect(createdFraction.isEqualTo(createdFraction2)).toBe(true);
+    createdFraction = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 1,
+      denominator: 2
+    });
+    createdFraction2 = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 2,
+      denominator: 4
+    });
+    expect(createdFraction.isEqualTo(createdFraction2)).toBe(true);
+    createdFraction = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 1,
+      denominator: 3
+    });
+    createdFraction2 = fraction.fromDict({
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 2,
+      denominator: 4
+    });
+    expect(createdFraction.isEqualTo(createdFraction2)).toBe(false);
+  });
+
   it('should convert itself to a string in fraction format', () => {
     expect(new Fraction(true, 1, 2, 3).toString()).toBe('-1 2/3');
     expect(new Fraction(false, 1, 2, 3).toString()).toBe('1 2/3');

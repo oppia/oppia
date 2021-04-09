@@ -144,6 +144,12 @@ describe('Translation Modal Controller', function() {
     expect($scope.uploadingTranslation).toBe(false);
   });
 
+  it('should return null when clicking on a disabled back button',
+    function() {
+      $scope.returnToPreviousTranslation();
+      expect($scope.textToTranslate).toBe(null);
+    });
+
   it('should broadcast copy to ck editor when clicking on content',
     function() {
       spyOn(CkEditorCopyContentService, 'broadcastCopy').and
@@ -176,6 +182,22 @@ describe('Translation Modal Controller', function() {
       });
 
       $scope.suggestTranslatedText();
+      expect($uibModalInstance.close).toHaveBeenCalled();
+    });
+
+  it('should close modal when suggestion could not be submitted',
+    function() {
+      $httpBackend.flush();
+
+      const errorResponseObject = {
+        status_code: 401,
+        error: 'Error!'
+      };
+      $httpBackend.expectPOST('/suggestionhandler/').respond(
+        401, errorResponseObject);
+
+      $scope.suggestTranslatedText();
+      $httpBackend.flush();
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 });

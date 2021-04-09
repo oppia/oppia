@@ -40,7 +40,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.topic_id = 'topic'
         self.story_id_1 = 'story_id_1'
@@ -144,7 +144,7 @@ class TopicPageDataHandlerTests(
                 'story_is_published': True,
                 'completed_node_titles': [],
                 'url_fragment': 'story-frag-one',
-                'pending_node_dicts': []
+                'all_node_dicts': []
             }],
             'additional_story_dicts': [{
                 'id': self.story_2.id,
@@ -156,7 +156,7 @@ class TopicPageDataHandlerTests(
                 'story_is_published': True,
                 'completed_node_titles': [],
                 'url_fragment': 'story-frag-two',
-                'pending_node_dicts': []
+                'all_node_dicts': []
             }],
             'uncategorized_skill_ids': [self.skill_id_1],
             'subtopics': [{
@@ -210,7 +210,7 @@ class TopicPageDataHandlerTests(
                     'story_is_published': True,
                     'completed_node_titles': [],
                     'url_fragment': 'story-frag-one',
-                    'pending_node_dicts': []
+                    'all_node_dicts': []
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
@@ -222,7 +222,7 @@ class TopicPageDataHandlerTests(
                     'story_is_published': True,
                     'completed_node_titles': [],
                     'url_fragment': 'story-frag-two',
-                    'pending_node_dicts': []
+                    'all_node_dicts': []
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{

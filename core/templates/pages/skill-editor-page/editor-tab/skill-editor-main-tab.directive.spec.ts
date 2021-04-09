@@ -20,26 +20,45 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 // ^^^ This block is to be removed.
 
 describe('Skill editor main tab directive', function() {
   var $scope = null;
   var ctrl = null;
   var $rootScope = null;
+  let $timeout = null;
   var directive = null;
-  var QuestionCreationService = null;
+  var UndoRedoService = null;
+  var $uibModal = null;
+  var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
+  var focusManagerService = null;
   var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
-  beforeEach(angular.mock.module('oppia'));
 
+  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    focusManagerService = TestBed.get(FocusManagerService);
+  });
+
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
+    $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
+    $uibModal = $injector.get('$uibModal');
+    UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('skillEditorMainTabDirective')[0];
-    QuestionCreationService = $injector.get('QuestionCreationService');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
+    SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
+    focusManagerService = $injector.get('FocusManagerService');
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -53,16 +72,32 @@ describe('Skill editor main tab directive', function() {
     expect($scope.subtopicName).toEqual(null);
   });
 
-  it('should call the Question Creation service', function() {
-    var questionSpy = spyOn(QuestionCreationService, 'createQuestion');
-    $scope.createQuestion();
-    expect(questionSpy).toHaveBeenCalled();
-  });
+  it('should navigate to questions tab when unsaved changes are not present',
+    function() {
+      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
+      var routingSpy = spyOn(
+        SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
+      $scope.createQuestion(),
+      expect(routingSpy).toHaveBeenCalled();
+      var createQuestionEventSpyon = spyOn(
+        SkillEditorRoutingService, 'creatingNewQuestion')
+        .and.callThrough();
+      $scope.createQuestion();
+      expect(createQuestionEventSpyon).toHaveBeenCalled();
+    });
 
   it('should return if skill has been loaded', function() {
     expect($scope.hasLoadedSkill()).toBe(false);
     spyOn(SkillEditorStateService, 'hasLoadedSkill').and.returnValue(true);
     expect($scope.hasLoadedSkill()).toBe(true);
+  });
+
+  it('should open save changes modal with $uibModal when unsaved changes are' +
+  ' present', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    $scope.createQuestion(),
+    expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should return assigned Skill Topic Data', function() {
@@ -90,5 +125,12 @@ describe('Skill editor main tab directive', function() {
     expect($scope.isTopicDropdownEnabled()).toEqual(false);
     $scope.assignedSkillTopicData = assignedSkillTopicData;
     expect($scope.isTopicDropdownEnabled()).toEqual(true);
+  });
+
+  it('should set focus on create question button', function() {
+    var focusSpy = spyOn(focusManagerService, 'setFocus');
+    ctrl.$onInit();
+    $timeout.flush();
+    expect(focusSpy).toHaveBeenCalled();
   });
 });

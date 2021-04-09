@@ -83,7 +83,7 @@ export class TopicViewerPageComponent implements OnInit {
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
 
     this.loaderService.showLoadingScreen('Loading');
-    this.topicViewerBackendApiService.fetchTopicData(
+    this.topicViewerBackendApiService.fetchTopicDataAsync(
       this.topicUrlFragment, this.classroomUrlFragment).then(
       (readOnlyTopic: ReadOnlyTopic) => {
         this.topicId = readOnlyTopic.getTopicId();

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for EditThumbnailModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Edit Thumbnail Modal Controller', function() {
   let $q = null;
   let $scope = null;
@@ -33,6 +35,8 @@ describe('Edit Thumbnail Modal Controller', function() {
   const tempBgColor = '';
   const uploadedImage = new File([], 'uploaded.png');
   const uploadedImageMimeType = 'image/svg+xml';
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {

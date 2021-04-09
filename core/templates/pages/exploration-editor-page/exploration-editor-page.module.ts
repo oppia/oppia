@@ -30,23 +30,31 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
+import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
+    InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    StateParamChangesEditorComponent
+    StateParamChangesEditorComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   providers: [
     {

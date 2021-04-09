@@ -57,6 +57,93 @@ import utils
 ])
 
 
+class RemoveDeprecatedExplorationModelFieldsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets skill_tags, default_skin, skin_customization fields
+    in ExplorationModels to None in order to remove it from the datastore.
+    Job is necessary only for March 2021 release and can be removed after.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveDeprecatedExplorationModelFieldsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        removed_deprecated_field = False
+        for deprecated_field in [
+                'skill_tags', 'default_skin', 'skin_customizations']:
+            if deprecated_field in exp_model._properties:  # pylint: disable=protected-access
+                del exp_model._properties[deprecated_field]  # pylint: disable=protected-access
+                removed_deprecated_field = True
+
+            if deprecated_field in exp_model._values:  # pylint: disable=protected-access
+                del exp_model._values[deprecated_field]  # pylint: disable=protected-access
+                removed_deprecated_field = True
+
+        if removed_deprecated_field:
+            exp_model.update_timestamps(update_last_updated_time=False)
+            exp_models.ExplorationModel.put_multi([exp_model])
+            yield ('SUCCESS_REMOVED - ExplorationModel', exp_model.id)
+        else:
+            yield ('SUCCESS_ALREADY_REMOVED - ExplorationModel', exp_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class RemoveDeprecatedExplorationRightsModelFieldsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets translator_ids, all_viewer_ids fields
+    in ExplorationRightsModels to None in order to remove it from the datastore.
+    Job is necessary only for March 2021 release and can be removed after.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(
+            RemoveDeprecatedExplorationRightsModelFieldsOneOffJob, cls
+        ).enqueue(job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsModel]
+
+    @staticmethod
+    def map(exp_rights_model):
+        removed_deprecated_field = False
+        for deprecated_field in ['translator_ids', 'all_viewer_ids']:
+            if deprecated_field in exp_rights_model._properties:  # pylint: disable=protected-access
+                del exp_rights_model._properties[deprecated_field]  # pylint: disable=protected-access
+                removed_deprecated_field = True
+
+            if deprecated_field in exp_rights_model._values:  # pylint: disable=protected-access
+                del exp_rights_model._values[deprecated_field]  # pylint: disable=protected-access
+                removed_deprecated_field = True
+
+        if removed_deprecated_field:
+            exp_rights_model.update_timestamps(update_last_updated_time=False)
+            exp_models.ExplorationRightsModel.put_multi([exp_rights_model])
+            yield (
+                'SUCCESS_REMOVED - ExplorationRightsModel', exp_rights_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - ExplorationRightsModel',
+                exp_rights_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
 class RegenerateStringPropertyIndexOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for regenerating the index of models changed to use an
@@ -172,7 +259,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
 class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-off job for testing exploration migration from any
     exploration schema version to the latest. This job runs the state
-    migration, but does not commit the new exploration to the store.
+    migration, but does not commit the new exploration to the datastore.
     """
 
     @classmethod
@@ -199,8 +286,8 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states, states_schema_version,
-                    item.id)
+                    versioned_exploration_states,
+                    states_schema_version)
                 states_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -256,8 +343,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
-        if (item.states_schema_version !=
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
+        if item.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
@@ -580,37 +666,6 @@ class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
         yield (key, values)
 
 
-class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the translator_ids from the ExpSummaryModel.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExpSummaryModel]
-
-    @staticmethod
-    def map(exp_summary_model):
-        # This is the only way to remove the field from the model,
-        # see https://stackoverflow.com/a/15116016/3688189 and
-        # https://stackoverflow.com/a/12701172/3688189.
-        if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
-            del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
-            if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
-                del exp_summary_model._values['translator_ids']  # pylint: disable=protected-access
-            exp_summary_model.update_timestamps(update_last_updated_time=False)
-            exp_summary_model.put()
-            yield ('SUCCESS_REMOVED - ExpSummaryModel', exp_summary_model.id)
-        else:
-            yield (
-                'SUCCESS_ALREADY_REMOVED - ExpSummaryModel',
-                exp_summary_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        """Implements the reduce function for this job."""
-        yield (key, len(values))
-
-
 def regenerate_exp_commit_log_model(exp_model, version):
     """Helper function to regenerate a commit log model for an
     exploration model.
@@ -758,3 +813,234 @@ class ExpCommitLogModelRegenerationValidator(
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-off job for testing the migration of all exp versions
+    to the latest schema version. This job runs the state migration, but does
+    not commit the new exploration to the datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotContentModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        exp_id = item.get_unversioned_instance_id()
+
+        latest_exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, strict=False)
+        if latest_exploration is None:
+            yield ('INFO - Exploration does not exist', item.id)
+            return
+
+        exploration_model = exp_models.ExplorationModel.get(exp_id)
+        if (exploration_model.states_schema_version !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            yield (
+                'FAILURE - Exploration is not at latest schema version', exp_id)
+            return
+
+        try:
+            latest_exploration.validate()
+        except Exception as e:
+            yield (
+                'INFO - Exploration %s failed non-strict validation' % item.id,
+                e)
+
+        target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        current_state_schema_version = item.content['states_schema_version']
+        if current_state_schema_version == target_state_schema_version:
+            yield (
+                'SUCCESS - Snapshot is already at latest schema version',
+                item.id)
+            return
+
+        versioned_exploration_states = {
+            'states_schema_version': current_state_schema_version,
+            'states': item.content['states']
+        }
+        while current_state_schema_version < target_state_schema_version:
+            try:
+                exp_domain.Exploration.update_states_from_model(
+                    versioned_exploration_states,
+                    current_state_schema_version)
+                current_state_schema_version += 1
+            except Exception as e:
+                error_message = (
+                    'Exploration snapshot %s failed migration to states '
+                    'v%s: %s' % (
+                        item.id, current_state_schema_version + 1, e))
+                logging.exception(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+                break
+
+            if target_state_schema_version == current_state_schema_version:
+                yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that may be used to migrate exploration schema
+    versions. This job will load all snapshots of all existing explorations
+    from the datastore and immediately store them back into the datastore.
+    The loading process of an exploration in exp_services automatically
+    performs schema updating. This job persists that conversion work, keeping
+    explorations up-to-date and improving the load time of new explorations.
+
+    NOTE TO DEVELOPERS: Make sure to run ExpSnapshotsMigrationAuditJob before
+    running this job.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotContentModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsMigrationJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        exp_id = item.get_unversioned_instance_id()
+
+        latest_exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, strict=False)
+        if latest_exploration is None:
+            yield ('INFO - Exploration does not exist', item.id)
+            return
+
+        exploration_model = exp_models.ExplorationModel.get(exp_id)
+        if (exploration_model.states_schema_version !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            yield (
+                'FAILURE - Exploration is not at latest schema version', exp_id)
+            return
+
+        try:
+            latest_exploration.validate()
+        except Exception as e:
+            yield (
+                'INFO - Exploration %s failed non-strict validation' % item.id,
+                e)
+
+        # If the snapshot being stored in the datastore does not have the most
+        # up-to-date states schema version, then update it.
+        target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        current_state_schema_version = item.content['states_schema_version']
+        if current_state_schema_version == target_state_schema_version:
+            yield (
+                'SUCCESS - Snapshot is already at latest schema version',
+                item.id)
+            return
+
+        versioned_exploration_states = {
+            'states_schema_version': current_state_schema_version,
+            'states': item.content['states']
+        }
+        while current_state_schema_version < target_state_schema_version:
+            exp_domain.Exploration.update_states_from_model(
+                versioned_exploration_states,
+                current_state_schema_version)
+            current_state_schema_version += 1
+
+            if target_state_schema_version == current_state_schema_version:
+                yield ('SUCCESS - Model upgraded', 1)
+
+        item.content['states'] = versioned_exploration_states['states']
+        item.content['states_schema_version'] = current_state_schema_version
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+
+        yield ('SUCCESS - Model saved', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the number of ratio terms used by each state of an
+    exploration.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            interaction = state.interaction
+            exp_and_state_key = '%s %s' % (
+                item.id, state_name)
+            if interaction.id == 'RatioExpressionInput':
+                number_of_terms = (
+                    interaction.customization_args['numberOfTerms'].value)
+                if number_of_terms > 10:
+                    yield (
+                        python_utils.UNICODE(number_of_terms), exp_and_state_key
+                    )
+
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class ExpSnapshotsDeletionJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that attempts to delete explorations that have no parent
+    ExplorationModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationSnapshotContentModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotContentModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+        ]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsDeletionJob, cls).enqueue(job_id, shard_count=16)
+
+    @staticmethod
+    def map(model):
+        class_name = model.__class__.__name__
+        exp_id = model.get_unversioned_instance_id()
+        exp_model = exp_models.ExplorationModel.get(exp_id, strict=False)
+        if exp_model is None:
+            model.delete()
+            yield ('SUCCESS_DELETED - %s' % class_name, 1)
+        else:
+            yield ('SUCCESS_PASS - %s' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

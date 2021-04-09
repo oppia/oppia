@@ -37,7 +37,11 @@ class TopicLandingRedirectPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self, topic):
-        """Handles GET requests."""
+        """Handles GET requests.
+
+        Args:
+            topic: str. Topic of page to be redirected to.
+        """
         self.redirect('/math/%s' % topic)
 
 

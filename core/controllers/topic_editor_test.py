@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
+from constants import constants
 from core.domain import config_domain
 from core.domain import skill_services
 from core.domain import story_fetchers
@@ -50,17 +51,17 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
 
-        self.topic_manager = user_services.UserActionsInfo(
+        self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.new_user = user_services.UserActionsInfo(self.new_user_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.new_user = user_services.get_user_actions_info(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.skill_id_2, self.admin_id, description='Skill Description 2')
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -107,7 +108,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
     def test_handler_updates_story_summary_dicts(self):
         self.login(self.ADMIN_EMAIL)
 
-        topic_id = topic_services.get_new_topic_id()
+        topic_id = topic_fetchers.get_new_topic_id()
         canonical_story_id = story_services.get_new_story_id()
         additional_story_id = story_services.get_new_story_id()
 
@@ -240,7 +241,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.save_new_story(
             story_services.get_new_story_id(),
             self.admin_id,
-            topic_services.get_new_topic_id(),
+            topic_fetchers.get_new_topic_id(),
             title='title',
             description='description',
             notes='note',
@@ -271,7 +272,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.get_json(
             '%s/%s/%s' % (
                 feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                self.topic_id, topic_services.get_new_topic_id()),
+                self.topic_id, topic_fetchers.get_new_topic_id()),
             expected_status_int=404)
 
         self.logout()
@@ -373,7 +374,7 @@ class TopicEditorTests(
         self.get_html_response(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=404)
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
@@ -463,14 +464,14 @@ class TopicEditorTests(
         self.get_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=404)
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
     def test_editable_topic_handler_put_fails_with_long_commit_message(self):
         change_cmd = {
             'version': 2,
-            'commit_message': 'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            'commit_message': 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
             'topic_and_subtopic_page_change_dicts': [{
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
@@ -488,7 +489,7 @@ class TopicEditorTests(
 
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters long.')
+            'Commit messages must be at most 375 characters long.')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {
@@ -696,7 +697,7 @@ class TopicEditorTests(
         # topic version.
         self.login(self.ADMIN_EMAIL)
 
-        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Name 1',
             abbreviated_name='topic-three', url_fragment='topic-three',
@@ -849,7 +850,7 @@ class TopicEditorTests(
         self.delete_json(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=404)
+                topic_fetchers.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
@@ -905,7 +906,7 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.TOPIC_RIGHTS_URL_PREFIX,
-                topic_services.get_new_topic_id()), expected_status_int=400)
+                topic_fetchers.get_new_topic_id()), expected_status_int=400)
         self.assertEqual(
             json_response['error'],
             'Expected a valid topic id to be provided.')
@@ -965,7 +966,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
         csrf_token = self.get_new_csrf_token()
 
-        new_topic_id = topic_services.get_new_topic_id()
+        new_topic_id = topic_fetchers.get_new_topic_id()
         self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
@@ -1001,3 +1002,129 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             {'publish_status': False}, csrf_token=csrf_token,
             expected_status_int=401)
         self.assertEqual(response['error'], 'The topic is already unpublished.')
+
+
+class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
+    """Tests for TopicUrlFragmentHandler."""
+
+    def test_topic_url_fragment_handler_when_unique(self):
+        self.login(self.ADMIN_EMAIL)
+
+        topic_url_fragment = 'fragment'
+
+        # Topic url fragment does not exist yet.
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_URL_FRAGMENT_HANDLER,
+                topic_url_fragment))
+        self.assertEqual(json_response['topic_url_fragment_exists'], False)
+
+        # Publish the topic.
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Topic Name',
+            abbreviated_name='Topic Name',
+            url_fragment=topic_url_fragment,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+
+        # Unique topic url fragment does not exist.
+        topic_url_fragment = 'fragment_2'
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_URL_FRAGMENT_HANDLER,
+                topic_url_fragment))
+        self.assertEqual(json_response['topic_url_fragment_exists'], False)
+
+        self.logout()
+
+    def test_topic_url_fragment_handler_when_duplicate(self):
+        self.login(self.ADMIN_EMAIL)
+
+        topic_url_fragment = 'fragment'
+
+        # Topic url fragment does not exist yet.
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_URL_FRAGMENT_HANDLER,
+                topic_url_fragment))
+        self.assertEqual(json_response['topic_url_fragment_exists'], False)
+
+        # Publish the topic.
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Topic Name',
+            abbreviated_name='Topic Name',
+            url_fragment=topic_url_fragment,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+
+        # Topic url fragment exists since we've already published it.
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_URL_FRAGMENT_HANDLER,
+                topic_url_fragment))
+        self.assertEqual(json_response['topic_url_fragment_exists'], True)
+
+        self.logout()
+
+
+class TopicNameHandlerTest(BaseTopicEditorControllerTests):
+    """Tests for TopicNameHandler."""
+
+    def test_topic_name_handler_when_unique(self):
+        self.login(self.ADMIN_EMAIL)
+
+        topic_name = 'Topic Name'
+
+        # Topic name does not exist yet.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
+        self.assertEqual(json_response['topic_name_exists'], False)
+
+        # Publish the topic.
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name=topic_name,
+            abbreviated_name=topic_name, url_fragment='my-topic',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+
+        # Unique topic name does not exists.
+        topic_name = 'Unique Topic Name'
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
+        self.assertEqual(json_response['topic_name_exists'], False)
+
+        self.logout()
+
+    def test_topic_name_handler_when_duplicate(self):
+        self.login(self.ADMIN_EMAIL)
+
+        topic_name = 'Topic Name'
+
+        # Topic name does not exist yet.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
+        self.assertEqual(json_response['topic_name_exists'], False)
+
+        # Publish the topic.
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name=topic_name,
+            abbreviated_name=topic_name, url_fragment='my-topic',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+
+        # Topic name exists since we've already published it.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
+        self.assertEqual(json_response['topic_name_exists'], True)
+
+        self.logout()

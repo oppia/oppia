@@ -19,8 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ClassroomDomainConstants } from
-  'domain/classroom/classroom-domain.constants.ts';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlySubtopicPageData } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from

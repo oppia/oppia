@@ -17,6 +17,7 @@
  * in the exploration editor.
  */
 
+var waitFor = require('../protractor_utils/waitFor.js');
 var ExplorationEditorImprovementsTab = function() {
   /*
    * Interactive elements
@@ -28,12 +29,24 @@ var ExplorationEditorImprovementsTab = function() {
   };
 
   this.expectHealthyExploration = async function() {
+    await waitFor.visibilityOf(
+      explorationHealth,
+      'Exploration health is taking too long to appear'
+    );
     expect(await explorationHealth.getText()).toEqual('HEALTHY');
   };
   this.expectWarningExploration = async function() {
+    await waitFor.visibilityOf(
+      explorationHealth,
+      'Exploration health is taking too long to appear'
+    );
     expect(await explorationHealth.getText()).toEqual('WARNING');
   };
   this.expectCriticalExploration = async function() {
+    await waitFor.visibilityOf(
+      explorationHealth,
+      'Exploration health is taking too long to appear'
+    );
     expect(await explorationHealth.getText()).toEqual('CRITICAL');
   };
 };

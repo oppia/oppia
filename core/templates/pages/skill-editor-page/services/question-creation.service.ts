@@ -55,8 +55,6 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
-require('services/question-validation.service.ts');
-
 
 angular.module('oppia').factory('QuestionCreationService', [
   '$location', '$rootScope', '$uibModal', 'AlertsService',
@@ -99,6 +97,21 @@ angular.module('oppia').factory('QuestionCreationService', [
         });
     };
 
+    var continueQuestionEditing = function(linkedSkillsWithDifficulty) {
+      newQuestionSkillIds = [];
+      newQuestionSkillDifficulties = [];
+      linkedSkillsWithDifficulty.forEach(function(linkedSkillWithDifficulty) {
+        newQuestionSkillIds.push(linkedSkillWithDifficulty.getId());
+        newQuestionSkillDifficulties.push(
+          linkedSkillWithDifficulty.getDifficulty());
+      });
+
+      populateMisconceptions();
+      if (AlertsService.warnings.length === 0) {
+        initializeNewQuestionCreation();
+      }
+    };
+
     var createQuestion = function() {
       newQuestionSkillIds = [];
       skill = SkillEditorStateService.getSkill();
@@ -125,39 +138,46 @@ angular.module('oppia').factory('QuestionCreationService', [
         function(summary) {
           return summary;
         });
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topic-editor-page/modal-templates/' +
-            'select-skill-and-difficulty-modal.template.html'),
-        backdrop: true,
-        resolve: {
-          allSkillSummaries: () => allSkillSummaries,
-          countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
-          currentMode: () => currentMode,
-          linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
-          skillIdToRubricsObject: () => skillIdToRubricsObject
-        },
-        controller: 'QuestionsListSelectSkillAndDifficultyModalController'
-      }).result.then(function(linkedSkillsWithDifficulty) {
-        newQuestionSkillIds = [];
-        newQuestionSkillDifficulties = [];
-        linkedSkillsWithDifficulty.forEach(
-          function(linkedSkillWithDifficulty) {
-            newQuestionSkillIds.push(
-              linkedSkillWithDifficulty.getId());
-            newQuestionSkillDifficulties.push(
-              linkedSkillWithDifficulty.getDifficulty());
-          });
 
-        populateMisconceptions();
-        if (AlertsService.warnings.length === 0) {
-          initializeNewQuestionCreation();
+      var noOfRubricsWithExplanation = 0;
+      for (var rubric of skillIdToRubricsObject[skillId]) {
+        if (rubric.getExplanations().length > 0) {
+          noOfRubricsWithExplanation++;
         }
-      }, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+      }
+
+      if (noOfRubricsWithExplanation > 1) {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/topic-editor-page/modal-templates/' +
+              'select-skill-and-difficulty-modal.template.html'),
+          backdrop: 'static',
+          resolve: {
+            allSkillSummaries: () => allSkillSummaries,
+            countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
+            currentMode: () => currentMode,
+            linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
+            skillIdToRubricsObject: () => skillIdToRubricsObject
+          },
+          controller: 'QuestionsListSelectSkillAndDifficultyModalController'
+        }).result.then(function(linkedSkillsWithDifficulty) {
+          continueQuestionEditing(linkedSkillsWithDifficulty);
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
+      } else {
+        for (var rubric of skillIdToRubricsObject[skillId]) {
+          if (rubric.getExplanations().length > 0) {
+            var rubricDifficulty = SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+              rubric.getDifficulty()];
+            linkedSkillsWithDifficulty[0].setDifficulty(rubricDifficulty);
+            break;
+          }
+        }
+        continueQuestionEditing(linkedSkillsWithDifficulty);
+      }
     };
 
     var initializeNewQuestionCreation = function() {

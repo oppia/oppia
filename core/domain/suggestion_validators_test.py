@@ -94,6 +94,50 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_author_id_migration_bot(self):
+        self.model_instance.author_ids = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.author_ids = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_final_reviewer_id_migration_bot(self):
+        self.model_instance.final_reviewer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_final_reviewer_id(self):
+        self.model_instance.final_reviewer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
@@ -224,13 +268,19 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
-            (
-                '[u\'failed validation check for domain object check of '
-                'GeneralSuggestionModel\', [u\'Entity id %s: '
-                'Entity fails domain validation with the error Expected '
-                'final_reviewer_id to be in a valid user ID format, '
-                'received %s\']]'
-            ) % (self.model_instance.id, self.model_instance.final_reviewer_id)]
+            '[u\'failed validation check for domain object check of '
+            'GeneralSuggestionModel\', [u\'Entity id %s: '
+            'Entity fails domain validation with the error Expected '
+            'final_reviewer_id to be in a valid user ID format, '
+            'received %s\']]' % (
+                self.model_instance.id,
+                self.model_instance.final_reviewer_id
+            ),
+            '[u\'failed validation check for invalid ids in field of '
+            'GeneralSuggestionModel\', [u"Entity id %s: '
+            'The user id wrong_id in the field \'reviewer_ids\' is invalid"]]'
+            % self.model_instance.id
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -241,10 +291,10 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for final reviewer '
-                'check of GeneralSuggestionModel\', [u\'Entity id %s: '
-                'Final reviewer id %s is not empty but '
-                'suggestion is in review\']]'
-            ) % (self.model_instance.id, self.admin_id)]
+                'check of GeneralSuggestionModel\', [u\'Entity id %s: Final '
+                'reviewer id %s is not empty but suggestion is in review\']]'
+            ) % (self.model_instance.id, self.model_instance.final_reviewer_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -253,12 +303,16 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [
-            (
-                '[u\'failed validation check for domain object check of '
-                'GeneralSuggestionModel\', [u\'Entity id %s: '
-                'Entity fails domain validation with the error Expected '
-                'author_id to be in a valid user ID format, received %s\']]'
-            ) % (self.model_instance.id, self.model_instance.author_id)]
+            '[u\'failed validation check for domain object check of '
+            'GeneralSuggestionModel\', [u\'Entity id %s: '
+            'Entity fails domain validation with the error Expected '
+            'author_id to be in a valid user ID format, received %s\']]'
+            % (self.model_instance.id, self.model_instance.author_id),
+            u'[u\'failed validation check for invalid ids in field of '
+            u'GeneralSuggestionModel\', [u"Entity id %s: '
+            u'The user id wrong_id in the field \'author_ids\' is invalid"]]'
+            % self.model_instance.id
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -384,6 +438,28 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.author_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_final_reviewer_id(self):
+        self.model_instance.final_reviewer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
@@ -447,11 +523,11 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         self.model_instance.put()
         expected_output = [
             (
-                '[u\'failed validation check for final reviewer check of '
-                'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
-                'Final reviewer ID %s is in a wrong format. It should be '
-                'either pid_<32 chars> or uid_<32 chars>.\']]'
-            ) % (self.model_instance.id, self.model_instance.final_reviewer_id)]
+                '[u\'failed validation check for invalid ids in field of '
+                'GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: The user id wrong_id in the field '
+                '\'final_reviewer_ids\' is invalid"]]'
+            ) % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -461,11 +537,10 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         self.model_instance.put()
         expected_output = [
             (
-                '[u\'failed validation check for final author check of '
-                'GeneralVoiceoverApplicationModel\', [u\'Entity id %s: '
-                'Author ID %s is in a wrong format. It should be either '
-                'pid_<32 chars> or uid_<32 chars>.\']]'
-            ) % (self.model_instance.id, self.model_instance.author_id)]
+                '[u\'failed validation check for invalid ids in field of '
+                'GeneralVoiceoverApplicationModel\', [u"Entity id %s: The user '
+                'id wrong_id in the field \'author_ids\' is invalid"]]'
+            ) % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -473,11 +548,11 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for final_reviewer_ids field '
+                '[u\'failed validation check for final_reviewer_ids field '
                 'check of GeneralVoiceoverApplicationModel\', '
-                '[u"Entity id %s: based on field final_reviewer_ids having '
-                'value %s, expected model UserSettingsModel with id %s but it '
-                'doesn\'t exist"]]') % (
+                '[u"Entity id %s: based on field final_reviewer_ids '
+                'having value %s, expected model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
                     self.model_instance.id, self.admin_id, self.admin_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)

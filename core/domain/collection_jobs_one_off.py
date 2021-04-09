@@ -61,7 +61,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             collection.validate(strict=False)
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Collection %s failed validation: %s' % (item.id, e))
             yield (
                 CollectionMigrationOneOffJob._ERROR_KEY,
@@ -96,3 +96,84 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class RemoveCollectionRightsTranslatorIdsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the translator_ids in *CollectionRightsModel to None
+    in order to remove it from the datastore.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveCollectionRightsTranslatorIdsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            collection_models.CollectionRightsModel
+        ]
+
+    @staticmethod
+    def map(collection_rights_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'translator_ids' in collection_rights_model._properties:  # pylint: disable=protected-access
+            del collection_rights_model._properties['translator_ids']  # pylint: disable=protected-access
+            if 'translator_ids' in collection_rights_model._values:  # pylint: disable=protected-access
+                del collection_rights_model._values['translator_ids']  # pylint: disable=protected-access
+            collection_rights_model.commit(
+                feconf.SYSTEM_COMMITTER_ID, 'Remove field', [])
+            yield (
+                'SUCCESS_REMOVED - CollectionRightsModel',
+                collection_rights_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - CollectionRightsModel',
+                collection_rights_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class RemoveCollectionModelNodesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the nodes in *CollectionModel to None in order to
+    remove it from the datastore.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveCollectionModelNodesOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            collection_models.CollectionModel
+        ]
+
+    @staticmethod
+    def map(collection_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'nodes' in collection_model._properties:  # pylint: disable=protected-access
+            del collection_model._properties['nodes']  # pylint: disable=protected-access
+            if 'nodes' in collection_model._values:  # pylint: disable=protected-access
+                del collection_model._values['nodes']  # pylint: disable=protected-access
+            collection_model.commit(
+                feconf.SYSTEM_COMMITTER_ID, 'Remove field', [])
+            yield ('SUCCESS_REMOVED - CollectionModel', collection_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - CollectionModel',
+                collection_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))

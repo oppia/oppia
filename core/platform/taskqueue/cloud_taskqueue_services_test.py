@@ -47,7 +47,8 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
-            'fn_identifier': taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+            'fn_identifier': (
+                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
@@ -84,7 +85,8 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
-            'fn_identifier': taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+            'fn_identifier': (
+                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
@@ -94,6 +96,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'
+
         def mock_create_task(parent, task, retry):
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(

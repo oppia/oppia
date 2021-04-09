@@ -214,6 +214,16 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
             skill_fetchers.get_skill_from_model(model)
 
+    def test_get_skill_from_model_with_description(self):
+        self.assertEqual(
+            skill_fetchers.get_skill_by_description('Description').to_dict(),
+            self.skill.to_dict()
+        )
+        self.assertEqual(
+            skill_fetchers.get_skill_by_description('Does not exist'),
+            None
+        )
+
     def test_get_skill_by_id_with_different_versions(self):
         changelist = [
             skill_domain.SkillChange({

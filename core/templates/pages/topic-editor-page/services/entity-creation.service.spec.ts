@@ -26,8 +26,6 @@ describe('Entity creation service', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
-
   var $rootScope = null;
   var $uibModal = null;
   var $q = null;

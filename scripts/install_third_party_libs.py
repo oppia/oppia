@@ -30,21 +30,22 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.18.2', os.path.join(
-        'third_party', 'python_libs')),
+    ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
+    ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
+    ('certifi', '2020.12.5', os.path.join(
+        TOOLS_DIR, 'certifi-2020.12.5')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
-    if not os.path.exists(target_path):
-        command_text = [
-            sys.executable, '-m', 'pip', 'install', '%s==%s'
-            % (package_name, version_number), '--target', target_path]
-        uextention_text = ['--user', '--prefix=', '--system']
-        current_process = subprocess.Popen(
-            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output_stderr = current_process.communicate()[1]
-        if 'can\'t combine user with prefix' in output_stderr:
-            subprocess.check_call(command_text + uextention_text)
+    command_text = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package_name, version_number), '--target', target_path]
+    uextention_text = ['--user', '--prefix=', '--system']
+    current_process = subprocess.Popen(
+        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output_stderr = current_process.communicate()[1]
+    if 'can\'t combine user with prefix' in output_stderr:
+        subprocess.check_call(command_text + uextention_text)
 
 
 import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
@@ -185,7 +186,7 @@ def ensure_pip_library_is_installed(package, version, path):
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
         install_backend_python_libs.pip_install(
-            package, version, exact_lib_path)
+            '%s==%s' % (package, version), exact_lib_path)
 
 
 def ensure_system_python_libraries_are_installed(package, version):

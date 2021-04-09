@@ -43,7 +43,7 @@ describe('Translate service', () => {
     const failHandler = jasmine.createSpy('fail');
     const translations = {I18n_t_1: 'Hello'};
 
-    translate.fetchTranslations('en').then(successHandler, failHandler);
+    translate.fetchTranslationAsync('en').then(successHandler, failHandler);
     const req = httpTestingController.expectOne('/assets/i18n/en.json');
     req.flush(translations);
 

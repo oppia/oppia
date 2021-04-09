@@ -25,8 +25,8 @@ export interface AugmentedSkillSummaryBackendDict {
   'worked_examples_count': number;
   'skill_model_created_on': number;
   'skill_model_last_updated': number;
-  'topic_name': string;
-  'classroom_name': string;
+  'topic_names': string[];
+  'classroom_names': string[];
 }
 
 export class AugmentedSkillSummary {
@@ -39,8 +39,8 @@ export class AugmentedSkillSummary {
     public workedExamplesCount: number,
     public skillModelCreatedOn: number,
     public skillModelLastUpdated: number,
-    public topicName: string,
-    public classroomName: string) { }
+    public topicNames: string[],
+    public classroomNames: string[]) { }
 
   static createFromBackendDict(
       summaryDict: AugmentedSkillSummaryBackendDict): AugmentedSkillSummary {
@@ -53,7 +53,7 @@ export class AugmentedSkillSummary {
       summaryDict.worked_examples_count,
       summaryDict.skill_model_created_on,
       summaryDict.skill_model_last_updated,
-      summaryDict.topic_name,
-      summaryDict.classroom_name);
+      summaryDict.topic_names,
+      summaryDict.classroom_names);
   }
 }

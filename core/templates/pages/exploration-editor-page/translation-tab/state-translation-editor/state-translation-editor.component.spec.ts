@@ -177,6 +177,8 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
+      spyOn(
+        translationLanguageService, 'getActiveLanguageDirection').and.stub();
       spyOnProperty(
         translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
@@ -343,7 +345,7 @@ describe('State Translation Editor Component', function() {
 
       expect(
         stateWrittenTranslationsService.displayed.getWrittenTranslation()
-          .getHtml()
+          .getTranslation()
       ).toBe('This is a html');
     });
 
@@ -378,10 +380,11 @@ describe('State Translation Editor Component', function() {
       $uibModal = $injector.get('$uibModal');
       editabilityService = $injector.get('EditabilityService');
       explorationStatesService = $injector.get('ExplorationStatesService');
-      translationLanguageService = $injector.get('TranslationLanguageService');
       translationTabActiveContentIdService = $injector.get(
         'TranslationTabActiveContentIdService');
-
+      translationLanguageService = $injector.get('TranslationLanguageService');
+      spyOn(
+        translationLanguageService, 'getActiveLanguageDirection').and.stub();
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
@@ -430,6 +433,15 @@ describe('State Translation Editor Component', function() {
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createNew('html', ''));
+    });
+
+    it('should open translation editor when it is editable and with a ' +
+       'Translatable object as data format', function() {
+      $scope.dataFormat = 'set_of_unicode_string';
+      $scope.openTranslationEditor();
+      expect($scope.translationEditorIsOpen).toBe(true);
+      expect($scope.activeWrittenTranslation).toEqual(
+        writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
     });
 
     it('should add written translation html when clicking on save' +

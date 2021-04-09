@@ -137,13 +137,6 @@ class BaseModel(datastore_services.Model):
         pass
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role for all the classes will be Exploration
-        editor by default. The subclasses may override this value if needed.
-        """
-        return feconf.ROLE_ID_EXPLORATION_EDITOR
-
-    @staticmethod
     def get_deletion_policy():
         """This method should be implemented by subclasses.
 
@@ -305,8 +298,11 @@ class BaseModel(datastore_services.Model):
             entities, update_last_updated_time=update_last_updated_time)
 
     @classmethod
-    def put_multi(cls, entities):
-        """Stores the given datastore_services.Model instances.
+    @transaction_services.run_in_transaction_wrapper
+    def put_multi_transactional(cls, entities):
+        """Stores the given datastore_services.Model instances and runs it
+        through a transaction. Either all models are stored, or none of them
+        in the case when the transaction fails.
 
         Args:
             entities: list(datastore_services.Model). List of model instances to
@@ -315,17 +311,14 @@ class BaseModel(datastore_services.Model):
         datastore_services.put_multi(entities)
 
     @classmethod
-    def put_multi_async(cls, entities):
-        """Stores the given datastore_services.Model instances asynchronously.
+    def put_multi(cls, entities):
+        """Stores the given datastore_services.Model instances.
 
         Args:
-            entities: list(datastore_services.Model). The list of model
-                instances to be stored.
-
-        Returns:
-            list(future). A list of futures.
+            entities: list(datastore_services.Model). List of model instances to
+                be stored.
         """
-        return datastore_services.put_multi_async(entities)
+        datastore_services.put_multi(entities)
 
     @classmethod
     def delete_multi(cls, entities):
@@ -432,6 +425,69 @@ class BaseModel(datastore_services.Model):
             result[2])
 
 
+class BaseHumanMaintainedModel(BaseModel):
+    """A model that tracks the last time it was updated by a human.
+
+    When the model is updated by a human, use `self.put_for_human()` to store
+    it. For example: after the title of an exploration is changed
+    by its creator.
+
+    Otherwise, when the model is updated by some non-human or automated process,
+    use `self.put_for_bot()`. For example: by a one-off job updating the
+    schema version of a property.
+    """
+
+    # When this entity was last updated on behalf of a human.
+    last_updated_by_human = (
+        datastore_services.DateTimeProperty(indexed=True, required=True))
+
+    def put(self):
+        """Unsupported operation on human-maintained models."""
+        raise NotImplementedError('Use put_for_human or put_for_bot instead')
+
+    def put_for_human(self):
+        """Stores the model instance on behalf of a human."""
+        self.last_updated_by_human = datetime.datetime.utcnow()
+        return super(BaseHumanMaintainedModel, self).put()
+
+    def put_for_bot(self):
+        """Stores the model instance on behalf of a non-human."""
+        return super(BaseHumanMaintainedModel, self).put()
+
+    @classmethod
+    def put_multi(cls, unused_instances):
+        """Unsupported operation on human-maintained models."""
+        raise NotImplementedError(
+            'Use put_multi_for_human or put_multi_for_bot instead')
+
+    @classmethod
+    def put_multi_for_human(cls, instances):
+        """Stores the given model instances on behalf of a human.
+
+        Args:
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        now = datetime.datetime.utcnow()
+        for instance in instances:
+            instance.last_updated_by_human = now
+        return super(BaseHumanMaintainedModel, cls).put_multi(instances)
+
+    @classmethod
+    def put_multi_for_bot(cls, instances):
+        """Stores the given model instances on behalf of a non-human.
+
+        Args:
+            instances: list(BaseHumanMaintainedModel). The instances to store.
+
+        Returns:
+            list(future). A list of futures.
+        """
+        return super(BaseHumanMaintainedModel, cls).put_multi(instances)
+
+
 class BaseCommitLogEntryModel(BaseModel):
     """Base Model for the models that store the log of commits to a
     construct.
@@ -535,7 +591,7 @@ class BaseCommitLogEntryModel(BaseModel):
             instance of the construct from which this is called.
         """
         return cls(
-            id=cls._get_instance_id(entity_id, version),
+            id=cls.get_instance_id(entity_id, version),
             user_id=committer_id,
             commit_type=commit_type,
             commit_message=commit_message,
@@ -548,7 +604,7 @@ class BaseCommitLogEntryModel(BaseModel):
         )
 
     @classmethod
-    def _get_instance_id(cls, target_entity_id, version):
+    def get_instance_id(cls, target_entity_id, version):
         """This method should be implemented in the inherited classes.
 
         Args:
@@ -562,7 +618,7 @@ class BaseCommitLogEntryModel(BaseModel):
                 classes.
         """
         raise NotImplementedError(
-            'The _get_instance_id() method is missing from the '
+            'The get_instance_id() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
     @classmethod
@@ -608,7 +664,7 @@ class BaseCommitLogEntryModel(BaseModel):
             BaseCommitLogEntryModel. The commit with the target entity id and
             version number.
         """
-        commit_id = cls._get_instance_id(target_entity_id, version)
+        commit_id = cls.get_instance_id(target_entity_id, version)
         return cls.get_by_id(commit_id)
 
 
@@ -632,6 +688,10 @@ class VersionedModel(BaseModel):
     # The class designated as the snapshot content model. This should be a
     # subclass of BaseSnapshotContentModel.
     SNAPSHOT_CONTENT_CLASS = None
+    # The class designated as the commit log entry model. This should be
+    # a subclass of BaseCommitLogEntryModel. In cases where we do not need
+    # to log the commits it can be None.
+    COMMIT_LOG_ENTRY_CLASS = None
     # Whether reverting is allowed. Default is False.
     ALLOW_REVERT = False
 
@@ -771,7 +831,7 @@ class VersionedModel(BaseModel):
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self]
         self.update_timestamps_multi(entities)
-        transaction_services.run_in_transaction(BaseModel.put_multi, entities)
+        BaseModel.put_multi_transactional(entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -800,12 +860,25 @@ class VersionedModel(BaseModel):
                 datastore_services.Key(
                     self.SNAPSHOT_METADATA_CLASS, snapshot_id)
                 for snapshot_id in snapshot_ids]
-            datastore_services.delete_multi(metadata_keys)
 
             content_keys = [
                 datastore_services.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                 for snapshot_id in snapshot_ids]
-            datastore_services.delete_multi(content_keys)
+
+            commit_log_keys = []
+            if self.COMMIT_LOG_ENTRY_CLASS is not None:
+                commit_log_ids = (
+                    self.COMMIT_LOG_ENTRY_CLASS.get_instance_id(
+                        self.id, version_number)
+                    for version_number in version_numbers
+                )
+                commit_log_keys = [
+                    datastore_services.Key(
+                        self.COMMIT_LOG_ENTRY_CLASS, commit_log_id)
+                    for commit_log_id in commit_log_ids]
+
+            datastore_services.delete_multi(
+                content_keys + metadata_keys + commit_log_keys)
 
             super(VersionedModel, self).delete()
         else:
@@ -846,6 +919,7 @@ class VersionedModel(BaseModel):
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []
+            all_models_commit_keys = []
             for model in versioned_models:
                 model_version_numbers = [
                     python_utils.UNICODE(num + 1) for num in
@@ -862,18 +936,29 @@ class VersionedModel(BaseModel):
                     datastore_services.Key(
                         model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
+                if model.COMMIT_LOG_ENTRY_CLASS is not None:
+                    commit_log_ids = (
+                        cls.COMMIT_LOG_ENTRY_CLASS.get_instance_id(
+                            model.id, version_number)
+                        for version_number in model_version_numbers
+                    )
+                    all_models_commit_keys.extend([
+                        datastore_services.Key(
+                            model.COMMIT_LOG_ENTRY_CLASS, commit_log_id)
+                        for commit_log_id in commit_log_ids])
+
             versioned_models_keys = [model.key for model in versioned_models]
             all_models_keys = (
                 all_models_metadata_keys +
                 all_models_content_keys +
+                all_models_commit_keys +
                 versioned_models_keys
             )
             for i in python_utils.RANGE(
                     0,
                     len(all_models_keys),
                     feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-                transaction_services.run_in_transaction(
-                    datastore_services.delete_multi,
+                datastore_services.delete_multi_transactional(
                     all_models_keys[
                         i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION])
         else:
@@ -902,8 +987,7 @@ class VersionedModel(BaseModel):
                 snapshot_metadata_models + snapshot_content_models +
                 versioned_models)
             cls.update_timestamps_multi(entities)
-            transaction_services.run_in_transaction(
-                BaseModel.put_multi, entities)
+            BaseModel.put_multi_transactional(entities)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
@@ -1034,10 +1118,10 @@ class VersionedModel(BaseModel):
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
-        except cls.EntityNotFoundError as e:
+        except cls.EntityNotFoundError:
             if not strict:
                 return None
-            raise e
+            python_utils.reraise_exception()
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):

@@ -751,6 +751,7 @@ class BuildTests(test_utils.GenericTestBase):
         app_dev_yaml_temp_file.name = mock_dev_yaml_filepath
         with python_utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write(u'Some content in mock_app_dev.yaml\n')
+            tmp.write(u'  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write(u'version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
@@ -783,7 +784,7 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": true\n')
+            tmp.write(u'  "DEV_MODE": true,\n')
             tmp.write(u'};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
@@ -798,7 +799,7 @@ class BuildTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
-                    '  "DEV_MODE": false\n'
+                    '  "DEV_MODE": false,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -810,7 +811,7 @@ class BuildTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
-                    '  "DEV_MODE": true\n'
+                    '  "DEV_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -830,7 +831,7 @@ class BuildTests(test_utils.GenericTestBase):
         constants_temp_file.name = mock_constants_path
         with python_utils.open_file(mock_constants_path, 'w') as tmp:
             tmp.write(u'export = {\n')
-            tmp.write(u'  "DEV_MODE": false\n')
+            tmp.write(u'  "DEV_MODE": false,\n')
             tmp.write(u'};')
 
         feconf_temp_file = tempfile.NamedTemporaryFile()
@@ -845,7 +846,7 @@ class BuildTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
-                    '  "DEV_MODE": true\n'
+                    '  "DEV_MODE": true,\n'
                     '};')
             with python_utils.open_file(mock_feconf_path, 'r') as feconf_file:
                 self.assertEqual(
@@ -926,7 +927,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
@@ -970,7 +971,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
@@ -1014,7 +1015,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
@@ -1048,7 +1049,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(
@@ -1082,7 +1083,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_modify_constants(prod_env, maintenance_mode):  # pylint: disable=unused-argument
+        def mock_modify_constants(prod_env, emulator_mode, maintenance_mode):  # pylint: disable=unused-argument
             check_function_calls['modify_constants_gets_called'] = True
 
         ensure_files_exist_swap = self.swap(

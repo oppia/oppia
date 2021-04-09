@@ -98,7 +98,7 @@ interface CollectionDeleteNodeChange {
   'exploration_id': string;
 }
 
-type CollectionChange = (
+export type CollectionChange = (
   CollectionPropertyChange |
   CollectionAddNodeChange |
   CollectionSwapNodeChange |

@@ -62,7 +62,7 @@ ISSUES_DIR = (
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
 INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
-    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs'))
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs_by_state_version'))
 INTERACTIONS_SPECS_FILE_PATH = (
     os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
@@ -95,6 +95,9 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions',
     'html_field_types_to_rule_specs.json')
+LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH_FILE_DIR = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'legacy_html_field_types_to_rule_specs_by_state_version')
 
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
@@ -175,6 +178,9 @@ IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
 MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -207,16 +213,41 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
+# The maximum number of days a feedback report can be saved in storage before it
+# must be scrubbed.
+APP_FEEDBACK_REPORT_MAXIMUM_DAYS = datetime.timedelta(days=90)
+
+# The minimum version of the Android feedback report info blob schema.
+MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the Android feedback report info blob schema.
+CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+MINIMUM_WEB_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the app feedback report daily stats blob schema.
+CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
+# The minimum version of the app feedback report daily stats blob schema.
+MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
+# The earliest supported version of the exploration states blob schema.
+EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 41
+CURRENT_STATE_SCHEMA_VERSION = 42
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -292,6 +323,9 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
+# Content id assigned to rule inputs that do not match any interaction
+# customization argument choices.
+INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
 DEFAULT_RECORDED_VOICEOVERS = {
     'voiceovers_mapping': {
@@ -408,6 +442,13 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+ES_LOCALHOST_PORT = 9200
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
+# auth information during deployment.
+ES_CLOUD_ID = None
+ES_USERNAME = None
+ES_PASSWORD = None
+
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
@@ -488,10 +529,7 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 3
-
-# Maximum allowed commit message length for SnapshotMetadata models.
-MAX_COMMIT_MESSAGE_LENGTH = 1000
+NUM_PRETEST_QUESTIONS = 0
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -812,6 +850,7 @@ SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -919,6 +958,13 @@ USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
 USER_QUERY_STATUS_FAILED = 'failed'
+
+ALLOWED_USER_QUERY_STATUSES = (
+    USER_QUERY_STATUS_PROCESSING,
+    USER_QUERY_STATUS_COMPLETED,
+    USER_QUERY_STATUS_ARCHIVED,
+    USER_QUERY_STATUS_FAILED
+)
 
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
@@ -1080,7 +1126,31 @@ AVAILABLE_LANDING_PAGES = {
 CLASSROOM_PAGES = ['math']
 
 # Authentication method using GAE ID (google sign in).
-AUTH_METHOD_GAE = 'gae'
+GAE_AUTH_PROVIDER_ID = 'gae'
+# Authentication method using Firebase authentication. Firebase signs its ID
+# Tokens with iss='Firebase' (iss: issuer, public API refers to this as
+# "provider id"), so using this naming convention helps us stay consistent with
+# the status quo.
+FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
+# Firebase-specific role specified for users with super admin privileges.
+FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
+
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+CLOUD_DATASTORE_EMULATOR_PORT = 8089
+
+FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+
+# TODO(#11462): Delete this after Firebase authentication has been deployed.
+ENABLE_USER_CREATION = True
+
+# The name of the cookie Oppia will place the session cookie into. The name is
+# arbitrary. If it is changed later on, then the cookie will live on in the
+# users' browsers as garbage (although it would expire eventually, see MAX_AGE).
+FIREBASE_SESSION_COOKIE_NAME = 'session'
+# The duration a session cookie from Firebase should remain valid for. After the
+# duration expires, a new cookie will need to be generated. Generating a new
+# cookie requires the user to sign-in _explicitly_.
+FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=14)
 
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
 # these back to appropriate places (rights_domain, topic_domain).
@@ -1112,6 +1182,10 @@ ROLE_EDITOR = 'editor'
 ROLE_VOICE_ARTIST = 'voice artist'
 ROLE_VIEWER = 'viewer'
 ROLE_NONE = 'none'
+
+# The list of entity types that do not require entity specific access control
+# when viewing respective suggestions.
+ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS = [ENTITY_TYPE_SKILL]
 
 # The allowed list of roles which can be used in change_role command.
 ALLOWED_ACTIVITY_ROLES = [
@@ -1239,7 +1313,8 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
-USER_ID_REGEX = r'^uid_[a-z]{%s}$' % USER_ID_RANDOM_PART_LENGTH
+USER_ID_REGEX = r'uid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
+PSEUDONYMOUS_ID_REGEX = r'pid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
 
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5

@@ -19,7 +19,7 @@
  */
 
 require('domain/classroom/classroom-backend-api.service');
-require('domain/sidebar/sidebar-status.service.ts');
+require('services/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
 require('services/navigation.service.ts');
@@ -61,7 +61,7 @@ angular.module('oppia').directive('topNavigationBar', [
             WindowDimensionsService, LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          var NAV_MODE_SIGNUP = 'signup';
+          var NAV_MODES_WITH_HIDDEN_USER_MENU = ['signup', 'login', 'logout'];
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'collection_editor',
             'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
@@ -71,7 +71,8 @@ angular.module('oppia').directive('topNavigationBar', [
           // which they will be hidden. Earlier elements will be hidden first.
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
-            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+            'I18N_TOPNAV_LIBRARY', 'I18N_TOPNAV_GET_INVOLVED',
+            'I18N_CREATE_EXPLORATION_CREATE'];
 
           ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
@@ -144,6 +145,13 @@ angular.module('oppia').directive('topNavigationBar', [
             SidebarStatusService.toggleSidebar();
           };
 
+          ctrl.navigateToClassroomPage = function(classroomUrl) {
+            SiteAnalyticsService.registerClassoomHeaderClickEvent();
+            $timeout(function() {
+              $window.location = classroomUrl;
+            }, 150);
+          };
+
           /**
            * Checks if i18n has been run.
            * If i18n has not yet run, the <a> and <span> tags will have
@@ -214,7 +222,8 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.currentUrl = window.location.pathname.split('/')[1];
             ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
             ctrl.logoutUrl = LOGOUT_URL;
-            ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+            ctrl.userMenuIsShown = (
+              NAV_MODES_WITH_HIDDEN_USER_MENU.indexOf(ctrl.currentUrl) === -1);
             ctrl.inClassroomPage = false;
             ctrl.standardNavIsShown = (
               NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);

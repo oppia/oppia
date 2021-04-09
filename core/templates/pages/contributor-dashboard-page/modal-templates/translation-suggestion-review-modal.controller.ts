@@ -12,29 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for translation suggestion review modal.
  */
 
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+
+require('services/alerts.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$scope', '$uibModalInstance', 'ContributionAndReviewService',
-    'SiteAnalyticsService', 'initialSuggestionId', 'reviewable',
+    '$http', '$scope', '$uibModalInstance', 'AlertsService',
+    'ContributionAndReviewService', 'SiteAnalyticsService',
+    'UrlInterpolationService',
+    'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION',
     function(
-        $scope, $uibModalInstance, ContributionAndReviewService,
-        SiteAnalyticsService, initialSuggestionId, reviewable,
-        suggestionIdToSuggestion, ACTION_ACCEPT_SUGGESTION,
-        ACTION_REJECT_SUGGESTION) {
+        $http, $scope, $uibModalInstance, AlertsService,
+        ContributionAndReviewService, SiteAnalyticsService,
+        UrlInterpolationService,
+        initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
+        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
       $scope.activeSuggestion = suggestionIdToSuggestion[
         $scope.activeSuggestionId];
+      $scope.subheading = subheading;
       delete suggestionIdToSuggestion[initialSuggestionId];
       var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 
@@ -43,6 +51,8 @@ angular.module('oppia').controller(
           .registerContributorDashboardViewSuggestionForReview('Translation');
       }
 
+      // The length of the commit message should not exceed 375 characters,
+      // since this is the maximum allowed commit message size.
       var generateCommitMessage = function() {
         var contentId = $scope.activeSuggestion.change.content_id;
         var stateName = $scope.activeSuggestion.change.state_name;
@@ -51,13 +61,38 @@ angular.module('oppia').controller(
         return `${contentType} section of "${stateName}" card`;
       };
 
+      var _getThreadHandlerUrl = function(suggestionId) {
+        return UrlInterpolationService.interpolateUrl(
+          '/threadhandler/<suggestionId>', { suggestionId });
+      };
+
+      var _getThreadMessagesAsync = function(threadId) {
+        return $http.get(_getThreadHandlerUrl(threadId)).then((response) => {
+          let threadMessageBackendDicts = response.data.messages;
+          return threadMessageBackendDicts.map(
+            m => ThreadMessage.createFromBackendDict(m));
+        });
+      };
+
       var init = function() {
+        $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
         $scope.reviewMessage = '';
+        if (!reviewable) {
+          $scope.suggestionIsRejected = (
+            $scope.activeSuggestion.status === 'rejected');
+          if ($scope.suggestionIsRejected) {
+            _getThreadMessagesAsync($scope.activeSuggestionId).then(
+              function(messageSummaries) {
+                $scope.reviewMessage = messageSummaries[1].text;
+              }
+            );
+          }
+        }
       };
 
       init();
@@ -76,6 +111,7 @@ angular.module('oppia').controller(
       };
 
       $scope.acceptAndReviewNext = function() {
+        $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
           'Translation');
 
@@ -83,16 +119,21 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           ACTION_ACCEPT_SUGGESTION,
           $scope.reviewMessage, generateCommitMessage(),
-          $scope.showNextItemToReview);
+          $scope.showNextItemToReview, (error) => {
+            $scope.rejectAndReviewNext('Invalid Suggestion');
+            AlertsService.clearWarnings();
+            AlertsService.addWarning(`Invalid Suggestion: ${error.data.error}`);
+          });
       };
 
-      $scope.rejectAndReviewNext = function() {
+      $scope.rejectAndReviewNext = function(reviewMessage) {
+        $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
           'Translation');
 
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          ACTION_REJECT_SUGGESTION, $scope.reviewMessage,
+          ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
           generateCommitMessage(), $scope.showNextItemToReview);
       };
 

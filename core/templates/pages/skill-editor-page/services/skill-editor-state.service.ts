@@ -31,7 +31,7 @@ import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 
-interface GroupedSkillSummaries {
+export interface GroupedSkillSummaries {
   current: {
     id: string,
     description: string,
@@ -66,8 +66,8 @@ export class SkillEditorStateService {
 
   private _setSkill = (skill: Skill) => {
     this._skill.copyFromSkill(skill);
-    this._skillChangedEventEmitter.emit();
     this._skillIsInitialized = true;
+    this._skillChangedEventEmitter.emit();
   };
 
   private _updateSkill = (skill: Skill) => {
@@ -121,31 +121,25 @@ export class SkillEditorStateService {
    */
   loadSkill(skillId: string): void {
     this._skillIsBeingLoaded = true;
-    this.skillBackendApiService.fetchSkill(
-      skillId).then(newBackendSkillObject => {
-      this.assignedSkillTopicData = (
-        newBackendSkillObject.assignedSkillTopicData);
-      this._updateSkill(newBackendSkillObject.skill);
-      this._updateGroupedSkillSummaries(
-        newBackendSkillObject.groupedSkillSummaries);
-      this.questionsListService.getQuestionSummariesAsync(
-        skillId, true, false
-      );
-      this._skillIsBeingLoaded = false;
-    }, (error) => {
-      this.alertsService.addWarning(error);
-      this._skillIsBeingLoaded = false;
-    });
-    this.skillRightsBackendApiService.fetchSkillRightsAsync(
-      skillId).then((newSkillRightsObject) => {
-      this._updateSkillRights(newSkillRightsObject);
-      this._skillIsBeingLoaded = false;
-    }, (error) => {
-      this.alertsService.addWarning(
-        error ||
-          'There was an error when loading the skill rights.');
-      this._skillIsBeingLoaded = false;
-    });
+    let skillDataPromise = this.skillBackendApiService.fetchSkill(skillId);
+    let skillRightsPromise = (
+      this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
+    Promise.all([skillDataPromise, skillRightsPromise]).then(
+      ([newBackendSkillObject, newSkillRightsObject]) => {
+        this._updateSkillRights(newSkillRightsObject);
+        this.assignedSkillTopicData = (
+          newBackendSkillObject.assignedSkillTopicData);
+        this._updateSkill(newBackendSkillObject.skill);
+        this._updateGroupedSkillSummaries(
+          newBackendSkillObject.groupedSkillSummaries);
+        this.questionsListService.getQuestionSummariesAsync(
+          skillId, true, false
+        );
+        this._skillIsBeingLoaded = false;
+      }, (error) => {
+        this.alertsService.addWarning(error);
+        this._skillIsBeingLoaded = false;
+      });
   }
   /**
    * Returns whether this service is currently attempting to load the
@@ -217,6 +211,24 @@ export class SkillEditorStateService {
         this._skillIsBeingSaved = false;
       });
     return true;
+  }
+  /**
+   * Checks if the skill description exists and updates class
+   * variable. `create-new-skill-modal.controller` will search
+   * for that variable.
+   */
+  updateExistenceOfSkillDescription(
+      description: string, successCallback: (value?: Object) => void): void {
+    this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
+      description).then(
+      (skillDescriptionExists) => {
+        successCallback(skillDescriptionExists);
+      }, (error) => {
+        this.alertsService.addWarning(
+          error ||
+          'There was an error when checking if the skill description ' +
+          'exists for another skill.');
+      });
   }
 
   get onSkillChange(): EventEmitter<unknown> {

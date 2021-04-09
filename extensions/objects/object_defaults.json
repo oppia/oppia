@@ -4,7 +4,6 @@
     "CodeString": "",
     "CoordTwoDim": [0.0, 0.0],
     "CustomOskLetters": [],
-    "DragAndDropHtmlString": "",
     "DragAndDropPositiveInt": 1,
     "Graph": {
         "edges": [],
@@ -18,15 +17,17 @@
     "ListOfCodeEvaluation": [],
     "ListOfCoordTwoDim": [],
     "ListOfGraph": [],
-    "ListOfSetsOfHtmlStrings": [],
+    "ListOfSetsOfTranslatableHtmlContentIds": [],
     "LogicErrorCategory": "mistake",
     "MusicPhrase": [],
     "NonnegativeInt": 0,
     "NormalizedString": "",
+    "PositiveInt": 1,
     "Real": 0.0,
     "SetOfAlgebraicIdentifier": [],
-    "SetOfHtmlString": [],
+    "SetOfTranslatableHtmlContentIds": [],
     "SetOfUnicodeString": [],
+    "TranslatableHtmlContentId": "",
     "TranslatableSetOfNormalizedString": {
       "contentId": null,
       "normalizedStrSet": []

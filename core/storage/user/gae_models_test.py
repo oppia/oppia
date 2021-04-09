@@ -103,12 +103,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             pin=self.GENERIC_PIN
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.UserSettingsModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
@@ -296,12 +290,6 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.CompletedActivitiesModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CompletedActivitiesModel.get_deletion_policy(),
@@ -372,12 +360,6 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.IncompleteActivitiesModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -470,12 +452,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             last_played_state_name=self.STATE_NAME_2,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.ExpUserLastPlaythroughModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -596,12 +572,6 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.LearnerPlaylistModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -844,7 +814,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     CREATOR_IDS = [USER_ID_5, USER_ID_6]
     CREATOR_USERNAMES = ['usernameuser_id_5', 'usernameuser_id_6']
     COLLECTION_IDS = ['23', '42', '4']
-    ACTIVITY_IDS = ['8', '16', '23']
+    EXPLORATION_IDS = ['exp_1', 'exp_2', 'exp_3']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     GENERIC_DATETIME = datetime.datetime(2020, 6, 2)
 
@@ -873,8 +843,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_2,
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.ACTIVITY_IDS,
-            feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            exploration_ids=self.EXPLORATION_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATETIME
         ).put()
@@ -935,8 +904,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': [],
             'collection_ids': [],
-            'activity_ids': [],
-            'feedback_thread_ids': [],
+            'exploration_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked_msec': None
         }
@@ -949,8 +917,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS,
-            'feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
+            'exploration_ids': self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'last_checked_msec':
                 utils.get_time_in_millisecs(self.GENERIC_DATETIME)
@@ -1441,12 +1408,6 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.CollectionProgressModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CollectionProgressModel.get_deletion_policy(),
@@ -1555,12 +1516,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             completed_node_ids=self.COMPLETED_NODE_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.StoryProgressModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1880,12 +1835,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             degree_of_mastery=self.DEGREE_OF_MASTERY,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.UserSkillMasteryModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -2272,7 +2221,8 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         expected_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
             'can_review_voiceover_for_language_codes': ['hi'],
-            'can_review_questions': True
+            'can_review_questions': True,
+            'can_submit_questions': False
         }
         self.assertEqual(user_data, expected_data)
 
@@ -2347,6 +2297,32 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_reviewer_ids), 1)
         self.assertFalse(self.USER_ID_1 in question_reviewer_ids)
         self.assertTrue(self.USER_ID_2 in question_reviewer_ids)
+
+    def test_get_question_submitter_user_ids(self):
+        question_submitter_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_submitter_user_ids())
+        self.assertEqual(len(question_submitter_ids), 0)
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False,
+            can_submit_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True,
+            can_submit_questions=True).put()
+
+        question_submitter_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_submitter_user_ids())
+        self.assertEqual(len(question_submitter_ids), 1)
+        self.assertFalse(self.USER_ID_1 in question_submitter_ids)
+        self.assertTrue(self.USER_ID_2 in question_submitter_ids)
 
 
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
@@ -2433,187 +2409,3 @@ class DeletedUsernameModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.DeletedUsernameModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-
-
-class UserAuthDetailsModelTests(test_utils.GenericTestBase):
-    """Tests for UserAuthDetailsModel."""
-
-    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
-    NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_GAE_ID = 'gae_id_x'
-    USER_ID = 'user_id'
-    USER_GAE_ID = 'gae_id'
-    PROFILE_ID = 'profile_id'
-    PROFILE_2_ID = 'profile_2_id'
-
-    def setUp(self):
-        """Set up user models in datastore for use in testing."""
-        super(UserAuthDetailsModelTests, self).setUp()
-
-        user_models.UserAuthDetailsModel(
-            id=self.USER_ID,
-            gae_id=self.USER_GAE_ID,
-        ).put()
-        user_models.UserAuthDetailsModel(
-            id=self.PROFILE_ID,
-            gae_id=None,
-            parent_user_id=self.USER_ID
-        ).put()
-        user_models.UserAuthDetailsModel(
-            id=self.PROFILE_2_ID,
-            gae_id=None,
-            parent_user_id=self.USER_ID
-        ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.UserAuthDetailsModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
-    def test_get_deletion_policy_is_delete_at_end(self):
-        self.assertEqual(
-            user_models.UserAuthDetailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE_AT_END)
-
-    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
-        # Deleting a full user.
-        user_models.UserAuthDetailsModel.apply_deletion_policy(self.USER_ID)
-        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
-            self.USER_ID))
-
-        # Deleting a profile user.
-        user_models.UserAuthDetailsModel.apply_deletion_policy(self.PROFILE_ID)
-        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
-            self.PROFILE_ID))
-
-    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
-        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
-            self.NONEXISTENT_USER_ID))
-        user_models.UserAuthDetailsModel.apply_deletion_policy(
-            self.NONEXISTENT_USER_ID)
-
-    def test_has_reference_to_existing_user_id_is_true(self):
-        # For a full user.
-        self.assertTrue(
-            user_models.UserAuthDetailsModel.has_reference_to_user_id(
-                self.USER_ID)
-        )
-
-        # For a profile user.
-        self.assertTrue(
-            user_models.UserAuthDetailsModel.has_reference_to_user_id(
-                self.PROFILE_ID)
-        )
-
-    def test_has_reference_to_non_existing_user_id_is_false(self):
-        self.assertFalse(
-            user_models.UserAuthDetailsModel.has_reference_to_user_id(
-                self.NONEXISTENT_USER_ID)
-        )
-
-    def test_get_by_auth_id_with_invalid_auth_method_name_is_none(self):
-        # For registered gae_id.
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID)
-        )
-
-        # For non registered gae_id.
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID)
-        )
-
-    def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
-        self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID))
-
-    def test_get_by_auth_id_for_correct_user_id_auth_id_mapping(self):
-        self.assertEqual(
-            user_models.UserAuthDetailsModel.get_by_id(self.USER_ID),
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
-        )
-
-    def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(self):
-        self.assertNotEqual(
-            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
-        )
-
-    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
-        user_auth_details_models = [
-            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
-            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
-        ]
-        fetched_output = (
-            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
-                self.USER_ID)
-        )
-        self.assertItemsEqual(user_auth_details_models, fetched_output)
-
-
-class UserIdentifiersModelTests(test_utils.GenericTestBase):
-    """Tests for UserIdentifiersModel."""
-
-    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
-    NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_GAE_ID = 'gae_id_x'
-    USER_ID = 'user_id'
-    USER_GAE_ID = 'gae_id'
-    PROFILE_ID = 'profile_id'
-    PROFILE_2_ID = 'profile_2_id'
-
-    def setUp(self):
-        """Set up user models in datastore for use in testing."""
-        super(UserIdentifiersModelTests, self).setUp()
-
-        user_models.UserIdentifiersModel(
-            id=self.USER_GAE_ID,
-            user_id=self.USER_ID,
-        ).put()
-
-    def test_get_deletion_policy_is_delete_at_end(self):
-        self.assertEqual(
-            user_models.UserIdentifiersModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE_AT_END)
-
-    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
-        # Deleting a full user.
-        user_models.UserIdentifiersModel.apply_deletion_policy(self.USER_ID)
-        self.assertIsNone(user_models.UserIdentifiersModel.get_by_id(
-            self.USER_ID))
-
-    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
-        self.assertIsNone(user_models.UserIdentifiersModel.get_by_id(
-            self.NONEXISTENT_USER_ID))
-        user_models.UserIdentifiersModel.apply_deletion_policy(
-            self.NONEXISTENT_USER_ID)
-
-    def test_has_reference_to_existing_user_id_is_true(self):
-        # For a full user.
-        self.assertTrue(
-            user_models.UserIdentifiersModel.has_reference_to_user_id(
-                self.USER_ID)
-        )
-
-    def test_has_reference_to_non_existing_user_id_is_false(self):
-        self.assertFalse(
-            user_models.UserIdentifiersModel.has_reference_to_user_id(
-                self.NONEXISTENT_USER_ID)
-        )
-
-    def test_get_by_gae_id_for_correct_gae_id(self):
-        self.assertEqual(
-            user_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
-            user_models.UserIdentifiersModel.get_by_gae_id(self.USER_GAE_ID)
-        )
-
-    def test_get_by_user_id_for_correct_user_id(self):
-        self.assertEqual(
-            user_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
-            user_models.UserIdentifiersModel.get_by_user_id(self.USER_ID)
-        )

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import datetime
 
 from constants import constants
@@ -46,6 +47,102 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to collections.
+
+    A new instance of this model is created and saved every time a commit to
+    CollectionModel or CollectionRightsModel occurs.
+
+    The id for this model is of the form 'collection-[collection_id]-[version]'.
+    """
+
+    # The id of the collection being edited.
+    collection_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
+        """
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_instance_id(cls, collection_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            collection_id: str. The id of the collection being edited.
+            version: int. The version number of the collection after the commit.
+
+        Returns:
+            str. The commit id with the collection id and version number.
+        """
+        return 'collection-%s-%s' % (collection_id, version)
+
+    @classmethod
+    def get_all_non_private_commits(
+            cls, page_size, urlsafe_start_cursor, max_age=None):
+        """Fetches a list of all the non-private commits sorted by their last
+        updated attribute.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+            max_age: datetime.timedelta. An instance of datetime.timedelta
+                representing the maximum age of the non-private commits to be
+                fetched.
+
+        Raises:
+            ValueError. The max_age is neither an instance of datetime.timedelta
+                nor None.
+
+        Returns:
+            3-tuple of (results, cursor, more). Where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
+            raise ValueError(
+                'max_age must be a datetime.timedelta instance or None.')
+
+        query = cls.query(
+            cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
+        if max_age:
+            query = query.filter(
+                cls.last_updated >= datetime.datetime.utcnow() - max_age)
+        return cls._fetch_page_sorted_by_last_updated(
+            query, page_size, urlsafe_start_cursor)
+
+
 class CollectionModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia collection.
 
@@ -55,6 +152,7 @@ class CollectionModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = CollectionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = CollectionCommitLogEntryModel
     ALLOW_REVERT = True
 
     # What this collection is called.
@@ -72,17 +170,12 @@ class CollectionModel(base_models.VersionedModel):
     # The version of all property blob schemas.
     schema_version = datastore_services.IntegerProperty(
         required=True, default=1, indexed=True)
-    # DEPRECATED in v2.4.2. Do not use.
-    nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
     # A dict representing the contents of a collection. Currently, this
     # contains the list of nodes. This dict should contain collection data
     # whose structure might need to be changed in the future.
     collection_contents = (
         datastore_services.JsonProperty(default={}, indexed=False))
-
-    # DEPRECATED in v2.4.2. Do not use.
-    nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -104,14 +197,62 @@ class CollectionModel(base_models.VersionedModel):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'collection_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'nodes': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'collection_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
     def get_collection_count(cls):
         """Returns the total number of collections."""
         return cls.get_all().count()
+
+    @staticmethod
+    def convert_to_valid_dict(model_dict):
+        """Replace invalid fields and values in the CollectionModel dict.
+
+        Some old CollectionModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the CollectionModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+
+        # The nodes field is moved to collection_contents dict. We
+        # need to move the values from nodes field to collection_contents dict
+        # and delete nodes.
+        if 'nodes' in model_dict and model_dict['nodes']:
+            model_dict['collection_contents']['nodes'] = (
+                copy.deepcopy(model_dict['nodes']))
+            del model_dict['nodes']
+
+        return model_dict
+
+    def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+
+        Some old CollectionModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+            with the the snapshot.
+        """
+        self.populate(
+            **CollectionModel.convert_to_valid_dict(snapshot_dict))
+        return self
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -136,9 +277,6 @@ class CollectionModel(base_models.VersionedModel):
 
         collection_rights = CollectionRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when collections
-        # are changed).
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, collection_rights.status,
@@ -185,7 +323,7 @@ class CollectionModel(base_models.VersionedModel):
                 commit_log_models.append(collection_commit_log)
             CollectionCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -270,9 +408,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -317,9 +452,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # DEPRECATED in v2.8.3, so translator_ids are not exported.
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -384,7 +517,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         # and delete translator_ids.
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
-            model_dict['translator_ids'] = []
+            del model_dict['translator_ids']
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.
@@ -441,9 +574,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when collections
-            # are changed).
             CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -456,7 +586,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
@@ -513,102 +643,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             'voiced_collection_ids': voiced_collection_ids,
             'viewable_collection_ids': viewable_collection_ids
         }
-
-
-class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to collections.
-
-    A new instance of this model is created and saved every time a commit to
-    CollectionModel or CollectionRightsModel occurs.
-
-    The id for this model is of the form 'collection-[collection_id]-[version]'.
-    """
-
-    # The id of the collection being edited.
-    collection_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
-
-    @staticmethod
-    def get_deletion_policy():
-        """Model contains data to pseudonymize or delete corresponding
-        to a user: user_id field.
-        """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
-
-    @staticmethod
-    def get_model_association_to_user():
-        """The history of commits is not relevant for the purposes of
-        Takeout, since commits do not contain any personal user data.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model contains data corresponding to a user, but this isn't exported
-        because the history of commits is not relevant for the purposes of
-        Takeout, since commits do not contain any personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    @classmethod
-    def _get_instance_id(cls, collection_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
-
-        Args:
-            collection_id: str. The id of the collection being edited.
-            version: int. The version number of the collection after the commit.
-
-        Returns:
-            str. The commit id with the collection id and version number.
-        """
-        return 'collection-%s-%s' % (collection_id, version)
-
-    @classmethod
-    def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        """Fetches a list of all the non-private commits sorted by their last
-        updated attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-            max_age: datetime.timedelta. An instance of datetime.timedelta
-                representing the maximum age of the non-private commits to be
-                fetched.
-
-        Raises:
-            ValueError. The max_age is neither an instance of datetime.timedelta
-                nor None.
-
-        Returns:
-            3-tuple of (results, cursor, more). Where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError(
-                'max_age must be a datetime.timedelta instance or None.')
-
-        query = cls.query(
-            cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
-        if max_age:
-            query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age)
-        return cls._fetch_page_sorted_by_last_updated(
-            query, page_size, urlsafe_start_cursor)
 
 
 class CollectionSummaryModel(base_models.BaseModel):

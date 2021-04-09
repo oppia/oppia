@@ -41,6 +41,50 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to skills.
+
+    A new instance of this model is created and saved every time a commit to
+    SkillModel occurs.
+
+    The id for this model is of the form 'skill-[skill_id]-[version]'.
+    """
+
+    # The id of the skill being edited.
+    skill_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_instance_id(cls, skill_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            skill_id: str. The id of the skill being edited.
+            version: int. The version number of the skill after the commit.
+
+        Returns:
+            str. The commit id with the skill id and version number.
+        """
+        return 'skill-%s-%s' % (skill_id, version)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
 class SkillModel(base_models.VersionedModel):
     """Model for storing Skills.
 
@@ -50,6 +94,7 @@ class SkillModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = SkillSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SkillSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = SkillCommitLogEntryModel
     ALLOW_REVERT = False
 
     # The description of the skill.
@@ -161,49 +206,21 @@ class SkillModel(base_models.VersionedModel):
             'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-
-class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to skills.
-
-    A new instance of this model is created and saved every time a commit to
-    SkillModel occurs.
-
-    The id for this model is of the form 'skill-[skill_id]-[version]'.
-    """
-
-    # The id of the skill being edited.
-    skill_id = datastore_services.StringProperty(indexed=True, required=True)
-
     @classmethod
-    def _get_instance_id(cls, skill_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
+    def get_by_description(cls, description):
+        """Gets SkillModel by description. Returns None if the skill with
+        description doesn't exist.
 
         Args:
-            skill_id: str. The id of the skill being edited.
-            version: int. The version number of the skill after the commit.
+            description: str. The description of the skill.
 
         Returns:
-            str. The commit id with the skill id and version number.
+            SkillModel|None. The skill model of the skill or None if not
+            found.
         """
-        return 'skill-%s-%s' % (skill_id, version)
-
-    @staticmethod
-    def get_model_association_to_user():
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return SkillModel.query().filter(
+            cls.description == description).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
 
 class SkillSummaryModel(base_models.BaseModel):

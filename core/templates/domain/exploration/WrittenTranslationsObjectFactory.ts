@@ -23,8 +23,7 @@ import { Injectable } from '@angular/core';
 import {
   TranslationBackendDict,
   WrittenTranslation,
-  WrittenTranslationObjectFactory,
-  WrittenTranslationDataFormat
+  WrittenTranslationObjectFactory
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 export interface WrittenTranslationsBackendDict {
@@ -51,7 +50,7 @@ export class WrittenTranslations {
     this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
 
-  getAllContentId(): string[] {
+  getAllContentIds(): string[] {
     return Object.keys(this.translationsMapping);
   }
 
@@ -68,7 +67,7 @@ export class WrittenTranslations {
     }
   }
 
-  getTranslationsLanguageCodes(contentId: string): string[] {
+  getLanguageCodes(contentId: string): string[] {
     return Object.keys(this.translationsMapping[contentId]);
   }
 
@@ -76,7 +75,7 @@ export class WrittenTranslations {
     if (!this.translationsMapping.hasOwnProperty(contentId)) {
       return false;
     }
-    return this.getTranslationsLanguageCodes(
+    return this.getLanguageCodes(
       contentId).indexOf(languageCode) !== -1;
   }
 
@@ -106,22 +105,24 @@ export class WrittenTranslations {
 
   addWrittenTranslation(
       contentId: string, languageCode: string,
-      dataFormat: WrittenTranslationDataFormat, translation: string): void {
+      dataFormat: string, translation: string|string[]): void {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
-    writtenTranslations[languageCode] = this._writtenTranslationObjectFactory
-      .createNew(dataFormat, translation);
+    writtenTranslations[languageCode] = (
+      this._writtenTranslationObjectFactory.createNew(dataFormat));
+    writtenTranslations[languageCode].setTranslation(translation);
   }
 
   updateWrittenTranslation(
-      contentId: string, languageCode: string, translation: string): void {
+      contentId: string, languageCode: string,
+      translation: string|string[]): void {
     var writtenTranslations = this.translationsMapping[contentId];
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');
     }
-    writtenTranslations[languageCode].translation = translation;
+    writtenTranslations[languageCode].setTranslation(translation);
     // Marking translation updated.
     writtenTranslations[languageCode].needsUpdate = false;
   }

@@ -5,14 +5,14 @@
 
     <style>
       html, body {
-        background: #eeeeee no-repeat center center fixed;
+        background: #eee no-repeat center center fixed;
         background-size: cover;
       }
 
       .oppia-story-player-tiles-container {
-        background-color: #ffffff;
+        background-color: #fff;
         border-radius: 4px;
-        box-shadow: 0px 0px 8px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 0 8px 6px rgba(0, 0, 0, 0.05);
         height: 100%;
         margin-bottom: 120px;
         margin-left: auto;
@@ -98,7 +98,7 @@
       }
 
       .oppia-lesson-icon-uncompleted {
-        background-color: #ffffff;
+        background-color: #fff;
         border: #296E5F 3px solid;
         border-radius: 50%;
         height: 40px;
@@ -150,7 +150,7 @@
 
       .oppia-story-viewer-mobile-card-content {
         border-radius: 4px;
-        box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);
         margin-top: 16px;
         overflow: hidden;
         width: 185px;
@@ -158,7 +158,7 @@
 
       .oppia-story-viewer-card-description-box {
         border-radius: 4px;
-        box-shadow: 0px 0px 4px #00000029;
+        box-shadow: 0 0 4px #00000029;
         display: flex;
         flex: 1;
         max-height: 180px;
@@ -202,7 +202,7 @@
           font-size: 2em;
           margin-top: 20px;
           padding-left: 40px;
-          padding-top: 0px;
+          padding-top: 0;
         }
 
         .oppia-story-viewer-description {
@@ -274,7 +274,26 @@
           width: 100vw;
           z-index: -1;
         }
-    }
+      }
+      @media (max-width: 768px) {
+        .navbar-brand {
+          display: none;
+        }
+
+        .oppia-navbar-brand-name.d-none {
+          /* !important is necessary otherwise d-none class of base components is not overwritten(!important
+          is being used there). */
+          display: flex !important;
+        }
+        .float-left {
+          margin-left: 40%;
+        }
+      }
+      @media (max-width: 500px) {
+        .float-left {
+          margin-left: 30%;
+        }
+      }
     </style>
   </head>
   <body>

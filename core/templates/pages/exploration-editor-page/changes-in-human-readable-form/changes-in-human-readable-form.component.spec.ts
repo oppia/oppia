@@ -466,7 +466,7 @@ describe('Changes in Human Readable Form Directive', function() {
       scope.lostChanges[0].newValue.outcome.dest + '</p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback">' +
-      scope.lostChanges[0].newValue.outcome.feedback.getHtml() +
+      scope.lostChanges[0].newValue.outcome.feedback.html +
       '</div>' +
       '</div>' +
       '<div class="sub-edit"><i>Rules: </i>' +
@@ -547,7 +547,7 @@ describe('Changes in Human Readable Form Directive', function() {
       scope.lostChanges[0].newValue.outcome.dest + '</p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback">' +
-      scope.lostChanges[0].newValue.outcome.feedback.getHtml() +
+      scope.lostChanges[0].newValue.outcome.feedback.html +
       '</div>' +
       '</div>' +
       '<div class="sub-edit"><i>Rules: </i>' +
@@ -653,7 +653,7 @@ describe('Changes in Human Readable Form Directive', function() {
       scope.lostChanges[0].newValue.dest + '</p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback">' +
-      scope.lostChanges[0].newValue.feedback.getHtml() +
+      scope.lostChanges[0].newValue.feedback.html +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -706,7 +706,7 @@ describe('Changes in Human Readable Form Directive', function() {
       scope.lostChanges[0].newValue.dest + '</p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback">' +
-      scope.lostChanges[0].newValue.feedback.getHtml() +
+      scope.lostChanges[0].newValue.feedback.html +
       '</div>' +
       '</div>' +
       '</div>' +

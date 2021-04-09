@@ -27,15 +27,9 @@ jobs:
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
-      - name: Install chrome version 77.0.3865.75-1
+      - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          sudo apt-get update
-          sudo apt-get install libappindicator3-1
-          curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
-          sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-          sudo dpkg -i google-chrome.deb
-          google-chrome --version
+        run: python -m scripts.install_chrome_for_ci
       - name: Run History Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationHistoryTab" --prod_env
@@ -45,3 +39,9 @@ jobs:
       - name: Run Extensions E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="extensions" --prod_env
+      - name: Uploading protractor-screenshots as Artifacts
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: protractor-screenshots
+          path: /home/runner/work/oppia/protractor-screenshots

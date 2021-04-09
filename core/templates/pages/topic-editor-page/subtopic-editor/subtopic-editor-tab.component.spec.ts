@@ -26,7 +26,6 @@ describe('Subtopic editor tab', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
   var ctrl = null;
   var skillSummary = null;
   var TopicEditorStateService = null;
@@ -58,7 +57,7 @@ describe('Subtopic editor tab', function() {
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
-      fetchTotalQuestionCountForSkillIds: () => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIdsAsync: () => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');

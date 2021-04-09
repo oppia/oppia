@@ -233,6 +233,18 @@ class ExplorationStats(python_utils.OBJECT):
                 'Expected state_stats_mapping to be a dict, received %s' % (
                     self.state_stats_mapping))
 
+    def clone(self):
+        """Returns a clone of this instance."""
+        return ExplorationStats(
+            self.exp_id, self.exp_version, self.num_starts_v1,
+            self.num_starts_v2, self.num_actual_starts_v1,
+            self.num_actual_starts_v2, self.num_completions_v1,
+            self.num_completions_v2,
+            {
+                state_name: state_stats.clone()
+                for state_name, state_stats in self.state_stats_mapping.items()
+            })
+
 
 class StateStats(python_utils.OBJECT):
     """Domain object representing analytics data for an exploration's state.
@@ -527,6 +539,16 @@ class StateStats(python_utils.OBJECT):
             if state_stats_dict[stat_property] < 0:
                 raise utils.ValidationError(
                     '%s cannot have negative values' % (stat_property))
+
+    def clone(self):
+        """Returns a clone of this instance."""
+        return StateStats(
+            self.total_answers_count_v1, self.total_answers_count_v2,
+            self.useful_feedback_count_v1, self.useful_feedback_count_v2,
+            self.total_hit_count_v1, self.total_hit_count_v2,
+            self.first_hit_count_v1, self.first_hit_count_v2,
+            self.num_times_solution_viewed_v2, self.num_completions_v1,
+            self.num_completions_v2)
 
 
 class SessionStateStats(python_utils.OBJECT):

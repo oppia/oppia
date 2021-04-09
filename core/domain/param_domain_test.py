@@ -36,7 +36,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         param_spec.obj_type = 'Real'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'is not among the supported object types'
-            ):
+        ):
             param_spec.validate()
 
         # Restore a valid parameter spec.
@@ -48,25 +48,32 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         # Raise an error because the name is invalid.
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Only parameter names'
-            ):
+        ):
             param_domain.ParamChange('¡hola', 'Copier', {}).validate()
+
+        # Raise an error because generator ID is not string.
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected generator ID to be a string'
+        ):
+            param_domain.ParamChange('abc', 123, {}).validate()
 
         # Raise an error because no such generator type exists.
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid generator id'
-            ):
+            utils.ValidationError, 'Invalid generator ID'
+        ):
             param_domain.ParamChange('abc', 'InvalidGenerator', {}).validate()
 
         # Raise an error because customization_args is not a dict.
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected a dict'
-            ):
+        ):
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()
 
         # Raise an error because the param_change name is not a string.
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected param_change name to be a string, '
-            'received'):
+            utils.ValidationError,
+            'Expected param_change name to be a string, received'
+        ):
             param_domain.ParamChange(3, 'Copier', {}).validate()
 
         # Raise an error because the arg names in customization_args are not
@@ -74,12 +81,6 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Invalid parameter change customization_arg name:'):
             param_domain.ParamChange('abc', 'Copier', {1: '1'}).validate()
-
-        # Raise an error because generator id is invalid.
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected generator id to be a string, '
-            'received'):
-            param_domain.ParamChange('abc', {'Copier': 'value'}, {}).validate()
 
     def test_param_change_class(self):
         """Test the ParamChange class."""

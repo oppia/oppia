@@ -28,10 +28,10 @@ require(
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-
+require('pages/exploration-editor-page/services/router.service.ts');
 angular.module('oppia').component('translatorOverview', {
   bindings: {
     isTranslationTabBusy: '='
@@ -39,12 +39,14 @@ angular.module('oppia').component('translatorOverview', {
   template: require('./translator-overview.component.html'),
   controller: [
     '$scope', '$window', 'ExplorationLanguageCodeService',
-    'LanguageUtilService', 'StateEditorService', 'TranslationLanguageService',
+    'FocusManagerService', 'LanguageUtilService',
+    'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
     'DEFAULT_AUDIO_LANGUAGE',
     function(
         $scope, $window, ExplorationLanguageCodeService,
-        LanguageUtilService, StateEditorService, TranslationLanguageService,
+        FocusManagerService, LanguageUtilService,
+        RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
         DEFAULT_AUDIO_LANGUAGE) {
       var ctrl = this;
@@ -139,6 +141,9 @@ angular.module('oppia').component('translatorOverview', {
       };
 
       ctrl.$onInit = function() {
+        if (RouterService.getActiveTabName() === 'translation') {
+          FocusManagerService.setFocus('audioTranslationLanguageCodeField');
+        }
         $scope.VOICEOVER_MODE = 'Voiceover';
         $scope.TRANSLATION_MODE = 'Translate';
 

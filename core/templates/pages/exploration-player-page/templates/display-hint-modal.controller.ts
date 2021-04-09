@@ -43,11 +43,11 @@ angular.module('oppia').controller('DisplayHintModalController', [
     var displayedCard = PlayerTranscriptService.getCard(
       PlayerPositionService.getDisplayedCardIndex());
     var recordedVoiceovers = displayedCard.getRecordedVoiceovers();
-    var hintContentId = $scope.hint.getContentId();
+    var hintContentId = $scope.hint.contentId;
 
     AudioTranslationManagerService.setSecondaryAudioTranslations(
       recordedVoiceovers.getBindableVoiceovers(hintContentId),
-      $scope.hint.getHtml(), COMPONENT_NAME_HINT);
+      $scope.hint.html, COMPONENT_NAME_HINT);
 
     AudioPlayerService.onAutoplayAudio.emit();
 

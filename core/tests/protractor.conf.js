@@ -1,3 +1,4 @@
+var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
@@ -53,6 +54,10 @@ var suites = {
 
     creatorDashboard: [
       'protractor_desktop/creatorDashboard.js'
+    ],
+
+    emailDashboard: [
+      'protractor_desktop/emailDashboard.js'
     ],
 
     embedding: [
@@ -324,7 +329,8 @@ exports.config = {
         dest: '../protractor-screenshots',
         // Function to build filenames of screenshots.
         pathBuilder: function(currentSpec) {
-          return currentSpec.fullName;
+          let filename = currentSpec.fullName;
+          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
         },
         captureOnlyFailedSpecs: true,
         reportFailedUrl: true,
@@ -341,6 +347,13 @@ exports.config = {
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
     browser.driver.manage().window().setSize(1285, 1000);
+
+    // Configure the Firebase Admin SDK to communicate with the emulator.
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+    FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+
+    // Navigate to the splash page so that tests can begin on an Angular page.
+    browser.driver.get('http://localhost:9001');
   },
 
   // The params object will be passed directly to the protractor instance,

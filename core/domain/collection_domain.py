@@ -476,7 +476,6 @@ class Collection(python_utils.OBJECT):
         new_collection_dict = (
             cls._convert_collection_contents_v3_dict_to_v4_dict(
                 collection_dict))
-        collection_dict['nodes'] = new_collection_dict['nodes']
         collection_dict['skills'] = new_collection_dict['skills']
         collection_dict['next_skill_id'] = (
             new_collection_dict['next_skill_id'])
@@ -503,10 +502,6 @@ class Collection(python_utils.OBJECT):
         This changes the structure of each node to not include skills as well
         as remove skills from the Collection model itself.
         """
-        new_collection_dict = (
-            cls._convert_collection_contents_v5_dict_to_v6_dict(
-                collection_dict))
-        collection_dict['nodes'] = new_collection_dict['nodes']
         del collection_dict['skills']
         del collection_dict['next_skill_index']
 
@@ -526,20 +521,22 @@ class Collection(python_utils.OBJECT):
             schema format.
 
         Raises:
-            Exception. The 'yaml_content' or the collection schema version is
-                not valid.
+            InvalidInputException. The 'yaml_content' or the schema version
+                is not specified.
+            Exception. The collection schema version is not valid.
         """
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
-        except Exception as e:
-            raise Exception(
+        except utils.InvalidInputException as e:
+            raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '
                 'a zip file. The YAML parser returned the following error: %s'
                 % e)
 
         collection_schema_version = collection_dict.get('schema_version')
         if collection_schema_version is None:
-            raise Exception('Invalid YAML file: no schema version specified.')
+            raise utils.InvalidInputException(
+                'Invalid YAML file: no schema version specified.')
         if not (1 <= collection_schema_version
                 <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             raise Exception(

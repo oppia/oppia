@@ -27,8 +27,6 @@ describe('Subtopic validation service', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
-
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   var SubtopicValidationService = null;

@@ -18,13 +18,15 @@
  */
 
 var action = require('../protractor_utils/action.js');
-var users = require('../protractor_utils/users.js');
 var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function() {
   var chapterTitleList = element.all(by.css('.protractor-chapter-title'));
-  var lockedChapterList = element.all(by.css('.protractor-locked-chapter'));
-  var loginButton = element(by.css('.protractor-test-login-button'));
+  var lessonCompletedIcons = element.all(
+    by.css('.protractor-test-lesson-icon-completed'));
+  var lessonUncompletedIcons = element.all(
+    by.css('.protractor-test-lesson-icon-uncompleted'));
+  var lessonTrack = element(by.css('.protractor-test-lesson-track'));
 
   this.get = async function(
       classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
@@ -40,13 +42,16 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectLockedChaptersCountToBe = async function(count) {
-    expect(await lockedChapterList.count()).toEqual(count);
+  this.expectCompletedLessonCountToBe = async function(count) {
+    await waitFor.visibilityOf(
+      lessonTrack, 'Lesson track takes too long to be visible.');
+    expect(await lessonCompletedIcons.count()).toEqual(count);
   };
 
-  this.login = async function(email, username) {
-    await action.click('Login button', loginButton);
-    await users.completeLoginFlowFromStoryViewerPage(email, username);
+  this.expectUncompletedLessonCountToBe = async function(count) {
+    await waitFor.visibilityOf(
+      lessonTrack, 'Lesson track takes too long to be visible.');
+    expect(await lessonUncompletedIcons.count()).toEqual(count);
   };
 };
 

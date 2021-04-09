@@ -42,16 +42,16 @@
   "Continue": {},
   "DragAndDropSortInput": {
     "IsEqualToOrdering": {
-      "description": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}"
+      "description": "is equal to ordering {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
     },
     "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
-      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
     },
     "HasElementXAtPositionY": {
-      "description": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}"
+      "description": "has element {{x|TranslatableHtmlContentId}} at position {{y|DragAndDropPositiveInt}}"
     },
     "HasElementXBeforeElementY": {
-      "description": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}"
+      "description": "has element {{x|TranslatableHtmlContentId}} before element {{y|TranslatableHtmlContentId}}"
     }
   },
   "EndExploration": {},
@@ -75,7 +75,7 @@
       "description": "has numerator equal to {{x|Int}}"
     },
     "HasDenominatorEqualTo": {
-      "description": "has denominator equal to {{x|NonnegativeInt}}"
+      "description": "has denominator equal to {{x|PositiveInt}}"
     },
     "HasIntegerPartEqualTo": {
       "description": "has integer part equal to {{x|Int}}"
@@ -107,16 +107,16 @@
   },
   "ItemSelectionInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfHtmlString}}"
+      "description": "is equal to {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "ContainsAtLeastOneOf": {
-      "description": "contains at least one of {{x|SetOfHtmlString}}"
+      "description": "contains at least one of {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "DoesNotContainAtLeastOneOf": {
-      "description": "omits at least one of {{x|SetOfHtmlString}}"
+      "description": "omits at least one of {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "IsProperSubsetOf": {
-      "description": "is a proper subset of {{x|SetOfHtmlString}}"
+      "description": "is a proper subset of {{x|SetOfTranslatableHtmlContentIds}}"
     }
   },
   "LogicProof": {
@@ -285,7 +285,10 @@
       "description": "is equivalent to {{x|RatioExpression}}"
     },
     "HasNumberOfTermsEqualTo": {
-      "description": "has number of terms equal to {{y|NonnegativeInt}}"
+      "description": "has number of terms equal to {{y|PositiveInt}}"
+    },
+    "HasSpecificTermEqualTo": {
+      "description": "has term {{x|PositiveInt}} equal to {{y|PositiveInt}}"
     }
   }
 }

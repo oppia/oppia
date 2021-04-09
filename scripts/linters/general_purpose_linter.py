@@ -26,6 +26,8 @@ import python_utils
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
+
+from .. import build
 from .. import common
 from .. import concurrent_task_utils
 
@@ -60,9 +62,14 @@ CONFIG_FILE_PATHS = (
     'webpack.dev.config.ts',
     'webpack.prod.config.ts')
 
-REQUIRED_STRINGS_CONSTANTS = {
-    'DEV_MODE: true': {
-        'message': 'Please set the DEV_MODE variable in constants.ts'
+BAD_STRINGS_CONSTANTS = {
+    '"DEV_MODE": false': {
+        'message': 'Please set the DEV_MODE variable in constants.ts '
+                   'to true before committing.',
+        'excluded_files': ()
+    },
+    '"EMULATOR_MODE": false': {
+        'message': 'Please set the EMULATOR_MODE variable in constants.ts '
                    'to true before committing.',
         'excluded_files': ()
     }
@@ -114,18 +121,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'\b(browser.pause)\('),
         'message': 'In tests, please do not use browser.pause().',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.sleep)\('),
-        'message': 'In tests, please do not use browser.sleep().',
-        'excluded_files': (
-            # TODO(#7622): Remove the file from the excluded list. Remove the
-            # TODO in core/tests/protractor_desktop/embedding.js pointing to the
-            # same issue. The following was placed due to a necessary sleep as
-            # a temporary measure to keep the embedding tests from failing.
-            'core/tests/protractor_desktop/embedding.js',
-        ),
         'excluded_dirs': ()
     },
     {
@@ -268,7 +263,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/pages/exploration-editor-page/translation-tab/'
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
             'core/templates/pages/library-page/search-bar/'
-            'search-bar.component.spec.ts'),
+            'search-bar.component.spec.ts',
+            'core/templates/pages/splash-page/splash-page.component.spec.ts'),
         'excluded_dirs': ()
     },
     {
@@ -287,6 +283,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
+            'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }
@@ -366,13 +363,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'datetime.datetime.now\(\)'),
-        'message': 'Please use datetime.datetime.utcnow() instead of '
-                   'datetime.datetime.now().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'ndb\.'),
         'message': (
             'Please use datastore_services instead of ndb, for example:\n'
@@ -393,39 +383,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
-        'regexp': re.compile(r'\sprint\('),
-        'message': 'Please use python_utils.PRINT().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'# pylint:\s*disable=[A-Z][0-9]{4}'),
         'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
                    'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'self.assertEquals\('),
-        'message': 'Please do not use self.assertEquals method. ' +
-                   'This method has been deprecated. Instead use ' +
-                   'self.assertEqual method.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'with open\(|= open\('),
-        'message': 'Please use python_utils.open_file() instead of open().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'StringIO'),
-        'message': 'Please use python_utils.string_io() instead of ' +
-                   'import StringIO.',
-        'excluded_files': ('python_utils.py', 'python_utils_test.py'),
         'excluded_dirs': ()
     },
     {
@@ -459,63 +422,9 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'urlsplit'),
-        'message': 'Please use python_utils.url_split().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urlparse'),
-        'message': 'Please use python_utils.url_parse().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urlunsplit'),
-        'message': 'Please use python_utils.url_unsplit().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'parse_qs'),
-        'message': 'Please use python_utils.parse_query_string().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wunquote\('),
-        'message': 'Please use python_utils.urllib_unquote().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'urljoin'),
-        'message': 'Please use python_utils.url_join().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w]input\('),
-        'message': 'Please use python_utils.INPUT.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w|\s]map\('),
-        'message': 'Please use python_utils.MAP.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wnext\('),
-        'message': 'Please use python_utils.NEXT.',
-        'excluded_files': (),
         'excluded_dirs': ()
     },
     {
@@ -525,63 +434,11 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\Wrange\('),
-        'message': 'Please use python_utils.RANGE.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wround\('),
-        'message': 'Please use python_utils.ROUND.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wstr\('),
-        'message': (
-            'Please try to use python_utils.convert_to_bytes() for the strings '
-            'used in webapp2\'s built-in methods or for strings used directly '
-            'in NDB datastore models. If you need to cast ints/floats to '
-            'strings, please use python_utils.UNICODE() instead.'),
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\Wzip\('),
-        'message': 'Please use python_utils.ZIP.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'basestring'),
-        'message': 'Please use python_utils.BASESTRING.',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'__metaclass__'),
         'message': 'Please use python_utils.with_metaclass().',
         'excluded_files': (),
         'excluded_dirs': ()
     },
-    {
-        'regexp': re.compile(r'iteritems'),
-        'message': 'Please use items() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'itervalues'),
-        'message': 'Please use values() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'iterkeys'),
-        'message': 'Please use keys() instead.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    }
 ]
 
 BAD_PATTERNS_MAP = {
@@ -820,14 +677,15 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             error_messages.extend(bad_pattern_error_messages)
 
             if filepath == 'constants.ts':
-                for pattern in REQUIRED_STRINGS_CONSTANTS:
-                    if pattern not in file_content:
-                        failed = True
-                        error_message = ('%s --> %s' % (
-                            filepath,
-                            REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
-                        error_messages.append(error_message)
-                        total_error_count += 1
+                for pattern in BAD_STRINGS_CONSTANTS:
+                    for line in file_content:
+                        if pattern in line:
+                            failed = True
+                            error_message = ('%s --> %s' % (
+                                filepath,
+                                BAD_STRINGS_CONSTANTS[pattern]['message']))
+                            error_messages.append(error_message)
+                            total_error_count += 1
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
@@ -852,6 +710,39 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        build.JS_FILEPATHS_NOT_TO_BUILD.
+
+        Returns:
+            TaskResult. A TaskResult object representing the result of the lint
+            check.
+        """
+        name = 'Extra JS files'
+        error_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+
+        for filepath in files_to_lint:
+            if (filepath.endswith(('.js')) and
+                    filepath.startswith(('core/templates', 'extensions')) and
+                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD and
+                    not filepath.endswith('protractor.js')):
+                error_message = (
+                    '%s  --> Found extra .js file' % filepath)
+                error_messages.append(error_message)
+                failed = True
+
+        if failed:
+            err_msg = (
+                'If you want the above files to be present as js files, '
+                'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                'build.py. Otherwise, rename them to .ts')
+            error_messages.append(err_msg)
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -867,7 +758,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     ['There are no files to be checked.'])]
         task_results = [
             self.check_mandatory_patterns(), self.check_bad_patterns(),
-            self.check_newline_at_eof()]
+            self.check_newline_at_eof(), self.check_extra_js_files()]
         return task_results
 
 

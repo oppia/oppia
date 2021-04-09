@@ -18,7 +18,7 @@
 
 require('components/skill-selector/merge-skill-modal.controller.ts');
 require(
-  'components/skill-selector/skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'assign-skill-to-topic-modal.controller.ts');
@@ -27,7 +27,7 @@ require(
   'delete-skill-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
-  'topic-selector.directive.ts');
+  'select-topics.component.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
@@ -40,9 +40,6 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'skills-list/unassign-skill-from-topics-modal.controller.ts');
-require(
-  'pages/topics-and-skills-dashboard-page/topic-selector/' +
-  'topic-selector.directive.ts');
 require('services/alerts.service.ts');
 
 require(
@@ -147,7 +144,7 @@ angular.module('oppia').directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                   'unassign-skill-from-topics-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillId: () => skillId
               },
@@ -190,13 +187,15 @@ angular.module('oppia').directive('skillsList', [
             });
           };
 
-          ctrl.assignSkillToTopic = function(skillId) {
-            var topicSummaries = $scope.getEditableTopicSummaries();
+          ctrl.assignSkillToTopic = function(skill) {
+            var skillId = skill.id;
+            var topicSummaries = $scope.getEditableTopicSummaries().filter(
+              topicSummary => !skill.topicNames.includes(topicSummary.name));
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'assign-skill-to-topic-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               windowClass: 'assign-skill-to-topic-modal',
               resolve: {
                 topicSummaries: () => topicSummaries
@@ -244,7 +243,7 @@ angular.module('oppia').directive('skillsList', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skill: () => skill,
                 skillSummaries: () => skillSummaries,
@@ -260,18 +259,18 @@ angular.module('oppia').directive('skillsList', [
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
               // Transfer questions from the old skill to the new skill.
-              TopicsAndSkillsDashboardBackendApiService.mergeSkills(
+              TopicsAndSkillsDashboardBackendApiService.mergeSkillsAsync(
                 skill.id, supersedingSkillId).then(function() {
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.
                 $timeout(function() {
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
+                  var successToast = 'Merged Skills.';
+                  AlertsService.addSuccessMessage(successToast, 1000);
                 }, 100);
-              }, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
+              }, function(response) {
+                AlertsService.addWarning(response.error.error);
               });
             }, function() {
               // Note to developers:

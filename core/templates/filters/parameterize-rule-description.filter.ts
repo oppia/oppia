@@ -69,23 +69,39 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
         // Special case for MultipleChoiceInput, ImageClickInput, and
         // ItemSelectionInput.
         if (choices) {
-          if (varType === 'SetOfHtmlString') {
+          if (varType === 'SetOfTranslatableHtmlContentIds') {
             replacementText = '[';
-            var key = inputs[varName];
+            const key = inputs[varName];
+            const contentIds = choices.map(choice => choice.val);
+
             for (var i = 0; i < key.length; i++) {
-              replacementText += $filter('formatRtePreview')(key[i]);
+              const choiceIndex = contentIds.indexOf(key[i]);
+              if (choiceIndex === -1) {
+                replacementText += 'INVALID';
+              } else {
+                replacementText += $filter('formatRtePreview')(
+                  choices[choiceIndex].label);
+              }
               if (i < key.length - 1) {
                 replacementText += ',';
               }
             }
             replacementText += ']';
-          } else if (varType === 'ListOfSetsOfHtmlStrings') {
+          } else if (varType === 'ListOfSetsOfTranslatableHtmlContentIds') {
             replacementText = '[';
-            var key = inputs[varName];
+            const key = inputs[varName];
+            const contentIds = choices.map(choice => choice.val);
+
             for (var i = 0; i < key.length; i++) {
               replacementText += '[';
               for (var j = 0; j < key[i].length; j++) {
-                replacementText += $filter('formatRtePreview')(key[i][j]);
+                const choiceIndex = contentIds.indexOf(key[i][j]);
+                if (choiceIndex === -1) {
+                  replacementText += 'INVALID';
+                } else {
+                  replacementText += $filter('formatRtePreview')(
+                    choices[choiceIndex].label);
+                }
                 if (j < key[i].length - 1) {
                   replacementText += ',';
                 }
@@ -100,7 +116,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
             replacementText = inputs[varName] + '';
           } else {
             // The following case is for MultipleChoiceInput and
-            // DragAndDropHtmlString.
+            // TranslatableHtmlContentId.
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
                 var filteredLabelText =
@@ -176,7 +192,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText += ']';
         } else if (
           varType === 'Real' || varType === 'NonnegativeInt' ||
-          varType === 'Int') {
+          varType === 'Int' || varType === 'PositiveInt') {
           replacementText = inputs[varName] + '';
         } else if (
           varType === 'CodeString' || varType === 'UnicodeString' ||

@@ -555,6 +555,29 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
 
+    def test_is_user_id_valid(self):
+        self.assertTrue(
+            utils.is_user_id_valid(
+                feconf.SYSTEM_COMMITTER_ID, allow_system_user_id=True))
+        self.assertTrue(
+            utils.is_user_id_valid(
+                feconf.MIGRATION_BOT_USER_ID, allow_system_user_id=True))
+        self.assertTrue(
+            utils.is_user_id_valid(
+                feconf.SUGGESTION_BOT_USER_ID, allow_system_user_id=True))
+        self.assertTrue(
+            utils.is_user_id_valid(
+                'pid_%s' % ('a' * 32), allow_pseudonymous_id=True))
+        self.assertTrue(
+            utils.is_user_id_valid('uid_%s' % ('a' * 32)))
+        self.assertFalse(
+            utils.is_user_id_valid('pid_%s' % ('a' * 32)))
+        self.assertFalse(
+            utils.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(
+            utils.is_user_id_valid('uid_%s' % ('a' * 31)))
+        self.assertFalse(utils.is_user_id_valid('a' * 36))
+
     def test_is_pseudonymous_id(self):
         self.assertTrue(utils.is_pseudonymous_id('pid_' + 'a' * 32))
         self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 32))
@@ -611,25 +634,31 @@ class UtilsTests(test_utils.GenericTestBase):
             dt,
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
 
-    def test_get_current_appengine_environment(self):
-        saved_appengine_runtime = (
-            os.environ['APPENGINE_RUNTIME'] if 'APPENGINE_RUNTIME' in os.environ
-            else None)
-        saved_server_software = (
-            os.environ['SERVER_SOFTWARE'] if 'SERVER_SOFTWARE' in os.environ
-            else None)
+    def test_grouper(self):
+        self.assertEqual(
+            [list(g) for g in utils.grouper(python_utils.RANGE(7), 3)],
+            [[0, 1, 2], [3, 4, 5], [6, None, None]])
+        # Returns an iterable of iterables, so we need to combine them into
+        # strings for easier comparison.
+        self.assertEqual(
+            [''.join(g) for g in utils.grouper('ABCDEFG', 3, fillvalue='x')],
+            ['ABC', 'DEF', 'Gxx'])
 
-        os.environ['APPENGINE_RUNTIME'] = 'True'
-        self.assertTrue(utils.is_local_server_environment())
-        os.environ['SERVER_SOFTWARE'] = 'Google App Engine/'
-        self.assertTrue(utils.is_appengine_cloud_environment())
+    def test_partition(self):
+        is_even = lambda n: (n % 2) == 0
 
-        if saved_appengine_runtime is not None:
-            os.environ['SERVER_SOFTWARE'] = saved_appengine_runtime
-        else:
-            del os.environ['SERVER_SOFTWARE']
+        evens, odds = (
+            utils.partition([10, 8, 1, 5, 6, 4, 3, 7], predicate=is_even))
 
-        if saved_server_software is not None:
-            os.environ['SERVER_SOFTWARE'] = saved_server_software
-        else:
-            del os.environ['SERVER_SOFTWARE']
+        self.assertEqual(list(evens), [10, 8, 6, 4])
+        self.assertEqual(list(odds), [1, 5, 3, 7])
+
+    def test_enumerated_partition(self):
+        logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
+        is_error = lambda msg: msg.startswith('ERROR: ')
+
+        errors, others = (
+            utils.partition(logs, predicate=is_error, enumerated=True))
+
+        self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
+        self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])

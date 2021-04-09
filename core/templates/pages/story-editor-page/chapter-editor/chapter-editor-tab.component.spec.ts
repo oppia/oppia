@@ -35,8 +35,6 @@ describe('Chapter Editor tab', function() {
   var storyReinitializedEventEmitter = null;
   importAllAngularServices();
 
-  importAllAngularServices();
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

@@ -15,12 +15,11 @@
 /**
  * @fileoverview Unit tests for contributor dashboard page component.
  */
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
@@ -29,7 +28,9 @@ describe('Contributor dashboard page', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
+  var $window = null;
   var LocalStorageService = null;
+  var $timeout = null;
   var UserService = null;
   var TranslationLanguageService = null;
   var userProfileImage = 'profile-data-url';
@@ -38,21 +39,30 @@ describe('Contributor dashboard page', function() {
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
     can_review_questions: true
   };
+  var windowRef = new WindowRef();
+  var focusManagerService = null;
 
   importAllAngularServices();
-
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+    $provide.value('WindowRef', windowRef);
   }));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    focusManagerService = TestBed.get(FocusManagerService);
+  });
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     UserService = $injector.get('UserService');
     $q = $injector.get('$q');
+    $window = $injector.get('$window');
+    $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');
+    focusManagerService = $injector.get('FocusManagerService');
     ctrl = $componentController('contributorDashboardPage');
 
     spyOn(LocalStorageService, 'getLastSelectedTranslationLanguageCode').and
@@ -60,6 +70,16 @@ describe('Contributor dashboard page', function() {
     spyOn(TranslationLanguageService, 'setActiveLanguageCode').and
       .callThrough();
   }));
+
+  it('should set focus on select lang field', function() {
+    var focusSpy = spyOn(focusManagerService, 'setFocus');
+    var windowSpy = spyOn ($window, 'scrollTo');
+    ctrl.onTabClick('translateTextTab');
+    $timeout.flush();
+    expect(focusSpy).toHaveBeenCalled();
+    $timeout.flush();
+    expect(windowSpy).toHaveBeenCalled();
+  });
 
   describe('when user is logged in', function() {
     var userInfo = {
@@ -130,6 +150,40 @@ describe('Contributor dashboard page', function() {
       ctrl.onTabClick(changedTab);
       expect(ctrl.activeTabName).toBe(changedTab);
       expect(ctrl.showLanguageSelector()).toBe(true);
+    });
+
+    it('should call scrollFunction on scroll', function() {
+      var e = document.createEvent('Event');
+      var scrollSpy = spyOn(ctrl, 'scrollFunction');
+      e.initEvent('scroll', true, true);
+
+      window.dispatchEvent(e);
+
+      expect(scrollSpy).toHaveBeenCalled();
+    });
+
+    it('should show default header if window pageYOffset is ' +
+      'less than 5', function() {
+      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+      nativeWindowSpy.and.returnValue({
+        pageYOffset: 4
+      });
+
+      ctrl.scrollFunction();
+
+      expect(ctrl.defaultHeaderVisible).toBe(true);
+    });
+
+    it('should show collapsed header if window pageYOffset is' +
+      ' scrolled greater than 5', function() {
+      const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+      nativeWindowSpy.and.returnValue({
+        pageYOffset: 6
+      });
+
+      ctrl.scrollFunction();
+
+      expect(ctrl.defaultHeaderVisible).toBe(false);
     });
   });
 

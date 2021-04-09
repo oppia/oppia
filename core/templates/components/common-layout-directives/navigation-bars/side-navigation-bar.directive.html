@@ -79,8 +79,11 @@
   side-navigation-bar .oppia-sidebar-menu-icon.fa {
     font-size: 24px;
   }
-
+  side-navigation-bar .classroom-submenu {
+    padding: 0 0 1em 18px;
+  }
 </style>
+
 <nav class="oppia-sidebar-menu oppia-sidebar-menu-transition">
   <div class="oppia-sidebar-header">
     <div class="oppia-sidebar-logo-container">
@@ -150,6 +153,18 @@
         </picture>
         <span translate="I18N_SIDEBAR_OPPIA_FOUNDATION"></span>
       </a>
+    </li>
+
+    <li ng-class="{'active': $ctrl.currentUrl === '/learn/math'}">
+      <a ng-click="$ctrl.toggleClassroomSubmenu()" class="protractor-mobile-test-classroom">
+        <i class="material-icons oppia-sidebar-menu-icon">school</i>
+        <span translate="I18N_SIDEBAR_CLASSROOM"></span>
+      </a>
+      <div ng-show="$ctrl.classroomSubmenuIsShown" class="classroom-submenu">
+        <a href="/learn/math" class="protractor-mobile-test-mathematics-link">
+          <span translate="I18N_SIDEBAR_CLASSROOM_BASIC_MATHS"></span>
+        </a>
+      </div>
     </li>
   </ul>
 

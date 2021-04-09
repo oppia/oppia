@@ -74,9 +74,11 @@ class ConfigPropertySnapshotMetadataModelValidator(
                 'config_property_ids',
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class ConfigPropertySnapshotContentModelValidator(
@@ -146,10 +148,10 @@ class PlatformParameterSnapshotMetadataModelValidator(
                 config_models.PlatformParameterModel,
                 [item.id[:item.id.find('-')]]
             ),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel,
-                [item.committer_id]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )
         ]
 

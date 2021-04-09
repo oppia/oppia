@@ -5779,7 +5779,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -5793,9 +5794,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def test_schema_of_new_reviewer_email_data_constant(self):
         self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA.keys()), [
-            constants.REVIEW_CATEGORY_QUESTION,
-            constants.REVIEW_CATEGORY_TRANSLATION,
-            constants.REVIEW_CATEGORY_VOICEOVER])
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
         for category_details in email_manager.NEW_REVIEWER_EMAIL_DATA.values():
             self.assertEqual(len(category_details), 4)
             self.assertTrue(
@@ -5826,7 +5827,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5872,7 +5874,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.voiceover_reviewer_id,
-                constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5917,7 +5920,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_new_contribution_reviewer(
                 self.question_reviewer_id,
-                constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -5947,7 +5951,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_not_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
         messages = self._get_sent_email_messages(
             self.TRANSLATION_REVIEWER_EMAIL)
@@ -5962,9 +5967,9 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     def test_schema_of_removed_reviewer_email_data_constant(self):
         self.assertEqual(
             sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA.keys()), [
-                constants.REVIEW_CATEGORY_QUESTION,
-                constants.REVIEW_CATEGORY_TRANSLATION,
-                constants.REVIEW_CATEGORY_VOICEOVER])
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER])
         for category_details in (
                 email_manager.REMOVED_REVIEWER_EMAIL_DATA.values()):
             self.assertEqual(len(category_details), 4)
@@ -5995,7 +6000,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
-                constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -6040,7 +6046,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.voiceover_reviewer_id,
-                constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                language_code='hi')
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
@@ -6082,7 +6089,8 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
-                self.question_reviewer_id, constants.REVIEW_CATEGORY_QUESTION,
+                self.question_reviewer_id,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
             # Make sure correct email is sent.

@@ -32,6 +32,23 @@ import feconf
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
+class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates description length"""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(model_instance):
+        if len(model_instance.description) > 1000:
+            yield (model_instance.corresponding_topic_id, model_instance.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield ('Topic Id: %s' % key, 'Story Id: %s' % values)
+
+
 class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate story schema
     versions. This job will load all existing story from the data store
@@ -133,3 +150,23 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class DeleteStoryCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to delete unneeded story commit logs."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryCommitLogEntryModel]
+
+    @staticmethod
+    def map(model):
+        if story_models.StoryModel.get(model.story_id, strict=False) is None:
+            model.delete()
+            yield ('SUCCESS_DELETED', model.story_id)
+        else:
+            yield ('SUCCESS_NO_ACTION', model.story_id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

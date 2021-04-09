@@ -101,25 +101,9 @@ export class ReadOnlyCollectionBackendApiService {
     return this._collectionCache.hasOwnProperty(collectionId);
   }
 
-  /**
-   * Retrieves a collection from the backend given a collection ID. This
-   * returns a promise object that allows a success and rejection callbacks
-   * to be registered. If the collection is successfully loaded and a
-   * success callback function is provided to the promise object, the
-   * success callback is called with the collection passed in as a
-   * parameter. If something goes wrong while trying to fetch the
-   * collection, the rejection callback is called instead, if present. The
-   * rejection callback function is passed the error that occurred and the
-   * collection ID.
-   */
-  fetchCollection(collectionId: string): Promise<Collection> {
-    return new Promise((resolve, reject) => {
-      this._fetchCollection(collectionId, resolve, reject);
-    });
-  }
 
   /**
-   * Behaves in the exact same way as fetchCollection (including callback
+   * Behaves in the exact same way as fetchCollectionAsync (including callback
    * behavior and returning a promise object), except this function will
    * attempt to see whether the given collection has already been loaded. If
    * it has not yet been loaded, it will fetch the collection from the
@@ -127,7 +111,7 @@ export class ReadOnlyCollectionBackendApiService {
    * it will store it in the cache to avoid requests from the backend in
    * further function calls.
    */
-  loadCollection(collectionId: string): Promise<Collection> {
+  async loadCollectionAsync(collectionId: string): Promise<Collection> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
         if (resolve) {

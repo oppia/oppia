@@ -20,16 +20,20 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import inspect
 import io
 import os
 import sys
 
-_FUTURE_PATH = os.path.join(
-    os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _FUTURE_PATH)
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
+
+_CERTIFI_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2020.12.5')
+sys.path.insert(0, _CERTIFI_PATH)
 
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
@@ -37,6 +41,10 @@ import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-impo
 import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 BASESTRING = past.builtins.basestring
@@ -55,6 +63,10 @@ def string_io(buffer_value=b''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
 
+    Args:
+        buffer_value: str. A string that is to be converted to in-memory text
+            stream.
+
     Returns:
         StringIO.StringIO or io.StringIO. The StringIO object.
     """
@@ -62,10 +74,10 @@ def string_io(buffer_value=b''):
         from StringIO import StringIO  # pylint: disable=import-only-modules
     except ImportError:
         from io import StringIO  # pylint: disable=import-only-modules
-    return StringIO(buffer_value)
+    return StringIO(buffer_value) # pylint: disable=disallowed-function-calls
 
 
-def get_args_of_function(function_node, args_to_ignore):
+def get_args_of_function_node(function_node, args_to_ignore):
     """Extracts the arguments from a function definition.
 
     Args:
@@ -79,11 +91,14 @@ def get_args_of_function(function_node, args_to_ignore):
     """
     try:
         return [
-            a.arg for a in function_node.args.args if a.arg not in
-            args_to_ignore]
+            a.arg
+            for a in function_node.args.args
+            if a.arg not in args_to_ignore
+        ]
     except AttributeError:
         return [
-            a.id for a in function_node.args.args if a.id not in args_to_ignore]
+            a.id for a in function_node.args.args if a.id not in args_to_ignore
+        ]
 
 
 def open_file(filename, mode, encoding='utf-8', newline=None):
@@ -97,6 +112,9 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
 
     Returns:
         _io.TextIOWrapper. The file object.
+
+    Raises:
+        IOError. The file cannot be opened.
     """
     # The try/except is needed here to unify the errors because io.open in
     # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
@@ -123,7 +141,7 @@ def url_join(base_url, relative_url):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urljoin(base_url, relative_url)
+    return urlparse.urljoin(base_url, relative_url) # pylint: disable=disallowed-function-calls
 
 
 def url_split(urlstring):
@@ -140,7 +158,7 @@ def url_split(urlstring):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urlsplit(urlstring)
+    return urlparse.urlsplit(urlstring) # pylint: disable=disallowed-function-calls
 
 
 def url_parse(urlstring):
@@ -159,7 +177,7 @@ def url_parse(urlstring):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urlparse(urlstring)
+    return urlparse.urlparse(urlstring) # pylint: disable=disallowed-function-calls
 
 
 def url_unsplit(url_parts):
@@ -177,7 +195,7 @@ def url_unsplit(url_parts):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.urlunsplit(url_parts)
+    return urlparse.urlunsplit(url_parts) # pylint: disable=disallowed-function-calls
 
 
 def parse_query_string(query_string):
@@ -196,7 +214,7 @@ def parse_query_string(query_string):
         import urlparse
     except ImportError:
         import urllib.parse as urlparse
-    return urlparse.parse_qs(query_string)
+    return urlparse.parse_qs(query_string) # pylint: disable=disallowed-function-calls
 
 
 def urllib_unquote(content):
@@ -212,10 +230,12 @@ def urllib_unquote(content):
     """
     try:
         import urllib
-        return urllib.unquote(content)
+
+        return urllib.unquote(content) # pylint: disable=disallowed-function-calls
     except ImportError:
         import urllib.parse
-        return urllib.urlparse.unquote(content)
+
+        return urllib.urlparse.unquote(content) # pylint: disable=disallowed-function-calls
 
 
 def url_quote(content):
@@ -248,9 +268,11 @@ def url_unquote_plus(content):
     """
     try:
         import urllib
+
         return urllib.unquote_plus(content)
     except ImportError:
         import urllib.parse
+
         return urllib.parse.unquote_plus(content)
 
 
@@ -286,17 +308,23 @@ def url_retrieve(source_url, filename=None):
     Returns:
         urlretrieve. The 'urlretrieve' object.
     """
+    context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib
+
         # Change the User-Agent to prevent servers from blocking requests.
         # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
         urllib.URLopener.version = (
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
-            'Gecko/20100101 Firefox/47.0')
-        return urllib.urlretrieve(source_url, filename=filename)
+            'Gecko/20100101 Firefox/47.0'
+        )
+        return urllib.urlretrieve(
+            source_url, filename=filename, context=context)
     except ImportError:
         import urllib.request
-        return urllib.request.urlretrieve(source_url, filename=filename)
+
+        return urllib.request.urlretrieve(
+            source_url, filename=filename, context=context)
 
 
 def url_open(source_url):
@@ -310,12 +338,15 @@ def url_open(source_url):
     Returns:
         urlopen. The 'urlopen' object.
     """
+    context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib2
-        return urllib2.urlopen(source_url)
+
+        return urllib2.urlopen(source_url, context=context)
     except ImportError:
         import urllib.request
-        return urllib.request.urlopen(source_url)
+
+        return urllib.request.urlopen(source_url, context=context)
 
 
 def url_request(source_url, data, headers):
@@ -333,9 +364,11 @@ def url_request(source_url, data, headers):
     """
     try:
         import urllib2
+
         return urllib2.Request(source_url, data, headers)
     except ImportError:
         import urllib.request
+
         return urllib.request.Request(source_url)
 
 
@@ -353,13 +386,12 @@ def divide(number1, number2):
     return past.utils.old_div(number1, number2)
 
 
-def with_metaclass(class1, class2):
-    """This function makes a dummy metaclass for one level of class
-    instantiation that replaces itself with the actual metaclass.
+def with_metaclass(meta, *bases):
+    """Python 2 & 3 helper for installing metaclasses.
 
-    Use it like this::
+    Example:
 
-        class BaseForm():
+        class BaseForm(python_utils.OBJECT):
             pass
 
         class FormType(type):
@@ -369,13 +401,18 @@ def with_metaclass(class1, class2):
             pass
 
     Args:
-        class1: class. The metaclass.
-        class2: class. The baseclass.
+        meta: type. The metaclass to install on the derived class.
+        *bases: tuple(class). The base classes to install on the derived class.
+            When empty, `object` will be the sole base class.
 
     Returns:
-        class. The base class with a metaclass.
+        class. A proxy class that mutates the classes which inherit from it to
+        install the input meta class and inherit from the input base classes.
+        The proxy class itself does not actually become one of the base classes.
     """
-    return future.utils.with_metaclass(class1, class2)
+    if not bases:
+        bases = (OBJECT,)
+    return future.utils.with_metaclass(meta, *bases)
 
 
 def convert_to_bytes(string_to_convert):
@@ -410,12 +447,13 @@ def _recursively_convert_to_str(value):
         return [_recursively_convert_to_str(e) for e in value]
     elif isinstance(value, dict):
         return {
-            _recursively_convert_to_str(k): _recursively_convert_to_str(
-                v) for k, v in value.items()}
+            _recursively_convert_to_str(k): _recursively_convert_to_str(v)
+            for k, v in value.items()
+        }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
     elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
-        temp = str(value.encode('utf-8'))
+        temp = str(value.encode('utf-8')) # pylint: disable=disallowed-function-calls
         # Remove the b'' prefix from the string.
         return temp[2:-1].decode('utf-8')
     elif type(value) == future.types.newbytes:  # pylint: disable=unidiomatic-typecheck
@@ -439,3 +477,39 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
+
+
+def reraise_exception():
+    """Reraise exception with complete stacktrace."""
+    # TODO(#11547): This method can be replace by 'raise e' after we migrate
+    # to Python 3.
+    # This code is needed in order to reraise the error properly with
+    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
+    exec_info = sys.exc_info()
+    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
+
+
+def is_string(value):
+    """Returns whether value has a string type."""
+    return isinstance(value, six.string_types)
+
+
+def get_args_of_function(func):
+    """Returns the argument names of the function.
+
+    Args:
+        func: function. The function to inspect.
+
+    Returns:
+        list(str). The names of the function's arguments.
+
+    Raises:
+        TypeError. The input argument is not a function.
+    """
+    try:
+        # Python 3.
+        return [p.name for p in inspect.signature(func).parameters
+                if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
+    except AttributeError:
+        # Python 2.
+        return inspect.getargspec(func).args

@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import base64
 import datetime
 import hmac
-import http.cookies
 import json
 import logging
 import os
@@ -28,6 +27,7 @@ import sys
 import time
 import traceback
 
+from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
@@ -46,26 +46,6 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 
-def _clear_login_cookies(response_headers):
-    """Clears login cookies from the given response headers.
-
-    Args:
-        response_headers: webapp2.ResponseHeaders. Response headers are used
-            to give a more detailed context of the response.
-    """
-    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
-    # for https:// . We just unset both below. We also unset dev_appserver_login
-    # cookie used in local server.
-    for cookie_name in [b'ACSID', b'SACSID', b'dev_appserver_login']:
-        cookie = http.cookies.SimpleCookie()
-        cookie[cookie_name] = ''
-        cookie[cookie_name]['expires'] = (
-            datetime.datetime.utcnow() +
-            datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
-        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response_headers.add_header(*cookie.output().split(b': ', 1))
-
-
 @backports.functools_lru_cache.lru_cache(maxsize=128)
 def load_template(filename):
     """Return the HTML file contents at filepath.
@@ -82,19 +62,37 @@ def load_template(filename):
     return html_text
 
 
-class LogoutPage(webapp2.RequestHandler):
-    """Class which handles the logout URL."""
+class SessionBeginHandler(webapp2.RequestHandler):
+    """Handler for creating new authentication sessions."""
 
     def get(self):
-        """Logs the user out, and returns them to a specified follow-up
-        page (or the home page if no follow-up page is specified).
-        """
+        """Establishes a new auth session."""
+        auth_services.establish_auth_session(self.request, self.response)
 
-        _clear_login_cookies(self.response.headers)
-        url_to_redirect_to = (
-            python_utils.convert_to_bytes(
-                self.request.get('redirect_url', '/')))
-        self.redirect(url_to_redirect_to)
+
+class SessionEndHandler(webapp2.RequestHandler):
+    """Handler for destroying existing authentication sessions."""
+
+    def get(self):
+        """Destroys an existing auth session."""
+        auth_services.destroy_auth_session(self.response)
+
+
+class SeedFirebaseHandler(webapp2.RequestHandler):
+    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob.
+
+    TODO(#11462): Delete this handler once the Firebase migration logic is
+    rollback-safe and all backup data is using post-migration data.
+    """
+
+    def get(self):
+        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
+        try:
+            auth_services.seed_firebase()
+        except Exception:
+            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
+        finally:
+            self.redirect('/')
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -166,44 +164,48 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        self.is_super_admin = user_services.is_current_user_super_admin()
-        if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
+        auth_claims = auth_services.get_auth_claims_from_request(request)
+        self.current_user_is_super_admin = (
+            auth_claims is not None and auth_claims.role_is_super_admin)
+
+        if (feconf.ENABLE_MAINTENANCE_MODE and
+                not self.current_user_is_super_admin):
             return
 
-        self.gae_id = user_services.get_current_gae_id()
         self.user_id = None
         self.username = None
+        self.email = None
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
-        # TODO(#11462): This part should be moved to the service layer when we
-        # migrate to Firebase.
-        if self.gae_id:
-            user_settings = user_services.get_user_settings_by_gae_id(
-                self.gae_id, strict=False)
+        if auth_claims:
+            auth_id = auth_claims.auth_id
+            user_settings = user_services.get_user_settings_by_auth_id(auth_id)
             if user_settings is None:
                 # If the user settings are not yet created and the request leads
                 # to signup page create a new user settings. Otherwise logout
                 # the not-fully registered user.
-                email = user_services.get_current_user_email()
+                email = auth_claims.email
                 if 'signup?' in self.request.uri:
-                    user_settings = user_services.create_new_user(
-                        self.gae_id, email)
+                    if not feconf.ENABLE_USER_CREATION:
+                        raise Exception('New sign-ups are temporarily disabled')
+                    user_settings = (
+                        user_services.create_new_user(auth_id, email))
                 else:
                     logging.error(
-                        'Cannot find user %s with email %s on page %s'
-                        % (self.gae_id, email, self.request.uri))
-                    _clear_login_cookies(self.response.headers)
+                        'Cannot find user %s with email %s on page %s' % (
+                            auth_id, email, self.request.uri))
+                    auth_services.destroy_auth_session(self.response)
                     return
 
+            self.email = user_settings.email
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
             if user_settings.deleted:
                 self.user_is_scheduled_for_deletion = user_settings.deleted
-            elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                  user_services.has_fully_registered_account(
-                      user_settings.user_id)):
+            elif (self.REDIRECT_UNFINISHED_SIGNUPS and
+                  not user_services.has_fully_registered_account(self.user_id)):
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
@@ -220,14 +222,14 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
-        self.values['is_moderator'] = user_services.is_at_least_moderator(
-            self.user_id)
+        self.values['is_moderator'] = (
+            user_services.is_at_least_moderator(self.user_id))
         self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
-        self.values['is_super_admin'] = self.is_super_admin
+        self.values['is_super_admin'] = self.current_user_is_super_admin
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass.
@@ -243,7 +245,8 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
+        if (feconf.ENABLE_MAINTENANCE_MODE and
+                not self.current_user_is_super_admin):
             self.handle_exception(
                 self.TemporaryMaintenanceException(
                     'Oppia is currently being upgraded, and the site should '
@@ -294,12 +297,13 @@ class BaseHandler(webapp2.RequestHandler):
         super(BaseHandler, self).dispatch()
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """Base method to handle GET requests.
-
-        Raises:
-            PageNotFoundException. Page not found error (error code 404).
-        """
-        raise self.PageNotFoundException
+        """Base method to handle GET requests."""
+        logging.warning('Invalid URL requested: %s', self.request.uri)
+        self.error(404)
+        self._render_exception(
+            404, {
+                'error': 'Could not find the page %s.' % self.request.uri})
+        return
 
     def post(self, *args):  # pylint: disable=unused-argument
         """Base method to handle POST requests.

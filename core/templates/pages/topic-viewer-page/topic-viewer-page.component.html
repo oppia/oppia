@@ -13,7 +13,7 @@
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
             <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
-            <a class="tab-title"
+            <a class="tab-title protractor-test-practice-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
             </a>
           </div>
@@ -21,7 +21,7 @@
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
             <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
-            <a class="tab-title"
+            <a class="tab-title protractor-test-revision-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_REVISION' | translate">
             </a>
           </div>
@@ -140,7 +140,7 @@
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
-    color: #ffffff;
+    color: #fff;
     cursor: pointer;
     font-size: 1.1em;
     font-weight: bold;
@@ -165,8 +165,8 @@
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
-    border-bottom: 4px solid #ffffff;
-    color: #ffffff;
+    border-bottom: 4px solid #fff;
+    color: #fff;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,

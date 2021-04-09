@@ -44,6 +44,7 @@ interface FetchTopicBackendResponse {
     [skillId: string]: RubricBackendDict[];
   };
   'classroom_url_fragment': string;
+  'skill_creation_is_allowed': boolean;
 }
 
 interface FetchTopicResponse {
@@ -59,6 +60,7 @@ interface FetchTopicResponse {
     [skillId: string]: RubricBackendDict[];
   };
   classroomUrlFragment: string;
+  skillCreationIsAllowed: boolean;
 }
 
 interface FetchStoriesBackendResponse {
@@ -131,6 +133,7 @@ export class EditableTopicBackendApiService {
           },
           skillIdToRubricsDict: response.skill_id_to_rubrics_dict,
           classroomUrlFragment: response.classroom_url_fragment,
+          skillCreationIsAllowed: response.skill_creation_is_allowed
         });
       }
     }, (errorResponse) => {

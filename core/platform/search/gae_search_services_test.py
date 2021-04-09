@@ -259,22 +259,31 @@ class SearchQueryTests(test_utils.GenericTestBase):
 
     def test_search_all_documents(self):
         doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
-            search.TextField(name='k', value='abc def ghi')])
+            search.TextField(name='category', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', language='en', rank=2, fields=[
-            search.TextField(name='k', value='abc jkl mno')])
+            search.TextField(name='category', value='abc jkl mno')])
         doc3 = search.Document(doc_id='doc3', language='en', rank=3, fields=[
-            search.TextField(name='k', value='abc jkl ghi')])
+            search.TextField(name='category', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        result = gae_search_services.search('k:abc', 'my_index')[0]
+        result = gae_search_services.search('', 'my_index', [], [])[0]
         self.assertIn({
-            'id': 'doc1', 'k': 'abc def ghi', 'rank': 1, 'language_code': 'en'
+            'id': 'doc1',
+            'category': 'abc def ghi',
+            'rank': 1,
+            'language_code': 'en'
         }, result)
         self.assertIn({
-            'id': 'doc2', 'k': 'abc jkl mno', 'rank': 2, 'language_code': 'en'
+            'id': 'doc2',
+            'category': 'abc jkl mno',
+            'rank': 2,
+            'language_code': 'en'
         }, result)
         self.assertIn({
-            'id': 'doc3', 'k': 'abc jkl ghi', 'rank': 3, 'language_code': 'en'
+            'id': 'doc3',
+            'category': 'abc jkl ghi',
+            'rank': 3,
+            'language_code': 'en'
         }, result)
 
     def test_search_when_query_string_is_invalid(self):
@@ -288,9 +297,9 @@ class SearchQueryTests(test_utils.GenericTestBase):
         with self.swap(logging, 'exception', mock_logging_function):
             doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
             gae_search_services.add_documents_to_index([doc], 'index')
-            result = gae_search_services.search('NOT:abc', 'my_index')
+            result = gae_search_services.search('NOT:abc', 'my_index', [], [])
             self.assertEqual(result, ([], None))
-            result = gae_search_services.search(r'\k:abc', 'my_index')
+            result = gae_search_services.search(r'\k:abc', 'my_index', [], [])
             self.assertEqual(result, ([], None))
 
             self.assertEqual(len(observed_log_messages), 2)
@@ -309,109 +318,134 @@ class SearchQueryTests(test_utils.GenericTestBase):
 
     def test_respect_search_query(self):
         doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
-            search.TextField(name='k', value='abc def ghi')])
+            search.TextField(name='category', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', rank=1, language='en', fields=[
-            search.TextField(name='k', value='abc jkl mno')])
+            search.TextField(name='category', value='abc jkl mno')])
         doc3 = search.Document(doc_id='doc3', rank=1, language='en', fields=[
-            search.TextField(name='k', value='abc jkl ghi')])
+            search.TextField(name='category', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        result = gae_search_services.search('k:jkl', 'my_index')[0]
+        result = gae_search_services.search('', 'my_index', ['jkl'], [])[0]
         self.assertNotIn({
-            'id': 'doc1', 'k': 'abc def ghi', 'language_code': 'en', 'rank': 1
+            'id': 'doc1',
+            'category': 'abc def ghi',
+            'language_code': 'en',
+            'rank': 1
         }, result)
         self.assertIn({
-            'id': 'doc2', 'k': 'abc jkl mno', 'language_code': 'en', 'rank': 1
+            'id': 'doc2',
+            'category': 'abc jkl mno',
+            'language_code': 'en',
+            'rank': 1
         }, result)
         self.assertIn({
-            'id': 'doc3', 'k': 'abc jkl ghi', 'language_code': 'en', 'rank': 1
+            'id': 'doc3',
+            'category': 'abc jkl ghi',
+            'language_code': 'en',
+            'rank': 1
         }, result)
 
     def test_respect_limit(self):
         doc1 = search.Document(doc_id='doc1', fields=[
-            search.TextField(name='k', value='abc def ghi')])
+            search.TextField(name='category', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', fields=[
-            search.TextField(name='k', value='abc jkl mno')])
+            search.TextField(name='category', value='abc jkl mno')])
         doc3 = search.Document(doc_id='doc3', fields=[
-            search.TextField(name='k', value='abc jkl ghi')])
+            search.TextField(name='category', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        result = gae_search_services.search('k:abc', 'my_index', size=2)[0]
+        result = gae_search_services.search(
+            '', 'my_index', ['abc'], '', size=2)[0]
         self.assertEqual(len(result), 2)
 
-    def test_use_cursor(self):
+    def test_use_offset(self):
         doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
-            search.TextField(name='k', value='abc def ghi')])
+            search.TextField(name='category', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', language='en', rank=1, fields=[
-            search.TextField(name='k', value='abc jkl mno')])
+            search.TextField(name='category', value='abc jkl mno')])
         doc3 = search.Document(doc_id='doc3', language='en', rank=1, fields=[
-            search.TextField(name='k', value='abc jkl ghi')])
+            search.TextField(name='category', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        result1, result1_cursor = gae_search_services.search(
-            'k:abc', 'my_index', size=2)
+        result1, result1_offset = gae_search_services.search(
+            '', 'my_index', ['abc'], [], size=2)
         result2, _ = gae_search_services.search(
-            'k:abc', 'my_index', cursor=result1_cursor)
+            '', 'my_index', ['abc'], [], offset=result1_offset)
         self.assertEqual(len(result1), 2)
         self.assertEqual(len(result2), 1)
-        dict1 = {'id': 'doc1', 'k': 'abc def ghi', 'language_code': 'en',
+        dict1 = {'id': 'doc1', 'category': 'abc def ghi', 'language_code': 'en',
                  'rank': 1}
         self.assertIn(dict1, result1 + result2)
-        dict2 = {'id': 'doc2', 'k': 'abc jkl mno', 'language_code': 'en',
+        dict2 = {'id': 'doc2', 'category': 'abc jkl mno', 'language_code': 'en',
                  'rank': 1}
         self.assertIn(dict2, result1 + result2)
-        dict3 = {'id': 'doc3', 'k': 'abc jkl ghi', 'language_code': 'en',
+        dict3 = {'id': 'doc3', 'category': 'abc jkl ghi', 'language_code': 'en',
                  'rank': 1}
         self.assertIn(dict3, result1 + result2)
 
     def test_ids_only(self):
         doc1 = search.Document(doc_id='doc1', fields=[
-            search.TextField(name='k', value='abc def ghi')])
+            search.TextField(name='category', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', fields=[
-            search.TextField(name='k', value='abc jkl mno')])
+            search.TextField(name='category', value='abc jkl mno')])
         doc3 = search.Document(doc_id='doc3', fields=[
-            search.TextField(name='k', value='abc jkl ghi')])
+            search.TextField(name='category', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
         result = gae_search_services.search(
-            'k:abc', 'my_index', ids_only=True)[0]
+            '', 'my_index', ['abc'], [], ids_only=True)[0]
         self.assertIn('doc1', result)
         self.assertIn('doc2', result)
         self.assertIn('doc3', result)
 
-    def test_cursor_is_none_if_no_more_results(self):
+    def test_offset_is_none_if_no_more_results(self):
         doc1 = search.Document(doc_id='doc1', fields=[
-            search.TextField(name='k', value='abc def ghi')])
+            search.TextField(name='category', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', fields=[
-            search.TextField(name='k', value='abc jkl mno')])
+            search.TextField(name='category', value='abc jkl mno')])
         doc3 = search.Document(doc_id='doc3', fields=[
-            search.TextField(name='k', value='abc jkl ghi')])
+            search.TextField(name='category', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        cursor = gae_search_services.search('k:abc', 'my_index')[1]
-        self.assertIsNone(cursor)
+        offset = gae_search_services.search('', 'my_index', ['abc'], [])[1]
+        self.assertIsNone(offset)
 
     def test_default_rank_is_descending_date(self):
         # Time is only saved with 1 second accuracy,
         # so I'm putting a 1 second delay between puts.
-        dict1 = {'id': 'doc1', 'k': 'abc def'}
-        dict2 = {'id': 'doc2', 'k': 'abc ghi'}
-        dict3 = {'id': 'doc3', 'k': 'abc jkl'}
+        dict1 = {'id': 'doc1', 'category': 'abc def'}
+        dict2 = {'id': 'doc2', 'category': 'abc ghi'}
+        dict3 = {'id': 'doc3', 'category': 'abc jkl'}
         gae_search_services.add_documents_to_index([dict1], 'my_index')
         time.sleep(1)
         gae_search_services.add_documents_to_index([dict2], 'my_index')
         time.sleep(1)
         gae_search_services.add_documents_to_index([dict3], 'my_index')
         result = gae_search_services.search(
-            'k:abc', 'my_index', ids_only=True)[0]
+            '', 'my_index', ['abc'], [], ids_only=True)[0]
         self.assertEqual(result, ['doc3', 'doc2', 'doc1'])
 
     def test_search_with_custom_rank_and_language(self):
-        doc1 = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
-        doc2 = {'id': 'doc2', 'k': 'abc ghi', 'rank': 1, 'language_code': 'fr'}
-        doc3 = {'id': 'doc3', 'k': 'abc jkl', 'rank': 2, 'language_code': 'nl'}
+        doc1 = {
+            'id': 'doc1',
+            'category': 'abc def',
+            'rank': 3,
+            'language_code': 'en'
+        }
+        doc2 = {
+            'id': 'doc2',
+            'category': 'abc ghi',
+            'rank': 1,
+            'language_code': 'fr'
+        }
+        doc3 = {
+            'id': 'doc3',
+            'category': 'abc jkl',
+            'rank': 2,
+            'language_code': 'nl'
+        }
         gae_search_services.add_documents_to_index([doc1, doc2, doc3], 'index')
-        result = gae_search_services.search('k:abc', 'index')[0]
+        result = gae_search_services.search('', 'index', ['abc'], [])[0]
         self.assertEqual(result, [doc1, doc3, doc2])
 
     def test_use_default_num_retries(self):
@@ -431,7 +465,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
             '<class \'google.appengine.api.search.search.TransientError\'>: '
             'oops')
         with search_ctx, search_counter_ctx, assert_raises_ctx as context_mgr:
-            gae_search_services.search('query', 'my_index')
+            gae_search_services.search('query', 'my_index', [], [])
 
         self.assertEqual(context_mgr.exception.original_exception, exception)
 
@@ -439,24 +473,17 @@ class SearchQueryTests(test_utils.GenericTestBase):
             search_counter.times_called, 1)
 
 
-class SearchGetFromIndexTests(test_utils.GenericTestBase):
-    def test_get_document_from_index(self):
-        document = search.Document(doc_id='my_doc', fields=[
-            search.TextField(name='my_field', value='value')
-        ])
-        search.Index('my_index').put(document)
-        result = gae_search_services.get_document_from_index(
-            'my_doc', 'my_index')
-        self.assertEqual(result.get('id'), 'my_doc')
-        self.assertEqual(result.get('my_field'), 'value')
-
-
 class ClearIndexTests(test_utils.GenericTestBase):
     def test_clear_index(self):
-        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        doc = {
+            'id': 'doc1',
+            'category': 'abc def',
+            'rank': 3,
+            'language_code': 'en'
+        }
         gae_search_services.add_documents_to_index([doc], 'index')
-        result = gae_search_services.search('k:abc', 'index')[0]
+        result = gae_search_services.search('', 'index', ['abc'], [])[0]
         self.assertEqual(result, [doc])
         gae_search_services.clear_index('index')
-        result = gae_search_services.search('k:abc', 'index')[0]
+        result = gae_search_services.search('', 'index', ['abc'], [])[0]
         self.assertEqual(result, [])

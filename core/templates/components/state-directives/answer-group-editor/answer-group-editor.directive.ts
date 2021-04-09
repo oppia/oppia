@@ -117,6 +117,8 @@ angular.module('oppia').directive('answerGroupEditor', [
               case 'Int':
               case 'NonnegativeInt':
                 return 0;
+              case 'PositiveInt':
+                return 1;
               case 'CodeString':
               case 'UnicodeString':
               case 'NormalizedString':
@@ -137,11 +139,9 @@ angular.module('oppia').directive('answerGroupEditor', [
                 return [
                   getDefaultInputValue('Real'),
                   getDefaultInputValue('Real')];
-              case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
               case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
-              case 'SetOfHtmlString':
               case 'SetOfNormalizedString':
               case 'MusicPhrase':
                 return [];

@@ -31,6 +31,8 @@ require('services/alerts.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -46,6 +48,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
             SkillEditorRoutingService, SkillEditorStateService,
             UndoRedoService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var ACTIVE_TAB_EDITOR = 'Editor';
           var ACTIVE_TAB_QUESTIONS = 'Questions';
           var ACTIVE_TAB_PREVIEW = 'Preview';
@@ -85,7 +88,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +
                 'skill-editor-save-modal.directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage, () => {
@@ -140,6 +143,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
           ctrl.$onInit = function() {
             $scope.activeTab = ACTIVE_TAB_EDITOR;
             ctrl.skill = SkillEditorStateService.getSkill();
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.onSkillChange.subscribe(
+                () => $rootScope.$applyAsync()));
           };
         }]
     };

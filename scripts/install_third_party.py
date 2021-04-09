@@ -341,6 +341,48 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
+def install_elasticsearch_dev_server():
+    """This installs a local ElasticSearch server to the oppia_tools
+    directory to be used by development servers and backend tests.
+    """
+    try:
+        subprocess.call(
+            ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        python_utils.PRINT('ElasticSearch is already installed.')
+        return
+    except OSError:
+        python_utils.PRINT('Installing ElasticSearch...')
+
+    if common.is_mac_os() or common.is_linux_os():
+        file_ext = 'tar.gz'
+        def download_and_extract(*args):
+            """This downloads and extracts the elasticsearch files."""
+            download_and_untar_files(*args)
+    elif common.is_windows_os():
+        file_ext = 'zip'
+        def download_and_extract(*args):
+            """This downloads and extracts the elasticsearch files."""
+            download_and_unzip_files(*args)
+    else:
+        raise Exception('Unrecognized or unsupported operating system.')
+
+    download_and_extract(
+        'https://artifacts.elastic.co/downloads/elasticsearch/' +
+        'elasticsearch-%s-%s-x86_64.%s' % (
+            common.ELASTICSEARCH_VERSION,
+            common.OS_NAME.lower(),
+            file_ext
+        ),
+        TARGET_DOWNLOAD_DIRS['oppiaTools'],
+        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
+        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
+    )
+    python_utils.PRINT('ElasticSearch installed successfully.')
+
+
 def install_redis_cli():
     """This installs the redis-cli to the local oppia third_party directory so
     that development servers and backend tests can make use of a local redis
@@ -414,6 +456,7 @@ def main(args=None):
     install_backend_python_libs.main()
     download_manifest_files(MANIFEST_FILE_PATH)
     install_redis_cli()
+    install_elasticsearch_dev_server()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

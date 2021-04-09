@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -75,13 +76,13 @@ class TopicEditorStoryHandler(base.BaseHandler):
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
-            summary['pending_node_dicts'] = []
+            summary['all_node_dicts'] = []
 
         for summary in additional_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
             summary['completed_node_titles'] = []
-            summary['pending_node_dicts'] = []
+            summary['all_node_dicts'] = []
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -135,7 +136,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             thumbnail_filename, feconf.ENTITY_TYPE_STORY, entity_id, raw_image,
             filename_prefix, image_is_compressible)
 
-        story_services.update_story(
+        topic_services.update_story_and_topic_summary(
             self.user_id, new_story_id, [story_domain.StoryChange({
                 'cmd': 'update_story_property',
                 'property_name': 'thumbnail_filename',
@@ -146,7 +147,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
                 'property_name': 'thumbnail_bg_color',
                 'old_value': None,
                 'new_value': thumbnail_bg_color
-            }), ], 'Added story thumbnail.')
+            }), ], 'Added story thumbnail.', topic_id)
 
         self.render_json({
             'storyId': new_story_id
@@ -259,6 +260,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             skill_question_count_dict[skill_id] = (
                 question_services.get_total_question_count_for_skill_ids(
                     [skill_id]))
+        skill_creation_is_allowed = (
+            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
             'classroom_url_fragment': classroom_url_fragment,
@@ -266,7 +269,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
-            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict,
+            'skill_creation_is_allowed': skill_creation_is_allowed
         })
 
         self.render_json(self.values)
@@ -288,10 +292,10 @@ class EditableTopicDataHandler(base.BaseHandler):
         commit_message = self.payload.get('commit_message')
 
         if (commit_message is not None and
-                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         topic_and_subtopic_page_change_dicts = self.payload.get(
             'topic_and_subtopic_page_change_dicts')
@@ -365,7 +369,7 @@ class TopicRightsHandler(base.BaseHandler):
         if topic_rights is None:
             raise self.InvalidInputException(
                 'Expected a valid topic id to be provided.')
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_topic = topic_services.check_can_edit_topic(
             user_actions_info, topic_rights)
 
@@ -433,7 +437,7 @@ class TopicUrlFragmentHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_create_topic
     def get(self, topic_url_fragment):
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
@@ -451,7 +455,7 @@ class TopicNameHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_create_topic
     def get(self, topic_name):
         """Handler that receives a topic name and checks whether
         a topic with the same name exists.

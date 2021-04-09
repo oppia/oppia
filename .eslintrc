@@ -13,14 +13,103 @@
     "@typescript-eslint",
     "oppia"
   ],
-  "overrides": [{
-    // We exclude test files from dependency injection format checks because
-    // they are never minified.
-    "files": ["*Spec.js", "*Spec.ts"],
-    "rules": {
-      "angular/di": "off"
+  "overrides": [
+    {
+      // We exclude test files from dependency injection format checks because
+      // they are never minified.
+      "files": ["*Spec.js", "*Spec.ts"],
+      "rules": {
+        "angular/di": "off"
+      }
+    },
+    {
+      // We only run the e2e action checks on end-to-end test files, and
+      // we exclude files that we haven't fixed yet.
+      "files": [
+        "core/tests/protractor/*.js",
+        "core/tests/protractor_utils/*.js",
+        "core/tests/protractor_desktop/*.js"
+      ],
+      "excludedFiles": [
+        "ClassroomPage.js",
+        "DeleteAccountPage.js",
+        "ExplorationEditorHistoryTab.js",
+        "ExplorationEditorMainTab.js",
+        "ExplorationEditorPage.js",
+        "ExplorationEditorSettingsTab.js",
+        "ExplorationEditorStatsTab.js",
+        "ExplorationEditorTranslationTab.js",
+        "GetStartedPage.js",
+        "LearnerDashboardPage.js",
+        "LibraryPage.js",
+        "ProfilePage.js",
+        "ProtractorConstants.js",
+        "SkillEditorPage.js",
+        "StoryEditorPage.js",
+        "SubscriptionDashboardPage.js",
+        "ThanksPage.js",
+        "TopicAndStoryViewerPage.js",
+        "TopicEditorPage.js",
+        "TopicsAndSkillsDashboardPage.js",
+        "action.js",
+        "forms.js",
+        "general.js",
+        "users.js",
+        "waitFor.js",
+        "workflow.js",
+        "additionalEditorFeatures.js",
+        "additionalPlayerFeatures.js",
+        "adminTabFeatures.js",
+        "classroomPage.js",
+        "classroomPageFileUploadFeatures.js",
+        "collections.js",
+        "contributorDashboard.js",
+        "coreEditorAndPlayerFeatures.js",
+        "creatorDashboard.js",
+        "embedding.js",
+        "explorationFeedbackTab.js",
+        "explorationHistoryTab.js",
+        "explorationImprovementsTab.js",
+        "explorationStatisticsTab.js",
+        "explorationTranslationTab.js",
+        "extensions.js",
+        "fileUploadExtensions.js",
+        "learnerDashboard.js",
+        "navigation.js",
+        "playVoiceovers.js",
+        "preferences.js",
+        "profileFeatures.js",
+        "publicationAndLibrary.js",
+        "skillEditor.js",
+        "topicAndStoryEditor.js",
+        "topicAndStoryEditorFileUploadFeatures.js",
+        "topicAndStoryViewer.js",
+        "topicsAndSkillsDashboard.js",
+        "userJourneys.js",
+        "voiceoverUploadFeatures.js",
+        "wipeout.js",
+        "accessibility.js",
+        "learnerFlow.js",
+        "libraryFlow.js",
+        "profileMenuFlow.js",
+        "excludedForTesting.js"
+      ],
+      "rules": {
+        "oppia/e2e-action": "error",
+      }
+    },
+    {
+      // We only run the protractor practices checks on protractor end-to-end test files.
+      "files": [
+        "core/tests/protractor/*.js",
+        "core/tests/protractor_utils/*.js",
+        "core/tests/protractor_desktop/*.js"
+      ],
+      "rules": {
+        "oppia/protractor-practices": "error",
+      }
     }
-  }],
+  ],
   "rules": {
     "oppia/break-after-parens": "error",
     "oppia/no-multiline-disable": "error",
@@ -295,6 +384,7 @@
     "@typescript-eslint/prefer-as-const": ["error"],
     "@typescript-eslint/no-array-constructor": ["error"],
     "@typescript-eslint/no-extra-semi": ["error"],
+    "@typescript-eslint/type-annotation-spacing": ["error"],
     "wrap-iife": [
       "error",
       "any"

@@ -23,9 +23,6 @@ import { StateInteractionIdService } from
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { TextInputRulesService } from
@@ -131,8 +128,6 @@ describe('Training Panel Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value('GenerateContentIdService', generateContentIdService);
     $provide.value(
       'TextInputRulesService',
@@ -212,7 +207,7 @@ describe('Training Panel Component', function() {
   it('should start to add new response and then cancel it', function() {
     $scope.beginAddingNewResponse();
     expect(ctrl.addingNewResponse).toBe(true);
-    expect(ctrl.classification.newOutcome.feedback.getContentId()).toBe(
+    expect(ctrl.classification.newOutcome.feedback.contentId).toBe(
       'feedback_1');
 
     $scope.cancelAddingNewResponse();

@@ -27,7 +27,6 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -49,7 +48,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.NEW_USER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3')
@@ -186,8 +185,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
         self.assertEqual(len(json_response['topic_assignment_dicts']), 0)
 
-        topic_id_1 = topic_services.get_new_topic_id()
-        topic_id_2 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Topic1',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -655,6 +654,13 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         large_image = '<svg><path d="%s" /></svg>' % (
             'M150 0 L75 200 L225 200 Z ' * 4000)
+        post_data = {
+            'description': 'Skill Description 2',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg'
+        }
         response_dict = self.post_json(
             self.url, post_data,
             csrf_token=csrf_token,
@@ -799,6 +805,44 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(
             topic.uncategorized_skill_ids,
             [self.linked_skill_id, skill_id])
+        self.logout()
+
+    def test_skill_creation_in_duplicate_description(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
+        post_data = {
+            'description': 'Duplicate Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict(),
+            'thumbnail_filename': 'image.svg'
+        }
+
+        # No errors when we publish the skill description for the first time.
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token)
+        self.assertTrue('error' not in response_dict)
+
+        # Error when we publish the same skill description again.
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'Skill description should not be a duplicate',
+            response_dict['error'])
+
         self.logout()
 
 

@@ -1,0 +1,21 @@
+<style>
+  set-of-translatable-html-content-ids-editor md-checkbox .md-label {
+    vertical-align: top;
+  }
+  set-of-translatable-html-content-ids-editor .oppia-check-box {
+    max-width: 300px;
+  }
+</style>
+
+<div class="container-fluid">
+  <div ng-repeat="choice in $ctrl.choices track by $index">
+    <md-checkbox ng-click="$ctrl.toggleSelection($index)"
+                 ng-model="$ctrl.selections[$index]"
+                 class="oppia-check-box" aria-label="choice">
+      <span>
+        <angular-html-bind class="protractor-test-html-item-select-option" html-data="choice.id">
+        </angular-html-bind>
+      </span>
+    </md-checkbox>
+  </div>
+</div>

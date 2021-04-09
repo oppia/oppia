@@ -63,6 +63,7 @@ from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
 from core.domain import user_services
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 import feconf
 
 from mapreduce import main as mapreduce_main
@@ -73,6 +74,11 @@ from webapp2_extras import routes
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
+
+# Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
+# Without this, a lot of unnecessary debug logs are printed in error logs,
+# which makes it tiresome to identify the actual error.
+logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -216,23 +222,25 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
+        r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
+    get_redirect_route(
         r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionreviewerhandler',
-        admin.AddContributionReviewerHandler),
+        r'/addcontributionrightshandler',
+        admin.AddContributionRightsHandler),
     get_redirect_route(
-        r'/removecontributionreviewerhandler',
-        admin.RemoveContributionReviewerHandler),
+        r'/removecontributionrightshandler',
+        admin.RemoveContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributionreviewershandler',
-        admin.ContributionReviewersListHandler),
+        r'/getcontributorusershandler',
+        admin.ContributorUsersListHandler),
     get_redirect_route(
-        r'/contributionreviewerrightsdatahandler',
-        admin.ContributionReviewerRightsDataHandler),
+        r'/contributionrightsdatahandler',
+        admin.ContributionRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
@@ -323,6 +331,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
+        skill_editor.SkillDescriptionHandler),
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
@@ -789,8 +800,15 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/numberofdeletionrequestshandler',
         admin.NumberOfDeletionRequestsHandler),
+    get_redirect_route(
+        r'/verifyusermodelsdeletedhandler',
+        admin.VerifyUserModelsDeletedHandler),
+    get_redirect_route(r'/deleteuserhandler', admin.DeleteUserHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
-    get_redirect_route(r'/logout', base.LogoutPage),
+
+    get_redirect_route(r'/session_begin', base.SessionBeginHandler),
+    get_redirect_route(r'/session_end', base.SessionEndHandler),
+    get_redirect_route(r'/seed_firebase', base.SeedFirebaseHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (
@@ -850,3 +868,5 @@ URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+
+firebase_auth_services.establish_firebase_connection()

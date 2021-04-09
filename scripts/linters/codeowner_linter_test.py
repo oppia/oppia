@@ -42,12 +42,16 @@ INVALID_MISSING_IMPORTANT_PATTERN_CODEOWNER_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_missing_important_pattern_codeowner')
 INVALID_MISSING_CODEOWNER_NAME_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_missing_codeowner_name')
+INVALID_INLINE_COMMENT_CODEOWNER_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_inline_comment_codeowner_filepath')
 INVALID_FULL_FILEPATH_CODEOWNER_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_path_codeowner')
 INVALID_WILDCARD_IN_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_wildcard_used_codeowner')
 INVALID_FILEPATH_MISSING_FROM_DIRECTORY = os.path.join(
     LINTER_TESTS_DIR, 'invalid_file_path_missing_codeowner')
+INVALID_FILEPATH_WITH_BLANKET_CODEOWNER_ONLY = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_file_path_with_blanket_codeowner_only')
 
 
 CODEOWNER_IMPORTANT_PATHS = [
@@ -74,7 +78,21 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 '.github/CODEOWNERS',
                 '.github/stale.yml']
 
+        def mock_listdir_with_blanket_codeowner_only_file(unused_arg):
+            return [
+                'manifest.json',
+                'package.json',
+                'yarn.lock',
+                'scripts/install_third_party_libs.py',
+                '.github/CODEOWNERS',
+                '.github/stale.yml',
+                'core/domain/new_file.py']
+
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        self.listdir_swap_file_with_blanket_codeowner_only = (
+            self.swap(
+                os, 'listdir', mock_listdir_with_blanket_codeowner_only_file)
+        )
 
     def test_missing_important_codeowner_path_from_list(self):
         # Remove '/.github/stale.yml' important path from the end of list
@@ -172,6 +190,38 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             ['SUCCESS  CODEOWNERS check passed'], lint_task_report.get_report())
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
+
+    def test_check_file_with_only_blanket_codeowner_defined_fails(self):
+        codeowner_swap = self.swap(
+            codeowner_linter, 'CODEOWNER_FILEPATH',
+            INVALID_FILEPATH_WITH_BLANKET_CODEOWNER_ONLY)
+
+        with self.listdir_swap_file_with_blanket_codeowner_only, codeowner_swap:
+            linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
+            lint_task_report = linter.check_codeowner_file()
+
+        error_message = (
+            './core/domain/new_file.py is not listed in the .github/CODEOWNERS '
+            'file.')
+        self.assert_same_list_elements(
+            error_message,
+            lint_task_report.trimmed_messages)
+        self.assertEqual('CODEOWNERS', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_check_invalid_inline_comment_codeowner_filepath(self):
+        codeowner_swap = self.swap(
+            codeowner_linter, 'CODEOWNER_FILEPATH',
+            INVALID_INLINE_COMMENT_CODEOWNER_FILEPATH)
+
+        with self.listdir_swap, codeowner_swap:
+            linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
+            lint_task_report = linter.check_codeowner_file()
+        self.assert_same_list_elements(
+            ['Please remove inline comment from line 17'],
+            lint_task_report.trimmed_messages)
+        self.assertEqual('CODEOWNERS', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_check_codeowner_file_without_codeowner_name(self):
         codeowner_swap = self.swap(

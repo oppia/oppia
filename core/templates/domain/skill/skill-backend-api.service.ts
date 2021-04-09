@@ -57,6 +57,10 @@ interface UpdateSkillBackendResponse {
   skill: SkillBackendDict;
 }
 
+interface DoesSkillWithDescriptionExistBackendResponse {
+  'skill_description_exists': boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -146,6 +150,31 @@ export class SkillBackendApiService {
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
+    });
+  }
+
+  private _doesSkillWithDescriptionExist(
+      description: string,
+      successCallback: (value?: boolean) => void,
+      errorCallback: (reason?: string) => void): void {
+    let skillDescriptionUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE, {
+        skill_description: description
+      });
+    this.http.get<DoesSkillWithDescriptionExistBackendResponse>(
+      skillDescriptionUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback(response.skill_description_exists);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
+  }
+
+  async doesSkillWithDescriptionExistAsync(description: string):
+      Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._doesSkillWithDescriptionExist(description, resolve, reject);
     });
   }
 }

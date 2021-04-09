@@ -43,31 +43,31 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/user.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
-    'DateTimeFormatService', 'DeviceInfoService',
+    '$http', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
+    'AlertsService', 'DateTimeFormatService', 'DeviceInfoService',
+    'FocusManagerService',
     'LearnerDashboardBackendApiService', 'LoaderService',
     'SuggestionModalForLearnerDashboardService',
     'ThreadStatusDisplayService', 'UrlInterpolationService',
-    'UserService', 'ACTIVITY_TYPE_COLLECTION',
-    'ACTIVITY_TYPE_EXPLORATION', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+    'UserService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
     'FATAL_ERROR_CODES', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $rootScope, $scope, $uibModal, AlertsService,
-        DateTimeFormatService, DeviceInfoService,
+        $http, $q, $rootScope, $timeout, $uibModal, $window,
+        AlertsService, DateTimeFormatService, DeviceInfoService,
+        FocusManagerService,
         LearnerDashboardBackendApiService, LoaderService,
         SuggestionModalForLearnerDashboardService,
         ThreadStatusDisplayService, UrlInterpolationService,
-        UserService, ACTIVITY_TYPE_COLLECTION,
-        ACTIVITY_TYPE_EXPLORATION, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+        UserService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
         FATAL_ERROR_CODES, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
         LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
@@ -232,44 +232,6 @@ angular.module('oppia').component('learnerDashboardPage', {
         return value;
       };
 
-      var getPlaylistSortableOptions = function(activityType) {
-        return {
-          'ui-floating': 'auto',
-          start: function(e, ui) {
-            ui.placeholder.height(ui.item.height());
-            $scope.$apply();
-          },
-          sort: function(e, ui) {
-            // Making top : 0px to avoid irregular change in position.
-            ui.helper.css(
-              // This throws "Unnecessarily quoted property 'top' found". We
-              // need to manually suppress this warning as the 'top' is a css
-              // property and we cannot pass it without using quotes around it.
-              /* eslint-disable-next-line quote-props */
-              {'top': '0 px'});
-          },
-          update: function(e, ui) {
-            var insertExpInLearnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl((
-                '/learnerplaylistactivityhandler/<activityType>/' +
-                '<activityId>'), {
-                activityType: activityType,
-                activityId: (
-                  ctrl.explorationPlaylist[ui.item.sortable.index].id)
-              }));
-
-            $http.post(insertExpInLearnerPlaylistUrl, {
-              index: ui.item.sortable.dropindex
-            });
-            $scope.$apply();
-          },
-          stop: function(e, ui) {
-            $scope.$apply();
-          },
-          axis: 'y'
-        };
-      };
-
       ctrl.onClickThread = function(
           threadStatus, explorationId, threadId, explorationTitle) {
         ctrl.loadingFeedbacks = true;
@@ -420,6 +382,14 @@ angular.module('oppia').component('learnerDashboardPage', {
         return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
           millisSinceEpoch);
       };
+
+      ctrl.addFocusWithoutScroll = function(label) {
+        FocusManagerService.setFocus(label);
+        $timeout(function() {
+          $window.scrollTo(0, 0);
+        }, 5);
+      };
+
       ctrl.$onInit = function() {
         ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
           EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -527,6 +497,12 @@ angular.module('oppia').component('learnerDashboardPage', {
 
         $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
           LoaderService.hideLoadingScreen();
+          // The $timeout is required because at execution time,
+          // the element may not be present in the DOM yet.Thus it ensure
+          // that the element is visible before focussing.
+          $timeout(() => {
+            ctrl.addFocusWithoutScroll('ourLessonsBtn');
+          }, 0);
         });
 
         ctrl.loadingFeedbacks = false;
@@ -534,11 +510,6 @@ angular.module('oppia').component('learnerDashboardPage', {
         ctrl.newMessage = {
           text: ''
         };
-
-        ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
-          ACTIVITY_TYPE_COLLECTION);
-        ctrl.explorationPlaylistSortableOptions = (
-          getPlaylistSortableOptions(ACTIVITY_TYPE_EXPLORATION));
       };
     }
   ]

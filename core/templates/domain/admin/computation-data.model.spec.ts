@@ -24,12 +24,12 @@ describe('Computation Data Model', () => {
       let backendDict = {
         is_stoppable: false,
         is_startable: true,
-        active_realtime_layer_index: null,
+        active_realtime_layer_index: '',
         computation_type: 'FeedbackAnalyticsAggregator',
         status_code: 'never_started',
-        last_started_msec: null,
-        last_finished_msec: null,
-        last_stopped_msec: null
+        last_started_msec: 0,
+        last_finished_msec: 0,
+        last_stopped_msec: 0
       };
 
       let computationData = ComputationData.createFromBackendDict(
@@ -37,12 +37,12 @@ describe('Computation Data Model', () => {
 
       expect(computationData.isStoppable).toEqual(false);
       expect(computationData.isStartable).toEqual(true);
-      expect(computationData.activeRealtimeLayerIndex).toEqual(null);
+      expect(computationData.activeRealtimeLayerIndex).toEqual('');
       expect(computationData.computationType).toEqual(
         'FeedbackAnalyticsAggregator');
       expect(computationData.statusCode).toEqual('never_started');
-      expect(computationData.lastStartedMsec).toEqual(null);
-      expect(computationData.lastFinishedMsec).toEqual(null);
-      expect(computationData.lastStoppedMsec).toEqual(null);
+      expect(computationData.lastStartedMsec).toEqual(0);
+      expect(computationData.lastFinishedMsec).toEqual(0);
+      expect(computationData.lastStoppedMsec).toEqual(0);
     });
 });

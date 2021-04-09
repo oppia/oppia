@@ -220,6 +220,10 @@ describe('Skill editor state service', () => {
 
   it('should report that a skill has loaded through loadSkill()',
     fakeAsync(() => {
+      spyOn(
+        fakeSkillRightsBackendApiService,
+        'fetchSkillRightsAsync'
+      ).and.callThrough();
       expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
       skillEditorStateService.loadSkill('skill_id_1');
       expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
