@@ -38,7 +38,9 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('components/state-editor/state-editor-properties-services/state-skill.service')
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-skill.service');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-name.service.ts');
@@ -61,7 +63,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service');
-require('services/context.service')
+require('services/context.service');
 
 import { Subscription } from 'rxjs';
 
@@ -94,18 +96,20 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$scope', 'ContextService', 'StateContentService', 'StateSkillService',
+        '$scope', 'ContextService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
         'StateNextContentIdIndexService',
-        'StateParamChangesService', 'StateSolicitAnswerDetailsService',
+        'StateParamChangesService', 'StateSkillService',
+        'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $scope, ContextService, StateContentService, StateSkillService,
+            $scope, ContextService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,
-            StateParamChangesService, StateSolicitAnswerDetailsService,
+            StateParamChangesService, StateSkillService,
+            StateSolicitAnswerDetailsService,
             StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -136,7 +140,8 @@ angular.module('oppia').directive('stateEditor', [
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
-            $scope.explorationIsLinkedToStory = ContextService.isExplorationLinkedToStory();
+            $scope.explorationIsLinkedToStory =
+              ContextService.isExplorationLinkedToStory();
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {
@@ -159,7 +164,7 @@ angular.module('oppia').directive('stateEditor', [
                   StateContentService.init(
                     $scope.stateName, stateData.content);
                   StateSkillService.init(
-                    $scope.stateName, stateData.linkedSkillId)
+                    $scope.stateName, stateData.linkedSkillId);
                   StateHintsService.init(
                     $scope.stateName, stateData.interaction.hints);
                   StateInteractionIdService.init(

@@ -2735,13 +2735,11 @@ title: Title
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V48
 
-    
     def test_load_from_v47(self):
         """Test direct loading from a v47 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V47)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""

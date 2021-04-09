@@ -39,10 +39,12 @@ angular.module('oppia').directive('stateSkillEditor', [
         '/components/state-editor/state-skill-editor/' +
         'state-skill-editor.directive.html'),
       controller: [
-        '$http', '$scope', '$uibModal', 'AlertsService', 'StateNextContentIdIndexService', 'StateSkillService',
+        '$http', '$scope', '$uibModal', 'AlertsService',
+        'StateNextContentIdIndexService', 'StateSkillService',
         'WindowDimensionsService',
         function(
-            $http, $scope, $uibModal, AlertsService, StateNextContentIdIndexService, StateSkillService,
+            $http, $scope, $uibModal, AlertsService,
+            StateNextContentIdIndexService, StateSkillService,
             WindowDimensionsService) {
           var ctrl = this;
           var categorizedSkills = null;
@@ -96,9 +98,9 @@ angular.module('oppia').directive('stateSkillEditor', [
               size: 'xl'
             }).result.then(function(result) {
               try {
-                StateSkillService.displayed = result.id
-                StateSkillService.saveDisplayedValue()
-                $scope.onSaveLinkedSkillId(result.id)
+                StateSkillService.displayed = result.id;
+                StateSkillService.saveDisplayedValue();
+                $scope.onSaveLinkedSkillId(result.id);
                 StateNextContentIdIndexService.saveDisplayedValue();
                 $scope.onSaveNextContentIdIndex(
                   StateNextContentIdIndexService.displayed);
@@ -122,16 +124,16 @@ angular.module('oppia').directive('stateSkillEditor', [
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
-                StateSkillService.displayed = null
-                StateSkillService.saveDisplayedValue()
-                $scope.onSaveLinkedSkillId(StateSkillService.displayed)
+              StateSkillService.displayed = null;
+              StateSkillService.saveDisplayedValue();
+              $scope.onSaveLinkedSkillId(StateSkillService.displayed);
             }, function() {
               AlertsService.clearWarnings();
             });
           };
 
           $scope.getSkillEditorUrl = function() {
-            if(StateSkillService.displayed){
+            if (StateSkillService.displayed) {
               return '/skill_editor/' + StateSkillService.displayed;
             }
           };
@@ -141,7 +143,7 @@ angular.module('oppia').directive('stateSkillEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.StateSkillService = StateSkillService
+            $scope.StateSkillService = StateSkillService;
             $scope.skillCardIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.skillDescription = null;

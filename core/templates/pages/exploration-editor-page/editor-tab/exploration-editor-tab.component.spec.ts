@@ -435,12 +435,12 @@ describe('Exploration editor tab component', function() {
     stateEditorService.setActiveStateName('First State');
     expect(
       explorationStatesService.getState('First State').linkedSkillId
-    ).toEqual(null)
+    ).toEqual(null);
 
     ctrl.saveLinkedSkillId('skill_id1');
     expect(
       explorationStatesService.getState('First State').linkedSkillId
-    ).toBe('skill_id1')
+    ).toBe('skill_id1');
   });
 
   it('should save interaction answer groups', function() {

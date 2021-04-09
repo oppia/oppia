@@ -382,7 +382,7 @@ import { StateCardObjectFactory } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
-import {StateSkillService} from 'components/state-editor/state-editor-properties-services/state-skill.service'
+import {StateSkillService} from 'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';

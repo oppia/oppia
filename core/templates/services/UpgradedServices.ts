@@ -397,7 +397,8 @@ import { StateClassifierMappingService } from
 import { StateContentService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-content.service';
-import { StateSkillService } from 
+import { StateSkillService } from
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len

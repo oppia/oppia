@@ -1661,15 +1661,17 @@ class Exploration(python_utils.OBJECT):
                                         choices))
 
         return states_dict
-    
+
     @classmethod
     def _convert_states_v42_dict_to_v43_dict(cls, states_dict):
         """Converts from version 42 to 43. Version 43 contains
         linked skil id.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -1716,13 +1718,15 @@ class Exploration(python_utils.OBJECT):
     def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
         """Converts a v47 exploration dict into a v48 exploration dict.
         Version 48 contains linked skill id to exploration state.
-        
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v47.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v48."""
+            following schema version v48.
+        """
 
         exploration_dict['schema_version'] = 48
 

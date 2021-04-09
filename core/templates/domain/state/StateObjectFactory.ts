@@ -69,10 +69,11 @@ export class State {
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
   constructor(
-      name: string, classifierModelId: string, linkedSkillId: string, content: SubtitledHtml,
-      interaction: Interaction, paramChanges: ParamChange[],
-      recordedVoiceovers: RecordedVoiceovers, solicitAnswerDetails: boolean,
-      writtenTranslations: WrittenTranslations, nextContentIdIndex: number) {
+      name: string, classifierModelId: string, linkedSkillId: string,
+      content: SubtitledHtml, interaction: Interaction,
+      paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
+      solicitAnswerDetails: boolean, writtenTranslations: WrittenTranslations,
+      nextContentIdIndex: number) {
     this.name = name;
     this.classifierModelId = classifierModelId;
     this.linkedSkillId = linkedSkillId;

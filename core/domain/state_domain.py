@@ -2303,7 +2303,8 @@ class State(python_utils.OBJECT):
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
             written_translations, solicit_answer_details,
-            next_content_id_index, linked_skill_id=None, classifier_model_id=None):
+            next_content_id_index, linked_skill_id=None,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:

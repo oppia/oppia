@@ -1038,9 +1038,9 @@ class Question(python_utils.OBJECT):
         linked skil id.
 
         Args:
-            question_state_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
 
         Returns:
             dict. The converted states_dict.

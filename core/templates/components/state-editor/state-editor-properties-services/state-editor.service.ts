@@ -168,11 +168,11 @@ export class StateEditorService {
   }
 
   setLinkedSkillId(newLinkedSkillId: string): void {
-    this.linkedSkillId = newLinkedSkillId
+    this.linkedSkillId = newLinkedSkillId;
   }
 
   getLinkedSkillId(): string {
-    return this.linkedSkillId
+    return this.linkedSkillId;
   }
 
   setInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {

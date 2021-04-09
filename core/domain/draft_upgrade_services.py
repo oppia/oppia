@@ -117,11 +117,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
 
         for change in draft_change_list:
             if (change.property_name ==
-                exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
                 raise InvalidDraftConversionException(
-                'Conversion cannot be completed.')
+                    'Conversion cannot be completed.')
         return draft_change_list
-
 
     @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, draft_change_list):
