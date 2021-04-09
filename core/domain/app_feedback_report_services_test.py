@@ -234,15 +234,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_scrubbed(
             scrubbed_android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
-    # def _run_one_off_job(self):
-    #     # Helper function to create, enqueue, and process a new job instance.
-    #     job_id = self.job_class.create_new()
-    #     self.job_class.enqueue(job_id)
-    #     self.process_and_flush_pending_mapreduce_tasks()
-
-    #     output = self.job_class.get_output(job_id)
-    #     self.assertEqual(output, [])
-
     def _verify_report_is_scrubbed(self, model_entity, scrubber):
         self.assertIsNotNone(model_entity)
         self.assertEqual(
