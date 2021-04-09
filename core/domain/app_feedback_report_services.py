@@ -158,18 +158,18 @@ def store_incoming_report_stats(report_obj):
     unticketed_stats_entity = (
         app_feedback_report_models.AppFeedbackReportStats.get_by_id(
             unticketed_stats_entity_id))
-    _add_report_to_stats_model_in_transaction(
-        unticketed_stats_entity, platform, date)
+    _update_report_stats_model_in_transaction(
+        unticketed_stats_entity, platform, date,report_obj, delta)
     all_report_stats_entity = (
         app_feedback_report_models.AppFeedbackReportStats.get_by_id(
             all_reports_entity_id))
-    _add_report_to_stats_model_in_transaction(
-        all_report_stats_entity, platform, date)
+    _update_report_stats_model_in_transaction(
+        all_report_stats_entity, platform, date, report_obj, delta)
 
 
 @transaction_services.run_in_transaction_wrapper
-def _add_report_to_stats_model_in_transaction(
-        stats_model, platform, date, report_obj):
+def _update_report_stats_model_in_transaction(
+        stats_model, platform, date, report_obj, delta):
     """Adds a new report's stats to the stats model.
 
     Args:
@@ -178,6 +178,8 @@ def _add_report_to_stats_model_in_transaction(
         platform: str. The platform of the report being aggregated.
         date: datetime.date. The date of the stats.
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
+        delta: The amount to increment the stats by, depending on if the report
+            is added or removed form the model.
     """
     parameter_names = app_feedback_report_domain.STATS_PARAMETER_NAMES
     # The stats we want to aggregate on.
@@ -191,12 +193,15 @@ def _add_report_to_stats_model_in_transaction(
     version_name = report_obj.device_system_context.version_name
 
     if stats_model is None:
+        if delta < 0:
+            raise utils.InvalidInputException(
+                'Cannot decrement counts from a stats model without reports.')
         # Create new stats model entity. These are the individual report fields
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
             parameter_names.report_type: {
-                report_type: 1 
+                report_type: 1 ]
             },
             parameter_names.country_locale_code:{
                 country_locale_code: 1
@@ -221,7 +226,7 @@ def _add_report_to_stats_model_in_transaction(
             stats_entity_id, PLATFORM_ANDROID, unticketed_id, stats_date, 1,
             stat_dict)
     else:
-        # Add report to existing stats model.
+        # Update existing stats model.
         stats_dict = stats_model.daily_param_stats
         _add_stats_count_for_parameter_value_to_stats_dict(
             stats_dict, parameter_names.report_type, report_type)
@@ -229,27 +234,28 @@ def _add_report_to_stats_model_in_transaction(
         stats_dict[parameter_names.country_locale_code][country_locale_code] = (
             _calculate_new_stats_count_for_parameter(
                 stats_dict[parameter_names.country_locale_code][
-                    country_locale_code]))
+                    country_locale_code], delta))
         stats_dict[parameter_names.entry_point_name][entry_point_name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.entry_point_name][entry_point_name]))
+                stats_dict[parameter_names.entry_point_name][entry_point_name],
+                delta))
         stats_dict[parameter_names.audio_language_code][audio_language_code] = (
             _calculate_new_stats_count_for_parameter(
                 stats_dict[parameter_names.audio_language_code][
-                    audio_language_code]))
+                    audio_language_code], delta))
         stats_dict[parameter_names.text_language_code][text_language_code] = (
             _calculate_new_stats_count_for_parameter(
                 stats_dict[parameter_names.text_language_code][
-                    text_language_code]))
+                    text_language_code], delta))
         stats_dict[parameter_names.sdk_version][sdk_version] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.sdk_version][sdk_version]))
+                stats_dict[parameter_names.sdk_version][sdk_version], delta))
         stats_dict[parameter_names.version_name][version_name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.version_name][version_name]))
+                stats_dict[parameter_names.version_name][version_name], delta))
 
         stats_model.daily_param_stats = stats_dict
-        stats_model.total_reports_submitted += 1
+        stats_model.total_reports_submitted += delta
         if (
             report_obj.submitted_on_datetime > 
             stats_model.newest_report_creation_timestamp):
@@ -260,20 +266,26 @@ def _add_report_to_stats_model_in_transaction(
         stats_model.put()
 
 
-def _calculate_new_stats_count_for_parameter(current_count):
+def _calculate_new_stats_count_for_parameter(current_count, delta):
     """Helper to increment or initialize the stats count for a parameter.
 
     Args:
         current_count: int|None. The current report count for a given report, or
             None of there are no reports that satisfied the given value.
+        delta: int. The amount to increment the current count by, either -1 or
+            +1.
     Returns:
         int. The new report count to put into the stats dict for a single
         parameter value.
     """
     if current_count is None:
+        if delta < 0:
+            raise utils.InvalidInputException(
+                'Cannot decrement a count for a parameter value that does not '
+                'exist for this stats model.')
         return 1
     else:
-        return current_count + 1
+        return current_count + delta
 
 
 def get_report_from_model(report_model):
@@ -569,38 +581,6 @@ def _save_android_app_feedback_report(report):
         model_entity.put()
 
 
-@transaction_services.run_in_transaction_wrapper
-def _scrub_single_report_in_transaction(report_id, scrubbed_by):
-    """See scrub_report for general documentation of what this method does.
-    It's only safe to call this method from within a transaction.
-
-    Args:
-        report_id: str. The id of the model entity to scrub.
-        scrubbed_by: str. The id of the user that is initiating scrubbing of
-            this report, or a constant
-            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
-            job.
-    """
-    report_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-        report_id)
-    if not report_entity:
-        raise Exception(
-            'The AppFeedbackReportModel trying to be scrubbed does not '
-            'exist.')
-    if report_entity.platform == (
-            app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
-        scrubbed_report_info = _scrub_report_info_dict(
-            report_entity.android_report_info)
-        report_entity.android_report_info = scrubbed_report_info
-    else:
-        scrubbed_report_info = _scrub_report_info_dict(
-            report_entity.web_report_info)
-        report_entity.web_report_info = scrubbed_report_info
-    report_entity.scrubbed_by = scrubbed_by
-    report_entity.update_timestamps()
-    report_entity.put()
-
-
 def _scrub_report_info_dict(report_info_dict):
     """Scrubs the dictionary of any fields that contains input directly from
     the user.
@@ -637,13 +617,63 @@ def get_all_filter_options():
 
 
 def reassign_ticket(report, new_ticket):
-    """Fetches all the possible values that moderators can filter reports or
-    tickets by.
+    """Reassign the ticket the report is in.
+
+    Args:
+        ticket: AppFeedbackReportTicket|None. The ID of the ticket to reassign
+            the report to or None if removing the report form a ticket wihtout
+            reassigning.
+    """
+    models = app_feedback_report_models
+    ticket_id = report.ticket_id
+    if ticket_id is None:
+        # Remove from the unticketed report stats.
+        ticket_id = models.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+
+    platform = report.platform
+    stats_date = report.submitted_on_datetime.date()
+    stats_id_to_decrement = models.AppFeedbackReportStatsModel.calculate_id(
+            platform, unticketed_ticket_id, stats_date)
+    stats_model_to_decrement = models.AppFeedbackReportStatsModel.get_by_id(
+        stats_id_to_decrement)
+    _update_report_stats_model_in_transaction(
+        stats_model_to_decrement, platform, stats_date, report, -1)
+
+    new_ticket_id = models.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    if new_ticket is not None:
+        new_ticket_id = ticket.ticket_id
+    
+    stats_id_to_increment = models.AppFeedbackReportStatsModel.calculate_id(
+        platform, new_ticket_id, stats_date)
+    stats_model_to_increment = models.AppFeedbackReportStatsModel.get_by_id(
+        stats_id_to_increment)
+    _update_report_stats_model_in_transaction(
+        stats_model_to_increment, platform, stats_date, report, 1)
+
+
+def edit_ticket_name(ticket, new_name):
+    """Updates the ticket name.
 
     Returns:
-        list(AppFeedbackReportFilter). A list of filters and the possible values
-        they can have.
+        ticket: AppFeedbackReportTicket. The domain object for a ticket.
+        new_name: str. The new name to assign the ticket.
     """
+    ticket.ticket_name = name
+    _save_ticket(ticket)
+
+
+def _save_ticket(ticket):
+    """Saves the ticket to persistent storage.
+
+    Returns:
+        ticket: AppFeedbackReportTicket. The domain object for a ticket to save
+            in storage.
+    """
+    ticket_model = app_feedback_report_models.AppFeedbackReportTicket.get_by_id(
+        ticket.id)
+    ticket_model.ticket_name = ticket.ticket_name
+    ticket_model.update_timestamps()
+    ticket_model.put()
 
 
 # // Called when updates a ticket name. Updates the entity in the
@@ -670,3 +700,35 @@ def reassign_ticket(report, new_ticket):
 # // AndroidFeedbackReportModel based on the a constant
 # // ALLOWED_ANDROID_REPORT_FILTERS
 # def get_all_filter_options() : FeedbackReportFilter
+
+
+
+# def _scrub_single_report_in_transaction(report_id, scrubbed_by):
+#     """See scrub_report for general documentation of what this method does.
+#     It's only safe to call this method from within a transaction.
+
+#     Args:
+#         report_id: str. The id of the model entity to scrub.
+#         scrubbed_by: str. The id of the user that is initiating scrubbing of
+#             this report, or a constant
+#             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
+#             job.
+#     """
+#     report_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+#         report_id)
+#     if not report_entity:
+#         raise Exception(
+#             'The AppFeedbackReportModel trying to be scrubbed does not '
+#             'exist.')
+#     if report_entity.platform == (
+#             app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
+#         scrubbed_report_info = _scrub_report_info_dict(
+#             report_entity.android_report_info)
+#         report_entity.android_report_info = scrubbed_report_info
+#     else:
+#         scrubbed_report_info = _scrub_report_info_dict(
+#             report_entity.web_report_info)
+#         report_entity.web_report_info = scrubbed_report_info
+#     report_entity.scrubbed_by = scrubbed_by
+#     report_entity.update_timestamps()
+#     report_entity.put()
