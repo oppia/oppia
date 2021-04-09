@@ -219,7 +219,6 @@ angular.module('oppia').directive('stateHintsEditor', [
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
             $scope.StateHintsService = StateHintsService;
-            console.log(StateHintsService.displayed)
             $scope.hintCardIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             StateHintsService.setActiveHintIndex(null);

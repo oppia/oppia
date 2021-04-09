@@ -171,6 +171,10 @@ export class StateEditorService {
     this.linkedSkillId = newLinkedSkillId
   }
 
+  getLinkedSkillId(): string {
+    return this.linkedSkillId
+  }
+
   setInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
     this.interaction.setAnswerGroups(newAnswerGroups);
   }

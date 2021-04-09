@@ -194,7 +194,6 @@ angular.module('oppia').component('explorationEditorTab', {
       };
 
       ctrl.saveLinkedSkillId = function(displayedValue) {
-        console.log('Inside savedLink', displayedValue)
         ExplorationStatesService.saveLinkedSkillId(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));

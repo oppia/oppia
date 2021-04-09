@@ -142,7 +142,6 @@ angular.module('oppia').directive('stateSkillEditor', [
 
           ctrl.$onInit = function() {
             $scope.StateSkillService = StateSkillService
-            console.log(StateSkillService.displayed)
             $scope.skillCardIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.skillDescription = null;
