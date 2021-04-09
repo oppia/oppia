@@ -431,6 +431,18 @@ describe('Exploration editor tab component', function() {
     ).toBe(2);
   });
 
+  it('should save linked skill id', function() {
+    stateEditorService.setActiveStateName('First State');
+    expect(
+      explorationStatesService.getState('First State').linkedSkillId
+    ).toEqual(null)
+
+    ctrl.saveLinkedSkillId('skill_1');
+    expect(
+      explorationStatesService.getState('First State').linkedSkillId
+    ).toBe('skill_1')
+  });
+
   it('should save interaction answer groups', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
