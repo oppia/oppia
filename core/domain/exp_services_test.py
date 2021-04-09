@@ -4372,7 +4372,7 @@ title: Old Title
 
         with self.assertRaisesRegexp(
             Exception,
-            'Sorry, we can only process v42-v%d exploration state schemas at '
+            'Sorry, we can only process v41-v%d exploration state schemas at '
             'present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
             exp_fetchers.get_exploration_from_model(exp_model)
 
