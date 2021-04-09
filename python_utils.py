@@ -284,10 +284,10 @@ def url_encode(query, doseq=False):
         str. The 'url-encoded' string.
     """
     try:
-        import urllib.parse as urlparse_urlencode
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib as urlparse_urlencode
-    return urlparse_urlencode.urlencode(query, doseq)
+        import urllib as urlparse
+    return urlparse.urlencode(query, doseq)
 
 
 def url_retrieve(source_url, filename=None):
