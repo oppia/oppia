@@ -724,15 +724,13 @@ class UserContributionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # IDs of explorations that this user has created
-    # Includes subsequently deleted and private explorations.
+    # IDs of explorations that this user has created.
     created_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, default=None)
+        repeated=True, indexed=True)
     # IDs of explorations that this user has made a positive
     # (i.e. non-revert) commit to.
-    # Includes subsequently deleted and private explorations.
     edited_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, default=None)
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
