@@ -156,4 +156,4 @@ class InvalidCommitTypeError(BaseAuditError):
     def __init__(self, model):
         super(InvalidCommitTypeError, self).__init__(model)
         self.message = (
-            'Commit type %s is not allowed'% model.commit_type)
+            'Commit type %s is not allowed' % model.commit_type)
