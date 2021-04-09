@@ -138,20 +138,20 @@ def store_incoming_report_stats(report_obj):
         raise NotImplementedError(
             'Stats aggregation for incoming web reports have not been '
             'implemented yet.')
-    else:
-        platform = PLATFORM_ANDROID
-        model_class = models
-        unticketed_id = (
-            model_class.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
-        all_reports_id = model_class.ALL_ANDROID_REPORTS_STATS_TICKET_ID
 
-        stats_date = report_obj.submitted_on_timestamp.date()
-        unticketed_stats_entity_id = (
-            app_feedback_report_models.AppFeedbackReportStats.calculate_id(
-                platform, unticketed_id, stats_date))
-        all_reports_entity_id = (
-            app_feedback_report_models.AppFeedbackReportStats.calculate_id(
-                platform, all_reports_id, stats_date))
+    model_class = app_feedback_report_models
+    platform = PLATFORM_ANDROID
+    unticketed_id = (
+        model_class.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
+    all_reports_id = model_class.ALL_ANDROID_REPORTS_STATS_TICKET_ID
+
+    stats_date = report_obj.submitted_on_timestamp.date()
+    unticketed_stats_entity_id = (
+        app_feedback_report_models.AppFeedbackReportStats.calculate_id(
+            platform, unticketed_id, stats_date))
+    all_reports_entity_id = (
+        app_feedback_report_models.AppFeedbackReportStats.calculate_id(
+            platform, all_reports_id, stats_date))
 
     # Add new report to the stats models for unticketed reports and all reports.
     unticketed_stats_entity = (
@@ -222,7 +222,7 @@ def _update_report_stats_model_in_transaction(
             }
         }
         app_feedback_report_models.AppFeedbackReportStats.create(
-            stats_entity_id, PLATFORM_ANDROID, unticketed_id, stats_date, 1,
+            stats_entity_id, platform, unticketed_id, stats_date, 1,
             stat_dict)
     else:
         # Update existing stats model.
@@ -394,8 +394,7 @@ def _get_android_report_from_model(android_report_model):
     user_supplied_feedback = app_feedback_report_domain.UserSuppliedFeedback(
         android_report_model.report_type, android_report_model.category,
         report_info_dict['user_feedback_selected_items'],
-        report_info_dict['user_feedback_other_text_input']
-    )
+        report_info_dict['user_feedback_other_text_input'])
     device_system_context = (
         app_feedback_report_domain.AndroidDeviceSystemContext(
             android_report_model.platform_version,

@@ -56,7 +56,9 @@ FILTER_FIELD_NAMES = utils.create_enum(
     'android_device_country_locale_code')
 
 MINIMUM_ANDROID_SDK_VERSION = 2
-ANDROID_TEXT_SIZE = utils.create_enum('small', 'medium', 'large', 'extra_large')
+ANDROID_TEXT_SIZE = utils.create_enum(
+    'text_size_unspecified', 'small_text_size', 'medium_text_size',
+    'large_text_size', 'extra_large_text_size')
 ANDROID_ENTRY_POINT = [
     ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
     ENTRY_POINT.revision_card, ENTRY_POINT.crash]
@@ -93,7 +95,17 @@ ALLOWED_ANDROID_NETWORK_TYPES = [
     ANDROID_NETWORK_TYPES.wifi, ANDROID_NETWORK_TYPES.cellular,
     ANDROID_NETWORK_TYPES.none]
 
+ALLOWED_ANDROID_TEXT_SIZES = [
+    ANDROID_TEXT_SIZE.text_size_unspecified, ANDROID_TEXT_SIZE.small_text_size,
+    ANDROID_TEXT_SIZE.medium_text_size, ANDROID_TEXT_SIZE.large_text_size,
+    ANDROID_TEXT_SIZE.extra_large_text_size]
+
 MAXIMUM_TICKET_NAME_LENGTH = 100
+PLATFORM_ANDROID = (
+    app_feedback_report_models.PLATFORM_CHOICE_ANDROID)
+PLATFORM_WEB = (
+    app_feedback_report_models.PLATFORM_CHOICE_WEB)
+
 
 class AppFeedbackReport(python_utils.OBJECT):
     """Domain object for a single feedback report."""
@@ -175,14 +187,14 @@ class AppFeedbackReport(python_utils.OBJECT):
 
         self.user_supplied_feedback.validate()
 
-        if platform == app_feedback_report_models.PLATFORM_ANDROID and (
-            not isinstance(
-                self.user_supplied_feedback, AndroidDeviceSystemContext)):
-                raise utils.ValidationError(
-                    'Expected device and system context to be of type '
-                    'AndroidDeviceSystemContext for platform %s, '
-                    'received: %r' % self.platform, self.device_system_context)
-        elif platform == app_feedback_report_models.PLATFORM_CHOICE_WEB:
+        if self.platform == PLATFORM_ANDROID and not isinstance(
+            self.device_system_context, AndroidDeviceSystemContext):
+            raise utils.ValidationError(
+                'Expected device and system context to be of type '
+                'AndroidDeviceSystemContext for platform %s, '
+                'received: %r' % (
+                    self.platform, self.device_system_context.__class__))
+        elif self.platform == PLATFORM_WEB:
             raise NotImplementedError(
                 'Subclasses of DeviceSystemContext for web systems should '
                 'implement domain validation.')
@@ -205,7 +217,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         """
         minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
         current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
-        if platform == app_feedback_report_models.PLATFORM_CHOICE_WEB:
+        if platform == PLATFORM_WEB:
             minimum_schema = feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION
             current_schema = feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION
         if not isinstance(schema_version, int) or schema_version <= 0:
@@ -218,7 +230,6 @@ class AppFeedbackReport(python_utils.OBJECT):
                 'The supported report schema versions for %s reports are '
                 '[%d, %d], received: %d.' % (
                     platform, minimum_schema, current_schema, schema_version))
-
 
     @classmethod
     def require_valid_platform(cls, platform):
@@ -235,8 +246,8 @@ class AppFeedbackReport(python_utils.OBJECT):
             raise utils.ValidationError('No platform supplied.')
         if platform not in app_feedback_report_models.PLATFORM_CHOICES:
             raise utils.ValidationError(
-                'Report platform should be \'web\' or \'android\', received: '
-                '%s' % platform)
+                'Report platform should be one of %s, received: %s' % (
+                    app_feedback_report_models.PLATFORM_CHOICES, platform))
 
     @classmethod
     def require_valid_scrubber_id(scrubber_id):
@@ -268,8 +279,8 @@ class AppFeedbackReport(python_utils.OBJECT):
         if submission_datetime < feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME:
             raise utils.ValidationError(
                 'Report submission timestamp %s should be later than '
-                '%s' % submission_datetime.isoformat(), (
-                    feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.isoformat()))
+                '%s' % (submission_datetime.isoformat(), (
+                    feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.isoformat())))
 
 
 class UserSuppliedFeedback(python_utils.OBJECT):
@@ -323,7 +334,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         self.require_valid_category(self.category)
         self.require_valid_user_feedback_items_for_category(
             self.category, self.user_feedback_selected_items,
-            self.user_feedback_selected_items)
+            self.user_feedback_other_text_input)
 
     @classmethod
     def require_valid_report_type(cls, report_type):
@@ -382,19 +393,19 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         if category in ALLOWED_SELECTION_ITEMS_CATEGORIES:
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
-            self.require_valid_selected_items_for_category(
+            cls.require_valid_selected_items_for_category(
                 category, selected_items)
-            if self._selected_items_include_other(selected_items):
+            if cls._selected_items_include_other(selected_items):
                 # If the user selects an 'other' option in their list of
                 # selection options, validate the input text.
-                self.require_valid_other_text_input_for_category(
+                cls.require_valid_other_text_input_for_category(
                     category, other_text_input)
             else:
                 # Report cannot have any input text in this report.
                 if other_text_input is not None:
                     raise utils.ValidationError(
                         'Report cannot have other input text %r for '
-                        'category %r.' % other_text_input, category)
+                        'category %r.' % (other_text_input, category))
 
         # If the report category only allows users to provide input text,
         # validate that the user_feedback_selected_items is None and that
@@ -406,9 +417,9 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                         category))
             if other_text_input is None:
                 raise utils.ValidationError(
-                    'Category %r with \'other\' selected requires  text input'
-                    ' provided by the user.' % category)
-            self.require_valid_other_text_input_for_category(
+                    'Category %r with \'other\' selected requires text input '
+                    'provided by the user.' % category)
+            cls.require_valid_other_text_input_for_category(
                 category, other_text_input)
 
     @classmethod
@@ -586,7 +597,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
         if self.device_model is None:
             raise utils.ValidationError('No device model supplied.')
-        if not isinstance(self.device_model, python_utils):
+        if not isinstance(self.device_model, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Android device model must be an string, received: %r.' % (
                     country_locale_code))
@@ -666,11 +677,11 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if not isinstance(locale_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'The device\'s %s locale code must be an string, '
-                'received: %r.' % locale_type, locale_code)
-        if not self._match_locale_code_string(locale_code):
+                'received: %r.' % (locale_type, locale_code))
+        if not cls._match_locale_code_string(locale_code):
             raise utils.ValidationError(
                 'The device\'s %s locale code is not a valid string, '
-                'received: %s.' % locale_type, locale_code)
+                'received: %s.' % (locale_type, locale_code))
 
     @classmethod
     def _match_locale_code_string(cls, code):
@@ -683,8 +694,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             bool. Whether the given code is valid. Valid codes are alphabetic
             string that may contain a number of single hyphens.
         """
-        regex_string = r'\w+(?:-\w+)+'
-        # regex_string = r'[a-z]+(-?)[a-z]+$'
+        regex_string = r'([a-z][-]?[a-z])+'
         return re.compile(regex_string).match(code.lower())
     
     @classmethod
@@ -764,271 +774,12 @@ class AppContext(python_utils.OBJECT):
         """Validates this AppContext domain object.
 
         Raises:
-            ValidationError. One or more attributes of the
-                AppContext are not valid.
-        """
-        self.entry_point.validate()
-        self.require_valid_language_code('text', self.text_language_code)
-        self.require_valid_language_code('audio', self.audio_language_code)
-
-    @classmethod
-    def require_valid_language_code(self, language_type, language_code):
-        """Checks that the language code is valid
-
-        Args:
-            language_type: str. The type of language code being validates,
-                either 'text' or 'audio'.
-            language_code: str. The language code being validated, as determined
-                by the Oppia app.
-        Raises:
-            ValidationError. The given code is not valid.
-        """
-        if language_code is None:
-            raise utils.ValidationError(
-                'No app %s language code supplied.' % language_type)
-        if not isinstance(language_code, int):
-            raise utils.ValidationError(
-                'Expected the app\'s %s language code to be a string, '
-                'received: %r' % (language_type, language_code))
-        if not self._match_language_code_string(language_code):
-            raise utils.ValidationError(
-                'The app\'s %s language code is not a valid string, '
-                'received: %s.' % (language_type, language_code))
-
-    @classmethod
-    def _match_language_code_string(cls, code):
-        """Helper that checks whether the given language code is a valid code.
-
-        Args:
-            code: str. The language code set on the app.
-        Raises:
-            bool. Whether the given code is valid. Valid codes are alphabetic
-            string that may contain a number of single hyphens.
-        """
-        regex_string = r'\w+(?:-\w+)+'
-        return re.compile(regex_string).match(code)
-
-
-class EntryPoint(python_utils.OBJECT):
-    """Domain object for the entry point used to initiate the feedback report.
-    """
-
-    def __init__(
-            self, entry_point_name, topic_id, story_id,
-            exploration_id, subtopic_id):
-        """Constructs an EntryPoint domain object.
-
-        Args:
-            entry_point_name: str. The user-readable name of the entry point
-                used, corresponding to an ENTRY_POINT enum.
-        """
-        self.entry_point_name = entry_point_name
-        self.topic_id = topic_id
-        self.story_id = story_id
-        self.exploration_id = exploration_id
-        self.subtopic_id = subtopic_id
-
-    def to_dict():
-        """Returns a dict representing this NavigationDrawerEntryPoint domain
-        object.
-
-        Raises:
-            NotImplementedError. Subclasses should implement their own dict
-                representations.
+            NotImplementedError. Subclasses should implement their own
+                validation checks.
         """
         raise NotImplementedError(
-            'Subclasses of EntryPoint should implement their own dict '
-            'representations.')
-
-
-class NavigationDrawerEntryPoint(EntryPoint):
-    """Domain object for the Android navigation drawer entry point."""
-
-    def __init__(self):
-        """Constructs an NavigationDrawerEntryPoint domain object."""
-        super(NavigationDrawerEntryPoint, self).__init__(
-            ENTRY_POINT.navigation_drawer, None, None, None, None)
-
-    def to_dict():
-        """Returns a dict representing this NavigationDrawerEntryPoint domain
-        object.
-
-        Returns:
-            dict. A dict, mapping all fields of NavigationDrawerEntryPoint
-            instance.
-        """
-        return {
-            'entry_point_name': self.entry_point_name
-        }
-
-
-class LessonPlayerEntryPoint(EntryPoint):
-    """Domain object for the lesson player entry point."""
-
-    def __init__(self, topic_id, story_id, exploration_id):
-        """Constructs an LessonPlayerEntryPoint domain object.
-
-        Args:
-            topic_id: str. The unique ID for the current topic the user is
-                playing when intiating the report.
-            story_id: str. The unique ID for the current story the user is
-                playing when intiating the report.
-            exploration_id: str. The unique ID for the current exploration the
-                user is playing when intiating the report.
-        """
-        super(LessonPlayerEntryPoint, self).__init__(
-            entry_point_name=ENTRY_POINT.lesson_player, topic_id=topic_id,
-            story_id=story_id, exploration_id=exploration_id, subtopic_id=None)
-
-    def to_dict():
-        """Returns a dict representing this LessonPlayerEntryPoint domain
-        object.
-
-        Returns:
-            dict. A dict, mapping all fields of LessonPlayerEntryPoint instance.
-        """
-        return {
-            'entry_point_name': self.entry_point_name,
-            'topic_id': self.topic_id,
-            'story_id': self.story_id,
-            'exploration_id': self.exploration_id
-        }
-
-    def validate(self):
-        """Validates this LessonPlayerEntryPoint domain object.
-
-        Raises:
-            ValidationError. One or more attributes of the
-                LessonPlayerEntryPoint are not valid.
-        """
-        self.require_valid_entry_point_name(self.entry_point_name)
-        topic_domain.require_valid_topic_id(self.topic_id)
-        story_domain.require_valid_story_id(self.story_id)
-        self.require_valid_entry_point_exploration(
-            self.exploration_id, self.story_id)
-    
-    @classmethod
-    def require_valid_entry_point_name(cls, entry_point_name):
-        """Validates this LessonPlayerEntryPoint name.
-
-        Args:
-            entry_point_name: str. The name used for this entry point object.
-        Raises:
-            ValidationError. The name is not valid for the type.
-        """
-        if entry_point_name is None:
-            raise utils.ValidationError('No entry point name supplied.')
-        if not isinstance(entry_point_name, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Entry point name must be a string, received: %r.' % (
-                    entry_point_name))
-        if entry_point_name is not ENTRY_POINT.lesson_player:
-            raise utils.ValidationError(
-                'Invalid emtry point name, received: %s.' % entry_point_name)
-
-    @classmethod
-    def require_valid_entry_point_exploration(cls, exploration_id, story_id):
-        """Checks whether the exploration id is a valid one.
-
-        Args:
-            exploration_id: str. The exploraiton ID to validate.
-            story_id: str. The ID of the story that has this exploration.
-        Raises:
-            ValidationError. The exploration ID is not a valid ID.
-        """
-        if not isinstance(exploration_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Exploration id should be a string, received: %r' % (
-                    exploration_id))
-        expected_story_id = exp_services.get_story_id_linked_to_exploration(
-            exploration_id)
-        if  (expected_story_id != story_id):
-            raise utils.ValidationError(
-                'Exploration with id %s is not part of story with id of %s, '
-                'should be found in story with id of %s' % (
-                    exploration_id, story_id, expected_story_id))
-
-
-class RevisionCardEntryPoint(EntryPoint):
-    """Domain object for the Android revision card entry point."""
-
-    def __init__(self, topic_id, subtopic_id):
-        """Constructs an RevisionCardEntryPoint domain object.
-        
-        Args:
-            topic_id: str. The unique ID for the current topic the user is
-                reviewing when intiating the report.
-            subtopic_id: int. The ID for the current subtopic the user is
-                reviewing when intiating the report.
-        """
-        super(RevisionCardEntryPoint, self).__init__(
-            ENTRY_POINT.revision_card, topic_id, subtopic_id, None, None)
-
-    def to_dict():
-        """Returns a dict representing this RevisionCardEntryPoint domain
-        object.
-
-        Returns:
-            dict. A dict, mapping all fields of RevisionCardEntryPoint
-            instance.
-        """
-        return {
-            'entry_point_name': self.entry_point_name,
-            'topic_id': self.topic_id,
-            'subtopic_id': self.subtopic_id
-        }
-
-    def validate(self):
-        """Validates this RevisionCardEntryPoint domain object.
-
-        Raises:
-            ValidationError. One or more attributes of the
-                RevisionCardEntryPoint are not valid.
-        """
-        self.require_valid_entry_point_name(self.entry_point_name)
-        topic_domain.require_valid_topic_id(self.topic_id)
-        if not isinstance(self.subtopic_id, int):
-            raise utils.ValidationError(
-                'Expected subtopic id to be an int, received %s' % (
-                    self.subtopic_id))
-    
-    @classmethod
-    def require_valid_entry_point_name(cls, entry_point_name):
-        """Validates this RevisionCardEntryPoint name.
-
-        Args:
-            entry_point_name: str. The name used for this entry point object.
-        Raises:
-            ValidationError. The name is not valid for the type.
-        """
-        if entry_point_name is None:
-            raise utils.ValidationError('No entry point name supplied.')
-        if not isinstance(entry_point_name, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Entry point name must be a string, received: %r.' % (
-                    entry_point_name))
-        if entry_point_name is not ENTRY_POINT.revision_card:
-            raise utils.ValidationError(
-                'Invalid emtry point name, received: %s.' % entry_point_name)
-
-
-class CrashEntryPoint(EntryPoint):
-    """Domain object for the Android crash dialog entry point."""
-
-    def __init__(self):
-        """Constructs an CrashEntryPoint domain object."""
-        super(CrashEntryPoint, self).__init__(ENTRY_POINT.crash)
-
-    def to_dict():
-        """Returns a dict representing this CrashEntryPoint domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of CrashEntryPoint
-            instance.
-        """
-        return {
-            'entry_point_name': self.entry_point_name
-        }
+            'Subclasses of AppContext should implement their own validation '
+            'checks.')
 
 
 class AndroidAppContext(AppContext):
@@ -1102,20 +853,22 @@ class AndroidAppContext(AppContext):
             ValidationError. One or more attributes of the
                 AndroidAppContext are not valid.
         """
-        super(AndroidAppContext, self).validate()
+        self.entry_point.validate()
+        self.require_valid_language_code('text', self.text_language_code)
+        self.require_valid_language_code('audio', self.audio_language_code)
         self.require_valid_text_size(self.text_size)
-        if (self.only_allows_wifi_download_and_update is None) or not (
-            isinstance(self.only_allowed_wifi_download_and_update, bool)):
+        if self.only_allows_wifi_download_and_update is None or not (
+            isinstance(self.only_allows_wifi_download_and_update, bool)):
             raise utils.ValidationError(
-                'only_allowed_wifi_download_and_update field should be a '
+                'only_allows_wifi_download_and_update field should be a '
                 'boolean, received: %r' % (
-                    self.only_allowed_wifi_download_and_update))
-        if (self.automatically_update_topics is None) or not (
+                    self.only_allows_wifi_download_and_update))
+        if self.automatically_update_topics is None or not (
             isinstance(self.automatically_update_topics, bool)):
             raise utils.ValidationError(
                 'automatically_update_topics field should be a '
                 'boolean, received: %r' % self.automatically_update_topics)
-        if (self.account_is_profile_admin is None) or not (
+        if self.account_is_profile_admin is None or not (
             isinstance(self.account_is_profile_admin, bool)):
             raise utils.ValidationError(
                 'account_is_profile_admin field should be a '
@@ -1127,6 +880,43 @@ class AndroidAppContext(AppContext):
             raise utils.ValidationError(
                 'Should have a logcat lots list, received: %r' % (
                     self.logcat_logs))
+
+    @classmethod
+    def require_valid_language_code(self, language_type, language_code):
+        """Checks that the language code is valid
+
+        Args:
+            language_type: str. The type of language code being validates,
+                either 'text' or 'audio'.
+            language_code: str. The language code being validated, as determined
+                by the Oppia app.
+        Raises:
+            ValidationError. The given code is not valid.
+        """
+        if language_code is None:
+            raise utils.ValidationError(
+                'No app %s language code supplied.' % language_type)
+        if not isinstance(language_code, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected the app\'s %s language code to be a string, '
+                'received: %r' % (language_type, language_code))
+        if not self._match_language_code_string(language_code):
+            raise utils.ValidationError(
+                'The app\'s %s language code is not a valid string, '
+                'received: %s.' % (language_type, language_code))
+
+    @classmethod
+    def _match_language_code_string(cls, code):
+        """Helper that checks whether the given language code is a valid code.
+
+        Args:
+            code: str. The language code set on the app.
+        Raises:
+            bool. Whether the given code is valid. Valid codes are alphabetic
+            string that may contain a number of single hyphens.
+        """
+        regex_string = r'([a-z][-]?[a-z])+'
+        return re.compile(regex_string).match(code)
 
     @classmethod
     def require_valid_text_size(cls, text_size):
@@ -1144,10 +934,248 @@ class AndroidAppContext(AppContext):
         if not isinstance(text_size, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Text size must be a stirng, received: %r.' % text_size)
-        if text_size not in ANDROID_TEXT_SIZE:
+        if text_size not in ALLOWED_ANDROID_TEXT_SIZES:
             raise utils.ValidationError(
                 'App text size should be one of %s, received: %s' % (
-                    ANDROID_TEXT_SIZE, text_size))
+                    ALLOWED_ANDROID_TEXT_SIZES, text_size))
+
+
+class EntryPoint(python_utils.OBJECT):
+    """Domain object for the entry point used to initiate the feedback report.
+    """
+
+    def __init__(
+            self, entry_point_name, topic_id, story_id,
+            exploration_id, subtopic_id):
+        """Constructs an EntryPoint domain object.
+
+        Args:
+            entry_point_name: str. The user-readable name of the entry point
+                used, corresponding to an ENTRY_POINT enum.
+        """
+        self.entry_point_name = entry_point_name
+        self.topic_id = topic_id
+        self.story_id = story_id
+        self.exploration_id = exploration_id
+        self.subtopic_id = subtopic_id
+
+    def to_dict():
+        """Returns a dict representing this NavigationDrawerEntryPoint domain
+        object.
+
+        Raises:
+            NotImplementedError. Subclasses should implement their own dict
+                representations.
+        """
+        raise NotImplementedError(
+            'Subclasses of EntryPoint should implement their own dict '
+            'representations.')
+
+    def validate(self):
+        """Validates the EntryPoint domain object.
+
+        Raises:
+            NotImplementedError. Subclasses should implement their own
+                validation checks.
+        """
+        raise NotImplementedError(
+            'Subclasses of EntryPoint should implement their own validation '
+            'checks.')
+    
+    @classmethod
+    def require_valid_entry_point_name(cls, actual_name, expected_name):
+        """Validates this LessonPlayerEntryPoint name.
+
+        Args:
+            actual_name: str. The name used for this entry point object.
+            expected_name: str. The name expected for this entry point object.
+        Raises:
+            ValidationError. The name is not valid for the type.
+        """
+        if actual_name is None:
+            raise utils.ValidationError('No entry point name supplied.')
+        if not isinstance(actual_name, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Entry point name must be a string, received: %r.' % (
+                    actual_name))
+        if actual_name is not expected_name:
+            raise utils.ValidationError(
+                'Expected enry point name %s, received: %s.' % (
+                    expected_name, actual_name))
+
+    @classmethod
+    def require_valid_entry_point_exploration(cls, exploration_id, story_id):
+        """Checks whether the exploration id is a valid one.
+
+        Args:
+            exploration_id: str. The exploraiton ID to validate.
+            story_id: str. The ID of the story that has this exploration.
+        Raises:
+            ValidationError. The exploration ID is not a valid ID.
+        """
+        if not isinstance(exploration_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Exploration id should be a string, received: %r' % (
+                    exploration_id))
+        expected_story_id = exp_services.get_story_id_linked_to_exploration(
+            exploration_id)
+        if  (expected_story_id != story_id):
+            raise utils.ValidationError(
+                'Exploration with id %s is not part of story with id of %s, '
+                'should be found in story with id of %s' % (
+                    exploration_id, story_id, expected_story_id))
+
+
+class NavigationDrawerEntryPoint(EntryPoint):
+    """Domain object for the Android navigation drawer entry point."""
+
+    def __init__(self):
+        """Constructs an NavigationDrawerEntryPoint domain object."""
+        super(NavigationDrawerEntryPoint, self).__init__(
+            ENTRY_POINT.navigation_drawer, None, None, None, None)
+
+    def to_dict():
+        """Returns a dict representing this NavigationDrawerEntryPoint domain
+        object.
+
+        Returns:
+            dict. A dict, mapping all fields of NavigationDrawerEntryPoint
+            instance.
+        """
+        return {
+            'entry_point_name': self.entry_point_name
+        }
+
+    def validate(self):
+        """Validates this NavigationDrawerEntryPoint domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                NavigationDrawerEntryPoint are not valid.
+        """
+        self.require_valid_entry_point_name(
+            self.entry_point_name, ENTRY_POINT.navigation_drawer)
+
+
+class LessonPlayerEntryPoint(EntryPoint):
+    """Domain object for the lesson player entry point."""
+
+    def __init__(self, topic_id, story_id, exploration_id):
+        """Constructs an LessonPlayerEntryPoint domain object.
+
+        Args:
+            topic_id: str. The unique ID for the current topic the user is
+                playing when intiating the report.
+            story_id: str. The unique ID for the current story the user is
+                playing when intiating the report.
+            exploration_id: str. The unique ID for the current exploration the
+                user is playing when intiating the report.
+        """
+        super(LessonPlayerEntryPoint, self).__init__(
+            entry_point_name=ENTRY_POINT.lesson_player, topic_id=topic_id,
+            story_id=story_id, exploration_id=exploration_id, subtopic_id=None)
+
+    def to_dict():
+        """Returns a dict representing this LessonPlayerEntryPoint domain
+        object.
+
+        Returns:
+            dict. A dict, mapping all fields of LessonPlayerEntryPoint instance.
+        """
+        return {
+            'entry_point_name': self.entry_point_name,
+            'topic_id': self.topic_id,
+            'story_id': self.story_id,
+            'exploration_id': self.exploration_id
+        }
+
+    def validate(self):
+        """Validates this LessonPlayerEntryPoint domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                LessonPlayerEntryPoint are not valid.
+        """
+        self.require_valid_entry_point_name(
+            self.entry_point_name, ENTRY_POINT.lesson_player)
+        topic_domain.require_valid_topic_id(self.topic_id)
+        story_domain.require_valid_story_id(self.story_id)
+        self.require_valid_entry_point_exploration(
+            self.exploration_id, self.story_id)
+
+
+class RevisionCardEntryPoint(EntryPoint):
+    """Domain object for the Android revision card entry point."""
+
+    def __init__(self, topic_id, subtopic_id):
+        """Constructs an RevisionCardEntryPoint domain object.
+        
+        Args:
+            topic_id: str. The unique ID for the current topic the user is
+                reviewing when intiating the report.
+            subtopic_id: int. The ID for the current subtopic the user is
+                reviewing when intiating the report.
+        """
+        super(RevisionCardEntryPoint, self).__init__(
+            ENTRY_POINT.revision_card, topic_id, subtopic_id, None, None)
+
+    def to_dict():
+        """Returns a dict representing this RevisionCardEntryPoint domain
+        object.
+
+        Returns:
+            dict. A dict, mapping all fields of RevisionCardEntryPoint
+            instance.
+        """
+        return {
+            'entry_point_name': self.entry_point_name,
+            'topic_id': self.topic_id,
+            'subtopic_id': self.subtopic_id
+        }
+
+    def validate(self):
+        """Validates this RevisionCardEntryPoint domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                RevisionCardEntryPoint are not valid.
+        """
+        self.require_valid_entry_point_name(
+            self.entry_point_name, ENTRY_POINT.revision_card)
+        topic_domain.require_valid_topic_id(self.topic_id)
+        if not isinstance(self.subtopic_id, int):
+            raise utils.ValidationError(
+                'Expected subtopic id to be an int, received %s' % (
+                    self.subtopic_id))
+
+
+class CrashEntryPoint(EntryPoint):
+    """Domain object for the Android crash dialog entry point."""
+
+    def __init__(self):
+        """Constructs an CrashEntryPoint domain object."""
+        super(CrashEntryPoint, self).__init__(ENTRY_POINT.crash)
+
+    def to_dict():
+        """Returns a dict representing this CrashEntryPoint domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of CrashEntryPoint
+            instance.
+        """
+        return {
+            'entry_point_name': self.entry_point_name
+        }
+
+    def validate(self):
+        """Validates this CrashEntryPoint domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                CrashEntryPoint are not valid.
+        """
+        self.require_valid_entry_point_name(
+            self.entry_point_name, ENTRY_POINT.crash)
 
 
 class AppFeedbackReportTicket(python_utils.OBJECT):
@@ -1294,16 +1322,14 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         Raises:
             ValidationError. The repo name is invalid.
         """
-        if not isinstance(self.github_issue_repo_name, python_utils.BASESTRING):
+        if not isinstance(repo_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'The Github repo name should be a string, received: %s' % (
-                    self.github_issue_repo_name))
-        if self.github_issue_repo_name not in (
-            app_feedback_report_models.GITHUB_REPO_CHOICES):
+                    repo_name))
+        if repo_name not in app_feedback_report_models.GITHUB_REPO_CHOICES:
             raise utils.ValidationError(
                 'The Github repo %s is invalid, must be one of %s.' % (
-                    self.github_issue_repo_name,
-                    app_feedback_report_models.GITHUB_REPO_CHOICE))
+                    repo_name, app_feedback_report_models.GITHUB_REPO_CHOICE))
 
 
 class AppFeedbackReportDailyStats(python_utils.OBJECT):

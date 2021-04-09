@@ -72,7 +72,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         'entry_point_info': {
             'entry_point_name': 'crash',
         },
-        'text_size': 'MEDIUM_TEXT_SIZE',
+        'text_size': 'medium_text_size',
         'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'account_is_profile_admin': False
