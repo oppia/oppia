@@ -183,10 +183,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LF:10\n'
             'LH:9\n'
             'end_of_record\n'
-            'SF:node_modules/oppia/anotherfile.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
@@ -263,10 +259,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
             'SF:/opensource/oppia/anotherfile.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
-            'SF:node_modules/oppia/thirdfile.ts\n'
             'LF:10\n'
             'LH:9\n'
             'end_of_record\n'

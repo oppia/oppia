@@ -30,12 +30,10 @@ interface ObjectEditorCustomScope extends ng.IScope {
   getAlwaysEditable?: (() => boolean);
   getIsEditable?: (() => boolean);
   getSchema?: (() => CustomSchema);
-  updateValue: (unknown) => void;
-  value: unknown;
 }
 
 angular.module('oppia').directive('objectEditor', [
-  '$compile', '$log', '$rootScope', function($compile, $log, $rootScope) {
+  '$compile', '$log', function($compile, $log) {
     return {
       scope: {
         alwaysEditable: '@',
@@ -46,12 +44,6 @@ angular.module('oppia').directive('objectEditor', [
         value: '='
       },
       link: function(scope: ObjectEditorCustomScope, element) {
-        const MIGRATED_EDITORS: string[] = [
-          'algebraic-expression',
-          'boolean',
-          'code-string',
-          'coord-two-dim'
-        ];
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
         var directiveName = scope.objType.replace(
@@ -65,29 +57,14 @@ angular.module('oppia').directive('objectEditor', [
         scope.getIsEditable = function() {
           return scope.isEditable;
         };
-        scope.updateValue = function(e) {
-          scope.value = e;
-          $rootScope.$applyAsync();
-        };
         if (directiveName) {
-          if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
-            element.html(
-              '<' + directiveName +
-              '-editor [always-editable]="alwaysEditable"' +
-              ' get-init-args="getInitArgs()" get-is-editable="' +
-              'getIsEditable()" get-schema="getSchema()"' +
-              '(value-changed)="updateValue($event)" [value]="value"></' +
-              directiveName + '-editor>');
-            $compile(element.contents())(scope);
-          } else {
-            element.html(
-              '<' + directiveName +
-              '-editor get-always-editable="getAlwaysEditable()"' +
-              ' get-init-args="getInitArgs()" get-is-editable=' +
-              '"getIsEditable()" get-schema="getSchema()" value="value"></' +
-              directiveName + '-editor>');
-            $compile(element.contents())(scope);
-          }
+          element.html(
+            '<' + directiveName +
+            '-editor get-always-editable="getAlwaysEditable()"' +
+            ' get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
+            ' get-schema="getSchema()" value="value"></' +
+            directiveName + '-editor>');
+          $compile(element.contents())(scope);
         } else {
           $log.error('Error in objectEditor: no editor type supplied.');
         }

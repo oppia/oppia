@@ -64,7 +64,6 @@ export class StateEditorService {
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
-  private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -312,10 +311,6 @@ export class StateEditorService {
 
   get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
     return this._handleCustomArgsUpdateEventEmitter;
-  }
-
-  get onObjectFormValidityChange(): EventEmitter<boolean> {
-    return this._objectFormValidityChangeEventEmitter;
   }
 }
 

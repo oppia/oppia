@@ -25,7 +25,6 @@
  */
 import 'firebase/auth';
 import 'hammerjs';
-import 'leaflet/dist/leaflet.css';
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.directive.ts');

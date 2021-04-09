@@ -1,11 +1,10 @@
 <div class="oppia-coord-two-dim-editor-container">
-  <div leaflet
-       id="coordTwoDimEditor"
-       class="oppia-coord-to-dim-editor-map"
-       [leafletOptions]="options"
-       (leafletClick)="leafletClick($event)">
-    <div [leafletLayer]="mapMarkers"></div>
-  </div>
+  <leaflet id="coordTwoDimEditor"
+           class="oppia-coord-to-dim-editor-map"
+           event-broadcast="$ctrl.mapEvents"
+           lf-center="$ctrl.mapCenter"
+           markers="$ctrl.mapMarkers">
+  </leaflet>
 </div>
 <style>
   .oppia-coord-to-dim-editor-map {
