@@ -1,5 +1,5 @@
 {
-	"I18N_ABOUT_PAGE_TITLE": "हाम्रप बारेमा - Oppia",
+	"I18N_ABOUT_PAGE_TITLE": "बारेमा | ओप्पिया",
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Oppia को साथमा पढाउनको लागि आवेदन दिनुहोस्",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "हाम्रो उपलब्धिहरू हेर्नुहोस्",
 	"I18N_ACTION_BROWSE_LESSONS": "हाम्रा पाठहरू हेर्नुहोस्",
@@ -100,6 +100,7 @@
 	"I18N_LIBRARY_GROUPS_LANGUAGES": "भाषाहरू",
 	"I18N_LIBRARY_LOADING": "लोड हुँदैछ",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "दृश्यहरू",
+	"I18N_PLAYBOOK_TAB_PARTICIPATION_PLAYBOOK": "सहभागिता निर्देशिका",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "भाषा",
 	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "अडियोले पाठसँग पूर्णतया मेल नखान सक्छ",
 	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "<[languageDescription]>मा उपलब्ध छैन",
