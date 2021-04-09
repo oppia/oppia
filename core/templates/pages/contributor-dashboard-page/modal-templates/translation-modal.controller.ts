@@ -34,12 +34,12 @@ angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
   'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'ENTITY_TYPE',
+  'opportunity', 'ENTITY_TYPE', 'TRANSLATION_TIPS',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
       SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
-      opportunity, ENTITY_TYPE) {
+      opportunity, ENTITY_TYPE, TRANSLATION_TIPS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -53,6 +53,8 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.uploadingTranslation = false;
     $scope.activeWrittenTranslation = {};
     $scope.activeWrittenTranslation.html = '';
+    $scope.activeLanguageCode =
+      TranslationLanguageService.getActiveLanguageCode();
     $scope.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
@@ -68,6 +70,7 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.moreAvailable = false;
     $scope.previousTranslationAvailable = false;
     $scope.textToTranslate = '';
+    $scope.TRANSLATION_TIPS = TRANSLATION_TIPS;
     $scope.languageDescription = (
       TranslationLanguageService.getActiveLanguageDescription());
     TranslateTextService.init(
@@ -114,7 +117,6 @@ angular.module('oppia').controller('TranslationModalController', [
         $scope.uploadingTranslation = true;
         var imagesData = ImageLocalStorageService.getStoredImagesData();
         ImageLocalStorageService.flushStoredImagesData();
-        ContextService.resetImageSaveDestination();
         TranslateTextService.suggestTranslatedText(
           $scope.activeWrittenTranslation.html,
           TranslationLanguageService.getActiveLanguageCode(),
@@ -131,10 +133,12 @@ angular.module('oppia').controller('TranslationModalController', [
             $scope.activeWrittenTranslation.html = '';
             $scope.uploadingTranslation = false;
           }, () => {
+            ContextService.resetImageSaveDestination();
             $uibModalInstance.close();
           });
       }
       if (!$scope.moreAvailable) {
+        ContextService.resetImageSaveDestination();
         $uibModalInstance.close();
       }
     };
