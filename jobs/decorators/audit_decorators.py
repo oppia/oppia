@@ -168,13 +168,13 @@ class RelationshipsOf(python_utils.OBJECT):
         Args:
             dependent_model_type: class. A subclass of BaseModel.
         """
-        self._model_kind = self._validate_model_type(dependent_model_type)
+        self._kind = self._validate_model_type(dependent_model_type)
         self._dependent_model_type = dependent_model_type
         self._related_model_kinds_by_prop_name = (
-            self._PROPERTY_RELATIONSHIPS_BY_MODEL_KIND[self._model_kind])
+            self._PROPERTY_RELATIONSHIPS_BY_MODEL_KIND[self._kind])
 
     def __call__(self, relationship_generator):
-        """Registers the property relationships of self._model_kind yielded by
+        """Registers the property relationships of self._kind yielded by
         the generator.
 
         See RelationshipsOf's docstring for a usage example.
@@ -188,8 +188,8 @@ class RelationshipsOf(python_utils.OBJECT):
         Returns:
             generator. The same object.
         """
-        camel_case_kind = ( # https://stackoverflow.com/a/1176023/4859885.
-            re.sub(r'(?<!^)(?=[A-Z])', '_', self._model_kind).lower())
+        # https://stackoverflow.com/a/1176023/4859885.
+        camel_case_kind = re.sub(r'(?<!^)(?=[A-Z])', '_', self._kind).lower()
         expected_name = '%s_relationships' % camel_case_kind
         if relationship_generator.__name__ != expected_name:
             raise ValueError('Please rename the function to %s' % expected_name)
