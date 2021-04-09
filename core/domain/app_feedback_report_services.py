@@ -154,24 +154,30 @@ def store_incoming_report_stats(report_obj):
                 platform, all_reports_id, stats_date))
 
     # Add new report to the stats models for unticketed reports and all reports.
-    _add_incoming_report_to_stats_model(
-        unticketed_stats_entity_id, platform, date)
-    _add_incoming_report_to_stats_model(all_reports_entity_id, platform, date)
+    unticketed_stats_entity = (
+        app_feedback_report_models.AppFeedbackReportStats.get_by_id(
+            unticketed_stats_entity_id))
+    _add_report_to_stats_model_in_transaction(
+        unticketed_stats_entity, platform, date)
+    all_report_stats_entity = (
+        app_feedback_report_models.AppFeedbackReportStats.get_by_id(
+            all_reports_entity_id))
+    _add_report_to_stats_model_in_transaction(
+        all_report_stats_entity, platform, date)
 
 
-def _add_incoming_report_to_stats_model(
-        stats_entity_id, platform, date, report_obj):
+@transaction_services.run_in_transaction_wrapper
+def _add_report_to_stats_model_in_transaction(
+        stats_model, platform, date, report_obj):
     """Adds a new report's stats to the stats model.
 
     Args:
-        stats_entity_id: str. The ID of the model to add stats to.
+        stats_model: AppFeedbackReportStatsModel. The stats model to add stats
+            to.
         platform: str. The platform of the report being aggregated.
         date: datetime.date. The date of the stats.
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
     """
-    stats_model = (
-        app_feedback_report_models.AppFeedbackReportStats.get_by_id(
-            stats_entity_id))
     parameter_names = app_feedback_report_domain.STATS_PARAMETER_NAMES
 
     # The stats we want to aggregate on.
@@ -325,14 +331,14 @@ def get_report_stats_from_model(stats_model):
     """
     ticket = app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
         stats_model.ticket_id)
-    param_stats = _get_stats_dict_from_json(stats_model.daily_param_stats)
+    param_stats = update_stats_dict_from_json(stats_model.daily_param_stats)
     app_feedback_report_domain.AppFeedbackReportDailyStats(
         stats_model.id, ticket, stats_model.platform,
         stats_model.stats_tracking_date, stats_model.total_reports_submitted,
         param_stats)
 
 
-def _get_stats_dict_from_json(daily_param_stats):
+def update_stats_dict_from_json(daily_param_stats):
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
@@ -461,6 +467,7 @@ def _get_entry_point(
         raise utils.InvalidInputException(
             "Received unexpected entry point type.")
 
+
 def scrub_all_unscrubbed_expiring_reports(scrubber_by):
     """Fetches the reports that are expiring and must be scrubbed.
 
@@ -469,20 +476,23 @@ def scrub_all_unscrubbed_expiring_reports(scrubber_by):
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
             job.
     """
-    models_to_scrub = get_all_expiring_reports_to_scrub()
-    for model_entity in models_to_scrub:
-        scrub_single_app_feedback_report(model_entity.id, scrubbed_by)
+    reports_to_scrub = get_all_expiring_reports_to_scrub()
+    for report in reports_to_scrub:
+        scrub_single_app_feedback_report(report, scrubbed_by)
 
 
 def get_all_expiring_reports_to_scrub():
     """Fetches the reports that are expiring and must be scrubbed.
 
     Returns:
-        list(str). The IDs for AppFeedbackReportModel entities that need to be
-        scrubbed.
+        list(AppFeedbackReport). The list of AppFeedbackReportModel domain
+        objects that need to be scrubbed.
     """
     model_class = app_feedback_report_models.AppFeedbackReportModel
-    return model_class.get_all_unscrubbed_expiring_reports()
+    model_ids = model_class.get_all_unscrubbed_expiring_reports()
+    model_entities = [model_class.get_by_id(model_id) for model_id in model_ids]
+    return [
+        get_report_from_model(model_entity) for model_entity in model_entities]
 
 
 def scrub_single_app_feedback_report(report_id, scrubbed_by):
@@ -490,13 +500,18 @@ def scrub_single_app_feedback_report(report_id, scrubbed_by):
     any user-entered input in the entity.
 
     Args:
-        report_id: str. The id of the model entity to scrub.
+        report: AppFeedbackReport. The domain object of the report to scrub.
         scrubbed_by: str. The id of the user that is initiating scrubbing of
             this report, or a constant
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
             job.
     """
-    _scrub_single_report_in_transaction(report_id, scrubbed_by)
+    report.scrubbed_by = scrubbed_by
+    report.user_supplied_feedback.user_feedback_other_text_input = None
+    if report.platform == PLATFORM_ANDROID:
+        report.app_context.event_logs = None
+        report.app_context.logcat_logs = None
+    _scrub_single_report_in_transaction(report.id, scrubbed_by)
 
 
 @transaction_services.run_in_transaction_wrapper
@@ -566,10 +581,15 @@ def get_all_filter_options():
     return filter_list
 
 
-# // Called when an admin triages reports; updates the assigned ticket in the
-# // AppFeedbackReportModel and modifies the AppFeedbackReportStatsModel so that
-# // aggregates are accurate (occurs in a transaction)
-# def reassign_ticket(report_id, ticket_id)
+def reassign_ticket(report, new_ticket):
+    """Fetches all the possible values that moderators can filter reports or
+    tickets by.
+
+    Returns:
+        list(AppFeedbackReportFilter). A list of filters and the possible values
+        they can have.
+    """
+
 
 # // Called when updates a ticket name. Updates the entity in the
 # // AppFeedbackReportTicketModel and the relevant tickets in the
