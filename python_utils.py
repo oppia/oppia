@@ -229,10 +229,10 @@ def urllib_unquote(content):
         str. The unquoted string.
     """
     try:
-        import urllib.parse as urlparse_unquote
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib as urlparse_unquote
-    return urlparse_unquote.unquote(content)
+        import urllib as urlparse
+    return urlparse.unquote(content)
 
 
 def url_quote(content):
@@ -246,10 +246,10 @@ def url_quote(content):
         str. The quoted string.
     """
     try:
-        import urllib.parse as urlparse_quote
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib as urlparse_quote
-    return urlparse_quote.quote(content)
+        import urllib as urlparse
+    return urlparse.quote(content)
 
 
 def url_unquote_plus(content):
@@ -264,10 +264,10 @@ def url_unquote_plus(content):
         str. The unquoted string.
     """
     try:
-        import urllib.parse as urlparse_unquote_plus
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib as urlparse_unquote_plus
-    return urlparse_unquote_plus.unquote_plus(content)
+        import urllib as urlparse
+    return urlparse.unquote_plus(content)
 
 
 def url_encode(query, doseq=False):
@@ -330,10 +330,10 @@ def url_open(source_url):
     """
     context = ssl.create_default_context(cafile=certifi.where())
     try:
-        import urllib.request as urlrequest_open
+        import urllib.request as urlrequest
     except ImportError:
-        import urllib2 as urlrequest_open
-    return urlrequest_open.urlopen(source_url, context=context)
+        import urllib2 as urlrequest
+    return urlrequest.urlopen(source_url, context=context)
 
 
 def url_request(source_url, data, headers):
