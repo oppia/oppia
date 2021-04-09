@@ -324,7 +324,7 @@ def get_ticket_from_model(ticket_model):
         reports.append(get_report_from_model(report_model))
 
     return app_feedback_report_domain.AppFeedbackReportTicket(
-        ticket_model.id, ticket_model.ticket_name,
+        ticket_model.id, ticket_model.ticket_name, ticket_model.platform,
         ticket_model.github_issue_repo_name, ticket_model.github_issue_number,
         ticket_model.archived, ticket_model.newest_report_timestamp, reports)
 
@@ -342,7 +342,8 @@ def get_report_stats_from_model(stats_model):
     """
     ticket = app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
         stats_model.ticket_id)
-    param_stats = _create_app_daily_stats_from_model_json(stats_model.daily_param_stats)
+    param_stats = _create_app_daily_stats_from_model_json(
+        stats_model.daily_param_stats)
     app_feedback_report_domain.AppFeedbackReportDailyStats(
         stats_model.id, ticket, stats_model.platform,
         stats_model.stats_tracking_date, stats_model.total_reports_submitted,
@@ -397,15 +398,20 @@ def _get_android_report_from_model(android_report_model):
     )
     device_system_context = (
         app_feedback_report_domain.AndroidDeviceSystemContext(
-            android_report_model.version_name,
+            android_report_model.platform_version,
             report_info_dict['package_version_code'],
             android_report_model.android_device_country_locale_code,
             report_info_dict['android_device_language_locale_code'],
-            report_info_dict['device_model'],
+            android_report_model.android_device_model,
             android_report_model.android_sdk_version,
             report_info_dict['build_fingerprint'],
             report_info_dict['network_type']))
-    entry_point = _get_entry_point(android_report_model.entry_point)
+    entry_point = _get_entry_point(
+        android_report_model.entry_point,
+        android_report_model.entry_point_topic_id,
+        android_report_model.entry_point_story_id,
+        android_report_model.entry_point_exploration_id,
+        android_report_model.entry_point_subtopic_id)
     app_context = app_feedback_report_domain.AndroidAppContext(
         entry_point, android_report_model.text_language_code,
         android_report_model.audio_language_code, report_info_dict['text_size'],
@@ -414,8 +420,9 @@ def _get_android_report_from_model(android_report_model):
         report_info_dict['account_is_profile_admin'],
         report_info_dict['event_logs'], report_info_dict['logcat_logs'])
     return app_feedback_report_domain.AppFeedbackReport(
-        android_report_model.id, android_report_model.platform,
-        android_report_model.report_submitted_timestamp,
+        android_report_model.id,
+        android_report_model.android_report_info_schema_version,
+        android_report_model.platform, android_report_model.submitted_on,
         android_report_model.ticket_id, android_report_model.scrubbed_by,
         user_supplied_feedback, device_system_context, app_context)
 
@@ -633,8 +640,9 @@ def reassign_ticket(report, new_ticket):
 
     # Update the ticket model.
     if old_ticket_id is not None:
-        ticket_model = app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-            old_ticket_id)
+        ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                old_ticket_id))
         ticket_obj = get_ticket_from_model(ticket_model)
         ticket_obj.reports.remove(report)
         _save_ticket(ticket_obj)

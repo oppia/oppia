@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import re
 
 from core.domain import exp_services
 from core.domain import story_domain
@@ -98,7 +99,7 @@ class AppFeedbackReport(python_utils.OBJECT):
     """Domain object for a single feedback report."""
 
     def __init__(
-            self, schema_version, report_id, platform, submitted_on_timestamp,
+            self, report_id, schema_version, platform, submitted_on_timestamp,
             ticket_id, scrubbed_by, user_supplied_feedback,
             device_system_context, app_context):
         """Constructs a AppFeedbackReport domain object.
@@ -123,8 +124,8 @@ class AppFeedbackReport(python_utils.OBJECT):
             app_context: AppContext. An object representing the user's Oppia
                 app state when they submitted the report.
         """
-        self.schema_version = schema_version
         self.report_id = report_id
+        self.schema_version = schema_version
         self.platform = platform
         self.submitted_on_timestamp = submitted_on_timestamp
         self.ticket_id = ticket_id
@@ -140,8 +141,8 @@ class AppFeedbackReport(python_utils.OBJECT):
             dict. A dict, mapping all fields of AppFeedbackReport instance.
         """
         return {
-            'schema_version': self.schema_version,
             'report_id': self.report_id,
+            'schema_version': self.schema_version,
             'platform': self.platform,
             'submitted_on_timestamp': utils.get_human_readable_time_string(
                 utils.get_time_in_millisecs(self.submitted_on_timestamp)),
@@ -181,7 +182,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                     'Expected device and system context to be of type '
                     'AndroidDeviceSystemContext for platform %s, '
                     'received: %r' % self.platform, self.device_system_context)
-        elif platform == app_feedback_report_models.PLATFORM_WEB:
+        elif platform == app_feedback_report_models.PLATFORM_CHOICE_WEB:
             raise NotImplementedError(
                 'Subclasses of DeviceSystemContext for web systems should '
                 'implement domain validation.')
@@ -204,13 +205,14 @@ class AppFeedbackReport(python_utils.OBJECT):
         """
         minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
         current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
-        if platform == app_feedback_report_models.PLATFORM_WEB:
+        if platform == app_feedback_report_models.PLATFORM_CHOICE_WEB:
             minimum_schema = feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION
             current_schema = feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION
         if not isinstance(schema_version, int) or schema_version <= 0:
             raise utils.ValidationError(
                 'The report schema version %r is invalid, expected an integer '
-                'in [%d, %d].' % minimum_schema, current_schema)
+                'in [%d, %d].' % (
+                    schema_version, minimum_schema, current_schema))
         if not minimum_schema <= schema_version <= current_schema:
             raise utils.ValidationError(
                 'The supported report schema versions for %s reports are '
@@ -310,7 +312,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 self.user_feedback_other_text_input)
         }
 
-    def validate():
+    def validate(self):
         """Validates this UserSuppliedFeedback domain object.
 
         Raises:
@@ -404,7 +406,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                         category))
             if other_text_input is None:
                 raise utils.ValidationError(
-                    'Category %r with \'other\' selected requires an text input'
+                    'Category %r with \'other\' selected requires  text input'
                     ' provided by the user.' % category)
             self.require_valid_other_text_input_for_category(
                 category, other_text_input)
@@ -500,7 +502,7 @@ class DeviceSystemContext(python_utils.OBJECT):
             'device_country_locale_code': self.device_country_locale_code
         }
 
-    def validate():
+    def validate(self):
         """Validates this DeviceSystemContext domain object.
 
         Raises:
@@ -568,7 +570,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             'network_type': self.network_type
         }
 
-    def validate():
+    def validate(self):
         """Validates this AndroidDeviceSystemContext domain object.
 
         Raises:
@@ -580,7 +582,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         self.require_valid_locale_code(
             'country', self.device_country_locale_code)
         self.require_valid_locale_code(
-            'language',self.device_language_locale_code)
+            'language', self.device_language_locale_code)
 
         if self.device_model is None:
             raise utils.ValidationError('No device model supplied.')
@@ -590,7 +592,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                     country_locale_code))
     
         self.require_valid_sdk_version(self.sdk_version)
-        if self.build_fingerprint is NotImplemented:
+        if self.build_fingerprint is None:
             raise utils.ValidationError('No build fingerprint supplied.')
         if not isinstance(self.build_fingerprint, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -682,7 +684,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             string that may contain a number of single hyphens.
         """
         regex_string = r'\w+(?:-\w+)+'
-        return re.compile(regex_string).match(code)
+        # regex_string = r'[a-z]+(-?)[a-z]+$'
+        return re.compile(regex_string).match(code.lower())
     
     @classmethod
     def require_valid_sdk_version(cls, sdk_version):
@@ -757,7 +760,7 @@ class AppContext(python_utils.OBJECT):
         }
 
     @classmethod
-    def validate():
+    def validate(self):
         """Validates this AppContext domain object.
 
         Raises:
@@ -786,11 +789,11 @@ class AppContext(python_utils.OBJECT):
         if not isinstance(language_code, int):
             raise utils.ValidationError(
                 'Expected the app\'s %s language code to be a string, '
-                'received: %r' % language_type, language_code)
+                'received: %r' % (language_type, language_code))
         if not self._match_language_code_string(language_code):
             raise utils.ValidationError(
                 'The app\'s %s language code is not a valid string, '
-                'received: %s.' % language_type, language_code)
+                'received: %s.' % (language_type, language_code))
 
     @classmethod
     def _match_language_code_string(cls, code):
@@ -811,8 +814,8 @@ class EntryPoint(python_utils.OBJECT):
     """
 
     def __init__(
-            self, entry_point_name, topic_id=None, story_id=None,
-            exploration_id=None, subtopic_id=None):
+            self, entry_point_name, topic_id, story_id,
+            exploration_id, subtopic_id):
         """Constructs an EntryPoint domain object.
 
         Args:
@@ -830,7 +833,7 @@ class EntryPoint(python_utils.OBJECT):
         object.
 
         Raises:
-            NotImplementedError. Suclasses should implement their own dict
+            NotImplementedError. Subclasses should implement their own dict
                 representations.
         """
         raise NotImplementedError(
@@ -844,7 +847,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
     def __init__(self):
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super(NavigationDrawerEntryPoint, self).__init__(
-            entry_point_name=ENTRY_POINT.navigation_drawer)
+            ENTRY_POINT.navigation_drawer, None, None, None, None)
 
     def to_dict():
         """Returns a dict representing this NavigationDrawerEntryPoint domain
@@ -875,7 +878,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         """
         super(LessonPlayerEntryPoint, self).__init__(
             entry_point_name=ENTRY_POINT.lesson_player, topic_id=topic_id,
-            story_id=story_id, exploration_id=exploration_id)
+            story_id=story_id, exploration_id=exploration_id, subtopic_id=None)
 
     def to_dict():
         """Returns a dict representing this LessonPlayerEntryPoint domain
@@ -959,8 +962,7 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super(RevisionCardEntryPoint, self).__init__(
-            entry_point_name=ENTRY_POINT.revision_card, topic_id=topic_id,
-            subtopic_id=subtopic_id)
+            ENTRY_POINT.revision_card, topic_id, subtopic_id, None, None)
 
     def to_dict():
         """Returns a dict representing this RevisionCardEntryPoint domain
@@ -1093,7 +1095,7 @@ class AndroidAppContext(AppContext):
             'logcat_logs': self.logcat_logs
         }
 
-    def validate():
+    def validate(self):
         """Validates this AndroidAppContext domain object.
 
         Raises:
@@ -1196,7 +1198,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             'reports': [report.report_id for report in self.reports]
         }
 
-    def validate():
+    def validate(self):
         """Validates this AppFeedbackReportTicket domain object.
 
         Raises:
@@ -1355,7 +1357,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             }
         }
 
-    def validate():
+    def validate(self):
         """Validates this AppFeedbackReportDailyStats domain object.
 
         Raises:
@@ -1412,7 +1414,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             if param_name not in STATS_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The param %s is not a valid param to aggregate stats on, '
-                    'must be one of %s' % param_name, STATS_PARAMETER_NAMES)
+                    'must be one of %s' % (param_name, STATS_PARAMETER_NAMES))
             param_count_object.validate()
 
 
@@ -1438,7 +1440,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
                 self.parameter_value_counts.items())
         }
 
-    def validate():
+    def validate(self):
         """Validates this ReportStatsParameterValueCounts domain object.
 
         Raises:
@@ -1478,7 +1480,7 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             'filter_options': self.filter_options
         }
 
-    def validate():
+    def validate(self):
         """Validates this AppFeedbackReportFilter domain object.
 
         Raises:

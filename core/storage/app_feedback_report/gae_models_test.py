@@ -335,7 +335,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
 
     def test_create_and_get_stats_model(self):
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.get_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 'android', self.TICKET_ID, self.STATS_DATE))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             entity_id=entity_id,
@@ -359,12 +359,14 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         self.assertEqual(stats_model.daily_param_stats, self.DAILY_STATS)
 
     def test_get_id_on_same_ticket_produces_same_id(self):
+        model_class = (
+            app_feedback_report_models.AppFeedbackReportStatsModel)
         entity_id = model_class.calculate_id(
                 'android', self.TICKET_ID, self.STATS_DATE)
         entity_id_copy = model_class.calculate_id(
                 'android', self.TICKET_ID, self.STATS_DATE)
 
-        assertEqual(entity_id, entity_id_copy)
+        self.assertEqual(entity_id, entity_id_copy)
 
     def test_get_stats_for_ticket(self):
         entity_id = (

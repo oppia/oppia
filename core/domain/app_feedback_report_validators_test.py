@@ -52,7 +52,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
     REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'other'
+    CATEGORY_OTHER = 'suggestion_other'
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
@@ -61,18 +61,21 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
+        'user_feedback_selected_items': None,
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
         'logcat_logs': ['logcat1', 'logcat2'],
         'package_version_code': 1,
-        'language_locale_code': 'en',
+        'build_fingerprint': 'example_fingerprint_id',
+        'network_type': 'wifi',
+        'android_device_language_locale_code': 'en',
         'entry_point_info': {
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'account_is_profile_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -102,7 +105,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
-            web_report_info=None))
+            web_report_info=None)
 
         self.expected_successful_validation_output = [
             u'[u\'fully-validated AppFeedbackReportModel\', 1]']
@@ -499,7 +502,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         'randomInteger123')
     REPORT_IDS_LIST = [REPORT_ID]
     TICKET_NAME = 'example ticket name'
-    REPORT_TYPE_SUGGESTION = 'suggestion'
+    REPORT_TYPE_SUGGESTION = 'suggestion_other'
     CATEGORY_OTHER = 'other'
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
@@ -509,18 +512,21 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
+        'user_feedback_selected_items': None,
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
         'logcat_logs': ['logcat1', 'logcat2'],
         'package_version_code': 1,
-        'language_locale_code': 'en',
+        'build_fingerprint': 'example_fingerprint_id',
+        'network_type': 'wifi',
+        'android_device_language_locale_code': 'en',
         'entry_point_info': {
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'account_is_profile_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -701,7 +707,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
 
         self.entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.PLATFORM_ANDROID, self.TICKET_ID, self.STATS_DATE))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             entity_id=self.entity_id,
@@ -799,7 +805,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
             feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME -
             datetime.timedelta(days=1))
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.PLATFORM_ANDROID, self.TICKET_ID, invalid_datetime.date()))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             entity_id=entity_id,
@@ -825,7 +831,7 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_validation_with_invalid_external_references_ids_fails(self):
         entity_id = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.generate_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.PLATFORM_ANDROID, 'invalid_ticket_id', self.STATS_DATE))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             entity_id=entity_id,

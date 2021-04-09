@@ -583,7 +583,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             str. The ID for this entity of the form
             '[platform]:[ticket_id]:[stats_date in YYYY-MM-DD]'.
         """
-        return '%s:%s:%s' % platform, ticket_id, stats_tracking_date.isoformat()
+        return '%s:%s:%s' % (
+            platform, ticket_id, stats_tracking_date.isoformat())
 
     @classmethod
     def get_stats_for_ticket(cls, ticket_id):

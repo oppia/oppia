@@ -146,7 +146,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_services.scrub_report(
                 fake_report_id, 'scrubber_user')
 
-    def test_cron_scrubbing_on_current_and_expired_reports_only_scrubs_expired(
+    def test_scrubbing_on_current_and_expired_reports_only_scrubs_expired(
             self):
         self._add_current_reports()
         self._add_expiring_android_report()
@@ -163,7 +163,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             scrubbed_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
         self._verify_report_is_not_scrubbed(current_model)
 
-    def test_cron_scrubbing_with_no_reports_in_storage_does_not_scrub_storage(
+    def test_scrubbing_with_no_reports_in_storage_does_not_scrub_storage(
             self):
         current_models_query = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
@@ -176,7 +176,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         stored_models = stored_models_query.fetch()
         self.assertEqual(len(stored_models), 0)
 
-    def test_cron_scrubbing_on_no_models_does_not_scrub_models(self):
+    def test_scrubbing_on_no_models_does_not_scrub_models(self):
         self._add_current_reports()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
 
@@ -185,7 +185,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.REPORT_ID_AT_MAX_DAYS))
         self._verify_report_is_not_scrubbed(current_model)
 
-    def test_cron_scrubbing_on_all_expired_models_updates_all_models(self):
+    def test_scrubbing_on_all_expired_models_updates_all_models(self):
         self._add_expiring_android_report()
         self._add_expiring_web_report()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
@@ -202,7 +202,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_scrubbed(
             web_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
-    def test_cron_scrubbing_on_already_scrubbed_models_does_not_scrub_models(
+    def test_scrubbing_on_already_scrubbed_models_does_not_scrub_models(
             self):
         self._add_scrubbed_report()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
@@ -213,7 +213,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         self._verify_report_is_scrubbed(scrubbed_model, 'scrubber_user')
 
-    def test_cron_scrubbing_runs_again_scrubs_newly_added_expired_models(self):
+    def test_scrubbing_runs_again_scrubs_newly_added_expired_models(self):
         self._add_expiring_android_report()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
         scrubbed_android_model = (
