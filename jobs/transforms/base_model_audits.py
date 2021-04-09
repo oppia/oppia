@@ -157,6 +157,7 @@ class ValidateModelTimestamps(beam.DoFn):
             yield audit_errors.ModelMutatedDuringJobError(model)
 
 
+@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidateCommitType(beam.DoFn):
     """DoFn to check whether commit type is valid."""
 
@@ -170,8 +171,8 @@ class ValidateCommitType(beam.DoFn):
         Yields:
             ModelCommitTypeError. Error for commit_type validation.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
 
         if (model.commit_type not in
                 base_models.VersionedModel.COMMIT_TYPE_CHOICES):
-            yield errors.ModelInvalidCommitTypeError(model)
+            yield audit_errors.InvalidCommitTypeError(model)

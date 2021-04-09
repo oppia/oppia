@@ -150,15 +150,10 @@ class ModelExpiredError(BaseAuditError):
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
 
 
-class ModelInvalidCommitTypeError(ModelValidationError):
+class InvalidCommitTypeError(BaseAuditError):
     """Error class for commit_type validation errors."""
 
     def __init__(self, model):
-        super(ModelInvalidCommitTypeError, self).__init__(model)
-        self._message = (
-            '%s Commit type %s is not allowed'
-            % (self.base_message, model.commit_type))
-
-    @property
-    def message(self):
-        return self._message
+        super(InvalidCommitTypeError, self).__init__(model)
+        self.message = (
+            'Commit type %s is not allowed'% model.commit_type)

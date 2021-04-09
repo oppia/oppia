@@ -277,20 +277,20 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
 
 
-class ModelInvalidCommitTypeErrorTests(ValidatorErrorTestBase):
+class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
+
     def test_model_invalid_id_error(self):
         model = base_models.BaseCommitLogEntryModel(
             id='123',
-            created_on=self.year_ago,
-            last_updated=self.now,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
             commit_type='invalid-type',
             user_id='',
             post_commit_status='',
             commit_cmds=[])
-        error = errors.ModelInvalidCommitTypeError(model)
-
-        msg = (
-            'Entity id %s: Commit type invalid-type is not allowed'
-            % (model.id))
-
-        self.assertEqual(error.message, msg)
+        error = audit_errors.InvalidCommitTypeError(model)
+        print(error.message)
+        self.assertEqual(
+            error.message,
+            'InvalidCommitTypeError in BaseCommitLogEntryModel(id="123"): '
+            'Commit type invalid-type is not allowed')

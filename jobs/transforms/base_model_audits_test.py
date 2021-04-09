@@ -150,25 +150,24 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         ])
 
 
-class ValidateCommitTypeTests(BaseSnapshotMetadataModelValidatorTests):
+class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
+
     def test_validate_commit_type(self):
-        with pipeline.TestPipeline(runner=direct_runner.DirectRunner()) as p:
-            invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
-                id='123',
-                created_on=self.year_ago,
-                last_updated=self.now,
-                commit_type='invalid-type',
-                user_id='',
-                post_commit_status='',
-                commit_cmds=[])
-            pcoll = p | beam.Create([invalid_commit_type_model])
+        invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[])
 
-            output = (
-                pcoll | beam.ParDo(base_model_validator.ValidateCommitType()))
+        output = (
+                self.pipeline
+                | beam.Create([invalid_commit_type_model])
+                | beam.ParDo(base_model_audits.ValidateCommitType())
+            )
 
-            beam_testing_util.assert_that(
-                output,
-                beam_testing_util.equal_to([
-                    errors.ModelInvalidCommitTypeError(
-                        invalid_commit_type_model)
-                ]))
+        self.assert_pcoll_equal(output, [
+            audit_errors.InvalidCommitTypeError(invalid_commit_type_model),
+        ])
