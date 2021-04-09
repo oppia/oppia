@@ -289,7 +289,7 @@ class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
             post_commit_status='',
             commit_cmds=[])
         error = audit_errors.InvalidCommitTypeError(model)
-        print(error.message)
+
         self.assertEqual(
             error.message,
             'InvalidCommitTypeError in BaseCommitLogEntryModel(id="123"): '

@@ -163,10 +163,10 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[])
 
         output = (
-                self.pipeline
-                | beam.Create([invalid_commit_type_model])
-                | beam.ParDo(base_model_audits.ValidateCommitType())
-            )
+            self.pipeline
+            | beam.Create([invalid_commit_type_model])
+            | beam.ParDo(base_model_audits.ValidateCommitType())
+        )
 
         self.assert_pcoll_equal(output, [
             audit_errors.InvalidCommitTypeError(invalid_commit_type_model),
