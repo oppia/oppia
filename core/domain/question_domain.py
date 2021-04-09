@@ -1061,8 +1061,6 @@ class Question(python_utils.OBJECT):
 
         return question_state_dict
 
-
-
     @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
