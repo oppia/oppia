@@ -14,7 +14,7 @@ param_specs:
     obj_type: UnicodeString
   c:
     obj_type: UnicodeString
-schema_version: 47
+schema_version: 48
 states:
   Code REPL:
     classifier_model_id: null
@@ -60,6 +60,7 @@ states:
       hints: []
       id: CodeRepl
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -108,6 +109,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes:
     - customization_args:
@@ -156,6 +158,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -218,6 +221,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 5
     param_changes:
     - customization_args:
@@ -298,6 +302,7 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -399,6 +404,7 @@ states:
       hints: []
       id: GraphInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -448,6 +454,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -505,6 +512,7 @@ states:
       hints: []
       id: SetInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -567,6 +575,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -629,6 +638,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -691,6 +701,7 @@ states:
       hints: []
       id: InteractiveMap
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -704,6 +715,6 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Test of expressions and interactions

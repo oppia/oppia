@@ -212,6 +212,7 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
+        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
@@ -288,6 +289,7 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
+        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,

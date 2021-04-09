@@ -1,6 +1,6 @@
-author_notes: ''
+author_notes: ""
 auto_tts_enabled: true
-blurb: ''
+blurb: ""
 category: Astronomy
 correctness_feedback_enabled: false
 init_state_name: Start
@@ -8,7 +8,7 @@ language_code: en
 objective: To test the exploration player
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   END:
     classifier_model_id: null
@@ -25,6 +25,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -51,7 +52,7 @@ states:
         dest: END
         feedback:
           content_id: default_outcome
-          html: ''
+          html: ""
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -59,6 +60,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -89,7 +91,7 @@ states:
         dest: Mid
         feedback:
           content_id: default_outcome
-          html: ''
+          html: ""
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
@@ -97,6 +99,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -110,6 +113,6 @@ states:
         ca_buttonText_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Exploration Player Test

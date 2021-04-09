@@ -8,7 +8,7 @@ language_code: en
 objective: become familiar with Oppia's capabilities
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   END:
     classifier_model_id: null
@@ -25,6 +25,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -71,6 +72,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -152,6 +154,7 @@ states:
       hints: []
       id: InteractiveMap
       solution: null
+    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
@@ -272,6 +275,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -324,6 +328,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -404,6 +409,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -764,6 +770,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 32
     param_changes: []
     recorded_voiceovers:
@@ -837,6 +844,6 @@ states:
         rule_input_29: {}
         rule_input_30: {}
         rule_input_31: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Welcome to Oppia!

@@ -8,7 +8,7 @@ language_code: en
 objective: Learn about the planets of the solar system
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   END:
     classifier_model_id: null
@@ -25,6 +25,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -93,6 +94,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
@@ -380,6 +382,7 @@ states:
       hints: []
       id: ImageClickInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 10
     param_changes: []
     recorded_voiceovers:
@@ -409,6 +412,6 @@ states:
         feedback_7: {}
         feedback_8: {}
         feedback_9: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: The Solar System

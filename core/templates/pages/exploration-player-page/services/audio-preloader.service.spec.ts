@@ -101,6 +101,7 @@ describe('Audio preloader service', () => {
             default_outcome: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -141,6 +142,7 @@ describe('Audio preloader service', () => {
             content: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -193,6 +195,7 @@ describe('Audio preloader service', () => {
             default_outcome: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -292,6 +295,7 @@ describe('Audio preloader service', () => {
             feedback_1: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       }

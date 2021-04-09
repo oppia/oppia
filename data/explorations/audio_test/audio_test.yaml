@@ -8,7 +8,7 @@ language_code: en
 objective: Try out playing audio on Oppia
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   Finish:
     classifier_model_id: null
@@ -25,6 +25,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -69,6 +70,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -136,6 +138,7 @@ states:
       hints: []
       id: CodeRepl
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -225,6 +228,7 @@ states:
         explanation:
           content_id: solution
           html: <p>I'm a cat person.</p>
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -280,6 +284,6 @@ states:
         rule_input_4: {}
         rule_input_5: {}
         solution: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Audio Test

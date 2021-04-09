@@ -8,7 +8,7 @@ language_code: en
 objective: discover the Root Linear Coefficient Theorem
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   Coefficient Signs:
     classifier_model_id: null
@@ -122,6 +122,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -199,6 +200,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -261,6 +263,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -289,6 +292,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -357,6 +361,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -438,6 +443,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -524,6 +530,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -603,6 +610,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -684,6 +692,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -767,6 +776,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -813,6 +823,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -876,6 +887,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -889,6 +901,6 @@ states:
         ca_buttonText_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Root Linear Coefficient Theorem

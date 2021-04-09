@@ -8,7 +8,7 @@ language_code: en
 objective: Dummy exploration for testing all interactions
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   Algebraic Expression Input:
     classifier_model_id: null
@@ -54,6 +54,7 @@ states:
           html: <p>The area of a circle is related to a constant called "pi".</p>
       id: AlgebraicExpressionInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -114,6 +115,7 @@ states:
       hints: []
       id: CodeRepl
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -152,6 +154,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -211,6 +214,7 @@ states:
       hints: []
       id: DragAndDropSortInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -243,6 +247,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -302,6 +307,7 @@ states:
       hints: []
       id: FractionInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
@@ -512,6 +518,7 @@ states:
           html: <p>dsf</p>
       id: GraphInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -680,6 +687,7 @@ states:
           html: <p>sdf</p>
       id: ImageClickInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -805,6 +813,7 @@ states:
           html: <p>sdf</p>
       id: ItemSelectionInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -913,6 +922,7 @@ states:
       hints: []
       id: ItemSelectionInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
@@ -984,6 +994,7 @@ states:
       hints: []
       id: LogicProof
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -1044,6 +1055,7 @@ states:
           html: <p>The slope-intercept form of a straight-line is 'y=m*x+c'.</p>
       id: MathEquationInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -1138,6 +1150,7 @@ states:
           html: <p>sfd</p>
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
@@ -1216,6 +1229,7 @@ states:
             on the C major scale.</p>'
       id: MusicNotesInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -1267,6 +1281,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -1328,6 +1343,7 @@ states:
       hints: []
       id: NumberWithUnits
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -1386,6 +1402,7 @@ states:
             values as well!</p>
       id: NumericExpressionInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -1458,6 +1475,7 @@ states:
       hints: []
       id: PencilCodeEditor
       solution: null
+    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
@@ -1517,6 +1535,7 @@ states:
       hints: []
       id: RatioExpressionInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
@@ -1589,6 +1608,7 @@ states:
           html: <p>Try orange. :) There are still two others, however!<br></p>
       id: SetInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -1660,6 +1680,7 @@ states:
           html: <p>Hint 1</p>
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -1765,6 +1786,7 @@ states:
             special markings on a map.</p>'
       id: InteractiveMap
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -1784,6 +1806,6 @@ states:
         feedback_2: {}
         feedback_3: {}
         hint_1: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Test of all interactions

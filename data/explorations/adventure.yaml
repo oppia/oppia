@@ -25,7 +25,7 @@ param_specs:
     obj_type: UnicodeString
   sneezeitem:
     obj_type: UnicodeString
-schema_version: 47
+schema_version: 48
 states:
   Clearing:
     classifier_model_id: null
@@ -127,6 +127,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 10
     param_changes: []
     recorded_voiceovers:
@@ -171,6 +172,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -298,6 +300,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 12
     param_changes: []
     recorded_voiceovers:
@@ -428,6 +431,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -494,6 +498,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 3
     param_changes:
     - customization_args:
@@ -739,6 +744,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 22
     param_changes: []
     recorded_voiceovers:
@@ -828,6 +834,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -867,6 +874,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes:
     - customization_args:
@@ -909,6 +917,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes:
     - customization_args:
@@ -954,6 +963,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes:
     - customization_args:
@@ -981,6 +991,6 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Parameterized Adventure

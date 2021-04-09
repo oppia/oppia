@@ -8,7 +8,7 @@ language_code: en
 objective: solve Problem 1 on the Project Euler site
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   After First Question:
     classifier_model_id: null
@@ -37,6 +37,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -65,6 +66,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -147,6 +149,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -215,6 +218,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -384,6 +388,7 @@ states:
       hints: []
       id: SetInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 14
     param_changes: []
     recorded_voiceovers:
@@ -469,6 +474,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -680,6 +686,7 @@ states:
       hints: []
       id: CodeRepl
       solution: null
+    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -739,6 +746,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -826,6 +834,7 @@ states:
       hints: []
       id: NumericInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -871,6 +880,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -884,6 +894,6 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Project Euler Problem 1

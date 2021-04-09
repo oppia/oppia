@@ -1,6 +1,6 @@
-author_notes: ''
+author_notes: ""
 auto_tts_enabled: true
-blurb: ''
+blurb: ""
 category: Algorithms
 correctness_feedback_enabled: false
 init_state_name: Start
@@ -8,7 +8,7 @@ language_code: en
 objective: To learn testing
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   Start:
     classifier_model_id: null
@@ -25,6 +25,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -34,6 +35,6 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: Test Exploration

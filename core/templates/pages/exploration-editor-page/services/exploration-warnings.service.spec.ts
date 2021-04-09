@@ -939,6 +939,7 @@ describe('Exploration Warnings Service', function() {
           },
           classifier_model_id: null,
           solicit_answer_details: false,
+          linked_skill_id: null,
           next_content_id_index: null,
         },
         State: {
@@ -974,6 +975,7 @@ describe('Exploration Warnings Service', function() {
             }
           },
           classifier_model_id: null,
+          linked_skill_id: null,
           next_content_id_index: null
         }
       });

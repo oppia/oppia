@@ -8,7 +8,7 @@ language_code: en
 objective: Learn about the world's first community-built personal online tutor
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   About this website:
     classifier_model_id: null
@@ -95,6 +95,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -210,6 +211,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
@@ -275,6 +277,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -370,6 +373,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
@@ -408,6 +412,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -444,6 +449,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -484,6 +490,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -546,6 +553,7 @@ states:
       hints: []
       id: InteractiveMap
       solution: null
+    linked_skill_id: null
     next_content_id_index: 2
     param_changes: []
     recorded_voiceovers:
@@ -589,6 +597,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -636,6 +645,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -727,6 +737,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
@@ -843,6 +854,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -870,6 +882,6 @@ states:
         feedback_2: {}
         feedback_3: {}
         feedback_4: {}
-states_schema_version: 42
+states_schema_version: 43
 tags: []
 title: About Oppia

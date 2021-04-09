@@ -220,6 +220,10 @@ describe('Exploration history', function() {
       32: {
         text: '',
         highlighted: false
+      },
+      33: {
+        text: 'linked_skill_id:',
+        highlighted: false
       }
     };
 
@@ -419,6 +423,10 @@ describe('Exploration history', function() {
       49: {
         text: '',
         highlighted: false
+      },
+      50: {
+        text: 'linked_skill_id',
+        highlighted: false
       }
     };
 
@@ -447,6 +455,7 @@ describe('Exploration history', function() {
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
+      'linked_skill_id: null\n' +
       'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
