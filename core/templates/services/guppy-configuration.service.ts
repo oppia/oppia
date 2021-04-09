@@ -41,28 +41,28 @@ const MULTIPLICATION_SYMBOL_DICT = {
 
 const FRACTION_SYMBOL_DICT = {
   output: {
-      latex: '\\frac{{$1}}{{$2}}',
-      small_latex: '\\frac{{$1}}{{$2}}',
-      asciimath: '/',
-      text: '({$1})/({$2})'
+    latex: '\\frac{{$1}}{{$2}}',
+    small_latex: '\\frac{{$1}}{{$2}}',
+    asciimath: '/',
+    text: '({$1})/({$2})'
   },
   input: 1,
   keys: ['/'],
   attrs: {
-      type: 'fraction',
-      group: 'functions'
+    type: 'fraction',
+    group: 'functions'
   },
   args: [{
-      up: '1',
-      down: '2',
-      name: 'numerator',
-      small: 'yes'
+    up: '1',
+    down: '2',
+    name: 'numerator',
+    small: 'yes'
   }, {
-      up: '1',
-      down: '2',
-      delete: '1',
-      name: 'denominator',
-      small: 'yes'
+    up: '1',
+    down: '2',
+    'delete': '1',
+    name: 'denominator',
+    small: 'yes'
   }]
 };
 
