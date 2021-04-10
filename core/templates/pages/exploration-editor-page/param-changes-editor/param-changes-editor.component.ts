@@ -275,8 +275,7 @@ angular.module('oppia').component('paramChangesEditor', {
 });
 
 @Directive({
-  selector: 'param-changes-editor',
-  jit: true
+  selector: 'param-changes-editor'
 })
 export class ParamChangesEditorDirective extends UpgradeComponent {
   @Input() paramChangesService: unknown;
