@@ -86,7 +86,7 @@
         "unicode_str": "Type an expression here, using only numbers."
       }
     }, {
-      "description": "Use fraction instead of the division symbol (÷) to represent division.",
+      "description": "Represent division using fractions (rather than ÷).",
       "name": "useFractionForDivision",
       "schema": {
         "type": "bool"
@@ -632,7 +632,7 @@
         "default_value": []
       },
       {
-        "description": "Use fraction instead of the division symbol (÷) to represent division.",
+        "description": "Represent division using fractions (rather than ÷).",
         "name": "useFractionForDivision",
         "schema": {
           "type": "bool"
@@ -934,7 +934,7 @@
         "default_value": []
       },
       {
-        "description": "Use fraction instead of the division symbol (÷) to represent division.",
+        "description": "Represent division using fractions (rather than ÷).",
         "name": "useFractionForDivision",
         "schema": {
           "type": "bool"

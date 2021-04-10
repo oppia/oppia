@@ -48,8 +48,7 @@ class AlgebraicExpressionInput(base.BaseInteraction):
     }, {
         'name': 'useFractionForDivision',
         'description': (
-            'Use fraction instead of the division symbol (÷) to represent '
-            'division.'),
+            'Represent division using fractions (rather than ÷).'),
         'schema': {
             'type': 'bool'
         },
