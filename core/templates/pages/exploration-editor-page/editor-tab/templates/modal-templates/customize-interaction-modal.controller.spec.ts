@@ -25,7 +25,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { InteractionDetailsCacheService } from
   // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
+  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -45,6 +45,7 @@ import { InteractionObjectFactory } from
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { ContextService } from 'services/context.service';
 
 describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
@@ -52,6 +53,7 @@ describe('Customize Interaction Modal Controller', function() {
   var $uibModal = null;
   var $q = null;
   var $uibModalInstance = null;
+  var contextService = null;
   var imageClickInputValidationService = null;
   var editorFirstTimeEventsService = null;
   var interactionDetailsCacheService = null;
@@ -69,6 +71,7 @@ describe('Customize Interaction Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
+    contextService = TestBed.get(ContextService);
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
     imageClickInputValidationService = TestBed.get(
       ImageClickInputValidationService);
@@ -91,6 +94,58 @@ describe('Customize Interaction Modal Controller', function() {
 
   afterEach(() => {
     testSubscriptions.unsubscribe();
+  });
+
+  describe('when state editor is in story mode', function() {
+    beforeEach(angular.mock.inject(function(_$injector_, $controller) {
+      $injector = _$injector_;
+      var $rootScope = $injector.get('$rootScope');
+      $uibModal = $injector.get('$uibModal');
+      $q = $injector.get('$q');
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      stateCustomizationArgsService.init(stateName, {
+        imageAndRegions: {value: {
+          imagePath: '',
+          labeledRegions: []
+        }},
+        highlightRegionsOnHover: {value: false}
+      });
+      stateInteractionIdService.init(stateName, 'ImageClickInput');
+
+      $scope = $rootScope.$new();
+
+      $controller('CustomizeInteractionModalController', {
+        $injector: $injector,
+        $scope: $scope,
+        $uibModal: $uibModal,
+        $uibModalInstance: $uibModalInstance,
+        ContextService: contextService,
+        EditorFirstTimeEventsService: editorFirstTimeEventsService,
+        imageClickInputValidationService: imageClickInputValidationService,
+        InteractionDetailsCacheService: interactionDetailsCacheService,
+        InteractionObjectFactory: interactionObjectFactory,
+        StateCustomizationArgsService: stateCustomizationArgsService,
+        StateEditorService: stateEditorService,
+        StateInteractionIdService: stateInteractionIdService,
+        StateNextContentIdIndexService: stateNextContentIdIndexService,
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
+      });
+    }));
+
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.ALLOWED_INTERACTION_CATEGORIES.length).toBe(2);
+        expect(
+          $scope.ALLOWED_INTERACTION_CATEGORIES[0].interaction_ids.length
+        ).toBe(7);
+        expect(
+          $scope.ALLOWED_INTERACTION_CATEGORIES[1].interaction_ids.length
+        ).toBe(7);
+      });
   });
 
   describe('when state editor is in question mode', function() {

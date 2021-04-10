@@ -120,6 +120,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
     story_jobs_one_off.DescriptionLengthAuditOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
+    story_jobs_one_off.StoryExplorationsAuditOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.DeleteStoryCommitLogsOneOffJob,
     suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,

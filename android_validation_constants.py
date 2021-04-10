@@ -23,6 +23,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 # that is to be viewed on the Android app. If, in the future, this is
 # changed, just this array has to be modified to include the new
 # interactions or remove existing ones.
+# These are linked to the ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
+# constants in constants.ts.
 VALID_INTERACTION_IDS = [
     'AlgebraicExpressionInput', 'Continue', 'DragAndDropSortInput',
     'EndExploration', 'FractionInput', 'ImageClickInput', 'ItemSelectionInput',
@@ -30,8 +32,10 @@ VALID_INTERACTION_IDS = [
     'NumericInput', 'NumberWithUnits', 'RatioExpressionInput', 'TextInput'
 ]
 
+# This is linked to SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID in constants.ts.
 SUPPORTED_LANGUAGES = ['en']
 
+# This is linked to VALID_RTE_COMPONENTS_FOR_ANDROID in constants.ts.
 VALID_RTE_COMPONENTS = ['image', 'link', 'math', 'skillreview']
 
 # If any of the following values are changed, edit the corresponding value in
