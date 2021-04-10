@@ -71,6 +71,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
@@ -123,6 +124,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    PromoBarComponent,
     SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -132,12 +134,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    WrapTextWithEllipsisPipe,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
     TruncatePipe,
-    PromoBarComponent
   ],
 
   entryComponents: [
@@ -155,11 +157,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ImageUploaderComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
+    PromoBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
-    PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
   ],
@@ -176,8 +178,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    LazyLoadingComponent,
+    SchemaBasedEditorDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    PromoBarComponent,
     ImageUploaderComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
@@ -192,7 +197,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
-    PromoBarComponent
+    WrapTextWithEllipsisPipe,
   ],
 })
 
