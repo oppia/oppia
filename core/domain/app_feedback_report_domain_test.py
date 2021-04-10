@@ -76,54 +76,63 @@ ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
 class AppFeedbackReportTest(test_utils.GenericTestBase):
 
-    # def setUp(self):
-    #     super(AppFeedbackReportModelValidatorTests, self).setUp()
-    #     signup(USER_1_EMAIL, USER_1_USERNAME)
-    #     user_1_id = get_user_id_from_email(USER_1_EMAIL)
-    #     report_id = (
-    #         app_feedback_report_models.AppFeedbackReportModel.generate_id(
-    #             PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
-    #     app_feedback_report_models.AppFeedbackReportModel.create(
-    #         entity_id=report_id,
-    #         platform=PLATFORM_ANDROID,
-    #         submitted_on=REPORT_SUBMITTED_TIMESTAMP,
-    #         report_type=REPORT_TYPE_SUGGESTION,
-    #         category=CATEGORY_OTHER,
-    #         platform_version=PLATFORM_VERSION,
-    #         android_device_country_locale_code=(
-    #             COUNTRY_LOCALE_CODE_INDIA),
-    #         android_sdk_version=ANDROID_SDK_VERSION,
-    #         android_device_model=ANDROID_DEVICE_MODEL,
-    #         entry_point=ENTRY_POINT_NAVIGATION_DRAWER,
-    #         entry_point_topic_id=None,
-    #         entry_point_story_id=None,
-    #         entry_point_exploration_id=None,
-    #         entry_point_subtopic_id=None,
-    #         text_language_code=TEXT_LANGUAGE_CODE_ENGLISH,
-    #         audio_language_code=AUDIO_LANGUAGE_CODE_ENGLISH,
-    #         android_report_info=ANDROID_REPORT_INFO,
-    #         web_report_info=None)
+    def setUp(self):
+        super(AppFeedbackReportModelValidatorTests, self).setUp()
+        signup(USER_1_EMAIL, USER_1_USERNAME)
+        user_1_id = get_user_id_from_email(USER_1_EMAIL)
+        report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            entity_id=report_id,
+            platform=PLATFORM_ANDROID,
+            submitted_on=REPORT_SUBMITTED_TIMESTAMP,
+            report_type=REPORT_TYPE_SUGGESTION,
+            category=CATEGORY_OTHER,
+            platform_version=PLATFORM_VERSION,
+            android_device_country_locale_code=(
+                COUNTRY_LOCALE_CODE_INDIA),
+            android_sdk_version=ANDROID_SDK_VERSION,
+            android_device_model=ANDROID_DEVICE_MODEL,
+            entry_point=ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point_topic_id=None,
+            entry_point_story_id=None,
+            entry_point_exploration_id=None,
+            entry_point_subtopic_id=None,
+            text_language_code=TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=ANDROID_REPORT_INFO,
+            web_report_info=None)
 
-    # def test_to_dict(self):
-    #     expected_dict = {
-    #         'report_id': self.report_id,
-    #         'schema_version': ANDROID_REPORT_INFO_SCHEMA_VERSION,
-    #         'platform': PLATFORM_ANDROID,
-    #         'submitted_on_timestamp': utils.get_human_readable_time_string(
-    #             utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP)),
-    #         'ticket_id': TICKET_ID,
-    #         'scrubbed_by': None,
-    #         'user_supplied_feedback': user_supplied_feedback.to_dict(),
-    #         'device_system_context': device_system_context.to_dict(),
-    #         'app_context': app_context.to_dict()
-    #     }
-    #     actual_dict = app_feedback_report_domain.AppFeedbackReport(
-    #         FULL_MESSAGE_ID, THREAD_ID, MESSAGE_ID,
-    #         owner_id, expected_message_dict['updated_status'],
-    #         expected_message_dict['updated_subject'],
-    #         expected_message_dict['text'], fake_date, fake_date, False)
-    #     assertDictEqual(
-    #         expected_message_dict, observed_message.to_dict())
+    def test_to_dict(self):
+        expected_dict = {
+            'report_id': self.report_id,
+            'schema_version': ANDROID_REPORT_INFO_SCHEMA_VERSION,
+            'platform': PLATFORM_ANDROID,
+            'submitted_on_timestamp': utils.get_human_readable_time_string(
+                utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP)),
+            'ticket_id': TICKET_ID,
+            'scrubbed_by': None,
+            'user_supplied_feedback': {
+                'report_type': REPORT_TYPE_SUGGESTION,
+                'category': CATEGORY_OTHER,
+                'user_feedback_selected_items': None,
+                'user_feedback_other_text_input': 'add an admin'
+            },
+            'device_system_context': {
+                
+            },
+            'app_context': {
+                
+            }
+        }
+        actual_dict = app_feedback_report_domain.AppFeedbackReport(
+            FULL_MESSAGE_ID, THREAD_ID, MESSAGE_ID,
+            owner_id, expected_message_dict['updated_status'],
+            expected_message_dict['updated_subject'],
+            expected_message_dict['text'], fake_date, fake_date, False)
+        assertDictEqual(
+            expected_message_dict, observed_message.to_dict())
 
 
 

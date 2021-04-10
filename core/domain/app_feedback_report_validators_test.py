@@ -544,8 +544,8 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         'randomInteger123')
     REPORT_IDS_LIST = [REPORT_ID]
     TICKET_NAME = 'example ticket name'
-    REPORT_TYPE_SUGGESTION = 'suggestion_other'
-    CATEGORY_OTHER = 'other'
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'suggestion_other'
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
@@ -565,7 +565,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         'entry_point_info': {
             'entry_point_name': 'crash',
         },
-        'text_size': 'MEDIUM_TEXT_SIZE',
+        'text_size': 'medium_text_size',
         'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'account_is_profile_admin': False
@@ -632,11 +632,15 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
             'AppFeedbackReportTicketModel\', '
             '[u\'Entity id invalid_entity_id: Entity id does not match regex '
             'pattern\']]')
-
+        expected_output.append(
+            u'[u\'failed validation check for domain object check of '
+            'AppFeedbackReportTicketModel\', '
+            '[u\'Entity id invalid_entity_id: Entity fails domain validation '
+            'with the error The ticket id invalid_entity_id is invalid\']]')
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_newest_report_greater_than_current_datetime_fails(self):
+    def test_newest_report_timestamp_greater_than_current_datetime_fails(self):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 self.ticket_id))
@@ -656,7 +660,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_newest_report_less_than_earliest_datetime_fails(self):
+    def test_newest_report_timestamp_less_than_earliest_datetime_fails(self):
         model_entity = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 self.ticket_id))
@@ -692,9 +696,15 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on field report_ids having value '
                 'invalid_report_id, expected model AppFeedbackReportModel'
                 ' with id invalid_report_id but it doesn\'t exist"]]') % (
-                    model_entity.id)]
+                    model_entity.id),
+            (
+                u'[u\'failed validation check for domain object check of '
+                'AppFeedbackReportTicketModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error The report with id invalid_report_id is invalid.\']]' % (
+                    model_entity.id))]
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_validation_with_deleted_external_references_fails(self):
         report_model_to_delete = (
@@ -709,7 +719,13 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on field report_ids having value '
                 '%s, expected model AppFeedbackReportModel'
                 ' with id %s but it doesn\'t exist"]]') % (
-                    self.ticket_id, self.REPORT_ID, self.REPORT_ID)]
+                    self.ticket_id, self.REPORT_ID, self.REPORT_ID),
+            (
+                u'[u\'failed validation check for domain object check of '
+                'AppFeedbackReportTicketModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error The report with id %s is invalid.\']]' % (
+                    self.ticket_id, report_model_to_delete.id))]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

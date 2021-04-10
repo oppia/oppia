@@ -1178,8 +1178,8 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                 to; must be one of PLATFORM_CHOICES.
             newest_report_creation_timestamp: datetime.datetime. Timestamp in
                 UTC of the newest submitted report that is in this ticket.
-            reports: list(AppFeedbackReport). The list of AppFeedbackReport
-                objects assigned to this ticket.
+            reports: list(str). The list of IDs for the AppFeedbackReports
+                assigned to this ticket.
         """
         self.ticket_id = ticket_id
         self.ticket_name = ticket_name
@@ -1207,7 +1207,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             'archived': self.archived,
             'newest_report_creation_timestamp': (
                 self.newest_report_creation_timestamp.isoformat()),
-            'reports': [report.report_id for report in self.reports]
+            'reports': [report_id for report_id in self.reports]
         }
 
     def validate(self):
@@ -1221,18 +1221,22 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         self.require_valid_ticket_id(self.ticket_id)
         self.require_valid_ticket_name(self.ticket_name)
         AppFeedbackReport.require_valid_platform(self.platform)
+
         if self.github_issue_repo_name is not None:
             self.require_valid_github_repo(self.github_issue_repo_name)
-        if not isinstance(self.github_issue_number, int) or (
-            self.github_issue_number < 1):
-            raise utils.ValidationError(
-                'The Github issue number name must be a positive integer, '
-                'received: %r' % self.github_issue_number)
+            
+        if self.github_issue_number is not None:
+            if not isinstance(self.github_issue_number, int) or (
+                self.github_issue_number < 1):
+                raise utils.ValidationError(
+                    'The Github issue number name must be a positive integer, '
+                    'received: %r' % self.github_issue_number)
+    
         if not isinstance(self.archived, bool):
             raise utils.ValidationError(
                 'The ticket archived status must be a boolean, received: %r' % (
                     self.archived))
-        self.require_valid_reports(self.reports)
+        self.require_valid_report_ids(self.reports)
 
     @classmethod
     def require_valid_ticket_id(cls, ticket_id):
@@ -1276,23 +1280,26 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                     len(ticket_name), MAXIMUM_TICKET_NAME_LENGTH))
 
     @classmethod
-    def require_valid_reports(cls, reports_list):
+    def require_valid_report_ids(cls, report_ids):
         """Checks whether the reports in this ticket are valid.
 
         Args:
-            reports_list: list(AppFeedbackReport). The list of reports
+            report_ids: list(str). The list of reports IDs of the reports
                 associated with this ticket.
         Raises:
             ValidationError. The list of reports is invalid.
         """
-        if reports_list is None:
+        if report_ids is None:
             raise utils.ValidationError('No reports list supplied.')
-        if not isinstance(reports_list, list):
+        if not isinstance(report_ids, list):
             raise utils.ValidationError(
                 'The reports list should be a list, received: %r' % (
-                    reports_list))
-        for report in reports_list:
-            report.validate()
+                    report_ids))
+        for report_id in report_ids:
+            if app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id) is None:
+                raise utils.ValidationError(
+                    'The report with id %s is invalid.' % report_id)
 
     @classmethod
     def require_valid_github_repo(cls, repo_name):

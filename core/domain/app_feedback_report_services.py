@@ -316,17 +316,11 @@ def get_ticket_from_model(ticket_model):
         AppFeedbackReportTicket. An AppFeedbackReportTicket domain object
         corresponding to the given model.
     """
-    reports = []
-    for report_id in ticket_model.report_ids:
-        report_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                report_id))
-        reports.append(get_report_from_model(report_model))
-
     return app_feedback_report_domain.AppFeedbackReportTicket(
         ticket_model.id, ticket_model.ticket_name, ticket_model.platform,
         ticket_model.github_issue_repo_name, ticket_model.github_issue_number,
-        ticket_model.archived, ticket_model.newest_report_timestamp, reports)
+        ticket_model.archived, ticket_model.newest_report_timestamp,
+        ticket_model.report_ids)
 
 
 def get_report_stats_from_model(stats_model):
