@@ -43,7 +43,7 @@ interface RubricData {
 }
 
 @Component({
-  selector: 'rubrics-editor',
+  selector: 'oppia-rubrics-editor',
   templateUrl: './rubrics-editor.component.html'
 })
 export class RubricsEditorComponent {

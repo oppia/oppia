@@ -30,7 +30,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
 
 @Component({
-  selector: 'create-new-skill-modal',
+  selector: 'oppia-create-new-skill-modal',
   templateUrl: './create-new-skill-modal.component.html'
 })
 export class CreateNewSkillModalComponent {
