@@ -845,7 +845,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'exp1', 1, self.translator_id, change_dict, 'description')
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json('%s/translation/%s' % (
+        self.put_json('%s/translation/%s' % (
             feconf.SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'invalid_html': '<p>Test Trans</p>'
