@@ -477,6 +477,7 @@ class DeleteStoryCommitLogsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the job that deletes commit logs that reference already deleted
     stories.
     """
+
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
