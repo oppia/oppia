@@ -26,11 +26,13 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -1629,6 +1631,150 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id),
                 expected_status_int=401)
+        self.logout()
+
+
+class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
+    """Tests for can_update_suggestion decorator."""
+
+    owner_username = 'owner'
+    owner_email = 'owner@example.com'
+    author_username = 'author'
+    author_email = 'author@example.com'
+    reviewer_email = 'reviewer@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
+    TARGET_TYPE = 'exploration'
+    exploration_id = 'exp_id'
+    target_version_id = 1
+    change_dict = {
+        'cmd': 'add_translation',
+        'content_id': 'content',
+        'language_code': 'hi',
+        'content_html': '<p>old content html</p>',
+        'state_name': 'State 1',
+        'translation_html': '<p>Translation for content.</p>'
+    }
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_reviewer_or_suggester_update_suggestions
+        def get(self, suggestion_id):
+            self.render_json({'suggestion_id': suggestion_id})
+
+    def setUp(self):
+        super(DecoratorForUpdatingSuggestionTests, self).setUp()
+        self.signup(self.author_email, self.author_username)
+        self.signup(self.user_email, self.username)
+        self.signup(self.owner_email, self.owner_username)
+        self.signup(self.reviewer_email, 'reviewer1')
+        self.author_id = self.get_user_id_from_email(self.author_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.reviewer_id = self.get_user_id_from_email(
+            self.reviewer_email)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.author = user_services.get_user_actions_info(self.author_id)
+        user_services.update_user_role(self.owner_id, feconf.ROLE_ID_ADMIN)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'hi')
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+        self.login(self.author_email)
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                self.exploration_id, self.author_id, [
+                    'State 1', 'State 2', 'State 3'],
+                ['TextInput'], category='Algebra'))
+
+        self.old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['State 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exploration.states['State 2'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exploration.states['State 3'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+
+        rights_manager.publish_exploration(self.author, self.exploration_id)
+
+        self.new_content = state_domain.SubtitledHtml(
+            'content', '<p>new content html</p>').to_dict()
+        self.resubmit_change_content = state_domain.SubtitledHtml(
+            'content', '<p>resubmit change content html</p>').to_dict()
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, self.TARGET_TYPE,
+            self.exploration_id, self.target_version_id,
+            self.author_id,
+            self.change_dict, '')
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id),
+             ('target_id', self.exploration_id)])[0]
+        self.suggestion_id = suggestion.suggestion_id
+        self.logout()
+
+    def test_author_can_update_suggestion(self):
+        self.login(self.author_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+        self.logout()
+
+    def test_owner_can_update_suggestion(self):
+        self.login(self.owner_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+        self.logout()
+
+    def test_reviewer_can_update_suggestion(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+        self.logout()
+
+    def test_non_author_cannot_update_suggestion(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.suggestion_id, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You are not allowed to update the suggestion.')
+        self.logout()
+
+    def test_guest_cannot_update_suggestion(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.suggestion_id, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_suggestions_with_invalid_suggestion_id_cannot_be_updated(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % 'suggestion-id',
+                expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid format for suggestion_id. ' +
+            'It must contain 3 parts separated by \'.\'')
+        self.logout()
+
+    def test_suggestions_with_no_suggestions_are_rejected(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'exploration.exp1.' +
+                'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
+                expected_status_int=404)
         self.logout()
 
 

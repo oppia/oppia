@@ -14,8 +14,8 @@
   <div class="oppia-opportunity-pagination-contaniner" *ngIf="visibleOpportunities.length > 0">
     <button type="button"
             class="oppia-pagination-button"
-            (click)="gotoPage(activePageNumber - 1)"
-            [disabled]="activePageNumber == 1">
+            ng-click="$ctrl.gotoPage($ctrl.activePageNumber - 1)"
+            ng-disabled="$ctrl.activePageNumber == 1">
       <span class="material-icons">navigate_before</span>Previous
     </button>
     <button type="button"

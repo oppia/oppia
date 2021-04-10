@@ -2753,6 +2753,82 @@ def get_decorator_for_accepting_suggestion(decorator):
     return generate_decorator_for_handler
 
 
+def can_reviewer_or_suggester_update_suggestions(handler):
+    """Decorator to check whether user can update the suggestions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that has common checks and
+        permissions specified by passed in decorator. This function is allowed
+        to be made by the users who have the rights to accept suggestions and
+        the suggesters who made their own suggestions.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            edit this suggestion.
+        InvalidInputException. The submitted suggestion id is not valid.
+        PageNotFoundException. A suggestion is not found with the given
+            suggestion id.
+    """
+    def test_can_update_suggestion(
+            self, suggestion_id, **kwargs):
+        """Returns a handler to test whether a
+        suggestion can be updated based on the user's roles.
+
+        Args:
+            suggestion_id: str. The suggestion id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            function. The handler for updating a
+            suggestion.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                edit this suggestion.
+            InvalidInputException. The submitted suggestion id is not valid.
+            PageNotFoundException. A suggestion is not found with the given
+                suggestion id.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        user_actions = self.user.actions
+
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException(
+                'Invalid format for suggestion_id.'
+                ' It must contain 3 parts separated by \'.\'')
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        if suggestion is None:
+            raise self.PageNotFoundException
+
+        if suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if user_services.can_review_translation_suggestions(
+                    self.user_id,
+                    language_code=suggestion.change.language_code):
+                return handler(self, suggestion_id, **kwargs)
+
+        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+            return handler(self, suggestion_id, **kwargs)
+
+        if suggestion_services.check_can_resubmit_suggestion(
+                suggestion_id, self.user_id):
+            return handler(self, suggestion_id, **kwargs)
+
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You are not allowed to update the suggestion.')
+
+    test_can_update_suggestion.__wrapped__ = True
+    return test_can_update_suggestion
+
+
 def can_view_reviewable_suggestions(handler):
     """Decorator to check whether user can view the list of suggestions that
     they are allowed to review.

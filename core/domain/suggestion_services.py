@@ -412,6 +412,22 @@ def accept_suggestion(
         _update_user_proficiency(user_proficiency)
 
 
+def update_translation_suggestion(suggestion_id, translation_html):
+    """Updates the change.translation_html of a suggestion with the
+        given suggestion_id.
+
+    Args:
+        suggestion_id: str. The id of the suggestion to be updated.
+        translation_html: str. The new translation html.
+    """
+
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    suggestion.change.translation_html = translation_html
+
+    _update_suggestion(suggestion)
+
+
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
     """Rejects the suggestion with the given suggestion_id.
 

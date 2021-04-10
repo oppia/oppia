@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Translation Suggestion Review Modal Controller', function() {
@@ -28,12 +28,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let contributionAndReviewService = null;
   let AlertsService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     contributionAndReviewService = $injector.get(
@@ -108,8 +103,25 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith('Translation');
     });
 
-    it('should accept suggestion in suggestion modal service when clicking on' +
-      ' accept and review next suggestion button', function() {
+    it('should notify user on failed suggestion activities', function() {
+      const error = {
+        data: {
+          error: 'Error'
+        }
+      };
+      spyOn(AlertsService, 'clearWarnings');
+      spyOn(AlertsService, 'addWarning');
+
+      $scope.showTranslationSuggestionUpdateError(error);
+
+      expect(AlertsService.clearWarnings).toHaveBeenCalled();
+      expect(
+        AlertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid Suggestion: Error');
+    });
+
+    it('should accept suggestion in suggestion modal service when clicking' +
+      ' on accept and review next suggestion button', function() {
       expect($scope.activeSuggestionId).toBe('suggestion_1');
       expect($scope.activeSuggestion).toEqual(suggestion1);
       expect($scope.reviewable).toBe(reviewable);
@@ -126,22 +138,27 @@ describe('Translation Suggestion Review Modal Controller', function() {
         });
 
       $scope.reviewMessage = 'Review message example';
+      $scope.translationUpdated = true;
       $scope.acceptAndReviewNext();
 
       expect($scope.activeSuggestionId).toBe('suggestion_2');
       expect($scope.activeSuggestion).toEqual(suggestion2);
       expect($scope.reviewable).toBe(reviewable);
       expect($scope.reviewMessage).toBe('');
+      expect($scope.finalCommitMessage).toContain(' (With Edits)');
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
       expect(contributionAndReviewService.resolveSuggestionToExploration)
         .toHaveBeenCalledWith(
-          '1', 'suggestion_1', 'accept', 'Review message example',
-          'hint section of "StateName" card', $scope.showNextItemToReview,
+          '1', 'suggestion_1', 'accept', 'Review message example: ' +
+          'This suggestion was submitted with reviewer edits.',
+          'hint section of "StateName" card (With Edits)',
+          $scope.showNextItemToReview,
           jasmine.any(Function));
 
       $scope.reviewMessage = 'Review message example 2';
+      $scope.translationUpdated = false;
       $scope.acceptAndReviewNext();
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
@@ -244,6 +261,37 @@ describe('Translation Suggestion Review Modal Controller', function() {
       $scope.cancel();
       expect($uibModalInstance.close).toHaveBeenCalledWith([]);
     });
+
+    it('should open the translation editor when the edit button is clicked',
+      function() {
+        $scope.editSuggestion();
+        expect($scope.startedEditing).toBe(true);
+      });
+
+    it('should close the translation editor when the cancel button is clicked',
+      function() {
+        $scope.cancelEdit();
+        expect($scope.startedEditing).toBe(false);
+      });
+
+    it('should update translation when the update button is clicked',
+      function() {
+        $scope.activeSuggestion.suggestion_id = 'suggestion_1';
+        $scope.editedContent.html = '<p>Test</p>';
+        spyOn(contributionAndReviewService, 'updateTranslationSuggestion')
+          .and.callFake((
+              suggestionId, updatedTranslation,
+              successCallback, errorCallback) => {
+            successCallback();
+          });
+
+        $scope.updateSuggestion();
+
+        expect(contributionAndReviewService.updateTranslationSuggestion)
+          .toHaveBeenCalledWith(
+            'suggestion_1', '<p>Test</p>', jasmine.any(Function),
+            jasmine.any(Function));
+      });
   });
 
   describe('when viewing suggestion', function() {

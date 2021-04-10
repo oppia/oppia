@@ -763,6 +763,41 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
 
+    def test_update_translation_suggestion_to_change_translation_html(self):
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'state_name': 'State 1',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                self.target_id, self.author_id, [
+                    'State 1', 'State 2', 'State 3'],
+                ['TextInput'], category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['State 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id, 1, self.author_id, change_dict, 'description')
+        suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, '<p>Test Translation</p>')
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(
+            updated_suggestion.change.translation_html,
+            '<p>Test Translation</p>')
+
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (
