@@ -44,23 +44,27 @@ def get_audit_do_fn_types_by_kind():
     return audit_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
 
 
-def get_id_property_targets_by_kind():
-    """Returns all registered ID properties and the models they target, keyed by
-    the kind of models the ID properties belong to.
+def get_id_referencing_properties_by_kind_of_possessor():
+    """Returns properties whose values refer to the IDs of the corresponding
+    set of model kinds, grouped by the kind of model the properties belong to.
 
     Returns:
-        dict(str, dict(ModelProperty, tuple(str))). Model kinds mapped to the ID
-        properties they own and the kinds of models targeted by the ID property.
-    """
-    return audit_decorators.RelationshipsOf.get_id_property_targets_by_kind()
-
-
-def get_model_kinds_targeted_by_id_properties():
-    """Returns all of the model kinds that are targeted by ID properties.
-
-    Returns:
-        set(str). All model kinds targeted by one or more ID properties.
+        dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
+        (ModelProperty, tuple(kind of models)), grouped by the kind of model the
+        properties belong to.
     """
     return (
         audit_decorators.RelationshipsOf
-        .get_model_kinds_targeted_by_id_properties())
+        .get_id_referencing_properties_by_kind_of_possessor())
+
+
+def get_all_model_kinds_referenced_by_properties():
+    """Returns all model kinds that are referenced by another model's property.
+
+    Returns:
+        set(str). All model kinds referenced by one or more properties,
+        excluding the models' own ID.
+    """
+    return (
+        audit_decorators.RelationshipsOf
+        .get_all_model_kinds_referenced_by_properties())

@@ -145,6 +145,9 @@ class ModelProperty(python_utils.OBJECT):
     def __str__(self):
         return '%s.%s' % (self.model_kind, self.property_name)
 
+    def __repr__(self):
+        return 'ModelProperty(%s, %s)' % (self.model_kind, self)
+
     def __eq__(self, other):
         return (
             (

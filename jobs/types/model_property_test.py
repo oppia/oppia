@@ -97,6 +97,11 @@ class ModelPropertyTests(test_utils.TestBase):
             python_utils.UNICODE(self.model_property),
             'SubclassOfBaseModel.value')
 
+    def test_repr(self):
+        self.assertEqual(
+            repr(self.model_property),
+            'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.value)')
+
     def test_equality(self):
         self.assertNotEqual(self.model_property, self.repeated_model_property)
         self.assertEqual(

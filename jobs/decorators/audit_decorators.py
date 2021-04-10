@@ -141,19 +141,18 @@ class AuditsExisting(python_utils.OBJECT):
 
 
 class RelationshipsOf(python_utils.OBJECT):
-    """Decorator for describing {DependentModel.property: Model} relationships.
+    """Decorator for describing {Model.property: Model.ID} relationships.
 
     This decorator adds a domain-specific language (DSL) for defining the
-    relationships between model properties and the IDs of related models.
+    relationship between model properties and the IDs of related models.
 
-    The name of the function is enforced so that code reads intuitively:
+    The name of the function is enforced by the decorator so that code reads
+    intuitively:
         "Relationships Of [MODEL_CLASS]
         "define model_relationships(model):
             yield model.property, [RELATED_MODELS...]
 
-    This naming convention is enforced by the decorator.
-
-    A concrete example:
+    Example:
         @RelationshipsOf(UserAuthDetailsModel)
         def user_auth_details_model_relationships(model):
             yield (model.id, [UserSettingsModel])
@@ -161,9 +160,9 @@ class RelationshipsOf(python_utils.OBJECT):
             yield (model.gae_id, [UserIdentifiersModel])
     """
 
-    # Maps ModelProperty instances to the set of models whose IDs are referenced
-    # by the property's value.
-    _ID_PROPERTY_TARGETS = collections.defaultdict(set)
+    # A dict(ModelProperty: set(str)). The keys are properties of a model whose
+    # values refer to the IDs of their corresponding set of model kinds.
+    _ID_REFERENCING_PROPERTIES = collections.defaultdict(set)
 
     def __init__(self, model_class):
         """Initializes a new RelationshipsOf decorator.
@@ -181,52 +180,57 @@ class RelationshipsOf(python_utils.OBJECT):
         See RelationshipsOf's docstring for a usage example.
 
         Args:
-            model_relationships: callable. Expected to yield tuples with types
+            model_relationships: callable. Expected to yield tuples of type
                 (Property, list(class)), where the properties are from the
-                self._model_class passed in to the function as an argument.
+                argument provided to the function.
 
         Returns:
             generator. The same object.
         """
         self._validate_name_of_model_relationships(model_relationships)
-        for property_obj, corresponding_models in (
-                model_relationships(self._model_class)):
-            id_property = (
-                model_property.ModelProperty(self._model_class, property_obj))
-            self._ID_PROPERTY_TARGETS[id_property].update(
+
+        yielded_items = model_relationships(self._model_class)
+        for property_instance, referenced_models in yielded_items:
+            property_of_model = model_property.ModelProperty(
+                self._model_class, property_instance)
+            self._ID_REFERENCING_PROPERTIES[property_of_model].update(
                 self._get_model_kind(m)
-                for m in corresponding_models if m is not self._model_class)
+                for m in referenced_models if m is not self._model_class)
+
         return model_relationships
 
     @classmethod
-    def get_id_property_targets_by_kind(cls):
-        """Returns all registered ID properties and the models they target,
-        keyed by the kind of models the ID properties belong to.
+    def get_id_referencing_properties_by_kind_of_possessor(cls):
+        """Returns properties whose values refer to the IDs of the corresponding
+        set of model kinds, grouped by the kind of model the properties belong
+        to.
 
         Returns:
-            dict(str, tuple(tuple(ModelProperty, tuple(str)))). Model kinds
-            mapped to the ID properties they own and the kinds of models
-            targeted by the ID property.
+            dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of
+            (ModelProperty, set(kind of models)), grouped by the kind of model
+            the properties belong to.
         """
-        by_kind = lambda id_property: id_property.model_kind
-        id_property_targets_by_kind = itertools.groupby(
-            sorted(cls._ID_PROPERTY_TARGETS.keys(), key=by_kind), key=by_kind)
+        by_kind = lambda model_property: model_property.model_kind
+        id_referencing_properties_by_kind_of_possessor = itertools.groupby(
+            sorted(cls._ID_REFERENCING_PROPERTIES.keys(), key=by_kind),
+            key=by_kind)
+        references_of = lambda p: cls._ID_REFERENCING_PROPERTIES[p]
         return {
-            model_kind: tuple(
-                (id_property, tuple(cls._ID_PROPERTY_TARGETS[id_property]))
-                for id_property in id_properties)
-            for model_kind, id_properties in id_property_targets_by_kind
+            kind: tuple((p, tuple(references_of(p))) for p in properties)
+            for kind, properties in (
+                id_referencing_properties_by_kind_of_possessor)
         }
 
     @classmethod
-    def get_model_kinds_targeted_by_id_properties(cls):
-        """Returns all of the model kinds that are targeted by ID properties.
+    def get_all_model_kinds_referenced_by_properties(cls):
+        """Returns all model kinds that are referenced by another's property.
 
         Returns:
-            set(str). All model kinds targeted by one or more ID properties.
+            set(str). All model kinds referenced by one or more properties,
+            excluding the models' own ID.
         """
-        return set(
-            itertools.chain.from_iterable(cls._ID_PROPERTY_TARGETS.values()))
+        return set(itertools.chain.from_iterable(
+            cls._ID_REFERENCING_PROPERTIES.values()))
 
     def _get_model_kind(self, model_class):
         """Returns the kind of the model class.

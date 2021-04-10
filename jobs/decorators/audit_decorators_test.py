@@ -196,12 +196,12 @@ class MockRelationshipsOf(audit_decorators.RelationshipsOf):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value for the unit tests.
-    _ID_PROPERTY_TARGETS = collections.defaultdict(set)
+    _ID_REFERENCING_PROPERTIES = collections.defaultdict(set)
 
     @classmethod
     def clear(cls):
         """Test-only helper method for clearing the decorator."""
-        cls._ID_PROPERTY_TARGETS.clear()
+        cls._ID_REFERENCING_PROPERTIES.clear()
 
 
 class RelationshipsOfTests(test_utils.TestBase):
@@ -210,11 +210,26 @@ class RelationshipsOfTests(test_utils.TestBase):
         super(RelationshipsOfTests, self).tearDown()
         MockRelationshipsOf.clear()
 
+    def get_property_of(self, model_class, property_name):
+        """Helper method to create a ModelProperty.
+
+        Args:
+            model_class: *. A subclass of BaseModel.
+            property_name: str. The name of the property to get.
+
+        Returns:
+            ModelProperty. An object that encodes both property and the model it
+            belongs to.
+        """
+        return model_property.ModelProperty(
+            model_class, getattr(model_class, property_name))
+
     def test_has_no_relationships_by_default(self):
         self.assertEqual(
-            MockRelationshipsOf.get_id_property_targets_by_kind(), {})
+            MockRelationshipsOf
+            .get_id_referencing_properties_by_kind_of_possessor(), {})
         self.assertEqual(
-            MockRelationshipsOf.get_model_kinds_targeted_by_id_properties(),
+            MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
             set())
 
     def test_valid_relationship_generator(self):
@@ -224,17 +239,15 @@ class RelationshipsOfTests(test_utils.TestBase):
             yield (model.foo_id, [FooModel])
 
         self.assertEqual(
-            MockRelationshipsOf.get_id_property_targets_by_kind(), {
+            MockRelationshipsOf
+            .get_id_referencing_properties_by_kind_of_possessor(), {
                 b'BarModel': (
-                    (
-                        model_property.ModelProperty(BarModel, BarModel.foo_id),
-                        (b'FooModel',)),
+                    (self.get_property_of(BarModel, 'foo_id'), (b'FooModel',)),
                 ),
             })
         self.assertEqual(
-            MockRelationshipsOf.get_model_kinds_targeted_by_id_properties(), {
-                b'FooModel',
-            })
+            MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
+            {b'FooModel'})
 
     def test_accepts_id_as_property(self):
         @MockRelationshipsOf(BarModel)
@@ -243,17 +256,15 @@ class RelationshipsOfTests(test_utils.TestBase):
             yield (model.id, [BazModel])
 
         self.assertEqual(
-            MockRelationshipsOf.get_id_property_targets_by_kind(), {
+            MockRelationshipsOf
+            .get_id_referencing_properties_by_kind_of_possessor(), {
                 b'BarModel': (
-                    (
-                        model_property.ModelProperty(BarModel, BarModel.id),
-                        (b'BazModel',)),
+                    (self.get_property_of(BarModel, 'id'), (b'BazModel',)),
                 ),
             })
         self.assertEqual(
-            MockRelationshipsOf.get_model_kinds_targeted_by_id_properties(), {
-                b'BazModel',
-            })
+            MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
+            {b'BazModel'})
 
     def test_rejects_values_that_are_not_types(self):
         foo_model = FooModel()
