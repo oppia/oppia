@@ -54,17 +54,17 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
             audit_jobs.AuditAllStorageModelsJob(pipeline).run)
 
     def test_base_model_audits(self):
-        base_model_with_invalid_id = self.new_model(
+        base_model_with_invalid_id = self.create_model(
             base_models.BaseModel, id='123@?!*', deleted=False)
-        base_model_with_invalid_timestamps = self.new_model(
+        base_model_with_invalid_timestamps = self.create_model(
             base_models.BaseModel, id='124', deleted=False,
             created_on=self.NOW, last_updated=self.YEAR_LATER)
-        base_model_with_inconsistent_timestamps = self.new_model(
+        base_model_with_inconsistent_timestamps = self.create_model(
             base_models.BaseModel, id='125', deleted=False,
             created_on=self.YEAR_LATER, last_updated=self.YEAR_AGO)
-        expired_base_model = self.new_model(
+        expired_base_model = self.create_model(
             base_models.BaseModel, id='126', deleted=True)
-        valid_base_model = self.new_model(
+        valid_base_model = self.create_model(
             base_models.BaseModel, id='127', deleted=False)
 
         self.model_io_stub.put_multi([
@@ -87,10 +87,10 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_user_audits(self):
-        user_settings_model_with_invalid_id = self.new_model(
+        user_settings_model_with_invalid_id = self.create_model(
             user_models.UserSettingsModel,
             id='128', email='a@a.com')
-        user_settings_model_with_valid_id = self.new_model(
+        user_settings_model_with_valid_id = self.create_model(
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID, email='a@a.com')
 
@@ -107,7 +107,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
     def test_reports_error_when_id_property_target_does_not_exist(self):
         self.model_io_stub.put_multi([
             # UserEmailPreferencesModel.id -> UserSettingsModel.id.
-            self.new_model(
+            self.create_model(
                 user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
             # UserSettingsModel missing.
         ])
@@ -122,9 +122,9 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
     def test_empty_when_id_property_target_exists(self):
         self.model_io_stub.put_multi([
-            self.new_model(
+            self.create_model(
                 user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
-            self.new_model(
+            self.create_model(
                 user_models.UserSettingsModel,
                 id=self.VALID_USER_ID, email='a@a.com'),
         ])
@@ -133,13 +133,13 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
     def test_empty_when_web_of_id_property_targets_exist(self):
         self.model_io_stub.put_multi([
-            self.new_model(
+            self.create_model(
                 auth_models.UserAuthDetailsModel,
                 id=self.VALID_USER_ID, firebase_auth_id='abc', gae_id='123'),
-            self.new_model(
+            self.create_model(
                 auth_models.UserIdByFirebaseAuthIdModel,
                 id='abc', user_id=self.VALID_USER_ID),
-            self.new_model(
+            self.create_model(
                 auth_models.UserIdentifiersModel,
                 id='123', user_id=self.VALID_USER_ID),
         ])
@@ -148,13 +148,13 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
     def test_reports_missing_id_property_target_even_if_sibling_property_is_valid(self): # pylint: disable=line-too-long
         self.model_io_stub.put_multi([
-            self.new_model(
+            self.create_model(
                 auth_models.UserAuthDetailsModel, id=self.VALID_USER_ID,
                 # Value is not None, so UserIdentifiersModel must exist.
                 gae_id='abc',
                 # Value is None, so missing UserIdByFirebaseAuthIdModel is OK.
                 firebase_auth_id=None),
-            self.new_model(
+            self.create_model(
                 auth_models.UserIdentifiersModel, user_id=self.VALID_USER_ID,
                 # Should be gae_id='abc', so error will occur.
                 id='123'),

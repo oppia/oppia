@@ -221,7 +221,7 @@ class RelationshipsOfTests(test_utils.TestBase):
         @MockRelationshipsOf(BarModel)
         def bar_model_relationships(model): # pylint: disable=unused-variable
             """Defines the relationships of BarModel."""
-            yield model.foo_id, [FooModel]
+            yield (model.foo_id, [FooModel])
 
         self.assertEqual(
             MockRelationshipsOf.get_id_property_targets_by_kind(), {
@@ -240,7 +240,7 @@ class RelationshipsOfTests(test_utils.TestBase):
         @MockRelationshipsOf(BarModel)
         def bar_model_relationships(model): # pylint: disable=unused-variable
             """Defines the relationships of BarModel."""
-            yield model.id, [BazModel]
+            yield (model.id, [BazModel])
 
         self.assertEqual(
             MockRelationshipsOf.get_id_property_targets_by_kind(), {
@@ -270,4 +270,4 @@ class RelationshipsOfTests(test_utils.TestBase):
             @MockRelationshipsOf(BarModel)
             def unused_bar_model_relationships(unused_model):
                 """Defines the relationships of BarModel."""
-                yield BarModel.foo_id, [FooModel]
+                yield (BarModel.foo_id, [FooModel])

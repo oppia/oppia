@@ -156,11 +156,13 @@ class RelationshipsOf(python_utils.OBJECT):
     A concrete example:
         @RelationshipsOf(UserAuthDetailsModel)
         def user_auth_details_model_relationships(model):
-            yield model.id, [UserSettingsModel]
-            yield model.firebase_auth_id, [UserIdByFirebaseAuthId]
-            yield model.gae_id, [UserIdentifiersModel]
+            yield (model.id, [UserSettingsModel])
+            yield (model.firebase_auth_id, [UserIdByFirebaseAuthId])
+            yield (model.gae_id, [UserIdentifiersModel])
     """
 
+    # Maps ModelProperty instances to the set of models whose IDs are referenced
+    # by the property's value.
     _ID_PROPERTY_TARGETS = collections.defaultdict(set)
 
     def __init__(self, model_class):

@@ -19,24 +19,92 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import mock
+
+from core.platform import models
 from core.tests import test_utils
 from jobs import job_test_utils
 import python_utils
 
+import apache_beam as beam
 from apache_beam.testing import util as beam_testing_util
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
-    def test_flush_pipeline_strict_raises_runtime_error_after_second_call(self):
-        self.flush_pipeline(strict=True)
-        self.assertRaisesRegexp(
-            RuntimeError, 'must be called exactly once',
-            lambda: self.flush_pipeline(strict=True))
+    def test_assert_pcoll_empty_raises_immediately(self):
+        # NOTE: Arbitrary operations that produce a non-empty PCollection.
+        output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
+        with self.assertRaisesRegexp(AssertionError, 'failed'):
+            self.assert_pcoll_empty(output)
 
-    def test_flush_pipeline_not_strict_does_not_raise(self):
-        self.flush_pipeline(strict=False)
-        self.flush_pipeline(strict=False)
+    def test_assert_pcoll_equal_raises_immediately(self):
+        # NOTE: Arbitrary operations that produce an empty PCollection.
+        output = self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
+
+        with self.assertRaisesRegexp(AssertionError, 'failed'):
+            self.assert_pcoll_equal(output, [123])
+
+    def test_assert_pcoll_empty_raises_runtime_error_when_called_twice(self):
+        # NOTE: Arbitrary operations that produce a non-empty PCollection.
+        output = self.pipeline | beam.Create([]) | beam.Map(lambda x: x)
+
+        self.assert_pcoll_empty(output)
+
+        self.assertRaisesRegexp(
+            RuntimeError, 'may be called at most once',
+            lambda: self.assert_pcoll_empty(output))
+
+    def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(self):
+        # NOTE: Arbitrary operations that produce a non-empty PCollection.
+        output = self.pipeline | beam.Create([123]) | beam.Map(lambda x: x)
+
+        self.assert_pcoll_equal(output, [123])
+
+        self.assertRaisesRegexp(
+            RuntimeError, 'may be called at most once',
+            lambda: self.assert_pcoll_equal(output, [123]))
+
+    def test_create_model_sets_date_properties(self):
+        model = self.create_model(base_models.BaseModel)
+
+        self.assertEqual(model.created_on, self.YEAR_AGO)
+        self.assertEqual(model.last_updated, self.YEAR_AGO)
+
+
+class JobTestBaseTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = mock.Mock()
+
+    def setUp(self):
+        super(JobTestBaseTests, self).setUp()
+        self.JOB_CLASS.reset_mock()
+
+    def test_run_job(self):
+        job_instance = self.JOB_CLASS.return_value
+
+        self.run_job()
+
+        self.JOB_CLASS.assert_called_with(self.pipeline)
+        job_instance.run.assert_called()
+
+    def test_job_output_is(self):
+        job_instance = self.JOB_CLASS.return_value
+        job_instance.run.return_value = (
+            # NOTE: Arbitrary operations that produce a non-empty PCollection.
+            self.pipeline | beam.Create([123]) | beam.Map(lambda x: x))
+
+        self.assert_job_output_is([123])
+
+    def test_job_output_is_empty(self):
+        job_instance = self.JOB_CLASS.return_value
+        job_instance.run.return_value = (
+            # NOTE: Arbitrary operations that produce an empty PCollection.
+            self.pipeline | beam.Create([]) | beam.Map(lambda x: x))
+
+        self.assert_job_output_is_empty()
 
 
 class DecorateBeamErrorsTests(test_utils.TestBase):
