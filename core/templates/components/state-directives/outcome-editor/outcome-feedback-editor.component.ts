@@ -41,9 +41,9 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
     };
   }
 
-  updateHtml($feedback: string): void {
-    if ($feedback !== this.outcome.feedback.html) {
-      this.outcome.feedback.html = $feedback;
+  updateHtml(newHtmlString: string): void {
+    if (newHtmlString !== this.outcome.feedback.html) {
+      this.outcome.feedback.html = newHtmlString;
       this.changeDetectorRef.detectChanges();
     }
   }
