@@ -16,7 +16,7 @@
  * @fileoverview Component for the list view of opportunities.
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -50,6 +50,7 @@ export class OpportunitiesListComponent {
   OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
 
   constructor(
+    private zone: NgZone,
     private readonly contributionOpportunitiesService:
       ContributionOpportunitiesService,
     private readonly translationLanguageService: TranslationLanguageService) {
@@ -80,17 +81,20 @@ export class OpportunitiesListComponent {
 
   ngOnInit(): void {
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
-      this.opportunities = opportunitiesDicts;
-      // "more" returned from GAE storage is not always reliable if true.
-      // TODO(#11900): The following may not work if the last fetched
-      // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
-      // robust solution.
-      more = more && opportunitiesDicts.length === this.OPPORTUNITIES_PAGE_SIZE;
-      this.visibleOpportunities = this.opportunities.slice(
-        0, this.OPPORTUNITIES_PAGE_SIZE);
-      this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
-        this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
-      this.loadingOpportunityData = false;
+      this.zone.run(() => {
+        this.opportunities = opportunitiesDicts;
+        // "more" returned from GAE storage is not always reliable if true.
+        // TODO(#11900): The following may not work if the last fetched
+        // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
+        // robust solution.
+        more = more &&
+        opportunitiesDicts.length === this.OPPORTUNITIES_PAGE_SIZE;
+        this.visibleOpportunities = this.opportunities.slice(
+          0, this.OPPORTUNITIES_PAGE_SIZE);
+        this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
+          this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
+        this.loadingOpportunityData = false;
+      });
     });
   }
 

@@ -30,8 +30,8 @@
     </div>
   </div>
   <div class="oppia-opportunities-label-container oppia-animate-fadein" *ngIf="labelRequired">
-    <div class="oppia-opportunities-label" [ngStyle]="labelStyle" >
-      <span class="protractor-test-opportunity-list-item-label" [hidden]="!opportunityDataIsLoading">{{ labelText }}</span>
+    <div class="oppia-opportunities-label" [ngStyle]="labelStyle">
+      <span class="protractor-test-opportunity-list-item-label" [hidden]="opportunityDataIsLoading">{{ labelText }}</span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>

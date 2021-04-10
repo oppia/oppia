@@ -28,6 +28,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { AppConstants } from 'app.constants';
+import constants from 'assets/constants';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -66,6 +67,8 @@ export class TranslationModalComponent {
     'type': string;
     'ui_config': UiConfig;
   };
+  TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
+  activeLanguageCode: string;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -80,6 +83,8 @@ export class TranslationModalComponent {
   ) {}
 
   ngOnInit(): void {
+    this.activeLanguageCode =
+    this.translationLanguageService.getActiveLanguageCode();
     // We need to set the context here so that the rte fetches
     // images for the given ENTITY_TYPE and targetId.
     this.contextService.setCustomEntityContext(

@@ -4,8 +4,8 @@
       <div class="oppia-opportunities-subheading">{{ subheading }}</div>
       <div class="oppia-opportunities-heading">{{ heading }}</div>
     </div>
-    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
+    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" attr.aria-label="Close">
+      <span attr.aria-hidden="true">&times;</span>
     </button>
   </div>
 </div>
@@ -43,9 +43,9 @@
         </schema-based-editor>
       </div>
     </div>
-    <div ng-if="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
+    <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>
-        <li ng-repeat="tip in TRANSLATION_TIPS[activeLanguageCode]"><[tip]>
+        <li *ngFor="let tip of TRANSLATION_TIPS[activeLanguageCode]">{{tip}}
         </li>
       </ul>
     </div>
