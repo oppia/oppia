@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for the outcome feedback editor.
+ * @fileoverview Component for the outcome feedback editor.
  */
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
