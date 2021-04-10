@@ -64,5 +64,5 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
         expiration_date = (
             datetime.datetime.utcnow() -
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
-        if model.last_updated < expiration_date:
+        if expiration_date > model.last_updated:
             yield audit_errors.ModelExpiringError(model)
