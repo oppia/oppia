@@ -8,7 +8,7 @@ language_code: en
 objective: start speaking Spanish
 param_changes: []
 param_specs: {}
-schema_version: 48
+schema_version: 47
 states:
   Adios:
     classifier_model_id: null
@@ -74,7 +74,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -196,7 +195,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 10
     param_changes: []
     recorded_voiceovers:
@@ -296,7 +294,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 6
     param_changes: []
     recorded_voiceovers:
@@ -333,7 +330,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -426,7 +422,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -533,7 +528,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -642,7 +636,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -753,7 +746,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -779,6 +771,6 @@ states:
         feedback_1: {}
         feedback_2: {}
         feedback_3: {}
-states_schema_version: 43
+states_schema_version: 42
 tags: []
 title: "\xA1Hola!"

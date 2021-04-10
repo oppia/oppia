@@ -8,7 +8,7 @@ language_code: en
 objective: practice listening to and transcribing musical pitches
 param_changes: []
 param_specs: {}
-schema_version: 48
+schema_version: 47
 states:
   Choice from Interval-1:
     classifier_model_id: null
@@ -103,7 +103,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -224,7 +223,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -346,7 +344,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -468,7 +465,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -597,7 +593,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -719,7 +714,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -840,7 +834,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -965,7 +958,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 9
     param_changes: []
     recorded_voiceovers:
@@ -1008,7 +1000,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1306,7 +1297,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 11
     param_changes: []
     recorded_voiceovers:
@@ -1621,7 +1611,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 11
     param_changes: []
     recorded_voiceovers:
@@ -1863,7 +1852,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -2086,7 +2074,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 7
     param_changes: []
     recorded_voiceovers:
@@ -2384,7 +2371,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -2725,7 +2711,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 15
     param_changes: []
     recorded_voiceovers:
@@ -3077,7 +3062,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 15
     param_changes: []
     recorded_voiceovers:
@@ -3428,7 +3412,6 @@ states:
       hints: []
       id: MusicNotesInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 15
     param_changes: []
     recorded_voiceovers:
@@ -3468,6 +3451,6 @@ states:
         feedback_7: {}
         feedback_8: {}
         feedback_9: {}
-states_schema_version: 43
+states_schema_version: 42
 tags: []
 title: Pitch Perfect

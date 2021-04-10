@@ -8,7 +8,7 @@ language_code: en
 objective: Classify all the strings
 param_changes: []
 param_specs: {}
-schema_version: 48
+schema_version: 47
 states:
   End:
     classifier_model_id: null
@@ -25,7 +25,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1346,7 +1345,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 11
     param_changes: []
     recorded_voiceovers:
@@ -1378,6 +1376,6 @@ states:
         rule_input_10: {}
         rule_input_8: {}
         rule_input_9: {}
-states_schema_version: 43
+states_schema_version: 42
 tags: []
 title: ''

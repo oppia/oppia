@@ -8,7 +8,7 @@ language_code: en
 objective: To demonstrate the string classifier and trained responses in explorations.
 param_changes: []
 param_specs: {}
-schema_version: 48
+schema_version: 47
 states:
   final:
     classifier_model_id: null
@@ -25,7 +25,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -101,7 +100,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
@@ -121,6 +119,6 @@ states:
         feedback_1: {}
         feedback_2: {}
         rule_input_4: {}
-states_schema_version: 43
+states_schema_version: 42
 tags: []
 title: Demonstrating string classifier

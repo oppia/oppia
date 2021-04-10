@@ -15,7 +15,7 @@ param_changes:
 param_specs:
   guess:
     obj_type: UnicodeString
-schema_version: 48
+schema_version: 47
 states:
   Continue Option:
     classifier_model_id: null
@@ -80,7 +80,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
@@ -115,7 +114,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -284,7 +282,6 @@ states:
       hints: []
       id: NumericInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 8
     param_changes: []
     recorded_voiceovers:
@@ -372,7 +369,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
@@ -546,7 +542,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 12
     param_changes: []
     recorded_voiceovers:
@@ -633,7 +628,6 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -713,7 +707,6 @@ states:
       hints: []
       id: NumericInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
@@ -783,7 +776,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -966,7 +958,6 @@ states:
       hints: []
       id: SetInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 14
     param_changes:
     - customization_args:
@@ -1114,7 +1105,6 @@ states:
       hints: []
       id: NumericInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
@@ -1281,7 +1271,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 12
     param_changes: []
     recorded_voiceovers:
@@ -1315,6 +1304,6 @@ states:
         rule_input_7: {}
         rule_input_8: {}
         rule_input_9: {}
-states_schema_version: 43
+states_schema_version: 42
 tags: []
 title: Three Balls
