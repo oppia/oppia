@@ -87,8 +87,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             raise Exception(
                 'ERROR    Please run start.sh first to install node-eslint '
                 'or node-stylelint and its dependencies.')
-        files_to_lint = self.all_filepaths
-        num_files_with_errors = 0
+
         failed = False
         stripped_error_messages = []
         full_error_messages = []
@@ -96,27 +95,21 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
 
         stylelint_cmd_args = [
             node_path, stylelint_path, '--config=' + self.config_path]
-        result_list = []
-        for _, filepath in enumerate(files_to_lint):
-            proc_args = stylelint_cmd_args + [filepath]
-            proc = subprocess.Popen(
-                proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc_args = stylelint_cmd_args + self.all_filepaths
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-            linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-            linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
-            if linter_stderr:
-                raise Exception(linter_stderr)
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
 
-            if linter_stdout:
-                num_files_with_errors += 1
-                result_list.append(linter_stdout)
+        if linter_stderr:
+            raise Exception(linter_stderr)
 
-        if num_files_with_errors:
-            for result in result_list:
-                full_error_messages.append(result)
-                stripped_error_messages.append(
-                    self._get_trimmed_error_output(result))
+        if linter_stdout:
+            full_error_messages.append(linter_stdout)
+            stripped_error_messages.append(
+                self._get_trimmed_error_output(linter_stdout))
             failed = True
 
         return concurrent_task_utils.TaskResult(

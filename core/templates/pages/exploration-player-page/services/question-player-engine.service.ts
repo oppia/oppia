@@ -120,7 +120,8 @@ export class QuestionPlayerEngineService {
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId, interaction.customizationArgs, true, nextFocusLabel);
+        interactionId, interaction.customizationArgs, true, nextFocusLabel,
+        null);
     }
     var initialCard =
       this.stateCardObjectFactory.createNewCard(
@@ -144,7 +145,8 @@ export class QuestionPlayerEngineService {
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
       true,
-      labelForFocusTarget);
+      labelForFocusTarget,
+      null);
   }
 
   init(

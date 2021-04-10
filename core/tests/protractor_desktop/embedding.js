@@ -122,6 +122,7 @@ describe('Embedding', function() {
       // iframes. see: https://github.com/angular/protractor/issues/4678
       // Current, work-around is to use browser.sleep() before executing
       // functions that require angular to be present inside the iframe.
+      // eslint-disable-next-line oppia/protractor-practices
       await browser.sleep(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
@@ -146,17 +147,16 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    await users.createUser('user1@embedding.com', 'user1Embedding');
-    await users.login('user1@embedding.com', true);
+    await users.createAndLoginAdminUser(
+      'user1@embedding.com', 'user1Embedding');
 
     // Create exploration.
     // Version 1 is creation of the exploration.
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     // Create Version 2 of the exploration.
     await createCountingExploration();
-
-    await general.openEditor(explorationId);
+    await general.openEditor(explorationId, false);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Version 3'));
     await explorationEditorPage.saveChanges('demonstration edit');
@@ -267,6 +267,7 @@ describe('Embedding', function() {
         // iframes. see: https://github.com/angular/protractor/issues/4678
         // Current, work-around is to use browser.sleep() before executing
         // functions that require angular to be present inside the iframe.
+        // eslint-disable-next-line oppia/protractor-practices
         await browser.sleep(5000);
         await waitFor.pageToFullyLoad();
 
@@ -276,11 +277,10 @@ describe('Embedding', function() {
         await browser.switchTo().defaultContent();
       };
 
-      await users.createUser('embedder2@example.com', 'Embedder2');
-      await users.login('embedder2@example.com', true);
+      await users.createAndLoginAdminUser('embedder2@example.com', 'Embedder2');
 
       // Create an exploration.
-      await workflow.createExploration();
+      await workflow.createExploration(true);
       explorationId = await general.getExplorationIdFromEditor();
 
       await explorationEditorMainTab.setContent(
@@ -314,7 +314,7 @@ describe('Embedding', function() {
       await workflow.publishExploration();
 
       // Change language to Thai, which is not a supported site language.
-      await general.openEditor(explorationId);
+      await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
       await explorationEditorPage.saveChanges(
@@ -323,7 +323,7 @@ describe('Embedding', function() {
       await checkPlaceholder('Type a number');
 
       // Change language to Spanish, which is a supported site language.
-      await general.openEditor(explorationId);
+      await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('español');
       await explorationEditorPage.saveChanges(

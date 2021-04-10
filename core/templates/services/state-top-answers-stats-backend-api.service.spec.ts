@@ -25,7 +25,7 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 
 describe('StateTopAnswersStatsBackendApiService', () => {
-  let httpTestingController:HttpTestingController;
+  let httpTestingController: HttpTestingController;
   let stateTopAnswersStatsBackendApiService:
    StateTopAnswersStatsBackendApiService;
 

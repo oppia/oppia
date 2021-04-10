@@ -28,40 +28,11 @@ import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 
 interface EditableCollectionBackendResponse {
   collection: CollectionBackendDict;
 }
-
-interface AddNodeCollectionChange {
-  'cmd': 'add_collection_node';
-  'exploration_id': string;
-}
-
-interface SwapNodesCollectionChange {
-  'cmd': 'swap_nodes';
-  'first_index': number;
-  'second_index': number;
-}
-
-interface DeleteNodeCollectionChange {
-  'cmd': 'delete_collection_node',
-  'exploration_id': string;
-}
-
-interface EditCollectionPropertyChange {
-  'cmd': 'edit_collection_property';
-  'property_name': string;
-  'exploration_id': string;
-  'new_value': Object;
-  'old_value': Object;
-}
-
-type CollectionChange = (
-  AddNodeCollectionChange |
-  SwapNodesCollectionChange |
-  DeleteNodeCollectionChange |
-  EditCollectionPropertyChange);
 
 // TODO(bhenning): I think that this might be better merged with the
 // CollectionBackendApiService. However, that violates the principle of a
@@ -108,7 +79,7 @@ export class EditableCollectionBackendApiService {
 
   private _updateCollection(
       collectionId: string, collectionVersion: number,
-      commitMessage: string, changeList: CollectionChange[],
+      commitMessage: string, changeList: BackendChangeObject[],
       successCallback: (value: Collection) => void,
       errorCallback: (reason: string) => void): void {
     var editableCollectionDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -164,7 +135,7 @@ export class EditableCollectionBackendApiService {
   async updateCollectionAsync(
       collectionId: string, collectionVersion: number,
       commitMessage: string,
-      changeList: CollectionChange[]): Promise<Collection> {
+      changeList: BackendChangeObject[]): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this._updateCollection(
         collectionId, collectionVersion, commitMessage, changeList,

@@ -279,8 +279,8 @@
         </i>
       </div>
       <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
-        <button class="btn add-story-btn protractor-test-create-story-button"
-                ng-click="createCanonicalStory()">
+        <button class="btn add-story-btn protractor-test-create-story-button oppia-autofocus"
+                ng-click="createCanonicalStory()" focus-on="addStoryBtn">
           + ADD STORY
         </button>
         <div class="canonical-stories">
@@ -468,7 +468,7 @@
   .topic-editor .add-skill-btn,
   .topic-editor .add-story-btn {
     background-color: #008098;
-    color: #FFFFFF;
+    color: #FFF;
     font-weight: bold;
     text-align: left;
   }
@@ -621,7 +621,7 @@
   }
 
   .topic-editor .practice-tab-checkbox {
-    box-shadow: rgb(102, 102, 102) 0px 0px 0px 2px inset;
+    box-shadow: rgb(102, 102, 102) 0 0 0 2px inset;
   }
 
   .topic-editor .practice-tab-text {

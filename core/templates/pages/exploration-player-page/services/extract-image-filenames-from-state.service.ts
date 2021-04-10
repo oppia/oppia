@@ -19,6 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { ContentTranslationLanguageService } from
+  'pages/exploration-player-page/services/content-translation-language.service';
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { State } from 'domain/state/StateObjectFactory';
 import {
@@ -37,7 +41,11 @@ type CustomizationArgsWithChoices = (
   providedIn: 'root'
 })
 export class ExtractImageFilenamesFromStateService {
-  constructor(private htmlEscaperService: HtmlEscaperService) {}
+  constructor(
+    private htmlEscaperService: HtmlEscaperService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService
+  ) {}
 
     INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
     INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';
@@ -52,7 +60,10 @@ export class ExtractImageFilenamesFromStateService {
      *                         should be returned.
      */
     _getStateContentHtml(state: State): string {
-      return state.content.html;
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      return this.contentTranslationManagerService.getTranslatedHtml(
+        state.writtenTranslations, languageCode, state.content);
     }
 
     /**
@@ -63,13 +74,21 @@ export class ExtractImageFilenamesFromStateService {
      */
     _getOutcomesHtml(state: State): string {
       let outcomesHtml = '';
-      state.interaction.answerGroups.forEach(function(answerGroup) {
-        let answerGroupHtml = answerGroup.outcome.feedback.html;
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      state.interaction.answerGroups.forEach(answerGroup => {
+        let answerGroupHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            answerGroup.outcome.feedback));
         outcomesHtml = outcomesHtml.concat(answerGroupHtml);
       });
       if (state.interaction.defaultOutcome !== null) {
-        outcomesHtml = outcomesHtml.concat(
-          state.interaction.defaultOutcome.feedback.html);
+        let defaultOutcomeHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            state.interaction.defaultOutcome.feedback));
+        outcomesHtml = outcomesHtml.concat(defaultOutcomeHtml);
       }
       return outcomesHtml;
     }
@@ -80,8 +99,13 @@ export class ExtractImageFilenamesFromStateService {
      */
     _getHintsHtml(state: State): string {
       let hintsHtml = '';
-      state.interaction.hints.forEach(function(hint) {
-        let hintHtml = hint.hintContent.html;
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      state.interaction.hints.forEach(hint => {
+        let hintHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            hint.hintContent));
         hintsHtml = hintsHtml.concat(hintHtml);
       });
       return hintsHtml;
@@ -93,7 +117,11 @@ export class ExtractImageFilenamesFromStateService {
      *                         returned.
      */
     _getSolutionHtml(state: State): string {
-      return state.interaction.solution.explanation.html;
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      return this.contentTranslationManagerService.getTranslatedHtml(
+        state.writtenTranslations, languageCode,
+        state.interaction.solution.explanation);
     }
 
     /**
@@ -113,10 +141,16 @@ export class ExtractImageFilenamesFromStateService {
           state.interaction.id === this.INTERACTION_TYPE_ITEM_SELECTION ||
           state.interaction.id === this.INTERACTION_TYPE_DRAG_AND_DROP_SORT) {
         let customizationArgsHtml = '';
+        let languageCode = (
+          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+        );
+        const self = this;
         (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
           .choices.value.forEach(function(value) {
             customizationArgsHtml = (
-              customizationArgsHtml.concat(value.html));
+              customizationArgsHtml.concat(
+                self.contentTranslationManagerService.getTranslatedHtml(
+                  state.writtenTranslations, languageCode, value)));
           });
         _allHtmlInTheState.push(customizationArgsHtml);
       }
@@ -145,16 +179,53 @@ export class ExtractImageFilenamesFromStateService {
       let dummyDocument = (
         new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
-      let imageTagList = dummyDocument.getElementsByTagName(
-        'oppia-noninteractive-image');
-      for (let i = 0; i < imageTagList.length; i++) {
-        // We have the attribute of filepath in oppia-noninteractive-image tag.
-        // But it actually contains the filename only. We use the variable
-        // filename instead of filepath since in the end we are retrieving the
-        // filenames in the exploration.
-        let filename = JSON.parse(
-          imageTagList[i].getAttribute('filepath-with-value'));
-        filenames.push(filename);
+      let imageTagLists = [];
+
+      // Add images that are in the base content (not embedded).
+      imageTagLists.push(
+        dummyDocument.getElementsByTagName(
+          'oppia-noninteractive-image'));
+
+      // Add images that are embedded in collapsibles.
+      let collapsibleTagList = dummyDocument.getElementsByTagName(
+        'oppia-noninteractive-collapsible');
+      for (let i = 0; i < collapsibleTagList.length; i++) {
+        let contentWithValue = JSON.parse(
+          collapsibleTagList[i].getAttribute('content-with-value'));
+        let collapsibleDocument = (
+          new DOMParser().parseFromString(contentWithValue, 'text/html'));
+        imageTagLists.push(
+          collapsibleDocument.getElementsByTagName(
+            'oppia-noninteractive-image'));
+      }
+
+      // Add images that are embedded in tabs.
+      let tabsTagList = dummyDocument.getElementsByTagName(
+        'oppia-noninteractive-tabs');
+      for (let i = 0; i < tabsTagList.length; i++) {
+        let contentsWithValue = JSON.parse(
+          tabsTagList[i].getAttribute('tab_contents-with-value'));
+        for (let contentWithValue of contentsWithValue) {
+          let tabDocument = (
+            new DOMParser().parseFromString(
+              contentWithValue.content, 'text/html'));
+          imageTagLists.push(
+            tabDocument.getElementsByTagName(
+              'oppia-noninteractive-image'));
+        }
+      }
+
+      for (let imageTagList of imageTagLists) {
+        for (let i = 0; i < imageTagList.length; i++) {
+          // We have the attribute of filepath in oppia-noninteractive-image
+          // tag. But it actually contains the filename only. We use the
+          // variable filename instead of filepath since in the end we are
+          // retrieving the filenames in the exploration.
+          let filename = JSON.parse(
+            this.htmlEscaperService.escapedStrToUnescapedStr(
+              imageTagList[i].getAttribute('filepath-with-value')));
+          filenames.push(filename);
+        }
       }
       return filenames;
     }

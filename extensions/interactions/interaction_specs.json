@@ -992,7 +992,7 @@
       "IsGreaterThan": "is greater than {{f|Fraction}}",
       "HasIntegerPartEqualTo": "has integer part equal to {{x|Int}}",
       "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
-      "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
+      "HasDenominatorEqualTo": "has denominator equal to {{x|PositiveInt}}"
     }
   },
   "RatioExpressionInput": {
@@ -1022,7 +1022,7 @@
         }
       },
       {
-        "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted.",
+        "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted. The number of elements should not be greater than 10.",
         "name": "numberOfTerms",
         "schema": {
           "type": "int",
@@ -1030,6 +1030,10 @@
             {
               "min_value": 0,
               "id": "is_at_least"
+            },
+            {
+              "max_value": 10,
+              "id": "is_at_most"
             }
           ]
         },
@@ -1041,7 +1045,8 @@
     "rule_descriptions": {
       "Equals": "is equal to {{x|RatioExpression}}",
       "IsEquivalent": "is equivalent to {{x|RatioExpression}}",
-      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|NonnegativeInt}}"
+      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|PositiveInt}}",
+      "HasSpecificTermEqualTo": "has term {{x|PositiveInt}} equal to {{y|PositiveInt}}"
     }
   }
 }

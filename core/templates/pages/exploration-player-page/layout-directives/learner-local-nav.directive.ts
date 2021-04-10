@@ -30,9 +30,6 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'feedback-popup.directive.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
-require(
-  'pages/exploration-player-page/suggestion-modal-for-learner-local-view/' +
-  'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
 require('services/attribution.service');
 require('services/user.service.ts');
@@ -54,7 +51,6 @@ angular.module('oppia').directive('learnerLocalNav', [
         '$http', '$rootScope', '$uibModal', 'AlertsService',
         'AttributionService', 'ExplorationEngineService',
         'LoaderService', 'ReadOnlyExplorationBackendApiService',
-        'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService',
         'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
@@ -62,7 +58,6 @@ angular.module('oppia').directive('learnerLocalNav', [
             $http, $rootScope, $uibModal, AlertsService,
             AttributionService, ExplorationEngineService,
             LoaderService, ReadOnlyExplorationBackendApiService,
-            SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService,
             ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
@@ -72,10 +67,6 @@ angular.module('oppia').directive('learnerLocalNav', [
               FEEDBACK_POPOVER_PATH);
           };
 
-          ctrl.showLearnerSuggestionModal = function() {
-            SuggestionModalForExplorationPlayerService.showSuggestionModal(
-              'edit_exploration_state_content', {});
-          };
           ctrl.showFlagExplorationModal = function() {
             $uibModal.open({
               template: require(

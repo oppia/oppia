@@ -20,6 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
+import { BaseTranslatableObject, InteractionRuleInputs } from
+  'interactions/rule-input-defs';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from
@@ -56,7 +58,7 @@ export class ContentTranslationManagerService {
     private extensionTagAssemblerService: ExtensionTagAssemblerService
   ) {}
 
-  init(explorationLanguageCode: string) : void {
+  init(explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
     this.originalTranscript = cloneDeep(
       this.playerTranscriptService.transcript);
@@ -77,7 +79,7 @@ export class ContentTranslationManagerService {
    * the page and restart the exploration.
    * @param {string} languageCode The language code to display translations for.
    */
-  displayTranslations(languageCode: string) : void {
+  displayTranslations(languageCode: string): void {
     const cards = this.playerTranscriptService.transcript;
 
     if (languageCode === this.explorationLanguageCode) {
@@ -90,6 +92,30 @@ export class ContentTranslationManagerService {
     this.onStateCardContentUpdateEmitter.emit();
   }
 
+  getTranslatedHtml(
+      writtenTranslations: WrittenTranslations,
+      languageCode: string,
+      content: SubtitledHtml
+  ): string {
+    const writtenTranslation = writtenTranslations.translationsMapping[
+      content.contentId][languageCode];
+    if (!writtenTranslation) {
+      return content.html;
+    }
+    const translationText = writtenTranslation.getTranslation();
+
+    // The isString() check is needed for the TypeScript compiler to narrow the
+    // type down from string|string[] to string. See "Using type predicates" at
+    // https://www.typescriptlang.org/docs/handbook/2/narrowing.html
+    // for more information.
+    if (this._isString(translationText) &&
+        this._isValidStringTranslation(writtenTranslation)) {
+      return translationText;
+    }
+
+    return content.html;
+  }
+
   _swapContent(
       writtenTranslations: WrittenTranslations,
       languageCode: string,
@@ -98,7 +124,7 @@ export class ContentTranslationManagerService {
     const writtenTranslation = writtenTranslations.translationsMapping[
       content.contentId][languageCode];
 
-    if (!this._isValidTranslation(writtenTranslation)) {
+    if (!this._isValidStringTranslation(writtenTranslation)) {
       return;
     }
 
@@ -113,13 +139,20 @@ export class ContentTranslationManagerService {
     content[valueName] = writtenTranslation.translation;
   }
 
-  _displayTranslationsForCard(card: StateCard, languageCode: string) : void {
+  _displayTranslationsForCard(card: StateCard, languageCode: string): void {
     const writtenTranslations = card.writtenTranslations;
 
     const contentTranslation = writtenTranslations.translationsMapping[
       card.contentId][languageCode];
-    if (this._isValidTranslation(contentTranslation)) {
-      card.contentHtml = contentTranslation.translation;
+    const contentTranslationText = contentTranslation.getTranslation();
+
+    // The isString() check is needed for the TypeScript compiler to narrow the
+    // type down from string|string[] to string. See "Using type predicates" at
+    // https://www.typescriptlang.org/docs/handbook/2/narrowing.html
+    // for more information.
+    if (this._isString(contentTranslationText) &&
+        this._isValidStringTranslation(contentTranslation)) {
+      card.contentHtml = contentTranslationText;
     }
 
     card.getHints().forEach(hint => this._swapContent(
@@ -145,8 +178,8 @@ export class ContentTranslationManagerService {
     });
 
     if (card.getInteraction().id) {
-      this._swapContentInCustomizationArgs(
-        card, languageCode);
+      this._swapContentInCustomizationArgs(card, languageCode);
+      this._swapContentInRules(card, languageCode);
     }
   }
 
@@ -201,9 +234,52 @@ export class ContentTranslationManagerService {
     card.setInteractionHtml(element.get(0).outerHTML);
   }
 
-  _isValidTranslation(writtenTranslation: WrittenTranslation): boolean {
+  _swapContentInRules(card: StateCard, languageCode: string): void {
+    const writtenTranslations = card.writtenTranslations;
+    const CONTENT_ID_KEY = 'contentId';
+
+    const answerGroups = card.getInteraction().answerGroups;
+    answerGroups.forEach(answerGroup => {
+      answerGroup.rules.forEach(rule => {
+        for (var key in rule.inputs) {
+          let ruleInputValue = rule.inputs[key];
+          if (this._isTranslatableObject(ruleInputValue)) {
+            const writtenTranslation = writtenTranslations.translationsMapping[
+              ruleInputValue.contentId][languageCode];
+            // There must be at least one translation.
+            if (writtenTranslation.translation.length === 0) {
+              continue;
+            }
+
+            let ruleInputValueKeys = Object.keys(ruleInputValue);
+
+            // Remove the 'contentId' key.
+            let contentIdIndex = ruleInputValueKeys.indexOf(CONTENT_ID_KEY);
+            ruleInputValueKeys.splice(contentIdIndex, 1);
+
+            // Retrieve the value corresponding to the other key.
+            let nonContentIdKey = ruleInputValueKeys[0];
+            ruleInputValue[nonContentIdKey] = writtenTranslation.translation;
+          }
+        }
+      });
+    });
+  }
+
+  _isTranslatableObject(
+      ruleInputValue: InteractionRuleInputs):
+      ruleInputValue is BaseTranslatableObject {
+    return 'contentId' in ruleInputValue;
+  }
+
+  _isString(translation: string|string[]): translation is string {
+    return (typeof translation === 'string');
+  }
+
+  _isValidStringTranslation(writtenTranslation: WrittenTranslation): boolean {
     return (
       writtenTranslation !== undefined &&
+      this._isString(writtenTranslation.translation) &&
       writtenTranslation.translation !== '' &&
       writtenTranslation.needsUpdate === false);
   }

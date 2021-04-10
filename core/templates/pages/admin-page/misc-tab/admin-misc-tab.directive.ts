@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * @fileoverview Directive for the miscellaneous tab in the admin panel.
  */
 
+require('domain/admin/admin-backend-api.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
@@ -24,12 +25,12 @@ require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window',
-  'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  '$rootScope', '$sce', '$window', 'AdminBackendApiService',
+  'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window,
-      AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      $rootScope, $sce, $window, AdminBackendApiService,
+      AdminTaskManagerService, UrlInterpolationService,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
@@ -44,16 +45,24 @@ angular.module('oppia').directive('adminMiscTab', [
         const ctrl = this;
         const DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-        const SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/senddummymailtoadminhandler');
-        const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
-        const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
-          '/numberofdeletionrequestshandler');
         const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
+        const explorationStatsRegenerationUtilityCsvRows = [
+          [
+            'Exploration ID',
+            'No. of valid Exploration Stats',
+            'No. of valid State Stats',
+            'Missing Exploration Stats',
+            'Missing State Stats',
+            'Errors'
+          ]
+        ];
 
         ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
+
+        ctrl.resetExplorationStatsRegenerationUtilityCsvRows = function() {
+          explorationStatsRegenerationUtilityCsvRows.length = 1;
+        };
 
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -66,16 +75,21 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.setStatusMessage('Clearing search index...');
 
           AdminTaskManagerService.startTask();
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'clear_search_index'
-          }).then(function() {
-            ctrl.setStatusMessage('Index successfully cleared.');
-            AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-            AdminTaskManagerService.finishTask();
-          });
+          AdminBackendApiService.clearSearchIndexAsync()
+            .then(() => {
+              ctrl.setStatusMessage('Index successfully cleared.');
+              AdminTaskManagerService.finishTask();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse);
+              AdminTaskManagerService.finishTask();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            });
         };
 
         ctrl.regenerateOpportunitiesRelatedToTopic = function() {
@@ -86,17 +100,83 @@ angular.module('oppia').directive('adminMiscTab', [
             return;
           }
           ctrl.regenerationMessage = 'Regenerating opportunities...';
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'regenerate_topic_related_opportunities',
-            topic_id: ctrl.topicIdForRegeneratingOpportunities
-          }).then(function(response) {
+          AdminBackendApiService.regenerateOpportunitiesRelatedToTopicAsync(
+            ctrl.topicIdForRegeneratingOpportunities).then(response => {
             ctrl.regenerationMessage = (
               'No. of opportunities model created: ' +
-              response.data.opportunities_count);
-          }, function(errorResponse) {
+              response);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
+          }, errorResponse => {
             ctrl.regenerationMessage = (
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
           });
+        };
+
+        const populateExplorationStatsRegenerationCsvResult = function(expIds) {
+          if (expIds.length === 0) {
+            let csvContent = explorationStatsRegenerationUtilityCsvRows.map(
+              row => row.join(',')).join('\n');
+            ctrl.csvUri = $sce.trustAsResourceUrl(
+              window.URL.createObjectURL(
+                new Blob([csvContent], { type: 'text/csv' })));
+            ctrl.csvFilename = (
+              `missing-exp-stats-output-${(new Date()).getTime()}.csv`);
+            ctrl.missingExplorationStatsRegenerationMessage = (
+              'Process complete. Please download the CSV output.');
+            return;
+          }
+          let expIdToRegenerate = expIds.pop();
+          ctrl.missingExplorationStatsRegenerationMessage = (
+            `Regenerating stats for Exploration id ${expIdToRegenerate}` +
+            '. Please wait.');
+          AdminBackendApiService
+            .populateExplorationStatsRegenerationCsvResultAsync(
+              expIdToRegenerate
+            ).then(response => {
+              explorationStatsRegenerationUtilityCsvRows.push([
+                expIdToRegenerate,
+                response.num_valid_exp_stats,
+                response.num_valid_state_stats,
+                `"${response.missing_exp_stats.join(', ') || 'NA'}"`,
+                `"${response.missing_state_stats.join(', ') || 'NA'}"`,
+                'NA'
+              ]);
+              populateExplorationStatsRegenerationCsvResult(expIds);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
+              explorationStatsRegenerationUtilityCsvRows.push([
+                expIdToRegenerate,
+                'NA',
+                'NA',
+                'NA',
+                'NA',
+                errorResponse]);
+              populateExplorationStatsRegenerationCsvResult(expIds);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            });
+        };
+
+        ctrl.regenerateMissingExplorationStats = function() {
+          ctrl.csvUri = null;
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (!$window.confirm(irreversibleActionMessage)) {
+            return;
+          }
+          let expIds = (
+            ctrl.explorationIdsForRegeneratingMissingStats.replaceAll(
+              ' ', '').split(','));
+          populateExplorationStatsRegenerationCsvResult(expIds);
         };
 
         ctrl.uploadTopicSimilaritiesFile = function() {
@@ -106,16 +186,20 @@ angular.module('oppia').directive('adminMiscTab', [
           var reader = new FileReader();
           reader.onload = function(e) {
             var data = (<FileReader>e.target).result;
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'upload_topic_similarities',
-              data: data
-            }).then(function() {
-              ctrl.setStatusMessage(
-                'Topic similarities uploaded successfully.');
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
+            AdminBackendApiService.uploadTopicSimilaritiesAsync(data)
+              .then(() => {
+                ctrl.setStatusMessage(
+                  'Topic similarities uploaded successfully.');
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
+                $rootScope.$apply();
+              }, errorResponse => {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse);
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
+                $rootScope.$apply();
+              });
           };
           reader.readAsText(file);
         };
@@ -130,73 +214,182 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.sendDummyMailToAdmin = function() {
-          $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
-            .then(function(response) {
+          AdminBackendApiService.sendDummyMailToAdminAsync()
+            .then(() => {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
-            }, function(errorResponse) {
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
             });
         };
 
         ctrl.flushMemoryCache = function() {
-          $http.post(MEMORY_CACHE_HANDLER_URL)
-            .then(function(response) {
+          AdminBackendApiService.flushMemoryCacheAsync()
+            .then(() => {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
-            }, function(errorResponse) {
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
             });
         };
 
         ctrl.getMemoryCacheProfile = function() {
-          $http.get(MEMORY_CACHE_HANDLER_URL)
-            .then(function(response) {
+          AdminBackendApiService.getMemoryCacheProfileAsync()
+            .then(response => {
               ctrl.result = {
-                totalAllocatedInBytes: response.data.total_allocation,
-                peakAllocatedInBytes: response.data.peak_allocation,
-                totalKeysStored: response.data.total_keys_stored
+                totalAllocatedInBytes: response.total_allocation,
+                peakAllocatedInBytes: response.peak_allocation,
+                totalKeysStored: response.total_keys_stored
               };
               ctrl.memoryCacheDataFetched = true;
               ctrl.setStatusMessage('Success!');
-            }, function(errorResponse) {
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
             });
         };
 
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
-          $http.put(
-            UPDATE_USERNAME_HANDLER_URL, {
-              old_username: ctrl.oldUsername,
-              new_username: ctrl.newUsername
-            }).then(
-            function(response) {
-              ctrl.setStatusMessage(
-                'Successfully renamed ' + ctrl.oldUsername + ' to ' +
-                  ctrl.newUsername + '!');
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            }
-          );
+          AdminBackendApiService.updateUserNameAsync(
+            ctrl.oldUsername, ctrl.newUsername)
+            .then(
+              () => {
+                ctrl.setStatusMessage(
+                  'Successfully renamed ' + ctrl.oldUsername + ' to ' +
+                    ctrl.newUsername + '!');
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
+                $rootScope.$apply();
+              }, errorResponse => {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse);
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
+                $rootScope.$apply();
+              }
+            );
         };
 
         ctrl.getNumberOfPendingDeletionRequestModels = function() {
           ctrl.setStatusMessage(
             'Getting the number of users that are being deleted...');
-          $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(
-            function(response) {
+          AdminBackendApiService.getNumberOfPendingDeletionRequestAsync()
+            .then(pendingDeletionRequests => {
               ctrl.setStatusMessage(
                 'The number of users that are being deleted is: ' +
-                response.data.number_of_pending_deletion_models);
-            },
-            function(errorResponse) {
+              pendingDeletionRequests.number_of_pending_deletion_models);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
             }
-          );
+            );
+        };
+
+        ctrl.grantSuperAdminPrivileges = function() {
+          ctrl.setStatusMessage('Communicating with Firebase server...');
+          AdminBackendApiService.grantSuperAdminPrivilegesAsync(
+            ctrl.usernameToGrant
+          ).then(
+            () => {
+              ctrl.setStatusMessage('Success!');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            });
+        };
+
+        ctrl.revokeSuperAdminPrivileges = function() {
+          ctrl.setStatusMessage('Communicating with Firebase server...');
+          AdminBackendApiService.revokeSuperAdminPrivilegesAsync(
+            ctrl.usernameToRevoke
+          ).then(
+            () => {
+              ctrl.setStatusMessage('Success!');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            });
+        };
+
+        ctrl.getModelsRelatedToUser = function() {
+          ctrl.setStatusMessage('Getting the models related to user...');
+          AdminBackendApiService.getModelsRelatedToUserAsync(ctrl.userIdToGet)
+            .then(isModal => {
+              if (isModal) {
+                ctrl.setStatusMessage(
+                  'Some related models exist, see logs ' +
+                  'to find out the exact models'
+                );
+              } else {
+                ctrl.setStatusMessage('No related models exist');
+              }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }
+            );
+        };
+
+        ctrl.deleteUser = function() {
+          ctrl.setStatusMessage('Starting the deletion of the user...');
+          AdminBackendApiService.deleteUserAsync(
+            ctrl.userIdToDelete, ctrl.usernameToDelete)
+            .then(() => {
+              ctrl.setStatusMessage('The deletion process was started.');
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, errorResponse => {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }
+            );
         };
 
         ctrl.submitQuery = function() {
@@ -230,6 +423,8 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.regenerationMessage = null;
           ctrl.oldUsername = null;
           ctrl.newUsername = null;
+          ctrl.explorationIdForRegeneratingMissingStats = null;
+          ctrl.missingExplorationStatsRegenerationMessage = null;
         };
       }]
     };

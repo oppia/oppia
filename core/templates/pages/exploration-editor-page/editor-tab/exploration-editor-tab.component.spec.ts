@@ -22,8 +22,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -60,9 +58,8 @@ import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { EditabilityService } from 'services/editability.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -70,6 +67,7 @@ describe('Exploration editor tab component', function() {
   var $scope = null;
   var $rootScope = null;
   var $uibModal = null;
+  var $timeout = null;
   var answerGroupObjectFactory = null;
   var editabilityService = null;
   var explorationFeaturesService = null;
@@ -85,7 +83,7 @@ describe('Exploration editor tab component', function() {
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
   var userExplorationPermissionsService = null;
-
+  var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
 
   importAllAngularServices();
@@ -97,16 +95,13 @@ describe('Exploration editor tab component', function() {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.get(SolutionObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
-    $provide.value(
-      'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
-    $provide.value(
-      'EditabilityService', TestBed.get(EditabilityService));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
@@ -150,8 +145,10 @@ describe('Exploration editor tab component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
+    $timeout = $injector.get('$timeout');
     stateEditorService = $injector.get('StateEditorService');
     editabilityService = $injector.get('EditabilityService');
+    focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
     explorationStatesService = $injector.get('ExplorationStatesService');
@@ -313,6 +310,33 @@ describe('Exploration editor tab component', function() {
 
   afterEach(() => {
     ctrl.$onDestroy();
+  });
+
+  it('should apply autofocus to elements in active tab', () => {
+    spyOn(routerService, 'getActiveTabName').and.returnValues(
+      'main', 'feedback', 'history');
+    spyOn(focusManagerService, 'setFocus');
+    ctrl.windowOnload();
+    expect(ctrl.TabName).toBe('main');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'oppiaEditableSection');
+    ctrl.windowOnload();
+    expect(ctrl.TabName).toBe('feedback');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'newThreadButton');
+    ctrl.windowOnload();
+    expect(ctrl.TabName).toBe('history');
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'usernameInputField');
+  });
+
+  it('should call focus method when window loads', () => {
+    stateEditorService.setActiveStateName('First State');
+    var ctrlSpy = spyOn(ctrl, 'windowOnload');
+    ctrl.initStateEditor();
+    $scope.$apply();
+    $timeout.flush();
+    expect(ctrlSpy).toHaveBeenCalled();
   });
 
   it('should initialize controller properties after its initialization',

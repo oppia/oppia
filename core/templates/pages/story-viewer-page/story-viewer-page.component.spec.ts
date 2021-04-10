@@ -187,7 +187,7 @@ describe('Story Viewer Page component', function() {
   }));
 
   it('should get path icon parameters after story data is loaded', function() {
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       $q.resolve(storyPlaythrough));
     ctrl.$onInit();
     $rootScope.$apply();
@@ -212,7 +212,7 @@ describe('Story Viewer Page component', function() {
 
   it('should show warning when fetching story data fails', function() {
     spyOn(alertsService, 'addWarning');
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       $q.reject({
         status: 404
       }));
@@ -243,7 +243,8 @@ describe('Story Viewer Page component', function() {
 
   it('should change page title and meta tag when story data is fetched',
     function() {
-      spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         $q.resolve(storyPlaythrough));
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'updateMetaTag');
@@ -260,7 +261,7 @@ describe('Story Viewer Page component', function() {
     });
 
   it('should show story\'s chapters when story has chapters', function() {
-    spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       $q.resolve(storyPlaythrough));
 
     ctrl.$onInit();
@@ -271,7 +272,8 @@ describe('Story Viewer Page component', function() {
 
   it('should not show story\'s chapters when story has no chapters',
     function() {
-      spyOn(storyViewerBackendApiService, 'fetchStoryData').and.returnValue(
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         $q.resolve(StoryPlaythrough.createFromBackendDict({
           story_nodes: [],
           story_title: 'Story Title 1',

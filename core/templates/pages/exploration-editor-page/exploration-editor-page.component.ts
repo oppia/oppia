@@ -54,9 +54,6 @@ require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.component.ts');
 require('pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.component.ts');
 require('pages/exploration-editor-page/history-tab/history-tab.component.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
@@ -155,6 +152,7 @@ require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
 
+require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorPage', {
@@ -172,7 +170,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationParamSpecsService', 'ExplorationPropertyService',
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
-    'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
+    'ExplorationTitleService', 'ExplorationWarningsService',
+    'FocusManagerService', 'GraphDataService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateEditorRefreshService', 'StateEditorService',
@@ -193,7 +192,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationParamSpecsService, ExplorationPropertyService,
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
-        ExplorationTitleService, ExplorationWarningsService, GraphDataService,
+        ExplorationTitleService, ExplorationWarningsService,
+        FocusManagerService, GraphDataService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateEditorRefreshService, StateEditorService,
@@ -400,6 +400,20 @@ angular.module('oppia').component('explorationEditorPage', {
         return RouterService.getActiveTabName();
       };
 
+      ctrl.setFocusOnActiveTab = function(activeTab) {
+        if (activeTab === 'history') {
+          FocusManagerService.setFocus('usernameInputField');
+        }
+        if (activeTab === 'feedback') {
+          if (!ctrl.activeThread) {
+            FocusManagerService.setFocus('newThreadButton');
+          }
+          if (ctrl.activeThread) {
+            FocusManagerService.setFocus('tmpMessageText');
+          }
+        }
+      };
+
       ctrl.startEditorTutorial = function() {
         EditabilityService.onStartTutorial();
         if (RouterService.getActiveTabName() !== 'main') {
@@ -453,8 +467,14 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.selectStatsTab = () => RouterService.navigateToStatsTab();
       ctrl.selectImprovementsTab = (
         () => RouterService.navigateToImprovementsTab());
-      ctrl.selectHistoryTab = () => RouterService.navigateToHistoryTab();
-      ctrl.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
+      ctrl.selectHistoryTab = () => {
+        RouterService.navigateToHistoryTab();
+        ctrl.setFocusOnActiveTab('history');
+      };
+      ctrl.selectFeedbackTab = () => {
+        RouterService.navigateToFeedbackTab();
+        ctrl.setFocusOnActiveTab('feedback');
+      };
       ctrl.getOpenThreadsCount = (
         () => ThreadDataBackendApiService.getOpenThreadsCount());
       ctrl.showUserHelpModal = () => {

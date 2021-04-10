@@ -2,14 +2,16 @@
   <div ng-if="!$ctrl.activeThread">
     <div ng-if="$ctrl.threadData.suggestionThreads.length > 0">
       <h2>Suggestions from Learners</h2>
-      <thread-table threads="$ctrl.threadData.suggestionThreads"
-                    on-click-row="$ctrl.setActiveThread">
-      </thread-table>
+      <oppia-thread-table ng-if="$ctrl.threadData.suggestionThreads"
+                          [threads]="$ctrl.threadData.suggestionThreads"
+                          (row-click)="$ctrl.setActiveThread($event)">
+      </oppia-thread-table>
       <br>
     </div>
 
     <div class="float-right">
-      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success float-right" ng-click="$ctrl.showCreateThreadModal()">
+      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success float-right oppia-autofocus"
+              ng-click="$ctrl.showCreateThreadModal()" focus-on="newThreadButton">
         Start new thread
       </button>
     </div>
@@ -22,9 +24,10 @@
       <em>No feedback has been given for this exploration yet.</em>
     </div>
 
-    <thread-table threads="$ctrl.threadData.feedbackThreads"
-                  on-click-row="$ctrl.setActiveThread">
-    </thread-table>
+    <oppia-thread-table ng-if="$ctrl.threadData.feedbackThreads"
+                        [threads]="$ctrl.threadData.feedbackThreads"
+                        (row-click)="$ctrl.setActiveThread($event)">
+    </oppia-thread-table>
 
     <em ng-if="!$ctrl.userIsLoggedIn">To create a new feedback thread, please log in.</em>
   </div>
@@ -107,9 +110,9 @@
             Add new message
             <span ng-if="$ctrl.isExplorationEditable() && !$ctrl.activeThread.isSuggestionThread()">(and/or change status)</span>
           </label>
-          <textarea class="form-control protractor-test-feedback-response-textarea" ng-model="$ctrl.tmpMessage.text"
+          <textarea class="form-control protractor-test-feedback-response-textarea oppia-autofocus" ng-model="$ctrl.tmpMessage.text"
                     id="$ctrl.tmpMessageText" rows="6"
-                    ng-disabled="$ctrl.messageSendingInProgress">
+                    ng-disabled="$ctrl.messageSendingInProgress" focus-on="tmpMessageText">
           </textarea>
         </div>
 
@@ -168,7 +171,7 @@
     margin-top: 6px;
   }
   feedback-tab .oppia-icon-container {
-    color: #ff0000;
+    color: #f00;
     margin-top: 7px;
   }
   feedback-tab .oppia-feedback-response-send-btn {

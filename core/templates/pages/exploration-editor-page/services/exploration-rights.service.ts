@@ -22,10 +22,12 @@ require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ExplorationRightsService', [
   '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
-  'ACTIVITY_STATUS_PUBLIC',
+  'ACTIVITY_STATUS_PUBLIC', 'ROLE_EDITOR', 'ROLE_OWNER', 'ROLE_VIEWER',
+  'ROLE_VOICE_ARTIST',
   function(
       $http, AlertsService, ExplorationDataService,
-      ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
+      ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, ROLE_EDITOR, ROLE_OWNER,
+      ROLE_VIEWER, ROLE_VOICE_ARTIST) {
     return {
       init: function(
           ownerNames, editorNames, voiceArtistNames, viewerNames, status,
@@ -114,6 +116,40 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
+      removeRoleAsync: function(memberUsername) {
+        var that = this;
+        var requestUrl = (
+          '/createhandler/rights/' + ExplorationDataService.explorationId);
+
+        return $http['delete'](requestUrl, {
+          params: {
+            username: memberUsername
+          }
+        }).then(function(response) {
+          var data = response.data;
+          AlertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
+        });
+      },
+      checkUserAlreadyHasRoles: function(username) {
+        return [...this.ownerNames, ...this.editorNames, ...this.viewerNames,
+          ...this.voiceArtistNames].includes(username);
+      },
+      getOldRole: function(username) {
+        if (this.ownerNames.includes(username)) {
+          return ROLE_OWNER;
+        } else if (this.editorNames.includes(username)) {
+          return ROLE_EDITOR;
+        } else if (this.voiceArtistNames.includes(username)) {
+          return ROLE_VOICE_ARTIST;
+        } else {
+          return ROLE_VIEWER;
+        }
+      },
       publish: function() {
         var that = this;
         var requestUrl = (
@@ -131,13 +167,14 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      saveModeratorChangeToBackend: function(emailBody) {
+      saveModeratorChangeToBackendAsync: async function(
+          emailBody) {
         var that = this;
         var explorationModeratorRightsUrl = (
           '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
 
-        $http.put(explorationModeratorRightsUrl, {
+        return $http.put(explorationModeratorRightsUrl, {
           email_body: emailBody,
           version: ExplorationDataService.data.version
         }).then(function(response) {

@@ -97,6 +97,17 @@
       "rules": {
         "oppia/e2e-action": "error",
       }
+    },
+    {
+      // We only run the protractor practices checks on protractor end-to-end test files.
+      "files": [
+        "core/tests/protractor/*.js",
+        "core/tests/protractor_utils/*.js",
+        "core/tests/protractor_desktop/*.js"
+      ],
+      "rules": {
+        "oppia/protractor-practices": "error",
+      }
     }
   ],
   "rules": {
@@ -373,6 +384,7 @@
     "@typescript-eslint/prefer-as-const": ["error"],
     "@typescript-eslint/no-array-constructor": ["error"],
     "@typescript-eslint/no-extra-semi": ["error"],
+    "@typescript-eslint/type-annotation-spacing": ["error"],
     "wrap-iife": [
       "error",
       "any"

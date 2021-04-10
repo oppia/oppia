@@ -27,13 +27,13 @@ require('services/html-escaper.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveMath', [
-  'AssetsBackendApiService', 'ContextService', 'HtmlEscaperService',
-  'ImageLocalStorageService', 'ImagePreloaderService', 'ENTITY_TYPE',
-  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  '$rootScope', 'AssetsBackendApiService', 'ContextService',
+  'HtmlEscaperService', 'ImageLocalStorageService', 'ImagePreloaderService',
+  'ENTITY_TYPE', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
-      AssetsBackendApiService, ContextService, HtmlEscaperService,
-      ImageLocalStorageService, ImagePreloaderService, ENTITY_TYPE,
-      IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+      $rootScope, AssetsBackendApiService, ContextService,
+      HtmlEscaperService, ImageLocalStorageService, ImagePreloaderService,
+      ENTITY_TYPE, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     return {
       restrict: 'E',
       scope: {},
@@ -68,6 +68,7 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
             ImagePreloaderService.getImageUrl(svgFilename)
               .then(function(objectUrl) {
                 ctrl.imageUrl = objectUrl;
+                $rootScope.$applyAsync();
               });
           } else {
             // This is the case when user is not in the exploration player. We
