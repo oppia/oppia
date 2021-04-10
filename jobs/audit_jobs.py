@@ -33,8 +33,14 @@ import apache_beam as beam
 AUDIT_DO_FN_TYPES_BY_KIND = audits_registry.get_audit_do_fn_types_by_kind()
 KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 
+# Type is: dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
+# (ModelProperty, tuple(kind of models)), grouped by the kind of model the
+# properties belong to.
 ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR = (
     audits_registry.get_id_referencing_properties_by_kind_of_possessor())
+
+# Type is: set(str). All model kinds referenced by one or more properties,
+# excluding the models' own ID.
 ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES = (
     audits_registry.get_all_model_kinds_referenced_by_properties())
 
