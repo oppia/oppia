@@ -2212,3 +2212,25 @@ class ExplorationSummary(python_utils.OBJECT):
                 self.contributors_summary.get(contributor_id, 0) + 1)
 
         self.contributor_ids = list(self.contributors_summary.keys())
+
+class MachineTranslatedText(python_utils.OBJECT):
+    """Domain object for machine translation of exploration content."""
+
+    def __init__(
+            self, source_language_code, target_langage_code, origin_text,
+            translated_text):
+        """Initializes a MachineTranslatedText domain object.
+
+        Args:
+            source_language_code: str. The code that represents the language of
+                the original text.
+            target_langage_code: str. The code that represents the language of
+                the translated text.
+            origin_text: str. The original text to be translated.
+            translated_text: str. The machine generated translation of the
+                original text.
+        """
+        self.source_language_code = source_language_code
+        self.target_langage_code = target_langage_code
+        self.origin_text = origin_text
+        self.translated_text = translated_text
