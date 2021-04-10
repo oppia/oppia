@@ -30,8 +30,8 @@
     </div>
   </div>
   <div class="oppia-opportunities-label-container oppia-animate-fadein" *ngIf="labelRequired">
-    <div class="oppia-opportunities-label" [ngStyle]="labelStyle" >
-      <span class="protractor-test-opportunity-list-item-label" [hidden]="!opportunityDataIsLoading">{{ labelText }}</span>
+    <div class="oppia-opportunities-label" [ngStyle]="labelStyle">
+      <span class="protractor-test-opportunity-list-item-label" [hidden]="opportunityDataIsLoading">{{ labelText }}</span>
       <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
@@ -45,7 +45,7 @@
 </div>
 <style>
   .oppia-opportunities-button {
-    background-color: #ffffff;
+    background-color: #fff;
     border: 2px solid #009688;
     border-radius: 5px;
     color: #009688;
@@ -56,7 +56,7 @@
   }
   .oppia-opportunities-button:hover {
     background-color: #6f817f;
-    color: #ffffff;
+    color: #fff;
     -webkit-transition: background-color 200ms ease-out;
     -ms-transition: background-color 200ms ease-out;
     transition: background-color 200ms ease-out;
@@ -100,7 +100,7 @@
     width: 25%;
   }
   .oppia-opportunities-label {
-    background-color: #ffffff;
+    background-color: #fff;
     border-radius: 8px;
     min-width: 150px;
     opacity: 0.8;
@@ -121,7 +121,7 @@
     width: 60%;
   }
   .oppia-opportunities-list-item {
-    background-color: #ffffff;
+    background-color: #fff;
     border: 1px solid #e8e7e2;
     display: flex;
     height: 90px;

@@ -17,9 +17,9 @@
 */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
@@ -29,6 +29,10 @@ import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from '../services/translate-text.service';
+
+class MockChangeDetectorRef {
+  detectChanges(): void {}
+}
 
 describe('Translation Modal Component', () => {
   let contextService: ContextService;
@@ -41,6 +45,7 @@ describe('Translation Modal Component', () => {
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalComponent>;
   let component: TranslationModalComponent;
+  let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
   const opportunity: TranslationOpportunity = {
     id: '1',
     heading: 'Heading',
@@ -49,7 +54,7 @@ describe('Translation Modal Component', () => {
     actionButtonTitle: 'Action Button'
   };
 
-  beforeEach(fakeAsync(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -58,14 +63,20 @@ describe('Translation Modal Component', () => {
         TranslationModalComponent
       ],
       providers: [
-        NgbActiveModal
+        NgbActiveModal,
+        {
+          provide: ChangeDetectorRef,
+          useValue: changeDetectorRef
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents().then(() => {
-      fixture = TestBed.createComponent(TranslationModalComponent);
-      component = fixture.componentInstance;
-      component.opportunity = opportunity;
-    });
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TranslationModalComponent);
+    component = fixture.componentInstance;
+    component.opportunity = opportunity;
     httpTestingController = TestBed.inject(HttpTestingController);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     contextService = TestBed.inject(ContextService);
@@ -75,7 +86,22 @@ describe('Translation Modal Component', () => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
-  }));
+  });
+
+  it('should invoke change detection when html is updated', () => {
+    component.activeWrittenTranslation.html = 'old';
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateHtml('new');
+    expect(component.activeWrittenTranslation.html).toEqual('new');
+  });
+
+  it('should not invoke change detection when html is not updated', () => {
+    component.activeWrittenTranslation.html = 'old';
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateHtml('old');
+    expect(component.activeWrittenTranslation.html).toEqual('old');
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
+  });
 
   afterEach(() => {
     httpTestingController.verify();

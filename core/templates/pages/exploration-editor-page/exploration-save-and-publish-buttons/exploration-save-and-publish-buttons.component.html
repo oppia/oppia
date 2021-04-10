@@ -1,7 +1,7 @@
 <ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak">
 
   <!-- Start of html for large screens. -->
-  <li class="nav-item d-none d-sm-block" ng-if="showPublishButton()">
+  <li class="nav-item d-none d-sm-block" ng-if="explorationCanBePublished">
     <div class="btn-group oppia-publish-button-container"
          uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
          tooltip-placement="bottom"

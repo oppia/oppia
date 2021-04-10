@@ -4,8 +4,8 @@
       <div class="oppia-opportunities-subheading">{{ subheading }}</div>
       <div class="oppia-opportunities-heading">{{ heading }}</div>
     </div>
-    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
+    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" attr.aria-label="Close">
+      <span attr.aria-hidden="true">&times;</span>
     </button>
   </div>
 </div>
@@ -38,9 +38,16 @@
       <div class="protractor-test-state-translation-editor">
         <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
         <schema-based-editor [schema]="getHtmlSchema.bind(this)"
-                             [(localValue)]="activeWrittenTranslation.html">
+                             [localValue]="activeWrittenTranslation.html"
+                             (localValueChange)="updateHtml($event)">
         </schema-based-editor>
       </div>
+    </div>
+    <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
+      <ul>
+        <li *ngFor="let tip of TRANSLATION_TIPS[activeLanguageCode]">{{tip}}
+        </li>
+      </ul>
     </div>
   </div>
 </div>
@@ -98,6 +105,12 @@
   }
   .oppia-text-to-translate-container {
     border: 1px solid #ccc;
+    margin: 15px 0;
+    padding: 20px;
+  }
+  .oppia-translation-tips-container {
+    background-color: #EEE;
+    border: 1px solid #EEE;
     margin: 15px 0;
     padding: 20px;
   }

@@ -28,6 +28,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
+import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 
 @NgModule({
   imports: [
@@ -37,10 +38,12 @@ import { SkillCreationService } from 'components/entity-creation-services/skill-
     DynamicContentModule,
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SelectTopicsComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SelectTopicsComponent
   ],
   providers: [
     SkillCreationService,

@@ -751,6 +751,7 @@ class BuildTests(test_utils.GenericTestBase):
         app_dev_yaml_temp_file.name = mock_dev_yaml_filepath
         with python_utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write(u'Some content in mock_app_dev.yaml\n')
+            tmp.write(u'  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write(u'version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
@@ -1149,7 +1150,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_build_using_webpack_command(self):
         def mock_check_call(cmd, **unused_kwargs):
-            expected_command = '%s %s --config %s' % (
+            expected_command = '%s --max-old-space-size=2400 %s --config %s' % (
                 common.NODE_BIN_PATH, build.WEBPACK_FILE,
                 build.WEBPACK_PROD_CONFIG
             )
