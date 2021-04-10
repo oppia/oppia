@@ -824,8 +824,33 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=500)
         self.assertEqual(
             response['error'],
-            'The suggestion with id %s has already been accepted' % (
+            'The suggestion with id %s has been accepted or rejected' % (
                 suggestion.suggestion_id))
+        self.logout()
+
+    def test_update_translation_invalid_input_exception(self):
+        self.login(self.TRANSLATOR_EMAIL)
+        change_dict = {
+            'cmd': 'add_translation',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'state_name': 'State 1',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', 1, self.translator_id, change_dict, 'description')
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json('%s/translation/%s' % (
+            feconf.SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'invalid_html': '<p>Test Trans</p>'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
         self.logout()
 
 

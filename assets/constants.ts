@@ -50,6 +50,8 @@ export default {
 
   "ACTION_ACCEPT_SUGGESTION": "accept",
   "ACTION_REJECT_SUGGESTION": "reject",
+  "STATUS_SUGGESTION_ACCEPTED": "accepted",
+  "STATUS_SUGGESTION_REJECTED": "rejected",
 
   "SKILL_STATUS_OPTIONS": {
     "ALL": "All",

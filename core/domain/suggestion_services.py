@@ -417,18 +417,15 @@ def update_translation_suggestion(suggestion_id, translation_html):
         given suggestion_id.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be accepted.
+        suggestion_id: str. The id of the suggestion to be updated.
         translation_html: str. The new translation html.
-
-    Returns:
-        Suggestion. The updated suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
 
     suggestion.change.translation_html = translation_html
 
-    return _update_suggestion(suggestion)
+    _update_suggestion(suggestion)
 
 
 def reject_suggestion(suggestion_id, reviewer_id, review_message):

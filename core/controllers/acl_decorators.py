@@ -2753,18 +2753,17 @@ def get_decorator_for_accepting_suggestion(decorator):
     return generate_decorator_for_handler
 
 
-def can_update_suggestions(handler):
-    """Decorator to check whether user can update the suggestions that
-    they are allowed to review.
+def can_reviewer_or_suggester_update_suggestions(handler):
+    """Decorator to check whether user can update the suggestions.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that has common checks and
-        permissions specified by passed in decorator. Users with rights
-        to accept translations andthe user who created a particular
-        translation are allowed to perform this action.
+        permissions specified by passed in decorator. This function is allowed
+        to be made by the users who have the rights to accept suggestions and
+        the suggesters who made their own suggestions.
 
     Raises:
         NotLoggedInException. The user is not logged in.
@@ -2777,7 +2776,7 @@ def can_update_suggestions(handler):
     def test_can_update_suggestion(
             self, suggestion_id, **kwargs):
         """Returns a handler to test whether a
-        suggestion can be updated based on the user roles.
+        suggestion can be updated based on the user's roles.
 
         Args:
             suggestion_id: str. The suggestion id.
@@ -2797,11 +2796,7 @@ def can_update_suggestions(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
-        user_actions = user_services.get_user_actions_info(
-            self.user_id
-        ).actions
-        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
-            return handler(self, suggestion_id, **kwargs)
+        user_actions = self.user.actions
 
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException(
@@ -2820,12 +2815,15 @@ def can_update_suggestions(handler):
                     language_code=suggestion.change.language_code):
                 return handler(self, suggestion_id, **kwargs)
 
+        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+            return handler(self, suggestion_id, **kwargs)
+
         if suggestion_services.check_can_resubmit_suggestion(
                 suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
-        else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You are not allowed to update the suggestion.')
+
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You are not allowed to update the suggestion.')
 
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion
