@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Error classes for model validations."""
+"""Error classes for model audits."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -24,14 +24,14 @@ import feconf
 import python_utils
 
 
-class ModelValidationErrorBase(python_utils.OBJECT):
-    """Base class for model validation errors.
+class BaseAuditError(python_utils.OBJECT):
+    """Base class for model audit errors.
 
     NOTE: Apache Beam will use pickle to serialize/deserialize class instances.
     """
 
-    # ModelValidationErrorBase and its subclasses will hold exactly one
-    # attribute to minimize their memory footprint.
+    # BaseAuditError and its subclasses will hold exactly one attribute to
+    # minimize their memory footprint.
     __slots__ = '_message',
 
     def __init__(self, model):
@@ -87,7 +87,7 @@ class ModelValidationErrorBase(python_utils.OBJECT):
             self.__class__.__name__, model_name, quoted_model_id, message)
 
     def __repr__(self):
-        return self.message
+        return '\'%s\'' % self.message.replace('\'', r'\'')
 
     def __eq__(self, other):
         return (
@@ -103,7 +103,7 @@ class ModelValidationErrorBase(python_utils.OBJECT):
         return hash((self.__class__, self.message))
 
 
-class InconsistentTimestampsError(ModelValidationErrorBase):
+class InconsistentTimestampsError(BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model):
@@ -112,7 +112,7 @@ class InconsistentTimestampsError(ModelValidationErrorBase):
             model.created_on, model.last_updated)
 
 
-class InvalidCommitStatusError(ModelValidationErrorBase):
+class InvalidCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent status values."""
 
     def __init__(self, model):
@@ -122,27 +122,26 @@ class InvalidCommitStatusError(ModelValidationErrorBase):
                 model.post_commit_status, model.post_commit_is_private))
 
 
-class ModelMutatedDuringJobError(ModelValidationErrorBase):
+class ModelMutatedDuringJobError(BaseAuditError):
     """Error class for models mutated during a job."""
 
     def __init__(self, model):
         super(ModelMutatedDuringJobError, self).__init__(model)
         self.message = (
-            'last_updated=%r is later than the validation job\'s start time' % (
+            'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
 
 
-class InvalidIdError(ModelValidationErrorBase):
-    """Error class for models with invalid ids."""
+class ModelIdRegexError(BaseAuditError):
+    """Error class for models with ids that fail to match a regex pattern."""
 
-    def __init__(self, model, regex):
-        super(InvalidIdError, self).__init__(model)
-        quote_escaped_regex = json.dumps(regex)
-        self.message = 'id does not match the expected regex=%s' % (
-            quote_escaped_regex)
+    def __init__(self, model, regex_string):
+        super(ModelIdRegexError, self).__init__(model)
+        quoted_regex = json.dumps(regex_string)
+        self.message = 'id does not match the expected regex=%s' % quoted_regex
 
 
-class ModelExpiredError(ModelValidationErrorBase):
+class ModelExpiredError(BaseAuditError):
     """Error class for expired models."""
 
     def __init__(self, model):

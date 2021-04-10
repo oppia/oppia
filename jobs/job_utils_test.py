@@ -14,18 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for functions for beam validators and one-off jobs."""
+"""Unit tests for jobs.job_utils."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import unittest
-
 from core.platform import models
-from jobs import jobs_utils
+from core.tests import test_utils
+from jobs import job_utils
 
-base_models, user_models = (
-    models.Registry.import_models([models.NAMES.base_model, models.NAMES.user]))
+from google.cloud import datastore as cloud_datastore_types
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -36,11 +36,11 @@ class FooModel(base_models.BaseModel):
     prop = datastore_services.StringProperty()
 
 
-class CloneTests(unittest.TestCase):
+class CloneTests(test_utils.TestBase):
 
     def test_clone_model(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = jobs_utils.clone_model(model)
+        clone = job_utils.clone_model(model)
 
         self.assertEqual(model.id, clone.id)
         self.assertEqual(model, clone)
@@ -49,7 +49,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_with_changes(self):
         model = base_models.BaseModel(id='123', deleted=True)
-        clone = jobs_utils.clone_model(model, deleted=False)
+        clone = job_utils.clone_model(model, deleted=False)
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -59,7 +59,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_with_changes_to_id(self):
         model = base_models.BaseModel(id='123')
-        clone = jobs_utils.clone_model(model, id='124')
+        clone = job_utils.clone_model(model, id='124')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -69,7 +69,7 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_sub_class(self):
         model = FooModel(id='123', prop='original')
-        clone = jobs_utils.clone_model(model)
+        clone = job_utils.clone_model(model)
 
         self.assertEqual(model, clone)
         self.assertIsNot(model, clone)
@@ -79,10 +79,31 @@ class CloneTests(unittest.TestCase):
 
     def test_clone_sub_class_with_changes(self):
         model = FooModel(id='123', prop='original')
-        clone = jobs_utils.clone_model(model, prop='updated')
+        clone = job_utils.clone_model(model, prop='updated')
 
         self.assertNotEqual(model, clone)
         self.assertIsNot(model, clone)
         self.assertIsInstance(clone, FooModel)
         self.assertEqual(model.prop, 'original')
         self.assertEqual(clone.prop, 'updated')
+
+
+class GetModelKindTests(test_utils.TestBase):
+
+    def test_get_from_datastore_model(self):
+        model = base_models.BaseModel()
+        self.assertEqual(job_utils.get_model_kind(model), 'BaseModel')
+
+    def test_get_from_datastore_model_class(self):
+        self.assertEqual(
+            job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
+
+    def test_get_from_cloud_datastore_entity(self):
+        entity = cloud_datastore_types.Entity(
+            key=cloud_datastore_types.Key('BaseModel', '123', project='foo'))
+        self.assertEqual(job_utils.get_model_kind(entity), 'BaseModel')
+
+    def test_get_from_bad_value(self):
+        self.assertRaisesRegexp(
+            TypeError, 'not a model type',
+            lambda: job_utils.get_model_kind(123))
