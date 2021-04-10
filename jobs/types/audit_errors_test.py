@@ -29,7 +29,8 @@ from jobs import job_utils
 from jobs.types import audit_errors
 import python_utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class FooError(audit_errors.BaseAuditError):
@@ -275,3 +276,21 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
             'ModelExpiredError in BaseModel(id="123"): deleted=True when older '
             'than %d days' % (
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
+
+
+class ModelExpiringErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = user_models.UserQueryModel(
+            id='test',
+            submitter_id='submitter',
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_AGO
+        )
+        error = audit_errors.ModelExpiringError(model)
+
+        self.assertEqual(
+            error.message,
+            'ModelExpiringError in UserQueryModel(id="test"): mark model '
+            'as deleted when older than %s days' % (
+                feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
