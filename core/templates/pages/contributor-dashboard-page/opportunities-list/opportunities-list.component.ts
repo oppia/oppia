@@ -81,6 +81,8 @@ export class OpportunitiesListComponent {
 
   ngOnInit(): void {
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      // This ngZone run closure will not be required after \
+      // migration is complete.
       this.zone.run(() => {
         this.opportunities = opportunitiesDicts;
         // "more" returned from GAE storage is not always reliable if true.
