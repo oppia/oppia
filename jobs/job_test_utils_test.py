@@ -124,8 +124,8 @@ class DecorateBeamErrorsTests(test_utils.TestBase):
 
     def test_decorates_message_with_both_unexpected_and_missing(self):
         actual_msg = (
-            'Error, unexpected elements ["abc", "def"], missing elements '
-            '["123", "456"] [while running FooJob]')
+            'Error, unexpected elements ["abc", "def"], '
+            'missing elements ["123", "456"] [while running FooJob]')
         decorated_msg = (
             'failed while running FooJob\n'
             '\n'
