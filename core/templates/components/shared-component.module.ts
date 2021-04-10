@@ -70,6 +70,8 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { ToastrModule } from 'ngx-toastr';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
@@ -168,6 +170,8 @@ const toastrConfig = {
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
     OnScreenKeyboardComponent,
+    PromoBarComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -176,6 +180,7 @@ const toastrConfig = {
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    WrapTextWithEllipsisPipe,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -184,7 +189,7 @@ const toastrConfig = {
     TranslatePipe,
     TruncatePipe,
     WarningsAndAlertsComponent,
-    PromoBarComponent
+    PromoBarComponent,
   ],
 
   entryComponents: [
@@ -207,11 +212,11 @@ const toastrConfig = {
     KeyboardShortcutHelpModalComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
+    PromoBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
-    PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TopNavigationBarWrapperComponent,
@@ -232,11 +237,14 @@ const toastrConfig = {
     BackgroundBannerComponent,
     BaseContentComponent,
     ExplorationSummaryTileDirective,
+    LazyLoadingComponent,
+    SchemaBasedEditorDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
     OppiaFooterDirective,
     LimitToPipe,
     LoadingMessageComponent,
+    PromoBarComponent,
     ImageUploaderComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
@@ -255,7 +263,8 @@ const toastrConfig = {
     TopNavigationBarWrapperComponent,
     TranslatePipe,
     WarningsAndAlertsComponent,
-    PromoBarComponent
+    PromoBarComponent,
+    WrapTextWithEllipsisPipe,
   ],
 })
 
