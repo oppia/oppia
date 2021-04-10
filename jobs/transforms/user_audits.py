@@ -19,12 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import re
+import datetime
 
 from core.platform import models
 import feconf
+from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
+from jobs.types import audit_errors
+
+import apache_beam as beam
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -33,4 +37,32 @@ from jobs.transforms import base_model_audits
 class ValidateUserModelId(base_model_audits.ValidateBaseModelId):
     """Overload for models keyed by a user ID, which have a special format."""
 
-    MODEL_ID_REGEX = re.compile(feconf.USER_ID_REGEX)
+    def __init__(self):
+        super(ValidateUserModelId, self).__init__()
+        # IMPORTANT: Only picklable objects can be stored on DoFns! This is
+        # because DoFns are serialized with pickle when run on a pipeline (and
+        # might be run on many different machines). Any other types assigned to
+        # self, like compiled re patterns, ARE LOST AFTER DESERIALIZATION!
+        # https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled
+        self._pattern = feconf.USER_ID_REGEX
+
+
+@audit_decorators.AuditsExisting(user_models.UserQueryModel)
+class ValidateOldModelsMarkedDeleted(beam.DoFn):
+    """DoFn to validate old models and mark them for deletion"""
+
+    def process(self, input_model):
+        """Function that checks if a model is old enough to mark them deleted.
+
+        Args:
+            input_model: user_models.UserQueryModel. Entity to validate.
+
+        Yields:
+            ModelExpiringError. An error class for expiring models.
+        """
+        model = job_utils.clone_model(input_model)
+        expiration_date = (
+            datetime.datetime.utcnow() -
+            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
+        if expiration_date > model.last_updated:
+            yield audit_errors.ModelExpiringError(model)

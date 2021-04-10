@@ -25,11 +25,12 @@ import pickle
 from core.platform import models
 from core.tests import test_utils as core_test_utils
 import feconf
-from jobs import jobs_utils
+from jobs import job_utils
 from jobs.types import audit_errors
 import python_utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class FooError(audit_errors.BaseAuditError):
@@ -132,10 +133,11 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
 
     def test_str(self):
         self.assertEqual(
-            repr(FooError(self.model)), 'FooError in BaseModel(id="123"): foo')
+            repr(FooError(self.model)),
+            '\'FooError in BaseModel(id="123"): foo\'')
         self.assertEqual(
             python_utils.UNICODE(FooError(self.model)),
-            'FooError in BaseModel(id="123"): foo')
+            '\'FooError in BaseModel(id="123"): foo\'')
 
     def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))
@@ -143,17 +145,17 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_equality_between_same_types_and_same_values(self):
         self.assertEqual(
             FooError(self.model),
-            FooError(jobs_utils.clone_model(self.model)))
+            FooError(job_utils.clone_model(self.model)))
 
     def test_equality_between_same_types_and_different_values(self):
         self.assertNotEqual(
             FooError(self.model),
-            FooError(jobs_utils.clone_model(self.model, id='987')))
+            FooError(job_utils.clone_model(self.model, id='987')))
 
     def test_hashable(self):
         set_of_errors = {
             FooError(self.model),
-            FooError(jobs_utils.clone_model(self.model)),
+            FooError(job_utils.clone_model(self.model)),
         }
         self.assertEqual(len(set_of_errors), 1)
 
@@ -274,3 +276,21 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
             'ModelExpiredError in BaseModel(id="123"): deleted=True when older '
             'than %d days' % (
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
+
+
+class ModelExpiringErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = user_models.UserQueryModel(
+            id='test',
+            submitter_id='submitter',
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_AGO
+        )
+        error = audit_errors.ModelExpiringError(model)
+
+        self.assertEqual(
+            error.message,
+            'ModelExpiringError in UserQueryModel(id="test"): mark model '
+            'as deleted when older than %s days' % (
+                feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
