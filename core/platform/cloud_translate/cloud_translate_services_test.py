@@ -43,10 +43,7 @@ class CloudTranslateServicesUnitTests(test_utils.TestBase):
     def test_translate_text_with_same_source_target_language_doesnt_call_api(
             self):
         def mock_translate_call(
-                text, source_language, target_language):
-            self.assertEqual(text, 'hello world')
-            self.assertEqual(source_language, 'en')
-            self.assertEqual(target_language, 'en')
+                text, source_language, target_language): # pylint: disable=unused-argument
             self.fail(msg='mock api called')
 
         with self.swap(
@@ -58,10 +55,7 @@ class CloudTranslateServicesUnitTests(test_utils.TestBase):
     def test_translate_text_with_valid_input_calls_translate_api(self):
 
         def mock_translate_call(
-                text, source_language, target_language):
-            self.assertEqual(text, 'hello world')
-            self.assertEqual(source_language, 'en')
-            self.assertEqual(target_language, 'es')
+                text, source_language, target_language): # pylint: disable=unused-argument
             return {
                 'translatedText': 'hola mundo'
             }
