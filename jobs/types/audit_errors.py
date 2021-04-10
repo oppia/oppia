@@ -161,6 +161,15 @@ class ModelExpiredError(BaseAuditError):
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
 
 
+class ModelExpiringError(BaseAuditError):
+    """Error class for models that are expiring."""
+
+    def __init__(self, model):
+        super(ModelExpiringError, self).__init__(model)
+        self.message = 'mark model as deleted when older than %s days' % (
+            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
+
+
 class ModelRelationshipError(BaseAuditError):
     """Error class for models with invalid relationships."""
 
