@@ -154,7 +154,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'number-with-units-editor.directive.ts',
     'number-with-units-validation.service.ts',
     'NumberWithUnitsObjectFactory.ts',
-    'numeric-input-validation.service.ts',
     'object-editor.directive.ts',
     'oppia-interactive-code-repl.directive.ts',
     'oppia-interactive-continue.component.ts',
