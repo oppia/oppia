@@ -39,8 +39,7 @@ KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR = (
     audits_registry.get_id_referencing_properties_by_kind_of_possessor())
 
-# Type is: set(str). All model kinds referenced by one or more properties,
-# excluding the models' own ID.
+# Type is: set(str). All model kinds referenced by one or more properties.
 ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES = (
     audits_registry.get_all_model_kinds_referenced_by_properties())
 
