@@ -17,7 +17,7 @@
 */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
 import { LoginRequiredMessageComponent } from '../login-required-message/login-required-message.component';
@@ -26,7 +26,7 @@ describe('Login Required Modal Content', () => {
   let component: LoginRequiredModalContent;
   let fixture: ComponentFixture<LoginRequiredModalContent>;
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
@@ -34,10 +34,9 @@ describe('Login Required Modal Content', () => {
         LoginRequiredMessageComponent],
       providers: [NgbActiveModal]
     }).compileComponents();
-    fixture = TestBed.createComponent(
-      LoginRequiredModalContent);
+    fixture = TestBed.createComponent(LoginRequiredModalContent);
     component = fixture.componentInstance;
-  });
+  }));
 
   it('should have a publicly accessible activeModal', () => {
     expect(component.activeModal).toBeInstanceOf(NgbActiveModal);

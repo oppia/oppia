@@ -1,7 +1,7 @@
 <div>
-  <opportunities-list load-opportunities="$ctrl.loadOpportunities"
-                      on-click-action-button="$ctrl.onClickButton"
-                      load-more-opportunities="$ctrl.loadMoreOpportunities"
-                      progress-bar-required="true">
-  </opportunities-list>
+  <oppia-opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
+                      (clickActionButton)="onClickButton($event)"
+                      [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
+                      [progressBarRequired]="true">
+  </oppia-opportunities-list>
 </div>

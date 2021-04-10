@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview AngularHtmlBind Directive wrapper upgrade.
- * This is specifically for use in TranslationModalContent. angular-html-bind
+ * This is specifically for use in TranslationModalComponent. angular-html-bind
  * should not be used in migrated files unless strictly necessary.
  */
 

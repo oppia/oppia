@@ -46,7 +46,7 @@ describe('User Exploration Permissions Service', () => {
   let permissionsResponse: ExplorationPermissions;
 
 
-  beforeEach(angular.mock.inject(() => {
+  beforeEach(()=> {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
@@ -59,7 +59,7 @@ describe('User Exploration Permissions Service', () => {
     spyOn(contextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
     UserExplorationPermissionsService.permissionsPromise = null;
-  }));
+  });
 
   afterEach(()=> {
     httpTestingController.verify();
