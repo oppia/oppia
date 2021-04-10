@@ -308,7 +308,7 @@ class ModelExpiringErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'ModelExpiringError in UserQueryModel(id="test"): mark model '
+            'ModelExpiringError in UserQueryModel(id=\'test\'): mark model '
             'as deleted when older than %s days' % (
                 feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
 
