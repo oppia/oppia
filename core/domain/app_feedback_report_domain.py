@@ -46,7 +46,7 @@ FEEDBACK_OPTIONS = utils.create_enum()
 ENTRY_POINT = utils.create_enum(
     'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
 STATS_PARAMETER_NAMES = utils.create_enum(
-    'all_submitted_reports', 'platform', 'report_type', 'country_locale_code',
+    'platform', 'report_type', 'country_locale_code',
     'entry_point_name', 'text_language_code', 'audio_language_code',
     'sdk_version', 'version_name')
 FILTER_FIELD_NAMES = utils.create_enum(
@@ -84,7 +84,6 @@ ALLOWED_SELECTION_ITEMS_CATEGORIES = [
     CATEGORY.issue_language_audio, CATEGORY.issue_language_text,
     CATEGORY.issue_topics, CATEGORY.issue_profile, CATEGORY.issue_other]
 ALLOWED_STATS_PARAMETERS = [
-    STATS_PARAMETER_NAMES.all_submitted_reports,
     STATS_PARAMETER_NAMES.report_type,
     STATS_PARAMETER_NAMES.country_locale_code,
     STATS_PARAMETER_NAMES.entry_point_name,
@@ -1460,15 +1459,15 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
             ValidationError. One or more attributes of the
                 ReportStatsParameterValueCounts are not valid.
         """
-        for (param_value, param_count) in self.parameter_value_counts:
-            if not isinstance(param_value, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'The param value should be a string, received: %r' % (
-                        param_value))
-            if not isinstance(param_count, int) or param_count < 1:
-                raise utils.ValidationError(
-                    'The param value count should be a positive int, '
-                    'received: %r' % param_count)
+        # for (param_value, param_count) in self.parameter_value_counts:
+        #     if not isinstance(param_value, python_utils.BASESTRING):
+        #         raise utils.ValidationError(
+        #             'The param value should be a string, received: %r' % (
+        #                 param_value))
+        #     if not isinstance(param_count, int) or param_count < 1:
+        #         raise utils.ValidationError(
+        #             'The param value count should be a positive int, '
+        #             'received: %r' % param_count)
 
 
 class AppFeedbackReportFilter(python_utils.OBJECT):

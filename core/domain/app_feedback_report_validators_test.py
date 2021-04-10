@@ -769,8 +769,8 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.PLATFORM_ANDROID, self.TICKET_ID, self.STATS_DATE))
         app_feedback_report_models.AppFeedbackReportStatsModel.create(
             entity_id=self.entity_id,
-            platform=self.PLATFORM_ANDROID,
             ticket_id=self.TICKET_ID,
+            platform=self.PLATFORM_ANDROID,
             stats_tracking_date=self.STATS_DATE,
             total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
             daily_param_stats=self.DAILY_STATS)

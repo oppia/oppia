@@ -315,7 +315,7 @@ class AppFeedbackReportStatsModelValidator(
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return app_feedback_report_services.get_report_stats_from_model(item)
+        return app_feedback_report_services.get_stats_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

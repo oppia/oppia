@@ -323,7 +323,7 @@ def get_ticket_from_model(ticket_model):
         ticket_model.report_ids)
 
 
-def get_report_stats_from_model(stats_model):
+def get_stats_from_model(stats_model):
     """Create and return a domain object AppFeedbackReportDailyStats given a
     model loaded from the the data.
 
@@ -354,17 +354,19 @@ def _create_app_daily_stats_from_model_json(daily_param_stats):
         dict. A dict mapping param names to ReportStatsParameterValueCounts
         domain objects.
     """
-    stats_dict = dict()
-    for parameter_name in app_feedback_report_domain.ALLOWED_STATS_PARAMETERS:
+    stats_dict = {}
+    print('@@@@@@@@@@THE PARAM STATS IS %r' % daily_param_stats)
+    for (stats_name, stats_values_dict) in daily_param_stats.items():
         # For each parameter possible, create a
         # ReportStatsParameterValueCounts domain object of possible parameter
         # values and number of reports with that value.
         parameter_counts = {
-            parameter_value: value_count for (parameter_value, value_count) in (
-                daily_param_stats[parameter_name])
+            value_name: value_count
+            for (value_name, value_count) in stats_values_dict.items()
         }
-        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
-            parameter_counts)
+        counts_obj = (
+            app_feedback_report_domain.ReportStatsParameterValueCounts(
+                parameter_counts))
         stats_dict[parameter_name] = counts_obj
     return stats_dict
 
