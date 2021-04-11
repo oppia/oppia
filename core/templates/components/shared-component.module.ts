@@ -67,6 +67,8 @@ import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
@@ -121,6 +123,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    PromoBarComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -129,11 +133,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    WrapTextWithEllipsisPipe,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TruncatePipe,
-    PromoBarComponent
   ],
 
   entryComponents: [
@@ -149,11 +153,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
+    PromoBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
-    PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
   ],
@@ -172,8 +176,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    LazyLoadingComponent,
+    SchemaBasedEditorDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    PromoBarComponent,
+    ImageUploaderComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -184,7 +192,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    PromoBarComponent
+    PromoBarComponent,
+    WrapTextWithEllipsisPipe
   ],
 })
 

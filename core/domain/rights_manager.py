@@ -718,7 +718,8 @@ def check_can_unpublish_activity(user, activity_rights):
 
 
 def _assign_role(
-        committer, assignee_id, new_role, activity_id, activity_type):
+        committer, assignee_id, new_role, activity_id, activity_type,
+        allow_assigning_any_role=False):
     """Assigns a new role to the user.
 
     Args:
@@ -734,6 +735,9 @@ def _assign_role(
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
+        allow_assigning_any_role: bool. Whether to assign a role to the user
+            irrespective of whether they have any existing role in the activity.
+            The default value is false.
 
     Raises:
         Exception. The committer does not have rights to modify a role.
@@ -760,7 +764,20 @@ def _assign_role(
     assignee_username = user_services.get_username(assignee_id)
     old_role = rights_domain.ROLE_NONE
 
-    if new_role == rights_domain.ROLE_OWNER:
+    if new_role not in [
+            rights_domain.ROLE_OWNER,
+            rights_domain.ROLE_EDITOR,
+            rights_domain.ROLE_VOICE_ARTIST,
+            rights_domain.ROLE_VIEWER
+    ]:
+        raise Exception('Invalid role: %s' % new_role)
+    # TODO(#12369): Currently, only exploration allows reassigning users to
+    # any role. We are expecting to remove the below check and allow this
+    # function to assign any role in general once the collection is removed.
+    if allow_assigning_any_role:
+        old_role = activity_rights.assign_new_role(assignee_id, new_role)
+
+    elif new_role == rights_domain.ROLE_OWNER:
         if activity_rights.is_owner(assignee_id):
             raise Exception('This user already owns this %s.' % activity_type)
 
@@ -777,6 +794,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VOICE_ARTIST
 
     elif new_role == rights_domain.ROLE_EDITOR:
+
         if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
@@ -793,6 +811,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VOICE_ARTIST:
+
         if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_voice_artist(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
@@ -806,6 +825,7 @@ def _assign_role(
             old_role = rights_domain.ROLE_VIEWER
 
     elif new_role == rights_domain.ROLE_VIEWER:
+
         if (activity_rights.is_owner(assignee_id) or
                 activity_rights.is_editor(assignee_id) or
                 activity_rights.is_viewer(assignee_id)):
@@ -817,9 +837,6 @@ def _assign_role(
                 'Public %ss can be viewed by anyone.' % activity_type)
 
         activity_rights.viewer_ids.append(assignee_id)
-
-    else:
-        raise Exception('Invalid role: %s' % new_role)
 
     commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)
@@ -863,7 +880,6 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
                 committer_id, removed_user_id, activity_id))
         raise Exception(
             'UnauthorizedUserException: Could not deassign role.')
-
     if activity_rights.is_owner(removed_user_id):
         old_role = rights_domain.ROLE_OWNER
         activity_rights.owner_ids.remove(removed_user_id)
@@ -1069,7 +1085,7 @@ def assign_role_for_exploration(
     """
     _assign_role(
         committer, assignee_id, new_role, exploration_id,
-        constants.ACTIVITY_TYPE_EXPLORATION)
+        constants.ACTIVITY_TYPE_EXPLORATION, allow_assigning_any_role=True)
     if new_role in [
             rights_domain.ROLE_OWNER,
             rights_domain.ROLE_EDITOR,
