@@ -38,7 +38,7 @@ export interface TaskEntryBackendDict<TaskType = string> {
   'status': string;
   'resolver_username': string;
   'resolver_profile_picture_data_url': string;
-  'resolved_on_msecs': number;
+  'resolved_on_msecs'?: number;
 }
 
 /**
@@ -76,7 +76,7 @@ export class TaskEntry<TaskType = string> {
   public readonly targetId: string;
   public readonly resolverUsername: string;
   public readonly resolverProfilePictureDataUrl: string;
-  public readonly resolvedOnMsecs: number;
+  public readonly resolvedOnMsecs?: number;
   protected issueDescription: string;
   private taskStatus: string;
 

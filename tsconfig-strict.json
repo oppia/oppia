@@ -52,6 +52,7 @@
     "core/templates/domain/exploration/SubtitledUnicodeObjectFactorySpec.ts",
     "core/templates/domain/exploration/answer-stats.model.ts",
     "core/templates/domain/exploration/answer-stats.model.spec.ts",
+    "core/templates/domain/improvements/needs-guiding-response-task.model.ts",
     "core/templates/domain/objects/FractionObjectFactory.ts",
     "core/templates/domain/objects/FractionObjectFactorySpec.ts",
     "core/templates/domain/opportunity/exploration-opportunity-summary.model.ts",
