@@ -17,8 +17,9 @@
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
+import { Subject, Subscription } from 'rxjs';
 import { EventBusGroup, EventBusService } from './event-bus.service';
-import { BaseEvent } from './oppia-events';
+import { BaseEvent } from './app-events';
 
 abstract class EventWithMessage<T> extends BaseEvent {
   public readonly message: T;
@@ -52,20 +53,16 @@ describe('Event Bus Group', () => {
   }));
 
   it('should throw uncaught errors', waitForAsync(() => {
-    let errorMessage = '';
-    spyOn(eventBusService, 'errorHandler').and.callFake((error: Error) => {
-      errorMessage = error.message;
-    });
+    spyOn(Subject.prototype, 'subscribe').and.callFake(
+      (f) => {
+        expect(() => f()).toThrowError('Error in event bus\nRandom Error');
+        return new Subscription();
+      }
+    );
     eventbusGroup.on(CustomEvent, _ => {
       throw new Error('Random Error');
     });
     eventbusGroup.emit(new CustomEvent('Event'));
-    expect(errorMessage).toBe('Random Error');
     eventbusGroup.unsubscribe();
   }));
-
-  it('should throw error', () => {
-    expect(() => eventBusService.errorHandler(
-      new Error('Random'))).toThrowError('Error in event bus\nRandom');
-  });
 });

@@ -28,8 +28,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { EventBusGroup, EventBusService } from 'oppia-events/event-bus.service';
-import { ObjectFormValidityChangeEvent } from 'oppia-events/oppia-events';
+import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
 describe('Add Answer Group Modal Controller', function() {
   importAllAngularServices();

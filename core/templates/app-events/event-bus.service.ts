@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseEvent } from './oppia-events';
+import { BaseEvent } from './app-events';
 
 type NewableType<T> = new(...args) => T;
 
@@ -30,9 +30,9 @@ type NewableType<T> = new(...args) => T;
 })
 export class EventBusService {
   // Subjects are used for the event passing mechanism.
-  subject$ = new Subject<BaseEvent>();
+  private _subject$ = new Subject<BaseEvent>();
 
-  errorHandler(error: Error): void {
+  private _errorHandler(error: Error): void {
     error.message = 'Error in event bus\n' + error.message;
     throw error;
   }
@@ -41,7 +41,7 @@ export class EventBusService {
   * This function will listen to messages of specific event types as specified
   * by the first param.
   * @param eventType The event that is to be listened for.
-  * @param action The action that is to be run when the event occurs
+  * @param action The action that is to be run when the event occurs.
   * @param callbackContext Callback context if any.
   *
   * @returns A subscription to the event asked for.
@@ -50,7 +50,7 @@ export class EventBusService {
       eventType: NewableType<T>,
       action: (event: T) => void,
       callbackContext = null): Subscription {
-    return this.subject$.pipe(filter((event: T): boolean => {
+    return this._subject$.pipe(filter((event: T): boolean => {
       return (event instanceof eventType);
     }
     )).subscribe(
@@ -58,7 +58,7 @@ export class EventBusService {
         try {
           action.call(callbackContext, event);
         } catch (error) {
-          this.errorHandler(error);
+          this._errorHandler(error);
         }
       }
     );
@@ -69,7 +69,7 @@ export class EventBusService {
   * @param event OppiaEvent that we want to trigger.
   */
   emit<T extends BaseEvent>(event: T): void {
-    this.subject$.next(event);
+    this._subject$.next(event);
   }
 }
 
