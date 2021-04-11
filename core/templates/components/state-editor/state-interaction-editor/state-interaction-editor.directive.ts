@@ -59,6 +59,7 @@ require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/context.service');
 
 import { Subscription } from 'rxjs';
 
@@ -86,15 +87,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
         '/components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
-        'ExplorationHtmlFormatterService', 'InteractionDetailsCacheService',
+        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        'EditabilityService', 'ExplorationHtmlFormatterService',
+        'InteractionDetailsCacheService',
         'ResponsesService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService', 'UrlInterpolationService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
-            $scope, $uibModal, AlertsService, EditabilityService,
-            ExplorationHtmlFormatterService, InteractionDetailsCacheService,
+            $scope, $uibModal, AlertsService, ContextService,
+            EditabilityService, ExplorationHtmlFormatterService,
+            InteractionDetailsCacheService,
             ResponsesService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -109,6 +112,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           // interaction preview.
           $scope.submitAnswer = function() {};
           $scope.adjustPageHeight = function() {};
+          $scope.interactionIsDisabled = false;
 
           $scope.getCurrentInteractionName = function() {
             return (
@@ -141,6 +145,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateCustomizationArgsService.savedMemento;
             $scope.interactionPreviewHtml = _getInteractionPreviewTag(
               currentCustomizationArgs);
+            $scope.interactionIsDisabled = (
+              $scope.interactionId === 'EndExploration' &&
+              ContextService.isExplorationLinkedToStory());
           };
 
           var _updateAnswerChoices = function() {
@@ -215,6 +222,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.openInteractionCustomizerModal = function() {
+            if ($scope.interactionIsDisabled) {
+              return;
+            }
             if (EditabilityService.isEditable()) {
               AlertsService.clearWarnings();
 

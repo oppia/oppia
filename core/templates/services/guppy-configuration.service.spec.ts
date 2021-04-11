@@ -17,8 +17,8 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Component, OnInit } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
 
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service';
@@ -55,6 +55,18 @@ class MockComponent {
   }
 }
 
+@Component({
+  template: '',
+  selector: 'mock-component-b'
+})
+class MockComponentB implements OnInit {
+  constructor(private guppyConfigService: GuppyConfigurationService) {}
+
+  ngOnInit(): void {
+    this.guppyConfigService.init();
+  }
+}
+
 let guppyConfigurationService: GuppyConfigurationService = null;
 
 describe('GuppyConfigurationService', () => {
@@ -80,22 +92,21 @@ describe('GuppyConfigurationService', () => {
   });
 
   describe('Components calling the service', () => {
-    let component: AlgebraicExpressionEditorComponent;
-    let fixture: ComponentFixture<AlgebraicExpressionEditorComponent>;
+    let component: MockComponentB;
+    let fixture: ComponentFixture<MockComponentB>;
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule(
         {
           imports: [HttpClientTestingModule],
-          declarations: [AlgebraicExpressionEditorComponent],
+          declarations: [MockComponentB],
         }
       ).compileComponents();
     }));
     beforeEach(() => {
       fixture = TestBed.createComponent(
-        AlgebraicExpressionEditorComponent);
+        MockComponentB);
       component = fixture.componentInstance;
-      component.currentValue = '';
     });
 
 
