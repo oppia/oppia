@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { BaseEvent } from './oppia-events';
+import { BaseEvent } from './app-events';
 
 type NewableType<T> = new(...args) => T;
 

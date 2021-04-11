@@ -20,7 +20,7 @@
       "components/*": ["../../core/templates/components/*"],
       "domain/*": ["../../core/templates/domain/*"],
       "expressions/*": ["../../core/templates/expressions/*"],
-      "oppia-events/*": ["../../core/templates/oppia-events/*"],
+      "app-events/*": ["../../core/templates/app-events/*"],
       "pages/*": ["../../core/templates/pages/*"],
       "services/*": ["../../core/templates/services/*"],
       "classifiers/*": ["../../extensions/classifiers/*"],

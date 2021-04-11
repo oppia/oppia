@@ -19,7 +19,7 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subject, Subscription } from 'rxjs';
 import { EventBusGroup, EventBusService } from './event-bus.service';
-import { BaseEvent } from './oppia-events';
+import { BaseEvent } from './app-events';
 
 abstract class EventWithMessage<T> extends BaseEvent {
   public readonly message: T;

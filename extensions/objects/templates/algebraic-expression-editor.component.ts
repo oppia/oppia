@@ -23,8 +23,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { EventBusGroup, EventBusService } from 'oppia-events/event-bus.service';
-import { ObjectFormValidityChangeEvent } from 'oppia-events/oppia-events';
+import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
