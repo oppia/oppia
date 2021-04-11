@@ -60,7 +60,7 @@ describe('Needs guiding responses task model', function() {
     expect(task.taskType).toEqual('needs_guiding_responses');
     expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
-    expect(task.getIssueDescription()).toBeNull();
+    expect(task.getIssueDescription()).toBeFalsy();
     expect(task.isObsolete()).toBeTrue();
   });
 
@@ -179,7 +179,7 @@ describe('Needs guiding responses task model', function() {
   it('should not change issue description after it is generated', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
       'eid', 1, 'Introduction', this.newTop10AnswerStats(0));
-    expect(task.getIssueDescription()).toBeNull();
+    expect(task.getIssueDescription()).toBeFalsy();
 
     task.refreshStatus(this.newTop10AnswerStats(7));
     expect(task.getIssueDescription()).toEqual(
