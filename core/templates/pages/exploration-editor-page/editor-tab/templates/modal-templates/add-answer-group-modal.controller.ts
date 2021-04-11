@@ -51,10 +51,15 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       $uibModalInstance: $uibModalInstance
     });
     const eventBusGroup: EventBusGroup = new EventBusGroup(EventBusService);
+    $scope.modalId = Symbol();
     $scope.isInvalid = false;
     eventBusGroup.on(
       ObjectFormValidityChangeEvent,
-      event => $scope.isInvalid = event.message.value);
+      event => {
+        if (event.message.modalId === $scope.modalId) {
+          $scope.isInvalid = event.message.value;
+        }
+      });
     $scope.feedbackEditorIsOpen = false;
     $scope.addState = addState;
     $scope.questionModeEnabled = (

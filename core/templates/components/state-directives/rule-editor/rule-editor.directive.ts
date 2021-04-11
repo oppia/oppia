@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EventBusGroup } from "oppia-events/event-bus.service";
+import { ObjectFormValidityChangeEvent } from "oppia-events/oppia-events";
+
 /**
  * @fileoverview Directive for the rule editor.
  */
@@ -53,18 +56,20 @@ angular.module('oppia').directive('ruleEditor', [
         isEditingRuleInline: '&',
         onCancelRuleEdit: '&',
         onSaveRule: '&',
-        rule: '='
+        rule: '=',
+        modalId: '<'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'PopulateRuleContentIdsService',
-        'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
-        'INTERACTION_SPECS',
+        '$scope', '$timeout', 'EventBusService',
+        'PopulateRuleContentIdsService', 'ResponsesService',
+        'StateEditorService', 'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, $timeout, PopulateRuleContentIdsService,
-            ResponsesService, StateEditorService, StateInteractionIdService,
+            $scope, $timeout, EventBusService,
+            PopulateRuleContentIdsService, ResponsesService,
+            StateEditorService, StateInteractionIdService,
             INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
@@ -265,6 +270,20 @@ angular.module('oppia').directive('ruleEditor', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.isInvalid = false;
+            if (ctrl.isEditingRuleInline()) {
+              const eventBusGroup: EventBusGroup = new EventBusGroup(
+                EventBusService);
+              ctrl.eventBusGroup = eventBusGroup;
+              ctrl.modalId = Symbol();
+              eventBusGroup.on(
+                ObjectFormValidityChangeEvent,
+                event => {
+                  if (event.message.modalId === ctrl.modalId) {
+                    ctrl.isInvalid = event.message.value;
+                  }
+                });
+            }
             ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
             ctrl.editRuleForm = {};
             // Select a default rule type, if one isn't already selected.
@@ -278,6 +297,10 @@ angular.module('oppia').directive('ruleEditor', [
                 StateEditorService.updateCurrentRuleInputIsValid(!newValue);
               }
             );
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.eventBusGroup.unsubscribe();
           };
         }
       ]

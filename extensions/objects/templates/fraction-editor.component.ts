@@ -20,6 +20,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { EventBusGroup, EventBusService } from 'oppia-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'oppia-events/oppia-events';
 
 @Component({
   selector: 'fraction-editor',
@@ -27,12 +29,18 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
   styleUrls: []
 })
 export class FractionEditorComponent implements OnInit {
+  @Input() modalId: symbol;
   @Input() value;
   @Output() valueChanged = new EventEmitter();
   errorMessage: string = '';
   fractionString: string = '0';
   currentFractionValueIsValid = false;
-  constructor(private fractionObjectFactory: FractionObjectFactory) {}
+  eventBus: EventBusGroup;
+  constructor(
+    private fractionObjectFactory: FractionObjectFactory,
+    private eventBusService: EventBusService) {
+    this.eventBus = new EventBusGroup(this.eventBusService);
+  }
 
   ngOnInit(): void {
     if (this.value !== null) {
@@ -41,16 +49,15 @@ export class FractionEditorComponent implements OnInit {
     }
   }
 
-  validateFraction(): void {
-    if (this.fractionString.length === 0) {
+  validateFraction(newFraction: string): void {
+    if (newFraction.length === 0) {
       this.errorMessage = 'Please enter a non-empty fraction value.';
       this.currentFractionValueIsValid = false;
     }
     try {
-      var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
-      if (!INTERMEDIATE_REGEX.test(this.fractionString)) {
-        this.value = this.fractionObjectFactory.fromRawInputString(
-          this.fractionString);
+      const INTERMEDIATE_REGEX = /^\s*-?\s*$/;
+      if (!INTERMEDIATE_REGEX.test(newFraction)) {
+        this.value = this.fractionObjectFactory.fromRawInputString(newFraction);
         this.valueChanged.emit(this.value);
       }
       this.errorMessage = '';
@@ -58,6 +65,9 @@ export class FractionEditorComponent implements OnInit {
     } catch (parsingError) {
       this.errorMessage = parsingError.message;
       this.currentFractionValueIsValid = false;
+    } finally {
+      this.eventBus.emit(new ObjectFormValidityChangeEvent(
+        {value: !this.currentFractionValueIsValid, modalId: this.modalId}));
     }
   }
 }
