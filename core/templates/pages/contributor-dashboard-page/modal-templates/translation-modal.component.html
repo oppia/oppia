@@ -1,16 +1,16 @@
 <div class="oppia-translate-text-header-container">
   <div class="oppia-translate-text-header">
     <div class="oppia-opportunities-details">
-      <div class="oppia-opportunities-subheading"><[subheading]></div>
-      <div class="oppia-opportunities-heading"><[heading]></div>
+      <div class="oppia-opportunities-subheading">{{ subheading }}</div>
+      <div class="oppia-opportunities-heading">{{ heading }}</div>
     </div>
-    <button type="button" class="close oppia-close-button-position" ng-click="confirm()" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
+    <button type="button" class="close oppia-close-button-position" (click)="activeModal.close()" attr.aria-label="Close">
+      <span attr.aria-hidden="true">&times;</span>
     </button>
   </div>
 </div>
 <div class="modal-body">
-  <div class="oppia-loading-text" ng-if="loadingData || uploadingTranslation">
+  <div class="oppia-loading-text" *ngIf="loadingData || uploadingTranslation">
     <div class="oppia-loading-text1 oppia-animate-fadein">
       <lazy-loading></lazy-loading>
     </div>
@@ -18,48 +18,51 @@
       <lazy-loading></lazy-loading>
     </div>
   </div>
-  <div ng-if="!textToTranslate && !loadingData">
+  <div *ngIf="!textToTranslate && !loadingData">
     <strong>Sorry! All available translations are in review currently.</strong>
   </div>
-  <div ng-if="textToTranslate">
+  <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
-      <strong>Please translate the given content in <[languageDescription]>:</strong>
-      <a class="oppia-skip-button" href="" ng-if="moreAvailable" ng-click="skipActiveTranslation()">skip</a>
+      <strong>Please translate the given content in {{ languageDescription }}:</strong>
+      <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">skip</a>
     </div>
-    <div ng-if="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
-      <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                         ng-click="onContentClick($event)"
-                         html-data="textToTranslate"
-                         class="oppia-rte-editor">
-      </angular-html-bind>
+    <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
+      <!-- textToTranslate contains the html content of an exploration state -->
+      <angular-html-bind-wrapper [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                 (click)="onContentClick($event)"
+                                 [htmlData]="textToTranslate"
+                                 class="oppia-rte-editor">
+      </angular-html-bind-wrapper>
     </div>
     <div class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
         <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
-        <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
+        <schema-based-editor [schema]="getHtmlSchema.bind(this)"
+                             [localValue]="activeWrittenTranslation.html"
+                             (localValueChange)="updateHtml($event)">
         </schema-based-editor>
       </div>
     </div>
-    <div ng-if="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
+    <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>
-        <li ng-repeat="tip in TRANSLATION_TIPS[activeLanguageCode]"><[tip]>
+        <li *ngFor="let tip of TRANSLATION_TIPS[activeLanguageCode]">{{tip}}
         </li>
       </ul>
     </div>
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-default" (click)="close()">Cancel</button>
   <button class="btn btn-success oppia-go-back-button"
-          ng-disabled="!previousTranslationAvailable"
-          ng-click="returnToPreviousTranslation()">Go Back
+          (disabled)="!previousTranslationAvailable"
+          (click)="returnToPreviousTranslation()">Go Back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
-          ng-disabled="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
-          ng-click="suggestTranslatedText()">
-    <i ng-show="uploadingTranslation" class="fa fa-spinner"></i>
-    <span ng-show="!uploadingTranslation && !moreAvailable">Save and close</span>
-    <span ng-show="!uploadingTranslation && moreAvailable">Save and translate another</span>
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation.html === ''"
+          (click)="suggestTranslatedText()">
+    <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
+    <span [hidden]="uploadingTranslation || moreAvailable">Save and close</span>
+    <span [hidden]="uploadingTranslation || !moreAvailable">Save and translate another</span>
   </button>
 </div>
 <style>
