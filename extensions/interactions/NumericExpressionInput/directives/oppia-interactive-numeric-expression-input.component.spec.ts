@@ -38,9 +38,10 @@ describe('NumericExpressionInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
     onSubmit: function(unusedAnswer, unusedRulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, unusedValidateExpressionFn) {
-      submitAnswerFn();
-    }
+    registerCurrentInteraction:
+      function(submitAnswerFn, _validateExpressionFn) {
+        submitAnswerFn();
+      }
   };
   let mockNumericExpressionInputRulesService = {};
   let mockInteractionAttributesExtractorService = {
@@ -76,7 +77,7 @@ describe('NumericExpressionInputInteractive', function() {
     }
     static configure(unusedName: string, unusedVal: Object): void {}
     static 'remove_global_symbol'(unusedSymbol: string): void {}
-    static 'add_global_symbol'(unusedName: string, unusedSymbol: Object): void {}
+    static 'add_global_symbol'(_name: string, _symbol: Object): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));

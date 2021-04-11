@@ -146,7 +146,7 @@ describe('RatioExpressionInputInteractive', function() {
       ctrl.RatioExpressionInputForm = {
         answer: {
           $invalid: false,
-          $setValidity: function(errorType, valid) {
+          $setValidity: function(_errorType, valid) {
             this.$invalid = !valid;
           }
         }

@@ -51,7 +51,7 @@ describe('AlgebraicExpressionEditor', () => {
     }
     static configure(unusedName: string, unusedVal: Object): void {}
     static 'remove_global_symbol'(unusedSymbol: string): void {}
-    static 'add_global_symbol'(unusedName: string, unusedSymbol: Object): void {}
+    static 'add_global_symbol'(_name: string, _symbol: Object): void {}
   }
 
   class MockWindowRef {

@@ -124,7 +124,7 @@ describe('SvgFilenameEditor', function() {
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockAssetsBackendApiService = {
-    getImageUrlForPreview: function(unusedContentType, unusedContentId, unusedFilepath) {
+    getImageUrlForPreview: function(_contentType, _contentId, _filepath) {
       return dataUrl;
     }
   };

@@ -109,7 +109,7 @@ describe('Exploration Player State Service', () => {
       _ExplorationPlayerStateService_,
       _PlaythroughIssuesService_,
       _PlaythroughService_,
-      unused_ReadOnlyExplorationBackendApiService_,
+      __ReadOnlyExplorationBackendApiService_,
       _StatsReportingService_) => {
     $rootScope = _$rootScope_;
     $q = _$q_;
@@ -132,7 +132,7 @@ describe('Exploration Player State Service', () => {
     }, {}, {}]);
     spyOn($q, 'all').and.returnValue(deferred.promise);
     spyOn(StatsReportingService, 'initSession').and.callFake((
-        unusedExplorationId, unusedTitle, version, unusedSessionId, unusedCollectionId) => {
+        _ExplorationId, _Title, version, _SessionId, _CollectionId) => {
       expect(version).toEqual(1);
     });
     spyOn(PlaythroughService, 'initSession').and.callFake((

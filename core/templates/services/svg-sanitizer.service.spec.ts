@@ -337,7 +337,7 @@ describe('SvgSanitizerService', () => {
         '/style><img onerror=alert(1) src>">',
         expected: [0, 9]
       }];
-    testCases.forEach((testCase, index) => {
+    testCases.forEach((testCase, _index) => {
       const testCaseResult = svgSanitizerService.getInvalidSvgTagsAndAttrs(
         domParser.parseFromString(testCase.payload, 'image/svg+xml'));
       expect(testCaseResult.attrs.length).toEqual(

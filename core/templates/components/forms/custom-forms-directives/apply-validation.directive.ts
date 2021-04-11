@@ -42,7 +42,7 @@ angular.module('oppia').directive('applyValidation', [
       },
       controllerAs: '$ctrl',
       controller: [function() {}],
-      link: function(scope: ApplyValidationCustomScope, unusedElm, unusedAttrs, ctrl) {
+      link: function(scope: ApplyValidationCustomScope, _Elm, _Attrs, ctrl) {
         // Add validators in reverse order.
         if (scope.$ctrl.validators()) {
           scope.$ctrl.validators().forEach(function(validatorSpec) {

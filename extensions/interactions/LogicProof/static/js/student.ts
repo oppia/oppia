@@ -415,25 +415,25 @@ var logicProofStudent = (function() {
       },
       num_lines: {
         format: 'bottom_up',
-        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
+        evaluateExpression: function(_args, _types, evaluationParameters) {
           return evaluationParameters.proof.lines.length;
         }
       },
       assumptions: {
         format: 'bottom_up',
-        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
+        evaluateExpression: function(_args, _types, evaluationParameters) {
           return evaluationParameters.assumptions;
         }
       },
       target: {
         format: 'bottom_up',
-        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
+        evaluateExpression: function(_args, _types, evaluationParameters) {
           return evaluationParameters.target;
         }
       },
       question_variables: {
         format: 'bottom_up',
-        evaluateExpression: function(unusedArgs, unusedTypes, evaluationParameters) {
+        evaluateExpression: function(_args, _types, evaluationParameters) {
           var names = logicProofShared.getOperatorsFromExpressionArray(
             evaluationParameters.assumptions.concat(
               [evaluationParameters.target]), ['variable']);

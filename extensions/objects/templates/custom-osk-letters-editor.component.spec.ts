@@ -27,7 +27,7 @@ describe('OnScreenKeyboard', function() {
     $provide.value(
       'GuppyInitializationService', new GuppyInitializationService());
   }));
-  beforeEach(angular.mock.inject(function(unused$injector, $componentController) {
+  beforeEach(angular.mock.inject(function(_$injector, $componentController) {
     ctrl = $componentController('customOskLettersEditor');
     let mockDiv = document.createElement('div');
     mockDiv.setAttribute('class', 'custom-letters-div');

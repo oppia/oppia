@@ -47,7 +47,7 @@ describe('Question misconception selector component', function() {
   }));
 
   beforeEach(angular.mock.inject(
-    function(_$componentController_, unused_$q_, unused_$rootScope_, $injector) {
+    function(_$componentController_, _$q_, _$rootScope_, $injector) {
       $componentController = _$componentController_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');

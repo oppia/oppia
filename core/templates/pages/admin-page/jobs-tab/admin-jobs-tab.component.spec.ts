@@ -100,7 +100,7 @@ describe('Admin Jobs Tab Component', () => {
       };
     }
 
-    private post(url: string, requestData: RequestData): FakeThen {
+    private post(_url: string, requestData: RequestData): FakeThen {
       return {
         then: (
             successCallback: (responseData?: object) => void,
@@ -178,7 +178,7 @@ describe('Admin Jobs Tab Component', () => {
 
   class MockUrlInterpolationService {
     interpolateUrl(
-        urlTemplate: string,
+        _urlTemplate: string,
         interpolationValues: InterpolationValuesType): string {
       if ('jobId' in interpolationValues) {
         if (interpolationValues.jobId === 'error') {

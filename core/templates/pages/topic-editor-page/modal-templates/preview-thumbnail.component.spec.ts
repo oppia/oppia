@@ -30,7 +30,7 @@ describe('Preview Thumbnail Directive', function() {
   }));
   var ctrl = null;
 
-  beforeEach(angular.mock.inject(function(unused$injector, $componentController) {
+  beforeEach(angular.mock.inject(function(_$injector, $componentController) {
     var MockContextSerivce = {
       getEntityType: () => 'topic',
       getEntityId: () => '1'

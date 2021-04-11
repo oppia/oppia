@@ -50,7 +50,7 @@ describe('EndExplorationValidationService', function() {
   };
 
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
+    getValuesFromAttributes: function(_interactionId, attrs) {
       return attrs;
     }
   };

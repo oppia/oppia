@@ -234,8 +234,8 @@ describe('Preview Tab Component', function() {
 
       // Mock init just to call the callback directly.
       spyOn(explorationEngineService, 'init').and.callFake(function(
-          unusedExplorationDict, unusedExplorationVersion, unusedPreferredAudioLanguage,
-          unusedAutoTtsEnabled, unusedPreferredContentLanguageCodes, successCallback) {
+          _ExplorationDict, _ExplorationVersion, _PreferredAudioLanguage,
+          _AutoTtsEnabled, _PreferredContentLanguageCodes, successCallback) {
         successCallback();
       });
 

@@ -101,7 +101,7 @@ export class ImageUploaderComponent {
     }
   }
 
-  validateUploadedFile(file: File, filename: string): string {
+  validateUploadedFile(file: File, _filename: string): string {
     if (!file || !file.size || !file.type.match('image.*')) {
       return 'This file is not recognized as an image';
     }

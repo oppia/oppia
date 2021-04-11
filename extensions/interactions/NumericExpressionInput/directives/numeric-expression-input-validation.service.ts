@@ -40,7 +40,7 @@ export class NumericExpressionInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      unusedCustomizationArgs: NumericExpressionInputCustomizationArgs): Warning[] {
+      _CustomizationArgs: NumericExpressionInputCustomizationArgs): Warning[] {
     return [];
   }
 

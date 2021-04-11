@@ -372,7 +372,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             });
           };
 
-          $scope.playPauseUploadedAudioTranslation = function(unusedLanguageCode) {
+          $scope.playPauseUploadedAudioTranslation = function(_languageCode) {
             $scope.audioTimerIsShown = true;
             if (!AudioPlayerService.isPlaying()) {
               if (AudioPlayerService.isTrackLoaded()) {

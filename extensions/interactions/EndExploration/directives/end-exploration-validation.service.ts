@@ -65,7 +65,7 @@ export class EndExplorationValidationService {
   }
 
   getAllWarnings(
-      unusedStateName: string, customizationArgs: EndExplorationCustomizationArgs,
+      _stateName: string, customizationArgs: EndExplorationCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 

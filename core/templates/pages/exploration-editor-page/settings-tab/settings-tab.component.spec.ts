@@ -424,7 +424,7 @@ describe('Settings Tab Component', () => {
         result: $q.resolve('Email body')
       });
       spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
-        .callFake((emailBody) => {
+        .callFake((_emailBody) => {
           return $q.resolve();
         });
       ctrl.canUnpublish = false;
@@ -465,12 +465,12 @@ describe('Settings Tab Component', () => {
     it('should toggle notifications', () => {
       let feedbackNotificationsSpy = spyOn(
         userEmailPreferencesService, 'setFeedbackNotificationPreferences')
-        .and.callFake((mute: boolean, callb: () => void) => {
+        .and.callFake((_mute: boolean, callb: () => void) => {
           callb();
         });
       let suggestionNotificationsSpy = spyOn(
         userEmailPreferencesService, 'setSuggestionNotificationPreferences')
-        .and.callFake((mute: boolean, callb: () => void) => {
+        .and.callFake((_mute: boolean, callb: () => void) => {
           callb();
         });
       ctrl.muteFeedbackNotifications();

@@ -38,7 +38,7 @@ describe('MathEquationInputInteractive', function() {
   let ctrl = null, $window = null;
   let mockCurrentInteractionService = {
     onSubmit: function(unusedAnswer, unusedRulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, unusedValidateEquationFn) {
+    registerCurrentInteraction: function(submitAnswerFn, _validateEquationFn) {
       submitAnswerFn();
     }
   };

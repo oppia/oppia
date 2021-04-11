@@ -88,7 +88,7 @@ describe('State Interaction controller', function() {
     });
 
     beforeEach(angular.mock.inject(function(
-        _$componentController_, $compile, unused$controller, $injector, $rootScope,
+        _$componentController_, $compile, _$controller, $injector, $rootScope,
         $templateCache) {
       $componentController = _$componentController_;
       scope = $rootScope.$new();

@@ -53,7 +53,7 @@ describe('Tag misconception modal controller', function() {
   }));
 
   beforeEach(angular.mock.inject(
-    function(_$controller_, unused_$q_, _$rootScope_, $injector) {
+    function(_$controller_, _$q_, _$rootScope_, $injector) {
       $rootScope = _$rootScope_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');

@@ -56,7 +56,7 @@ export class AudioFileUploaderComponent {
     return null;
   }
 
-  addAudio(evt: Event): void {
+  addAudio(_evt: Event): void {
     let file = this.fileInputRef.nativeElement.files[0];
     if (!file) {
       this.fileClear.emit();

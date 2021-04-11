@@ -226,7 +226,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
           if (html === undefined) {
             return html;
           }
-          return html.replace(componentRe, function(match, unusedP1, unusedP2, p3) {
+          return html.replace(componentRe, function(match, _P1, _P2, p3) {
             if (RteHelperService.isInlineComponent(p3)) {
               return '<span type="oppia-noninteractive-' + p3 + '">' +
                     match + '</span>';
@@ -266,9 +266,11 @@ angular.module('oppia').directive('ckEditor4Rte', [
           if (event.data === undefined) {
             return;
           }
-          event.data = event.data.replace(componentRe, function(unusedMatch, p1, p2) {
-            return p1 + '</' + p2 + '>';
-          });
+          event.data = event.data.replace(componentRe,
+            function(_Match, p1, p2) {
+              return p1 + '</' + p2 + '>';
+            }
+          );
         }, null, null, 20);
 
         ck.on('change', function() {

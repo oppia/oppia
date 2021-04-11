@@ -40,7 +40,7 @@ angular.module('oppia').factory('CollectionLinearizerService', [
       return collection.getCollectionNodes();
     };
 
-    var addAfter = function(collection, curExplorationId, unusedNewExplorationId) {
+    var addAfter = function(collection, curExplorationId, _NewExplorationId) {
       collection.getCollectionNodeByExplorationId(curExplorationId);
     };
 

@@ -20,7 +20,7 @@
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = async function(unusedInteractionEditor, placeHolderText) {
+var customizeInteraction = async function(_InteractionEditor, placeHolderText) {
   await browser.executeScript(
     "var editor = $('schema-based-editor .CodeMirror')[0].CodeMirror;" +
     "editor.setValue('" + placeHolderText + "');");

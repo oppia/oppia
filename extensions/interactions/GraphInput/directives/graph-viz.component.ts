@@ -33,7 +33,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 const debounce = (delay: number = 5): MethodDecorator => {
   return function(
-      target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+      _target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     const key = `__timeout__${propertyKey}`;
 

@@ -24,7 +24,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import constants from 'assets/constants';
 
 class MockActiveModal {
-  close(value): void {
+  close(_value): void {
     return;
   }
 }
