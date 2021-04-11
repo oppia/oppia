@@ -20,8 +20,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { EventBusGroup, EventBusService } from 'oppia-events/event-bus.service';
-import { ObjectFormValidityChangeEvent } from 'oppia-events/oppia-events';
+import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
 @Component({
   selector: 'fraction-editor',

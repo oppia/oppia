@@ -16,8 +16,8 @@
  * @fileoverview Directive for the rule editor.
  */
 
-import { EventBusGroup } from 'oppia-events/event-bus.service';
-import { ObjectFormValidityChangeEvent } from 'oppia-events/oppia-events';
+import { EventBusGroup } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
