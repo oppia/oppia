@@ -45,7 +45,7 @@ describe('Topics and Skills Dashboard Page', function() {
 
   var mocktasdReinitalizedEventEmitter = null;
 
-  fdescribe('when backend dict contains topics', function() {
+  describe('when backend dict contains topics', function() {
     var sampleDataResults = {
       topic_summary_dicts: [{
         id: SAMPLE_TOPIC_ID,
@@ -72,7 +72,6 @@ describe('Topics and Skills Dashboard Page', function() {
       can_delete_topic: true,
       can_delete_skill: true
     };
-    var SkillCreationService;
     let CreateNewSkillModalService;
 
     beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -117,7 +116,6 @@ describe('Topics and Skills Dashboard Page', function() {
       var MockWindowDimensionsService = {
         isWindowNarrow: () => false
       };
-      SkillCreationService = $injector.get('SkillCreationService');
       CreateNewSkillModalService = $injector.get('CreateNewSkillModalService');
 
       ctrl = $componentController('topicsAndSkillsDashboardPage', {
