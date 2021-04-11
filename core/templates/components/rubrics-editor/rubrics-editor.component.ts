@@ -191,5 +191,5 @@ export class RubricsEditorComponent {
   }
 }
 
-angular.module('oppia').directive('rubricsEditor',
+angular.module('oppia').directive('oppiaRubricsEditor',
   downgradeComponent({ component: RubricsEditorComponent }));
