@@ -94,13 +94,11 @@ describe('Context service', () => {
       expect(ecs.isInQuestionPlayerMode()).toEqual(false);
     });
 
-    it('should affirm that exploration player cannot refer to skills',
-      () => {
-        expect(ecs.getPageContext()).toBe('learner');
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-        ecs.setExplorationIsLinkedToStory();
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-      });
+    it('should check if exploration is linked to a story', () => {
+      expect(ecs.isExplorationLinkedToStory()).toBe(false);
+      ecs.setExplorationIsLinkedToStory();
+      expect(ecs.isExplorationLinkedToStory()).toBe(true);
+    });
   });
 
   describe('behavior in the exploration learner embed view', () => {
@@ -154,6 +152,12 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('editor');
     });
 
+    it('should correctly retrieve the story context', () => {
+      expect(ecs.isExplorationLinkedToStory()).toBe(false);
+      ecs.setExplorationIsLinkedToStory();
+      expect(ecs.isExplorationLinkedToStory()).toBe(true);
+    });
+
     it('should correctly retrieve exploration editor mode', () => {
       expect(ecs.isInExplorationEditorMode()).toBe(true);
     });
@@ -166,14 +170,6 @@ describe('Context service', () => {
       () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
-
-    it('should correctly affirm exploration editor can only refer to skills' +
-      ' only if exploration linked to story', () => {
-      expect(ecs.getPageContext()).toBe('editor');
-      expect(ecs.canEntityReferToSkills()).toBe(false);
-      ecs.setExplorationIsLinkedToStory();
-      expect(ecs.canEntityReferToSkills()).toBe(true);
-    });
   });
 
   describe('behavior in the topic editor view', () => {
@@ -212,15 +208,6 @@ describe('Context service', () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
 
-    it('should correctly affirm that topic editor can refer to skills',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-        expect(ecs.getPageContext()).toBe('topic_editor');
-        expect(ecs.canEntityReferToSkills()).toBe(true);
-      });
-
     it('should not report exploration context when the context' +
       ' is not related to editor or player', ()=> {
       expect(ecs.getPageContext()).toBe('other');
@@ -250,15 +237,6 @@ describe('Context service', () => {
       expect(ecs.getEntityType()).toBe('question');
       expect(ecs.getEntityId()).toBe('questionId');
     });
-
-    it('should correctly affirm that skill editor can refer to skills',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-        expect(ecs.getPageContext()).toBe('skill_editor');
-        expect(ecs.canEntityReferToSkills()).toBe(true);
-      });
 
     it('should affirm the exploration context for exploration player',
       ()=> {
@@ -309,15 +287,6 @@ describe('Context service', () => {
         expect(ecs.canAddOrEditComponents()).toBe(false);
         spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
         expect(ecs.canAddOrEditComponents()).toBe(true);
-      });
-
-    it('should correctly affirm that story editor cannot refer to skills',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-        expect(ecs.canEntityReferToSkills()).toBe(false);
-        spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
-        expect(ecs.getPageContext()).toBe('story_editor');
-        expect(ecs.canEntityReferToSkills()).toBe(false);
       });
   });
 
@@ -407,24 +376,6 @@ describe('Context service', () => {
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
     });
-
-    it('should check that the community dashboard question editor is open',
-      () => {
-        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
-        ecs.setContributorDashboardQuestionEditorIsOpen();
-        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeTrue();
-      }
-    );
-
-    it('should check that the community dashboard question editor is closed',
-      () => {
-        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
-        ecs.setContributorDashboardQuestionEditorIsOpen();
-        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeTrue();
-        ecs.clearContributorDashboardQuestionEditorIsOpen();
-        expect(ecs.getContributorDashboardQuestionEditorIsOpen()).toBeFalse();
-      }
-    );
 
     it('should throw an error when trying to retrieve the exploration id',
       () => {
