@@ -13,12 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for filepath editor.
+ * @fileoverview Component for filepath editor.
  */
 
-// This directive can only be used in the context of an exploration.
-
+// This component can only be used in the context of an exploration.
+/**
+ * NOTE: These are some hacky behavior in the component class. Apologies in
+ * advance if you were stuck on one of these for a long time.
+ *
+ * 1. Whenever changing a property of the data property of this component
+ * class, please make sure the object is reassigned. Angular's change detection
+ * uses the `===` operator which would only return false when the object
+ * changes. You can use the spread operator to achieve the desired result.
+ * Eg: this.data = {..this.data};
+ *
+ * 2. Angular treats SVG+XMl as dangerous by default. To show this image in the
+ * view, we run our own security (for our own safety) and bypass the angular
+ * security. When we bypass Angular's security checks, it attaches some
+ * additional information to inform the Angular's view engine to not run
+ * security checks on the image data. This can only be done the in html file
+ * using property binding (i.e. [src]). If we use this in the ts file, by doing
+ * `const img = new Image; img.src = bypassedValue;`, Angular will raise errors.
+ * In addition to this, our custom functions will also fail for this data. To
+ * overcome this, during the migration of this component, a new property called
+ * imgData was introduced. This contains the unBypassed value for svgs or just
+ * the normal image data for other file formats. While updating
+ * `this.data.metadata.uploadedImageData`, make sure that you also update
+ * imgData. Failing to do so could lead to unpredictable behavior.
+ */
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -38,7 +62,7 @@ interface FilepathData {
   mode: number;
   metadata: {
     uploadedFile?: File;
-    uploadedImageData?: string | ArrayBuffer;
+    uploadedImageData?: string | SafeResourceUrl;
     originalWidth?: number;
     originalHeight?: number;
     savedImageFilename?: string;
@@ -107,7 +131,12 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   processedImageIsTooLarge: boolean;
   entityId: string;
   entityType: string;
+  // Check the note before imports and after fileoverview.
+  private imgData;
+  // Check the note before imports and after fileoverview.
   private _data: FilepathData;
+
+  // Check the note before imports and after fileoverview.
   get data(): FilepathData {
     return this._data;
   }
@@ -194,7 +223,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.entityId = this.contextService.getEntityId();
     this.entityType = this.contextService.getEntityType();
 
-    window.addEventListener('mouseup', function(e) {
+    window.addEventListener('mouseup', (e) => {
       e.preventDefault();
       this.userIsDraggingCropArea = false;
       this.userIsResizingCropArea = false;
@@ -321,7 +350,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     let y = e.offsetY;
     const containerClass = 'filepath-editor-image-crop-container';
     let node = e.target;
-    while (!node.classList.contains(containerClass)) {
+    while (node !== null && !node.classList.contains(containerClass)) {
       x += node.offsetLeft;
       y += node.offsetTop;
       node = node.offsetParent;
@@ -361,13 +390,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     const dimensions = this.calculateTargetImageDimensions();
     const direction = this.cropAreaResizeDirection;
 
-    const adjustResizeLeft = function(x) {
+    const adjustResizeLeft = (x) => {
       // Update crop area x1 value, correcting for boundaries.
       this.cropArea.x1 = this.clamp(
         x, 0, this.cropArea.x2 - this.CROP_AREA_MIN_WIDTH_PX);
     };
 
-    const adjustResizeRight = function(x) {
+    const adjustResizeRight = (x) => {
       // Update crop area x2 value, correcting for boundaries.
       this.cropArea.x2 = this.clamp(
         x,
@@ -375,13 +404,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         dimensions.width);
     };
 
-    const adjustResizeTop = function(y) {
+    const adjustResizeTop = (y) => {
       // Update crop area y1 value, correcting for boundaries.
       this.cropArea.y1 = this.clamp(
         y, 0, this.cropArea.y2 - this.CROP_AREA_MIN_HEIGHT_PX);
     };
 
-    const adjustResizeBottom = function(y) {
+    const adjustResizeBottom = (y) => {
       // Update crop area y2 value, correcting for boundaries.
       this.cropArea.y2 = this.clamp(
         y,
@@ -471,24 +500,20 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  private getTrustedResourceUrlForImageFileName(imageFileName) {
+  private getTrustedResourceUrlForImageFileName(
+      imageFileName, sanitizeSvg = false) {
     if (
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
       this.imageLocalStorageService.isInStorage(imageFileName)) {
       const imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
         imageFileName);
-      if (imageFileName.endsWith('.svg')) {
+      if (imageFileName.endsWith('.svg') && sanitizeSvg) {
         return this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl);
       }
       return imageUrl;
     }
     const encodedFilepath = window.encodeURIComponent(imageFileName);
-    if (imageFileName.endsWith('.svg')) {
-      return this.svgSanitizerService.getTrustedSvgResourceUrl(
-        this.assetsBackendApiService.getImageUrlForPreview(
-          this.entityType, this.entityId, encodedFilepath));
-    }
     return this.assetsBackendApiService.getImageUrlForPreview(
       this.entityType, this.entityId, encodedFilepath);
   }
@@ -554,7 +579,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     if (position === this.MOUSE_INSIDE) {
       this.lastMouseDownEventCoordinates = { x: coords.x, y: coords.y };
       this.cropAreaXWhenLastDown = this.cropArea.x1;
-      this.cropAreaXWhenLastDown = this.cropArea.y1;
+      this.cropAreaYWhenLastDown = this.cropArea.y1;
       this.userIsDraggingCropArea = true;
     } else if (position !== null) {
       this.lastMouseDownEventCoordinates = { x: coords.x, y: coords.y };
@@ -616,7 +641,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
     // Translucent background layer.
     if (this.isUserCropping()) {
-      const data = 'url(' + this.data.metadata.uploadedImageData + ')';
+      const data = 'url(' + (
+        // Check point 2 in the note before imports and after fileoverview.
+        this.imgData || this.data.metadata.uploadedImageData) + ')';
       styles.background = data + ' no-repeat';
 
       const x = this.cropArea.x1 + 3; // Add crop area border.
@@ -649,8 +676,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     const y1 = this.cropArea.y1 * r;
     const width = (this.cropArea.x2 - this.cropArea.x1) * r;
     const height = (this.cropArea.y2 - this.cropArea.y1) * r;
-
-    const imageDataURI = this.data.metadata.uploadedImageData as string;
+    // Check point 2 in the note before imports and after fileoverview.
+    const imageDataURI = this.imgData || (
+      this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
 
     let newImageFile;
@@ -664,7 +692,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         url: imageDataURI,
         frames: 'all',
         outputType: 'canvas',
-      }).then(async function(frameData) {
+      }).then(async frameData => {
         let frames = [];
         for (let i = 0; i < frameData.length; i += 1) {
           let canvas = frameData[i].getImage();
@@ -686,7 +714,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         });
       });
     } else if (mimeType === 'data:image/svg+xml') {
-      const imageData = this.data.metadata.uploadedImageData as string;
+      // Check point 2 in the note before imports and after fileoverview.
+      const imageData = this.imgData || (
+        this.data.metadata.uploadedImageData as string);
       newImageFile = (
         this.imageUploadHelperService.convertImageDataToImageFile(
           this.data.metadata.uploadedImageData as string));
@@ -694,7 +724,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     } else {
       // Generate new image data and file.
       const newImageData = this.getCroppedImageData(
-        this.data.metadata.uploadedImageData,
+        // Check point 2 in the note before imports and after fileoverview.
+        this.imgData || this.data.metadata.uploadedImageData,
         x1, y1, width, height);
       this.validateProcessedFilesize(newImageData);
 
@@ -716,6 +747,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.data.metadata.uploadedImageData = newImageData;
     this.data.metadata.originalWidth = width;
     this.data.metadata.originalHeight = height;
+    // Check point 1 in the note before imports and after fileoverview.
     this.data = {...this.data};
     // Re-calculate the dimensions of the base image and reset the
     // coordinates of the crop area to the boundaries of the image.
@@ -771,7 +803,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.imageResizeRatio = Math.max(
       0.1, this.imageResizeRatio - amount / 100);
     const dimensions = this.calculateTargetImageDimensions();
-    const imageDataURI = this.data.metadata.uploadedImageData;
+    // Check point 2 in the note before imports and after fileoverview.
+    const imageDataURI = this.imgData || this.data.metadata.uploadedImageData;
     const resampledImageData = this.getResampledImageData(
       imageDataURI, dimensions.width, dimensions.height);
     this.validateProcessedFilesize(resampledImageData);
@@ -782,7 +815,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.imageResizeRatio = Math.min(
       1, this.imageResizeRatio + amount / 100);
     const dimensions = this.calculateTargetImageDimensions();
-    const imageDataURI = this.data.metadata.uploadedImageData;
+    // Check point 2 in the note before imports and after fileoverview.
+    const imageDataURI = this.imgData || this.data.metadata.uploadedImageData;
     const resampledImageData = this.getResampledImageData(
       imageDataURI, dimensions.width, dimensions.height);
     this.validateProcessedFilesize(resampledImageData);
@@ -807,11 +841,18 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
+        // Check point 2 in the note before imports and after fileoverview.
+        this.imgData = (<FileReader>e.target).result;
+        let imageData: string | SafeResourceUrl = (<FileReader>e.target).result;
+        if (file.name.endsWith('.svg')) {
+          imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
+            imageData as string);
+        }
         this.data = {
           mode: this.MODE_UPLOADED,
           metadata: {
             uploadedFile: file,
-            uploadedImageData: (<FileReader>e.target).result,
+            uploadedImageData: imageData,
             originalWidth: img.naturalWidth || 300,
             originalHeight: img.naturalHeight || 150
           },
@@ -824,7 +865,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
           x2: dimensions.width,
           y2: dimensions.height
         };
-        const imageDataURI = this.data.metadata.uploadedImageData;
+        const imageDataURI = (<FileReader>e.target).result;
         const resampledImageData = this.getResampledImageData(
           imageDataURI, dimensions.width, dimensions.height);
         this.validateProcessedFilesize(resampledImageData);
@@ -839,8 +880,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       mode: this.MODE_SAVED,
       metadata: {
         savedImageFilename: filename,
+        // Check point 2 in the note before imports and after fileoverview.
         savedImageUrl: this.getTrustedResourceUrlForImageFileName(
-          filename) as string
+          filename, true) as string
       },
       crop: true
     };
@@ -883,7 +925,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
 
     // Check mime type from imageDataURI.
-    const imageDataURI = this.data.metadata.uploadedImageData as string;
+    // Check point 2 in the note before imports and after fileoverview.
+    const imageDataURI = this.imgData || (
+      this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
     let resampledFile;
 
@@ -962,6 +1006,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     const reader = new FileReader();
     reader.onload = () => {
       const imageData = reader.result as string;
+      // Check point 2 in the note before imports and after fileoverview.
+      this.imgData = imageData;
       this.imageLocalStorageService.saveImage(filename, imageData);
       const img = new Image();
       img.onload = () => {
@@ -973,7 +1019,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
           width: dimensions.width + 'px'
         };
       };
-      img.src = this.getTrustedResourceUrlForImageFileName(filename);
+      // Check point 2 in the note before imports and after fileoverview.
+      img.src = this.getTrustedResourceUrlForImageFileName(filename) as string;
     };
     reader.readAsDataURL(resampledFile);
   }
@@ -1016,7 +1063,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         processData: false,
         contentType: false,
         type: 'POST',
-        dataFilter: function(data) {
+        dataFilter: data => {
           // Remove the XSSI prefix.
           const transformedData = data.substring(5);
           return JSON.parse(transformedData);
@@ -1034,7 +1081,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
             width: dimensions.width + 'px'
           };
         };
-        img.src = this.getTrustedResourceUrlForImageFileName(data.filename);
+        // Check point 2 in the note before imports and after fileoverview.
+        img.src = this.getTrustedResourceUrlForImageFileName(
+          data.filename) as string;
       }).fail((data) => {
         // Remove the XSSI prefix.
         var transformedData = data.responseText.substring(5);

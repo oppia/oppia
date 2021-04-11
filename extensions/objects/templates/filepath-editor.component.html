@@ -1,103 +1,103 @@
-<div class="filepath-editor" 
-     [attr.style]="getMainContainerDynamicStyles()"
-     class="filepath-editor-main-container">
-  <div *ngIf="isImageUploaded()"
-       class="filepath-editor-img-toolbar"
-       [attr.style]="getToolbarDynamicStyles()">
-    <div class="filepath-editor-img-toolbar-resize">
-      Resize to:
-      <span class="filepath-editor-button filepath-editor-decrease-size"
-            (click)="decreaseResizePercent(10)">-
-      </span>
-      <span class="filepath-editor-resize-input">
-         {{ getCurrentResizePercent() }} %
-      </span>
-      <span class="filepath-editor-button filepath-editor-increase-size"
-            (click)="increaseResizePercent(10)">+
-      </span>
-    </div>
-    <div class="filepath-editor-img-toolbar-size">
-      Image Size:
-      <span>{{ calculateTargetImageDimensions().width }}</span>
-      &times;
-      <span> {{ calculateTargetImageDimensions().height }} </span>
-      <i class="material-icons"
-         *ngIf="getImageSizeHelp() !== null"
-         title="{{getImageSizeHelp()}}">
-        &#xE887;
-      </i>
-    </div>
-  </div>
-  <div class="filepath-editor-image-container"
-       [attr.style]="getImageContainerDynamicStyles()">
-    <div *ngIf="isNoImageUploaded()">
-      <oppia-image-uploader (fileChanged)="onFileChanged($event)"
-                            [allowedImageFormats]="allowedImageFormats">
-      </oppia-image-uploader>
-    </div>
+<div class="filepath-editor">
+  <div [attr.style]="getMainContainerDynamicStyles()"
+      class="filepath-editor-main-container">
     <div *ngIf="isImageUploaded()"
-         class="filepath-editor-image-crop-container"
-         (mousemove)="onMouseMoveOnImageArea($event)">
-      <div *ngIf="isUserCropping()"
-           class="filepath-editor-image-shade-overlay">
+        class="filepath-editor-img-toolbar"
+        [attr.style]="getToolbarDynamicStyles()">
+      <div class="filepath-editor-img-toolbar-resize">
+        Resize to:
+        <span class="filepath-editor-button filepath-editor-decrease-size"
+              (click)="decreaseResizePercent(10)">-
+        </span>
+        <span class="filepath-editor-resize-input">
+          {{ getCurrentResizePercent() }} %
+        </span>
+        <span class="filepath-editor-button filepath-editor-increase-size"
+              (click)="increaseResizePercent(10)">+
+        </span>
       </div>
-      <div class="filepath-editor-crop-area"
-           *ngIf="imageResizeRatio === 1 && isCropAllowed()"
-           [attr.style]="getCropAreaDynamicStyles()"
-           (mousedown)="onMouseDownOnCropArea($event)"
-           (mouseup)="onMouseUpOnCropArea($event)">
-      </div>
-      <div *ngIf="isUserCropping()"
-           class="filepath-editor-image-crop-button-bar"
-           [attr.style]="getCropButtonBarDynamicStyles()">
-        <div class="filepath-editor-button filepath-editor-crop-button"
-             (click)="confirmCropImage()">
-          Crop
-        </div>
-        <div class="filepath-editor-button filepath-editor-crop-button"
-             (click)="cancelCropImage()">
-          Cancel
-        </div>
-      </div>
-      <img [src]="data.metadata.uploadedImageData"
-           [attr.style]="getUploadedImageDynamicStyles()">
-    </div>
-    <div *ngIf="isImageSaved()">
-      <div class="filepath-editor-saved-image-container">
-        <i class="material-icons filepath-editor-trash"
-           (click)="resetFilePathEditor()"
-           title="Delete this image">
-          &#xE872;
+      <div class="filepath-editor-img-toolbar-size">
+        Image Size:
+        <span>{{ calculateTargetImageDimensions().width }}</span>
+        &times;
+        <span> {{ calculateTargetImageDimensions().height }} </span>
+        <i class="material-icons"
+          *ngIf="getImageSizeHelp() !== null"
+          title="{{getImageSizeHelp()}}">
+          &#xE887;
         </i>
-        <img [src]="data.metadata.savedImageUrl" [ngStyle]="imageContainerStyle">
       </div>
     </div>
-  </div>
-  <div *ngIf="isImageUploaded()" class="filepath-editor-save-box">
-    <button type="button"
-            class="btn btn-success filepath-editor-use"
-            (click)="saveUploadedFile()"
-            [attr.disabled]="isUserCropping()">
-      Use This Image
-    </button>
-    <button type="button"
-            class="btn btn-secondary filepath-editor-discard"
-            (click)="discardUploadedFile()"
-            [attr.disabled]="isUserCropping()">
-      Discard
-    </button>
-  </div>
-  <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.tags.length">
-    Unsupported SVG tags found: {{ invalidTagsAndAttributes.tags }}
-  </div>
-  <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.attrs.length">
-    Unsupported SVG attributes found: {{ invalidTagsAndAttributes.attrs }}
-  </div>
-  <div class="oppia-form-error oppia-processed-image-too-large-error" *ngIf="processedImageIsTooLarge">
-    The processed image is too large to upload. Please try cropping or resizing the current image.
+    <div class="filepath-editor-image-container"
+        [attr.style]="getImageContainerDynamicStyles()">
+      <div *ngIf="isNoImageUploaded()">
+        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+                              [allowedImageFormats]="allowedImageFormats">
+        </oppia-image-uploader>
+      </div>
+      <div *ngIf="isImageUploaded()"
+          class="filepath-editor-image-crop-container"
+          (mousemove)="onMouseMoveOnImageArea($event)">
+        <div *ngIf="isUserCropping()"
+            class="filepath-editor-image-shade-overlay">
+        </div>
+        <div class="filepath-editor-crop-area"
+            *ngIf="imageResizeRatio === 1 && isCropAllowed()"
+            [attr.style]="getCropAreaDynamicStyles()"
+            (mousedown)="onMouseDownOnCropArea($event)"
+            (mouseup)="onMouseUpOnCropArea($event)">
+        </div>
+        <div *ngIf="isUserCropping()"
+            class="filepath-editor-image-crop-button-bar"
+            [attr.style]="getCropButtonBarDynamicStyles()">
+          <div class="filepath-editor-button filepath-editor-crop-button"
+              (click)="confirmCropImage()">
+            Crop
+          </div>
+          <div class="filepath-editor-button filepath-editor-crop-button"
+              (click)="cancelCropImage()">
+            Cancel
+          </div>
+        </div>
+        <img [src]="data.metadata.uploadedImageData"
+            [attr.style]="getUploadedImageDynamicStyles()">
+      </div>
+      <div *ngIf="isImageSaved()">
+        <div class="filepath-editor-saved-image-container">
+          <i class="material-icons filepath-editor-trash"
+            (click)="resetFilePathEditor()"
+            title="Delete this image">
+            &#xE872;
+          </i>
+          <img [src]="data.metadata.savedImageUrl" [ngStyle]="imageContainerStyle">
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isImageUploaded()" class="filepath-editor-save-box">
+      <button type="button"
+              class="btn btn-success filepath-editor-use"
+              (click)="saveUploadedFile()"
+              [disabled]="isUserCropping()">
+        Use This Image
+      </button>
+      <button type="button"
+              class="btn btn-secondary filepath-editor-discard"
+              (click)="discardUploadedFile()"
+              [disabled]="isUserCropping()">
+        Discard
+      </button>
+    </div>
+    <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.tags.length">
+      Unsupported SVG tags found: {{ invalidTagsAndAttributes.tags }}
+    </div>
+    <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" *ngIf="invalidTagsAndAttributes.attrs.length">
+      Unsupported SVG attributes found: {{ invalidTagsAndAttributes.attrs }}
+    </div>
+    <div class="oppia-form-error oppia-processed-image-too-large-error" *ngIf="processedImageIsTooLarge">
+      The processed image is too large to upload. Please try cropping or resizing the current image.
+    </div>
   </div>
 </div>
-
 <style>
   .filepath-editor .filepath-editor-saved-image-container img {
     background-color: white;

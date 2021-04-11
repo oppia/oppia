@@ -55,6 +55,7 @@ angular.module('oppia').directive('objectEditor', [
           'coord-two-dim',
           'custom-osk-letters',
           'drag-and-drop-positive-int',
+          'filepath',
           'fraction'
         ];
         // Converts a camel-cased string to a lower-case hyphen-separated
