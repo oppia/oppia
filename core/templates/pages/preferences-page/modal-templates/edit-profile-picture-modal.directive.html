@@ -6,9 +6,9 @@
   <div class="modal-body oppia-profile-image-uploader-container">
     <div class="oppia-profile-image-uploader">
       <div ng-hide="uploadedImage">
-        <image-uploader on-file-changed="onFileChanged"
-                        allowed-image-formats="allowedImageFormats">
-        </image-uploader>
+        <oppia-image-uploader (file-changed)="onFileChanged($event)"
+                              [allowed-image-formats]="allowedImageFormats">
+        </oppia-image-uploader>
       </div>
 
       <div class="oppia-form-error oppia-form-error-text"

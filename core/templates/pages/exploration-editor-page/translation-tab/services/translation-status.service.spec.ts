@@ -438,7 +438,7 @@ describe('Translation status service', function() {
       tls.setActiveLanguageCode('hi');
       var explorationTranslationsRequiredCount = (
         tss.getExplorationContentRequiredCount());
-      expect(explorationTranslationsRequiredCount).toBe(8);
+      expect(explorationTranslationsRequiredCount).toBe(9);
 
       // To test changes after adding a new state.
       ess.addState('Fourth');
@@ -456,7 +456,7 @@ describe('Translation status service', function() {
       tls.setActiveLanguageCode('hi');
       var explorationTranslationsRequiredCount = (
         tss.getExplorationContentRequiredCount());
-      expect(explorationTranslationsRequiredCount).toBe(9);
+      expect(explorationTranslationsRequiredCount).toBe(10);
     });
 
     it('should return a correct count of audio not available in an exploration',
@@ -482,7 +482,7 @@ describe('Translation status service', function() {
       tls.setActiveLanguageCode('hi');
       var explorationTranslationNotAvailableCount = (
         tss.getExplorationContentNotAvailableCount());
-      expect(explorationTranslationNotAvailableCount).toBe(6);
+      expect(explorationTranslationNotAvailableCount).toBe(7);
 
       ess.addState('Fourth');
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
@@ -491,7 +491,7 @@ describe('Translation status service', function() {
 
       explorationTranslationNotAvailableCount = (
         tss.getExplorationContentNotAvailableCount());
-      expect(explorationTranslationNotAvailableCount).toBe(7);
+      expect(explorationTranslationNotAvailableCount).toBe(8);
     });
 
     it('should correctly return an object containing status colors of audio ' +

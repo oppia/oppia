@@ -21,7 +21,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 
 require('directives/mathjax-bind.directive.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
