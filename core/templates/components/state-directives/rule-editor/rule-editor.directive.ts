@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EventBusGroup } from "oppia-events/event-bus.service";
-import { ObjectFormValidityChangeEvent } from "oppia-events/oppia-events";
-
 /**
  * @fileoverview Directive for the rule editor.
  */
+
+import { EventBusGroup } from 'oppia-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'oppia-events/oppia-events';
 
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
@@ -281,6 +281,7 @@ angular.module('oppia').directive('ruleEditor', [
                 event => {
                   if (event.message.modalId === ctrl.modalId) {
                     ctrl.isInvalid = event.message.value;
+                    $scope.$applyAsync();
                   }
                 });
             }

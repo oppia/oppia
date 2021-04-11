@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the object componients.
+ * @fileoverview Module for the object components.
  */
 import 'core-js/es7/reflect';
 import 'zone.js';
@@ -30,6 +30,8 @@ import { CustomOskLettersEditorComponent } from './templates/custom-osk-letters-
 import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop-positive-int-editor.component';
 import { FractionEditorComponent } from './templates/fraction-editor.component';
 import { FormsModule } from '@angular/forms';
+import { FilepathEditorComponent } from './templates/filepath-editor.component';
+import { CustomFormsComponentsModule } from 'components/forms/custom-forms-directives/custom-form-components.module';
 
 
 @NgModule({
@@ -37,7 +39,8 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     BrowserModule,
     FormsModule,
-    LeafletModule
+    LeafletModule,
+    CustomFormsComponentsModule
   ],
   declarations: [
     AlgebraicExpressionEditorComponent,
@@ -46,6 +49,7 @@ import { FormsModule } from '@angular/forms';
     CoordTwoDimEditorComponent,
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
+    FilepathEditorComponent,
     FractionEditorComponent
   ],
   entryComponents: [
@@ -55,6 +59,7 @@ import { FormsModule } from '@angular/forms';
     CoordTwoDimEditorComponent,
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
+    FilepathEditorComponent,
     FractionEditorComponent
   ],
   exports: [
@@ -64,6 +69,7 @@ import { FormsModule } from '@angular/forms';
     CoordTwoDimEditorComponent,
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
+    FilepathEditorComponent,
     FractionEditorComponent
   ],
 })

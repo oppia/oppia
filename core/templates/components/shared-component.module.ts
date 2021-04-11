@@ -34,7 +34,6 @@ import { LazyLoadingComponent } from
 import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { SkillSelectorComponent } from
   './skill-selector/skill-selector.component';
@@ -46,7 +45,6 @@ import { KeyboardShortcutHelpModalComponent } from
   'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
-import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 import { StorySummaryTileDirective } from
   './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from
@@ -73,6 +71,8 @@ import { PromoBarComponent } from './common-layout-directives/common-elements/pr
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
+import { TranslateModule } from 'filters/translate.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -90,14 +90,16 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
 @NgModule({
   imports: [
-    CommonModule,
     BrowserModule,
+    CommonModule,
+    CustomFormsComponentsModule,
     MaterialModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
     ObjectComponentsModule,
+    TranslateModule,
     ...firebaseAuthModules,
   ],
 
@@ -113,7 +115,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -131,7 +132,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TranslatePipe,
     TruncatePipe,
     PromoBarComponent
   ],
@@ -148,7 +148,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -163,17 +162,18 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // Modules.
     DynamicContentModule,
     FormsModule,
+    CustomFormsComponentsModule,
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
+    TranslateModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
-    ImageUploaderComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
@@ -184,7 +184,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TranslatePipe,
     PromoBarComponent
   ],
 })
