@@ -31,7 +31,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 describe('State Name Editor component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -43,7 +42,6 @@ describe('State Name Editor component', function() {
   var stateEditorService = null;
   var stateNameService = null;
   var mockExternalSaveEventEmitter = null;
-  var focusManagerService = null;
   var mockExplorationData = {
     explorationId: 0,
     autosaveChangeList: function() {}
@@ -66,7 +64,6 @@ describe('State Name Editor component', function() {
     editabilityService = TestBed.get(EditabilityService);
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -90,7 +87,6 @@ describe('State Name Editor component', function() {
     $rootScope = $injector.get('$rootScope');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
-    focusManagerService = $injector.get('FocusManagerService');
     spyOn(mockExplorationData, 'autosaveChangeList');
     spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
 
@@ -301,12 +297,5 @@ describe('State Name Editor component', function() {
     ctrl.tmpStateName = 'SampleState';
     mockExternalSaveEventEmitter.emit();
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
-  });
-
-  it('should apply focus on main tab', () => {
-    var focusSpy = spyOn(focusManagerService, 'setFocus');
-    ctrl.TabName = 'main';
-    ctrl.initStateNameEditor();
-    expect(focusSpy).toHaveBeenCalledWith('oppiaEditableSection');
   });
 });
