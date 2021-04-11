@@ -96,7 +96,17 @@ commands:
     steps:
       - store_artifacts:
           path: /home/circleci/protractor-screenshots/
-          destination: protractor-screenshots
+          destination: protractor-screenshots/
+      - store_artifacts:
+          path: /home/circleci/oppia/core/protractor-video/
+          destination: protractor-video/
+  
+  install_ffmpeg:
+    description: "Install ffmpeg for video recorder"
+    steps:
+      - run:
+          name: Install ffmpeg
+          command: sudo apt install ffmpeg
 
 jobs:
   setup_and_typescript_tests:
@@ -145,6 +155,7 @@ jobs:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
+      - install_ffmpeg
       - run:
           name: Run e2e navigation test
           command: |
@@ -177,6 +188,7 @@ jobs:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
+      - install_ffmpeg
       - run:
           name: Run e2e publication test
           command: |
@@ -207,6 +219,7 @@ jobs:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
+      - install_ffmpeg
       - run:
           name: Run e2e file upload features test
           command: |
@@ -243,6 +256,7 @@ jobs:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
+      - install_ffmpeg
       - run:
           name: Run e2e topics and skills dashboard test
           command: |

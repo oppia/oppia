@@ -338,6 +338,28 @@ exports.config = {
       }));
     }
 
+    // Adding a video reporter
+    var _ADD_VIDEO_REPORTER = true;
+
+    var ffmpegArguments = [
+      '-y',
+      '-r', '30',
+      '-f', 'x11grab',
+      '-s', '1366x768',
+      '-i', process.env.DISPLAY,
+      '-g', '300',
+      '-vcodec', 'qtrle',
+    ]
+
+    if(_ADD_VIDEO_REPORTER) {
+      jasmine.getEnv().addReporter(new VideoReporter({
+        baseDirectory: Path.join(__dirname, '../protractor-video'),
+        singleVideo: false,
+        singleVideoPath: fullName,
+        ffmpegArgs: ffmpegArguments
+      }));
+    }
+
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'pretty',
