@@ -21,6 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { AlertsService } from './alerts.service';
 import { ImageUploadHelperService } from './image-upload-helper.service';
 
+export interface ImagesData {
+  filename: string;
+  imageBlob: Blob;
+}
 @Injectable({
   providedIn: 'root'
 })
