@@ -28,16 +28,17 @@
  * Eg: this.data = {..this.data};
  *
  * 2. Angular treats SVG+XMl as dangerous by default. To show this image in the
- * view, we run our own security (for our own safety) and bypass the angular
- * security. When we bypass Angular's security checks, it attaches some
+ * view, we run our own security (for our own safety) and circumvent the angular
+ * security. When we circumvent Angular's security checks, it attaches some
  * additional information to inform the Angular's view engine to not run
  * security checks on the image data. This can only be done the in html file
  * using property binding (i.e. [src]). If we use this in the ts file, by doing
- * `const img = new Image; img.src = bypassedValue;`, Angular will raise errors.
+ * `const img = new Image; img.src = circumventedValue;`, Angular will raise
+ * errors.
  * In addition to this, our custom functions will also fail for this data. To
  * overcome this, during the migration of this component, a new property called
- * imgData was introduced. This contains the unBypassed value for svgs or just
- * the normal image data for other file formats. While updating
+ * imgData was introduced. This contains the not circumvented value for svgs or
+ * just the normal image data for other file formats. While updating
  * `this.data.metadata.uploadedImageData`, make sure that you also update
  * imgData. Failing to do so could lead to unpredictable behavior.
  */

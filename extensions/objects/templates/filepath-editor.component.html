@@ -1,9 +1,9 @@
 <div class="filepath-editor">
   <div [attr.style]="getMainContainerDynamicStyles()"
-      class="filepath-editor-main-container">
+       class="filepath-editor-main-container">
     <div *ngIf="isImageUploaded()"
-        class="filepath-editor-img-toolbar"
-        [attr.style]="getToolbarDynamicStyles()">
+         class="filepath-editor-img-toolbar"
+         [attr.style]="getToolbarDynamicStyles()">
       <div class="filepath-editor-img-toolbar-resize">
         Resize to:
         <span class="filepath-editor-button filepath-editor-decrease-size"
@@ -22,51 +22,51 @@
         &times;
         <span> {{ calculateTargetImageDimensions().height }} </span>
         <i class="material-icons"
-          *ngIf="getImageSizeHelp() !== null"
-          title="{{getImageSizeHelp()}}">
+           *ngIf="getImageSizeHelp() !== null"
+           title="{{getImageSizeHelp()}}">
           &#xE887;
         </i>
       </div>
     </div>
     <div class="filepath-editor-image-container"
-        [attr.style]="getImageContainerDynamicStyles()">
+         [attr.style]="getImageContainerDynamicStyles()">
       <div *ngIf="isNoImageUploaded()">
         <oppia-image-uploader (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats">
         </oppia-image-uploader>
       </div>
       <div *ngIf="isImageUploaded()"
-          class="filepath-editor-image-crop-container"
-          (mousemove)="onMouseMoveOnImageArea($event)">
+           class="filepath-editor-image-crop-container"
+           (mousemove)="onMouseMoveOnImageArea($event)">
         <div *ngIf="isUserCropping()"
-            class="filepath-editor-image-shade-overlay">
+             class="filepath-editor-image-shade-overlay">
         </div>
         <div class="filepath-editor-crop-area"
-            *ngIf="imageResizeRatio === 1 && isCropAllowed()"
-            [attr.style]="getCropAreaDynamicStyles()"
-            (mousedown)="onMouseDownOnCropArea($event)"
-            (mouseup)="onMouseUpOnCropArea($event)">
+             *ngIf="imageResizeRatio === 1 && isCropAllowed()"
+             [attr.style]="getCropAreaDynamicStyles()"
+             (mousedown)="onMouseDownOnCropArea($event)"
+             (mouseup)="onMouseUpOnCropArea($event)">
         </div>
         <div *ngIf="isUserCropping()"
-            class="filepath-editor-image-crop-button-bar"
-            [attr.style]="getCropButtonBarDynamicStyles()">
+             class="filepath-editor-image-crop-button-bar"
+             [attr.style]="getCropButtonBarDynamicStyles()">
           <div class="filepath-editor-button filepath-editor-crop-button"
-              (click)="confirmCropImage()">
+               (click)="confirmCropImage()">
             Crop
           </div>
           <div class="filepath-editor-button filepath-editor-crop-button"
-              (click)="cancelCropImage()">
+               (click)="cancelCropImage()">
             Cancel
           </div>
         </div>
         <img [src]="data.metadata.uploadedImageData"
-            [attr.style]="getUploadedImageDynamicStyles()">
+             [attr.style]="getUploadedImageDynamicStyles()">
       </div>
       <div *ngIf="isImageSaved()">
         <div class="filepath-editor-saved-image-container">
           <i class="material-icons filepath-editor-trash"
-            (click)="resetFilePathEditor()"
-            title="Delete this image">
+             (click)="resetFilePathEditor()"
+             title="Delete this image">
             &#xE872;
           </i>
           <img [src]="data.metadata.savedImageUrl" [ngStyle]="imageContainerStyle">

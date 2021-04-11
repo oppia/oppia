@@ -65,7 +65,8 @@ angular.module('oppia').directive('ruleEditor', [
       controller: [
         '$scope', '$timeout', 'EventBusService',
         'PopulateRuleContentIdsService', 'ResponsesService',
-        'StateEditorService', 'StateInteractionIdService', 'INTERACTION_SPECS',
+        'StateEditorService', 'StateInteractionIdService',
+        'INTERACTION_SPECS',
         function(
             $scope, $timeout, EventBusService,
             PopulateRuleContentIdsService, ResponsesService,
