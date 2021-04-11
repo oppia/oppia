@@ -69,5 +69,15 @@ describe('OnScreenKeyboard', function() {
     component.keyDownCallBack({key: 'Backspace'} as unknown as KeyboardEvent);
     expect(component.value.length).toBe(0);
     component.keyDownCallBack({key: 'x'} as unknown as KeyboardEvent);
+    let event: Event = new KeyboardEvent('keydown', {
+      code: 'a'
+    });
+    window.dispatchEvent(event);
+    fixture.detectChanges();
+    event = new KeyboardEvent('keyup', {
+      code: 'a'
+    });
+    window.dispatchEvent(event);
+    fixture.detectChanges();
   });
 });

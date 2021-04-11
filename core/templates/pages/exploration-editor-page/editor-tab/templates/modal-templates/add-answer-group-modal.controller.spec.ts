@@ -111,9 +111,10 @@ describe('Add Answer Group Modal Controller', function() {
     $scope.updateAnswerGroupFeedback({
       feedback: feedback
     });
+    $scope.modalId = Symbol();
     const eventBusGroup = new EventBusGroup(TestBed.inject(EventBusService));
     eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-      value: true, modalId: Symbol()}));
+      value: true, modalId: $scope.modalId}));
     expect($scope.feedbackEditorIsOpen).toBe(true);
     expect($scope.tmpOutcome.feedback).toBe(feedback);
   });
