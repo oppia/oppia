@@ -75,9 +75,9 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: null,
-        resolver_profile_picture_data_url: null,
-        resolved_on_msecs: null,
+        resolver_username: '',
+        resolver_profile_picture_data_url: '',
+        resolved_on_msecs: undefined,
       }));
 
     expect(task.entityType).toEqual('exploration');
@@ -104,9 +104,9 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: null,
-        resolver_profile_picture_data_url: null,
-        resolved_on_msecs: null,
+        resolver_username: '',
+        resolver_profile_picture_data_url: '',
+        resolved_on_msecs: undefined,
       })
     ).toThrowError(
       'backend dict has entity_type "???" but expected "exploration"');
@@ -130,9 +130,9 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: null,
-        resolver_profile_picture_data_url: null,
-        resolved_on_msecs: null,
+        resolver_username: '',
+        resolver_profile_picture_data_url: '',
+        resolved_on_msecs: undefined,
       })
     ).toThrowError(
       'backend dict has task_type "???" but expected ' +
@@ -153,9 +153,9 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: null,
-        resolver_profile_picture_data_url: null,
-        resolved_on_msecs: null,
+        resolver_username: '',
+        resolver_profile_picture_data_url: '',
+        resolved_on_msecs: undefined,
       })
     ).toThrowError('backend dict has target_type "???" but expected "state"');
   });
