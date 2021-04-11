@@ -55,27 +55,75 @@ def clone_model(model, **new_values):
     return cls(id=model_id, **props)
 
 
-def get_model_kind(item):
-    """Returns the "kind", a globally unique identifier, of the given item.
+def get_model_kind(model):
+    """Returns the "kind" of the given model.
 
     NOTE: A model's kind is usually, but not always, the same as a model's class
-    name. This function will always return the correct value for "kind", even if
-    it is different from the class's name.
+    name. Specifically, the kind is different when a model overwrites the
+    _get_kind() class method. Although Oppia never does this, the Apache Beam
+    framework uses "kind" to refer to models extensively, so we follow the same
+    convention and take special care to always return the correct value.
 
     Args:
-        item: base_models.Model|cloud_datastore_types.Entity. The item to
+        model: base_models.Model|cloud_datastore_types.Entity. The model to
             inspect.
 
     Returns:
-        str. The item's kind.
+        bytes. The model's kind.
 
     Raises:
         TypeError. When the argument is not a model.
     """
-    if isinstance(item, base_models.BaseModel) or (
-            isinstance(item, type) and issubclass(item, base_models.BaseModel)):
-        return item._get_kind() # pylint: disable=protected-access
-    elif isinstance(item, cloud_datastore_types.Entity):
-        return item.kind
+    if isinstance(model, base_models.BaseModel) or (
+            isinstance(model, type) and
+            issubclass(model, base_models.BaseModel)):
+        return model._get_kind() # pylint: disable=protected-access
+    elif isinstance(model, cloud_datastore_types.Entity):
+        return model.kind
     else:
-        raise TypeError('%r is not a model type' % type(item).__name__)
+        raise TypeError('%r is not a model type or instance' % model)
+
+
+def get_model_property(model, property_name):
+    """Returns the given property from a model.
+
+    Args:
+        model: base_models.Model|cloud_datastore_types.Entity. The model to
+            inspect.
+        property_name: str. The name of the property to extract.
+
+    Returns:
+        *. The property's value.
+
+    Raises:
+        TypeError. When the argument is not a model.
+    """
+    if property_name == 'id':
+        return get_model_id(model)
+    elif isinstance(model, base_models.BaseModel):
+        return getattr(model, property_name)
+    elif isinstance(model, cloud_datastore_types.Entity):
+        return model.get(property_name)
+    else:
+        raise TypeError('%r is not a model instance' % model)
+
+
+def get_model_id(model):
+    """Returns the given model's ID.
+
+    Args:
+        model: base_models.Model|cloud_datastore_types.Entity. The model to
+            inspect.
+
+    Returns:
+        bytes. The model's ID.
+
+    Raises:
+        TypeError. When the argument is not a model.
+    """
+    if isinstance(model, base_models.BaseModel):
+        return model.id
+    elif isinstance(model, cloud_datastore_types.Entity):
+        return model.key.id_or_name
+    else:
+        raise TypeError('%r is not a model instance' % model)

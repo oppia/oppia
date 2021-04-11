@@ -30,15 +30,20 @@ from jobs.types import audit_errors
 
 import apache_beam as beam
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(auth_models, user_models) = (
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-@audit_decorators.AuditsExisting(user_models.UserSettingsModel)
-class ValidateUserModelId(base_model_audits.ValidateBaseModelId):
+@audit_decorators.AuditsExisting(
+    auth_models.UserAuthDetailsModel,
+    user_models.UserEmailPreferencesModel,
+    user_models.UserSettingsModel,
+)
+class ValidateModelWithUserId(base_model_audits.ValidateBaseModelId):
     """Overload for models keyed by a user ID, which have a special format."""
 
     def __init__(self):
-        super(ValidateUserModelId, self).__init__()
+        super(ValidateModelWithUserId, self).__init__()
         # IMPORTANT: Only picklable objects can be stored on DoFns! This is
         # because DoFns are serialized with pickle when run on a pipeline (and
         # might be run on many different machines). Any other types assigned to
@@ -66,3 +71,9 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
         if expiration_date > model.last_updated:
             yield audit_errors.ModelExpiringError(model)
+
+
+@audit_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
+def user_email_preferences_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.id, [user_models.UserSettingsModel]

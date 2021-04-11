@@ -29,6 +29,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from jobs.decorators import audit_decorators
+from jobs.transforms import auth_audits  # pylint: disable=unused-import
 from jobs.transforms import base_model_audits  # pylint: disable=unused-import
 from jobs.transforms import user_audits  # pylint: disable=unused-import
 
@@ -41,3 +42,29 @@ def get_audit_do_fn_types_by_kind():
         targeted.
     """
     return audit_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
+
+
+def get_id_referencing_properties_by_kind_of_possessor():
+    """Returns properties whose values refer to the IDs of the corresponding
+    set of model kinds, grouped by the kind of model the properties belong to.
+
+    Returns:
+        dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
+        (ModelProperty, tuple(kind of models)), grouped by the kind of model the
+        properties belong to.
+    """
+    return (
+        audit_decorators.RelationshipsOf
+        .get_id_referencing_properties_by_kind_of_possessor())
+
+
+def get_all_model_kinds_referenced_by_properties():
+    """Returns all model kinds that are referenced by another model's property.
+
+    Returns:
+        set(str). All model kinds referenced by one or more properties,
+        excluding the models' own ID.
+    """
+    return (
+        audit_decorators.RelationshipsOf
+        .get_all_model_kinds_referenced_by_properties())

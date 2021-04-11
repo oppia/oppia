@@ -34,6 +34,7 @@ from google.appengine.ext import ndb
 transaction_services = models.Registry.import_transaction_services()
 Model = ndb.Model
 Key = ndb.Key
+Property = ndb.Property
 
 BooleanProperty = ndb.BooleanProperty
 DateProperty = ndb.DateProperty

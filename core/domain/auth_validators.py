@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
 from core.platform import models
+import feconf
 
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
@@ -114,12 +115,7 @@ class UserIdByFirebaseAuthIdModelValidator(
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        # Firebase *explicitly* requires IDs to have at most 128 characters:
-        # https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
-        #
-        # After manually inspecting ~200 of them, however, we've also found that
-        # they only use alpha-numeric characters, hence the tighter restriction.
-        return '^[A-Za-z0-9]{1,128}$'
+        return feconf.FIREBASE_AUTH_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
