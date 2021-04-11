@@ -18,13 +18,20 @@
 
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
+require('services/context.service');
 
 angular.module('oppia').factory('ExplorationLanguageCodeService', [
-  'ExplorationPropertyService', 'SUPPORTED_CONTENT_LANGUAGES',
-  function(ExplorationPropertyService, SUPPORTED_CONTENT_LANGUAGES) {
+  'ContextService', 'ExplorationPropertyService', 'SUPPORTED_CONTENT_LANGUAGES',
+  'SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID',
+  function(
+      ContextService, ExplorationPropertyService, SUPPORTED_CONTENT_LANGUAGES,
+      SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'language_code';
     child.getSupportedContentLanguages = function() {
+      if (ContextService.isExplorationLinkedToStory()) {
+        return SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
+      }
       return SUPPORTED_CONTENT_LANGUAGES;
     };
     child.getCurrentLanguageDescription = function() {
