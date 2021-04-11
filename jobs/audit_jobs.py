@@ -285,7 +285,7 @@ class GetMissingModelKeyErrors(beam.PTransform):
             tuple(ModelKey, ModelRelationshipError). The key for a referenced
             model and the error to report when the key doesn't exist.
         """
-        # NOTE: This is loop yields 1 or many values, depending on whether the
+        # NOTE: This loop yields 1 or many values, depending on whether the
         # property is a repeated property (i.e. a list).
         for property_value in property_of_model.yield_value_from_model(model):
             if property_value is None:
