@@ -27,7 +27,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
 @Component({
-  selector: 'response-header',
+  selector: 'oppia-response-header',
   templateUrl: './response-header.component.html'
 })
 export class ResponseHeaderComponent {
@@ -89,5 +89,5 @@ export class ResponseHeaderComponent {
 }
 
 angular.module('oppia').directive(
-  'responseHeader', downgradeComponent(
+  'oppiaResponseHeader', downgradeComponent(
     {component: ResponseHeaderComponent}));
