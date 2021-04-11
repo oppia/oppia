@@ -19,7 +19,7 @@
 module.exports = {
   'ci': {
     'collect': {
-      'numberOfRuns': 1,
+      'numberOfRuns': 3,
       'puppeteerScript': 'puppeteer-login-script.js',
       'url': [
         'http://127.0.0.1:8181/',
