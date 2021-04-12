@@ -72,15 +72,15 @@ class Registry(python_utils.OBJECT):
                     data_type, list(cls.DEFAULT_VALUE_BY_TYPE_DICT.keys())))
 
         param_dict = {
-            'name': name,
+            'name': name.value,
             'description': description,
-            'data_type': data_type,
+            'data_type': data_type.value,
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': default,
             'is_feature': is_feature,
-            'feature_stage': feature_stage,
+            'feature_stage': feature_stage.value if feature_stage else None,
         }
         return cls.init_platform_parameter_from_dict(param_dict)
 
@@ -132,10 +132,7 @@ class Registry(python_utils.OBJECT):
         if parameter_from_cache is not None:
             return parameter_from_cache
 
-        parameter = None
-
-        parameter_from_storage = cls.load_platform_parameter_from_storage(
-            name)
+        parameter_from_storage = cls.load_platform_parameter_from_storage(name)
         if parameter_from_storage is not None:
             parameter = parameter_from_storage
         elif name in cls.parameter_registry:

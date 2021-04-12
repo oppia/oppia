@@ -167,6 +167,8 @@ def main(args=None):
             stack.enter_context(common.managed_firebase_auth_emulator())
         python_utils.PRINT('Starting GAE development server')
         stack.enter_context(managed_dev_appserver)
+        python_utils.PRINT('Starting Cloud Datastore Emulator')
+        stack.enter_context(common.managed_cloud_datastore_emulator())
 
         # Wait for the servers to come up.
         common.wait_for_port_to_be_in_use(PORT_NUMBER_FOR_GAE_SERVER)

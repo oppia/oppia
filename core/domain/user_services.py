@@ -190,7 +190,7 @@ def get_gravatar_url(email):
     """
     return (
         'https://www.gravatar.com/avatar/%s?d=identicon&s=%s' %
-        (hashlib.md5(email).hexdigest(), GRAVATAR_SIZE_PX))
+        (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
 def fetch_gravatar(email):

@@ -241,8 +241,7 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect(
-                b'https://oppiatestserver.appspot.com', permanent=True)
+            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
         if (feconf.ENABLE_MAINTENANCE_MODE and
@@ -335,13 +334,13 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = b'application/json; charset=utf-8'
-        self.response.headers[b'Content-Disposition'] = (
-            b'attachment; filename="oppia-attachment.txt"')
-        self.response.headers[b'Strict-Transport-Security'] = (
-            b'max-age=31536000; includeSubDomains')
-        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
-        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
+        self.response.content_type = 'application/json; charset=utf-8'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename="oppia-attachment.txt"')
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
@@ -354,11 +353,10 @@ class BaseHandler(webapp2.RequestHandler):
             filename: str. The name of the file to be rendered.
             content_type: str. The type of file to be rendered.
         """
-        self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
+        self.response.headers['Content-Type'] = python_utils.convert_to_bytes(
             content_type)
         self.response.headers[
-            b'Content-Disposition'] = python_utils.convert_to_bytes(
-                'attachment; filename=%s' % filename)
+            'Content-Disposition'] = str('attachment; filename=%s' % filename)
         self.response.write(values)
 
     def render_template(self, filepath, iframe_restriction='DENY'):
@@ -375,16 +373,15 @@ class BaseHandler(webapp2.RequestHandler):
         """
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
-        self.response.headers[b'Strict-Transport-Security'] = (
-            b'max-age=31536000; includeSubDomains')
-        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
-        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
                 self.response.headers[
-                    b'X-Frame-Options'] = python_utils.convert_to_bytes(
-                        iframe_restriction)
+                    'X-Frame-Options'] = str(iframe_restriction)
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -476,7 +473,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.error(b''.join(traceback.format_exception(*sys.exc_info())))
+        logging.error(''.join(traceback.format_exception(*sys.exc_info())))
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -513,8 +510,7 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         self.error(500)
-        self._render_exception(
-            500, {'error': python_utils.convert_to_bytes(exception)})
+        self._render_exception(500, {'error': str(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -576,7 +572,7 @@ class CsrfTokenManager(python_utils.OBJECT):
 
         digester = hmac.new(python_utils.convert_to_bytes(CSRF_SECRET.value))
         digester.update(python_utils.convert_to_bytes(user_id))
-        digester.update(':')
+        digester.update(b':')
         digester.update(python_utils.convert_to_bytes(issued_on))
 
         digest = digester.digest()

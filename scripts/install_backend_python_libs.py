@@ -307,7 +307,7 @@ def _rectify_third_party_directory(mismatches):
                 str(requirements_version))
             _remove_metadata(
                 normalized_library_name,
-                python_utils.convert_to_bytes(directory_version))
+                str(directory_version))
 
 
 def _is_git_url_mismatch(mismatch_item):
@@ -433,15 +433,6 @@ def verify_pip_is_installed():
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e)
-    else:
-        if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
-            common.print_each_string_after_two_new_lines([
-                'Oppia requires pip==%s, but you have pip==%s installed.' % (
-                    OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
-                'Upgrading pip on your behalf...',
-            ])
-            _run_pip_command(
-                ['install', 'pip==%s' % OPPIA_REQUIRED_PIP_VERSION])
 
 
 def _run_pip_command(cmd_parts):
@@ -462,7 +453,7 @@ def _run_pip_command(cmd_parts):
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
+    elif b'can\'t combine user with prefix' in stderr:
         python_utils.PRINT('Trying by setting --user and --prefix flags.')
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])

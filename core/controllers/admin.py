@@ -76,7 +76,40 @@ class AdminHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
-        self.render_json({})
+        demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
+
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
+
+        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+
+        self.render_json({
+            'config_properties': (
+                config_domain.Registry.get_config_property_schemas()),
+            'continuous_computations_data': [],
+            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
+            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
+            'demo_exploration_ids': demo_exploration_ids,
+            'human_readable_current_time': (
+                utils.get_human_readable_time_string(
+                    utils.get_current_time_in_millisecs())),
+            'one_off_job_status_summaries': [],
+            'audit_job_status_summaries': [],
+            'recent_job_data': [],
+            'unfinished_job_data': [],
+            'updatable_roles': {
+                role: role_services.HUMAN_READABLE_ROLES[role]
+                for role in role_services.UPDATABLE_ROLES
+            },
+            'viewable_roles': {
+                role: role_services.HUMAN_READABLE_ROLES[role]
+                for role in role_services.VIEWABLE_ROLES
+            },
+            'topic_summaries': topic_summary_dicts,
+            'role_graph_data': role_services.get_role_graph_data(),
+            'feature_flags': feature_flag_dicts,
+        })
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -208,11 +241,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(python_utils.convert_to_bytes(
-                exploration_id))
+            exp_services.load_demo(python_utils.UNICODE(exploration_id))
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    exploration_id))
+                user_services.get_system_user(), python_utils.UNICODE(exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
 

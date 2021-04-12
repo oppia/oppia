@@ -411,20 +411,19 @@ def main(args=None):
         if not task.finished:
             python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif (task.exception and
-              'No tests were run' in python_utils.convert_to_bytes(
-                  task.exception.args[0])):
+        elif task.exception and 'No tests were run' in task.exception.args[0]:
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
-            exc_str = python_utils.convert_to_bytes(task.exception.args[0])
+            exc_str = task.exception.args[0]
             python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
                 '([0-9]+) failures',
-                python_utils.convert_to_bytes(task.exception.args[0]))
+                task.exception.args[0]
+            )
 
             try:
                 test_count = int(tests_failed_regex_match.group(1))

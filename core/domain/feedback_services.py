@@ -24,7 +24,6 @@ import itertools
 
 from core.domain import email_manager
 from core.domain import feedback_domain
-from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import taskqueue_services
@@ -606,8 +605,7 @@ def get_thread_analytics_multi(exploration_ids):
         list. If an exploration id is invalid, the number of threads in the
         corresponding FeedbackAnalytics object will be zero.
     """
-    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics_multi( # pylint: disable=line-too-long
-        exploration_ids)
+    return []
 
 
 def get_thread_analytics(exploration_id):
@@ -619,8 +617,7 @@ def get_thread_analytics(exploration_id):
     Returns:
         FeedbackAnalytics. The feedback analytics of the given exploration.
     """
-    return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
-        exploration_id)
+    return []
 
 
 def get_total_open_threads(feedback_analytics_list):

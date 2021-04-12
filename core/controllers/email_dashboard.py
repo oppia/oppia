@@ -21,7 +21,6 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
 import feconf
@@ -98,11 +97,6 @@ class EmailDashboardDataHandler(base.BaseHandler):
             self.user_id, kwargs)
 
         # Start MR job in background.
-        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': user_query_id}
-        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
-
         user_query = (
             user_query_services.get_user_query(user_query_id, strict=True))
         data = {

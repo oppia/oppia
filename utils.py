@@ -426,7 +426,7 @@ def convert_to_hash(input_string, max_length):
     encoded_string = base64.b64encode(
         hashlib.sha1(python_utils.convert_to_bytes(input_string)).digest(),
         altchars=b'ab'
-    ).replace('=', 'c')
+    ).replace(b'=', b'c')
 
     return encoded_string[:max_length]
 

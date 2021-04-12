@@ -66,8 +66,6 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
 
-from mapreduce import main as mapreduce_main
-from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
@@ -171,41 +169,8 @@ def ui_access_wrapper(self, *args, **kwargs):
     """
     self.real_dispatch(*args, **kwargs)
 
-
-MAPREDUCE_HANDLERS = []
-
-for path, handler_class in mapreduce_main.create_handlers_map():
-    if path.startswith('.*/pipeline'):
-        if 'pipeline/rpc/' in path or path == '.*/pipeline(/.+)':
-            path = path.replace('.*/pipeline', '/mapreduce/ui/pipeline')
-        else:
-            path = path.replace('.*/pipeline', '/mapreduce/worker/pipeline')
-    else:
-        if '_callback' in path:
-            path = path.replace('.*', '/mapreduce/worker', 1)
-        elif '/list_configs' in path:
-            continue
-        else:
-            path = path.replace('.*', '/mapreduce/ui', 1)
-
-    if '/ui/' in path or path.endswith('/ui'):
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = ui_access_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-    else:
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = authorization_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-
-# Tell map/reduce internals that this is now the base path to use.
-mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
-
 # Register the URLs with the classes responsible for handling them.
-URLS = MAPREDUCE_HANDLERS + [
+URLS = [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
@@ -866,7 +831,20 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+from google.cloud import ndb
 
+
+client = ndb.Client()
+
+class NdbWsgiMiddleware:
+    """Wraps the WSGI application into the NDB client context."""
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+      with client.context():
+          return self.wsgi_app(environ, start_response)
+
+
+app = NdbWsgiMiddleware(webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
 firebase_auth_services.establish_firebase_connection()

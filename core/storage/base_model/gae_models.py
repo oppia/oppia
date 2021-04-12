@@ -379,7 +379,8 @@ class BaseModel(datastore_services.Model):
         for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
-                ID_LENGTH)
+                ID_LENGTH
+            ).decode('utf-8')
             if not cls.get_by_id(new_id):
                 return new_id
 

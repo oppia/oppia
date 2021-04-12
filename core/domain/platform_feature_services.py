@@ -153,8 +153,8 @@ def _get_server_mode():
         mode, 'prod' if in production mode.
     """
     return (
-        platform_parameter_domain.SERVER_MODES.dev
-        if constants.DEV_MODE else platform_parameter_domain.SERVER_MODES.prod)
+        platform_parameter_domain.SERVER_MODES.dev.value
+        if constants.DEV_MODE else platform_parameter_domain.SERVER_MODES.prod.value)
 
 
 def _create_evaluation_context_for_server():

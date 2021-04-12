@@ -76,8 +76,9 @@ google-apitools==0.5.31
     # via apache-beam
 google-auth-httplib2==0.0.4
     # via google-api-python-client
-google-auth==1.28.0
+google-auth==1.28.1
     # via
+    #   -r requirements.in
     #   apache-beam
     #   google-api-core
     #   google-api-python-client
@@ -135,21 +136,13 @@ googleapis-common-protos[grpc]==1.52.0
     #   grpc-google-iam-v1
     #   proto-google-cloud-datastore-v1
 googleappenginecloudstorageclient==1.9.22.1
-    # via
-    #   googleappenginemapreduce
-    #   googleappenginepipeline
-googleappenginemapreduce==1.9.22.0
-    # via -r requirements.in
+    # via googleappenginepipeline
 googleappenginepipeline==1.9.22.1
-    # via
-    #   -r requirements.in
-    #   googleappenginemapreduce
+    # via -r requirements.in
 googledatastore==7.0.0
     # via -r requirements.in
 graphy==1.0.0
-    # via
-    #   -r requirements.in
-    #   googleappenginemapreduce
+    # via -r requirements.in
 grpc-google-iam-v1==0.12.3
     # via
     #   google-cloud-bigtable
@@ -182,11 +175,7 @@ httplib2==0.9.2
 idna==2.10
     # via requests
 mock==2.0.0
-    # via
-    #   apache-beam
-    #   googleappenginemapreduce
-mox==0.5.3
-    # via googleappenginemapreduce
+    # via apache-beam
 msgpack==1.0.2
     # via cachecontrol
 mutagen==1.43.0
@@ -275,9 +264,7 @@ rsa==4.5
     #   google-auth
     #   oauth2client
 simplejson==3.17.0
-    # via
-    #   -r requirements.in
-    #   googleappenginemapreduce
+    # via -r requirements.in
 six==1.15.0
     # via
     #   -r requirements.in

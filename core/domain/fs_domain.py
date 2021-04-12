@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-import cloudstorage
+from google.cloud import storage
 
 app_identity_services = models.Registry.import_app_identity_services()
 
@@ -121,6 +121,12 @@ class GcsFileSystem(GeneralFileSystem):
     This implementation ignores versioning.
     """
 
+    def __init__(self, *args):
+        self._storage_client = storage.Client()
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        self._bucket = self._storage_client.get_bucket(bucket_name)
+        super().__init__(*args)
+
     def _get_gcs_file_url(self, filepath):
         """Returns the constructed GCS file URL.
 
@@ -131,12 +137,9 @@ class GcsFileSystem(GeneralFileSystem):
         Returns:
             str. The GCS file URL.
         """
-        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-
         # Upload to GCS bucket with filepath
-        # "<bucket>/<entity>/<entity-id>/assets/<filepath>".
-        gcs_file_url = '/%s/%s/%s' % (
-            bucket_name, self._assets_path, filepath)
+        # "<entity>/<entity-id>/assets/<filepath>".
+        gcs_file_url = '%s/%s' % (self._assets_path, filepath)
         return gcs_file_url.encode('utf-8')
 
     def isfile(self, filepath):
@@ -149,11 +152,9 @@ class GcsFileSystem(GeneralFileSystem):
         Returns:
             bool. Whether the file exists in GCS.
         """
-        try:
-            return bool(cloudstorage.stat(
-                self._get_gcs_file_url(filepath), retry_params=None))
-        except cloudstorage.NotFoundError:
-            return False
+        return self._bucket.get_blob(
+            self._get_gcs_file_url(filepath)
+        ) is not None
 
     def get(self, filepath):
         """Gets a file as an unencoded stream of raw bytes.
@@ -167,9 +168,8 @@ class GcsFileSystem(GeneralFileSystem):
             exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
-            gcs_file = cloudstorage.open(self._get_gcs_file_url(filepath))
-            data = gcs_file.read()
-            gcs_file.close()
+            blob = self._bucket.get_blob(self._get_gcs_file_url(filepath))
+            data = blob.download_as_bytes()
             return FileStream(data)
         else:
             return None
@@ -183,10 +183,8 @@ class GcsFileSystem(GeneralFileSystem):
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the cloud file.
         """
-        gcs_file = cloudstorage.open(
-            self._get_gcs_file_url(filepath), mode='w', content_type=mimetype)
-        gcs_file.write(raw_bytes)
-        gcs_file.close()
+        blob = self._bucket.Blob(self._get_gcs_file_url(filepath))
+        blob.upload_from_string(raw_bytes, content_type=mimetype)
 
     def delete(self, filepath):
         """Deletes a file and the metadata associated with it.
@@ -195,9 +193,10 @@ class GcsFileSystem(GeneralFileSystem):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
-        try:
-            cloudstorage.delete(self._get_gcs_file_url(filepath))
-        except cloudstorage.NotFoundError:
+        blob = self._bucket.get_blob(self._get_gcs_file_url(filepath))
+        if blob is not None:
+            blob.delete()
+        else:
             raise IOError('Image does not exist: %s' % filepath)
 
     def copy(self, source_assets_path, filepath):
@@ -214,9 +213,9 @@ class GcsFileSystem(GeneralFileSystem):
             '/%s/%s/%s' % (bucket_name, source_assets_path, filepath)
         ).encode('utf-8')
 
-        # The cloudstorage.copy2 method copies the file from the source URL to
-        # the destination URL.
-        cloudstorage.copy2(source_file_url, self._get_gcs_file_url(filepath))
+        src_blob = self._bucket.blob(source_file_url)
+        self._bucket.copy_blob(
+            src_blob, self._bucket, new_name=self._get_gcs_file_url(filepath))
 
     def listdir(self, dir_name):
         """Lists all files in a directory.
@@ -241,17 +240,11 @@ class GcsFileSystem(GeneralFileSystem):
         if not prefix.endswith('/'):
             prefix += '/'
         # The prefix now ends and starts with '/'.
-        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-        # The path entered should be of the form, /bucket_name/prefix.
-        path = '/%s%s' % (bucket_name, prefix)
-
-        path_prefix = '/%s/' % utils.vfs_construct_path(
-            bucket_name, self._assets_path)
-        stats = cloudstorage.listbucket(path)
+        blobs = self._storage_client.list_blobs(self._bucket, prefix=prefix)
         files_in_dir = []
-        for stat in stats:
+        for blob in blobs:
             # Remove the asset path from the prefix of filename.
-            files_in_dir.append(stat.filename.replace(path_prefix, ''))
+            files_in_dir.append(blob.name.replace(prefix, ''))
         return files_in_dir
 
 

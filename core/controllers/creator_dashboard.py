@@ -35,7 +35,6 @@ from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import topic_fetchers
-from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
 import python_utils
@@ -80,40 +79,17 @@ class NotificationsDashboardHandler(base.BaseHandler):
     @acl_decorators.can_access_creator_dashboard
     def get(self):
         """Handles GET requests."""
-        job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
-
         last_seen_msec = (
             subscription_services.get_last_seen_notifications_msec(
                 self.user_id))
 
-        # Replace author_ids with their usernames.
-        author_ids = [
-            notification['author_id'] for notification in recent_notifications
-            if notification['author_id']]
-        author_usernames = user_services.get_usernames(author_ids)
-
-        author_id_to_username = {
-            None: '',
-        }
-        for ind, author_id in enumerate(author_ids):
-            author_id_to_username[author_id] = author_usernames[ind]
-        for notification in recent_notifications:
-            notification['author_username'] = (
-                author_id_to_username[notification['author_id']])
-            del notification['author_id']
-
-        subscription_services.record_user_has_seen_notifications(
-            self.user_id, job_queued_msec if job_queued_msec else 0.0)
-
         self.values.update({
             # This may be None if no job has ever run for this user.
-            'job_queued_msec': job_queued_msec,
+            'job_queued_msec': 0,
             # This may be None if this is the first time the user has seen
             # the dashboard.
             'last_seen_msec': last_seen_msec,
-            'recent_notifications': recent_notifications,
+            'recent_notifications': [],
         })
         self.render_json(self.values)
 
@@ -217,9 +193,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                         collection_summary.category),
                 })
 
-        dashboard_stats = (
-            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
-                self.user_id))
+        dashboard_stats = {}
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
                 feedback_thread_analytics)
@@ -336,20 +310,8 @@ class NotificationsHandler(base.BaseHandler):
     @acl_decorators.can_access_creator_dashboard
     def get(self):
         """Handles GET requests."""
-        num_unseen_notifications = 0
-        last_seen_msec = (
-            subscription_services.get_last_seen_notifications_msec(
-                self.user_id))
-        _, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
-        for notification in recent_notifications:
-            if (notification['last_updated_ms'] > last_seen_msec and
-                    notification['author_id'] != self.user_id):
-                num_unseen_notifications += 1
-
         self.render_json({
-            'num_unseen_notifications': num_unseen_notifications,
+            'num_unseen_notifications': 0,
         })
 
 

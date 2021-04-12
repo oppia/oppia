@@ -37,7 +37,6 @@ import utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
-app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -576,7 +575,7 @@ def send_mail_to_admin(email_subject, email_body):
         email_body: str. Body (message) of the email.
     """
 
-    app_id = app_identity_services.get_application_id()
+    app_id = 'test id'
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
     system_name_email = '%s <%s>' % (
         feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
