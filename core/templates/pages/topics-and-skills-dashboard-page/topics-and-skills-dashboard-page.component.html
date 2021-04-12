@@ -87,12 +87,12 @@
           </div>
 
           <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-            <topics-list topic-summaries="$ctrl.displayedTopicSummaries"
-                         page-number="$ctrl.pageNumber"
-                         items-per-page="$ctrl.itemsPerPage"
-                         ng-if="$ctrl.topicSummaries.length > 0"
-                         user-can-delete-topic="$ctrl.userCanDeleteTopic">
-            </topics-list>
+            <oppia-topics-list [topic-summaries]="$ctrl.displayedTopicSummaries"
+                               [page-number]="$ctrl.pageNumber"
+                               [items-per-page]="$ctrl.itemsPerPage"
+                               ng-if="$ctrl.topicSummaries.length > 0"
+                               [user-can-delete-topic]="$ctrl.userCanDeleteTopic">
+            </oppia-topics-list>
             <p class="intro-card-message" ng-if="!$ctrl.topicSummaries.length">
               No topics to display.
             </p>

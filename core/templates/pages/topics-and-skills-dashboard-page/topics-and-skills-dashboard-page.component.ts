@@ -40,7 +40,7 @@ require(
     'skills-list.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
-    'topics-list.directive.ts');
+    'topics-list.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
     'topics-and-skills-dashboard-page.service');
