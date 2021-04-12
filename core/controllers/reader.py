@@ -318,6 +318,9 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
+        if self is None:
+            raise self.InvalidInputException('ID missing')
+            
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
         answer = self.payload.get('answer')
