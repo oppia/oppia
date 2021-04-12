@@ -40,7 +40,8 @@ import { SelectTopicsComponent } from './topic-selector/select-topics.component'
   declarations: [
     OppiaAngularRootComponent,
     TopicsListComponent,
-    DeleteTopicModalComponent
+    DeleteTopicModalComponent,
+    SelectTopicsComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
