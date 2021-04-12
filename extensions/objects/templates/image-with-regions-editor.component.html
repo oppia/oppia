@@ -15,11 +15,11 @@
          (mousemove)="onSvgMouseMove($event)"
          (mouseup)="onSvgMouseUp($event)">
       <image [attr.href]="getPreviewUrl(value.imagePath)"
-            xlink:href=""
-            x="0"
-            y="0"
-            [attr.height]="getImageHeight()"
-            [attr.width]="getImageWidth()">
+             xlink:href=""
+             x="0"
+             y="0"
+             [attr.height]="getImageHeight()"
+             [attr.width]="getImageWidth()">
       </image>
       <rect *ngIf="userIsCurrentlyDrawing"
             [attr.x]="rectX"
@@ -40,8 +40,8 @@
             (mousedown)="onMousedownRegion(idx)">
       </rect>
       <a *ngFor="let labeledRegion of value.labeledRegions; let idx = index" href
-        (click)="deleteRegion(idx)"
-        target="_blank" rel="noopener">
+         (click)="deleteRegion(idx)"
+         target="_blank" rel="noopener">
         <text font-family="Material Icons"
               font-size="20px"
               text-decoration="none"
