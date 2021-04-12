@@ -42,32 +42,21 @@ class DevModeCloudTranslateServicesUnitTests(test_utils.TestBase):
 
     def test_translate_text_same_source_target_language_doesnt_call_emulator(
             self):
-        def mock_translate_call(
-                text, source_language, target_language):
-            self.assertEqual(text, 'hello world')
-            self.assertEqual(source_language, 'en')
-            self.assertEqual(target_language, 'en')
-            self.fail(msg='mock api called')
-
-        with self.swap(
-            dev_mode_cloud_translate_services.CLIENT, 'translate',
-            mock_translate_call):
+        with self.swap_to_always_raise(
+            dev_mode_cloud_translate_services.CLIENT,
+            'translate',
+            error=AssertionError
+        ):
             translated_text = dev_mode_cloud_translate_services.translate_text(
                 'hello world', 'en', 'en')
             self.assertEqual(translated_text, 'hello world')
 
     def test_translate_text_with_valid_input_calls_emulator_translate(self):
-
-        def mock_translate_call(
-                text, source_language, target_language):
-            self.assertEqual(text, 'hello world')
-            self.assertEqual(source_language, 'en')
-            self.assertEqual(target_language, 'es')
-            return 'hola mundo'
-
-        with self.swap(
-            dev_mode_cloud_translate_services.CLIENT, 'translate',
-            mock_translate_call):
+        with self.swap_to_always_return(
+            dev_mode_cloud_translate_services.CLIENT,
+            'translate',
+            value='hola mundo'
+        ):
             translated_text = dev_mode_cloud_translate_services.translate_text(
                 'hello world', 'en', 'es')
             self.assertEqual(translated_text, 'hola mundo')
