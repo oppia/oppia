@@ -56,7 +56,7 @@ describe('Solution Verification Service', () => {
       imports: [HttpClientTestingModule],
       providers: [
         { provide: INTERACTION_SPECS, useValue: mockInteractionState }
-      ],
+      ]
     });
 
     siis = TestBed.get(StateInteractionIdService);

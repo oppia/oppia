@@ -77,7 +77,7 @@
 /core/domain/classifier*.py @oppia/ml
 /proto/ @oppia/ml
 /core/templates/domain/classifier/ @oppia/ml
-/core/templates/services/classifier-data-backend-api.service.ts @oppia/ml
+/core/templates/services/classifier-data-backend-api.service*.ts @oppia/ml
 /extensions/classifiers/ @oppia/ml
 /buf.yaml @oppia/ml
 /buf.gen.yaml @oppia/ml

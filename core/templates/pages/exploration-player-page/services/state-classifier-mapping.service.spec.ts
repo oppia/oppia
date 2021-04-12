@@ -95,7 +95,7 @@ describe('State classifier mapping service', () => {
       it('should fetch classifier data correctly', waitForAsync(async() => {
         spyOn(
           classifierDataBackendApiService,
-          'getClassifierData').and.callFake(() => {
+          'getClassifierDataAsync').and.callFake(() => {
           return new Promise((resolve, reject) => {
             resolve(classifierData);
           });
@@ -109,7 +109,7 @@ describe('State classifier mapping service', () => {
         async() => {
           spyOn(
             classifierDataBackendApiService,
-            'getClassifierData').and.callFake(() => {
+            'getClassifierDataAsync').and.callFake(() => {
             return new Promise((resolve, reject) => {
               reject('No classifier data found for exploration');
             });

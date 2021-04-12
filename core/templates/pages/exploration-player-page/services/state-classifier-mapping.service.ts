@@ -54,7 +54,7 @@ export class StateClassifierMappingService {
       this.loggerService.info('Fetching classifier data for ' + stateName);
       try {
         const classifier = (
-          await this.classifierDataService.getClassifierData(
+          await this.classifierDataService.getClassifierDataAsync(
             this._explorationId, this._explorationVersion, stateName));
         this.stateClassifierMapping[stateName] = classifier;
       } catch (error) {

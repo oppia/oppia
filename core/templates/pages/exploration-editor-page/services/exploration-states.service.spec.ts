@@ -16,7 +16,7 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-import {importAllAngularServices} from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'components/state-editor/state-editor-properties-services/' +

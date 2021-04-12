@@ -253,7 +253,6 @@ angular.module('oppia').component('explorationEditorPage', {
             ContextService.getExplorationId(), explorationData.version);
           ExplorationStatesService.init(explorationData.states);
 
-
           ExplorationTitleService.init(explorationData.title);
           ExplorationCategoryService.init(explorationData.category);
           ExplorationObjectiveService.init(explorationData.objective);

@@ -87,7 +87,7 @@ WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
 WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
@@ -114,7 +114,6 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.bundle.js',
     '*.bundle.js.map',
     'webpack_bundles/*',
-    'third_party/generated/proto/.gitkeep*'
 )
 
 PAGES_IN_APP_YAML = (

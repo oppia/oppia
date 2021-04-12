@@ -156,5 +156,6 @@
     "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
     "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
   ],
-  "include": ["typings/*.ts"]
+  "include": ["typings/*.ts"],
+  "exclude": ["extensions/classifiers/proto"]
 }

@@ -70,7 +70,7 @@ export class ClassifierDataBackendApiService {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
-  private getDownloadUrl(
+  private _getDownloadUrl(
       entityType: string, entityId: string, filename: string): string {
     return this.urlInterpolationService.interpolateUrl(
       this.classifierDataDownloadUrlTemplate, {
@@ -80,7 +80,7 @@ export class ClassifierDataBackendApiService {
       });
   }
 
-  private async getClassifierMetadata(
+  private async getClassifierMetadataAsync(
       explorationId: string, explorationVersion: number,
       stateName: string): Promise<ClassifierMetaData> {
     return new Promise((resolve, reject) => {
@@ -104,16 +104,16 @@ export class ClassifierDataBackendApiService {
     });
   }
 
-  async getClassifierData(
+  async getClassifierDataAsync(
       explorationId: string, explorationVersion: number,
       stateName: string): Promise<Classifier> {
     return new Promise((resolve, reject) => {
-      this.getClassifierMetadata(
+      this.getClassifierMetadataAsync(
         explorationId, explorationVersion, stateName).then(
         response => {
           let classifierMetaData = response;
           this.http.get(
-            this.getDownloadUrl(
+            this._getDownloadUrl(
               AppConstants.ENTITY_TYPE.EXPLORATION, explorationId,
               response.filename), {
               responseType: 'arraybuffer'
