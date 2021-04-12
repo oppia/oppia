@@ -59,7 +59,7 @@ describe('Successive incorrect answers task model', function() {
     expect(task.taskType).toEqual('successive_incorrect_answers');
     expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
-    expect(task.getIssueDescription()).toBeFalsy();
+    expect(task.getIssueDescription()).toNull();
     expect(task.isObsolete()).toBeTrue();
   });
 
@@ -165,7 +165,7 @@ describe('Successive incorrect answers task model', function() {
   it('should not change issue description after it is generated', () => {
     const task = SuccessiveIncorrectAnswersTask.createNew(
       'eid', 1, 'Introduction', 0);
-    expect(task.getIssueDescription()).toBeFalsy();
+    expect(task.getIssueDescription()).toBeNull();
 
     task.refreshStatus(7);
     expect(task.getIssueDescription()).toEqual(

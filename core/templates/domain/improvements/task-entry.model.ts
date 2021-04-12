@@ -34,10 +34,10 @@ export interface TaskEntryBackendDict<TaskType = string> {
   'task_type': TaskType;
   'target_type': string;
   'target_id': string;
-  'issue_description': string;
+  'issue_description': string | null;
   'status': string;
-  'resolver_username': string;
-  'resolver_profile_picture_data_url': string;
+  'resolver_username': string | null;
+  'resolver_profile_picture_data_url': string | null;
   'resolved_on_msecs': number | null;
 }
 
@@ -54,7 +54,7 @@ export interface TaskEntryPayloadDict<TaskType = string> {
   'entity_version': number;
   'task_type': TaskType;
   'target_id': string;
-  'issue_description': string;
+  'issue_description': string | null;
   'status': string;
 }
 
@@ -74,10 +74,10 @@ export class TaskEntry<TaskType = string> {
   public readonly taskType: TaskType;
   public readonly targetType: string;
   public readonly targetId: string;
-  public readonly resolverUsername: string;
-  public readonly resolverProfilePictureDataUrl: string;
+  public readonly resolverUsername: string | null;
+  public readonly resolverProfilePictureDataUrl: string | null;
   public readonly resolvedOnMsecs: number | null;
-  protected issueDescription: string;
+  protected issueDescription: string | null;
   private taskStatus: string;
 
   constructor(backendDict: TaskEntryBackendDict<TaskType>) {
@@ -129,7 +129,7 @@ export class TaskEntry<TaskType = string> {
     return this.taskStatus;
   }
 
-  public getIssueDescription(): string {
+  public getIssueDescription(): string | null {
     return this.issueDescription;
   }
 

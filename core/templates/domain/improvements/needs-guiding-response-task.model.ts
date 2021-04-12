@@ -56,10 +56,10 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
       task_type: ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
       target_type: ImprovementsConstants.TASK_TARGET_TYPE_STATE,
       target_id: stateName,
-      issue_description: '',
+      issue_description: null,
       status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
-      resolver_username: '',
-      resolver_profile_picture_data_url: '',
+      resolver_username: null,
+      resolver_profile_picture_data_url: null,
       resolved_on_msecs: null,
     });
   }

@@ -46,7 +46,7 @@ describe('Ineffective feedback loop task model', function() {
     expect(task.taskType).toEqual('ineffective_feedback_loop');
     expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
-    expect(task.getIssueDescription()).toBeFalsy();
+    expect(task.getIssueDescription()).toBeNull();
     expect(task.isObsolete()).toBeTrue();
   });
 
@@ -75,8 +75,8 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: '',
-        resolver_profile_picture_data_url: '',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       }));
 
@@ -104,8 +104,8 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: '',
-        resolver_profile_picture_data_url: '',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -130,8 +130,8 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: '',
-        resolver_profile_picture_data_url: '',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -153,8 +153,8 @@ describe('Ineffective feedback loop task model', function() {
           'At least 3 learners had quit after revisiting this card several ' +
           'times.'),
         status: 'open',
-        resolver_username: '',
-        resolver_profile_picture_data_url: '',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError('backend dict has target_type "???" but expected "state"');
@@ -163,7 +163,7 @@ describe('Ineffective feedback loop task model', function() {
   it('should not change issue description after it is generated', () => {
     const task = IneffectiveFeedbackLoopTask.createNew(
       'eid', 1, 'Introduction', 0);
-    expect(task.getIssueDescription()).toBeFalsy();
+    expect(task.getIssueDescription()).toBeNull();
 
     task.refreshStatus(7);
     expect(task.getIssueDescription()).toEqual(

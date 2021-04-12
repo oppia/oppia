@@ -61,7 +61,7 @@ describe('Needs guiding responses task model', () => {
     expect(task.taskType).toEqual('needs_guiding_responses');
     expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
-    expect(task.getIssueDescription()).toBeFalsy();
+    expect(task.getIssueDescription()).toBeNull();
     expect(task.isObsolete()).toBeTrue();
   });
 
@@ -77,8 +77,8 @@ describe('Needs guiding responses task model', () => {
         '3 of the top 10 answers for this card did not have explicit ' +
         'feedback from Oppia.'),
       status: 'open',
-      resolver_username: '',
-      resolver_profile_picture_data_url: '',
+      resolver_username: null,
+      resolver_profile_picture_data_url: null,
       resolved_on_msecs: null,
     });
 
@@ -107,8 +107,8 @@ describe('Needs guiding responses task model', () => {
           '3 of the top 10 answers for this card did not have explicit ' +
           'feedback from Oppia.'),
         status: 'open',
-        resolver_username: '',
-        resolver_profile_picture_data_url: '',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -133,8 +133,8 @@ describe('Needs guiding responses task model', () => {
           '3 of the top 10 answers for this card did not have explicit ' +
           'feedback from Oppia.'),
         status: 'open',
-        resolver_username: '',
-        resolver_profile_picture_data_url: '',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
@@ -155,8 +155,8 @@ describe('Needs guiding responses task model', () => {
           '3 of the top 10 answers for this card did not have explicit ' +
           'feedback from Oppia.'),
         status: 'open',
-        resolver_username: '',
-        resolver_profile_picture_data_url: '',
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       })
     ).toThrowError('backend dict has target_type "???" but expected "state"');
@@ -180,7 +180,7 @@ describe('Needs guiding responses task model', () => {
   it('should not change issue description after it is generated', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
       'eid', 1, 'Introduction', newTop10AnswerStats(0));
-    expect(task.getIssueDescription()).toBeFalsy();
+    expect(task.getIssueDescription()).toBeNull();
 
     task.refreshStatus(newTop10AnswerStats(7));
     expect(task.getIssueDescription()).toEqual(
