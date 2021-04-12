@@ -59,7 +59,7 @@ describe('Successive incorrect answers task model', function() {
     expect(task.taskType).toEqual('successive_incorrect_answers');
     expect(task.targetType).toEqual('state');
     expect(task.targetId).toEqual('Introduction');
-    expect(task.getIssueDescription()).toNull();
+    expect(task.getIssueDescription()).toBeNull();
     expect(task.isObsolete()).toBeTrue();
   });
 
