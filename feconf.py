@@ -1149,6 +1149,14 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+# Firebase *explicitly* requires IDs to have at most 128 characters, and may
+# contain any valid ASCII character:
+# https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
+#
+# After manually inspecting ~200 of them, however, we've found that they only
+# use alpha-numeric characters, hence the tighter restriction.
+FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
+
 CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
