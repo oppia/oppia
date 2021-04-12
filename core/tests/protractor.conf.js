@@ -354,7 +354,7 @@ exports.config = {
 
     if(_ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter(new VideoReporter({
-        baseDirectory: Path.join(__dirname, '../protractor-video'),
+        baseDirectory: path.resolve(__dirname, '../protractor-video'),
         singleVideo: false,
         singleVideoPath: fullName,
         ffmpegArgs: ffmpegArguments
