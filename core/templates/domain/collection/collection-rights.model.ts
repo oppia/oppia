@@ -19,18 +19,18 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface CollectionRightsBackendDict {
-  'collection_id': number;
-  'can_edit': boolean;
-  'can_unpublish': boolean;
-  'is_private': boolean;
+  'collection_id': number | null;
+  'can_edit': boolean | null;
+  'can_unpublish': boolean | null;
+  'is_private': boolean | null;
   'owner_names': string[];
 }
 
 export class CollectionRights {
-  _collectionId: number;
-  _canEdit: boolean;
-  _canUnpublish: boolean;
-  _isPrivate: boolean;
+  _collectionId: number | null;
+  _canEdit: boolean | null;
+  _canUnpublish: boolean | null;
+  _isPrivate: boolean | null;
   _ownerNames: string[];
 
   constructor(collectionRightsObject: CollectionRightsBackendDict) {
@@ -59,28 +59,28 @@ export class CollectionRights {
     });
   }
 
-  getCollectionId(): number {
+  getCollectionId(): number | null {
     return this._collectionId;
   }
 
   // Returns true if the the user can edit the collection. This property is
   // immutable.
-  canEdit(): boolean {
+  canEdit(): boolean | null {
     return this._canEdit;
   }
 
   // Returns true if the user can unpublish the collection.
-  canUnpublish(): boolean {
+  canUnpublish(): boolean | null {
     return this._canUnpublish;
   }
 
   // Returns true if the collection is private.
-  isPrivate(): boolean {
+  isPrivate(): boolean | null {
     return this._isPrivate;
   }
 
   // Returns true if the collection is public.
-  isPublic(): boolean {
+  isPublic(): boolean | null {
     return !this._isPrivate;
   }
 
