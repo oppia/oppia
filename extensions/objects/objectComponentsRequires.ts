@@ -24,10 +24,10 @@ require('objects/templates/custom-osk-letters-editor.component.ts');
 require('objects/templates/drag-and-drop-positive-int-editor.component.ts');
 require('objects/templates/filepath-editor.component.ts');
 require('objects/templates/fraction-editor.component.ts');
-require('objects/templates/graph-editor.directive.ts');
-require('objects/templates/graph-property-editor.directive.ts');
-require('objects/templates/html-editor.directive.ts');
-require('objects/templates/image-with-regions-editor.directive.ts');
+require('objects/templates/graph-editor.component.ts');
+require('objects/templates/graph-property-editor.component.ts');
+require('objects/templates/html-editor.component.ts');
+require('objects/templates/image-with-regions-editor.component.ts');
 require('objects/templates/int-editor.directive.ts');
 // eslint-disable-next-line max-len
 require('objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component.ts');

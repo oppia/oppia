@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
@@ -72,6 +72,8 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() canEditEdgeWeight: boolean;
   @Input() interactionIsActive: boolean;
   @Input() canEditOptions: boolean;
+
+  @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
   isMobile: boolean = false;
   helpText: string = '';
   _MODES = {
@@ -267,6 +269,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
         y: this.state.mouseY,
         label: ''
       });
+      this.graphChange.emit(this.graph);
     }
     if (this.state.hoveredVertex === null) {
       this.state.selectedVertex = null;
@@ -332,6 +335,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this._deleteRepeatedUndirectedEdges();
     }
     this.graph[option] = !this.graph[option];
+    this.graphChange.emit(this.graph);
   }
 
   setMode(mode: number): void {
@@ -535,6 +539,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       dst: endIndex,
       weight: 1
     });
+    this.graphChange.emit(this.graph);
     return;
   }
 
@@ -569,6 +574,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
 
   deleteEdge(index: number): void {
     this.graph.edges.splice(index, 1);
+    this.graphChange.emit(this.graph);
     this.state.hoveredEdge = null;
   }
 
@@ -601,6 +607,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     });
     this.graph.edges = this.graph.edges.filter(edge => edge !== null);
     this.graph.vertices.splice(index, 1);
+    this.graphChange.emit(this.graph);
     this.state.hoveredVertex = null;
   }
 
@@ -641,6 +648,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     if (angular.isNumber(this.selectedEdgeWeightValue)) {
       this.graph.edges[this.state.selectedEdge].weight = (
         this.selectedEdgeWeightValue);
+      this.graphChange.emit(this.graph);
     }
     this.state.selectedEdge = null;
   }

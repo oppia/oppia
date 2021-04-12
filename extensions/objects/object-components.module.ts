@@ -31,7 +31,13 @@ import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop
 import { FractionEditorComponent } from './templates/fraction-editor.component';
 import { FormsModule } from '@angular/forms';
 import { FilepathEditorComponent } from './templates/filepath-editor.component';
-import { CustomFormsComponentsModule } from 'components/forms/custom-forms-directives/custom-form-components.module';
+import { GraphInputInteractionModule } from 'interactions/GraphInput/graph-input-interactions.module';
+import { GraphEditorComponent } from './templates/graph-editor.component';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
+import { HtmlEditorComponent } from './templates/html-editor.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
+import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
 
 
 @NgModule({
@@ -40,7 +46,9 @@ import { CustomFormsComponentsModule } from 'components/forms/custom-forms-direc
     BrowserModule,
     FormsModule,
     LeafletModule,
-    CustomFormsComponentsModule
+    SharedFormsModule,
+    GraphInputInteractionModule,
+    NgbModalModule
   ],
   declarations: [
     AlgebraicExpressionEditorComponent,
@@ -50,7 +58,11 @@ import { CustomFormsComponentsModule } from 'components/forms/custom-forms-direc
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
-    FractionEditorComponent
+    FractionEditorComponent,
+    GraphEditorComponent,
+    HtmlEditorComponent,
+    ImageWithRegionsEditorComponent,
+    ImageWithRegionsResetConfirmationModalComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -60,7 +72,11 @@ import { CustomFormsComponentsModule } from 'components/forms/custom-forms-direc
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
-    FractionEditorComponent
+    FractionEditorComponent,
+    GraphEditorComponent,
+    HtmlEditorComponent,
+    ImageWithRegionsEditorComponent,
+    ImageWithRegionsResetConfirmationModalComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -70,7 +86,11 @@ import { CustomFormsComponentsModule } from 'components/forms/custom-forms-direc
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
-    FractionEditorComponent
+    FractionEditorComponent,
+    GraphEditorComponent,
+    HtmlEditorComponent,
+    ImageWithRegionsEditorComponent,
+    ImageWithRegionsResetConfirmationModalComponent
   ],
 })
 
