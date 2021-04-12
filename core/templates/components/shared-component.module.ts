@@ -69,8 +69,11 @@ import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
@@ -96,6 +99,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    ObjectComponentsModule,
     ...firebaseAuthModules,
   ],
 
@@ -118,6 +122,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    PromoBarComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -126,12 +132,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    WrapTextWithEllipsisPipe,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
     TruncatePipe,
-    PromoBarComponent
   ],
 
   entryComponents: [
@@ -148,11 +154,11 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ExplorationEmbedButtonModalComponent,
     ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
+    PromoBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
-    PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
   ],
@@ -164,12 +170,16 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ObjectComponentsModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    LazyLoadingComponent,
+    SchemaBasedEditorDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    PromoBarComponent,
     ImageUploaderComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
@@ -182,7 +192,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
-    PromoBarComponent
+    WrapTextWithEllipsisPipe,
   ],
 })
 

@@ -150,3 +150,64 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class StoryExplorationsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to validate explorations in stories."""
+
+    _DELETED_KEY = 'story_deleted'
+    _PROCESSED_KEY = 'story_processed'
+    _ERROR_KEY = 'story_failed_validation'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (StoryExplorationsAuditOneOffJob._DELETED_KEY, 1)
+            return
+
+        story = story_fetchers.get_story_by_id(item.id)
+        exp_ids = story.story_contents.get_all_linked_exp_ids()
+        validation_errors = story_services.validate_explorations_for_story(
+            exp_ids, False)
+        if validation_errors:
+            yield (
+                StoryExplorationsAuditOneOffJob._ERROR_KEY,
+                'Failed to validate explorations for story %s: %s' % (
+                    item.id, validation_errors))
+            return
+
+        yield (StoryExplorationsAuditOneOffJob._PROCESSED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == StoryExplorationsAuditOneOffJob._DELETED_KEY:
+            num_deleted = sum(ast.literal_eval(v) for v in values)
+            values = ['Encountered %d deleted stories.' % num_deleted]
+        elif key == StoryExplorationsAuditOneOffJob._PROCESSED_KEY:
+            num_processed = sum(ast.literal_eval(v) for v in values)
+            values = ['Successfully processed %d stories.' % num_processed]
+        yield (key, values)
+
+
+class DeleteStoryCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to delete unneeded story commit logs."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryCommitLogEntryModel]
+
+    @staticmethod
+    def map(model):
+        if story_models.StoryModel.get(model.story_id, strict=False) is None:
+            model.delete()
+            yield ('SUCCESS_DELETED', model.story_id)
+        else:
+            yield ('SUCCESS_NO_ACTION', model.story_id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

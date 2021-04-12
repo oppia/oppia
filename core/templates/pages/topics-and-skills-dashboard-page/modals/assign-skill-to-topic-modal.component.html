@@ -3,10 +3,11 @@
 </div>
 
 <div class="modal-body">
-  <oppia-select-topics [topicSummaries]="topicSummaries"
-                       [selectedTopicIds]="selectedTopicIds">
+  <oppia-select-topics [topic-summaries]="topicSummaries"
+                       [selected-topic-ids]="selectedTopicIds"
+                       (selected-topic-ids-update)="selectedTopicIds = $event">
   </oppia-select-topics>
-  <em *ngIf="!topicSummaries.length">The skill is already assigned to all available topics.</em>
+  <em ng-if="!topicSummaries.length">The skill is already assigned to all available topics.</em>
 </div>
 
 <div class="modal-footer">
