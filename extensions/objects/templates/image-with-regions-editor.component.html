@@ -8,12 +8,12 @@
   <div class="position-relative" *ngIf="value.imagePath !== ''">
     <div>Add new regions by clicking on the image and dragging:</div>
     <svg class="oppia-image-with-regions-editor-svg"
-        width="100%"
-        attr.style="cursor: {{getCursorStyle()}};"
-        attr.height="{{getImageHeight()}}"
-        (mousedown)="onSvgMouseDown($event)"
-        (mousemove)="onSvgMouseMove($event)"
-        (mouseup)="onSvgMouseUp($event)">
+         width="100%"
+         attr.style="cursor: {{getCursorStyle()}};"
+         attr.height="{{getImageHeight()}}"
+         (mousedown)="onSvgMouseDown($event)"
+         (mousemove)="onSvgMouseMove($event)"
+         (mouseup)="onSvgMouseUp($event)">
       <image [attr.href]="getPreviewUrl(value.imagePath)"
             xlink:href=""
             x="0"
@@ -60,17 +60,16 @@
     </svg>
 
     <input type="text" *ngIf="selectedRegion !== null"
-          class="oppia-image-with-regions-region-label-editor"
-          [attr.style]="getRegionLabelEditorStyle()"
-          (mouseup)="regionLabelEditorMouseUp()"
-          [(ngModel)]="value.labeledRegions[selectedRegion].label"
-          (ngModelChange)="regionLabelSetter()"
-          >
+           class="oppia-image-with-regions-region-label-editor"
+           [attr.style]="getRegionLabelEditorStyle()"
+           (mouseup)="regionLabelEditorMouseUp()"
+           [(ngModel)]="value.labeledRegions[selectedRegion].label"
+           (ngModelChange)="regionLabelSetter()">
 
     <div class="text-danger oppia-error-text">{{errorText}}</div>
     <button type="button" class="btn btn-danger" (click)="resetEditor()">Clear Image and Regions</button>
   </div>
-</div>  
+</div>
 <style>
   input.oppia-image-with-regions-region-label-editor {
     background-color: rgba(0, 0, 0, 0.5);
