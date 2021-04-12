@@ -64,6 +64,3 @@ class MachineTranslatedTextModel(base_models.BaseModel):
     hashed_text = utils.convert_to_hash(origin_text)
     id_ = f'{source_language_code}|{target_language_code}|{hashed_text}'
     return MachineTranslatedTextModel.get(id_)
-
-
-
