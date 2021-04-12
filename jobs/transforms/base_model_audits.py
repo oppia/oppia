@@ -36,6 +36,7 @@ import feconf
 from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
+import utils
 
 import apache_beam as beam
 
@@ -44,9 +45,7 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
-VALIDATION_MODE_NEUTRAL = 'neutral'
-VALIDATION_MODE_STRICT = 'strict'
-VALIDATION_MODE_NON_STRICT = 'non-strict'
+VALIDATION_MODES = utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
 
 
 class ValidateDeletedModel(beam.DoFn):
@@ -197,7 +196,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         Returns:
             str. The type of validation mode: neutral, strict or non strict.
         """
-        return VALIDATION_MODE_NEUTRAL
+        return VALIDATION_MODES.neutral
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
@@ -216,11 +215,11 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                 input_model)
             if domain_object is None:
                 return
-            if validation_type == VALIDATION_MODE_NEUTRAL:
+            if validation_type == VALIDATION_MODES.neutral:
                 domain_object.validate()
-            elif validation_type == VALIDATION_MODE_STRICT:
+            elif validation_type == VALIDATION_MODES.strict:
                 domain_object.validate(strict=True)
-            elif validation_type == VALIDATION_MODE_NON_STRICT:
+            elif validation_type == VALIDATION_MODES.non_strict:
                 domain_object.validate(strict=False)
             else:
                 raise Exception(

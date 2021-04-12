@@ -185,7 +185,7 @@ class MockValidateModelDomainObjectInstancesWithNonStrict(
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return 'non-strict'
+        return 'non_strict'
 
 
 class MockValidateModelDomainObjectInstancesWithInvalid(
@@ -217,7 +217,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(
-                base_model_audits.ValidateModelDomainObjectInstances()))
+                base_model_audits.ValidateModelDomainObjectInstances())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -233,7 +234,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(
-                MockValidateModelDomainObjectInstancesWithNeutral()))
+                MockValidateModelDomainObjectInstancesWithNeutral())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -249,7 +251,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(
-                MockValidateModelDomainObjectInstancesWithStrict()))
+                MockValidateModelDomainObjectInstancesWithStrict())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -265,7 +268,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(
-                MockValidateModelDomainObjectInstancesWithNonStrict()))
+                MockValidateModelDomainObjectInstancesWithNonStrict())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -280,7 +284,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(MockValidateModelDomainObjectInstancesWithInvalid()))
+            | beam.ParDo(MockValidateModelDomainObjectInstancesWithInvalid())
+        )
         self.assert_pcoll_equal(output, [
             audit_errors.ModelDomainObjectValidateError(
                 model, 'Invalid validation type for domain object: invalid')
@@ -324,7 +329,8 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model_instance1, model_instance2])
-            | beam.ParDo(MockValidateExplorationModelDomainObjectInstances()))
+            | beam.ParDo(MockValidateExplorationModelDomainObjectInstances())
+        )
 
         self.assert_pcoll_equal(output, [
             audit_errors.ModelDomainObjectValidateError(
