@@ -20,7 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
-import python_utils
+from utils import convert_to_hash
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -61,6 +61,6 @@ class MachineTranslatedTextModel(base_models.BaseModel):
         MachineTranslatedTextModel|None. The MachineTranslatedTextModel if a
         translation exists or None if no translation is found.
     """
-    hashed_text = utils.convert_to_hash(origin_text)
+    hashed_text = convert_to_hash(origin_text)
     id_ = f'{source_language_code}|{target_language_code}|{hashed_text}'
     return MachineTranslatedTextModel.get(id_)
