@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import app_feedback_report_constants
 from core.platform import models
 import feconf
 import python_utils
@@ -29,8 +30,8 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-PLATFORM_CHOICE_ANDROID = 'android'
-PLATFORM_CHOICE_WEB = 'web'
+PLATFORM_CHOICE_ANDROID = app_feedback_report_constants.PLATFORM_ANDROID
+PLATFORM_CHOICE_WEB = app_feedback_report_constants.PLATFORM_WEB
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
@@ -245,8 +246,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             new_id = '%s.%s.%s' % (
-                platform, int(submitted_datetime_in_msec),
-                random_hash)
+                platform, int(submitted_datetime_in_msec), random_hash)
             if not cls.get_by_id(new_id):
                 return new_id
         raise Exception(

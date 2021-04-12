@@ -1,20 +1,4 @@
-# coding: utf-8
-#
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-"""Domain objects for app feedback reporting."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -22,6 +6,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import re
 
+from core.domain import app_feedback_report_constants
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import topic_domain
@@ -33,77 +18,6 @@ import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
-
-
-REPORT_TYPE = utils.create_enum('suggestion', 'issue', 'crash')
-CATEGORY = utils.create_enum(
-    'suggestion_new_feature', 'suggestion_new_language','suggestion_other',
-    'issue_lesson_question', 'issue_language_general', 'issue_language_audio',
-    'issue_language_text', 'issue_topics', 'issue_profile', 'issue_other',
-    'crash_lesson_player', 'crash_practice_questions', 'crash_options_page',
-    'crash_profile_page', 'crash_other')
-FEEDBACK_OPTIONS = utils.create_enum()
-ENTRY_POINT = utils.create_enum(
-    'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
-STATS_PARAMETER_NAMES = utils.create_enum(
-    'platform', 'report_type', 'country_locale_code',
-    'entry_point_name', 'text_language_code', 'audio_language_code',
-    'sdk_version', 'version_name')
-FILTER_FIELD_NAMES = utils.create_enum(
-    'platform', 'report_type', 'entry_point', 'submitted_on',
-    'android_device_model', 'sdk_version', 'text_language_code',
-    'audio_language_code', 'platform_version',
-    'android_device_country_locale_code')
-
-MINIMUM_ANDROID_SDK_VERSION = 2
-ANDROID_TEXT_SIZE = utils.create_enum(
-    'text_size_unspecified', 'small_text_size', 'medium_text_size',
-    'large_text_size', 'extra_large_text_size')
-ANDROID_ENTRY_POINT = [
-    ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
-    ENTRY_POINT.revision_card, ENTRY_POINT.crash]
-ANDROID_VERSION_NAME_DELIMITER = '-'
-ANDROID_NETWORK_TYPES = utils.create_enum('wifi', 'cellular', 'none')
-
-ALLOWED_REPORT_TYPES = [
-    REPORT_TYPE.suggestion, REPORT_TYPE.issue, REPORT_TYPE.crash]
-ALLOWED_CATEGORIES = [
-    CATEGORY.suggestion_new_feature, CATEGORY.suggestion_new_language,
-    CATEGORY.suggestion_other, CATEGORY.issue_language_general,
-    CATEGORY.issue_language_audio, CATEGORY.issue_language_text,
-    CATEGORY.issue_topics, CATEGORY.issue_profile, CATEGORY.issue_other,
-    CATEGORY.crash_lesson_player, CATEGORY.crash_practice_questions,
-    CATEGORY.crash_options_page, CATEGORY.crash_profile_page,
-    CATEGORY.crash_other]
-ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
-    CATEGORY.suggestion_other, CATEGORY.issue_other,
-    CATEGORY.crash_lesson_player, CATEGORY.crash_practice_questions,
-    CATEGORY.crash_options_page, CATEGORY.crash_profile_page,
-    CATEGORY.crash_other]
-ALLOWED_SELECTION_ITEMS_CATEGORIES = [
-    CATEGORY.issue_language_audio, CATEGORY.issue_language_text,
-    CATEGORY.issue_topics, CATEGORY.issue_profile, CATEGORY.issue_other]
-ALLOWED_STATS_PARAMETERS = [
-    STATS_PARAMETER_NAMES.report_type,
-    STATS_PARAMETER_NAMES.country_locale_code,
-    STATS_PARAMETER_NAMES.entry_point_name,
-    STATS_PARAMETER_NAMES.text_language_code,
-    STATS_PARAMETER_NAMES.audio_language_code,
-    STATS_PARAMETER_NAMES.sdk_version, STATS_PARAMETER_NAMES.version_name]
-ALLOWED_ANDROID_NETWORK_TYPES = [
-    ANDROID_NETWORK_TYPES.wifi, ANDROID_NETWORK_TYPES.cellular,
-    ANDROID_NETWORK_TYPES.none]
-
-ALLOWED_ANDROID_TEXT_SIZES = [
-    ANDROID_TEXT_SIZE.text_size_unspecified, ANDROID_TEXT_SIZE.small_text_size,
-    ANDROID_TEXT_SIZE.medium_text_size, ANDROID_TEXT_SIZE.large_text_size,
-    ANDROID_TEXT_SIZE.extra_large_text_size]
-
-MAXIMUM_TICKET_NAME_LENGTH = 100
-PLATFORM_ANDROID = (
-    app_feedback_report_models.PLATFORM_CHOICE_ANDROID)
-PLATFORM_WEB = (
-    app_feedback_report_models.PLATFORM_CHOICE_WEB)
 
 
 class AppFeedbackReport(python_utils.OBJECT):
@@ -184,14 +98,15 @@ class AppFeedbackReport(python_utils.OBJECT):
 
         self.user_supplied_feedback.validate()
 
-        if self.platform == PLATFORM_ANDROID and not isinstance(
-            self.device_system_context, AndroidDeviceSystemContext):
+        if self.platform == app_feedback_report_constants.PLATFORM_ANDROID and (
+            not isinstance(
+                self.device_system_context, AndroidDeviceSystemContext)):
             raise utils.ValidationError(
                 'Expected device and system context to be of type '
                 'AndroidDeviceSystemContext for platform %s, '
                 'received: %r' % (
                     self.platform, self.device_system_context.__class__))
-        elif self.platform == PLATFORM_WEB:
+        elif self.platform == app_feedback_report_constants.PLATFORM_WEB:
             raise NotImplementedError(
                 'Subclasses of DeviceSystemContext for web systems should '
                 'implement domain validation.')
@@ -214,7 +129,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         """
         minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
         current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
-        if platform == PLATFORM_WEB:
+        if platform == app_feedback_report_constants.PLATFORM_WEB:
             minimum_schema = feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION
             current_schema = feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION
         if not isinstance(schema_version, int) or schema_version <= 0:
@@ -332,10 +247,12 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """
         if report_type is None:
             raise utils.ValidationError('No report_type supplied.')
-        if report_type not in ALLOWED_REPORT_TYPES:
+        if report_type not in (
+            app_feedback_report_constants.ALLOWED_REPORT_TYPES):
             raise utils.ValidationError(
                 'Invalid report type %s, must be one of %s.' % (
-                    report_type, ALLOWED_REPORT_TYPES))
+                    report_type,
+                    app_feedback_report_constants.ALLOWED_REPORT_TYPES))
 
     @classmethod
     def require_valid_category(cls, category):
@@ -350,10 +267,10 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """
         if category is None:
             raise utils.ValidationError('No category supplied.')
-        if category not in ALLOWED_CATEGORIES:
+        if category not in app_feedback_report_constants.ALLOWED_CATEGORIES:
             raise utils.ValidationError(
                 'Invalid category %s, must be one of %s.' % (
-                    category, ALLOWED_CATEGORIES))
+                    category, app_feedback_report_constants.ALLOWED_CATEGORIES))
 
     @classmethod
     def require_valid_user_feedback_items_for_category(
@@ -373,7 +290,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             ValidationError. The given selection items and text input for the
             category are not valid.
         """
-        if category in ALLOWED_SELECTION_ITEMS_CATEGORIES:
+        if category in (
+            app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES):
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
             cls.require_valid_selected_items_for_category(
@@ -393,7 +311,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         # If the report category only allows users to provide input text,
         # validate that the user_feedback_selected_items is None and that
         # there is a user_feedback_other_text_input.
-        if category in ALLOWED_ONLY_INPUT_TEXT_CATEGORIES:
+        if category in (
+            app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES):
             if selected_items is not None:
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' % (
@@ -440,7 +359,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """
         if other_input is None:
             raise utils.ValidationError(
-                'Category %s requires text input in the report.' % category)
+                'Category %s requires text input in the report, received:'
+                ' %r.' % (category, other_input))
         if not isinstance(other_input, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid input text must be a string, received: %r.' % (
@@ -461,8 +381,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             bool. Whether an 'other' option is included in the selected items.
         """
         for item in selected_items:
-            if item.lower().contains('other'):
-                return true
+            if 'other' in item.lower():
+                return True
         return False
 
 
@@ -610,7 +530,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if not isinstance(version_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Version name must be a string, received: %r.' % version_name)
-        if len(version_name.split(ANDROID_VERSION_NAME_DELIMITER)) != 3:
+        if len(version_name.split(
+            app_feedback_report_constants.ANDROID_VERSION_NAME_DELIMITER)) != 3:
             raise utils.ValidationError(
                 'The version name is not a valid string format, received: '
                 '%s.' % version_name)
@@ -677,7 +598,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             bool. Whether the given code is valid. Valid codes are alphabetic
             string that may contain a number of single hyphens.
         """
-        regex_string = r'([a-z][-]?[a-z])+'
+        regex_string = r'^([a-z]+[-]?[a-z]+)+$'
         return re.compile(regex_string).match(code.lower())
     
     @classmethod
@@ -694,7 +615,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if not isinstance(sdk_version, int):
             raise utils.ValidationError(
                 'SDK version must be an int, received: %r.' % sdk_version)
-        if sdk_version < MINIMUM_ANDROID_SDK_VERSION:
+        if sdk_version < (
+            app_feedback_report_constants.MINIMUM_ANDROID_SDK_VERSION):
             raise utils.ValidationError(
                 'Invalid SDK version, received: %s.' % sdk_version)
      
@@ -714,7 +636,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if not isinstance(network_type, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Network type  must be a string, received: %r.' % network_type)
-        if network_type not in ALLOWED_ANDROID_NETWORK_TYPES:
+        if network_type not in (
+            app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
             raise utils.ValidationError(
                 'Invalid network type, received: %s.' % network_type)
 
@@ -898,7 +821,7 @@ class AndroidAppContext(AppContext):
             bool. Whether the given code is valid. Valid codes are alphabetic
             string that may contain a number of single hyphens.
         """
-        regex_string = r'([a-z][-]?[a-z])+'
+        regex_string = r'^([a-z]+[-]?[a-z]+)+$'
         return re.compile(regex_string).match(code)
 
     @classmethod
@@ -917,10 +840,12 @@ class AndroidAppContext(AppContext):
         if not isinstance(text_size, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Text size must be a stirng, received: %r.' % text_size)
-        if text_size not in ALLOWED_ANDROID_TEXT_SIZES:
+        if text_size not in (
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
             raise utils.ValidationError(
                 'App text size should be one of %s, received: %s' % (
-                    ALLOWED_ANDROID_TEXT_SIZES, text_size))
+                    app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES,
+                    text_size))
 
 
 class EntryPoint(python_utils.OBJECT):
@@ -1015,7 +940,8 @@ class NavigationDrawerEntryPoint(EntryPoint):
     def __init__(self):
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super(NavigationDrawerEntryPoint, self).__init__(
-            ENTRY_POINT.navigation_drawer, None, None, None, None)
+            app_feedback_report_constants.ENTRY_POINT.navigation_drawer, None,
+            None, None, None)
 
     def to_dict(self):
         """Returns a dict representing this NavigationDrawerEntryPoint domain
@@ -1037,7 +963,8 @@ class NavigationDrawerEntryPoint(EntryPoint):
                 NavigationDrawerEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
-            self.entry_point_name, ENTRY_POINT.navigation_drawer)
+            self.entry_point_name,
+            app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
 
 
 class LessonPlayerEntryPoint(EntryPoint):
@@ -1055,8 +982,10 @@ class LessonPlayerEntryPoint(EntryPoint):
                 user is playing when intiating the report.
         """
         super(LessonPlayerEntryPoint, self).__init__(
-            entry_point_name=ENTRY_POINT.lesson_player, topic_id=topic_id,
-            story_id=story_id, exploration_id=exploration_id, subtopic_id=None)
+            entry_point_name=(
+                app_feedback_report_constants.ENTRY_POINT.lesson_player),
+            topic_id=topic_id, story_id=story_id, exploration_id=exploration_id,
+            subtopic_id=None)
 
     def to_dict(self):
         """Returns a dict representing this LessonPlayerEntryPoint domain
@@ -1080,7 +1009,8 @@ class LessonPlayerEntryPoint(EntryPoint):
                 LessonPlayerEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
-            self.entry_point_name, ENTRY_POINT.lesson_player)
+            self.entry_point_name, 
+            app_feedback_report_constants.ENTRY_POINT.lesson_player)
         topic_domain.require_valid_topic_id(self.topic_id)
         story_domain.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
@@ -1100,7 +1030,8 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super(RevisionCardEntryPoint, self).__init__(
-            ENTRY_POINT.revision_card, topic_id, subtopic_id, None, None)
+            app_feedback_report_constants.ENTRY_POINT.revision_card,
+            topic_id, subtopic_id, None, None)
 
     def to_dict(self):
         """Returns a dict representing this RevisionCardEntryPoint domain
@@ -1124,7 +1055,8 @@ class RevisionCardEntryPoint(EntryPoint):
                 RevisionCardEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
-            self.entry_point_name, ENTRY_POINT.revision_card)
+            self.entry_point_name,
+            app_feedback_report_constants.ENTRY_POINT.revision_card)
         topic_domain.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
@@ -1137,7 +1069,10 @@ class CrashEntryPoint(EntryPoint):
 
     def __init__(self):
         """Constructs an CrashEntryPoint domain object."""
-        super(CrashEntryPoint, self).__init__(ENTRY_POINT.crash)
+        super(
+            CrashEntryPoint, self).__init__(
+                app_feedback_report_constants.ENTRY_POINT.crash, None, None,
+                None, None)
 
     def to_dict(self):
         """Returns a dict representing this CrashEntryPoint domain object.
@@ -1158,7 +1093,8 @@ class CrashEntryPoint(EntryPoint):
                 CrashEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
-            self.entry_point_name, ENTRY_POINT.crash)
+            self.entry_point_name,
+            app_feedback_report_constants.ENTRY_POINT.crash)
 
 
 class AppFeedbackReportTicket(python_utils.OBJECT):
@@ -1272,11 +1208,13 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The ticket name should be a string, received: %s' % (
                     ticket_name))
-        if len(ticket_name) > MAXIMUM_TICKET_NAME_LENGTH:
+        if len(ticket_name) > (
+            app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH):
             raise utils.ValidationError(
                 'The ticket name is too long, has %d characters but only '
                 'allowed %d characters' % (
-                    len(ticket_name), MAXIMUM_TICKET_NAME_LENGTH))
+                    len(ticket_name),
+                    app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH))
 
     @classmethod
     def require_valid_report_ids(cls, report_ids):
@@ -1423,10 +1361,13 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The param stats should be a dict, received: %r' % param_stats)
         for (param_name, param_count_obj) in param_stats.items():
-            if param_name not in STATS_PARAMETER_NAMES:
+            if param_name not in (
+                app_feedback_report_constants.STATS_PARAMETER_NAMES):
                 raise utils.ValidationError(
                     'The param %s is not a valid param to aggregate stats on, '
-                    'must be one of %s' % (param_name, STATS_PARAMETER_NAMES))
+                    'must be one of %s' % (
+                        param_name,
+                        app_feedback_report_constants.STATS_PARAMETER_NAMES))
             param_count_object.validate()
 
 
