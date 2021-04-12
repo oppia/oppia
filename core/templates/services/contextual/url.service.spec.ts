@@ -24,7 +24,7 @@ import { WindowRef } from './window-ref.service';
 describe('Url Service', () => {
   let urlService: UrlService = null;
   let windowRef: WindowRef = null;
-  let sampleHash: any = 'sampleHash';
+  let sampleHash = 'sampleHash';
   let pathname = '/embed';
   let mockLocation = null;
   let origin = 'http://sample.com';

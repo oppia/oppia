@@ -719,8 +719,13 @@ module.exports = {
         path.resolve(__dirname, 'typings')
       ],
       use: [
+        'cache-loader',
         {
           loader: 'ts-loader',
+          options: {
+            // Typescript checks do the type checking.
+            transpileOnly: true
+          }
         },
         {
           loader: 'angular2-template-loader'
