@@ -94,6 +94,12 @@ export default {
 
   "TASK_TARGET_TYPE_STATE": "state",
 
+  // Roles in exploration.
+  "ROLE_OWNER": "owner",
+  "ROLE_EDITOR": "editor",
+  "ROLE_VOICE_ARTIST": "voice artist",
+  "ROLE_VIEWER": "viewer",
+
   // Regex to validate the format of Math rich-text component SVGs. If this is
   // changed in the future, the existing filenames on the server should be
   // handled as well.
@@ -4736,6 +4742,15 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
+  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "link", "math", "skillreview"],
+
+  // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
+  "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
+    "code": "en",
+    "description": "English"
+  }],
+
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
@@ -5286,6 +5301,32 @@ export default {
       "FractionInput",
       "NumberWithUnits",
       "NumericInput"
+    ]
+  }],
+
+  // These are linked to the VALID_INTERACTION_IDS constant in
+  // android_validation_constants.py.
+  "ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+      "Continue",
+      "EndExploration",
+      "ImageClickInput",
+      "ItemSelectionInput",
+      "MultipleChoiceInput",
+      "TextInput",
+      "DragAndDropSortInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+      "FractionInput",
+      "NumericInput",
+      "NumericExpressionInput",
+      "AlgebraicExpressionInput",
+      "MathEquationInput",
+      "NumberWithUnits",
+      "RatioExpressionInput"
     ]
   }],
 
