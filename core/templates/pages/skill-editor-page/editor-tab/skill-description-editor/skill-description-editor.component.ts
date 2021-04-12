@@ -85,6 +85,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     );
   }
 }
+
 angular.module('oppia').directive(
   'oppiaSkillDescriptionEditor', downgradeComponent(
     {component: SkillDescriptionEditorComponent}));
