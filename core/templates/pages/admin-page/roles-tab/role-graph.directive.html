@@ -20,7 +20,7 @@
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select id="label-target-role-method" ng-model="$ctrl.formData.viewUserRoles.filterCriterion" class="form-control protractor-test-role-method">
+              <select id="label-target-role-method" ng-model="$ctrl.formData.viewUserRoles.filterCriterion" class="form-control protractor-test-role-method" ng-change="$ctrl.clearResults()">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
@@ -29,7 +29,7 @@
           <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewUserRoles.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
             <label for="label-target-role-value" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select id="label-target-role-value" ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.formData.viewUserRoles.role" class="form-control protractor-test-role-value">
+              <select id="label-target-role-value" ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.formData.viewUserRoles.role" class="form-control protractor-test-role-value" ng-change="$ctrl.clearResults()">
               </select>
             </div>
           </div>
@@ -57,7 +57,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="(name, role) in $ctrl.result">
+              <tr ng-repeat="(name, role) in $ctrl.userRolesResult">
                 <td class="protractor-test-roles-result-rows"><[name]></td>
                 <td><[role]></td>
               </tr>
@@ -106,7 +106,7 @@
               <select id="label-target-view-reviewer-method"
                       ng-model="$ctrl.formData.viewContributionReviewers.filterCriterion"
                       class="form-control protractor-test-view-contribution-rights-method"
-                      ng-change="$ctrl.clearReviewersData()">
+                      ng-change="$ctrl.clearResults()">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
@@ -119,7 +119,8 @@
               <select id="label-target-form-review-category-select"
                       class="form-control protractor-test-form-contribution-rights-category-select"
                       ng-options="roleString as roleName for (roleName, roleString) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES"
-                      ng-model="$ctrl.formData.viewContributionReviewers.category">
+                      ng-model="$ctrl.formData.viewContributionReviewers.category"
+                      ng-change="$ctrl.clearResults()">
               </select>
             </div>
           </div>
@@ -164,27 +165,27 @@
               <tbody>
                 <tr>
                   <td>
-                    <span ng-if="$ctrl.result.translationLanguages.length === 0"><i>None</i></span>
-                    <span ng-repeat="language in $ctrl.result.translationLanguages"
+                    <span ng-if="$ctrl.contributionReviewersResult.translationLanguages.length === 0"><i>None</i></span>
+                    <span ng-repeat="language in $ctrl.contributionReviewersResult.translationLanguages"
                           class="protractor-test-translation-reviewer-language">
                       <[language]><[$last ? '' : ', ']>
                     </span>
                   </td>
                   <td>
-                    <span ng-if="$ctrl.result.voiceoverLanguages.length === 0"><i>None</i></span>
-                    <span ng-repeat="language in $ctrl.result.voiceoverLanguages"
+                    <span ng-if="$ctrl.contributionReviewersResult.voiceoverLanguages.length === 0"><i>None</i></span>
+                    <span ng-repeat="language in $ctrl.contributionReviewersResult.voiceoverLanguages"
                           class="protractor-test-voiceover-reviewer-language">
                       <[language]><[$last ? '' : ', ']>
                     </span>
                   </td>
                   <td>
                     <span class="protractor-test-question-reviewer">
-                      <[$ctrl.result.questions ? 'Allowed' : 'Not-allowed']>
+                      <[$ctrl.contributionReviewersResult.questions ? 'Allowed' : 'Not-allowed']>
                     </span>
                   </td>
                   <td>
                     <span class="protractor-test-question-contributor">
-                      <[$ctrl.result.can_submit_questions ? 'Allowed' : 'Not-allowed']>
+                      <[$ctrl.contributionReviewersResult.can_submit_questions ? 'Allowed' : 'Not-allowed']>
                     </span>
                   </td>
                 </tr>
@@ -192,7 +193,7 @@
             </table>
           </div>
           <div ng-if="$ctrl.formData.viewContributionReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE" class="protractor-test-reviewer-roles-result">
-            <strong>Usernames:</strong> <[$ctrl.result.usernames]>
+            <strong>Usernames:</strong> <[$ctrl.contributionReviewersResult.usernames]>
           </div>
         </div>
       </md-card>
