@@ -76,7 +76,7 @@ export class TaskEntry<TaskType = string> {
   public readonly targetId: string;
   public readonly resolverUsername: string;
   public readonly resolverProfilePictureDataUrl: string;
-  public readonly resolvedOnMsecs?: number;
+  public readonly resolvedOnMsecs: number | null;
   protected issueDescription: string;
   private taskStatus: string;
 
