@@ -53,7 +53,8 @@ describe('Classifier Data Backend API Service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      classifierDataBackendApiService.getClassifierDataAsync('0', 1, 'state').then(
+      classifierDataBackendApiService.getClassifierDataAsync(
+        '0', 1, 'state').then(
         successHandler, failHandler);
 
       const metaDataReq = httpTestingController.expectOne(
@@ -88,7 +89,8 @@ describe('Classifier Data Backend API Service', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        classifierDataBackendApiService.getClassifierDataAsync('0', 1, 'state').then(
+        classifierDataBackendApiService.getClassifierDataAsync(
+          '0', 1, 'state').then(
           successHandler, failHandler);
         const req = httpTestingController.expectOne(
           req => req.url === classifierMetaDataRequestUrl);
@@ -104,7 +106,8 @@ describe('Classifier Data Backend API Service', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        classifierDataBackendApiService.getClassifierDataAsync('0', 1, 'state').then(
+        classifierDataBackendApiService.getClassifierDataAsync(
+          '0', 1, 'state').then(
           successHandler, failHandler);
 
         const metaDataReq = httpTestingController.expectOne(
