@@ -123,7 +123,7 @@ export class Skill {
   }
 
   getRubrics(): Rubric[] {
-    return this._rubrics.slice();
+    return this._rubrics;
   }
 
   appendMisconception(newMisconception: Misconception): void {

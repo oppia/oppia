@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Functionality for showing skill modal.
+ */
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -22,10 +26,6 @@ import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
-
-/**
- * @fileoverview Functionality for showing skill modal.
- */
 
 @Injectable({
   providedIn: 'root'

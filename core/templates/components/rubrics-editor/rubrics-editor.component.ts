@@ -42,6 +42,12 @@ interface RubricData {
   data: string[]
 }
 
+interface SkillDescriptionStatusValuesInterface {
+  STATUS_CHANGED: string,
+  STATUS_UNCHANGED: string,
+  STATUS_DISABLED: string
+}
+
 @Component({
   selector: 'oppia-rubrics-editor',
   templateUrl: './rubrics-editor.component.html'
@@ -51,12 +57,12 @@ export class RubricsEditorComponent {
   @Input() newSkillBeingCreated: boolean;
   @Output() saveRubric: EventEmitter<unknown> = (
     new EventEmitter());
-  skillDescriptionStatusValues = (
+  skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface = (
     TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
-  skillDifficultyMedium = (
+  skillDifficultyMedium: string = (
     constants.SKILL_DIFFICULTY_MEDIUM);
-  explanationsMemento = {};
-  explanationEditorIsOpen = {};
+  explanationsMemento: object = {};
+  explanationEditorIsOpen: object = {};
   editableExplanations: Explanation = {};
   selectedRubricIndex: number;
   EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {type: 'html',
@@ -73,7 +79,7 @@ export class RubricsEditorComponent {
     return true;
   }
 
-  getSchema(): object {
+  getSchema(): ExplanationFormSchema {
     return this.EXPLANATION_FORM_SCHEMA;
   }
 
