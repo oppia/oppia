@@ -215,8 +215,8 @@ describe('Story Viewer Page component', () => {
         '1', 'Story node title');
       expect(component.getExplorationUrl(node)).toBe(
         '/explore/null?topic_url_fragment=topic&' +
-         'classroom_url_fragment=math&story_url_fragment=story&' +
-         'node_id=1');
+        'classroom_url_fragment=math&story_url_fragment=story&' +
+        'node_id=1');
     });
 
   it('should get complete image path corresponding to a given' +

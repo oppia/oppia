@@ -47,7 +47,8 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
       declarations: [StoryViewerNavbarBreadcrumbComponent],
       imports: [HttpClientTestingModule],
       providers: [
-        { provide: StoryViewerBackendApiService,
+        {
+          provide: StoryViewerBackendApiService,
           useValue: {
             fetchStoryDataAsync: () => (
               new Promise((resolve) => {
