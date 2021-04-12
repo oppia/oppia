@@ -28,6 +28,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
+import { TopicsListComponent } from './topics-list/topics-list.component';
+import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 
 @NgModule({
@@ -39,10 +41,14 @@ import { SelectTopicsComponent } from './topic-selector/select-topics.component'
   ],
   declarations: [
     OppiaAngularRootComponent,
+    TopicsListComponent,
+    DeleteTopicModalComponent,
     SelectTopicsComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
+    TopicsListComponent,
+    DeleteTopicModalComponent,
     SelectTopicsComponent
   ],
   providers: [

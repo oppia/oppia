@@ -41,3 +41,46 @@ class GetAuditsByKindTests(test_utils.TestBase):
         with get_audit_do_fn_types_by_kind_swap:
             self.assertIs(
                 audits_registry.get_audit_do_fn_types_by_kind(), unique_obj)
+
+
+class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
+
+    def test_returns_value_from_decorator(self):
+        unique_obj = object()
+
+        @classmethod
+        def get_id_referencing_properties_by_kind_of_possessor_mock(unused_cls):
+            """Returns the unique_obj."""
+            return unique_obj
+
+        get_id_referencing_properties_by_kind_of_possessor_swap = self.swap(
+            audit_decorators.RelationshipsOf,
+            'get_id_referencing_properties_by_kind_of_possessor',
+            get_id_referencing_properties_by_kind_of_possessor_mock)
+
+        with get_id_referencing_properties_by_kind_of_possessor_swap:
+            self.assertIs(
+                audits_registry
+                .get_id_referencing_properties_by_kind_of_possessor(),
+                unique_obj)
+
+
+class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
+
+    def test_returns_value_from_decorator(self):
+        unique_obj = object()
+
+        @classmethod
+        def get_all_model_kinds_referenced_by_properties_mock(unused_cls):
+            """Returns the unique_obj."""
+            return unique_obj
+
+        get_all_model_kinds_referenced_by_properties_swap = self.swap(
+            audit_decorators.RelationshipsOf,
+            'get_all_model_kinds_referenced_by_properties',
+            get_all_model_kinds_referenced_by_properties_mock)
+
+        with get_all_model_kinds_referenced_by_properties_swap:
+            self.assertIs(
+                audits_registry.get_all_model_kinds_referenced_by_properties(),
+                unique_obj)
