@@ -80,12 +80,12 @@
               </div>
               <a ng-click="changeActiveAnswerGroupIndex(answerGroups.length)" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-response-tab" ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
                 <oppia-response-header [index]="$index"
-                                 [is-active]="$index === activeAnswerGroupIndex"
-                                 (summary)="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
-                                 (short-summary)="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
-                                 [outcome]="defaultOutcome"
-                                 [navigate-to-state]="navigateToState"
-                                 [is-response]="true">
+                                       [is-active]="$index === activeAnswerGroupIndex"
+                                       (summary)="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
+                                       (short-summary)="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
+                                       [outcome]="defaultOutcome"
+                                       [navigate-to-state]="navigateToState"
+                                       [is-response]="true">
                 </oppia-response-header>
               </a>
 
