@@ -302,7 +302,9 @@ angular.module('oppia').directive('ruleEditor', [
           };
 
           ctrl.$onDestroy = function() {
-            ctrl.eventBusGroup.unsubscribe();
+            if (ctrl.eventBusGroup) {
+              ctrl.eventBusGroup.unsubscribe();
+            }
           };
         }
       ]
