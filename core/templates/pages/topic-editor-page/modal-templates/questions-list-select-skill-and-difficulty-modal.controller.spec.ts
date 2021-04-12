@@ -17,7 +17,6 @@
  * QuestionsListSelectSkillAndDifficultyModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { ShortSkillSummary } from
   'domain/skill/short-skill-summary.model';
 import { SkillDifficulty } from
@@ -44,14 +43,6 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     var skillIdToRubricsObject = {};
 
     beforeEach(angular.mock.module('oppia'));
-
-    beforeEach(function() {
-      TestBed.configureTestingModule({
-        providers: [
-          ShortSkillSummary
-        ]
-      });
-    });
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
