@@ -157,9 +157,9 @@ class ModelDomainObjectValidateError(BaseAuditError):
 
     def __init__(self, model, error_message):
         super(ModelDomainObjectValidateError, self).__init__(model)
-        self._message = (
-            'Entity id %s: Entity fails domain validation with the '
-            'error: %s' % (model.id, error_message))
+        self.message = (
+            'Entity fails domain validation with the '
+            'error: %s' % error_message)
 
 
 class ModelExpiredError(BaseAuditError):

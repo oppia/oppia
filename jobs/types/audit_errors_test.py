@@ -309,8 +309,8 @@ class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
             model, error_message)
 
         msg = (
-            'Entity id %s: Entity fails domain validation with the '
-            'error: %s' % (model.id, error_message))
+            'ModelDomainObjectValidateError in BaseModel(id=\'123\'): Entity'
+            ' fails domain validation with the error: %s' % error_message)
 
         self.assertEqual(error.message, msg)
 
