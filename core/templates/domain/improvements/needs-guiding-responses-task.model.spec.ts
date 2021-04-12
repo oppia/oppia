@@ -79,7 +79,7 @@ describe('Needs guiding responses task model', () => {
       status: 'open',
       resolver_username: '',
       resolver_profile_picture_data_url: '',
-      resolved_on_msecs: undefined,
+      resolved_on_msecs: null,
     });
 
     expect(task.entityType).toEqual('exploration');
@@ -109,7 +109,7 @@ describe('Needs guiding responses task model', () => {
         status: 'open',
         resolver_username: '',
         resolver_profile_picture_data_url: '',
-        resolved_on_msecs: undefined,
+        resolved_on_msecs: null,
       })
     ).toThrowError(
       'backend dict has entity_type "???" but expected "exploration"');
@@ -135,7 +135,7 @@ describe('Needs guiding responses task model', () => {
         status: 'open',
         resolver_username: '',
         resolver_profile_picture_data_url: '',
-        resolved_on_msecs: undefined,
+        resolved_on_msecs: null,
       })
     ).toThrowError(
       'backend dict has task_type "???" but expected "needs_guiding_responses"'
@@ -157,7 +157,7 @@ describe('Needs guiding responses task model', () => {
         status: 'open',
         resolver_username: '',
         resolver_profile_picture_data_url: '',
-        resolved_on_msecs: undefined,
+        resolved_on_msecs: null,
       })
     ).toThrowError('backend dict has target_type "???" but expected "state"');
   });

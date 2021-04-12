@@ -60,7 +60,7 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
       status: ImprovementsConstants.TASK_STATUS_OBSOLETE,
       resolver_username: '',
       resolver_profile_picture_data_url: '',
-      resolved_on_msecs: undefined,
+      resolved_on_msecs: null,
     });
   }
 

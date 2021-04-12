@@ -38,7 +38,7 @@ export interface TaskEntryBackendDict<TaskType = string> {
   'status': string;
   'resolver_username': string;
   'resolver_profile_picture_data_url': string;
-  'resolved_on_msecs'?: number;
+  'resolved_on_msecs': number | null;
 }
 
 /**
