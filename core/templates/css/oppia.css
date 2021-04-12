@@ -1987,6 +1987,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-interaction-preview {
   height: 100%;
   opacity: 0.5;
+  outline: none;
   padding: 4px;
   position: absolute;
   width: 100%;
