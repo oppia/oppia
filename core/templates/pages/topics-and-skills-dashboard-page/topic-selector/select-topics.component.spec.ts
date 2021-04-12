@@ -13,18 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the topic selector directive.
+ * @fileoverview Unit tests for the select topics component.
  */
 
-describe('Topic selector Directive', function() {
-  beforeEach(angular.mock.module('oppia'));
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SelectTopicsComponent } from './select-topics.component';
 
-  var $scope = null;
-  var ctrl = null;
-  var $rootScope = null;
-  var directive = null;
-  var selectedTopicIds = [];
-  var topicSummaries = [{
+describe('Topic Selector Component', () => {
+  let fixture: ComponentFixture<SelectTopicsComponent>;
+  let componentInstance: SelectTopicsComponent;
+  let topicSummaries = [{
     additionalStoryCount: 0,
     canEditTopic: true,
     canonicalStoryCount: 0,
@@ -65,33 +63,36 @@ describe('Topic selector Directive', function() {
     urlFragment: 'd2',
   }];
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-
-    $scope = $rootScope.$new();
-
-    directive = $injector.get('selectTopicsDirective')[0];
-
-    $scope.getTopicSummaries = () => {
-      return topicSummaries;
-    };
-    $scope.selectedTopicIds = selectedTopicIds;
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        SelectTopicsComponent
+      ]
+    }).compileComponents();
   }));
 
-  it('should allow select and deselect the topics', function() {
-    ctrl.$onInit();
-    $scope.selectOrDeselectTopic(topicSummaries[0].id, 0);
-    expect(selectedTopicIds).toEqual([topicSummaries[0].id]);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SelectTopicsComponent);
+    componentInstance = fixture.componentInstance;
+    componentInstance.topicSummaries = topicSummaries;
+    componentInstance.selectedTopicIds = [];
+    spyOn(componentInstance.selectedTopicIdsChange, 'emit');
+  });
+
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should allow select and deselect the topics', () => {
+    componentInstance.selectOrDeselectTopic(topicSummaries[0].id, 0);
+    expect(componentInstance.selectedTopicIds).toEqual([topicSummaries[0].id]);
     expect(topicSummaries[0].isSelected).toEqual(true);
-    $scope.selectOrDeselectTopic(topicSummaries[1].id, 1);
-    expect(selectedTopicIds).toEqual(
+    componentInstance.selectOrDeselectTopic(topicSummaries[1].id, 1);
+    expect(componentInstance.selectedTopicIds).toEqual(
       [topicSummaries[0].id, topicSummaries[1].id]);
     expect(topicSummaries[1].isSelected).toEqual(true);
-    $scope.selectOrDeselectTopic(topicSummaries[0].id, 0);
-    expect(selectedTopicIds).toEqual([topicSummaries[1].id]);
+    componentInstance.selectOrDeselectTopic(topicSummaries[0].id, 0);
+    expect(componentInstance.selectedTopicIds).toEqual([topicSummaries[1].id]);
     expect(topicSummaries[0].isSelected).toEqual(false);
   });
 });
