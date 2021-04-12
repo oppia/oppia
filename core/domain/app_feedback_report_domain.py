@@ -483,7 +483,7 @@ class DeviceSystemContext(python_utils.OBJECT):
         self.version_name = version_name
         self.device_country_locale_code = device_country_locale_code
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this DeviceSystemContext domain object.
         Subclasses should override this to propertly format any additional
         properties.
@@ -545,7 +545,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         self.build_fingerprint = build_fingerprint
         self.network_type = network_type
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this AndroidDeviceSystemContext domain
         object.
 
@@ -739,7 +739,7 @@ class AppContext(python_utils.OBJECT):
         self.text_language_code = text_language_code
         self.audio_language_code = audio_language_code
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this AppContext domain object. Subclasses
         should override this to propertly format any additional properties.
 
@@ -809,7 +809,7 @@ class AndroidAppContext(AppContext):
         self.event_logs = event_logs
         self.logcat_logs = logcat_logs
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this AndroidAppContext domain object.
 
         Returns:
@@ -942,7 +942,7 @@ class EntryPoint(python_utils.OBJECT):
         self.exploration_id = exploration_id
         self.subtopic_id = subtopic_id
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1017,7 +1017,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
         super(NavigationDrawerEntryPoint, self).__init__(
             ENTRY_POINT.navigation_drawer, None, None, None, None)
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1058,7 +1058,7 @@ class LessonPlayerEntryPoint(EntryPoint):
             entry_point_name=ENTRY_POINT.lesson_player, topic_id=topic_id,
             story_id=story_id, exploration_id=exploration_id, subtopic_id=None)
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this LessonPlayerEntryPoint domain
         object.
 
@@ -1102,7 +1102,7 @@ class RevisionCardEntryPoint(EntryPoint):
         super(RevisionCardEntryPoint, self).__init__(
             ENTRY_POINT.revision_card, topic_id, subtopic_id, None, None)
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this RevisionCardEntryPoint domain
         object.
 
@@ -1139,7 +1139,7 @@ class CrashEntryPoint(EntryPoint):
         """Constructs an CrashEntryPoint domain object."""
         super(CrashEntryPoint, self).__init__(ENTRY_POINT.crash)
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this CrashEntryPoint domain object.
 
         Returns:
@@ -1189,7 +1189,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         self.newest_report_creation_timestamp = newest_report_creation_timestamp
         self.reports = reports
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this AppFeedbackReportTicket domain
         object.
 
@@ -1350,7 +1350,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
         self.total_reports_submitted = total_reports_submitted
         self.daily_param_stats = daily_param_stats
 
-    def to_dict():
+    def to_dict(self):
         """Returns a dict representing this AppFeedbackReportDailyStats domain
         object.
 
@@ -1445,7 +1445,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
         """
         self.parameter_value_counts
 
-    def to_dict():
+    def to_dict(self):
         return {
             param_value_name: value_count
             for (param_value_name, value_count) in (
@@ -1486,7 +1486,7 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
         self.filter_name = filter_name
         self.filter_options = filter_options
 
-    def to_dict():
+    def to_dict(self):
         return {
             'filter_name': self.filter_name,
             'filter_options': self.filter_options
