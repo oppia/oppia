@@ -48,7 +48,9 @@ def _get_completed_activities_from_model(completed_activities_model):
     return user_domain.CompletedActivities(
         completed_activities_model.id,
         completed_activities_model.exploration_ids,
-        completed_activities_model.collection_ids)
+        completed_activities_model.collection_ids,
+        completed_activities_model.story_ids,
+        completed_activities_model.topic_ids)
 
 
 def _get_incomplete_activities_from_model(incomplete_activities_model):
@@ -66,7 +68,9 @@ def _get_incomplete_activities_from_model(incomplete_activities_model):
     return user_domain.IncompleteActivities(
         incomplete_activities_model.id,
         incomplete_activities_model.exploration_ids,
-        incomplete_activities_model.collection_ids)
+        incomplete_activities_model.collection_ids,
+        incomplete_activities_model.story_ids,
+        incomplete_activities_model.topic_ids)
 
 
 def _get_last_playthrough_information(last_playthrough_model):

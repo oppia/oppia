@@ -273,6 +273,8 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
     USER_2_ID = 'id_2'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
+    STORY_IDS_1 = ['story_1', 'story_2', 'story_3']
+    TOPIC_IDS_1 = ['topic_1', 'topic_2', 'topic_3']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -281,12 +283,16 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         user_models.CompletedActivitiesModel(
             id=self.USER_1_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
-            collection_ids=self.COLLECTION_IDS_1
+            collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            topic_ids=self.TOPIC_IDS_1
         ).put()
         user_models.CompletedActivitiesModel(
             id=self.USER_2_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
             collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            topic_ids=self.TOPIC_IDS_1,
             deleted=True
         ).put()
 
@@ -331,7 +337,9 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
             'exploration_ids': self.EXPLORATION_IDS_1,
-            'collection_ids': self.COLLECTION_IDS_1
+            'collection_ids': self.COLLECTION_IDS_1,
+            'story_ids': self.STORY_IDS_1,
+            'topic_ids': self.TOPIC_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -344,6 +352,8 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
     USER_2_ID = 'id_2'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
+    STORY_IDS_1 = ['story_1', 'story_2', 'story_3']
+    TOPIC_IDS_1 = ['topic_1', 'topic_2', 'topic_3']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -352,12 +362,16 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         user_models.IncompleteActivitiesModel(
             id=self.USER_1_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
-            collection_ids=self.COLLECTION_IDS_1
+            collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            topic_ids=self.TOPIC_IDS_1
         ).put()
         user_models.IncompleteActivitiesModel(
             id=self.USER_2_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
             collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            topic_ids=self.TOPIC_IDS_1,
             deleted=True
         ).put()
 
@@ -402,7 +416,9 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             user_models.IncompleteActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
             'exploration_ids': self.EXPLORATION_IDS_1,
-            'collection_ids': self.COLLECTION_IDS_1
+            'collection_ids': self.COLLECTION_IDS_1,
+            'story_ids': self.STORY_IDS_1,
+            'topic_ids': self.TOPIC_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 

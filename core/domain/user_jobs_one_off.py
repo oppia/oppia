@@ -406,6 +406,34 @@ class CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob(
     def reduce(key, values):
         yield (key, len(values))
 
+class AddTopicIdsAndStoryIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that adds story_ids and topic_ids in CompletedActivitiesModel.
+    
+    NOTE TO DEVELOPERS: This job can be deleted after it is run in April 2021
+    release.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            user_models.CompletedActivitiesModel,
+            user_models.IncompleteActivitiesModel
+        ]
+
+    @staticmethod
+    def map(model_instance):
+        model_instance.story_ids = []
+        model_instance.topic_ids = []
+        model_instance.update_timestamps(
+            update_last_updated_time=False)
+        model_instance.put()
+        yield(
+            'SUCCESS', model_instance)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
 
 class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the activity_ids from the UserSubscriptionsModel.

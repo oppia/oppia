@@ -360,6 +360,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
     # IDs of all the collections completed by the user.
     collection_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the stories completed by the user.
+    story_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics completed by the user.
+    topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    
 
     @staticmethod
     def get_deletion_policy():
@@ -376,7 +383,9 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'topic_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -420,7 +429,9 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
         return {
             'exploration_ids': user_model.exploration_ids,
-            'collection_ids': user_model.collection_ids
+            'collection_ids': user_model.collection_ids,
+            'story_ids': user_model.story_ids,
+            'topic_ids': user_model.topic_ids
         }
 
 
@@ -436,6 +447,12 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
     # The ids of the collections partially completed by the user.
     collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the stories partially completed by the user.
+    story_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics partially completed by the user.
+    topic_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
@@ -453,7 +470,9 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'topic_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -497,7 +516,9 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
         return {
             'exploration_ids': user_model.exploration_ids,
-            'collection_ids': user_model.collection_ids
+            'collection_ids': user_model.collection_ids,
+            'story_ids': user_model.story_ids,
+            'topic_ids': user_model.topic_ids
         }
 
 

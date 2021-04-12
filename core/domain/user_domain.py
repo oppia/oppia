@@ -623,10 +623,12 @@ class IncompleteActivities(python_utils.OBJECT):
     """Domain object for the incomplete activities model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids, topic_ids):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
+        self.story_ids = story_ids
+        self.topic_ids = topic_ids
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of incomplete exploration ids."""
@@ -648,15 +650,37 @@ class IncompleteActivities(python_utils.OBJECT):
         """
         self.collection_ids.remove(collection_id)
 
+    def add_story_id(self, story_id):
+        """Adds the story id to the list of incomplete story ids."""
+        self.story_ids.append(story_id)
+
+    def remove_story_id(self, story_id):
+        """Removes the story id from the list of incomplete story
+        ids.
+        """
+        self.story_ids.remove(story_id)
+
+    def add_topic_id(self, topic_id):
+        """Adds the topic id to the list of incomplete topic ids."""
+        self.topic_ids.append(topic_id)
+
+    def remove_topic_id(self, topic_id):
+        """Removes the topic id from the list of incomplete topic
+        ids.
+        """
+        self.topic_ids.remove(topic_id)
+
 
 class CompletedActivities(python_utils.OBJECT):
     """Domain object for the activities completed by learner model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids, topic_ids):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
+        self.story_ids = story_ids
+        self.topic_ids = topic_ids
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of completed exploration ids."""
@@ -677,6 +701,26 @@ class CompletedActivities(python_utils.OBJECT):
         ids.
         """
         self.collection_ids.remove(collection_id)
+
+    def add_story_id(self, story_id):
+        """Adds the story id to the list of completed story ids."""
+        self.story_ids.append(story_id)
+
+    def remove_story_id(self, story_id):
+        """Removes the story id from the list of completed story
+        ids.
+        """
+        self.story_ids.remove(story_id)
+
+    def add_topic_id(self, topic_id):
+        """Adds the topic id to the list of completed topic ids."""
+        self.topic_ids.append(topic_id)
+
+    def remove_topic_id(self, topic_id):
+        """Removes the topic id from the list of completed topic
+        ids.
+        """
+        self.topic_ids.remove(topic_id)
 
 
 class LearnerPlaylist(python_utils.OBJECT):
