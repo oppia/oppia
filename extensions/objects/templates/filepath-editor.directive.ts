@@ -542,10 +542,27 @@ angular.module('oppia').directive('filepathEditor', [
             }).then(async function(frameData) {
               let frames = [];
               for (let i = 0; i < frameData.length; i += 1) {
-                let canvas = frameData[i].getImage();
+                let sourceCanvas = frameData[i].getImage();
+                // Some GIFs may be optimised such that frames are stacked and
+                // only incremental changes are present in individual frames.
+                // For such GIFs, no additional operation needs to be done to
+                // handle transparent content. These GIFs have 0 or 1 Disposal
+                // method value.
+                // See https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+                if (frameData[i].frameInfo.disposal > 1) {
+                  // Frames that have transparent content may not render
+                  // properly in the gifshot output. As a workaround, add a
+                  // white background to individual frames before creating a
+                  // GIF.
+                  let ctx = sourceCanvas.getContext('2d');
+                  ctx.globalCompositeOperation = 'destination-over';
+                  ctx.fillStyle = '#FFF';
+                  ctx.fillRect(0, 0, width, height);
+                  ctx.globalCompositeOperation = 'source-over';
+                }
                 frames.push(
                   await getCroppedGIFDataAsync(
-                    canvas.toDataURL('image/png'), x1, y1, width, height
+                    sourceCanvas.toDataURL('image/png'), x1, y1, width, height
                   ));
               }
               gifshot.createGIF({
@@ -731,8 +748,9 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         const validateProcessedFilesize = function(resampledImageData) {
+          const mimeType = resampledImageData.split(';')[0];
           const imageSize = atob(
-            resampledImageData.replace('data:image/png;base64,', '')).length;
+            resampledImageData.replace(`${mimeType};base64,`, '')).length;
           // The processed image can sometimes be larger than 100 KB. This is
           // because the output of HTMLCanvasElement.toDataURL() operation in
           // getResampledImageData() is browser specific and can vary in size.
@@ -769,10 +787,25 @@ angular.module('oppia').directive('filepathEditor', [
             }).then(function(frameData) {
               let frames = [];
               for (let i = 0; i < frameData.length; i += 1) {
-                let canvas = frameData[i].getImage();
-                frames.push(
-                  canvas.toDataURL('image/png')
-                );
+                let sourceCanvas = frameData[i].getImage();
+                // Some GIFs may be optimised such that frames are stacked and
+                // only incremental changes are present in individual frames.
+                // For such GIFs, no additional operation needs to be done to
+                // handle transparent content. These GIFs have 0 or 1 Disposal
+                // method value.
+                // See https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+                if (frameData[i].frameInfo.disposal > 1) {
+                  // Frames that have transparent content may not render
+                  // properly in the gifshot output. As a workaround, add a
+                  // white background to individual frames before creating a
+                  // GIF.
+                  let ctx = sourceCanvas.getContext('2d');
+                  ctx.globalCompositeOperation = 'destination-over';
+                  ctx.fillStyle = '#FFF';
+                  ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+                  ctx.globalCompositeOperation = 'source-over';
+                }
+                frames.push(sourceCanvas.toDataURL('image/png'));
               }
               gifshot.createGIF({
                 gifWidth: dimensions.width,
@@ -780,6 +813,10 @@ angular.module('oppia').directive('filepathEditor', [
                 images: frames
               }, function(obj) {
                 if (!obj.error) {
+                  validateProcessedFilesize(obj.image);
+                  if (ctrl.processedImageIsTooLarge) {
+                    return;
+                  }
                   resampledFile = (
                     ImageUploadHelperService.convertImageDataToImageFile(
                       obj.image));
