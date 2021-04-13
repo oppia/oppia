@@ -51,12 +51,12 @@ NOT_FULLY_COVERED_FILENAMES = [
     'base-content.directive.ts',
     'base-interaction-validation.service.ts',
     'Base.ts',
-    'boolean-editor.directive.ts',
+    'boolean-editor.component.ts',
     'change-list.service.ts',
     'ck-editor-4-rte.directive.ts',
     'ck-editor-4-widgets.initializer.ts',
     'code-repl-prediction.service.ts',
-    'code-string-editor.directive.ts',
+    'code-string-editor.component.ts',
     'codemirror-mergeview.directive.ts',
     'collection-details-editor.directive.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
@@ -68,14 +68,12 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-navbar.component.ts',
     'collection-node-creator.directive.ts',
     'collection-node-editor.directive.ts',
-    'collection-node.model.ts',
     'collection-player-page.directive.ts',
     'collection-summary-tile.directive.ts',
     'collection-update.service.ts',
     'collection.model.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
-    'context.service.ts',
     'continue-button.directive.ts',
     'contribution-and-review.service.ts',
     'contribution-opportunities-backend-api.service.ts',
@@ -84,7 +82,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'conversation-skin.directive.ts',
     'conversion.ts',
     'convert-to-plain-text.pipe.ts',
-    'coord-two-dim-editor.directive.ts',
+    'coord-two-dim-editor.component.ts',
     'correctness-footer.directive.ts',
     'create-activity-button.directive.ts',
     'csrf-token.service.ts',
@@ -126,7 +124,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'html-escaper.service.ts',
     'html-select.directive.ts',
     'I18nFooter.ts',
-    'image-uploader.directive.ts',
+    'image-uploader.component.ts',
     'image-with-regions-editor.directive.ts',
     'input-response-pair.directive.ts',
     'int-editor.directive.ts',
@@ -156,12 +154,10 @@ NOT_FULLY_COVERED_FILENAMES = [
     'number-with-units-editor.directive.ts',
     'number-with-units-validation.service.ts',
     'NumberWithUnitsObjectFactory.ts',
-    'numeric-input-validation.service.ts',
     'object-editor.directive.ts',
     'oppia-interactive-code-repl.directive.ts',
     'oppia-interactive-continue.component.ts',
     'oppia-interactive-drag-and-drop-sort-input.directive.ts',
-    'oppia-interactive-end-exploration.directive.ts',
     'oppia-interactive-fraction-input.component.ts',
     'oppia-interactive-graph-input.component.ts',
     'oppia-interactive-image-click-input.directive.ts',
@@ -185,7 +181,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-response-code-repl.directive.ts',
     'oppia-response-continue.component.ts',
     'oppia-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-response-end-exploration.directive.ts',
     'oppia-response-fraction-input.component.ts',
     'oppia-response-graph-input.component.ts',
     'oppia-response-image-click-input.directive.ts',
@@ -203,7 +198,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-code-repl.directive.ts',
     'oppia-short-response-continue.component.ts',
     'oppia-short-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-short-response-end-exploration.directive.ts',
     'oppia-short-response-fraction-input.component.ts',
     'oppia-short-response-graph-input.component.ts',
     'oppia-short-response-image-click-input.directive.ts',
@@ -222,7 +216,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'opportunities-list.component.ts',
     'outcome-destination-editor.directive.ts',
     'outcome-editor.directive.ts',
-    'outcome-feedback-editor.directive.ts',
+    'outcome-feedback-editor.component.ts',
     'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
     'player-correctness-feedback-enabled.service.ts',
@@ -386,6 +380,7 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
                 'It\'s not possible to diff the test coverage correctly.')
         _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
+        self.file_path = match.group(1)
 
         match = re.search(r'LF:(\d+)\n', stanza)
         if match is None:
@@ -463,7 +458,8 @@ def check_coverage_changes():
         file_name = stanza.file_name
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
-
+        if stanza.file_path.startswith('node_modules/'):
+            continue
         if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
                 errors += (
