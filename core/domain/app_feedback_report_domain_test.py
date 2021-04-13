@@ -888,38 +888,38 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_REPORT_INFO, None)
 
         param_stats = {
-            'platform': {
+            'platform': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     PLATFORM_ANDROID: 1})
-            },
-            'report_type': {
+            ),
+            'report_type': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     REPORT_TYPE_SUGGESTION: 1})
-            },
-            'country_local_code': {
+            ),
+            'country_local_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     COUNTRY_LOCALE_CODE_INDIA: 1})
-            },
-            'entry_point_name': {
+            ),
+            'entry_point_name': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     ENTRY_POINT_NAVIGATION_DRAWER: 1})
-            },
-            'text_language_code': {
+            ),
+            'text_language_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     LANGUAGE_LOCALE_CODE_ENGLISH: 1})
-            },
-            'audio_language_code': {
+            ),
+            'audio_language_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     LANGUAGE_LOCALE_CODE_ENGLISH: 1})
-            },
-            'sdk_version': {
+            ),
+            'sdk_version': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     ANDROID_SDK_VERSION: 1})
-            },
-            'version_name': {
+            ),
+            'version_name': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     ANDROID_PLATFORM_VERSION: 1})
-            }
+            )
         }
         self.stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
@@ -937,30 +937,14 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             'stats_tracking_date': REPORT_SUBMITTED_TIMESTAMP.isoformat(),
             'total_reports_submitted': 1,
             'daily_param_stats': {
-                'platform': {
-                    PLATFORM_ANDROID: 1
-                },
-                'report_type': {
-                    REPORT_TYPE_SUGGESTION: 1
-                },
-                'country_local_code': {
-                    COUNTRY_LOCALE_CODE_INDIA: 1
-                },
-                'entry_point_name': {
-                    ENTRY_POINT_NAVIGATION_DRAWER: 1
-                },
-                'text_language_code': {
-                    LANGUAGE_LOCALE_CODE_ENGLISH: 1
-                },
-                'audio_language_code': {
-                    LANGUAGE_LOCALE_CODE_ENGLISH: 1
-                },
-                'sdk_version': {
-                    ANDROID_SDK_VERSION: 1
-                },
-                'version_name': {
-                    ANDROID_PLATFORM_VERSION: 1
-                }
+                'platform': { PLATFORM_ANDROID: 1 },
+                'report_type': { REPORT_TYPE_SUGGESTION: 1 },
+                'country_local_code': { COUNTRY_LOCALE_CODE_INDIA: 1 },
+                'entry_point_name': { ENTRY_POINT_NAVIGATION_DRAWER: 1 },
+                'text_language_code': { LANGUAGE_LOCALE_CODE_ENGLISH: 1 },
+                'audio_language_code': { LANGUAGE_LOCALE_CODE_ENGLISH: 1 },
+                'sdk_version': { ANDROID_SDK_VERSION: 1 },
+                'version_name': { ANDROID_PLATFORM_VERSION: 1 }
             }
         }
         self.assertDictEqual(expected_dict, self.stats_obj.to_dict())
@@ -971,11 +955,15 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             self.stats_obj, 'The stats id %s is invalid' % 'invalid_stats_id')
 
     def test_validation_invalid_stats_fails(self):
-        self.stats_obj.daily_param_stats = {'invalid_stats': 0}
+        self.stats_obj.daily_param_stats = {
+            'invalid_stat_name':
+            app_feedback_report_domain.ReportStatsParameterValueCounts(
+                {'invalid_stats': 0}),
+        }
         self._assert_validation_error(
             self.stats_obj,
             'The param %s is not a valid param to aggregate stats on' % (
-                'invalid_stats'))
+                'invalid_stat_name'))
 
     def _assert_validation_error(
             self, stats_obj, expected_error_substring):
@@ -1055,8 +1043,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
         self.filter.filter_name = 'invalid_filter_name'
         self._assert_validation_error(
             self.filter,
-            'The filter name should be one of %s' % (
-                app_feedback_report_constants.PLATFORM_CHOICES))
+            'The filter name should be one of ')
 
     def test_validation_filter_values_list_is_none_fails(self):
         self.filter.filter_options = None
