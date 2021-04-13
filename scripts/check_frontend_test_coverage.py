@@ -127,7 +127,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'image-uploader.component.ts',
     'image-with-regions-editor.component.ts',
     'input-response-pair.directive.ts',
-    'int-editor.directive.ts',
+    'int-editor.component.ts',
     'item-selection-input-validation.service.ts',
     'language-util.service.ts',
     'learner-answer-info-card.directive.ts',

@@ -38,6 +38,7 @@ import { HtmlEditorComponent } from './templates/html-editor.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
 import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
+import { IntEditorComponent } from './templates/int-editor.component';
 
 
 @NgModule({
@@ -62,7 +63,8 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
     GraphEditorComponent,
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
-    ImageWithRegionsResetConfirmationModalComponent
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -76,7 +78,8 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
     GraphEditorComponent,
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
-    ImageWithRegionsResetConfirmationModalComponent
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -90,7 +93,8 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
     GraphEditorComponent,
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
-    ImageWithRegionsResetConfirmationModalComponent
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent
   ],
 })
 

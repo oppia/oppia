@@ -13,12 +13,50 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for int editor.
+ * @fileoverview Component for int editor.
  */
 
-// Every editor directive should implement an alwaysEditable option. There
+// Every editor component should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
+
+import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'int-editor',
+  templateUrl: './int-editor.component.html',
+  styleUrls: []
+})
+export class IntEditorComponent implements OnInit {
+  @Input() modalId: symbol;
+
+  @Input() value: number;
+  @Input() valueChanged: EventEmitter<number> = new EventEmitter<number>();
+  SCHEMA: { type: string; validators: { id: string; }[]; } = {
+    type: 'int',
+    validators: [{
+      id: 'is_integer'
+    }]
+  };
+
+
+
+  ngOnInit(): void {
+    if (!this.value) {
+      this.value = 0;
+      this.valueChanged.emit(this.value);
+    }
+  }
+
+  getSchema(): { type: string; validators: { id: string; }[]; } {
+    return this.SCHEMA;
+  }
+
+  updateValue(value: number): void {
+    this.value = value;
+    this.valueChanged.emit(value);
+  }
+}
 
 angular.module('oppia').directive('intEditor', [
   function() {

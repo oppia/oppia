@@ -28,7 +28,7 @@ require('objects/templates/graph-editor.component.ts');
 require('objects/templates/graph-property-editor.component.ts');
 require('objects/templates/html-editor.component.ts');
 require('objects/templates/image-with-regions-editor.component.ts');
-require('objects/templates/int-editor.directive.ts');
+require('objects/templates/int-editor.component.ts');
 // eslint-disable-next-line max-len
 require('objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component.ts');
 require('objects/templates/list-of-tabs-editor.directive.ts');
