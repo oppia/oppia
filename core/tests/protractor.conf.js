@@ -356,10 +356,7 @@ exports.config = {
       jasmine.getEnv().addReporter(new VideoReporter({
         baseDirectory: path.resolve(__dirname, '../protractor-video'),
         singleVideo: false,
-        singleVideoPath: function(currentSpec) {
-          let filename = currentSpec.fullName;
-          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
-        },
+        singleVideoPath: uuid,
         ffmpegArgs: ffmpegArguments
       }));
     }
