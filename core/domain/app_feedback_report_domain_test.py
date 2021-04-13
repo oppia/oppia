@@ -360,7 +360,7 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
 class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(AndroidDeviceSystemContext, self).setUp()
+        super(AndroidDeviceSystemContextTests, self).setUp()
         self.device_system_context = (
             app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
