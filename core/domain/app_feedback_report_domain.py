@@ -908,7 +908,7 @@ class EntryPoint(python_utils.OBJECT):
                     actual_name))
         if actual_name is not expected_name:
             raise utils.ValidationError(
-                'Expected enry point name %s, received: %s.' % (
+                'Expected entry point name %s, received: %s.' % (
                     expected_name, actual_name))
 
     @classmethod
@@ -1011,8 +1011,8 @@ class LessonPlayerEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name, 
             app_feedback_report_constants.ENTRY_POINT.lesson_player)
-        topic_domain.require_valid_topic_id(self.topic_id)
-        story_domain.require_valid_story_id(self.story_id)
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
+        story_domain.Story.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
             self.exploration_id, self.story_id)
 
@@ -1031,7 +1031,7 @@ class RevisionCardEntryPoint(EntryPoint):
         """
         super(RevisionCardEntryPoint, self).__init__(
             app_feedback_report_constants.ENTRY_POINT.revision_card,
-            topic_id, subtopic_id, None, None)
+            topic_id, None, None, subtopic_id)
 
     def to_dict(self):
         """Returns a dict representing this RevisionCardEntryPoint domain
@@ -1057,7 +1057,7 @@ class RevisionCardEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.revision_card)
-        topic_domain.require_valid_topic_id(self.topic_id)
+        topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % (
@@ -1384,7 +1384,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
                 specific value for a given parameter, and integer values for the
                 number of reports that satisfy that value.
         """
-        self.parameter_value_counts
+        self.parameter_value_counts = parameter_value_counts
 
     def to_dict(self):
         return {
@@ -1400,15 +1400,15 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
             ValidationError. One or more attributes of the
                 ReportStatsParameterValueCounts are not valid.
         """
-        # for (param_value, param_count) in self.parameter_value_counts:
-        #     if not isinstance(param_value, python_utils.BASESTRING):
-        #         raise utils.ValidationError(
-        #             'The param value should be a string, received: %r' % (
-        #                 param_value))
-        #     if not isinstance(param_count, int) or param_count < 1:
-        #         raise utils.ValidationError(
-        #             'The param value count should be a positive int, '
-        #             'received: %r' % param_count)
+        for (param_value, param_count) in self.parameter_value_counts:
+            if not isinstance(param_value, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'The param value should be a string, received: %r' % (
+                        param_value))
+            if not isinstance(param_count, int) or param_count < 1:
+                raise utils.ValidationError(
+                    'The param value count should be a positive int, '
+                    'received: %r' % param_count)
 
 
 class AppFeedbackReportFilter(python_utils.OBJECT):

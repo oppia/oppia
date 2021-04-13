@@ -24,6 +24,8 @@ import datetime
 from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
+from core.domain import exp_domain
+from core.domain import story_services
 from core.tests import test_utils
 from core.platform import models
 
@@ -46,6 +48,7 @@ TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
 
 PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_ANDROID
 PLATFORM_WEB = app_feedback_report_constants.PLATFORM_WEB
+TICKET_NAME = 'ticket name'
 TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
 REPORT_TYPE_SUGGESTION = 'suggestion'
@@ -354,7 +357,7 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
             self.device_system_context.validate()
 
 
-class AndroidDeviceSystemContext(test_utils.GenericTestBase):
+class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AndroidDeviceSystemContext, self).setUp()
@@ -497,3 +500,464 @@ class AndroidDeviceSystemContext(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             context_obj.validate()
+
+
+class EntryPointDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(EntryPointDomainTests, self).setUp()
+        self.entry_point = (
+            app_feedback_report_domain.EntryPoint(
+                'entry_point_name', 'topic_id', 'story_id', 'exploration_id',
+                'subtopic_id'))
+
+    def test_to_dict_raises_exception(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of EntryPoint should implement their own dict'):
+            self.entry_point.to_dict()
+
+    def test_validation_raises_exception(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of EntryPoint should implement their own validation'):
+            self.entry_point.validate()
+
+
+class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(NavigationDrawerEntryPointDomainTests, self).setUp()
+        self.entry_point = (
+            app_feedback_report_domain.NavigationDrawerEntryPoint())
+
+    def test_to_dict(self):
+        expected_dict = {
+            'entry_point_name': (
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+        }
+        self.assertDictEqual(
+            expected_dict, self.entry_point.to_dict())
+
+    def test_validation_invalid_name_fails(self):
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected entry point name %s' % (
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)):
+            self.entry_point.validate()
+
+
+class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LessonPlayerEntryPointDomainTests, self).setUp()
+        self.entry_point = (
+            app_feedback_report_domain.LessonPlayerEntryPoint(
+                'topic_id', 'story_id', 'exploration_id'))
+
+    def test_to_dict(self):
+        expected_dict = {
+            'entry_point_name': (
+                app_feedback_report_constants.ENTRY_POINT.lesson_player),
+            'topic_id': 'topic_id',
+            'story_id': 'story_id',
+            'exploration_id': 'exploration_id'
+        }
+        self.assertDictEqual(
+            expected_dict, self.entry_point.to_dict())
+
+    def test_validation_invalid_name_fails(self):
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        self._assert_validation_error(
+            self.entry_point,
+            'Expected entry point name %s' % (
+                app_feedback_report_constants.ENTRY_POINT.lesson_player))
+
+    def test_validation_invalid_topic_id_fails(self):
+        self.entry_point.topic_id = 'invalid_topic_id'
+        self._assert_validation_error(
+            self.entry_point,
+            'Topic id %s is invalid' % 'invalid_topic_id')
+
+    def test_validation_invalid_story_id_fails(self):
+        self.entry_point.topic_id = 'valid_topic1'
+        self.entry_point.story_id = 'invalid_story_id'
+        self._assert_validation_error(
+            self.entry_point, 'Invalid story id')
+
+    def test_validation_invalid_exploration_id_fails(self):
+        self.entry_point.topic_id = 'valid_topic1'
+        self.entry_point.story_id = 'valid_story1'
+        self.entry_point.exploration_id = 'invalid_exploration'
+        self._assert_validation_error(
+            self.entry_point,
+            'Exploration with id invalid_exploration is not part of story '
+            'with id')
+
+    def _assert_validation_error(
+            self, entry_point_obj, expected_error_substring):
+        """Checks that the entry point passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            entry_point_obj.validate()
+
+
+class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(RevisionCardEntryPointDomainTests, self).setUp()
+        self.entry_point = (
+            app_feedback_report_domain.RevisionCardEntryPoint(
+                'topic_id', 'subtopic_id'))
+
+    def test_to_dict(self):
+        expected_dict = {
+            'entry_point_name': (
+                app_feedback_report_constants.ENTRY_POINT.revision_card),
+            'topic_id': 'topic_id',
+            'subtopic_id': 'subtopic_id'
+        }
+        self.assertDictEqual(
+            expected_dict, self.entry_point.to_dict())
+
+    def test_validation_invalid_name_fails(self):
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        self._assert_validation_error(
+            self.entry_point,
+            'Expected entry point name %s' % (
+                app_feedback_report_constants.ENTRY_POINT.revision_card))
+
+    def test_validation_invalid_topic_id_fails(self):
+        self.entry_point.topic_id = 'invalid_topic_id'
+        self._assert_validation_error(
+            self.entry_point,
+            'Topic id %s is invalid' % 'invalid_topic_id')
+
+    def test_validation_invalid_subtopic_id_fails(self):
+        self.entry_point.topic_id = 'valid_topic1'
+        self.entry_point.subtopic_id = 'invalid_subtopic_id'
+        self._assert_validation_error(
+            self.entry_point, 'Expected subtopic id to be an int')
+
+    def _assert_validation_error(
+            self, entry_point_obj, expected_error_substring):
+        """Checks that the entry point passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            entry_point_obj.validate()
+
+
+class CrashEntryPointDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CrashEntryPointDomainTests, self).setUp()
+        self.entry_point = (
+            app_feedback_report_domain.CrashEntryPoint())
+
+    def test_to_dict(self):
+        expected_dict = {
+            'entry_point_name': (
+                app_feedback_report_constants.ENTRY_POINT.crash)
+        }
+        self.assertDictEqual(
+            expected_dict, self.entry_point.to_dict())
+
+    def test_validation_invalid_name_fails(self):
+        self.entry_point.entry_point_name = 'invalid_entry_point_name'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected entry point name %s' % (
+                app_feedback_report_constants.ENTRY_POINT.crash)):
+            self.entry_point.validate()
+
+    
+class AppContextDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AppContextDomainTests, self).setUp()
+        entry_point = (
+            app_feedback_report_domain.NavigationDrawerEntryPoint())
+        self.app_context = (
+            app_feedback_report_domain.AppContext(
+                entry_point, LANGUAGE_LOCALE_CODE_ENGLISH,
+                LANGUAGE_LOCALE_CODE_ENGLISH))
+
+    def test_to_dict(self):
+        expected_dict = {
+            'entry_point': {
+                'entry_point_name': (
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
+                ),
+            },
+            'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+            'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
+        }
+        self.assertDictEqual(
+            expected_dict, self.app_context.to_dict())
+
+    def test_validation_raises_exception(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+           'Subclasses of AppContext should implement their own validation'):
+            self.app_context.validate()
+
+
+class AndroidAppContextDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AndroidAppContextDomainTests, self).setUp()
+        entry_point = (
+            app_feedback_report_domain.NavigationDrawerEntryPoint())
+        self.app_context = (
+            app_feedback_report_domain.AndroidAppContext(
+                entry_point, LANGUAGE_LOCALE_CODE_ENGLISH,
+                LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, True, False,
+                False, EVENT_LOGS, LOGCAT_LOGS))
+
+    def test_to_dict(self):
+        expected_dict = {
+            'entry_point': {
+                'entry_point_name': (
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
+                ),
+            },
+            'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+            'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+            'text_size': ANDROID_TEXT_SIZE,
+            'only_allows_wifi_download_and_update': True,
+            'automatically_update_topics': False,
+            'account_is_profile_admin': False,
+            'event_logs': EVENT_LOGS,
+            'logcat_logs': LOGCAT_LOGS
+        }
+        self.assertDictEqual(
+            expected_dict, self.app_context.to_dict())
+
+    def test_validation_invalid_text_size_fails(self):
+        self.app_context.text_size = 'invalid_text_size'
+        self._assert_validation_error(
+            self.app_context, 'App text size should be one of')
+
+    def test_validation_event_logs_is_none_fails(self):
+        self.app_context.event_logs = None
+        self._assert_validation_error(
+            self.app_context, 'Should have an event log list')
+
+    def test_validation_logcat_logs_is_none_fails(self):
+        self.app_context.logcat_logs = None
+        self._assert_validation_error(
+            self.app_context, 'Should have a logcat log list')
+
+
+    def _assert_validation_error(
+            self, app_context_obj, expected_error_substring):
+        """Checks that the app context passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            app_context_obj.validate()
+
+
+class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AppFeedbackReportStatsDomainTests, self).setUp()
+        
+        self.ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                TICKET_NAME))
+        self.android_report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
+        self.ticket_obj = app_feedback_report_domain.AppFeedbackReportTicket(
+            self.ticket_id, TICKET_NAME, PLATFORM_ANDROID, None, None, False,
+            REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
+        android_user_supplied_feedback = (
+            app_feedback_report_domain.UserSuppliedFeedback(
+                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER, USER_SELECTED_ITEMS,
+                USER_TEXT_INPUT))
+        android_device_system_context = (
+            app_feedback_report_domain.AndroidDeviceSystemContext(
+                ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
+                COUNTRY_LOCALE_CODE_INDIA, LANGUAGE_LOCALE_CODE_ENGLISH,
+                ANDROID_DEVICE_MODEL, ANDROID_SDK_VERSION,
+                ANDROID_BUILD_FINGERPRINT, NETWORK_WIFI))
+        navigation_drawer_entry_point = (
+            app_feedback_report_domain.NavigationDrawerEntryPoint())
+        android_app_context = (
+            app_feedback_report_domain.AndroidAppContext(
+                navigation_drawer_entry_point, LANGUAGE_LOCALE_CODE_ENGLISH,
+                LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, True,
+                False, False, EVENT_LOGS, LOGCAT_LOGS))
+        self.android_report_obj = app_feedback_report_domain.AppFeedbackReport(
+            self.android_report_id, ANDROID_REPORT_INFO_SCHEMA_VERSION,
+            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, self.ticket_id, None,
+            android_user_supplied_feedback, android_device_system_context,
+            android_app_context)
+
+        param_stats = {
+            'platform': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    PLATFORM_ANDROID: 1})
+            },
+            'report_type': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    REPORT_TYPE_SUGGESTION: 1})
+            },
+            'country_local_code': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    COUNTRY_LOCALE_CODE_INDIA: 1})
+            },
+            'entry_point_name': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    ENTRY_POINT_NAVIGATION_DRAWER: 1})
+            },
+            'text_language_code': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    LANGUAGE_LOCALE_CODE_ENGLISH: 1})
+            },
+            'audio_language_code': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    LANGUAGE_LOCALE_CODE_ENGLISH: 1})
+            },
+            'sdk_version': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    ANDROID_SDK_VERSION: 1})
+            },
+            'version_name': {
+                app_feedback_report_domain.ReportStatsParameterValueCounts({
+                    ANDROID_PLATFORM_VERSION: 1})
+            }
+        }
+        self.stats_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                self.ticket_id))
+        self.stats_obj = app_feedback_report_domain.AppFeedbackReportStats(
+            self.stats_id, self.ticket_obj, PLATFORM_ANDROID,
+            REPORT_SUBMITTED_TIMESTAMP, 1, param_stats)
+
+    def test_to_dict(self):
+        expected_dict = {
+            'stats_id': self.stats_id,
+            'ticket': self.ticket_obj.to_dict(),
+            'platform': PLATFORM_ANDROID,
+            'stats_tracking_date': REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+            'total_reports_submitted': 1,
+            'daily_param_stats': {
+                'platform': {
+                    PLATFORM_ANDROID: 1
+                },
+                'report_type': {
+                    REPORT_TYPE_SUGGESTION: 1
+                },
+                'country_local_code': {
+                    COUNTRY_LOCALE_CODE_INDIA: 1
+                },
+                'entry_point_name': {
+                    ENTRY_POINT_NAVIGATION_DRAWER: 1
+                },
+                'text_language_code': {
+                    LANGUAGE_LOCALE_CODE_ENGLISH: 1
+                },
+                'audio_language_code': {
+                    LANGUAGE_LOCALE_CODE_ENGLISH: 1
+                },
+                'sdk_version': {
+                    ANDROID_SDK_VERSION: 1
+                },
+                'version_name': {
+                    ANDROID_PLATFORM_VERSION: 1
+                }
+            }
+        }
+        self.assertDictEqual(
+            expected_dict, self.app_context.to_dict())
+
+
+class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AppFeedbackReportTicketDomainTests, self).setUp()
+        
+        self.ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                TICKET_NAME))
+
+        self.android_report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
+        android_user_supplied_feedback = (
+            app_feedback_report_domain.UserSuppliedFeedback(
+                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER, USER_SELECTED_ITEMS,
+                USER_TEXT_INPUT))
+        android_device_system_context = (
+            app_feedback_report_domain.AndroidDeviceSystemContext(
+                ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
+                COUNTRY_LOCALE_CODE_INDIA, LANGUAGE_LOCALE_CODE_ENGLISH,
+                ANDROID_DEVICE_MODEL, ANDROID_SDK_VERSION,
+                ANDROID_BUILD_FINGERPRINT, NETWORK_WIFI))
+        navigation_drawer_entry_point = (
+            app_feedback_report_domain.NavigationDrawerEntryPoint())
+        android_app_context = (
+            app_feedback_report_domain.AndroidAppContext(
+                navigation_drawer_entry_point, LANGUAGE_LOCALE_CODE_ENGLISH,
+                LANGUAGE_LOCALE_CODE_ENGLISH, ANDROID_TEXT_SIZE, True,
+                False, False, EVENT_LOGS, LOGCAT_LOGS))
+        self.android_report_obj = app_feedback_report_domain.AppFeedbackReport(
+            self.android_report_id, ANDROID_REPORT_INFO_SCHEMA_VERSION,
+            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, self.ticket_id, None,
+            android_user_supplied_feedback, android_device_system_context,
+            android_app_context)
+
+        self.ticket_obj = app_feedback_report_domain.AppFeedbackReportTicket(
+            self.ticket_id, PLATFORM_ANDROID, None, None, Fase,
+            REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
+
+    def test_to_dict(self):
+        expected_dict = {
+            'ticket_id': self.ticket_id,
+            'ticket_name': TICKET_NAME,
+            'platform': PLATFORM_ANDROID,
+            'github_issue_repo_name': None,
+            'github_issue_number': None,
+            'archived': False,
+            'newest_report_creation_timestamp': (
+                REPORT_SUBMITTED_TIMESTAMP.isoformat()),
+            'reports': [self.android_report_id]
+        }
+        self.assertDictEqual(
+            expected_dict, self.ticket_obj.to_dict())
+
+    def test_validation_invalid_ticket_id_fails(self):
+        self.app_context.ticket_id = 'invalid_ticket_id'
+        self._assert_validation_error(
+            self.app_context,
+            'The ticket id %s is invalid' % 'invalid_ticket_id')
+
+
+    def _assert_validation_error(
+            self, app_context_obj, expected_error_substring):
+        """Checks that the app context passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            app_context_obj.validate()
