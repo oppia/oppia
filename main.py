@@ -657,8 +657,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
-        r'%s/translation/<suggestion_id>' % feconf.SUGGESTION_URL_PREFIX,
-        suggestion.SuggestionHandler),
+        r'%s/translation/<suggestion_id>' % feconf.UPDATE_SUGGESTION_URL_PREFIX,
+        suggestion.UpdateSuggestionHandler),
     get_redirect_route(
         r'%s' % feconf.QUESTIONS_URL_PREFIX,
         reader.QuestionPlayerHandler),

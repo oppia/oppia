@@ -785,7 +785,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('%s/translation/%s' % (
-            feconf.SUGGESTION_URL_PREFIX,
+            feconf.UPDATE_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'translation_html': '<p>Test Trans</p>'
             }, csrf_token=csrf_token)
@@ -818,10 +818,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json('%s/translation/%s' % (
-            feconf.SUGGESTION_URL_PREFIX,
+            feconf.UPDATE_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'trnaslation_html': '<p>Test Trans</p>'
-            }, csrf_token=csrf_token, expected_status_int=500)
+            }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
             'The suggestion with id %s has been accepted or rejected' % (
@@ -846,7 +846,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('%s/translation/%s' % (
-            feconf.SUGGESTION_URL_PREFIX,
+            feconf.UPDATE_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'invalid_html': '<p>Test Trans</p>'
             }, csrf_token=csrf_token, expected_status_int=400)

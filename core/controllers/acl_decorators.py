@@ -2753,8 +2753,8 @@ def get_decorator_for_accepting_suggestion(decorator):
     return generate_decorator_for_handler
 
 
-def can_reviewer_or_suggester_update_suggestions(handler):
-    """Decorator to check whether user can update the suggestions.
+def can_update_suggestions(handler):
+    """Decorator to check whether the current user can update the suggestions.
 
     Args:
         handler: function. The function to be decorated.
@@ -2762,7 +2762,7 @@ def can_reviewer_or_suggester_update_suggestions(handler):
     Returns:
         function. The newly decorated function that has common checks and
         permissions specified by passed in decorator. This function is allowed
-        to be made by the users who have the rights to accept suggestions and
+        to be called for users who have the rights to accept suggestions and
         the suggesters who made their own suggestions.
 
     Raises:

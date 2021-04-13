@@ -148,9 +148,13 @@ class SuggestionHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
+
+class UpdateSuggestionHandler(base.BaseHandler):
+    """"Handles update operations relating to suggestions."""
+
     # TODO(#11735): Currently, only handles the translation suggestion
     # updates. This needs to update to generally handle the suggestions.
-    @acl_decorators.can_reviewer_or_suggester_update_suggestions
+    @acl_decorators.can_update_suggestions
     def put(self, suggestion_id):
         """Handles PUT requests.
 
@@ -158,9 +162,9 @@ class SuggestionHandler(base.BaseHandler):
             ValidationError. The suggestion is already handled.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if (suggestion.status == constants.STATUS_SUGGESTION_ACCEPTED
-                or suggestion.status == constants.STATUS_SUGGESTION_REJECTED):
-            raise utils.ValidationError(
+        if (suggestion.status in [constants.STATUS_SUGGESTION_ACCEPTED,
+                constants.STATUS_SUGGESTION_REJECTED]):
+            raise self.InvalidInputException(
                 'The suggestion with id %s has been accepted or rejected'
                 % (suggestion_id)
             )

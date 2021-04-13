@@ -420,7 +420,6 @@ def update_translation_suggestion(suggestion_id, translation_html):
         suggestion_id: str. The id of the suggestion to be updated.
         translation_html: str. The new translation html.
     """
-
     suggestion = get_suggestion_by_id(suggestion_id)
 
     suggestion.change.translation_html = translation_html

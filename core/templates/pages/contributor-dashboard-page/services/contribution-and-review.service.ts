@@ -38,7 +38,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
     var _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
     var _UPDATE_TRANSLATION_HANDLER_URL = (
-      '/suggestionhandler/translation/<suggestion_id>'
+      '/updatesuggestionhandler/translation/<suggestion_id>'
     );
 
     var _fetchSuggestionsAsync = async function(url) {
