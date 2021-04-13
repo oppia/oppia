@@ -164,8 +164,9 @@ class UpdateSuggestionHandler(base.BaseHandler):
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if (
-                suggestion.status in [constants.STATUS_SUGGESTION_ACCEPTED,
-                constants.STATUS_SUGGESTION_REJECTED]):
+                suggestion.status in [
+                    constants.STATUS_SUGGESTION_ACCEPTED,
+                    constants.STATUS_SUGGESTION_REJECTED]):
             raise self.InvalidInputException(
                 'The suggestion with id %s has been accepted or rejected'
                 % (suggestion_id)
