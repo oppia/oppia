@@ -1403,17 +1403,19 @@ def update_email_preferences(
             id=user_id)
         email_preferences_model.site_updates = False
 
+    old_site_updates_preference = email_preferences_model.site_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
     email_preferences_model.feedback_message_notifications = (
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
+    email_preferences_model = (
+            bulk_email_manager.add_or_update_bulk_email_preference(
+                get_email_from_user_id(user_id), can_receive_email_updates,
+                email_preferences_model))
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
-
-    bulk_email_manager.add_or_update_mailchimp_user_status(
-        user_id, get_email_from_user_id(user_id), can_receive_email_updates)
 
 
 def get_email_preferences(user_id):

@@ -406,6 +406,11 @@ def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
 
 
+# To use mailhcimp email service.
+BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP = 'mailchimp_email_service'
+# Use GAE email service by default.
+BULK_EMAIL_SERVICE_PROVIDER = BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
+
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
