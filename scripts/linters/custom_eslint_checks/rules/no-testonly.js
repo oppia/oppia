@@ -32,15 +32,22 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      notTestOnlyAllowed: 'Can not call a function containing \'testOnly\' ' +
-        'in a JS/TS file that is not a .spec file'
+      notTestOnlyAllowed: 'Please do not call a testOnly function from a ' +
+        'non-test file.'
     }
   },
   create: function(context) {
+    var validateCallExpression = function(node) {
+      if (typeof node.callee.name === 'string' &&
+        node.callee.name.toLowerCase().includes('testonly')) {
+        return true;
+      } else {
+        return false;
+      }
+    };
     return {
       CallExpression(node) {
-        if (typeof node.callee.name === 'string' &&
-          node.callee.name.toLowerCase().includes('testonly')) {
+        if (validateCallExpression(node)) {
           context.report({
             node,
             loc: node.loc,

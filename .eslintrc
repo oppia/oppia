@@ -108,6 +108,13 @@
       "rules": {
         "oppia/protractor-practices": "error",
       }
+    },
+    {
+      // We exclude spec files to the no-testonly check
+      "files": ["*spec.js", "*spec.ts"],
+      "rules": {
+        "oppia/no-testonly": "off"
+      }
     }
   ],
   "rules": {
