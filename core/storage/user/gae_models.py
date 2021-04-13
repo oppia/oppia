@@ -366,7 +366,6 @@ class CompletedActivitiesModel(base_models.BaseModel):
     # IDs of all the topics completed by the user.
     topic_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    
 
     @staticmethod
     def get_deletion_policy():

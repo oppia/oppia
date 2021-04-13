@@ -623,7 +623,8 @@ class IncompleteActivities(python_utils.OBJECT):
     """Domain object for the incomplete activities model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids, story_ids, topic_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids,
+            topic_ids):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
@@ -675,7 +676,8 @@ class CompletedActivities(python_utils.OBJECT):
     """Domain object for the activities completed by learner model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids, story_ids, topic_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids,
+            topic_ids):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids

@@ -1441,6 +1441,7 @@ class MockUserSubscriptionsModelWithActivityIDs(
     activity_ids = (
         datastore_services.StringProperty(indexed=True, repeated=True))
 
+
 class AddTopicIdsAndStoryIdsOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -1461,9 +1462,9 @@ class AddTopicIdsAndStoryIdsOneOffJobTests(test_utils.GenericTestBase):
     def test_completed_activities_model_for_story_and_topic_ids(self):
         original_completed_activities_model = (
             user_models.CompletedActivitiesModel(
-                id = 'id',
-                exploration_ids = [],
-                collection_ids = []
+                id='id',
+                exploration_ids=[],
+                collection_ids=[]
             )
         )
         original_completed_activities_model.update_timestamps()
@@ -1471,9 +1472,9 @@ class AddTopicIdsAndStoryIdsOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertEqual([[u'SUCCESS', 1]], output)
-        
-        migrated_completed_activities_model = user_models.CompletedActivitiesModel.get(
-            'id')
+
+        migrated_completed_activities_model = (
+            user_models.CompletedActivitiesModel.get('id'))
         self.assertEqual(
             migrated_completed_activities_model.story_ids, [])
         self.assertEqual(
@@ -1486,9 +1487,9 @@ class AddTopicIdsAndStoryIdsOneOffJobTests(test_utils.GenericTestBase):
     def test_incomplete_activities_model_for_story_and_topic_ids(self):
         original_incomplete_activities_model = (
             user_models.IncompleteActivitiesModel(
-                id = 'id',
-                exploration_ids = [],
-                collection_ids = []
+                id='id',
+                exploration_ids=[],
+                collection_ids=[]
             )
         )
         original_incomplete_activities_model.update_timestamps()
@@ -1496,9 +1497,9 @@ class AddTopicIdsAndStoryIdsOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertEqual([[u'SUCCESS', 1]], output)
-        
-        migrated_incomplete_activities_model = user_models.IncompleteActivitiesModel.get(
-            'id')
+
+        migrated_incomplete_activities_model = (
+            user_models.IncompleteActivitiesModel.get('id'))
         self.assertEqual(
             migrated_incomplete_activities_model.story_ids, [])
         self.assertEqual(
@@ -1506,7 +1507,7 @@ class AddTopicIdsAndStoryIdsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_incomplete_activities_model.last_updated,
             migrated_incomplete_activities_model.last_updated
-        ) 
+        )
 
 
 class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
