@@ -23,6 +23,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { FocusOnDirective } from './focus-on.directive';
+import { NgInitDirective } from './ng-init.directive';
 
 @NgModule({
   imports: [
@@ -31,11 +32,13 @@ import { FocusOnDirective } from './focus-on.directive';
     FormsModule,
   ],
   declarations: [
-    FocusOnDirective
+    FocusOnDirective,
+    NgInitDirective
   ],
   entryComponents: [],
   exports: [
-    FocusOnDirective
+    FocusOnDirective,
+    NgInitDirective
   ],
 })
 

@@ -18,4 +18,4 @@
 
 require('objects/templates/math-expression-content-editor.directive.ts');
 require('objects/templates/sanitized-url-editor.directive.ts');
-require('objects/templates/list-of-tabs-editor.directive.ts');
+require('objects/templates/list-of-tabs-editor.component.ts');

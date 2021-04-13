@@ -39,6 +39,12 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
 import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
 import { IntEditorComponent } from './templates/int-editor.component';
+import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { ListOfSetsOfTranslatableHtmlContentIdsEditorComponent } from './templates/list-of-sets-of-translatable-html-content-ids-editor.component';
+import { DirectivesModule } from 'components/../directives/directives.module';
+import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.component';
+import { ListOfUnicodeStringEditorComponent } from './templates/list-of-unicode-string-editor.component';
+import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-string-editor.component';
 
 
 @NgModule({
@@ -49,6 +55,8 @@ import { IntEditorComponent } from './templates/int-editor.component';
     LeafletModule,
     SharedFormsModule,
     GraphInputInteractionModule,
+    DynamicContentModule,
+    DirectivesModule,
     NgbModalModule
   ],
   declarations: [
@@ -64,7 +72,11 @@ import { IntEditorComponent } from './templates/int-editor.component';
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
     ImageWithRegionsResetConfirmationModalComponent,
-    IntEditorComponent
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    SetOfUnicodeStringEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -79,7 +91,11 @@ import { IntEditorComponent } from './templates/int-editor.component';
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
     ImageWithRegionsResetConfirmationModalComponent,
-    IntEditorComponent
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    SetOfUnicodeStringEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -94,7 +110,11 @@ import { IntEditorComponent } from './templates/int-editor.component';
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
     ImageWithRegionsResetConfirmationModalComponent,
-    IntEditorComponent
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    SetOfUnicodeStringEditorComponent
   ],
 })
 

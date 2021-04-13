@@ -13,52 +13,50 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for int editor.
+ * @fileoverview Component for list of unicode string editor.
  */
 
 // Every editor component should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'int-editor',
-  templateUrl: './int-editor.component.html',
+  selector: 'list-of-unicode-string-editor',
+  templateUrl: './list-editor.component.html',
   styleUrls: []
 })
-export class IntEditorComponent implements OnInit {
+export class ListOfUnicodeStringEditorComponent implements OnInit {
   @Input() modalId: symbol;
-
-  @Input() value: number;
-  @Input() valueChanged: EventEmitter<number> = new EventEmitter<number>();
-  SCHEMA: { type: string; validators: { id: string; }[]; } = {
-    type: 'int',
-    validators: [{
-      id: 'is_integer'
-    }]
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  SCHEMA = {
+    type: 'list',
+    items: {
+      type: 'unicode'
+    }
   };
-
-
 
   ngOnInit(): void {
     if (!this.value) {
-      this.value = 0;
+      this.value = [];
       this.valueChanged.emit(this.value);
     }
   }
 
-  getSchema(): { type: string; validators: { id: string; }[]; } {
+  getSchema(): unknown {
     return this.SCHEMA;
   }
 
-  updateValue(value: number): void {
+  updateValue(value: unknown): void {
     this.value = value;
-    this.valueChanged.emit(value);
+    this.valueChanged.emit(this.value);
   }
 }
 
-angular.module('oppia').directive('intEditor', downgradeComponent({
-  component: IntEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'listOfUnicodeStringEditor', downgradeComponent({
+    component: ListOfUnicodeStringEditorComponent
+  }) as angular.IDirectiveFactory);

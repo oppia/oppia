@@ -13,52 +13,53 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for int editor.
+ * @fileoverview Component for set of unicode string editor.
  */
 
 // Every editor component should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'int-editor',
-  templateUrl: './int-editor.component.html',
+  selector: 'set-of-unicode-string-editor',
+  templateUrl: './list-editor.component.html',
   styleUrls: []
 })
-export class IntEditorComponent implements OnInit {
+export class SetOfUnicodeStringEditorComponent implements OnInit {
   @Input() modalId: symbol;
-
-  @Input() value: number;
-  @Input() valueChanged: EventEmitter<number> = new EventEmitter<number>();
-  SCHEMA: { type: string; validators: { id: string; }[]; } = {
-    type: 'int',
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  SCHEMA = {
+    type: 'list',
+    items: {
+      type: 'unicode'
+    },
     validators: [{
-      id: 'is_integer'
+      id: 'is_uniquified'
     }]
   };
 
-
-
   ngOnInit(): void {
     if (!this.value) {
-      this.value = 0;
+      this.value = [];
       this.valueChanged.emit(this.value);
     }
   }
 
-  getSchema(): { type: string; validators: { id: string; }[]; } {
+  getSchema(): unknown {
     return this.SCHEMA;
   }
 
-  updateValue(value: number): void {
+  updateValue(value: unknown): void {
     this.value = value;
-    this.valueChanged.emit(value);
+    this.valueChanged.emit(this.value);
   }
 }
 
-angular.module('oppia').directive('intEditor', downgradeComponent({
-  component: IntEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'setOfUnicodeStringEditor', downgradeComponent({
+    component: SetOfUnicodeStringEditorComponent
+  }) as angular.IDirectiveFactory);
