@@ -423,8 +423,6 @@ class AddTopicIdsAndStoryIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model_instance):
-        model_instance.story_ids = []
-        model_instance.topic_ids = []
         model_instance.update_timestamps(
             update_last_updated_time=False)
         model_instance.put()
