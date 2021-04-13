@@ -159,7 +159,8 @@ class UpdateSuggestionHandler(base.BaseHandler):
         """Handles PUT requests.
 
         Raises:
-            ValidationError. The suggestion is already handled.
+            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The 'translation_html' parameter is missing.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if (suggestion.status in [constants.STATUS_SUGGESTION_ACCEPTED,
