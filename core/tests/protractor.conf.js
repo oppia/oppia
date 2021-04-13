@@ -352,15 +352,14 @@ exports.config = {
       '-vcodec', 'qtrle',
     ]
 
-    var vidName = function (result) {
-      result.fullName + '.mov';
-    };
-
     if(_ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter(new VideoReporter({
         baseDirectory: path.resolve(__dirname, '../protractor-video'),
         singleVideo: false,
-        singleVideoPath: vidName,
+        singleVideoPath: function(currentSpec) {
+          let filename = currentSpec.fullName;
+          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
+        },
         ffmpegArgs: ffmpegArguments
       }));
     }
