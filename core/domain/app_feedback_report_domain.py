@@ -1255,7 +1255,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         if repo_name not in app_feedback_report_models.GITHUB_REPO_CHOICES:
             raise utils.ValidationError(
                 'The Github repo %s is invalid, must be one of %s.' % (
-                    repo_name, app_feedback_report_models.GITHUB_REPO_CHOICE))
+                    repo_name, app_feedback_report_models.GITHUB_REPO_CHOICES))
 
 
 class AppFeedbackReportDailyStats(python_utils.OBJECT):
@@ -1264,7 +1264,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
     """
 
     def __init__(
-        self, id, ticket, platform, stats_tracking_date,
+        self, stats_id, ticket, platform, stats_tracking_date,
         total_reports_submitted, daily_param_stats):
         """Constructs a AppFeedbackReportDailyStats domain object.
 

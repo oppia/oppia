@@ -789,8 +789,8 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
         android_user_supplied_feedback = (
             app_feedback_report_domain.UserSuppliedFeedback(
-                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER, USER_SELECTED_ITEMS,
-                USER_TEXT_INPUT))
+                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER,
+                USER_SELECTED_ITEMS, USER_TEXT_INPUT))
         android_device_system_context = (
             app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
@@ -846,8 +846,9 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
         }
         self.stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.ticket_id))
-        self.stats_obj = app_feedback_report_domain.AppFeedbackReportStats(
+                PLATFORM_ANDROID, self.ticket_id,
+                REPORT_SUBMITTED_TIMESTAMP.date()))
+        self.stats_obj = app_feedback_report_domain.AppFeedbackReportDailyStats(
             self.stats_id, self.ticket_obj, PLATFORM_ANDROID,
             REPORT_SUBMITTED_TIMESTAMP, 1, param_stats)
 
@@ -888,6 +889,30 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.app_context.to_dict())
 
+    def test_validation_invalid_id_fails(self):
+        self.stats_obj.stats_id = 'invalid_stats_id'
+        self._assert_validation_error(
+            self.stats_obj, 'The stats id %s is invalid' % 'invalid_stats_id')
+
+    def test_validation_invalid_stats_fails(self):
+        self.stats_obj.daily_param_stats = {'invalid_stats'}
+        self._assert_validation_error(
+            self.stats_obj,
+            'The param %s is not a valid param to aggregate stats on' % (
+                'invalid_stats'))
+
+    def _assert_validation_error(
+            self, stats_obj, expected_error_substring):
+        """Checks that the stats object passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            stats_obj.validate()
+
 
 class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
@@ -903,8 +928,8 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
                 PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
         android_user_supplied_feedback = (
             app_feedback_report_domain.UserSuppliedFeedback(
-                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER, USER_SELECTED_ITEMS,
-                USER_TEXT_INPUT))
+                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER,
+                USER_SELECTED_ITEMS, USER_TEXT_INPUT))
         android_device_system_context = (
             app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
@@ -925,7 +950,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             android_app_context)
 
         self.ticket_obj = app_feedback_report_domain.AppFeedbackReportTicket(
-            self.ticket_id, PLATFORM_ANDROID, None, None, Fase,
+            self.ticket_id, TICKET_NAME, PLATFORM_ANDROID, None, None, False,
             REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
 
     def test_to_dict(self):
@@ -944,14 +969,31 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             expected_dict, self.ticket_obj.to_dict())
 
     def test_validation_invalid_ticket_id_fails(self):
-        self.app_context.ticket_id = 'invalid_ticket_id'
+        self.ticket_obj.ticket_id = 'invalid_ticket_id'
         self._assert_validation_error(
-            self.app_context,
+            self.ticket_obj,
             'The ticket id %s is invalid' % 'invalid_ticket_id')
 
+    def test_validation_invalid_report_ids_fails(self):
+        self.ticket_obj.reports = ['invalid_report_id']
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The report with id %s is invalid.' % 'invalid_report_id')
+
+    def test_validation_invalid_github_issue_number_fails(self):
+        self.ticket_obj.github_issue_number = -1
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The Github issue number name must be a positive integer')
+
+    def test_validation_invalid_github_repo_name_fails(self):
+        self.ticket_obj.github_issue_repo_name = 'invalid_repo_name'
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The Github repo %s is invalid' % 'invalid_repo_name')
 
     def _assert_validation_error(
-            self, app_context_obj, expected_error_substring):
+            self, ticket_obj, expected_error_substring):
         """Checks that the app context passes validation.
 
         Args:
@@ -960,4 +1002,13 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
         """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
-            app_context_obj.validate()
+            ticket_obj.validate()
+
+
+class ReportStatsParameterValueCounts(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AppFeedbackReportStatsDomainTests, self).setUp()
+
+
+
