@@ -638,7 +638,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_admin': False
     }
@@ -836,7 +836,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             'entry_point_name': 'crash',
         },
         'text_size': 'MEDIUM_TEXT_SIZE',
-        'download_and_update_only_on_wifi': True,
+        'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'is_admin': False
     }

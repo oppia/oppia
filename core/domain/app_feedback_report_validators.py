@@ -73,7 +73,7 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
-        if item.platform == app_feedback_report_models.PLATFORM_CHOICE_ANDROID:
+        if item.platform == PLATFORM_ANDROID:
             if not (
                     feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION <=
                     item.android_report_info_schema_version <=

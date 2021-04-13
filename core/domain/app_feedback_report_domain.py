@@ -156,10 +156,10 @@ class AppFeedbackReport(python_utils.OBJECT):
         """
         if platform is None:
             raise utils.ValidationError('No platform supplied.')
-        if platform not in app_feedback_report_models.PLATFORM_CHOICES:
+        if platform not in app_feedback_report_constants.PLATFORM_CHOICES:
             raise utils.ValidationError(
                 'Report platform should be one of %s, received: %s' % (
-                    app_feedback_report_models.PLATFORM_CHOICES, platform))
+                    app_feedback_report_constants.PLATFORM_CHOICES, platform))
 
     @classmethod
     def require_valid_scrubber_id(cls, scrubber_id):
@@ -784,7 +784,7 @@ class AndroidAppContext(AppContext):
                 'Should have an event log list, received: %r' % self.event_logs)
         if self.logcat_logs is None or not isinstance(self.logcat_logs, list):
             raise utils.ValidationError(
-                'Should have a logcat lots list, received: %r' % (
+                'Should have a logcat log list, received: %r' % (
                     self.logcat_logs))
 
     @classmethod
@@ -1189,7 +1189,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
                 'The ticket id should be a string, received: %s' % (
                     ticket_id))
         if len(ticket_id.split(
-            app_feedback_report_models.TICKET_ID_DELIMITER)) != 3:
+            app_feedback_report_constants.TICKET_ID_DELIMITER)) != 3:
             raise utils.ValidationError('The ticket id %s is invalid' % (
                 ticket_id))
 
@@ -1252,10 +1252,11 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The Github repo name should be a string, received: %s' % (
                     repo_name))
-        if repo_name not in app_feedback_report_models.GITHUB_REPO_CHOICES:
+        if repo_name not in app_feedback_report_constants.GITHUB_REPO_CHOICES:
             raise utils.ValidationError(
                 'The Github repo %s is invalid, must be one of %s.' % (
-                    repo_name, app_feedback_report_models.GITHUB_REPO_CHOICES))
+                    repo_name,
+                    app_feedback_report_constants.GITHUB_REPO_CHOICES))
 
 
 class AppFeedbackReportDailyStats(python_utils.OBJECT):
@@ -1303,7 +1304,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             'stats_tracking_date': self.stats_tracking_date.isoformat(),
             'total_reports_submitted': self.total_reports_submitted,
             'daily_param_stats': {
-                param_name: param_count.to_dict()
+                param_name: param_value_counts.to_dict()
                 for (param_name, param_value_counts) in (
                     self.daily_param_stats.items())
             }
@@ -1344,7 +1345,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The stats id should be a string, received: %r' % stats_id)
         if len(stats_id.split(
-            app_feedback_report_models.STATS_ID_DELIMITER)) != 3:
+            app_feedback_report_constants.STATS_ID_DELIMITER)) != 3:
             raise utils.ValidationError('The stats id %s is invalid' % stats_id)
 
     @classmethod
@@ -1400,7 +1401,7 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
             ValidationError. One or more attributes of the
                 ReportStatsParameterValueCounts are not valid.
         """
-        for (param_value, param_count) in self.parameter_value_counts:
+        for (param_value, param_count) in self.parameter_value_counts.items():
             if not isinstance(param_value, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'The param value should be a string, received: %r' % (
@@ -1430,7 +1431,7 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
     def to_dict(self):
         return {
             'filter_name': self.filter_name,
-            'filter_options': self.filter_options
+            'filter_options': self.filter_options.sort()
         }
 
     def validate(self):

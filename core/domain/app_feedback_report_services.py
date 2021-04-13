@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
@@ -32,9 +33,9 @@ import utils
 transaction_services = models.Registry.import_transaction_services()
 
 PLATFORM_ANDROID = (
-    app_feedback_report_models.PLATFORM_CHOICE_ANDROID)
+    constants.PLATFORM_CHOICE_ANDROID)
 PLATFORM_WEB = (
-    app_feedback_report_models.PLATFORM_CHOICE_WEB)
+    constants.PLATFORM_CHOICE_WEB)
 
 
 def create_android_report_from_json(report_json):
@@ -134,16 +135,14 @@ def store_incoming_report_stats(report_obj):
     Args:
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
     """
-    if report_obj.platform == model_class.PLATFORM_CHOICE_WEB:
+    if report_obj.platform == PLATFORM_WEB:
         raise NotImplementedError(
             'Stats aggregation for incoming web reports have not been '
             'implemented yet.')
 
-    model_class = app_feedback_report_models
     platform = PLATFORM_ANDROID
-    unticketed_id = (
-        model_class.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
-    all_reports_id = model_class.ALL_ANDROID_REPORTS_STATS_TICKET_ID
+    unticketed_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    all_reports_id = constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID
 
     stats_date = report_obj.submitted_on_timestamp.date()
     unticketed_stats_entity_id = (
@@ -298,8 +297,7 @@ def get_report_from_model(report_model):
         AppFeedbackReport. An AppFeedbackReport domain object corresponding to
         the given model.
     """
-    if report_model.platform == (
-        app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
+    if report_model.platform == PLATFORM_ANDROID:
         return _get_android_report_from_model(report_model)
     else:
         return _get_web_report_from_model(report_model)
@@ -532,7 +530,7 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
 
 
 def _save_android_app_feedback_report(report):
-    """Saves the AppFeedbackReport domain object in persistence storage.
+    """Saves the AppFeedbackReport domain object in persistent storage.
 
     Args:
         report: AppFeedbackReport. The domain object of the report to save.
@@ -555,7 +553,7 @@ def _save_android_app_feedback_report(report):
         'build_fingerprint': device_system_context.build_fingerprint,
         'network_type': device_system_context.network_type,
         'text_size': app_context.text_size,
-        'download_and_update_only_on_wifi': (
+        'only_allows_wifi_download_and_update': (
             app_context.only_allows_wifi_download_and_update),
         'automatically_update_topics': app_context.automatically_update_topics,
         'account_is_profile_admin': app_context.account_is_profile_admin
@@ -581,23 +579,6 @@ def _save_android_app_feedback_report(report):
         model_entity.android_report_info = android_report_info
         model_entity.update_timestamps()
         model_entity.put()
-
-
-def _scrub_report_info_dict(report_info_dict):
-    """Scrubs the dictionary of any fields that contains input directly from
-    the user.
-
-    Args:
-        report_info_dict: dict. The info dict collected in a report.
-
-    Returns:
-        dict. The scrubbed report.
-    """
-    new_report_info = dict()
-    for key in report_info_dict:
-        if key not in app_feedback_report_models.REPORT_INFO_TO_REDACT:
-            new_report_info[key] = report_info_dict[key]
-    return new_report_info
 
 
 def get_all_filter_options():
@@ -658,7 +639,7 @@ def reassign_ticket(report, new_ticket):
         stats_model_to_decrement, platform, stats_date, report, -1)
     
     # Get the ID of the ticket to add the report to.
-    new_ticket_id = app_feedback_report_models.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
     if new_ticket is not None:
         new_ticket_id = new_ticket.ticket_id
     stats_id_to_increment = app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
@@ -713,34 +694,3 @@ def _save_ticket(ticket):
 # // Fetches and processes a list of FeedbackReportDailyStats to display in the
 # // dashboard
 # def get_stats(ticket_id, splice_val): list<FeedbackReportDailyStats>
-
-
-# def _scrub_single_report_in_transaction(report_id, scrubbed_by):
-#     """See scrub_report for general documentation of what this method does.
-#     It's only safe to call this method from within a transaction.
-
-#     Args:
-#         report_id: str. The id of the model entity to scrub.
-#         scrubbed_by: str. The id of the user that is initiating scrubbing of
-#             this report, or a constant
-#             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID if scrubbed by the cron
-#             job.
-#     """
-#     report_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-#         report_id)
-#     if not report_entity:
-#         raise Exception(
-#             'The AppFeedbackReportModel trying to be scrubbed does not '
-#             'exist.')
-#     if report_entity.platform == (
-#             app_feedback_report_models.PLATFORM_CHOICE_ANDROID):
-#         scrubbed_report_info = _scrub_report_info_dict(
-#             report_entity.android_report_info)
-#         report_entity.android_report_info = scrubbed_report_info
-#     else:
-#         scrubbed_report_info = _scrub_report_info_dict(
-#             report_entity.web_report_info)
-#         report_entity.web_report_info = scrubbed_report_info
-#     report_entity.scrubbed_by = scrubbed_by
-#     report_entity.update_timestamps()
-#     report_entity.put()

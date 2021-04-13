@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 from core.platform import models
 from core.tests import test_utils
@@ -85,15 +86,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
-        model_class = app_feedback_report_models.AppFeedbackReportModel
-        self.web_report_id = model_class.create(
-            self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP,
-            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
-            self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
-            self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
-            self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
-            None, self.WEB_REPORT_INFO)
         self.android_report_id = model_class.create(
             self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
@@ -102,6 +94,140 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
             self.ANDROID_REPORT_INFO, None)
+        self.android_report_model  = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.android_report_id))
+        self.android_report_obj = (
+            app_feedback_report_services.get_report_from_model(report_model))
+
+    def test_get_report_from_model_has_same_report_info(self):
+        self.assertEqual(
+            self.android_report_model.id, self.android_report_obj.report_id)
+        self.assertEqual(
+            self.android_report_model.platform,
+            self.android_report_obj.platform)
+        self.assertEqual(self.android_report_model.ticket_id, None)
+        self.assertEqual(self.android_report_model.scrubbed_by, None)
+
+    def test_get_report_from_model_has_same_user_supplied_feedback_info(self):
+        user_supplied_feedback = self.android_report_obj.user_supplied_feedback
+        
+        self.assertEqual(
+            user_supplied_feedback.report_type,
+            self.android_report_model.report_type)
+        self.assertEqual(
+            user_supplied_feedback.category, self.android_report_model.category)
+        self.assertEqual(
+            user_supplied_feedback.user_feedback_selected_items, None)
+        self.assertEqual(
+            user_supplied_feedback.user_feedback_other_text_input,
+            self.android_report_model.android_report_info[
+                'user_feedback_other_text_input'])
+
+    def test_get_report_from_model_has_same_device_system_info(self):
+        device_system_context = self.android_report_obj.device_system_context
+        
+        self.assertTrue(isinstance(
+            device_system_context,
+            app_feedback_report_domain.AndroidDeviceSystemContext))
+        self.assertEqual(
+            device_system_context.version_name,
+            self.android_report_model.platform_version)
+        self.assertEqual(
+            device_system_context.package_version_code,
+            self.android_report_model.android_report_info[
+                'package_version_code'])
+        self.assertEqual(
+            device_system_context.device_country_locale_code,
+            self.android_report_model.android_device_country_locale_code)
+        self.assertEqual(
+            device_system_context.device_model,
+            self.android_report_model.android_device_model)
+        self.assertEqual(
+            device_system_context.sdk_version,
+            self.android_report_model.android_sdk_version)
+        self.assertEqual(
+            device_system_context.build_fingerprint,
+            self.android_report_model.android_report_info[
+                'build_fingerprint'])
+        self.assertEqual(
+            device_system_context.network_type,
+            self.android_report_model.android_report_info[
+                'network_type'])
+
+    def test_get_report_from_model_has_same_app_info(self):
+        app_context = self.android_report_obj.app_context
+        
+        self.assertTrue(isinstance(
+            app_context, app_feedback_report_domain.AndroidAppContext))
+        self.assertEqual(
+            app_context.entry_point.entry_point_name,
+            self.android_report_model.entry_point_name)
+        self.assertEqual(
+            app_context.text_language_code,
+            self.android_report_model.text_language_code)
+        self.assertEqual(
+            app_context.audio_language_code,
+            self.android_report_model.audio_language_code)
+        self.assertEqual(
+            app_context.text_size,
+            self.android_report_model.android_report_info['text_size'])
+        self.assertEqual(
+            app_context.only_allows_wifi_download_and_update,
+            self.android_report_model.android_report_info[
+                'only_allows_wifi_download_and_update'])
+        self.assertEqual(
+            app_context.automatically_update_topics,
+            self.android_report_model.android_report_info[
+                'automatically_update_topics'])
+        self.assertEqual(
+            app_context.account_is_profile_admin,
+            self.android_report_model.android_report_info[
+                'account_is_profile_admin'])
+        self.assertEqual(
+            app_context.event_logs,
+            self.android_report_model.android_report_info['event_logs'])
+        self.assertEqual(
+            app_context.logcat_ogs,
+            self.android_report_model.android_report_info['logcat_logs'])
+
+    def test_get_ticket_from_model_has_same_ticket_info(self):
+        app_context = self.android_report_obj.app_context
+        
+        self.assertTrue(isinstance(
+            app_context, app_feedback_report_domain.AndroidAppContext))
+        self.assertEqual(
+            app_context.entry_point.entry_point_name,
+            self.android_report_model.entry_point_name)
+        self.assertEqual(
+            app_context.text_language_code,
+            self.android_report_model.text_language_code)
+        self.assertEqual(
+            app_context.audio_language_code,
+            self.android_report_model.audio_language_code)
+        self.assertEqual(
+            app_context.text_size,
+            self.android_report_model.android_report_info['text_size'])
+        self.assertEqual(
+            app_context.only_allows_wifi_download_and_update,
+            self.android_report_model.android_report_info[
+                'only_allows_wifi_download_and_update'])
+        self.assertEqual(
+            app_context.automatically_update_topics,
+            self.android_report_model.android_report_info[
+                'automatically_update_topics'])
+        self.assertEqual(
+            app_context.account_is_profile_admin,
+            self.android_report_model.android_report_info[
+                'account_is_profile_admin'])
+        self.assertEqual(
+            app_context.event_logs,
+            self.android_report_model.android_report_info['event_logs'])
+        self.assertEqual(
+            app_context.logcat_ogs,
+            self.android_report_model.android_report_info['logcat_logs'])
+        
+
 
     # Test get domain objects from model
     # test stats are calculated correctly
@@ -125,7 +251,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 'entry_point_name': 'crash',
             },
             'text_size': 'MEDIUM_TEXT_SIZE',
-            'download_and_update_only_on_wifi': True,
+            'only_allows_wifi_download_and_update': True,
             'automatically_update_topics': False,
             'is_admin': False
         }

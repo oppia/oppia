@@ -19,6 +19,20 @@
 import utils
 
 
+PLATFORM_CHOICE_ANDROID = 'android'
+PLATFORM_CHOICE_WEB = 'web'
+PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
+GITHUB_REPO_CHOICES = PLATFORM_CHOICES
+
+# IDs to use for stats model entities tracking all reports and all unticketed
+# reports.
+ALL_ANDROID_REPORTS_STATS_TICKET_ID = 'all_android_reports_stats_ticket_id'
+UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
+    'unticketed_android_reports_stats_ticket_id')
+
+REPORT_ID_DELIMITER = '.'
+TICKET_ID_DELIMITER = '.'
+STATS_ID_DELIMITER = ':'
 REPORT_TYPE = utils.create_enum('suggestion', 'issue', 'crash')
 CATEGORY = utils.create_enum(
     'suggestion_new_feature', 'suggestion_new_language','suggestion_other',
@@ -26,7 +40,6 @@ CATEGORY = utils.create_enum(
     'issue_language_text', 'issue_topics', 'issue_profile', 'issue_other',
     'crash_lesson_player', 'crash_practice_questions', 'crash_options_page',
     'crash_profile_page', 'crash_other')
-FEEDBACK_OPTIONS = utils.create_enum()
 ENTRY_POINT = utils.create_enum(
     'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
 STATS_PARAMETER_NAMES = utils.create_enum(

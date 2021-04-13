@@ -30,24 +30,6 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-PLATFORM_CHOICE_ANDROID = app_feedback_report_constants.PLATFORM_ANDROID
-PLATFORM_CHOICE_WEB = app_feedback_report_constants.PLATFORM_WEB
-PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
-GITHUB_REPO_CHOICES = PLATFORM_CHOICES
-
-REPORT_INFO_TO_REDACT = (
-    'user_feedback_other_text_input', 'event_logs', 'logcat_logs')
-
-REPORT_ID_DELIMITER = '.'
-TICKET_ID_DELIMITER = '.'
-STATS_ID_DELIMITER = ':'
-
-# IDs to use for stats model entities tracking all reports and all unticketed
-# reports.
-ALL_ANDROID_REPORTS_STATS_TICKET_ID = 'all_android_reports_stats_ticket_id'
-UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
-    'unticketed_android_reports_stats_ticket_id')
-
 
 class AppFeedbackReportModel(base_models.BaseModel):
     """Model for storing feedback reports sent from learners.
@@ -67,7 +49,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # The platform (web or Android) that the report is sent from and that the
     # feedback corresponds to.
     platform = datastore_services.StringProperty(
-        required=True, indexed=True, choices=PLATFORM_CHOICES)
+        required=True, indexed=True,
+        choices=app_feedback_report_constants.PLATFORM_CHOICES)
     # The ID of the user that scrubbed this report, if it has been scrubbed.
     scrubbed_by = datastore_services.StringProperty(
         required=False, indexed=True)
@@ -195,7 +178,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         android_schema_version = None
         web_schema_version = None
-        if platform == PLATFORM_CHOICE_ANDROID:
+        if platform == app_feedback_report_constants.PLATFORM_CHOICE_ANDROID:
             android_schema_version = (
                 feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)
         else:
@@ -379,11 +362,13 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     ticket_name = datastore_services.StringProperty(required=True, indexed=True)
     # The platform that the reports in this ticket pertain to.
     platform = datastore_services.StringProperty(
-        required=True, indexed=True, choices=PLATFORM_CHOICES)
+        required=True, indexed=True,
+        choices=app_feedback_report_constants.PLATFORM_CHOICES)
     # The Github repository that has the associated issue for this ticket. The
     # possible values correspond to GITHUB_REPO_CHOICES.
     github_issue_repo_name = datastore_services.StringProperty(
-        required=False, indexed=True, choices=GITHUB_REPO_CHOICES)
+        required=False, indexed=True,
+        choices=app_feedback_report_constants.GITHUB_REPO_CHOICES)
     # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
         required=False, indexed=True)
@@ -509,7 +494,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     ticket_id = datastore_services.StringProperty(required=True, indexed=True)
     # The platform that these statistics are for.
     platform = datastore_services.StringProperty(
-        required=True, indexed=True, choices=PLATFORM_CHOICES)
+        required=True, indexed=True,
+        choices=app_feedback_report_constants.PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model.
     stats_tracking_date = datastore_services.DateProperty(
