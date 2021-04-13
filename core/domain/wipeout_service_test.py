@@ -25,7 +25,6 @@ from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_services
-from core.domain import bulk_email_manager
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -63,40 +62,6 @@ import python_utils
 ])
 
 datastore_services = models.Registry.import_datastore_services()
-
-
-def empty_function(*_):
-    """Empty function to mock
-    bulk_email_manager.permanently_delete_user_from_list which consists of just
-    an API call which is separately tested.
-    """
-    pass
-
-
-def swapped_add_or_update_function(
-        user_id, _user_email, can_receive_email_updates):
-    """Mock function that just updates the UserPreferencesModel without
-    calling the mailchimp api for testing.
-
-    Args:
-        user_id: str. The ID of the user.
-        _user_email: str. Email ID of the user.
-        can_receive_email_updates: bool. Whether the user can receive
-            email updates.
-    """
-    email_preferences_model = user_models.UserEmailPreferencesModel.get(
-        user_id, strict=False)
-    email_preferences_model.site_updates = can_receive_email_updates
-    email_preferences_model.update_timestamps()
-    email_preferences_model.put()
-
-
-setattr(
-    bulk_email_manager, 'permanently_delete_user_from_list',
-    empty_function)
-setattr(
-    bulk_email_manager, 'add_or_update_mailchimp_user_status',
-    swapped_add_or_update_function)
 
 
 class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
@@ -291,14 +256,28 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             email_preferences.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-        wipeout_service.pre_delete_user(self.user_1_id)
+        observed_log_messages = []
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'info', _mock_logging_function):
+            wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
         email_preferences = user_services.get_email_preferences(self.user_1_id)
+        self.assertItemsEqual(
+            observed_log_messages,
+            ['Email ID %s permanently deleted from bulk email provider\'s db. '
+            'Cannot access API, since this is a dev environment'
+            % self.USER_1_EMAIL, 'Updated status of email ID %s\'s bulk email '
+            'preference in the service provider\'s db to False. Cannot access '
+            'API, since this is a dev environment.' % self.USER_1_EMAIL])
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
+
 
     def test_pre_delete_profile_users_works_correctly(self):
         user_settings = user_services.get_user_settings(self.profile_user_id)

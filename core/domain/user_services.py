@@ -28,7 +28,6 @@ import re
 from constants import constants
 from core.domain import auth_domain
 from core.domain import auth_services
-from core.domain import bulk_email_manager
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
@@ -44,6 +43,7 @@ auth_models, user_models, audit_models, suggestion_models = (
          models.NAMES.suggestion]))
 
 current_user_services = models.Registry.import_current_user_services()
+platform_bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -1410,10 +1410,9 @@ def update_email_preferences(
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
-    email_preferences_model = (
-            bulk_email_manager.add_or_update_bulk_email_preference(
-                get_email_from_user_id(user_id), can_receive_email_updates,
-                email_preferences_model))
+    email_preferences_model.site_updates = can_receive_email_updates
+    platform_bulk_email_services.add_or_update_user_status(
+        get_email_from_user_id(user_id), can_receive_email_updates)
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
 

@@ -26,7 +26,6 @@ from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import bulk_email_manager
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import taskqueue_services
