@@ -153,6 +153,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
+    OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
     SkillMasteryViewerComponent,
