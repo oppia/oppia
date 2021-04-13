@@ -28,6 +28,9 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
+    'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
+    'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
     'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
     'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
     'opportunity', 'question', 'recommendations', 'skill', 'statistics',
@@ -37,9 +40,9 @@ NAMES = utils.create_enum(
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
-    NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
-    NAMES.question, NAMES.skill, NAMES.story, NAMES.subtopic, NAMES.suggestion,
-    NAMES.topic)
+    NAMES.app_feedback_report, NAMES.collection, NAMES.config,
+    NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
+    NAMES.subtopic, NAMES.suggestion, NAMES.topic)
 
 GAE_PLATFORM = 'gae'
 
@@ -83,6 +86,9 @@ class _Gae(Platform):
             if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
+            elif name == NAMES.app_feedback_report:
+                from core.storage.app_feedback_report import gae_models as app_feedback_report_models # pylint: disable=line-too-long
+                returned_models.append(app_feedback_report_models)
             elif name == NAMES.audit:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
@@ -326,6 +332,21 @@ class _Gae(Platform):
         from core.platform.search import elastic_search_services
         return elastic_search_services
 
+    @classmethod
+    def import_cloud_translate_services(cls):
+        """Imports and returns cloud_translate_services module.
+
+        Returns:
+            module. The cloud_translate_services module.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.cloud_translate import (
+                dev_mode_cloud_translate_services)
+            return dev_mode_cloud_translate_services
+        else:
+            from core.platform.cloud_translate import cloud_translate_services
+            return cloud_translate_services
+
     NAME = 'gae'
 
 
@@ -465,6 +486,15 @@ class Registry(python_utils.OBJECT):
             module. The taskqueue_services module.
         """
         return cls._get().import_taskqueue_services()
+
+    @classmethod
+    def import_cloud_translate_services(cls):
+        """Imports and returns cloud_translate_services module.
+
+        Returns:
+            module. The cloud_translate_services module.
+        """
+        return cls._get().import_cloud_translate_services()
 
     @classmethod
     def import_search_services(cls):
