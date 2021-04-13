@@ -20,7 +20,16 @@
  * followed by the name of the arg.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { 
+  AfterViewInit, 
+  Component, 
+  ElementRef, 
+  EventEmitter, 
+  HostListener, 
+  Input, 
+  OnInit, 
+  Output 
+} from '@angular/core';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
