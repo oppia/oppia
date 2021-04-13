@@ -38,6 +38,19 @@ PLATFORM_WEB = (
     constants.PLATFORM_CHOICE_WEB)
 
 
+def get_report_models(report_ids):
+    """Fetchs and returns a the AppFeedbackReportModels with the given ids.
+
+    Args:
+        reprot_ids: list(str). The ids for the models to fetch
+    Returns:
+        list(AppFeedbackReportModel). A list of models that correspond to the
+        requested reports.
+    """
+    return app_feedback_report_models.AppFeedbackReportModel.get_multi(
+        report_ids)
+
+
 def create_android_report_from_json(report_json):
     """Creates an AppFeedbackReport domain object instance from the incoming
     JSON request.
@@ -90,7 +103,6 @@ def create_android_report_from_json(report_json):
         PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'],
         None, None, user_supplied_feedback_obj, device_system_context_obj,
         app_context_obj)
-    _save_android_app_feedback_report(report_obj)
 
     return report_obj
 
@@ -179,7 +191,7 @@ def _update_report_stats_model_in_transaction(
         delta: The amount to increment the stats by, depending on if the report
             is added or removed form the model.
     """
-    parameter_names = app_feedback_report_domain.STATS_PARAMETER_NAMES
+    parameter_names = app_feedback_report_constants.ALLOWED_STATS_PARAMETERS
     # The stats we want to aggregate on.
     report_type = report_obj.user_supplied_feedback.report_type
     country_locale_code = (
@@ -252,16 +264,16 @@ def _update_report_stats_model_in_transaction(
             _calculate_new_stats_count_for_parameter(
                 stats_dict[parameter_names.version_name][version_name], delta))
 
-        stats_model.daily_param_stats = stats_dict
-        stats_model.total_reports_submitted += delta
-        if (
-            report_obj.submitted_on_datetime > 
-            stats_model.newest_report_creation_timestamp):
-            stats_model.newest_report_creation_timestamp = (
-                report_obj.submitted_on_datetime)
+    stats_model.daily_param_stats = stats_dict
+    stats_model.total_reports_submitted += delta
+    if (
+        report_obj.submitted_on_datetime > 
+        stats_model.newest_report_creation_timestamp):
+        stats_model.newest_report_creation_timestamp = (
+            report_obj.submitted_on_datetime)
 
-        stats_model.update_timestamps()
-        stats_model.put()
+    stats_model.update_timestamps()
+    stats_model.put()
 
 
 def _calculate_new_stats_count_for_parameter(current_count, delta):
@@ -522,14 +534,14 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     if report.platform == PLATFORM_ANDROID:
         report.app_context.event_logs = None
         report.app_context.logcat_logs = None
-        _save_android_app_feedback_report(report)
+        save_android_feedback_report_to_storage(report)
     else:
         raise NotImplementedError(
             'Saving web report entities to persistent storage has not been '
             'implemented yet.')
 
 
-def _save_android_app_feedback_report(report):
+def save_android_feedback_report_to_storage(report):
     """Saves the AppFeedbackReport domain object in persistent storage.
 
     Args:
@@ -625,7 +637,7 @@ def reassign_ticket(report, new_ticket):
 
     # Update the report model.
     report.ticket_id = new_ticket.id
-    _save_android_app_feedback_report(report)
+    save_android_feedback_report_to_storage(report)
 
     # Update the stats model.
     platform = report.platform
@@ -679,18 +691,3 @@ def _save_ticket(ticket):
     ticket_model.report_ids = [report.id for report in ticket.reports]
     ticket_model.update_timestamps()
     ticket_model.put()
-
-
-# // Fetches and processes the next batch of reports maintainers want to view and
-# // returns a list of FeedbackReports.
-# def get_next_batch_of_reports(active_filters, page_num, cursor):
-#    list<FeedbackReport>
-
-# // Fetches and processes the next batch of reports maintainers want to view.
-# // Returns a list of FeedbackReportTickets
-# def get_next_batch_of_tickets(active_filters, page_num, cursor):
-#    list<FeedbackReportTicket>
-
-# // Fetches and processes a list of FeedbackReportDailyStats to display in the
-# // dashboard
-# def get_stats(ticket_id, splice_val): list<FeedbackReportDailyStats>

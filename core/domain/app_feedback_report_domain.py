@@ -1304,8 +1304,8 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             'stats_tracking_date': self.stats_tracking_date.isoformat(),
             'total_reports_submitted': self.total_reports_submitted,
             'daily_param_stats': {
-                param_name: param_value_counts.to_dict()
-                for (param_name, param_value_counts) in (
+                param_name: param_counts_obj.to_dict()
+                for (param_name, param_counts_obj) in (
                     self.daily_param_stats.items())
             }
         }
@@ -1363,12 +1363,12 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
                 'The param stats should be a dict, received: %r' % param_stats)
         for (param_name, param_count_obj) in param_stats.items():
             if param_name not in (
-                app_feedback_report_constants.STATS_PARAMETER_NAMES):
+                app_feedback_report_constants.ALLOWED_STATS_PARAMETERS):
                 raise utils.ValidationError(
                     'The param %s is not a valid param to aggregate stats on, '
                     'must be one of %s' % (
                         param_name,
-                        app_feedback_report_constants.STATS_PARAMETER_NAMES))
+                        app_feedback_report_constants.ALLOWED_STATS_PARAMETERS))
             param_count_object.validate()
 
 
@@ -1446,10 +1446,10 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
                 'The filter name should be a string, received: %r' % (
                     self.filter_name))
         if self.filter_name not in (
-            app_feedback_report_constants.FILTER_FIELD_NAMES):
+            app_feedback_report_constants.ALLOWED_FILTERS):
             raise utils.ValidationError(
                 'The filter name should be one of %s, received: %s' % (
-                    app_feedback_report_constants.FILTER_FIELD_NAMES,
+                    app_feedback_report_constants.ALLOWED_FILTERS,
                     self.filter_name))
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(

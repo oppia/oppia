@@ -45,10 +45,10 @@ ENTRY_POINT = utils.create_enum(
 STATS_PARAMETER_NAMES = utils.create_enum(
     'platform', 'report_type', 'country_locale_code',
     'entry_point_name', 'text_language_code', 'audio_language_code',
-    'sdk_version', 'version_name')
+    'android_sdk_version', 'version_name')
 FILTER_FIELD_NAMES = utils.create_enum(
     'platform', 'report_type', 'entry_point', 'submitted_on',
-    'android_device_model', 'sdk_version', 'text_language_code',
+    'android_device_model', 'android_sdk_version', 'text_language_code',
     'audio_language_code', 'platform_version',
     'android_device_country_locale_code')
 
@@ -86,11 +86,19 @@ ALLOWED_STATS_PARAMETERS = [
     STATS_PARAMETER_NAMES.entry_point_name,
     STATS_PARAMETER_NAMES.text_language_code,
     STATS_PARAMETER_NAMES.audio_language_code,
-    STATS_PARAMETER_NAMES.sdk_version, STATS_PARAMETER_NAMES.version_name]
+    STATS_PARAMETER_NAMES.android_sdk_version,
+    STATS_PARAMETER_NAMES.version_name]
+ALLOWED_FILTERS = [
+    FILTER_FIELD_NAMES.report_type, FILTER_FIELD_NAMES.platform,
+    FILTER_FIELD_NAMES.entry_point, FILTER_FIELD_NAMES.submitted_on,
+    FILTER_FIELD_NAMES.android_device_model,
+    FILTER_FIELD_NAMES.android_sdk_version,
+    FILTER_FIELD_NAMES.text_language_code,
+    FILTER_FIELD_NAMES.audio_language_code, FILTER_FIELD_NAMES.platform_version,
+    FILTER_FIELD_NAMES.android_device_country_locale_code]
 ALLOWED_ANDROID_NETWORK_TYPES = [
     ANDROID_NETWORK_TYPES.wifi, ANDROID_NETWORK_TYPES.cellular,
     ANDROID_NETWORK_TYPES.none]
-
 ALLOWED_ANDROID_TEXT_SIZES = [
     ANDROID_TEXT_SIZE.text_size_unspecified, ANDROID_TEXT_SIZE.small_text_size,
     ANDROID_TEXT_SIZE.medium_text_size, ANDROID_TEXT_SIZE.large_text_size,
