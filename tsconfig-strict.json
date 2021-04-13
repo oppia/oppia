@@ -41,17 +41,14 @@
     "core/templates/domain/classifier/answer-classification-result.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.spec.ts",
-<<<<<<< HEAD
     "core/templates/domain/collection/guest-collection-progress.model.ts",
     "core/templates/domain/collection/guest-collection-progress.model.spec.ts",
-=======
     "core/templates/domain/collection/collection-playthrough.model.ts",
     "core/templates/domain/collection/collection-playthrough.model.spec.ts",
     "core/templates/domain/collection/collection-rights.model.ts",
     "core/templates/domain/collection/collection-rights.model.spec.ts",
     "core/templates/domain/collection/collection-summary.model.ts",
     "core/templates/domain/collection/collection-summary.model.spec.ts",
->>>>>>> 8ae754380fe109eebbed7c2dfc375862752fa6f2
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
