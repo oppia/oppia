@@ -45,4 +45,12 @@ class AlgebraicExpressionInput(base.BaseInteraction):
             'obj_type': 'CustomOskLetters',
         },
         'default_value': []
+    }, {
+        'name': 'useFractionForDivision',
+        'description': (
+            'Represent division using fractions (rather than ÷).'),
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False
     }]

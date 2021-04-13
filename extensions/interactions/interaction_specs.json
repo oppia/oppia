@@ -85,6 +85,13 @@
         "content_id": null,
         "unicode_str": "Type an expression here, using only numbers."
       }
+    }, {
+      "description": "Represent division using fractions (rather than ÷).",
+      "name": "useFractionForDivision",
+      "schema": {
+        "type": "bool"
+      },
+      "default_value": false
     }],
     "is_terminal": false,
     "default_outcome_heading": null,
@@ -623,6 +630,14 @@
           "type": "custom"
         },
         "default_value": []
+      },
+      {
+        "description": "Represent division using fractions (rather than ÷).",
+        "name": "useFractionForDivision",
+        "schema": {
+          "type": "bool"
+        },
+        "default_value": false
       }
     ],
     "is_terminal": false,
@@ -917,6 +932,14 @@
           "type": "custom"
         },
         "default_value": []
+      },
+      {
+        "description": "Represent division using fractions (rather than ÷).",
+        "name": "useFractionForDivision",
+        "schema": {
+          "type": "bool"
+        },
+        "default_value": false
       }
     ],
     "is_terminal": false,

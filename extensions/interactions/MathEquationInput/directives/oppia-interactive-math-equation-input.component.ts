@@ -81,6 +81,8 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
+        GuppyConfigurationService.changeDivSymbol(
+          JSON.parse($attrs.useFractionForDivisionWithValue || 'false'));
         GuppyInitializationService.init(
           'guppy-div-learner',
           MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,

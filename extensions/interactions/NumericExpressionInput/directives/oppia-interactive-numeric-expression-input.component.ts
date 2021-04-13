@@ -86,9 +86,10 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        const { placeholder } = (
+        const { useFractionForDivision, placeholder } = (
           InteractionAttributesExtractorService.getValuesFromAttributes(
             'NumericExpressionInput', $attrs));
+        GuppyConfigurationService.changeDivSymbol(useFractionForDivision);
         GuppyInitializationService.init(
           'guppy-div-learner',
           placeholder.unicode,
