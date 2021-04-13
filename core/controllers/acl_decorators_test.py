@@ -1659,7 +1659,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_reviewer_or_suggester_update_suggestions
+        @acl_decorators.can_update_suggestions
         def get(self, suggestion_id):
             self.render_json({'suggestion_id': suggestion_id})
 
