@@ -1444,6 +1444,12 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The filter name should be a string, received: %r' % (
                     self.filter_name))
+        if self.filter_name not in (
+            app_feedback_report_constants.FILTER_FIELD_NAMES):
+            raise utils.ValidationError(
+                'The filter name should be one of %s, received: %s' % (
+                    app_feedback_report_constants.FILTER_FIELD_NAMES,
+                    self.filter_name))
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(
                 'The filter options should be a list, received: %r' % (

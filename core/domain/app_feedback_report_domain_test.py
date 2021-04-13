@@ -994,7 +994,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, ticket_obj, expected_error_substring):
-        """Checks that the app context passes validation.
+        """Checks that the ticket passes validation.
 
         Args:
             expected_error_substring: str. String that should be a substring
@@ -1005,10 +1005,77 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             ticket_obj.validate()
 
 
-class ReportStatsParameterValueCounts(test_utils.GenericTestBase):
+class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
+        
+    def test_validation_with_invalid_parameter_value_fails(self):
+        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
+            {
+                1: 1,
+                2: 1
+            })
+        self._assert_validation_error(
+            counts_obj,
+            'The param value should be a string')
+
+    def test_validation_with_invalid_parameter_counts_fails(self):
+        counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
+            {
+                'value_1': 0,
+            })
+        self._assert_validation_error(
+            counts_obj,
+            'The param value count should be a positive int')
+
+    def _assert_validation_error(
+            self, counts_obj, expected_error_substring):
+        """Checks that the parameter counts passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            counts_obj.validate()
+
+
+class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(AppFeedbackReportStatsDomainTests, self).setUp()
+        super(AppFeedbackReportFilterDomainTests, self).setUp()
+        self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
+            'platform', ['web', 'android'])
 
+    def test_to_dict(self):
+        expected_dict = {
+            'filter_name': 'platform',
+            'filter_options': app_feedback_report_constants.PLATFORM_CHOICES
+        }
+        self.assertDictEqual(
+            expected_dict, self.filter.to_dict())
 
+    def test_validation_with_invalid_filter_name_fails(self):
+        self.filter.filter_name = 'invalid_filter_name'
+        self._assert_validation_error(
+            self.filter,
+            'The filter name should be one of %s' % (
+                app_feedback_report_constants.PLATFORM_CHOICES))
+
+    def test_validation_filter_values_list_is_none_fails(self):
+        self.filter.filter_options = None
+        self._assert_validation_error(
+            self.filter,
+            'The filter options should be a list')
+
+    def _assert_validation_error(
+            self, counts_obj, expected_error_substring):
+        """Checks that the parameter counts passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            counts_obj.validate()
 

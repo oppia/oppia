@@ -103,6 +103,20 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
             self.ANDROID_REPORT_INFO, None)
 
+    # Test get domain objects from model
+    # test stats are calculated correctly
+    # test new report added to unticketed stats
+    # test new report added to all report stats
+    # Test get all expiring reports
+    # Test getting filter options
+    # Reassigning ticket changes name
+    # Reassigning ticket updates increasing stats
+    # Reassigning ticket updates decreasing stats
+    # reassigning ticket does not change all report stats
+    # Edit ticket changes name
+
+
+
     def test_scrub_android_report_removes_info(self):
         expected_report_dict = {
             'package_version_code': 1,
