@@ -14,7 +14,9 @@
 
 """Check whether a PR is low-risk.
 
-A low-risk PR can be merged without running the full CI checks.
+A low-risk PR can be merged without running the full CI checks. When
+called with a URL to a PR, this script exits with code 0 if and only if
+the PR is low-risk. Otherwise, the exit code is nonzero.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -35,6 +37,17 @@ PR_URL_REGEX = (
 
 
 def parse_pr_url(pr_url):
+    """Extract the owner, repo, and PR number from a PR URL.
+
+    For example, in the URL https://github.com/foobar/oppia/pull/23, the
+    owner is `foobar`, the repo is `oppia`, and the PR number is `23`.
+
+    Args:
+        pr_url: str. URL to the PR on GitHub.
+
+    Returns:
+        str, str, str. 3-tuple of the PR owner, repository, and number.
+    """
     match = re.match(PR_URL_REGEX, pr_url)
     if match:
         return match.group('owner', 'repo', 'num')
@@ -43,6 +56,14 @@ def parse_pr_url(pr_url):
 
 
 def load_diff(url):
+    """Download a PR diff from GitHub.
+
+    Args:
+        url: str. URL of the diff on GitHub.
+
+    Returns:
+        list(str). List of the right-stripped lines of the diff.
+    """
     response = python_utils.url_request(url, None, None)
     lines = [line.rstrip() for line in response]
     response.close()
@@ -50,6 +71,16 @@ def load_diff(url):
 
 
 def lookup_pr(owner, repo, pull_number):
+    """Lookup a PR using the GitHub API.
+
+    Args:
+        owner: str. Owner of the repository the PR is in.
+        repo: str. Repository the PR is in.
+        pull_number: str. PR number.
+
+    Returns:
+        dict. JSON object returned by the GitHub API v3.
+    """
     request = python_utils.url_request(
         GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
         None,
@@ -61,6 +92,17 @@ def lookup_pr(owner, repo, pull_number):
 
 
 def parse_diff(diff):
+    """Parse a PR diff into the changes made in each file.
+
+    Args:
+        diff: list(str). List of the right-stripped lines of the diff.
+
+    Returns:
+        dict(tuple(str, str), list(str)). A dictionary that maps from
+        tuples of (old filename, new filename) to lists of the diff
+        lines associated with those files. Context lines before the
+        first changed line and after the last changed line are excluded.
+    """
     file_diffs = {}
     old, new = '', ''
     file_diff_started = False
@@ -91,6 +133,22 @@ def parse_diff(diff):
 
 
 def check_if_pr_is_translation_pr(pr):
+    """Check if a PR is low-risk by virtue of being a translation PR.
+
+    To be a low-risk translation PR, a PR must:
+
+    * Be opened from a branch on the oppia/oppia repository.
+    * Be opened from the branch `translatewiki-prs`.
+    * Only change JSON files in `assets/i18n`.
+    * Not change the names of any files.
+
+    Args:
+        pr: dict. JSON object of PR from GitHub API.
+
+    Returns:
+        str. An empty string if the PR is a translation PR and low-risk,
+        else a message explaining why the PR is not low-risk.
+    """
     source_repo = pr['head']['repo']['full_name']
     if source_repo != 'oppia/oppia':
         return 'Source repo is not oppia/oppia'
@@ -107,12 +165,33 @@ def check_if_pr_is_translation_pr(pr):
 
 
 def check_if_pr_is_changelog_pr(pr):
+    """Check if a PR is low-risk by virtue of being a changelog PR.
+
+    To be a low-risk changelog PR, a PR must:
+
+    * Be opened from a branch on the oppia/oppia repository.
+    * Be opened from a branch matching
+      `^update-changelog-for-release-v[0-9.]+$`.
+    * Only change the following files:
+        * AUTHORS
+        * CONTRIBUTORS
+        * CHANGELOG
+        * package.json to update the version number
+        * about-page.constants.ts to add names to the contributors list
+
+    Args:
+        pr: dict. JSON object of PR from GitHub API.
+
+    Returns:
+        str. An empty string if the PR is a changelog PR and low-risk,
+        else a message explaining why the PR is not low-risk.
+    """
     source_repo = pr['head']['repo']['full_name']
     if source_repo != 'oppia/oppia':
         return 'Source repo is not oppia/oppia'
     pr_source_branch = pr['head']['ref']
     if re.match(
-            '^update-changelog-for-release-v[0-9.]$',
+            '^update-changelog-for-release-v[0-9.]+$',
             source_branch):
         return 'Source branch does not indicate a changelog PR'
     diff = parse_diff(load_diff(pr['diff_url']))
@@ -151,6 +230,7 @@ LOW_RISK_CHECKERS = {
 
 
 def main(tokens=None):
+    """Check if a PR is low-risk."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'pr_url',
