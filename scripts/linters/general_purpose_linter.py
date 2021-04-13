@@ -420,12 +420,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': (),
         'excluded_dirs': ()
     },
-    {
-        'regexp': re.compile(r'__metaclass__'),
-        'message': 'Please use python_utils.with_metaclass().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
 ]
 
 BAD_PATTERNS_MAP = {
