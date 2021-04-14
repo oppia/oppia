@@ -602,8 +602,7 @@ def get_all_filter_options():
         they can have.
     """
     filter_list = list()
-    filter_names = app_feedback_report_models.FILTER_FIELD_NAMES
-    for filter_name in filter_names:
+    for filter_name in app_feedback_report_constants.FILTER_FIELD_NAMES:
         filter_values = app_feedback_report_models.AppFeedbackReportModel.query(
             projection=[filter_name], distinct=True)
         filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(

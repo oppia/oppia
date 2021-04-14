@@ -406,28 +406,35 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         unticketed_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 unticketed_stats_id))
-        stats_json = unticketed_stats_model.daily_param_stats
+        
+        expected_json = {
+            parameter_names.report_type: {
+                self.REPORT_TYPE_SUGGESTION: 2
+            },
+            parameter_names.country_locale_code:{
+                self.COUNTRY_LOCALE_CODE_INDIA: 2
+            },
+            parameter_names.entry_point_name: {
+                self.ENTRY_POINT_NAVIGATION_DRAWER: 2
+            },
+            parameter_names.text_language_code: {
+               self.TEXT_LANGUAGE_CODE_ENGLISH: 2
+            },
+            parameter_names.audio_language_code: {
+                self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
+            },
+            parameter_names.sdk_version: {
+                self.ANDROID_SDK_VERSION: 2
+            },
+            parameter_names.version_name: {
+                self.ANDROID_PLATFORM_VERSION: 2
+            }
+        }
 
         self.assertEqual(unticketed_stats_model.platform, self.PLATFORM_ANDROID)
         self.assertTrue(unticketed_stats_model.total_reports_submitted = 2)
-        self.assertEqual(stats_json['report_type'][REPORT_TYPE_SUGGESTION], 2)
-        self.assertEqual(
-            stats_json[
-                'country_locale_code'][self.DEVICE_COUNTRY_LOCALE_CODE_INDIA],
-                2)
-        self.assertEqual(
-            stats_json['entry_point_name'][self.ENTRY_POINT_NAVIGATION_DRAWER],
-            2)
-        self.assertEqual(
-            stats_json['text_langauge_code'][self.TEXT_LANGUAGE_CODE_ENGLISH],
-            2)
-        self.assertEqual(
-            stats_json['audio_language_code'][self.AUDIO_LANGUAGE_CODE_ENGLISH],
-            2)
-        self.assertEqual(
-            stats_json['android_sdk_version'][self.ANDROID_SDK_VERSION], 2)
-        self.assertEqual(
-            stats_json['version_name'][self.ANDROID_PLATFORM_VERSION], 2)
+        self._verify_stats_model(
+            unticketed_stats_model.daily_param_stats, expected_json)
 
     def test_new_report_added_updates_all_reports_stats_model_correctly(self):
         report_obj_1 = (
@@ -448,38 +455,278 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         all_reports_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 all_report_stats_id))
-        stats_json = all_report_stats_model.daily_param_stats
+
+        expected_json = {
+            parameter_names.report_type: {
+                self.REPORT_TYPE_SUGGESTION: 2
+            },
+            parameter_names.country_locale_code:{
+                self.COUNTRY_LOCALE_CODE_INDIA: 2
+            },
+            parameter_names.entry_point_name: {
+                self.ENTRY_POINT_NAVIGATION_DRAWER: 2
+            },
+            parameter_names.text_language_code: {
+               self.TEXT_LANGUAGE_CODE_ENGLISH: 2
+            },
+            parameter_names.audio_language_code: {
+                self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
+            },
+            parameter_names.sdk_version: {
+                self.ANDROID_SDK_VERSION: 2
+            },
+            parameter_names.version_name: {
+                self.ANDROID_PLATFORM_VERSION: 2
+            }
+        }
 
         self.assertEqual(
             all_reports_stats_model.platform, self.PLATFORM_ANDROID)
-        self.assertTrue(all_reports_stats_model.total_reports_submitted = 2)
-        self.assertEqual(stats_json['report_type'][REPORT_TYPE_SUGGESTION], 2)
-        self.assertEqual(
-            stats_json[
-                'country_locale_code'][self.DEVICE_COUNTRY_LOCALE_CODE_INDIA],
-                2)
-        self.assertEqual(
-            stats_json['entry_point_name'][self.ENTRY_POINT_NAVIGATION_DRAWER],
-            2)
-        self.assertEqual(
-            stats_json['text_langauge_code'][self.TEXT_LANGUAGE_CODE_ENGLISH],
-            2)
-        self.assertEqual(
-            stats_json['audio_language_code'][self.AUDIO_LANGUAGE_CODE_ENGLISH],
-            2)
-        self.assertEqual(
-            stats_json['android_sdk_version'][self.ANDROID_SDK_VERSION], 2)
-        self.assertEqual(
-            stats_json['version_name'][self.ANDROID_PLATFORM_VERSION], 2)
+        self.assertEqual(all_reports_stats_model.total_reports_submitted, 2)
+        self._verify_stats_model(
+            all_reports_stats_model.daily_param_stats, expected_json)
 
-    # Test get all expiring reports
-    
-    # Test getting filter options
-    # Reassigning ticket changes name
-    # Reassigning ticket updates increasing stats
-    # Reassigning ticket updates decreasing stats
-    # reassigning ticket does not change all report stats
-    # Edit ticket changes name
+    def test_get_all_expiring_reports(self):
+        expiring_report_id_1 = self._add_expiring_android_report()
+        expiring_report_id_2 = self._add_expiring_android_report()
+
+        expiring_reports = (
+            app_feedback_report_services.get_all_expiring_reports_to_scrub())
+        expiring_report_ids = [report.report_id for report in expiring_reports]
+
+        self.assertEqual(len(expiring_reports), 1)
+        self.assertTrue(expiring_report_id_1 in expiring_report_ids)
+        self.assertTrue(expiring_report_id_2 in expiring_report_ids)
+
+    def test_get_all_filter_options(self):
+        filter_options = app_feedback_report_services.get_all_filter_options()
+        filter_names = filter_options.keys()
+
+        self.assertTrue('report_type' in filter_names)
+        self.assertEqual(
+            filter_options['report_type'], self.REPORT_TYPE_SUGGESTION)
+        self.assertTrue('platform' in filter_names)
+        self.assertEqual(
+            filter_options['platform'], self.PLATFORM_ANDROID)
+        self.assertTrue('entry_point' in filter_names)
+        self.assertEqual(
+            filter_options['entry_point'], self.ENTRY_POINT_NAVIGATION_DRAWER)
+        self.assertTrue('android_device_model' in filter_names)
+        self.assertEqual(
+            filter_options['android_device_model'], self.ANDROID_DEVICE_MODEL)
+        self.assertTrue('text_lanaguage_code' in filter_names)
+        self.assertEqual(
+            filter_options['text_lanaguage_code'],
+            self.TEXT_LANGUAGE_CODE_ENGLISH)
+        self.assertTrue('audio_language_code' in filter_names)
+        self.assertEqual(
+            filter_options['audio_language_code'],
+            self.AUDIO_LANGUAGE_CODE_ENGLISH)
+        self.assertTrue('android_device_country_locale_code' in filter_names)
+        self.assertEqual(
+            filter_options['android_device_country_locale_code'],
+            self.DEVICE_COUNTRY_LOCALE_CODE_INDIA)
+
+    def test_edit_ticket_name_updates_ticket_model(self):
+        new_ticket_name = 'a new ticket name'
+        app_feedback_report_services.edit_ticket_name(
+            self.android_ticket_obj, new_ticket_name)
+        
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertEqual(self.android_report_obj.report_id, new_ticket_model.id)
+        self.assertEqual(
+            self.android_report_obj.platform, new_ticket_model.platform)
+        self.assertEqual(new_ticket_model.ticket_name, new_ticket_name)
+
+    def test_edit_ticket_name_does_not_change_ticket_model(self):
+        new_ticket_name = 'a new ticket name'
+        app_feedback_report_services.edit_ticket_name(
+            self.android_ticket_obj, new_ticket_name)
+        
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertEqual(self.android_report_obj.report_id, new_ticket_model.id)
+        self.assertEqual(
+            self.android_report_obj.platform, new_ticket_model.platform)
+        self.assertEqual(new_ticket_model.ticket_name, new_ticket_name)
+
+    def test_edit_ticket_name_does_not_change_stats_model(self):
+        old_stats_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                self.android_ticket_id))
+        old_stats_model = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                old_stats_id))
+
+        new_ticket_name = 'a new ticket name'
+        app_feedback_report_services.edit_ticket_name(
+            self.android_ticket_obj, new_ticket_name)
+        
+        new_stats_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                self.android_ticket_id))
+        new_stats_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                new_stats_id))
+
+        self.assertEqual(old_stats_id, new_stats_id)
+        self.assertEqual(
+            old_stats_model.total_reports_submitted,
+            new_stats_model.total_reports_submitted)
+        self.assertEqual(
+            old_stats_model.platform, new_stats_model.platform)
+        self.assertEqual(
+            old_stats_model.newest_report_timestamp,
+            new_stats_model.newest_report_timestamp)
+        self._verify_stats_model(
+            new_stats_model.daily_param_stats,
+            old_stats_model.daily_param_stats)
+
+    def test_reassign_report_ticket_name_updates_increasing_stats_model(self):
+        old_stats_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                self.android_ticket_id))
+        old_stats_model = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                old_stats_id))
+
+        new_ticket_name = 'a new ticket name'
+        app_feedback_report_services.edit_ticket_name(
+            self.android_ticket_obj, new_ticket_name)
+        new_stats_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                new_ticket_name))
+        new_stats_model = (
+            app_feedback_report_models.AppFeedbackReport.get_by_id(
+                new_stats_id))
+
+        parameter_names = (
+            app_feedback_report_constants.ALLOWED_STATS_PARAM_NAMES)
+        expected_json = {
+            parameter_names.report_type: {
+                self.REPORT_TYPE_SUGGESTION: 1
+            },
+            parameter_names.country_locale_code:{
+                self.COUNTRY_LOCALE_CODE_INDIA: 1
+            },
+            parameter_names.entry_point_name: {
+                self.ENTRY_POINT_NAVIGATION_DRAWER: 1
+            },
+            parameter_names.text_language_code: {
+               self.TEXT_LANGUAGE_CODE_ENGLISH: 1
+            },
+            parameter_names.audio_language_code: {
+                self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
+            },
+            parameter_names.sdk_version: {
+                self.ANDROID_SDK_VERSION: 1
+            },
+            parameter_names.version_name: {
+                self.ANDROID_PLATFORM_VERSION: 1
+            }
+        }
+        self.assertNotEqual(old_stats_id, new_stats_id)
+        self.assertEqual(new_stats_model.total_reports_submitted, 1)
+        self._verify_stats_model(
+            new_stats_model.daily_param_stats,
+            expected_json)
+
+    def test_reassign_report_ticket_name_updates_decreasing_stats_model(self):
+        old_stats_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                self.android_ticket_id))
+        old_stats_model = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                old_stats_id))
+
+        new_ticket_name = 'a new ticket name'
+        app_feedback_report_services.edit_ticket_name(
+            self.android_ticket_obj, new_ticket_name)
+        new_stats_model = (
+            app_feedback_report_models.AppFeedbackReport.get_by_id(
+                old_stats_id))
+
+        parameter_names = (
+            app_feedback_report_constants.ALLOWED_STATS_PARAM_NAMES)
+        expected_json = {
+            parameter_names.report_type: {
+                self.REPORT_TYPE_SUGGESTION: 0
+            },
+            parameter_names.country_locale_code:{
+                self.COUNTRY_LOCALE_CODE_INDIA: 0
+            },
+            parameter_names.entry_point_name: {
+                self.ENTRY_POINT_NAVIGATION_DRAWER: 0
+            },
+            parameter_names.text_language_code: {
+               self.TEXT_LANGUAGE_CODE_ENGLISH: 0
+            },
+            parameter_names.audio_language_code: {
+                self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
+            },
+            parameter_names.sdk_version: {
+                self.ANDROID_SDK_VERSION: 0
+            },
+            parameter_names.version_name: {
+                self.ANDROID_PLATFORM_VERSION: 0
+            }
+        }
+        self.assertEqual(new_stats_model.total_reports_submitted, 1)
+        self._verify_stats_model(
+            new_stats_model.daily_param_stats,
+            expected_json)
+
+    def test_reassign_report_ticket_name_does_not_change_all_report_stats_model(
+            self):
+        old_all_report_stats_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID))
+        old_all_report_stats_model = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                old_all_report_stats_id))
+
+        new_ticket_name = 'a new ticket name'
+        app_feedback_report_services.edit_ticket_name(
+            self.android_ticket_obj, new_ticket_name)
+        new_all_reports_stats_model = (
+            app_feedback_report_models.AppFeedbackReport.get_by_id(
+                old_all_report_stats_id))
+
+        parameter_names = (
+            app_feedback_report_constants.ALLOWED_STATS_PARAM_NAMES)
+        expected_json = {
+            parameter_names.report_type: {
+                self.REPORT_TYPE_SUGGESTION: 1
+            },
+            parameter_names.country_locale_code:{
+                self.COUNTRY_LOCALE_CODE_INDIA: 1
+            },
+            parameter_names.entry_point_name: {
+                self.ENTRY_POINT_NAVIGATION_DRAWER: 1
+            },
+            parameter_names.text_language_code: {
+               self.TEXT_LANGUAGE_CODE_ENGLISH: 1
+            },
+            parameter_names.audio_language_code: {
+                self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
+            },
+            parameter_names.sdk_version: {
+                self.ANDROID_SDK_VERSION: 1
+            },
+            parameter_names.version_name: {
+                self.ANDROID_PLATFORM_VERSION: 1
+            }
+        }
+
+        self.assertEqual(new_all_reports_stats_model.total_reports_submitted, 1)
+        self._verify_stats_model(
+            new_all_reports_stats_model.daily_param_stats,
+            expected_json)
 
     def test_scrub_android_report_removes_info(self):
         expected_report_dict = {
@@ -684,7 +931,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         expiring_android_report_model.put()
         return report_id
 
-  ANDROID_  def _add_expiring_web_report(self):
+    def _add_expiring_web_report(self):
+        report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_OVER_MAX))
         expiring_web_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
                 id=self.WEB_REPORT_ID_OVER_MAX_DAYS,
@@ -708,12 +958,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     self.WEB_REPORT_INFO_SCHEMA_VERSION)))
         expiring_web_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_web_report_model.put()
+        return report_id
 
-  ANDROID_  def _add_scrubbed_report(self):
+    def _add_scrubbed_report(self):
         """Add an already-scrubbed report to the model."""
+        report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
         expiring_android_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.SCRUBBED_REPORT_ID,
+                id=report_id,
                 platform=self.PLATFORM_ANDROID,
                 scrubbed_by='scrubber_user',
                 ticket_id='%s.%s.%s' % (
@@ -735,4 +989,28 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     self.ANDROID_REPORT_INFO_SCHEMA_VERSION)))
         expiring_android_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_android_report_model.put()
-ANDROID_
+        return report_id
+
+    def _verify_stats_model(self, stats_json, expected_json):
+        self.assertEqual(
+            stats_json['report_type'],
+            expected_json['report_type'])
+        self.assertEqual(
+            stats_json['country_locale_code'],
+            expected_json['country_locale_code'])
+        self.assertEqual(
+            stats_json['entry_point_name'],
+            expected_json['entry_point_name'])
+        self.assertEqual(
+            stats_json['text_language_code'],
+            expected_json['text_language_code'])
+        self.assertEqual(
+            stats_json['audio_language_code'],
+            expected_json['audio_language_code'])
+        self.assertEqual(
+            stats_json['sdk_version'],
+            expected_json['sdk_version'])
+        self.assertEqual(
+            stats_json['version_name'],
+            expected_json['version_name'])
+

@@ -69,12 +69,18 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(IncomingAndroidFeedbackReportHandlerTests, self).setUp()
+        self.headers = {
+            'api_key': feconf.ANDROID_API_KEY,
+            'app_package_name': feconf.ANDROID_APP_PACKAGE_NAME,
+            'app_version_name': feconf.ANDROID_APP_VERSION_NAME,
+            'app_version_code': feconf.ANDROID_APP_VERSION_CODE
+        }
         self.payload = {
             'headers': {
                 'api_key': feconf.ANDROID_API_KEY,
                 'app_package_name': feconf.ANDROID_APP_PACKAGE_NAME,
                 'app_version_name': feconf.ANDROID_APP_VERSION_NAME,
-                'app_version_code': feconf. ANDROID_APP_VERSION_CODE
+                'app_version_code': feconf.ANDROID_APP_VERSION_CODE
             },
             'report': REPORT_JSON
         }
@@ -82,7 +88,8 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def test_incoming_report_saved_to_storage(self):
         self.post_json(
-            feconf.INCOMING_APP_FEEDBACK_REPORT_URL, payload, self.csrf_token)
+            feconf.INCOMING_APP_FEEDBACK_REPORT_URL, self.payload,
+            self.csrf_token)
 
         all_reports = (
             app_feedback_report_models.AppFeedbackReportModel.get_all())
