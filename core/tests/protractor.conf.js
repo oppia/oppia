@@ -4,6 +4,7 @@ var glob = require('glob');
 var path = require('path');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
+var exitCode=0;
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -416,16 +417,19 @@ exports.config = {
 
   SELENIUM_PROMISE_MANAGER: false,
 
+  onComplete: function(success){
+    if (!success) {
+      exitCode = 1;
+    }
+  },
   // ----- The cleanup step -----
   //
   // A callback function called once the tests have finished running and
   // the webdriver instance has been shut down. It is passed the exit code
   // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {},
-
-  onComplete: function(success){
-    if (!success) {
-      process.exit(1);
+  onCleanUp: function() {
+    if (exitCode !== 0){
+      process.exit(exitCode);
     }
   }
 };
