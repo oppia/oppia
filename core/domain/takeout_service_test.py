@@ -595,23 +595,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Setup for GeneralFeedbackReplyToId.
         user_two_fake_hash_lambda_one = (
             lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_1)
-        user_two_fake_hash_one = self.swap(
-            utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
-        with user_two_fake_hash_one:
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_1)
-            model.update_timestamps()
-            model.put()
 
         user_two_deterministic_hash_lambda_two = (
             lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_2)
-        user_two_deterministic_hash_two = self.swap(
-            utils, 'convert_to_hash', user_two_deterministic_hash_lambda_two)
-        with user_two_deterministic_hash_two:
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_2)
-            model.update_timestamps()
-            model.put()
 
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_1_id',
