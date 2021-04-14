@@ -997,7 +997,7 @@ class Exploration(python_utils.OBJECT):
         # Check if a state marked as checkpoint is bypassable.
         end_states = []
         for state_name, state in self.states.items():
-            if state.interaction.id == "EndExploration":
+            if state.interaction.id == 'EndExploration':
                 end_states.append(state_name)
 
         # For every state which is marked as a checkpoint and is not the initial
