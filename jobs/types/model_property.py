@@ -161,4 +161,4 @@ class ModelProperty(python_utils.OBJECT):
             if self.__class__ is other.__class__ else NotImplemented)
 
     def __hash__(self):
-        return hash((self._model_class, self._property_obj))
+        return id((self._model_class, self._property_obj))

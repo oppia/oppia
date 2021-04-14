@@ -192,8 +192,7 @@ class _Gae(Platform):
             list(class). The corresponding storage-layer model classes.
         """
         model_names = [
-            name for name in NAMES.__dict__
-            if '__' not in name and name != 'base_model']
+            name for name in NAMES if name != 'base_model']
         return cls.get_storage_model_classes(model_names)
 
     @classmethod

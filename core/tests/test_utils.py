@@ -1809,7 +1809,8 @@ title: Title
             stack.enter_context(self.swap(
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
-            client = ndb.Client()
+            print(self.id())
+            client = ndb.Client(namespace=self.id()[-100:])
             stack.enter_context(client.context())
 
             super(GenericTestBase, self).run(result=result)
@@ -1832,6 +1833,7 @@ title: Title
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
+        print('LOGOUT')
         os.environ['USER_ID'] = ''
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
@@ -2019,7 +2021,7 @@ title: Title
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests. We make it a positive integer
         # because those are always valid auth IDs.
-        return str(hash(email))
+        return str(abs(hash(email)))
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -2353,7 +2355,7 @@ title: Title
             elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     traverse_schema_and_assign_content_ids(
-                        x[schema_property.name],
+                        schema['properties'][schema_property.name],
                         schema_property['schema'],
                         '%s_%s' % (contentId, schema_property.name))
 

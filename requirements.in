@@ -36,6 +36,7 @@ google-auth==1.28.1
 google-cloud-ndb==1.8.0
 google-cloud-tasks==1.5.0
 google-cloud-translate==2.0.1
+pytest==6.2.3
 webapp2==3.0.0b1
 elasticsearch==7.10.0
 

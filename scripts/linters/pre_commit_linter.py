@@ -208,6 +208,9 @@ class FileCache(python_utils.OBJECT):
         return self._CACHE_DATA_DICT[key]
 
 
+NAME_SPACE = multiprocessing.Manager().Namespace()
+
+
 def _get_linters_for_file_extension(file_extension_to_lint):
     """Return linters for the file extension type.
 
@@ -218,6 +221,8 @@ def _get_linters_for_file_extension(file_extension_to_lint):
         (CustomLintChecks, ThirdPartyLintChecks). A 2-tuple containing objects
         of lint check classes to run in parallel processing.
     """
+    NAME_SPACE.files = FileCache()
+    FILE_CACHE = NAME_SPACE.files
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     custom_linters = []
     third_party_linters = []
@@ -362,6 +367,8 @@ def _get_filepaths_from_path(input_path):
     Returns:
         list. Paths to lintable files.
     """
+    NAME_SPACE.files = FileCache()
+    FILE_CACHE = NAME_SPACE.files
     input_path = os.path.join(os.getcwd(), input_path)
     if not os.path.exists(input_path):
         python_utils.PRINT(
@@ -479,6 +486,8 @@ def read_files(file_paths):
     """Read all files to be checked and cache them. This will spin off multiple
     threads to increase the efficiency.
     """
+    NAME_SPACE.files = FileCache()
+    FILE_CACHE = NAME_SPACE.files
     threads = []
     for file_path in file_paths:
         thread = threading.Thread(target=FILE_CACHE.read, args=(file_path,))
@@ -685,12 +694,6 @@ def main(args=None):
             '---------------------------',
             'All Checks Passed.',
             '---------------------------']))
-
-
-NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
-NAME_SPACE.files = FileCache()
-FILE_CACHE = NAME_SPACE.files
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
