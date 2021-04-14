@@ -166,6 +166,10 @@ var suites = {
 
     wipeout: [
       'protractor_desktop/wipeout.js',
+    ],
+
+    protractorTesting: [
+      'protractor_desktop/exitCodeTest.js',
     ]
   };
 
@@ -417,5 +421,11 @@ exports.config = {
   // A callback function called once the tests have finished running and
   // the webdriver instance has been shut down. It is passed the exit code
   // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {}
+  onCleanUp: function() {},
+
+  onComplete: function(success){
+    if (!success) {
+      process.exit(1);
+    }
+  }
 };
