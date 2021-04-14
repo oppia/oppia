@@ -51,12 +51,10 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
         self.dev_feature = registry.Registry.create_platform_parameter(
             PARAM_NAMES.parameter_a, 'parameter for test', DATA_TYPES.bool,
-            is_feature=True,
-            feature_stage=param_domain.FEATURE_STAGES.dev)
+            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.dev)
         self.prod_feature = registry.Registry.create_platform_parameter(
             PARAM_NAMES.parameter_b, 'parameter for test', DATA_TYPES.bool,
-            is_feature=True,
-            feature_stage=param_domain.FEATURE_STAGES.prod)
+            is_feature=True, feature_stage=param_domain.FEATURE_STAGES.prod)
         registry.Registry.update_platform_parameter(
             self.prod_feature.name, self.user_id, 'edit rules',
             [
