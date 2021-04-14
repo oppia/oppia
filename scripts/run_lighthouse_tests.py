@@ -34,7 +34,7 @@ from scripts import common
 
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
-LIGHTHOUSE_MODE_STATIC= 'static'
+LIGHTHOUSE_MODE_STATIC = 'static'
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
 SERVER_MODE_PROD = 'dev'
@@ -194,7 +194,8 @@ def main(args=None):
     enable_webpages()
     atexit.register(cleanup)
 
-    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE or lighthouse_mode == LIGHTHOUSE_MODE_STATIC:
+    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE
+       or lighthouse_mode == LIGHTHOUSE_MODE_STATIC:
         python_utils.PRINT('Building files in production mode.')
         # We are using --source_maps here, so that we have at least one CI check
         # that builds using source maps in prod env. This is to ensure that
