@@ -24,7 +24,6 @@ module.exports = {
       'url': [
         'http://127.0.0.1:8181/',
         'http://127.0.0.1:8181/about',
-        'http://127.0.0.1:8181/admin',
         'http://127.0.0.1:8181/community-library',
         'http://127.0.0.1:8181/contact',
         'http://127.0.0.1:8181/contributor-dashboard',
@@ -32,27 +31,11 @@ module.exports = {
         'http://127.0.0.1:8181/creator-guidelines',
         'http://127.0.0.1:8181/delete-account',
         'http://127.0.0.1:8181/donate',
-        'http://127.0.0.1:8181/emaildashboard',
         'http://127.0.0.1:8181/get-started',
         'http://127.0.0.1:8181/learner-dashboard',
         'http://127.0.0.1:8181/nonprofits',
         'http://127.0.0.1:8181/moderator',
         'http://127.0.0.1:8181/parents',
-        'http://127.0.0.1:8181/partners',
-        'http://127.0.0.1:8181/preferences',
-        'http://127.0.0.1:8181/privacy-policy',
-        'http://127.0.0.1:8181/profile/username1',
-        'http://127.0.0.1:8181/signup?return_url=%2F',
-        'http://127.0.0.1:8181/teach',
-        'http://127.0.0.1:8181/teachers',
-        'http://127.0.0.1:8181/topics-and-skills-dashboard',
-        'http://127.0.0.1:8181/terms',
-        'http://127.0.0.1:8181/thanks',
-        'http://127.0.0.1:8181/volunteers',
-        `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
-        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
-        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
       ]
     },
     'assert': {
@@ -94,6 +77,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.99}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -104,6 +88,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/admin$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -114,6 +99,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/about$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -124,6 +110,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/community-library$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.97}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -134,6 +121,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/contact$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -144,6 +132,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/contributor-dashboard$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.96}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -154,6 +143,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/creator-dashboard$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.83}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -164,6 +154,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/creator-guidelines$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.99}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
             ],
@@ -174,6 +165,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/delete-account$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.99}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -184,6 +176,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/donate$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}],
             // The YouTube embed on donate page loads images in jpg format, thus
             // we need to allow one image.
             'uses-webp-images': [
@@ -194,18 +187,9 @@ module.exports = {
           }
         },
         {
-          'matchingUrlPattern': 'http://[^/]+/emaildashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
           'matchingUrlPattern': 'http://[^/]+/get-started$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.99}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -216,6 +200,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/learner-dashboard$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.93}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -228,6 +213,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/nonprofits$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -238,6 +224,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/moderator$',
           'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
@@ -248,159 +235,7 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/parents$',
           'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/partners$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/preferences$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/privacy-policy$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/profile/username1$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/signup?return_url=%2F$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/teach$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/teachers$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/terms$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/thanks$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/volunteers$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/topics-and-skills-dashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/create/.*$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            // We need to use passive event listeners on this page so that
-            // the page works correctly.
-            'uses-passive-event-listeners': ['error', {'minScore': 0}],
-            // MIDI library uses some deprecated API.
-            'deprecations': ['error', {'minScore': 0}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/topic_editor/.*$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/skill_editor/.*$',
-          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}],
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],

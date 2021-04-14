@@ -34,6 +34,7 @@ from scripts import common
 
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
+LIGHTHOUSE_MODE_STATIC= 'static'
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
 SERVER_MODE_PROD = 'dev'
@@ -41,8 +42,9 @@ SERVER_MODE_DEV = 'prod'
 GOOGLE_APP_ENGINE_PORT = 8181
 SUBPROCESSES = []
 LIGHTHOUSE_CONFIG_FILENAMES = {
-    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc.js',
-    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js'
+    LIGHTHOUSE_MODE_STATIC: '.lighthouserc-static.js',
+    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js',
+    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc-performance.js'
 }
 APP_YAML_FILENAMES = {
     SERVER_MODE_PROD: 'app.yaml',
@@ -60,7 +62,7 @@ _PARSER.add_argument(
     '--mode',
     help='Sets the mode for the lighthouse tests',
     required=True,
-    choices=['accessibility', 'performance'],)
+    choices=['accessibility', 'performance', 'static'],)
 
 
 def cleanup():
@@ -181,6 +183,9 @@ def main(args=None):
     elif parsed_args.mode == LIGHTHOUSE_MODE_PERFORMANCE:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
+    elif parsed_args.mode == LIGHTHOUSE_MODE_STATIC:
+        lighthouse_mode = LIGHTHOUSE_MODE_STATIC
+        server_mode = SERVER_MODE_PROD
     else:
         raise Exception(
             'Invalid parameter passed in: \'%s\', please choose'
@@ -189,7 +194,7 @@ def main(args=None):
     enable_webpages()
     atexit.register(cleanup)
 
-    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
+    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE or lighthouse_mode == LIGHTHOUSE_MODE_STATIC:
         python_utils.PRINT('Building files in production mode.')
         # We are using --source_maps here, so that we have at least one CI check
         # that builds using source maps in prod env. This is to ensure that
@@ -221,7 +226,8 @@ def main(args=None):
         common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
         common.wait_for_port_to_be_in_use(GOOGLE_APP_ENGINE_PORT)
 
-        run_lighthouse_puppeteer_script()
+        if lighthouse_mode != LIGHTHOUSE_MODE_STATIC:
+            run_lighthouse_puppeteer_script()
         run_lighthouse_checks(lighthouse_mode)
 
 
