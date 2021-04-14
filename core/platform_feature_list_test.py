@@ -70,9 +70,9 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_no_duplicated_names_in_features_lists(self):
         duplicate_names = []
-        for name in self.all_features_set:
-            if self.all_features_list.count(name) > 1:
-                duplicate_names.append(name)
+        for feature in self.all_features_set:
+            if self.all_features_list.count(feature) > 1:
+                duplicate_names.append(feature.value)
         self.assertTrue(
             len(duplicate_names) == 0,
             msg='Following entries appear more than once in features lists'
@@ -81,9 +81,9 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_no_duplicate_names_in_deprecated_names_list(self):
         duplicate_names = []
-        for name in set(platform_feature_list.DEPRECATED_FEATURE_NAMES):
-            if platform_feature_list.DEPRECATED_FEATURE_NAMES.count(name) > 1:
-                duplicate_names.append(name)
+        for feature in set(platform_feature_list.DEPRECATED_FEATURE_NAMES):
+            if platform_feature_list.DEPRECATED_FEATURE_NAMES.count(feature) > 1:
+                duplicate_names.append(feature.value)
         self.assertTrue(
             len(duplicate_names) == 0,
             msg='Following entries appear more than once in deprecated name '
@@ -94,9 +94,9 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         deprecated_names_set = set(
             platform_feature_list.DEPRECATED_FEATURE_NAMES)
         found_deprecated_names = []
-        for name in self.all_features_set:
-            if name in deprecated_names_set:
-                found_deprecated_names.append(name)
+        for feature in self.all_features_set:
+            if feature in deprecated_names_set:
+                found_deprecated_names.append(feature.value)
         self.assertTrue(
             len(found_deprecated_names) == 0,
             msg='Following names in feature lists are deprecated and should '
@@ -132,11 +132,11 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_all_entries_in_test_features_list_are_in_test_stage(self):
         invalid_feature_names = []
-        for name in platform_feature_list.TEST_FEATURES_LIST:
-            feature_flag = registry.Registry.get_platform_parameter(name)
+        for feature in platform_feature_list.TEST_FEATURES_LIST:
+            feature_flag = registry.Registry.get_platform_parameter(feature.name)
             if (feature_flag.feature_stage !=
                     platform_parameter_domain.FEATURE_STAGES.test.value):
-                invalid_feature_names.append(name)
+                invalid_feature_names.append(feature.name)
         self.assertTrue(
             len(invalid_feature_names) == 0,
             msg='Following entries defined in TEST_FEATURES_LIST are not in '
@@ -145,11 +145,11 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_all_entries_in_prod_features_list_are_in_prod_stage(self):
         invalid_feature_names = []
-        for name in platform_feature_list.PROD_FEATURES_LIST:
-            feature_flag = registry.Registry.get_platform_parameter(name)
+        for feature in platform_feature_list.PROD_FEATURES_LIST:
+            feature_flag = registry.Registry.get_platform_parameter(feature.value)
             if (feature_flag.feature_stage !=
                     platform_parameter_domain.FEATURE_STAGES.prod.value):
-                invalid_feature_names.append(name)
+                invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
             msg='Following entries defined in PROD_FEATURES_LIST are not in '
