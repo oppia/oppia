@@ -1672,7 +1672,7 @@ class Exploration(python_utils.OBJECT):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initalize a
                 State domain object.
-            init_state_name: str. The name of the first state
+            init_state_name: str. The name of the first state.
 
         Returns:
             dict. The converted states_dict.
