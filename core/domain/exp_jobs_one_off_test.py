@@ -658,6 +658,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         the given state schema version. All passed state dictionaries in
         'states_dict' must have the states schema version indicated by
         'states_schema_version'.
+
         Note that it makes an explicit commit to the datastore instead of using
         the usual functions for updating and creating explorations. This is
         because the latter approach would result in an exploration with the
@@ -3241,6 +3242,7 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         the given state schema version. All passed state dictionaries in
         'states_dict' must have the states schema version indicated by
         'states_schema_version'.
+
         Note that it makes an explicit commit to the datastore instead of using
         the usual functions for updating and creating explorations. This is
         because the latter approach would result in an exploration with the

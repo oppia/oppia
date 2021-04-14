@@ -332,6 +332,7 @@ title: Old Title
         reverting to a version prior to the migration still maintains a valid
         exploration. It tests both the exploration domain object and the
         exploration model stored in the datastore for validity.
+
         Note: It is important to distinguish between when the test is testing
         the exploration domain versus its model. It is operating at the domain
         layer when using exp_fetchers.get_exploration_by_id. Otherwise, it
