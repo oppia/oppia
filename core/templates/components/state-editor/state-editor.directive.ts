@@ -96,7 +96,7 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$scope', 'ContextService', 'StateContentService',
+        '$http', '$scope', 'ContextService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
         'StateNextContentIdIndexService',
@@ -104,7 +104,7 @@ angular.module('oppia').directive('stateEditor', [
         'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $scope, ContextService, StateContentService,
+            $http, $scope, ContextService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,
@@ -140,8 +140,11 @@ angular.module('oppia').directive('stateEditor', [
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
-            $scope.explorationIsLinkedToStory =
-              ContextService.isExplorationLinkedToStory();
+            ctrl.explorationId = ContextService.getExplorationId();
+            $http.get('/createhandler/data/' + ctrl.explorationId)
+              .then(function(response) {
+                $scope.explorationIsLinkedToStory = response.data.exploration_is_linked_to_story;
+              });
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {
