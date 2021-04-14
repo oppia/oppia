@@ -22,9 +22,6 @@ import json
 import logging
 import math
 
-import jinja2
-from jinja2 import meta
-
 import python_utils  # isort:skip
 
 
@@ -45,7 +42,7 @@ def _js_string_filter(value):
 
     for replacement in replacements:
         string = string.replace(replacement[0], replacement[1])
-    return jinja2.utils.Markup(string)
+    return string
 
 
 def _log2_floor_filter(value):
@@ -83,25 +80,19 @@ def parse_string(string, params, autoescape=True):
     Raises:
         Exception. Unable to parse string with Jinja.
     """
-    env = jinja2.Environment(autoescape=autoescape)
-
-    env.filters.update(JINJA_FILTERS)
-    try:
-        parsed_string = env.parse(string)
-    except jinja2.exceptions.TemplateError:
-        raise Exception('Unable to parse string with Jinja: %s' % string)
+    parsed_string = string
 
     variables = meta.find_undeclared_variables(parsed_string)
     if any([var not in params for var in variables]):
         logging.info('Cannot parse %s fully using %s', string, params)
 
     try:
-        return env.from_string(string).render(params)
+        return string
     except Exception:
         logging.error(
             'jinja_utils.parse_string() failed with args: %s, %s, %s' %
             (string, params, autoescape))
-        return env.from_string('[CONTENT PARSING ERROR]').render({})
+        return '[CONTENT PARSING ERROR]'
 
 
 def evaluate_object(obj, params):

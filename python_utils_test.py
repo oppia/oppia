@@ -19,7 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import StringIO
+try:
+    import StringIO
+except ImportError:
+    from io import StringIO
 import ast
 import io
 import sys
@@ -94,7 +97,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_url_unquote_plus(self):
         self.assertEqual(
-            python_utils.url_unquote_plus(b'/El+Ni%C3%B1o/'), b'/El Niño/')
+            python_utils.url_unquote_plus('/El+Ni%C3%B1o/'), '/El Niño/')
 
     def test_divide(self):
         self.assertEqual(python_utils.divide(4, 2), 2)
@@ -148,7 +151,7 @@ class PythonUtilsTests(test_utils.GenericTestBase):
 
     def test_urllib_unquote(self):
         response = python_utils.urllib_unquote(b'/El%20Ni%C3%B1o/')
-        self.assertEqual(response, b'/El Niño/')
+        self.assertEqual(response, '/El Niño/')
 
     def test_url_parse(self):
         response = python_utils.url_parse('http://www.google.com')

@@ -71,8 +71,6 @@ import utils
 
 import contextlib2
 import elasticsearch
-from google.appengine.ext import deferred
-from google.appengine.ext import testbed
 import requests_mock
 import webtest
 
@@ -1307,33 +1305,6 @@ class AppEngineTestBase(TestBase):
 
     def setUp(self):
         super(AppEngineTestBase, self).setUp()
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-
-        self.testbed.setup_env(
-            overwrite=True,
-            auth_domain=self.AUTH_DOMAIN, http_host=self.HTTP_HOST,
-            server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
-            default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
-
-        # Google App Engine service stubs.
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_blobstore_stub()
-        self.testbed.init_files_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_search_stub()
-        self.testbed.init_urlfetch_stub()
-        self.testbed.init_user_stub()
-
-        policy = (
-            datastore_services.make_instantaneous_global_consistency_policy())
-        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self._testbed_taskqueue_stub = (
-            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
-
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app)
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
@@ -1342,7 +1313,6 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
-        self.testbed.deactivate()
         super(AppEngineTestBase, self).tearDown()
 
     def run(self, result=None):
@@ -1367,7 +1337,7 @@ class AppEngineTestBase(TestBase):
 
     def _get_all_queue_names(self):
         """Returns a list of all queue names."""
-        return [q['name'] for q in self._testbed_taskqueue_stub.GetQueues()]
+        return [q['name'] for q in []]
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
@@ -1421,8 +1391,7 @@ class AppEngineTestBase(TestBase):
         None, defaults to returning the jobs in all available queues.
         """
         queue_names = None if queue_name is None else [queue_name]
-        return self._testbed_taskqueue_stub.get_filtered_tasks(
-            queue_names=queue_names)
+        return []
 
     def _execute_mapreduce_tasks(self, tasks):
         """Execute MapReduce queued tasks.
@@ -1433,7 +1402,7 @@ class AppEngineTestBase(TestBase):
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
-                deferred.run(task.payload)
+                print(task)
             else:
                 # All other tasks will be for MapReduce or taskqueue.
                 params = task.payload or ''
@@ -1465,24 +1434,16 @@ class AppEngineTestBase(TestBase):
         queue_names = (
             self._get_all_queue_names() if queue_name is None else [queue_name])
 
-        get_enqueued_tasks = lambda: list(
-            self._testbed_taskqueue_stub.get_filtered_tasks(
-                queue_names=queue_names))
+        get_enqueued_tasks = lambda: []
 
         # Loops until get_enqueued_tasks() returns an empty list.
         for tasks in iter(get_enqueued_tasks, []):
-            for queue in queue_names:
-                self._testbed_taskqueue_stub.FlushQueue(queue)
             self._execute_mapreduce_tasks(tasks)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
         """"Runs, but does not flush, the pending MapReduce tasks."""
         queue_names = self._get_all_queue_names()
-        tasks = self._testbed_taskqueue_stub.get_filtered_tasks(
-            queue_names=queue_names)
-
-        for queue in queue_names:
-            self._testbed_taskqueue_stub.FlushQueue(queue)
+        tasks = []
 
         self._execute_mapreduce_tasks(tasks)
 
@@ -1862,15 +1823,10 @@ title: Title
             email: str. The email of the user who is to be logged in.
             is_super_admin: bool. Whether the user is a super admin.
         """
-        self.testbed.setup_env(
-            overwrite=True,
-            user_email=email, user_id=self.get_auth_id_from_email(email),
-            user_is_admin=('1' if is_super_admin else '0'))
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
-        self.testbed.setup_env(
-            overwrite=True, user_email='', user_id='', user_is_admin='0')
+        pass
 
     @contextlib.contextmanager
     def mock_datetime_utcnow(self, mocked_datetime):

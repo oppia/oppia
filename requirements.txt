@@ -309,7 +309,7 @@ webencodings==0.5.1
     #   -r requirements.in
     #   bleach
     #   html5lib
-webob==1.8.6
+webob==1.8.7
     # via webapp2
 
 # The following packages are considered to be unsafe in a requirements file:

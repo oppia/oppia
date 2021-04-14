@@ -401,6 +401,11 @@ def _get_possible_normalized_metadata_directory_names(
         normalize_directory_name(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
+        normalize_directory_name(
+            '%s-%s-py3.7.egg-info' % (library_name, version_string)),
+        normalize_directory_name(
+            '%s-%s-py3.7.egg-info' % (
+                library_name.replace('-', '_'), version_string)),
     }
 
 
