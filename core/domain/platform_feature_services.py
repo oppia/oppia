@@ -49,7 +49,7 @@ ALL_FEATURES_LIST = (
     platform_feature_list.PROD_FEATURES_LIST
 )
 
-ALL_FEATURES_NAMES_SET = set(ALL_FEATURES_LIST)
+ALL_FEATURES_NAMES_SET = set([feature.value for feature in ALL_FEATURES_LIST])
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -85,8 +85,8 @@ def get_all_feature_flag_dicts():
         feature flags.
     """
     return [
-        registry.Registry.get_platform_parameter(name).to_dict()
-        for name in ALL_FEATURES_LIST
+        registry.Registry.get_platform_parameter(feature.value).to_dict()
+        for feature in ALL_FEATURES_LIST
     ]
 
 
@@ -149,13 +149,13 @@ def _get_server_mode():
     """Returns the running mode of Oppia.
 
     Returns:
-        str. The server mode of Oppia, 'dev' if Oppia is running in development
-        mode, 'prod' if in production mode.
+        Enum. The server mode of Oppia, dev if Oppia is running in development
+        mode, prod if in production mode.
     """
     return (
-        platform_parameter_domain.SERVER_MODES.dev.value
+        platform_parameter_domain.SERVER_MODES.dev
         if constants.DEV_MODE
-        else platform_parameter_domain.SERVER_MODES.prod.value
+        else platform_parameter_domain.SERVER_MODES.prod
     )
 
 

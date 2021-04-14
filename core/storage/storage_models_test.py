@@ -61,8 +61,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for clazz in self._get_base_or_versioned_model_child_classes():
             try:
                 self.assertIn(
-                    clazz.get_deletion_policy(),
-                    base_models.DELETION_POLICY)
+                    clazz.get_deletion_policy(), base_models.DELETION_POLICY)
             except NotImplementedError:
                 self.fail(msg='get_deletion_policy is not defined for %s' % (
                     clazz.__name__))

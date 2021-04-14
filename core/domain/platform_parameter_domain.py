@@ -34,10 +34,9 @@ FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
 DATA_TYPES = python_utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
 
 ALLOWED_SERVER_MODES = [
-    SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
+    SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
 ALLOWED_FEATURE_STAGES = [
-    FEATURE_STAGES.dev.value, FEATURE_STAGES.test.value,
-    FEATURE_STAGES.prod.value]
+    FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
 ALLOWED_PLATFORM_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
 ALLOWED_APP_VERSION_FLAVORS = (
@@ -111,8 +110,8 @@ class EvaluationContext(python_utils.OBJECT):
         """Returns the server mode of Oppia.
 
         Returns:
-            str. The the server mode of Oppia, must be one of the following:
-            'dev', 'test', 'prod'.
+            Enum(SERVER_MODES). The the server mode of Oppia,
+            must be one of the following: dev, test, prod.
         """
         return self._server_mode
 
@@ -259,7 +258,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
         matched = False
         if self._type == 'server_mode' and op == '=':
-            matched = context.server_mode == value
+            matched = context.server_mode.value == value
         elif self._type == 'platform_type' and op == '=':
             matched = context.platform_type == value
         elif self._type == 'browser_type' and op == '=':
@@ -288,7 +287,9 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
         if self._type == 'server_mode':
             for _, mode in self._conditions:
-                if mode not in ALLOWED_SERVER_MODES:
+                try:
+                    getattr(SERVER_MODES, mode)
+                except AttributeError:
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))
@@ -724,7 +725,9 @@ class PlatformParameter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
-        if self._feature_stage not in ALLOWED_FEATURE_STAGES:
+        try:
+            getattr(FEATURE_STAGES, self._feature_stage)
+        except AttributeError:
             raise utils.ValidationError(
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))

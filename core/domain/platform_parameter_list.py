@@ -33,13 +33,13 @@ PARAM_NAMES = python_utils.create_enum( # pylint: disable=invalid-name
 # Platform parameters should all be defined below.
 
 Registry.create_feature_flag(
-    PARAM_NAMES.dummy_feature.value,
+    PARAM_NAMES.dummy_feature,
     'This is a dummy feature flag.',
-    FEATURE_STAGES.dev.value,
+    FEATURE_STAGES.dev,
 )
 
 Registry.create_platform_parameter(
-    PARAM_NAMES.dummy_parameter.value,
+    PARAM_NAMES.dummy_parameter,
     'This is a dummy platform parameter.',
-    DATA_TYPES.string.value
+    DATA_TYPES.string
 )

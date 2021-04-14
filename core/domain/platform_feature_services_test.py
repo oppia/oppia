@@ -25,15 +25,16 @@ from core.domain import platform_feature_services as feature_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
+import python_utils
 import utils
 
+PARAM_NAMES = python_utils.create_enum('feature_a', 'feature_b')  # pylint: disable=invalid-name
+SERVER_MODES = platform_parameter_domain.SERVER_MODES
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
 class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     """Test for the platform feature services."""
 
-    DEV_MODE = platform_parameter_domain.SERVER_MODES.dev.value
-    TEST_MODE = platform_parameter_domain.SERVER_MODES.test.value
-    PROD_MODE = platform_parameter_domain.SERVER_MODES.prod.value
 
     def setUp(self):
         super(PlatformFeatureServiceTest, self).setUp()
@@ -44,16 +45,17 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         registry.Registry.parameter_registry.clear()
         # Parameter names that might be used in following tests.
         param_names = ['feature_a', 'feature_b']
+        param_name_enums = [PARAM_NAMES.feature_a, PARAM_NAMES.feature_b]
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
             param_names)
 
         self.dev_feature = registry.Registry.create_feature_flag(
-            'feature_a', 'a feature in dev stage',
-            platform_parameter_domain.FEATURE_STAGES.dev.value)
+            PARAM_NAMES.feature_a, 'a feature in dev stage',
+            platform_parameter_domain.FEATURE_STAGES.dev)
         self.prod_feature = registry.Registry.create_feature_flag(
-            'feature_b', 'a feature in prod stage',
-            platform_parameter_domain.FEATURE_STAGES.prod.value)
+            PARAM_NAMES.feature_b, 'a feature in prod stage',
+            platform_parameter_domain.FEATURE_STAGES.prod)
         registry.Registry.update_platform_parameter(
             self.dev_feature.name, self.user_id, 'edit rules',
             [
@@ -62,7 +64,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', self.DEV_MODE]
+                                ['=', SERVER_MODES.dev.value]
                             ]
                         }
                     ],
@@ -81,15 +83,15 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             'conditions': [
                                 [
                                     '=',
-                                    self.DEV_MODE
+                                    SERVER_MODES.dev.value
                                 ],
                                 [
                                     '=',
-                                    self.TEST_MODE
+                                    SERVER_MODES.test.value
                                 ],
                                 [
                                     '=',
-                                    self.PROD_MODE
+                                    SERVER_MODES.prod.value
                                 ]
                             ]
                         }
@@ -103,7 +105,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         self.original_feature_list = feature_services.ALL_FEATURES_LIST
         self.original_feature_name_set = (
             feature_services.ALL_FEATURES_NAMES_SET)
-        feature_services.ALL_FEATURES_LIST = param_names
+        feature_services.ALL_FEATURES_LIST = param_name_enums
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
     def tearDown(self):
@@ -123,7 +125,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 context.server_mode,
-                platform_parameter_domain.FEATURE_STAGES.dev.value)
+                platform_parameter_domain.FEATURE_STAGES.dev)
             self.assertEqual(context.platform_type, 'Android')
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
@@ -200,7 +202,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             'conditions': [
                                 [
                                     '=',
-                                    self.PROD_MODE
+                                    SERVER_MODES.prod.value
                                 ]
                             ],
                         },
@@ -238,7 +240,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             'conditions': [
                                 [
                                     '=',
-                                    self.DEV_MODE
+                                    FEATURE_STAGES.dev.value
                                 ]
                             ]
                         }

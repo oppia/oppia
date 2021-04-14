@@ -60,8 +60,7 @@ class StorageModelAuditJobsTest(test_utils.GenericTestBase):
         # As models.NAMES is an enum, it cannot be iterated. So we use the
         # __dict__ property which can be iterated.
         for name in models.NAMES:
-            if '__' not in name.value:
-                all_model_module_names.append(name)
+            all_model_module_names.append(name)
 
         names_of_ndb_model_subclasses = []
         for module_name in all_model_module_names:

@@ -191,7 +191,7 @@ class _Gae(Platform):
         """
         model_names = [
             name for name in NAMES
-            if '__' not in name.value and name.value != 'base_model']
+            if name.value != 'base_model']
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
