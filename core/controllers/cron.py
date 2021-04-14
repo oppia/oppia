@@ -19,18 +19,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
-from core import jobs
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import activity_jobs_one_off
 from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
-from core.domain import recommendations_jobs_one_off
 from core.domain import suggestion_services
-from core.domain import user_jobs_one_off
 from core.domain import user_services
-from core.domain import wipeout_jobs_one_off
 import feconf
 import utils
 
@@ -75,106 +70,6 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_message = 'All MapReduce jobs are running fine.'
 
         email_manager.send_mail_to_admin(email_subject, email_message)
-
-
-class CronDashboardStatsHandler(base.BaseHandler):
-    """Handler for appending dashboard stats to a list."""
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
-            user_jobs_one_off.DashboardStatsOneOffJob.create_new())
-
-
-class CronUserDeletionHandler(base.BaseHandler):
-    """Handler for running the user deletion one off job."""
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        wipeout_jobs_one_off.UserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.UserDeletionOneOffJob.create_new())
-
-
-class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
-    """Handler for running the fully complete user deletion one off job."""
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
-            .create_new()
-        )
-
-
-class CronExplorationRecommendationsHandler(base.BaseHandler):
-    """Handler for computing exploration recommendations."""
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        job_class = (
-            recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
-        job_class.enqueue(job_class.create_new())
-
-
-class CronActivitySearchRankHandler(base.BaseHandler):
-    """Handler for computing activity search ranks."""
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles GET requests."""
-        activity_jobs_one_off.IndexAllActivitiesJobManager.enqueue(
-            activity_jobs_one_off.IndexAllActivitiesJobManager.create_new())
-
-
-class CronMapreduceCleanupHandler(base.BaseHandler):
-    """Handler for cleaning up data items of completed map/reduce jobs."""
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Clean up intermediate data items for completed M/R jobs that
-        started more than MAX_MAPREDUCE_METADATA_RETENTION_MSECS milliseconds
-        ago.
-
-        Map/reduce runs leave around a large number of rows in several
-        tables.  This data is useful to have around for a while:
-        - it helps diagnose any problems with jobs that may be occurring
-        - it shows where resource usage is occurring
-        However, after a few days, this information is less relevant, and
-        should be cleaned up.
-        """
-        # Only consider jobs that started at most 1 week before recency_msec.
-        # The latest start time that a job scheduled for cleanup may have.
-        max_start_time_msec = (
-            utils.get_current_time_in_millisecs() -
-            jobs.MAX_MAPREDUCE_METADATA_RETENTION_MSECS
-        )
-
-        jobs.cleanup_old_jobs_pipelines()
-
-        if jobs.do_unfinished_jobs_exist(
-                cron_services.MapReduceStateModelsCleanupManager.__name__):
-            logging.warning('A previous cleanup job is still running.')
-        else:
-            cron_services.MapReduceStateModelsCleanupManager.enqueue(
-                cron_services.MapReduceStateModelsCleanupManager.create_new(),
-                additional_job_params={
-                    jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
-                })
-            logging.warning(
-                'Deletion jobs for auxiliary MapReduce entities kicked off.')
-
-        if jobs.do_unfinished_jobs_exist(
-                cron_services.JobModelsCleanupManager.__name__):
-            logging.warning(
-                'A previous JobModels cleanup job is still running.')
-        else:
-            cron_services.JobModelsCleanupManager.enqueue(
-                cron_services.JobModelsCleanupManager.create_new())
-            logging.warning('Deletion jobs for JobModels entities kicked off.')
 
 
 class CronModelsCleanupHandler(base.BaseHandler):

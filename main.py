@@ -845,6 +845,6 @@ class NdbWsgiMiddleware:
       with client.context():
           return self.wsgi_app(environ, start_response)
 
-
-app = NdbWsgiMiddleware(webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
+app = NdbWsgiMiddleware(app_without_context)
 firebase_auth_services.establish_firebase_connection()

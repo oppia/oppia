@@ -178,6 +178,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
+        print(auth_claims)
         if auth_claims:
             auth_id = auth_claims.auth_id
             user_settings = user_services.get_user_settings_by_auth_id(auth_id)
@@ -271,6 +272,7 @@ class BaseHandler(webapp2.RequestHandler):
                 # page and the user_id is None, if that is the case an exception
                 # is raised which is handled by the frontend by showing a
                 # continue to registration modal.
+                print(self.user_id)
                 if 'signup' in self.request.uri and not self.user_id:
                     raise self.UnauthorizedUserException(
                         'Registration session expired.')
@@ -487,26 +489,22 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(401, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(400, {'error': str(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(500, {'error': str(exception)})
             return
 
         if isinstance(exception, self.TemporaryMaintenanceException):
             self.error(503)
-            self._render_exception(503, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(503, {'error': str(exception)})
             return
 
         self.error(500)

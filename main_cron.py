@@ -32,21 +32,6 @@ URLS = [
     main.get_redirect_route(
         r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler),
     main.get_redirect_route(
-        r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
-    main.get_redirect_route(
-        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
-    main.get_redirect_route(
-        r'/cron/users/fully_complete_user_deletion',
-        cron.CronFullyCompleteUserDeletionHandler),
-    main.get_redirect_route(
-        r'/cron/explorations/recommendations',
-        cron.CronExplorationRecommendationsHandler),
-    main.get_redirect_route(
-        r'/cron/explorations/search_rank',
-        cron.CronActivitySearchRankHandler),
-    main.get_redirect_route(
-        r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
-    main.get_redirect_route(
         r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
     main.get_redirect_route(
         r'/cron/mail/admins/contributor_dashboard_bottlenecks',

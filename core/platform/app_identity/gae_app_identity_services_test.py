@@ -23,8 +23,6 @@ from constants import constants
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
-from google.appengine.api import app_identity
-
 
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
@@ -46,11 +44,6 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
                 self.expected_bucket_name)
-
-    def test_get_gcs_resource_bucket_name_dev(self):
-        self.assertEqual(
-            gae_app_identity_services.get_gcs_resource_bucket_name(),
-            app_identity.get_default_gcs_bucket_name())
 
     def test_get_default_gcs_bucket_name(self):
         self.assertEqual(

@@ -22,7 +22,6 @@ import datetime
 import logging
 
 from constants import constants
-from core import jobs
 from core.domain import config_services
 from core.domain import cron_services
 from core.domain import email_manager
@@ -38,7 +37,6 @@ import feconf
 import main_cron
 import utils
 
-from mapreduce import model as mapreduce_model
 import webtest
 
 (
@@ -48,14 +46,6 @@ import webtest
     models.NAMES.exploration, models.NAMES.job,
     models.NAMES.suggestion, models.NAMES.user
 ])
-
-
-class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
-    """Test job that maps over the general suggestion model."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [suggestion_models.GeneralSuggestionModel]
 
 
 class CronJobTests(test_utils.GenericTestBase):
@@ -93,40 +83,6 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertEqual(self.email_subjects, ['MapReduce status report'])
         self.assertEqual(
             self.email_bodies, ['All MapReduce jobs are running fine.'])
-
-        self.logout()
-
-    def test_send_mail_to_admin_on_job_failure(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        job_id = SampleMapReduceJobManager.create_new()
-        SampleMapReduceJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(
-            SampleMapReduceJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-
-        # Increase retries to denote a stuck job.
-        shard_state_model_class = mapreduce_model.ShardState
-        recent_job_models = shard_state_model_class.all()
-        for job_model in recent_job_models:
-            job_model.retries += 1
-            job_model.put()
-
-        with self.testapp_swap, self.send_mail_to_admin_swap:
-            self.get_html_response('/cron/mail/admin/job_status')
-
-        self.assertEqual(self.email_subjects, ['MapReduce failure alert'])
-        self.assertEqual(len(self.email_bodies), 1)
-        self.assertIn(
-            '5 jobs have failed in the past 25 hours. More information '
-            '(about at most 50 jobs; to see more, please check the logs)',
-            self.email_bodies[0])
 
         self.logout()
 
@@ -219,51 +175,6 @@ class CronJobTests(test_utils.GenericTestBase):
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
         self.assertEqual(len(all_jobs), 1)
         self.assertEqual(all_jobs[0].job_type, 'IndexAllActivitiesJobManager')
-
-    def test_clean_data_items_of_completed_map_reduce_jobs(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
-        recency_msec_swap = self.swap(
-            jobs, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
-
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        job_id = SampleMapReduceJobManager.create_new()
-        SampleMapReduceJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(
-            SampleMapReduceJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_DEFAULT), 0)
-
-        with self.testapp_swap, logging_swap, recency_msec_swap:
-            self.get_html_response('/cron/jobs/cleanup')
-
-        self.assertEqual(
-            observed_log_messages,
-            [
-                '1 MR jobs cleaned up.',
-                'Deletion jobs for auxiliary MapReduce entities kicked off.',
-                'Deletion jobs for JobModels entities kicked off.'
-            ]
-        )
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-
-        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_cannot_clean_data_item_of_jobs_with_existing_running_cleanup_job(
             self):
