@@ -137,5 +137,5 @@ class MachineTranslatedTextModel(base_models.BaseModel):
             'hashed_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'source_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'target_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
