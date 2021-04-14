@@ -32,7 +32,7 @@ import apache_beam as beam
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class ValidateUserModelIdTests(job_test_utils.PipelinedTestBase):
+class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
 
@@ -44,7 +44,7 @@ class ValidateUserModelIdTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model_with_invalid_id])
-            | beam.ParDo(user_audits.ValidateUserModelId())
+            | beam.ParDo(user_audits.ValidateModelWithUserId())
         )
 
         self.assert_pcoll_equal(output, [
@@ -61,7 +61,7 @@ class ValidateUserModelIdTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model_with_valid_id])
-            | beam.ParDo(user_audits.ValidateUserModelId())
+            | beam.ParDo(user_audits.ValidateModelWithUserId())
         )
 
         self.assert_pcoll_equal(output, [])
