@@ -72,6 +72,7 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { StoryPreviewTabComponent } from 'pages/story-editor-page/story-preview-tab/story-preview-tab.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -123,6 +124,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
+    StoryPreviewTabComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
@@ -150,6 +152,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
+    StoryPreviewTabComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     PromoBarComponent,
@@ -176,6 +179,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
+    StoryPreviewTabComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
