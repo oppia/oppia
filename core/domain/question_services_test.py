@@ -3057,9 +3057,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': '1/2'
+                    'x': ['Test']
                 },
-                'rule_type': 'MatchesExactlyWith'
+                'rule_type': 'Equals'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -3084,10 +3084,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'placeholder': {
                         'value': {
                             'content_id': 'ca_placeholder_0',
-                            'unicode_str': (
-                                'Type an expression here, using only numbers.')
+                            'unicode_str': ''
                         }
-                    }
+                    },
+                    'rows': {'value': 1}
                 },
                 'default_outcome': {
                     'dest': None,
@@ -3100,16 +3100,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'labelled_as_correct': True,
                     'missing_prerequisite_skill_id': None
                 },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': 'Hint 1'
-                    }
-                }],
+                'hints': [],
                 'solution': {},
-                'id': 'NumericExpressionInput'
+                'id': 'TextInput'
             },
-            'next_content_id_index': 3,
+            'next_content_id_index': 4,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -3133,6 +3128,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        linked_skill_id = question.question_state_data['linked_skill_id']
+        linked_skill_id = question.question_state_data.linked_skill_id
         self.assertEqual(
             linked_skill_id, None)
