@@ -169,7 +169,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
-    
+
     def test_convert_states_v43_dict_to_v44_dict(self):
         draft_change_list_1_v43 = [
             exp_domain.ExplorationChange({

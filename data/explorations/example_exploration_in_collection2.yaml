@@ -1,6 +1,6 @@
-author_notes: ""
+author_notes: ''
 auto_tts_enabled: true
-blurb: ""
+blurb: ''
 category: Welcome
 correctness_feedback_enabled: false
 init_state_name: Start
@@ -51,7 +51,7 @@ states:
         dest: END
         feedback:
           content_id: default_outcome
-          html: ""
+          html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []

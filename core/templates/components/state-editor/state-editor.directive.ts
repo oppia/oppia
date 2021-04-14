@@ -143,7 +143,8 @@ angular.module('oppia').directive('stateEditor', [
             ctrl.explorationId = ContextService.getExplorationId();
             $http.get('/createhandler/data/' + ctrl.explorationId)
               .then(function(response) {
-                $scope.explorationIsLinkedToStory = response.data.exploration_is_linked_to_story;
+                $scope.explorationIsLinkedToStory = (
+                  response.data.exploration_is_linked_to_story);
               });
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(

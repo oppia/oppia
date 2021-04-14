@@ -658,7 +658,6 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         the given state schema version. All passed state dictionaries in
         'states_dict' must have the states schema version indicated by
         'states_schema_version'.
-
         Note that it makes an explicit commit to the datastore instead of using
         the usual functions for updating and creating explorations. This is
         because the latter approach would result in an exploration with the
@@ -717,11 +716,11 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -755,11 +754,11 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration converts older explorations to a
         previous state schema version before running the audit job.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -838,16 +837,16 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         }
 
         self.create_exploration_with_states_schema_version(
-            42,
+            41,
             self.NEW_EXP_ID,
             self.albert_id,
             {'Introduction': states_dict}
         )
 
         swap_states_schema_version = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 43)
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
         swap_exp_schema_version = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
         with swap_states_schema_version, swap_exp_schema_version:
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
@@ -928,7 +927,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         }
 
         self.create_exploration_with_states_schema_version(
-            42,
+            41,
             self.NEW_EXP_ID,
             self.albert_id,
             {'Introduction': states_dict}
@@ -939,13 +938,13 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         swap_states_schema_version = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 43)
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
         swap_exp_schema_version = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
 
         with swap_states_schema_version, swap_exp_schema_version, self.swap(
             exp_domain.Exploration,
-            '_convert_states_v42_dict_to_v43_dict',
+            '_convert_states_v41_dict_to_v42_dict',
             mock_conversion
         ):
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
@@ -959,7 +958,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed '
-            'migration to states v43: u\'property_that_dne\'"]]'
+            'migration to states v42: u\'property_that_dne\'"]]'
         ]
         self.assertEqual(actual_output, expected_output)
 
@@ -1016,11 +1015,11 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         failure for a default exploration (of states schema version 0), due to
         the exploration having a null interaction ID in its initial state.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1044,11 +1043,11 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1084,11 +1083,11 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1107,15 +1106,15 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job creates appropriate
         classifier data models for explorations.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exp_model = exp_models.ExplorationModel(
                 id=self.NEW_EXP_ID, category='category', title=self.EXP_TITLE,
                 objective='Old objective', language_code='en', tags=[],
-                blurb='', author_notes='', states_schema_version=42,
+                blurb='', author_notes='', states_schema_version=41,
                 init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
                 states={
                     'END': {
@@ -3242,7 +3241,6 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         the given state schema version. All passed state dictionaries in
         'states_dict' must have the states schema version indicated by
         'states_schema_version'.
-
         Note that it makes an explicit commit to the datastore instead of using
         the usual functions for updating and creating explorations. This is
         because the latter approach would result in an exploration with the
@@ -3328,11 +3326,11 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         """Tests that the snapshot migration job skips deleted explorations
         and does not attempt to migrate any of the snapshots.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3379,9 +3377,9 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         previous state schema.
         """
         swap_states_schema_version = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
         swap_exp_schema_version = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
         with swap_states_schema_version, swap_exp_schema_version:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
@@ -3399,7 +3397,7 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '42',
+                'from_version': '41',
                 'to_version': latest_schema_version
             })
         ]
@@ -3428,11 +3426,11 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         """Test that the audit job catches any errors that would otherwise
         occur during the migration.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3446,7 +3444,7 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         migration_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '42',
+                'from_version': '41',
                 'to_version': latest_schema_version
             })
         ]
@@ -3464,7 +3462,7 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         with self.swap(
-            exp_domain.Exploration, '_convert_states_v42_dict_to_v43_dict',
+            exp_domain.Exploration, '_convert_states_v41_dict_to_v42_dict',
             mock_conversion
         ):
             job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
@@ -3478,7 +3476,7 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
 
         expected_output_message = (
             u'[u\'MIGRATION_ERROR\', [u"Exploration snapshot %s-1 failed '
-            'migration to states v43: u\'property_that_dne\'"]]'
+            'migration to states v42: u\'property_that_dne\'"]]'
             % self.VALID_EXP_ID
         )
         self.assertIn(expected_output_message, actual_output)
@@ -3509,11 +3507,11 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
         self.assertIn(expected_output_message, actual_output)
 
     def test_audit_job_detects_exploration_that_is_not_up_to_date(self):
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3521,11 +3519,11 @@ class ExpSnapshotsMigrationAuditJobTests(test_utils.GenericTestBase):
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        swap_states_schema_43 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 43)
-        swap_exp_schema_48 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
-        with swap_states_schema_43, swap_exp_schema_48:
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        with swap_states_schema_42, swap_exp_schema_47:
             job_id = exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.create_new()
             exp_jobs_one_off.ExpSnapshotsMigrationAuditJob.enqueue(job_id)
             self.process_and_flush_pending_mapreduce_tasks()
@@ -3585,16 +3583,16 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
     def test_migration_job_succeeds_on_default_exploration(self):
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
             exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Bring the main exploration to schema version 43.
+        # Bring the main exploration to schema version 42.
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
             [self.VALID_EXP_ID])
@@ -3602,15 +3600,15 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
             exp_domain.ExplorationChange({
                 'cmd': (
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
-                'from_version': '42',
-                'to_version': '43'
+                'from_version': '41',
+                'to_version': '42'
             })
         ]
-        swap_states_schema_43 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 43)
-        swap_exp_schema_48 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
-        with swap_states_schema_43, swap_exp_schema_48:
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        with swap_states_schema_42, swap_exp_schema_47:
             exp_services.update_exploration(
                 self.albert_id, self.VALID_EXP_ID, migration_change_list,
                 'Ran Exploration Migration job.')
@@ -3631,11 +3629,11 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE)
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3702,11 +3700,11 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
         self.assertIn(expected_output_message, actual_output)
 
     def test_migration_job_detects_exploration_that_is_not_up_to_date(self):
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.VALID_EXP_ID, title='title', category='category')
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -3714,11 +3712,11 @@ class ExpSnapshotsMigrationJobTests(test_utils.GenericTestBase):
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        swap_states_schema_43 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 43)
-        swap_exp_schema_48 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 48)
-        with swap_states_schema_43, swap_exp_schema_48:
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        with swap_states_schema_42, swap_exp_schema_47:
             job_id = exp_jobs_one_off.ExpSnapshotsMigrationJob.create_new()
             exp_jobs_one_off.ExpSnapshotsMigrationJob.enqueue(job_id)
             self.process_and_flush_pending_mapreduce_tasks()

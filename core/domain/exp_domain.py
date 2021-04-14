@@ -1815,7 +1815,6 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
-
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema

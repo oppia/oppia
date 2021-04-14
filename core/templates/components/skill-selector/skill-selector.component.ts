@@ -56,7 +56,6 @@ export class SkillSelectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('Inside skill selector')
     this.currCategorizedSkills = this.categorizedSkills;
     for (let topicName in this.currCategorizedSkills) {
       let topicNameDict = {

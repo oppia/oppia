@@ -289,11 +289,11 @@ title: Old Title
 
         # Create exploration that uses an old states schema version and ensure
         # it is properly converted.
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             self.save_new_valid_exploration(
                 self.OLD_EXP_ID, self.albert_id, title='Old Title',
                 end_state_name='End')
@@ -332,7 +332,6 @@ title: Old Title
         reverting to a version prior to the migration still maintains a valid
         exploration. It tests both the exploration domain object and the
         exploration model stored in the datastore for validity.
-
         Note: It is important to distinguish between when the test is testing
         the exploration domain versus its model. It is operating at the domain
         layer when using exp_fetchers.get_exploration_by_id. Otherwise, it
@@ -346,11 +345,11 @@ title: Old Title
         end_state_name = 'End'
 
         # Create an exploration with an old states schema version.
-        swap_states_schema_42 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
-        with swap_states_schema_42, swap_exp_schema_47:
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
             exploration = self.save_new_valid_exploration(
                 exp_id, self.albert_id, title='Old Title',
                 end_state_name=end_state_name)
@@ -360,7 +359,7 @@ title: Old Title
 
         # Load the exploration without using the conversion pipeline. All of
         # these changes are to happen on an exploration with states schema
-        # version 42.
+        # version 41.
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)
 
@@ -463,7 +462,7 @@ title: Old Title
         # (pre-migration).
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)
-        self.assertEqual(exploration_model.states_schema_version, 42)
+        self.assertEqual(exploration_model.states_schema_version, 41)
 
         # The exploration domain object should be updated since it ran through
         # the conversion pipeline.
@@ -490,11 +489,11 @@ title: Old Title
         commit_dict_4 = {
             'committer_id': feconf.MIGRATION_BOT_USERNAME,
             'commit_message':
-                'Update exploration states from schema version 42 to %d.' %
+                'Update exploration states from schema version 41 to %d.' %
                 feconf.CURRENT_STATE_SCHEMA_VERSION,
             'commit_cmds': [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': '42',
+                'from_version': '41',
                 'to_version': python_utils.UNICODE(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             }],
