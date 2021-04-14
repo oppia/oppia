@@ -35,6 +35,7 @@ googledatastore==7.0.0
 google-auth==1.28.1
 google-cloud-ndb==1.8.0
 google-cloud-tasks==1.5.0
+google-cloud-translate==2.0.1
 webapp2==3.0.0b1
 elasticsearch==7.10.0
 

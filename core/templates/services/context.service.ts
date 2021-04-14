@@ -39,6 +39,8 @@ export class ContextService {
   questionId = null;
   editorContext = null;
   customEntityContext = null;
+  // Depending on this value, new images can be either saved in the localStorage
+  // or uploaded directly to the datastore.
   imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
@@ -279,9 +281,7 @@ export class ContextService {
     return (allowedPageContext.includes(currentPageContext));
   }
 
-  // Sets the current context to save images in local storage. Depending on this
-  // value, new images can be either saved in the localStorage or uploaded
-  // directly to the datastore.
+  // Sets the current context to save images to the server.
   resetImageSaveDestination(): void {
     this.imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
   }

@@ -2424,7 +2424,8 @@ title: Title
     def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, state_names, interaction_ids,
             title='A title', category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
@@ -2441,6 +2442,8 @@ title: Title
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            correctness_feedback_enabled: bool. Whether the correctness feedback
+                is enabled or not for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -2455,6 +2458,7 @@ title: Title
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
 
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
@@ -2462,6 +2466,9 @@ title: Title
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
+            if correctness_feedback_enabled:
+                from_state.interaction.default_outcome.labelled_as_correct = (
+                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
