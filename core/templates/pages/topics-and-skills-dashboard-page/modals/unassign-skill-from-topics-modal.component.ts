@@ -19,7 +19,18 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+
+export interface TopicAssignmentsSummary {
+  subtopicId: number,
+  topicVersion: number,
+  topicId: string
+}
+
+interface TopicAssignments {
+  [key: string]: TopicAssignmentsSummary
+}
 
 @Component({
   selector: 'oppia-unassign-skill-from-topics-modal',
@@ -28,10 +39,10 @@ import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_ski
 export class UnassignSkillFromTopicsModalComponent
   extends ConfirmOrCancelModal {
   skillId: string;
-  topicsAssignments;
+  topicsAssignments: TopicAssignments;
   topicsAssignmentsAreFetched: boolean = false;
   selectedTopicNames: string[] = [];
-  selectedTopics;
+  selectedTopics: TopicAssignmentsSummary[];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -44,7 +55,7 @@ export class UnassignSkillFromTopicsModalComponent
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
-        this.skillId).then((response) => {
+        this.skillId).then((response: AssignedSkill[]) => {
         this.topicsAssignments = {};
         response.map((topic) => {
           this.topicsAssignments[topic.topicName] = {
@@ -62,7 +73,7 @@ export class UnassignSkillFromTopicsModalComponent
   }
 
   selectedTopicToUnassign(topicId: string): void {
-    let index = this.selectedTopicNames.indexOf(topicId);
+    let index: number = this.selectedTopicNames.indexOf(topicId);
     if (index !== -1) {
       this.selectedTopicNames.splice(index, 1);
     } else {

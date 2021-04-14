@@ -19,16 +19,19 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.model';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 
 @Component({
   selector: 'oppia-merge-skill',
   templateUrl: './merge-skill-modal.component.html'
 })
 export class MergeSkillModalComponent extends ConfirmOrCancelModal {
-  categorizedSkills;
-  skill;
-  skillSummaries;
-  untriagedSkillSummaries;
+  categorizedSkills: SkillsCategorizedByTopics;
+  skill: AugmentedSkillSummary;
+  skillSummaries: AugmentedSkillSummary[];
+  untriagedSkillSummaries: SkillSummary[];
   allowSkillsFromOtherTopics: boolean = true;
   selectedSkillId: string;
 

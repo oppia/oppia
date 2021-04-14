@@ -33,12 +33,17 @@ import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
-import { UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
+import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 
-interface SkillsCategorizedByTopics {
+export interface SkillsCategorizedByTopics {
   [key: string]: {
     [key: string]: ShortSkillSummary[]
   }
+}
+
+interface MergeModalResult {
+  skill: AugmentedSkillSummary,
+  supersedingSkillId: string
 }
 
 @Component({
@@ -99,7 +104,7 @@ export class SkillsListComponent {
             this.alertsService.addSuccessMessage(successToast, 1000);
           }, 100);
         }
-      )['catch']((errorMessage) => {
+      )['catch']((errorMessage: string) => {
         let errorToast: string = null;
         // This error is thrown as part of a final validation check in
         // the backend, hence the message does not include instructions
@@ -131,9 +136,9 @@ export class SkillsListComponent {
         backdrop: 'static'
       });
     modalRef.componentInstance.skillId = skillId;
-    modalRef.result.then((topicsToUnassign) => {
+    modalRef.result.then((topicsToUnassign: TopicAssignmentsSummary) => {
       for (let topic in topicsToUnassign) {
-        let changeList = [];
+        let changeList: BackendChangeObject[] = [];
         if (topicsToUnassign[topic].subtopicId) {
           changeList.push({
             cmd: 'remove_skill_id_from_subtopic',
@@ -213,10 +218,11 @@ export class SkillsListComponent {
     });
   }
 
-  mergeSkill(skill: object): void {
-    let skillSummaries = this.mergeableSkillSummaries;
-    let categorizedSkills = this.skillsCategorizedByTopics;
-    let untriagedSkillSummaries = this.untriagedSkillSummaries;
+  mergeSkill(skill: AugmentedSkillSummary): void {
+    let skillSummaries: SkillSummary[] = this.mergeableSkillSummaries;
+    let categorizedSkills: SkillsCategorizedByTopics =
+    this.skillsCategorizedByTopics;
+    let untriagedSkillSummaries: SkillSummary[] = this.untriagedSkillSummaries;
     let allowSkillsFromOtherTopics: boolean = true;
 
     let modalRef: NgbModalRef = this.ngbModal.open(MergeSkillModalComponent, {
@@ -232,9 +238,9 @@ export class SkillsListComponent {
     modalRef.componentInstance.untriagedSkillSummaries =
     untriagedSkillSummaries;
 
-    modalRef.result.then((result) => {
-      let skill = result.skill;
-      let supersedingSkillId = result.supersedingSkillId;
+    modalRef.result.then((result: MergeModalResult) => {
+      let skill: AugmentedSkillSummary = result.skill;
+      let supersedingSkillId: string = result.supersedingSkillId;
       // Transfer questions from the old skill to the new skill.
       this.topicsAndSkillsDashboardBackendApiService.mergeSkillsAsync(
         skill.id, supersedingSkillId).then(() => {
@@ -257,7 +263,7 @@ export class SkillsListComponent {
   }
 
   getSerialNumberForSkill(skillIndex: number): number {
-    const skillSerialNumber = (
+    const skillSerialNumber: number = (
       skillIndex + (this.pageNumber * this.itemsPerPage));
     return (skillSerialNumber + 1);
   }

@@ -19,6 +19,7 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 @Component({
@@ -27,7 +28,7 @@ import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_ski
 })
 export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   skillId: string;
-  topicsAssignments;
+  topicsAssignments: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;
 
   constructor(
@@ -41,7 +42,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
-        this.skillId).then((response) => {
+        this.skillId).then((response: AssignedSkill[]) => {
         this.topicsAssignments = response;
         this.topicsAssignmentsAreFetched = true;
       });
