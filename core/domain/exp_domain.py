@@ -1664,7 +1664,39 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v42_dict_to_v43_dict(cls, states_dict):
-        """Converts from version 42 to 43. Version 43 contains
+        """Converts from version 42 to 43. Version 43 adds a new customization
+        arg to NumericExpressionInput, AlgebraicExpressionInput, and
+        MathEquationInput. The customization arg will allow creators to choose
+        whether to render the division sign (÷) instead of a fraction for the
+        division operation.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id not in [
+                    'NumericExpressionInput', 'AlgebraicExpressionInput',
+                    'MathEquationInput']:
+                continue
+
+            customization_args = state_dict['interaction']['customization_args']
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v43_dict_to_v44_dict(cls, states_dict):
+        """Converts from version 43 to 44. Version 44 contains
         linked skil id.
 
         Args:
@@ -1711,30 +1743,8 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 48
+    CURRENT_EXP_SCHEMA_VERSION = 49
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
-
-    @classmethod
-    def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
-        """Converts a v47 exploration dict into a v48 exploration dict.
-        Version 48 contains linked skill id to exploration state.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v47.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v48.
-        """
-
-        exploration_dict['schema_version'] = 48
-
-        exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 43
-
-        return exploration_dict
 
     @classmethod
     def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
@@ -1758,6 +1768,53 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states_schema_version'] = 42
 
         return exploration_dict
+
+    @classmethod
+    def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
+        """Converts a v47 exploration dict into a v48 exploration dict.
+        Adds a new customization arg to NumericExpressionInput,
+        AlgebraicExpressionInput, and MathEquationInput. The customization arg
+        will allow creators to choose whether to render the division sign (÷)
+        instead of a fraction for the division operation.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v47.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v48.
+        """
+        exploration_dict['schema_version'] = 48
+
+        exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 43
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v48_dict_to_v49_dict(cls, exploration_dict):
+        """Converts a v48 exploration dict into a v49 exploration dict.
+        Version 49 contains linked skill id to exploration state.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v48.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v49.
+        """
+
+        exploration_dict['schema_version'] = 49
+
+        exploration_dict['states'] = cls._convert_states_v43_dict_to_v44_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 44
+
+        return exploration_dict
+
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
@@ -1804,6 +1861,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v47_dict_to_v48_dict(
                 exploration_dict)
             exploration_schema_version = 48
+
+        if exploration_schema_version == 48:
+            exploration_dict = cls._convert_v48_dict_to_v49_dict(
+                exploration_dict)
+            exploration_schema_version = 49
 
         return exploration_dict
 

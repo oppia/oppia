@@ -2586,7 +2586,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V48 = (
+    YAML_CONTENT_V49 = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -2597,7 +2597,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 48
+schema_version: 49
 states:
   (untitled state):
     classifier_model_id: null
@@ -2728,18 +2728,12 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 43
+states_schema_version: 44
 tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V48
-
-    def test_load_from_v47(self):
-        """Test direct loading from a v47 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V47)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V49
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -2870,7 +2864,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 48
+schema_version: 49
 states:
   (untitled state):
     classifier_model_id: null
@@ -2972,7 +2966,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 43
+states_schema_version: 44
 tags: []
 title: Title
 """)
@@ -3121,7 +3115,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 48
+schema_version: 49
 states:
   (untitled state):
     classifier_model_id: null
@@ -3233,7 +3227,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 43
+states_schema_version: 44
 tags: []
 title: Title
 """)

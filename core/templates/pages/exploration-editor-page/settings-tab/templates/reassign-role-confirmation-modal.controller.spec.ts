@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for DeleteTopicModalController.
+ * @fileoverview Unit tests for ReassignRoleConfirmationModalController.
  */
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 
-describe('Delete Topic Modal Controller', function() {
+describe('Reassign Role Confirm Or Cancel Modal Controller ', function() {
   var $scope = null;
   var $uibModalInstance = null;
+  var testUsername = 'testUsername';
+  var testRole = 'testRole';
+  var testOldRole = 'testOldRole';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
     $scope = $rootScope.$new();
-    $controller('DeleteTopicModalController', {
+    $controller('ReassignRoleConfirmationModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
-      topicName: 'hello'
+      username: testUsername,
+      newRole: testRole,
+      oldRole: testOldRole,
     });
   }));
 
-  it('should initialize the correct value', function() {
-    $scope.init();
-    expect($scope.topicName).toEqual('hello');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.username).toBe(testUsername);
+      expect($scope.newRole).toBe(testRole);
+      expect($scope.oldRole).toBe(testOldRole);
+    });
 });

@@ -36,7 +36,10 @@ interface CkeditorCustomScope extends ng.IScope {
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
-  function(CkEditorCopyContentService, ContextService, RteHelperService) {
+  'VALID_RTE_COMPONENTS_FOR_ANDROID',
+  function(
+      CkEditorCopyContentService, ContextService, RteHelperService,
+      VALID_RTE_COMPONENTS_FOR_ANDROID) {
     /**
      * Creates a CKEditor configuration.
      * @param config CKEditor config to add to
@@ -131,9 +134,14 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var icons = [];
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          if (!((scope.uiConfig() &&
+          var hideComplexExtensionFlag = (
+            scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
-            componentDefn.isComplex))) {
+            componentDefn.isComplex);
+          var notSupportedOnAndroidFlag = (
+            ContextService.isExplorationLinkedToStory() &&
+            VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(componentDefn.id) === -1);
+          if (!(hideComplexExtensionFlag || notSupportedOnAndroidFlag)) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
