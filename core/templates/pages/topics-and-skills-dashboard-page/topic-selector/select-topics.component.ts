@@ -29,6 +29,10 @@ export class SelectTopicsComponent {
    @Output() selectedTopicIdsChange: EventEmitter<string[]> = (
      new EventEmitter());
 
+   ngOnInit(): void {
+     console.log(this.topicSummaries);
+   }
+
    selectOrDeselectTopic(topicId: string, index: number): void {
      if (!this.topicSummaries[index].isSelected) {
        this.selectedTopicIds.push(topicId);

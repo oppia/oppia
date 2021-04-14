@@ -19,13 +19,14 @@
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
 
 @Component({
   selector: 'oppia-assign-skill-to-topic-modal',
   templateUrl: './assign-skill-to-topic-modal.component.html'
 })
 export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
-  topicSummaries;
+  topicSummaries: TopicSummary[];
   selectedTopicIds: string[] = [];
 
   constructor(

@@ -20,8 +20,12 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.model';
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
@@ -30,22 +34,27 @@ import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topi
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
 import { UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 
+interface SkillsCategorizedByTopics {
+  [key: string]: {
+    [key: string]: ShortSkillSummary[]
+  }
+}
+
 @Component({
   selector: 'oppia-skills-list',
   templateUrl: './skills-list.component.html'
 })
 export class SkillsListComponent {
-  @Input() skillSummaries;
+  @Input() skillSummaries: AugmentedSkillSummary[];
   @Input() pageNumber: number;
   @Input() itemsPerPage: number;
-  @Input() editableTopicSummaries;
-  @Input() mergeableSkillSummaries;
-  @Input() untriagedSkillSummaries;
+  @Input() editableTopicSummaries: TopicSummary[];
+  @Input() mergeableSkillSummaries: SkillSummary[];
+  @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() userCanDeleteSkill: boolean;
   @Input() userCanCreateSkill: boolean;
-  @Input() unpublishedSkill;
-  @Input() skillsCategorizedByTopics;
-  directiveSubscriptions = new Subscription();
+  @Input() skillsCategorizedByTopics: SkillsCategorizedByTopics;
+  directiveSubscriptions: Subscription = new Subscription();
   selectedIndex: string;
   SKILL_HEADINGS: string[] = [
     'index', 'description', 'worked_examples_count',
@@ -160,20 +169,22 @@ export class SkillsListComponent {
     });
   }
 
-  assignSkillToTopic(skill: object): void {
+  assignSkillToTopic(skill: AugmentedSkillSummary): void {
     let skillId: string = skill.id;
+    let topicSummaries: TopicSummary[] = this.editableTopicSummaries.filter(
+      topicSummary => !skill.topicNames.includes(topicSummary.name));
     let modalRef: NgbModalRef = this.ngbModal
       .open(AssignSkillToTopicModalComponent, {
         backdrop: 'static',
         windowClass: 'assign-skill-to-topic-modal'
       });
-    modalRef.componentInstance.topicSummaries = this.editableTopicSummaries;
+    modalRef.componentInstance.topicSummaries = topicSummaries;
     modalRef.result.then((topicIds: string[]) => {
       let changeList = [{
         cmd: 'add_uncategorized_skill_id',
         new_uncategorized_skill_id: skillId
       }];
-      let topicSummaries = this.editableTopicSummaries;
+      let topicSummaries: TopicSummary[] = this.editableTopicSummaries;
       for (let i = 0; i < topicIds.length; i++) {
         for (let j = 0; j < topicSummaries.length; j++) {
           if (topicSummaries[j].id === topicIds[i]) {
