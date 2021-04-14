@@ -32,26 +32,19 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      notTestOnlyAllowed: 'Please do not call a testOnly function from a ' +
+      noTestOnlyAllowed: 'Please do not call a testOnly function from a ' +
         'non-test file.'
     }
   },
   create: function(context) {
-    var validateCallExpression = function(node) {
-      if (typeof node.callee.name === 'string' &&
-        node.callee.name.toLowerCase().includes('testonly')) {
-        return true;
-      } else {
-        return false;
-      }
-    };
     return {
       CallExpression(node) {
-        if (validateCallExpression(node)) {
+        if (node.callee.type === 'Identifier' &&
+          node.callee.name.toLowerCase().includes('testonly')) {
           context.report({
             node,
             loc: node.loc,
-            messageId: 'notTestOnlyAllowed'
+            messageId: 'noTestOnlyAllowed'
           });
         }
       }
