@@ -19,16 +19,18 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import base_model_validators, translation_domain
-from core.platform.cloud_translate import cloud_translate_services
+from core.domain import base_model_validators
+from core.domain import translation_domain
 from core.platform import models
-import utils
+from core.platform.cloud_translate import cloud_translate_services
 
 (base_models,) = models.Registry.import_models([
     models.NAMES.base_model
 ])
 
-class MachineTranslatedTextModelValidator(base_model_validators.BaseModelValidator):
+
+class MachineTranslatedTextModelValidator(
+        base_model_validators.BaseModelValidator):
     """Class for validating MachineTranslationModel."""
 
     @classmethod
