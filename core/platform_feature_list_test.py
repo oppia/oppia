@@ -161,7 +161,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         all_feature_names_set = [
             feature.value for feature in self.all_features_set]
         missing_features = (
-                set(all_feature_names_set) - set(feature_names_in_frontend))
+            set(all_feature_names_set) - set(feature_names_in_frontend))
         self.assertTrue(
             len(missing_features) == 0,
             msg='Following entries are not defined in frontend: %s.' % (
@@ -173,7 +173,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
         all_feature_names_set = [
             feature.value for feature in self.all_features_set]
         missing_features = (
-                set(feature_names_in_frontend) - set(all_feature_names_set))
+            set(feature_names_in_frontend) - set(all_feature_names_set))
         self.assertTrue(
             len(missing_features) == 0,
             msg='Following entries are defined in frontend but not defined'
