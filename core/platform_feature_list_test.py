@@ -81,9 +81,9 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_no_duplicate_names_in_deprecated_names_list(self):
         duplicate_names = []
-        deprecated_names = platform_feature_list.DEPRECATED_FEATURE_NAMES
-        for feature in set(deprecated_names):
-            if deprecated_names.count(feature) > 1:
+        deprecated_features = platform_feature_list.DEPRECATED_FEATURE_NAMES
+        for feature in set(deprecated_features):
+            if deprecated_features.count(feature) > 1:
                 duplicate_names.append(feature.value)
         self.assertTrue(
             len(duplicate_names) == 0,
