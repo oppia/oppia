@@ -81,8 +81,9 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_no_duplicate_names_in_deprecated_names_list(self):
         duplicate_names = []
-        for feature in set(platform_feature_list.DEPRECATED_FEATURE_NAMES):
-            if platform_feature_list.DEPRECATED_FEATURE_NAMES.count(feature) > 1:
+        deprecated_names = platform_feature_list.DEPRECATED_FEATURE_NAMES
+        for feature in set(deprecated_names):
+            if deprecated_names.count(feature) > 1:
                 duplicate_names.append(feature.value)
         self.assertTrue(
             len(duplicate_names) == 0,
@@ -133,7 +134,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
     def test_all_entries_in_test_features_list_are_in_test_stage(self):
         invalid_feature_names = []
         for feature in platform_feature_list.TEST_FEATURES_LIST:
-            feature_flag = registry.Registry.get_platform_parameter(feature.name)
+            feature_flag = (
+                registry.Registry.get_platform_parameter(feature.name))
             if (feature_flag.feature_stage !=
                     platform_parameter_domain.FEATURE_STAGES.test.value):
                 invalid_feature_names.append(feature.name)
@@ -146,7 +148,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
     def test_all_entries_in_prod_features_list_are_in_prod_stage(self):
         invalid_feature_names = []
         for feature in platform_feature_list.PROD_FEATURES_LIST:
-            feature_flag = registry.Registry.get_platform_parameter(feature.value)
+            feature_flag = (
+                registry.Registry.get_platform_parameter(feature.value))
             if (feature_flag.feature_stage !=
                     platform_parameter_domain.FEATURE_STAGES.prod.value):
                 invalid_feature_names.append(feature.value)
