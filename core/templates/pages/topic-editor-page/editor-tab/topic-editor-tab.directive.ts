@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
   'components/forms/custom-forms-directives/' +
     'edit-thumbnail-modal.controller.ts');

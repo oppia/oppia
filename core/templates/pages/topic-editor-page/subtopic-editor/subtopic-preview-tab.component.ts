@@ -16,7 +16,7 @@
  * @fileoverview Controller for the subtopic preview tab directive.
  */
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');

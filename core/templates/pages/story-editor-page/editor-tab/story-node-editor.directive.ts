@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require('components/skill-selector/select-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.component.ts');
