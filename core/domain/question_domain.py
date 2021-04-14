@@ -1034,32 +1034,30 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v42_dict_to_v43_dict(cls, question_state_dict):
-        """Converts from version 42 to 43. Version 43 adds a new
-        customization arg to NumericInput interaction which allows
-        creators to set input range greater than or equal to zero.
+        """Converts from version 42 to 43. Version 43 adds a new customization
+        arg to NumericExpressionInput, AlgebraicExpressionInput, and
+        MathEquationInput. The customization arg will allow creators to choose
+        whether to render the division sign (÷) instead of a fraction for the
+        division operation.
+
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initialize a State domain object.
+
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
+        if question_state_dict['interaction']['id'] in [
+                'NumericExpressionInput', 'AlgebraicExpressionInput',
+                'MathEquationInput']:
             customization_args = question_state_dict[
                 'interaction']['customization_args']
             customization_args.update({
-                'placeholder': {
-                    'value': {
-                        'content_id': 'ca_placeholder_0',
-                        'unicode_str': (
-                            'Type an expression here, using only numbers.')
-                    }
+                'useFractionForDivision': {
+                    'value': True
                 }
             })
-            question_state_dict['written_translations']['translations_mapping'][
-                'ca_placeholder_0'] = {}
-            question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
-                'ca_placeholder_0'] = {}
 
         return question_state_dict
 

@@ -171,36 +171,65 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
     def test_convert_states_v42_dict_to_v43_dict(self):
-        draft_change_list_v42 = [
+        draft_change_list_1_v42 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': {}
+            })
+        ]
+        draft_change_list_2_v42 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
             })
         ]
         # Migrate exploration to state schema version 43.
         self.create_and_migrate_new_exploration('42', '43')
-        # Migrate the draft change list's state schema to the migrated
-        # exploration's schema. In this case there are no changes to the
-        # draft change list since version 43 adds a customization arg
-        # in the Numeric Input interaction to check whether the input
-        #is greater than or equal to zero.
-        migrated_draft_change_list_v43 = (
+        migrated_draft_change_list_1_v43 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v42, 1, 2, self.EXP_ID)
-        )
+                draft_change_list_1_v42, 1, 2, self.EXP_ID))
+        # Verify that changes which include answer groups are
+        # not upgraded to v42.
+        self.assertIsNone(migrated_draft_change_list_1_v43)
+
+        migrated_draft_change_list_2_v43 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_2_v42, 1, 2, self.EXP_ID))
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
-        draft_change_list_v42_dict_list = [
-            change.to_dict() for change in draft_change_list_v42
+        draft_change_list_2_v42_dict_list = [
+            change.to_dict() for change in draft_change_list_2_v42
         ]
-        migrated_draft_change_list_v43_dict_list = [
-            change.to_dict() for change in migrated_draft_change_list_v43
+        migrated_draft_change_list_2_v43_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_2_v43
         ]
+        # Verify that changes which do not include answer groups can
+        # be upgraded to v43.
         self.assertEqual(
-            draft_change_list_v42_dict_list,
-            migrated_draft_change_list_v43_dict_list)
+            draft_change_list_2_v42_dict_list,
+            migrated_draft_change_list_2_v43_dict_list)
 
     def test_convert_states_v41_dict_to_v42_dict(self):
         draft_change_list_1_v41 = [

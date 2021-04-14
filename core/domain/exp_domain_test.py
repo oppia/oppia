@@ -2617,7 +2617,10 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -2641,7 +2644,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -2649,6 +2652,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -2656,6 +2660,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -3103,7 +3108,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 48
 states:
   (untitled state):
     classifier_model_id: null

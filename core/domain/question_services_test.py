@@ -2947,7 +2947,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             solution.correct_answer, [['ca_choices_2', 'ca_choices_3']])
 
-    def test_migrate_question_state_from_v42_with_numeric_input_interaction_to_latest(self):
+    def test_migrate_question_state_from_v42_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -2962,7 +2962,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': '1'
+                    'x': '1/2'
                 },
                 'rule_type': 'MatchesExactlyWith'
             }],
@@ -2986,12 +2986,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'answer_groups': [answer_group],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
-                    'input': {
+                    'placeholder': {
                         'value': {
-                            'content_id': 'ca_buttonText_0',
-                            'unicode_str': ''
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': (
+                                'Type an expression here, using only numbers.')
                         }
-                    },
+                    }
                 },
                 'default_outcome': {
                     'dest': None,
@@ -3011,7 +3012,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     }
                 }],
                 'solution': {},
-                'id': 'NumericInput'
+                'id': 'NumericExpressionInput'
             },
             'next_content_id_index': 3,
             'param_changes': [],
@@ -3039,5 +3040,4 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['placeholder'].value.unicode_str,
-            'Type input greater than or equal to zero.')
+            cust_args['useFractionForDivision'].value, True)

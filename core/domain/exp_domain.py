@@ -1590,9 +1590,11 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v42_dict_to_v43_dict(cls, states_dict):
-        """Converts from version 42 to 43. Version 43 adds a new
-        customization arg to NumericInput interaction which allows
-        creators to set input should be grater than or equal to zero.
+        """Converts from version 42 to 43. Version 43 adds a new customization
+        arg to NumericExpressionInput, AlgebraicExpressionInput, and
+        MathEquationInput. The customization arg will allow creators to choose
+        whether to render the division sign (÷) instead of a fraction for the
+        division operation.
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
@@ -1601,22 +1603,18 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'NumericInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': (
-                                'Type input greater than or eual to zero.')
-                        }
-                    }
-                })
-                state_dict['written_translations']['translations_mapping'][
-                    'ca_placeholder_0'] = {}
-                state_dict['recorded_voiceovers']['voiceovers_mapping'][
-                    'ca_placeholder_0'] = {}
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id not in [
+                    'NumericExpressionInput', 'AlgebraicExpressionInput',
+                    'MathEquationInput']:
+                continue
+
+            customization_args = state_dict['interaction']['customization_args']
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
 
         return states_dict
 
@@ -1651,7 +1649,7 @@ class Exploration(python_utils.OBJECT):
     # definitions, this version number must be changed and a migration process
     # put in place.
     CURRENT_EXP_SCHEMA_VERSION = 48
-    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 47
+    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
     def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
@@ -1677,23 +1675,26 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
         """Converts a v47 exploration dict into a v48 exploration dict.
-        Adds a new customization arg to NumericInput interaction
-        which allows creators to set input greator than or equal to zero.
+        Adds a new customization arg to NumericExpressionInput,
+        AlgebraicExpressionInput, and MathEquationInput. The customization arg
+        will allow creators to choose whether to render the division sign (÷)
+        instead of a fraction for the division operation.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v43.
+                with schema version v47.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v44.
+            following schema version v48.
         """
         exploration_dict['schema_version'] = 48
 
-        exploration_dict['states'] = cls._convert_states_v38_dict_to_v39_dict(
+        exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 43
 
         return exploration_dict
-
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
@@ -1727,6 +1728,11 @@ class Exploration(python_utils.OBJECT):
                 'at present.' % (
                     cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                     cls.CURRENT_EXP_SCHEMA_VERSION))
+
+        if exploration_schema_version == 47:
+            exploration_dict = cls._convert_v47_dict_to_v48_dict(
+                exploration_dict)
+            exploration_schema_version = 48
 
         if exploration_schema_version == 47:
             exploration_dict = cls._convert_v47_dict_to_v48_dict(
