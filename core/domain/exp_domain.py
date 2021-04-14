@@ -963,6 +963,81 @@ class Exploration(python_utils.OBJECT):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
+        # Check if first state is a checkpoint or not
+        if not self.states[self.init_state_name].card_is_checkpoint:
+            raise utils.ValidationError(
+                'Expected card_is_checkpoint of first state to be True'
+                'but found it to be %s'
+                % self.states[self.init_state_name].card_is_checkpoint
+            )
+
+        # Check if end states are checkpoint
+        for state_name, state in self.states.items():
+            interaction = state.interaction
+            if interaction.id == 'EndExploration':
+                if self.states[state_name].card_is_checkpoint:
+                    raise utils.ValidationError(
+                        'Expected card_is_checkpoint of end state to be False'
+                        'but found it to be %s'
+                        % self.states[state_name].card_is_checkpoint
+                    )
+
+        # Check if checkpoint count is at max 8 and atleast 1
+        checkpoint_count = 0
+        for state_name, state in self.states.items():
+            if state.card_is_checkpoint:
+                checkpoint_count = checkpoint_count + 1
+        if checkpoint_count > 8 or checkpoint_count == 0:
+            raise utils.ValidationError(
+                'Expected checkpoint count to be atleast 1 and atmax 8'
+                'but found it to be %s'
+                % checkpoint_count
+            )
+
+        # Check if a state marked as checkpoint is bypassable
+        end_states = []
+        for state_name, state in self.states.items():
+            if state.interaction.id == "EndExploration":
+                end_states.append(state_name)
+
+        # For every state which is marked as a checkpoint and is not the initial
+        # state we remove it from the states dict. Then we make a list of
+        # unseen states. If all end states are unseen on removing a state,
+        # this means that the removed state is not bypassable.
+        for state_name, state in self.states.items():
+            if state_name == self.init_state_name:
+                continue
+            elif state.card_is_checkpoint:
+                new_states = {key:val for key, val in self.states.items()
+                    if key != state_name}
+                processed_queue = []
+                curr_queue = [self.init_state_name]
+
+                while curr_queue and curr_queue[0] != state_name:
+                    curr_state_name = curr_queue[0]
+                    curr_queue = curr_queue[1:]
+                    if not curr_state_name in processed_queue:
+                        processed_queue.append(curr_state_name)
+
+                        curr_state = new_states[curr_state_name]
+
+                        if not curr_state.interaction.is_terminal:
+                            all_outcomes = (
+                                curr_state.interaction.get_all_outcomes())
+                            for outcome in all_outcomes:
+                                dest_state = outcome.dest
+                                if (dest_state not in curr_queue and
+                                        dest_state not in processed_queue):
+                                    curr_queue.append(dest_state)
+
+                if len(new_states) != len(processed_queue):
+                    unseen_states = list(
+                        set(new_states.keys()) - set(processed_queue))
+                    if not all(state in unseen_states for state in end_states):
+                        raise utils.ValidationError(
+                            'Cannot make %s a checkpoint as it is '
+                            'bypassable' % state_name)
+
         if strict:
             warnings_list = []
 
