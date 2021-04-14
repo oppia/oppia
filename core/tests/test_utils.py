@@ -184,8 +184,7 @@ def get_storage_model_module_names():
     # As models.NAMES is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
     for name in models.NAMES:
-        if '__' not in name.value:
-            yield name
+        yield name
 
 
 def get_storage_model_classes():
