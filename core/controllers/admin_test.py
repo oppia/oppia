@@ -70,6 +70,7 @@ BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
+
 class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
     """Test job that counts the total number of explorations."""
 
@@ -731,7 +732,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [getattr(PARAM_NAMES, feature.name)])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -763,7 +765,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [getattr(PARAM_NAMES, feature.name)])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -806,7 +809,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [getattr(PARAM_NAMES, feature.name)])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -850,7 +854,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [getattr(PARAM_NAMES, feature.name)])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -1013,7 +1018,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [getattr(PARAM_NAMES, feature.name)])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))

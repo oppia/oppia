@@ -85,8 +85,8 @@ def get_all_feature_flag_dicts():
         feature flags.
     """
     return [
-        registry.Registry.get_platform_parameter(feature.value).to_dict()
-        for feature in ALL_FEATURES_LIST
+        registry.Registry.get_platform_parameter(_feature.value).to_dict()
+        for _feature in ALL_FEATURES_LIST
     ]
 
 

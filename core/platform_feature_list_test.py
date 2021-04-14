@@ -106,7 +106,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
     def test_all_entries_in_features_lists_are_features(self):
         non_feature_names = []
         for feature in self.all_features_set:
-            feature_flag = registry.Registry.get_platform_parameter(feature.value)
+            feature_flag = (
+                registry.Registry.get_platform_parameter(feature.value))
             if not feature_flag.is_feature:
                 non_feature_names.append(feature.value)
         self.assertTrue(
@@ -118,7 +119,8 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
     def test_all_entries_in_dev_features_list_are_in_dev_stage(self):
         invalid_feature_names = []
         for feature in platform_feature_list.DEV_FEATURES_LIST:
-            feature_flag = registry.Registry.get_platform_parameter(feature.value)
+            feature_flag = (
+                registry.Registry.get_platform_parameter(feature.value))
             if (feature_flag.feature_stage !=
                     platform_parameter_domain.FEATURE_STAGES.dev.value):
                 invalid_feature_names.append(feature.value)
@@ -156,10 +158,10 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_all_names_in_features_lists_exist_in_frontend(self):
         feature_names_in_frontend = self._parse_feature_names_in_frontend()
-        all_feature_names_set = [feature.value for feature in self.all_features_set]
-        missing_features = (set(all_feature_names_set)
-                            - set(feature_names_in_frontend))
-
+        all_feature_names_set = [
+            feature.value for feature in self.all_features_set]
+        missing_features = (
+                set(all_feature_names_set) - set(feature_names_in_frontend))
         self.assertTrue(
             len(missing_features) == 0,
             msg='Following entries are not defined in frontend: %s.' % (
@@ -168,11 +170,10 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
 
     def test_all_names_in_frontend_are_known(self):
         feature_names_in_frontend = self._parse_feature_names_in_frontend()
-        all_feature_names_set = [feature.value for feature in self.all_features_set]
+        all_feature_names_set = [
+            feature.value for feature in self.all_features_set]
         missing_features = (
-            set(feature_names_in_frontend) -
-            set(all_feature_names_set))
-
+                set(feature_names_in_frontend) - set(all_feature_names_set))
         self.assertTrue(
             len(missing_features) == 0,
             msg='Following entries are defined in frontend but not defined'

@@ -26,6 +26,7 @@ import utils
 
 SERVER_MODES = parameter_domain.SERVER_MODES
 
+
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterChange class."""
 

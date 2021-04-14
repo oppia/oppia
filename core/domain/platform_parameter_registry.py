@@ -55,8 +55,8 @@ class Registry(python_utils.OBJECT):
         Args:
             name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            data_type: Enum(DATA_TYPES). The data type of the platform parameter,
-                must be one of the following: bool, number, string.
+            data_type: Enum(DATA_TYPES). The data type of the platform
+                parameter, must be one of the following: bool, number, string.
             is_feature: bool. True if the platform parameter is a feature flag.
             feature_stage: Enum(FEATURE_STAGES)|None. The stage of the feature,
                 required if 'is_feature' is True.
@@ -69,7 +69,7 @@ class Registry(python_utils.OBJECT):
         else:
             allowed_data_types = [
                 data_type_enum.value
-                for data_type_enum in cls.DEFAULT_VALUE_BY_TYPE_DICT.keys()
+                for data_type_enum in cls.DEFAULT_VALUE_BY_TYPE_DICT
             ]
             raise Exception(
                 'Unsupported data type \'%s\', must be one of'' %s.' % (

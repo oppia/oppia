@@ -32,9 +32,9 @@ PARAM_NAMES = python_utils.create_enum('feature_a', 'feature_b')  # pylint: disa
 SERVER_MODES = platform_parameter_domain.SERVER_MODES
 FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
+
 class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     """Test for the platform feature services."""
-
 
     def setUp(self):
         super(PlatformFeatureServiceTest, self).setUp()

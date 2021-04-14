@@ -34,8 +34,8 @@ import utils
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
-
 PARAM_NAMES = python_utils.create_enum('parameter_a')  # pylint: disable=invalid-name
+
 
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     """Tests for the platform parameter Registry."""
