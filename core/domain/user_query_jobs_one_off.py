@@ -85,7 +85,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has created atleast n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.created_exploration_ids) >=
             query_model.created_at_least_n_exps)
@@ -95,7 +98,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has created fewer than n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.created_exploration_ids) <
             query_model.created_fewer_than_n_exps)
@@ -105,7 +111,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has edited atleast n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.edited_exploration_ids) >=
             query_model.edited_at_least_n_exps)
@@ -115,7 +124,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has edited atmost n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.edited_exploration_ids) <
             query_model.edited_fewer_than_n_exps)
@@ -137,7 +149,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         interaction in any of the explorations created by the user.
         """
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         exploration_ids = user_contributions.created_exploration_ids
         exploration_instances = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(

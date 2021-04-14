@@ -53,6 +53,8 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     USER_E_USERNAME = 'e'
     USER_F_EMAIL = 'f@example.com'
     USER_F_USERNAME = 'f'
+    USER_G_EMAIL = 'g@example.com'
+    USER_G_USERNAME = 'g'
     USER_SUBMITTER_EMAIL = 'submit@example.com'
     USER_SUBMITTER_USERNAME = 'submit'
 
@@ -93,10 +95,13 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         # User A has no created or edited explorations.
         # User B has one created exploration.
         # User C has one edited exploration.
-        # User D has created an exploration and then edited it.
-        # User E has created an exploration 10 days before.
+        # User D has created an exploration and a collection and then edited
+        # the exploration.
+        # User E has created an exploration with logic proof interaction
+        # 10 days before.
         # User F has one created exploration but is not subscribed to emails.
         # Submitter is the user who submits the query.
+        # User G has no user contribution model.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         user_services.update_email_preferences(
@@ -121,6 +126,10 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.user_f_id = self.get_user_id_from_email(self.USER_F_EMAIL)
         user_services.update_email_preferences(
             self.user_f_id, False, True, True, True)
+        self.signup(self.USER_G_EMAIL, self.USER_G_USERNAME)
+        self.user_g_id = self.get_user_id_from_email(self.USER_G_EMAIL)
+        user_services.update_email_preferences(
+            self.user_g_id, True, True, True, True)
         self.signup(self.USER_SUBMITTER_EMAIL, self.USER_SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.USER_SUBMITTER_EMAIL)
@@ -174,6 +183,10 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             user_a_settings,
             user_a_settings.last_logged_in - datetime.timedelta(days=3))
 
+        user_contribution_model = user_models.UserContributionsModel.get(
+            self.user_g_id)
+        user_contribution_model.delete()
+
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
 
@@ -184,6 +197,17 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             predicate_function = getattr(
                 job_class, '_is_%s_query_satisfied' % predicate['backend_id'])
             self.assertIsNotNone(predicate_function)
+
+    def test_that_user_without_user_contribution_model_is_skipped(self):
+        user_query_id = user_query_services.save_new_user_query(
+            self.submitter_id, {
+                'used_logic_proof_interaction': True,
+                'created_collection': False
+            })
+        self._run_one_off_job(user_query_id)
+
+        query = user_models.UserQueryModel.get(user_query_id)
+        self.assertNotIn(self.user_g_id, query.user_ids)
 
     def test_user_has_not_logged_in_last_n_days(self):
         user_query_1_id = user_query_services.save_new_user_query(
