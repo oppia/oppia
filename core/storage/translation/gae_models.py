@@ -29,10 +29,14 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class MachineTranslatedTextModel(base_models.BaseModel):
-    """Model for storing machine translations"""
+    """Model for storing machine translations. Model instances have a key
+    generated from the source and target language codes, followed by a sha-1
+    hash of the origin text formated as follows:
+        '[source_language_code]:[target_language_code]:[hashed_text]'
+    See MachineTranslatedTextModel._generate_id() below for details."""
 
     # The untranslated text.
-    origin_text = datastore_services.StringProperty(required=True)
+    origin_text = datastore_services.TextProperty(required=True, indexed=False)
     # The language code of the untranslated text.
     source_language_code = datastore_services.StringProperty(
         required=True, indexed=True)
@@ -76,7 +80,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
     @classmethod
     def _generate_id(
             cls, source_language_code, target_language_code, origin_text):
-        """Generates key for the instance of MachineTranslatedTextModel
+        """Generates a key for the instance of MachineTranslatedTextModel
         class in the required format with the arguments provided.
 
         Args:
@@ -91,7 +95,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
         """
         # max_length is 450, less than maximum key length (500) to allow room
         # for language_codes.
-        hashed_text = utils.convert_to_hash(origin_text, 450)
+        hashed_text = utils.convert_to_hash(origin_text, 50)
         return (
             '%s:%s:%s' % (
                 source_language_code, target_language_code, hashed_text)

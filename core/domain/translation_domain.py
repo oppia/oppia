@@ -13,7 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Models for machine translations retrieved from Google Cloud Translate."""
+
+"""Domain objects for machine translations retrieved from Google Cloud
+Translate."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -57,6 +59,8 @@ class MachineTranslatedText(python_utils.OBJECT):
                 'Expected source_language_code to be a string, received %s' %
                 self.source_language_code
             )
+        # TODO(#12341): Tidy up this logic once we have a canonical list of
+        # language codes.
         if not utils.is_supported_audio_language_code(
                 self.source_language_code
             ) and not utils.is_valid_language_code(
@@ -71,6 +75,8 @@ class MachineTranslatedText(python_utils.OBJECT):
                 'Expected target_language_code to be a string, received %s' %
                 self.target_language_code
             )
+        # TODO(#12341): Tidy up this logic once we have a canonical list of
+        # language codes.
         if not utils.is_supported_audio_language_code(
                 self.target_language_code
             ) and not utils.is_valid_language_code(
