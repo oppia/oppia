@@ -212,6 +212,7 @@ import { TextInputValidationService } from 'interactions/TextInput/directives/te
 import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
 import { baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { EventBusService } from 'app-events/event-bus.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
@@ -454,6 +455,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExternalSaveService', ExternalSaveService],
   ['ExtractImageFilenamesFromStateService',
     ExtractImageFilenamesFromStateService],
+  ['EventBusService', EventBusService],
   ['FatigueDetectionService',
     FatigueDetectionService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
