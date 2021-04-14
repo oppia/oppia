@@ -1738,23 +1738,35 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-    def _convert_states_v42_dict_to_v43_dict(cls, states_dict, init_state_name):
-        """Converts from version 42 to version 43. Version 43 adds
-        card_is_checkpoint boolean to the state, which allows creators to
-        mark a state as a checkpoint for the learners
+    def _convert_states_v42_dict_to_v43_dict(cls, states_dict):
+        """Converts from version 42 to 43. Version 43 adds a new customization
+        arg to NumericExpressionInput, AlgebraicExpressionInput, and
+        MathEquationInput. The customization arg will allow creators to choose
+        whether to render the division sign (÷) instead of a fraction for the
+        division operation.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initalize a
+                respectively, a state name and a dict used to initialize a
                 State domain object.
-            init_state_name: str. The name of the first state.
 
         Returns:
             dict. The converted states_dict.
         """
-        for (state_name, state_dict) in states_dict.items():
-            state_dict['card_is_checkpoint'] = bool(
-                state_name == init_state_name)
+        for state_dict in states_dict.values():
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id not in [
+                    'NumericExpressionInput', 'AlgebraicExpressionInput',
+                    'MathEquationInput']:
+                continue
+
+            customization_args = state_dict['interaction']['customization_args']
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
+
         return states_dict
 
     @classmethod
@@ -1817,8 +1829,10 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
         """Converts a v47 exploration dict into a v48 exploration dict.
-        Adds card_is_checkpoint to mark a state as a checkpoint for the
-        learners.
+        Adds a new customization arg to NumericExpressionInput,
+        AlgebraicExpressionInput, and MathEquationInput. The customization arg
+        will allow creators to choose whether to render the division sign (÷)
+        instead of a fraction for the division operation.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -1829,8 +1843,9 @@ class Exploration(python_utils.OBJECT):
             following schema version v48.
         """
         exploration_dict['schema_version'] = 48
+
         exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
-            exploration_dict['states'], exploration_dict['init_state_name'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 43
 
         return exploration_dict
@@ -1875,6 +1890,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
                 exploration_dict)
             exploration_schema_version = 47
+        if exploration_schema_version == 47:
+            exploration_dict = cls._convert_v47_dict_to_v48_dict(
+                exploration_dict)
+            exploration_schema_version = 48
+
         if exploration_schema_version == 47:
             exploration_dict = cls._convert_v47_dict_to_v48_dict(
                 exploration_dict)
