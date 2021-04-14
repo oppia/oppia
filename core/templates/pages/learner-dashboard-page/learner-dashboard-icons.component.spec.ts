@@ -36,7 +36,7 @@ class MockTranslatePipe {
   }
 }
 
-describe('Learner Dashboard Icons Component', () => {
+fdescribe('Learner Dashboard Icons Component', () => {
   let component: LearnerDashboardIconsComponent;
   let fixture: ComponentFixture<LearnerDashboardIconsComponent>;
 
@@ -108,7 +108,6 @@ describe('Learner Dashboard Icons Component', () => {
       .and.callThrough();
     let getActivityActive = component.activityActive;
 
-    tick();
     fixture.detectChanges();
 
     expect(getActivityActive).toBe(false);
@@ -125,7 +124,6 @@ describe('Learner Dashboard Icons Component', () => {
     component.activityActive = true;
     let setActivityActive = component.activityActive;
 
-    tick();
     fixture.detectChanges();
 
     expect(setActivityActive).toBe(true);
@@ -173,7 +171,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.canActivityBeAddedToLearnerPlaylist('1');
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(true);
@@ -195,7 +192,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.canActivityBeAddedToLearnerPlaylist('1');
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(false);
@@ -218,7 +214,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToLearnerPlaylist();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(true);
@@ -241,7 +236,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToLearnerPlaylist();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(true);
@@ -264,7 +258,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToCompletedActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(true);
@@ -287,7 +280,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToCompletedActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(true);
@@ -310,7 +302,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToIncompleteActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(true);
@@ -333,7 +324,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToIncompleteActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(true);
@@ -356,7 +346,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToLearnerPlaylist();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(false);
@@ -379,7 +368,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToLearnerPlaylist();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(false);
@@ -402,7 +390,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToCompletedActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(false);
@@ -425,7 +412,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToCompletedActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(false);
@@ -448,7 +434,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToIncompleteActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(false);
@@ -471,7 +456,6 @@ describe('Learner Dashboard Icons Component', () => {
 
     let result = component.belongsToIncompleteActivities();
 
-    tick();
     fixture.detectChanges();
 
     expect(result).toBe(false);
@@ -491,7 +475,6 @@ describe('Learner Dashboard Icons Component', () => {
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);
 
-    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
@@ -511,7 +494,6 @@ describe('Learner Dashboard Icons Component', () => {
     component.removeFromLearnerPlaylist(
       activityId, activityTitle, activityType);
 
-    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
@@ -539,7 +521,6 @@ describe('Learner Dashboard Icons Component', () => {
     component.addToLearnerPlaylist(
       activityId, activityType);
 
-    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
@@ -569,7 +550,6 @@ describe('Learner Dashboard Icons Component', () => {
     component.addToLearnerPlaylist(
       activityId, activityType);
 
-    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
@@ -599,7 +579,6 @@ describe('Learner Dashboard Icons Component', () => {
     component.addToLearnerPlaylist(
       activityId, activityType);
 
-    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();
@@ -629,7 +608,6 @@ describe('Learner Dashboard Icons Component', () => {
     component.addToLearnerPlaylist(
       activityId, activityType);
 
-    tick();
     fixture.detectChanges();
 
     expect(learnerPlaylistSpy).toHaveBeenCalled();

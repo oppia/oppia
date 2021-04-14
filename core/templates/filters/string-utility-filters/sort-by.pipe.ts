@@ -15,6 +15,7 @@
 /**
  * @fileoverview Sort By pipe for Oppia.
  */
+
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
 // SortBy pipe is a replica of angular js orderBy filter.
 // The first check of this pipe is to filter out whether the

@@ -53,7 +53,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // the summary tile is clicked.
   @Input() openInNewWindow: string;
   @Input() isCommunityOwned: boolean;
-  // If this is not undefined, collection preview tile for mobile
+  // If this is true, collection preview tile for mobile
   // will be displayed.
   @Input() isCollectionPreviewTile: boolean;
   // If the screen width is below the threshold defined here, the mobile

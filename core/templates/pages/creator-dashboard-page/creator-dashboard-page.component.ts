@@ -43,7 +43,6 @@ require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/suggestions.service.ts');
 require('services/user.service.ts');
-require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').component('creatorDashboardPage', {

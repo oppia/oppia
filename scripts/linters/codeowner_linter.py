@@ -31,7 +31,6 @@ CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 # This list needs to be in sync with the important patterns in the CODEOWNERS
 # file.
 CODEOWNER_IMPORTANT_PATHS = [
-    '/core/templates/services/png-sanitizer.service.ts',
     '/core/templates/services/svg-sanitizer.service.ts',
     '/scripts/linters/warranted_angular_security_bypasses.py',
     '/core/controllers/acl_decorators*.py',

@@ -673,7 +673,6 @@
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
 # 8 lines.
-/core/templates/services/png-sanitizer.service.ts @BenHenning
 /core/templates/services/svg-sanitizer.service.ts @BenHenning
 /scripts/linters/warranted_angular_security_bypasses.py @BenHenning
 /core/controllers/acl_decorators*.py @BenHenning

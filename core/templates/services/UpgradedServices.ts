@@ -222,11 +222,6 @@ import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { LearnerPlaylistBackendApiService } from
-  'domain/learner_dashboard/learner-playlist-backend-api.service';
-import { SuggestionModalForLearnerDashboardService } from
-  // eslint-disable-next-line max-len
-  'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerParamsService } from
@@ -1079,15 +1074,6 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardBackendApiService'] =
       new LearnerDashboardBackendApiService(
         upgradedServices['HttpClient']);
-    upgradedServices['LearnerPlaylistBackendApiService'] =
-      new LearnerPlaylistBackendApiService(
-        upgradedServices['AlertsService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['NgbModal'],
-        upgradedServices['UrlInterpolationService']);
-    upgradedServices['SuggestionModalForLearnerDashboardService'] =
-      new SuggestionModalForLearnerDashboardService(
-        upgradedServices['NgbModal'],);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient']);

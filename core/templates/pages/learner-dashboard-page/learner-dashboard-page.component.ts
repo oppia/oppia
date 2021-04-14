@@ -39,7 +39,6 @@ import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
-import { PngSanitizerService } from 'services/png-sanitizer.service';
 import { UserService } from 'services/user.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -85,7 +84,6 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 })
 export class LearnerDashboardPageComponent implements OnInit {
   threadIndex: number;
-
 
   EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
     LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -149,6 +147,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   threadId: string;
   messageSummaries: FeedbackMessageSummary[];
   threadSummary: FeedbackThreadSummary;
+
   constructor(
     private alertsService: AlertsService,
     private deviceInfoService: DeviceInfoService,
@@ -159,7 +158,6 @@ export class LearnerDashboardPageComponent implements OnInit {
     private learnerPlaylistBackendApiService:
       LearnerPlaylistBackendApiService,
     private loaderService: LoaderService,
-    private pngSanitizerService: PngSanitizerService,
     private suggestionModalForLearnerDashboardService:
       SuggestionModalForLearnerDashboardService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
@@ -173,7 +171,7 @@ export class LearnerDashboardPageComponent implements OnInit {
     userProfileImagePromise.then(
       dataUrl => {
         this.profilePictureDataUrl =
-            this.pngSanitizerService.getTrustedPngResourceUrl(dataUrl);
+          decodeURIComponent(dataUrl);
       });
 
     this.loaderService.showLoadingScreen('Loading');
@@ -613,12 +611,13 @@ export class LearnerDashboardPageComponent implements OnInit {
       millisSinceEpoch);
   }
 
-  getTrustedPngResourceUrl(base64ImageData: string): SafeResourceUrl {
-    return this.pngSanitizerService.getTrustedPngResourceUrl(base64ImageData);
+  decodePngURIData(base64ImageData: string): string {
+    console.log(base64ImageData)
+    console.log(decodeURIComponent(base64ImageData))
+    return decodeURIComponent(base64ImageData);
   }
 }
 
 angular.module('oppia').directive(
   'learnerDashboardPage', downgradeComponent(
     {component: LearnerDashboardPageComponent}));
-// Dont forget animations.

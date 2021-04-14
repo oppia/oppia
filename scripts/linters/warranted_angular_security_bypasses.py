@@ -32,8 +32,6 @@ EXCLUDED_BYPASS_SECURITY_TRUST_FILES = (
     # value as a safe is done by bypassing the inbuilt Angular's security
     # mechanism. The svg-sanitizer file is going to be a permanent member in
     # this list due to the aforementioned reason.
-    'core/templates/services/png-sanitizer.service.spec.ts',
-    'core/templates/services/png-sanitizer.service.ts',
     'core/templates/services/svg-sanitizer.service.spec.ts',
     'core/templates/services/svg-sanitizer.service.ts')
 EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES = ()

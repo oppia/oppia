@@ -334,7 +334,6 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { PngSanitizerService } from 'services/png-sanitizer.service';
 import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
@@ -665,7 +664,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
   ['SvgSanitizerService', SvgSanitizerService],
-  ['PngSanitizerService', PngSanitizerService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
   ['TextInputTokenizer', TextInputTokenizer],

@@ -40,7 +40,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { PngSanitizerService } from 'services/png-sanitizer.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
@@ -108,7 +107,6 @@ describe('Learner dashboard page', () => {
   let userService: UserService = null;
 
   let profilePictureDataUrl = 'profile-picture-url';
-  let pngSanitizerService: PngSanitizerService = null;
   let windowRef: WindowRef = null;
 
   let explorationDict: ExplorationBackendDict = {
@@ -304,7 +302,6 @@ describe('Learner dashboard page', () => {
             useClass: MockLearnerPlaylistBackendApiService
           },
           SuggestionModalForLearnerDashboardService,
-          PngSanitizerService,
           UrlInterpolationService,
           UserService,
           WindowRef,
@@ -324,8 +321,6 @@ describe('Learner dashboard page', () => {
       focusManagerService = TestBed.inject(FocusManagerService);
       learnerDashboardBackendApiService =
         TestBed.inject(LearnerDashboardBackendApiService);
-      pngSanitizerService =
-        TestBed.inject(PngSanitizerService);
       suggestionModalForLearnerDashboardService =
         TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
@@ -396,9 +391,6 @@ describe('Learner dashboard page', () => {
         .callFake(() => {
           return Promise.resolve(profilePictureDataUrl);
         });
-
-      spyOn(pngSanitizerService, 'getTrustedPngResourceUrl')
-        .and.returnValue('profile-picture-url');
 
       spyOn(userService, 'getUserInfoAsync').and
         .callFake(() => {
@@ -1880,8 +1872,11 @@ describe('Learner dashboard page', () => {
       });
 
     it('should sanitize given png base64 data and generate url', () => {
-      component.getTrustedPngResourceUrl('base64Data');
-      expect(pngSanitizerService.getTrustedPngResourceUrl).toHaveBeenCalled();
+      let result = component.decodePngURIData('%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
+
+      fixture.detectChanges();
+
+      expect(result).toBe('шеллы');
     });
   });
 
