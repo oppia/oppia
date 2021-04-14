@@ -149,8 +149,8 @@ def _get_server_mode():
     """Returns the running mode of Oppia.
 
     Returns:
-        Enum(SERVER_MODES). The server mode of Oppia, dev if Oppia is running in development
-        mode, prod if in production mode.
+        Enum(SERVER_MODES). The server mode of Oppia, dev if Oppia is running
+        in development mode, prod if in production mode.
     """
     return (
         platform_parameter_domain.SERVER_MODES.dev
