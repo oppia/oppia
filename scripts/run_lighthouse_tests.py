@@ -194,8 +194,8 @@ def main(args=None):
     enable_webpages()
     atexit.register(cleanup)
 
-    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE
-       or lighthouse_mode == LIGHTHOUSE_MODE_STATIC:
+    if (lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE or
+            lighthouse_mode == LIGHTHOUSE_MODE_STATIC):
         python_utils.PRINT('Building files in production mode.')
         # We are using --source_maps here, so that we have at least one CI check
         # that builds using source maps in prod env. This is to ensure that
