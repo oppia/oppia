@@ -102,7 +102,7 @@
             </div>
             <div class="skill-list-options-container">
               <p class="fas fa-ellipsis-v skill-edit-box-icon" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
-              <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" aria-label="Edit Option For Skill <[skill]>" ng-mouseleave="$ctrl.changeEditOptions(null)">
+              <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" aria-label="Edit Option For Skill <[skill.description]>" ng-mouseleave="$ctrl.changeEditOptions(null)">
                 <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
                   <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill)">
                     <i class="fa fa-wrench"></i>
