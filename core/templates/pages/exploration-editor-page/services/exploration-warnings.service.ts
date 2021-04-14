@@ -222,7 +222,6 @@ angular.module('oppia').factory('ExplorationWarningsService', [
 
       var _states = ExplorationStatesService.getStates();
       _states.getStateNames().forEach(function(stateName) {
-        console.error(_states)
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
           var validatorServiceName =
