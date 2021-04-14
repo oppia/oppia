@@ -1672,15 +1672,14 @@ class Exploration(python_utils.OBJECT):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initalize a
                 State domain object.
+            init_state_name: str. The name of the first state
 
         Returns:
             dict. The converted states_dict.
         """
         for (state_name, state_dict) in states_dict.items():
-            if state_name == init_state_name:
-                state_dict['card_is_checkpoint'] = True
-            else:
-                state_dict['card_is_checkpoint'] = False
+            state_dict['card_is_checkpoint'] = bool(
+                state_name == init_state_name)
         return states_dict
 
     @classmethod

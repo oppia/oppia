@@ -1040,7 +1040,7 @@ class Question(python_utils.OBJECT):
 
         Args:
             question_state_dict: dict. A dict representation of
-                question_state_data
+                question_state_data.
 
         Returns:
             dict. The converted question_state_dict.
