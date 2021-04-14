@@ -20,6 +20,7 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.model';
 import { ShortSkillSummary } from 'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
@@ -180,7 +181,7 @@ export class SkillsListComponent {
       });
     modalRef.componentInstance.topicSummaries = topicSummaries;
     modalRef.result.then((topicIds: string[]) => {
-      let changeList = [{
+      let changeList: BackendChangeObject[] = [{
         cmd: 'add_uncategorized_skill_id',
         new_uncategorized_skill_id: skillId
       }];
@@ -189,7 +190,7 @@ export class SkillsListComponent {
         for (let j = 0; j < topicSummaries.length; j++) {
           if (topicSummaries[j].id === topicIds[i]) {
             this.editableTopicBackendApiService.updateTopic(
-              topicIds[i], topicSummaries[j].version,
+              topicIds[i], topicSummaries[j].version.toString(),
               'Added skill with id ' + skillId + ' to topic.',
               changeList
             ).then(() => {
