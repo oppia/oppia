@@ -115,7 +115,18 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "NumericInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [{
+      "description": "Allow only input greater than or equal to zero for NumericInput interaction.",
+      "name": "input",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+           "min_value": 0,
+           "id": "is_at_least"
+         }]
+     },
+     "default_value": "false"
+    }],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {

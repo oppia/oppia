@@ -1691,6 +1691,34 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v43_dict_to_v44_dict(cls, states_dict):
+        """Converts from version 43 to 44. Version 44 adds a new
+        customization arg to NumericInput interaction which allows
+        creators to set input should be grater than or equal to zero.
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'NumericInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': (
+                                'Type input greater than or eual to zero.')
+                        }
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -1721,7 +1749,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 48
+    CURRENT_EXP_SCHEMA_VERSION = 49
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1772,6 +1800,26 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v48_dict_to_v49_dict(cls, exploration_dict):
+        """Converts a v47 exploration dict into a v48 exploration dict.
+        Adds a new customization arg to NumericInput interaction
+        which allows creators to set input greator than or equal to zero.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v43.
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v44.
+        """
+        exploration_dict['schema_version'] = 49
+
+        exploration_dict['states'] = cls._convert_states_v38_dict_to_v39_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 44
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -1816,6 +1864,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v47_dict_to_v48_dict(
                 exploration_dict)
             exploration_schema_version = 48
+
+        if exploration_schema_version == 48:
+            exploration_dict = cls._convert_v48_dict_to_v49_dict(
+                exploration_dict)
+            exploration_schema_version = 49
 
         return exploration_dict
 

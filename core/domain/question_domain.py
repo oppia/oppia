@@ -1062,6 +1062,31 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v43_dict_to_v44_dict(cls, question_state_dict):
+        """Converts from version 43 to 44. Version 44 adds a new
+        customization arg to NumericInput interaction which allows
+        creators to set input range greater than or equal to zero.
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'placeholder': {
+                    'value': {
+                        False
+                    }
+                }
+            })
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
