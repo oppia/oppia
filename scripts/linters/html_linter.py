@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import html.parser
 import os
+import re
 import subprocess
 
 import python_utils
@@ -71,6 +72,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         expected_indentation = self.indentation_level * self.indentation_width
         tag_line = self.file_lines[line_number - 1].lstrip()
         opening_tag = '<' + tag
+        attr_pos_mapping = {}
 
         # Check the indentation for content of style tag.
         if tag_line.startswith(opening_tag) and tag == 'style':
@@ -117,6 +119,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
             # Therefore the check should run only for those
             # attributes which have a value.
             if value:
+                value_in_quotes = True
                 # &quot; is rendered as a double quote by the parser.
                 if '&quot;' in starttag_text:
                     expected_value = value
@@ -126,6 +129,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     rendered_text = starttag_text
 
                 if not expected_value in rendered_text:
+                    value_in_quotes = False
                     self.failed = True
                     error_message = (
                         '%s --> The value %s of attribute '
@@ -134,6 +138,10 @@ class CustomHTMLParser(html.parser.HTMLParser):
                             self.filepath, value, attr,
                             tag, line_number))
                     self.error_messages.append(error_message)
+
+                self._check_space_between_attributes_and_values(
+                    tag, attr, value, rendered_text,
+                    value_in_quotes, attr_pos_mapping)
 
         for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
@@ -208,6 +216,46 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.indentation_level += 1
             elif data_line.startswith(ending_block):
                 self.indentation_level -= 1
+
+    def _check_space_between_attributes_and_values(
+            self, tag, attr, value, rendered_text,
+            value_in_quotes, attr_pos_mapping):
+        """Checks if there are any spaces between attributes and their value.
+
+        Args:
+            tag: str. The tag name of the HTML line.
+            attr: str. The attribute name in the tag.
+            value: str. The value of the attribute.
+            rendered_text: str. The rendered text of the tag.
+            value_in_quotes: bool. Whether the given attribute value
+                is in double quotes.
+            attr_pos_mapping: dict. Mapping between attribute and their
+                starting positions in the tag.
+        """
+        line_number, _ = self.getpos()
+        if attr not in attr_pos_mapping:
+            attr_positions = []
+            # Finds the positions of the attribute in the tag.
+            for match in re.finditer(re.escape(attr), rendered_text.lower()):
+                start, end = match.start(), match.end()
+                # Appends the position only if it is an attribute.
+                # It will not append the position if it is a substring.
+                if (rendered_text[start - 1] in [' ', '"']
+                        and rendered_text[end] in [' ', '=']):
+                    attr_positions.append(start)
+            attr_pos_mapping[attr] = attr_positions
+        attr_pos = attr_pos_mapping[attr].pop(0)
+        rendered_attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
+        attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
+        expected_attr_assignment = attr_val_structure.format(
+            rendered_attr_name, value)
+        if not rendered_text.startswith(expected_attr_assignment, attr_pos):
+            self.failed = True
+            error_message = (
+                '%s --> Attribute %s for tag %s on line '
+                '%s has unwanted white spaces around it' % (
+                    self.filepath, attr, tag, line_number))
+            self.error_messages.append(error_message)
 
 
 class HTMLLintChecksManager(python_utils.OBJECT):
