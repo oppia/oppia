@@ -266,11 +266,6 @@ class TasksTests(test_utils.EmailTestBase):
                 self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
-            email_reply_to_id_model = (
-                email_models.GeneralFeedbackEmailReplyToIdModel.get(
-                    self.user_id_a, thread_id, strict=False))
-            email_reply_to_id_model.delete()
-
             raises_feedback_thread_does_not_exist = self.assertRaisesRegexp(
                 Exception,
                 'Feedback thread for current user and thread_id does not exist'
