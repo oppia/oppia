@@ -93,16 +93,30 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               NumericInputValidationService.getErrorString(ctrl.localValue));
           };
 
+          ctrl.NumericInputvalidation = function() {
+            if(NumericInputValidationService.isCustomizationArgTrue() === 1) {
+              return true;
+            }
+          }
+
           ctrl.onKeypress = function(evt) {
-            if (evt.keyCode === 13) {
+            if (evt.which === 38 || evt.which === 40) {
               if (
                 Object.keys(ctrl.floatForm.floatValue.$error).length !== 0) {
-                ctrl.isUserCurrentlyTyping = false;
-                FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
+                //ctrl.isUserCurrentlyTyping = false;
+                //FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
+                if(NumericInputValidationService.isCustomizationArgTrue() === 1 && evt.which === 40) {
+                  //ctrl.isUserCurrentlyTyping = false;
+                  //FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
+                  console.log("Prevent!");
+                  evt.reset();
+                }
               } else {
+                console.log("Prevent2!");
                 SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
               }
             } else {
+              console.log("Prevent3!");
               ctrl.isUserCurrentlyTyping = true;
             }
           };
