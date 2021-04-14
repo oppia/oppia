@@ -69,9 +69,10 @@ import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { ToastrModule } from 'ngx-toastr';
-import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
@@ -165,6 +166,8 @@ const toastrConfig = {
     LimitToPipe,
     LoadingDotsComponent,
     LoadingMessageComponent,
+    OnScreenKeyboardComponent,
+    OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SideNavigationBarComponent,
@@ -209,6 +212,7 @@ const toastrConfig = {
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     ImageUploaderComponent,
+    OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
@@ -247,6 +251,8 @@ const toastrConfig = {
     PromoBarComponent,
     ImageUploaderComponent,
     OnScreenKeyboardComponent,
+    OutcomeFeedbackEditorComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,

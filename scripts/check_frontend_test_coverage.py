@@ -214,7 +214,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'opportunities-list.component.ts',
     'outcome-destination-editor.directive.ts',
     'outcome-editor.directive.ts',
-    'outcome-feedback-editor.directive.ts',
+    'outcome-feedback-editor.component.ts',
     'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
     'player-correctness-feedback-enabled.service.ts',
