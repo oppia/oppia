@@ -36,7 +36,7 @@ class MockTranslatePipe {
   }
 }
 
-fdescribe('Learner Dashboard Icons Component', () => {
+describe('Learner Dashboard Icons Component', () => {
   let component: LearnerDashboardIconsComponent;
   let fixture: ComponentFixture<LearnerDashboardIconsComponent>;
 

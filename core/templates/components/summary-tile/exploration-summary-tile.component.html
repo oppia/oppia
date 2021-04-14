@@ -20,7 +20,7 @@
     <div *ngIf="!isPlaylistTile" class="title-section-mask"
          (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
     </div>
-    <div  class="summary-section" section ="{isWindowLarge ? undefined : 'right-section'}" >
+    <div class="summary-section" section ="{isWindowLarge ? undefined : 'right-section'}">
       <div *ngIf="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective" [innerHTML]="getObjective | truncateAndCapitalize:95">
       </div>
       <div *ngIf="!getObjective" class="objective">

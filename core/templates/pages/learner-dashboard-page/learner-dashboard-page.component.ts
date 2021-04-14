@@ -612,8 +612,6 @@ export class LearnerDashboardPageComponent implements OnInit {
   }
 
   decodePngURIData(base64ImageData: string): string {
-    console.log(base64ImageData)
-    console.log(decodeURIComponent(base64ImageData))
     return decodeURIComponent(base64ImageData);
   }
 }
