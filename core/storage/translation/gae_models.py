@@ -93,7 +93,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
         # for language_codes.
         hashed_text = utils.convert_to_hash(origin_text, 450)
         return (
-            '{%s}:{%s}:{%s}' % (
+            '%s:%s:%s' % (
                 source_language_code, target_language_code, hashed_text)
         )
 
