@@ -760,6 +760,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                 '16CharString1234'),
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            local_timezone_offset_hrs=0,
             report_type=self.REPORT_TYPE_SUGGESTION,
             category=self.CATEGORY_OTHER,
             platform_version=self.PLATFORM_VERSION,
@@ -1477,6 +1478,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'platform': self.PLATFORM_ANDROID,
                     'ticket_id': self.TICKET_ID,
                     'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+                    'local_timezone_offset_hrs': 0,
                     'report_type': self.REPORT_TYPE_SUGGESTION,
                     'category': self.CATEGORY_OTHER,
                     'platform_version': self.PLATFORM_VERSION}}

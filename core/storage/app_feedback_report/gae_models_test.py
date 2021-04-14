@@ -97,6 +97,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                     int(self.TICKET_CREATION_TIMESTAMP_MSEC),
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+                local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.PLATFORM_VERSION,
@@ -121,7 +122,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2))
         app_feedback_report_models.AppFeedbackReportModel.create(
             report_id, self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2,
-            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            0, self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
             self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
@@ -144,7 +145,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2))
         app_feedback_report_models.AppFeedbackReportModel.create(
-            report_id, self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_id, self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2, 0,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.PLATFORM_VERSION, self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
@@ -211,6 +212,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 'ticket_id': self.TICKET_ID,
                 'submitted_on': utils.get_human_readable_time_string(
                     self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
+                'local_timezone_offset_hrs': 0,
                 'report_type': self.REPORT_TYPE_SUGGESTION,
                 'category': self.CATEGORY_OTHER,
                 'platform_version': self.PLATFORM_VERSION

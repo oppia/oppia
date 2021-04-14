@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+from dateutil import tz
 
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
@@ -45,14 +46,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
-    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615519337)
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(
+        timestamp=1615519337, tz=tz.tzoffset('', 0))
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TIMESTAMP_AT_MAX_DAYS = datetime.datetime.utcnow() - (
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS)
     TIMESTAMP_OVER_MAX_DAYS = datetime.datetime.utcnow() - (
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
         datetime.timedelta(days=2))
-    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(
+        timestamp=1616173836, tz=tz.tzoffset('', 0))
     TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP)
     TICKET_NAME = 'a ticket name'
@@ -138,7 +141,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
         app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, self.PLATFORM_ANDROID,
-            self.REPORT_SUBMITTED_TIMESTAMP,
+            self.REPORT_SUBMITTED_TIMESTAMP, 0,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.ANDROID_PLATFORM_VERSION,
             self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
@@ -191,7 +194,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
         app_feedback_report_models.AppFeedbackReportModel.create(
             new_report_id_2, self.PLATFORM_ANDROID,
-            self.REPORT_SUBMITTED_TIMESTAMP,
+            self.REPORT_SUBMITTED_TIMESTAMP, 0,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.ANDROID_PLATFORM_VERSION,
             self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
@@ -404,8 +407,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             report_obj, app_feedback_report_domain.AppFeedbackReport))
         self.assertEqual(report_obj.platform, self.PLATFORM_ANDROID)
         self.assertEqual(
-            report_obj.submitted_on_timestamp,
-            self.REPORT_SUBMITTED_TIMESTAMP)
+            report_obj.submitted_on_timestamp, self.REPORT_SUBMITTED_TIMESTAMP)
 
     def test_create_android_report_from_json_saves_model_to_storage(self):
         report_obj = (
@@ -930,6 +932,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     'random_hash', self.TICKET_CREATION_TIMESTAMP,
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+                local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
@@ -960,6 +963,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     'random_hash', self.TICKET_CREATION_TIMESTAMP,
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+                local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
@@ -989,6 +993,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+                local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
@@ -1020,6 +1025,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+                local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
                 platform_version=self.ANDROID_PLATFORM_VERSION,

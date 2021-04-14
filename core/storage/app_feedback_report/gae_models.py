@@ -64,6 +64,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # the report was locally cached for a long time on an Android device.
     submitted_on = datastore_services.DateTimeProperty(
         required=True, indexed=True)
+    # The nuber of hours offset from UTC of the user's local timezone.
+    local_timezone_offset_hrs = datastore_services.IntegerProperty(
+        required=False, indexed=True)
     # The type of feedback for this report; this can be an arbitrary string
     # since future iterations of the report structure may introduce new types
     # and we cannot rely on the backend updates to fully sync with the frontend
@@ -129,8 +132,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, entity_id, platform, submitted_on, report_type, category,
-            platform_version, android_device_country_locale_code,
+            cls, entity_id, platform, submitted_on, hours_offset, report_type,
+            category, platform_version, android_device_country_locale_code,
             android_sdk_version, android_device_model, entry_point,
             entry_point_topic_id, entry_point_story_id,
             entry_point_exploration_id, entry_point_subtopic_id,
@@ -143,6 +146,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
             platform: str. The platform the report is submitted on.
             submitted_on: datetime.datetime. The date and time the report was
                 submitted, in the user's local time zone.
+            hours_offset: int. The hours offset from UTC of the user's local
+                time zone.
             report_type: str. The type of report.
             category: str. The category the report is providing feedback on.
             platform_version: str. The version of Oppia that the report was
@@ -186,6 +191,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION)
         report_entity = cls(
             id=entity_id, platform=platform, submitted_on=submitted_on,
+            local_timezone_offset_hrs=hours_offset,
             report_type=report_type, category=category,
             platform_version=platform_version,
             android_device_country_locale_code=(
@@ -268,6 +274,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'scrubbed_by': base_models.EXPORT_POLICY.EXPORTED,
             'ticket_id': base_models.EXPORT_POLICY.EXPORTED,
             'submitted_on': base_models.EXPORT_POLICY.EXPORTED,
+            'local_timezone_offset_hrs': base_models.EXPORT_POLICY.EXPORTED,
             'report_type': base_models.EXPORT_POLICY.EXPORTED,
             'category': base_models.EXPORT_POLICY.EXPORTED,
             'platform_version': base_models.EXPORT_POLICY.EXPORTED,
@@ -316,6 +323,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 'ticket_id': report_model.ticket_id,
                 'submitted_on': utils.get_human_readable_time_string(
                     submitted_on_msec),
+                'local_timezone_offset_hrs': (
+                    report_model.local_timezone_offset_hrs),
                 'report_type': report_model.report_type,
                 'category': report_model.category,
                 'platform_version': report_model.platform_version

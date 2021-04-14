@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+from dateutil import tz
 
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
@@ -92,17 +93,20 @@ def create_android_report_from_json(report_json):
         app_context_json['account_is_profile_admin'],
         app_context_json['event_logs'], app_context_json['logcat_logs'])
 
+    # time_offset = app_feedback_report_domain.TimeOffset().set_offset(
+    #         hours=report_json['report_submission_utc_offset_hrs'])
     report_datetime = datetime.datetime.fromtimestamp(
         timestamp=report_json['report_submission_timestamp_sec'],
-        tz=TimeZone(
-            utc_offset=report_json['report_submission_utc_offset_hrs']))
+        tz=tz.tzoffset(name='', offset=0)
+        # app_feedback_report_domain.TimeOffset().set_offset(
+        #     offset=report_json['report_submission_utc_offset_hrs'])
+        )
     report_id = app_feedback_report_models.AppFeedbackReportModel.generate_id(
-        PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'])
+        PLATFORM_ANDROID, report_datetime)
     report_obj = app_feedback_report_domain.AppFeedbackReport(
         report_id, report_json['android_report_info_schema_version'],
-        PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'],
-        None, None, user_supplied_feedback_obj, device_system_context_obj,
-        app_context_obj)
+        PLATFORM_ANDROID, report_datetime, None, None,
+        user_supplied_feedback_obj, device_system_context_obj, app_context_obj)
 
     return report_obj
 
@@ -428,6 +432,7 @@ def _get_android_report_from_model(android_report_model):
         android_report_model.id,
         android_report_model.android_report_info_schema_version,
         android_report_model.platform, android_report_model.submitted_on,
+        android_report_model.local_timezone_offset_hrs,
         android_report_model.ticket_id, android_report_model.scrubbed_by,
         user_supplied_feedback, device_system_context, app_context)
 
@@ -581,6 +586,7 @@ def save_feedback_report_to_storage(report):
             model_entity = (
                 app_feedback_report_models.AppFeedbackReportModel.create(
                     report.id, report.platform, report.submitted_on_timestamp,
+                    report.local_timezone_offset_hrs,
                     user_supplied_feedback.category,
                     device_system_context.version_name,
                     app_context.device_country_locale_code,
@@ -597,6 +603,7 @@ def save_feedback_report_to_storage(report):
             model_entity = (
                 app_feedback_report_models.AppFeedbackReportModel.create(
                     report.id, report.platform, report.submitted_on_timestamp,
+                    report.local_timezone_offset_hrs,
                     user_supplied_feedback.category,
                     device_system_context.version_name,
                     app_context.device_country_locale_code,
@@ -711,14 +718,3 @@ def _save_ticket(ticket):
     ticket_model.report_ids = [report_id for report_id in ticket.reports]
     ticket_model.update_timestamps()
     ticket_model.put()
-
-
-class TimeZone(datetime.tzinfo):
-    """Constructs a basic timzone object to use with the report submission
-    timestamp to indicate the user's timezone.
-
-    Once Python 3 migration is complete, we should use datetime.timezone objects
-    to indicate timezones in the timestamps.
-    """
-    def __init__(self, utc_offset):
-        self.utcoffset = utc_offset

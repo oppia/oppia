@@ -41,8 +41,8 @@ class AppFeedbackReport(python_utils.OBJECT):
 
     def __init__(
             self, report_id, schema_version, platform, submitted_on_timestamp,
-            ticket_id, scrubbed_by, user_supplied_feedback,
-            device_system_context, app_context):
+            local_timezone_offset_hrs, ticket_id, scrubbed_by,
+            user_supplied_feedback, device_system_context, app_context):
         """Constructs a AppFeedbackReport domain object.
 
         Args:
@@ -52,6 +52,8 @@ class AppFeedbackReport(python_utils.OBJECT):
             submitted_on_timestamp: datetime.datetime: Timestamp in seconds
                 since epoch (in UTC) of when the report was submitted by the
                 user.
+            local_timezone_offset_hrs: int. The number of hours offset from UTC for
+                the user's local time.
             ticket_id: str|None. The unique ID that this ticket is assigned to;
                 None if this report is not yet ticketed.
             scrubbed_by: str. The unique ID of the user that scrubbed this
@@ -69,6 +71,7 @@ class AppFeedbackReport(python_utils.OBJECT):
         self.schema_version = schema_version
         self.platform = platform
         self.submitted_on_timestamp = submitted_on_timestamp
+        self.local_timezone_offset_hrs = local_timezone_offset_hrs
         self.ticket_id = ticket_id
         self.scrubbed_by = scrubbed_by
         self.user_supplied_feedback = user_supplied_feedback
@@ -87,6 +90,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             'platform': self.platform,
             'submitted_on_timestamp': utils.get_human_readable_time_string(
                 utils.get_time_in_millisecs(self.submitted_on_timestamp)),
+            'local_timezone_offset_hrs': self.local_timezone_offset_hrs,
             'ticket_id': self.ticket_id,
             'scrubbed_by': self.scrubbed_by,
             'user_supplied_feedback': self.user_supplied_feedback.to_dict(),
@@ -108,6 +112,18 @@ class AppFeedbackReport(python_utils.OBJECT):
 
         if self.scrubbed_by is not None:
             self.require_valid_scrubber_id(self.scrubbed_by)
+
+        if not (
+            constants.TIMEZONE_MINIMUM_OFFSET <= 
+            self.local_timezone_offset_hrs <= 
+            constants.TIMEZONE_MAXIMUM_OFFSET):
+            raise utils.ValidationError(
+                'Expected local timezone offset to be in [%d, %d], '
+                'received: %d' % (
+                    constants.TIMEZONE_MINIMUM_OFFSET,
+                    constants.TIMEZONE_MAXIMUM_OFFSET,
+                    self.local_timezone_offset_hrs))
+
 
         if self.ticket_id is not None:
             AppFeedbackReportTicket.require_valid_ticket_id(self.ticket_id)
@@ -1471,3 +1487,20 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The filter options should be a list, received: %r' % (
                     self.filter_options))
+
+
+# class TimeOffset(datetime.tzinfo):
+#     """Constructs a basic timzone object to use with the report submission
+#     timestamp to indicate the user's timezone.
+
+#     Once Python 3 migration is complete, we should use datetime.timezone objects
+#     to indicate timezones in the timestamps.
+#     """
+#     def __init__(self):
+#         super(TimeOffset, self).__init__
+    
+#     def set_offset(self, dt, offset):
+#         self.utcoffset = dt.timedelta(hours=offset)
+
+#     def utcoffset(self, dt):
+#         return self.utcoffset

@@ -52,6 +52,9 @@ FILTER_FIELD_NAMES = utils.create_enum(
     'audio_language_code', 'platform_version',
     'android_device_country_locale_code')
 
+TIMEZONE_MINIMUM_OFFSET = -12
+TIMEZONE_MAXIMUM_OFFSET = 14
+
 MINIMUM_ANDROID_SDK_VERSION = 2
 ANDROID_TEXT_SIZE = utils.create_enum(
     'text_size_unspecified', 'small_text_size', 'medium_text_size',

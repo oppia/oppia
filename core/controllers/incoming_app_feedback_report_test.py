@@ -80,7 +80,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         }
         self.csrf_token = self.get_new_csrf_token()
 
-    def test_incoming_report_saved_to_storage(self):
+    def test_incoming_report_saves_to_storage(self):
         self.post_json(
             url=feconf.INCOMING_APP_FEEDBACK_REPORT_URL, payload=self.payload,
             headers=self.headers, csrf_token=self.csrf_token)

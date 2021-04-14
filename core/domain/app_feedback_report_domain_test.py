@@ -154,6 +154,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'platform': PLATFORM_ANDROID,
             'submitted_on_timestamp': utils.get_human_readable_time_string(
                 utils.get_time_in_millisecs(REPORT_SUBMITTED_TIMESTAMP)),
+            'local_timezone_offset_hrs': 0,
             'ticket_id': TICKET_ID,
             'scrubbed_by': None,
             'user_supplied_feedback': {
@@ -880,7 +881,7 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
         app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, PLATFORM_ANDROID,
-            REPORT_SUBMITTED_TIMESTAMP, REPORT_TYPE_SUGGESTION,
+            REPORT_SUBMITTED_TIMESTAMP, 0, REPORT_TYPE_SUGGESTION,
             CATEGORY_SUGGESTION_OTHER, ANDROID_PLATFORM_VERSION,
             COUNTRY_LOCALE_CODE_INDIA, ANDROID_SDK_VERSION,
             ANDROID_DEVICE_MODEL, ENTRY_POINT_NAVIGATION_DRAWER, None, None,
