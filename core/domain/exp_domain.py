@@ -963,7 +963,7 @@ class Exploration(python_utils.OBJECT):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check if first state is a checkpoint or not
+        # Check if first state is a checkpoint or not.
         if not self.states[self.init_state_name].card_is_checkpoint:
             raise utils.ValidationError(
                 'Expected card_is_checkpoint of first state to be True'
@@ -971,7 +971,7 @@ class Exploration(python_utils.OBJECT):
                 % self.states[self.init_state_name].card_is_checkpoint
             )
 
-        # Check if end states are checkpoint
+        # Check if end states are checkpoint.
         for state_name, state in self.states.items():
             interaction = state.interaction
             if interaction.id == 'EndExploration':
@@ -982,7 +982,7 @@ class Exploration(python_utils.OBJECT):
                         % self.states[state_name].card_is_checkpoint
                     )
 
-        # Check if checkpoint count is at max 8 and atleast 1
+        # Check if checkpoint count is at max 8 and atleast 1.
         checkpoint_count = 0
         for state_name, state in self.states.items():
             if state.card_is_checkpoint:
@@ -994,7 +994,7 @@ class Exploration(python_utils.OBJECT):
                 % checkpoint_count
             )
 
-        # Check if a state marked as checkpoint is bypassable
+        # Check if a state marked as checkpoint is bypassable.
         end_states = []
         for state_name, state in self.states.items():
             if state.interaction.id == "EndExploration":
@@ -1008,8 +1008,8 @@ class Exploration(python_utils.OBJECT):
             if state_name == self.init_state_name:
                 continue
             elif state.card_is_checkpoint:
-                new_states = {key:val for key, val in self.states.items()
-                    if key != state_name}
+                new_states = copy.deepcopy(self.states)
+                new_states.pop(state_name)
                 processed_queue = []
                 curr_queue = [self.init_state_name]
 
