@@ -21,11 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.domain improt app_feedback_report_constants as constants
+from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 from core.platform import models
 from core.tests import test_utils
+
+import feconf
+import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -33,7 +36,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
-    """Test functions in app_feedback_report_services."""
+    """Tests for functions in app_feedback_report_services."""
 
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
@@ -44,10 +47,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615519337)
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
-    REPORT_SUBMITTED_TIMESTAMP_AT_MAX = datetime.datetime.utcnow() - (
+    TIMESTAMP_AT_MAX_DAYS = datetime.datetime.utcnow() - (
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS)
-    REPORT_SUBMITTED_TIMESTAMP_OVER_MAX = datetime.datetime.utcnow() - (
-        feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS + 2)
+    TIMESTAMP_OVER_MAX_DAYS = datetime.datetime.utcnow() - (
+        feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
+        datetime.timedelta(days=2))
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP)
@@ -76,7 +80,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'entry_point_info': {
             'entry_point_name': 'crash',
         },
-        'text_size': 'MEDIUM_TEXT_SIZE',
+        'text_size': 'medium_text_size',
         'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
         'account_is_profile_admin': False
@@ -98,13 +102,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             "audio_language_code": "en",
             "only_allows_wifi_download_and_update": True,
             "automatically_update_topics": False,
-            "is_admin": False,
+            "account_is_profile_admin": False,
             "event_logs": ["example", "event"],
             "logcat_logs": ["example", "log"]
         },
         "device_context": {
-            "device_model": "example_model",
-            "sdk_version": 23,
+            "android_device_model": "example_model",
+            "android_sdk_version": 23,
             "build_fingerprint": "example_fingerprint_id",
             "network_type": "wifi"
         },
@@ -113,8 +117,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         "system_context": {
             "platform_version": "0.1-alpha-abcdef1234",
             "package_version_code": 1,
-            "country_locale_code": "in",
-            "language_locale_code": "en"
+            "android_device_country_locale_code": "in",
+            "android_device_language_locale_code": "en"
         },
         "user_supplied_feedback": {
             "report_type": "suggestion",
@@ -129,9 +133,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
-        self.android_report_id = app_feedback_report_models.generate_id(
-            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP)
-        app_feedback_report_models.create(
+        self.android_report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
+        app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
@@ -145,19 +150,22 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.android_report_id))
         self.android_report_obj = (
-            app_feedback_report_services.get_report_from_model(report_model))
+            app_feedback_report_services.get_report_from_model(
+                self.android_report_model))
         
-        self.android_ticket_id = app_feedback_report_models.generate_id(
-            self.TICKET_NAME)
+        self.android_ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                self.TICKET_NAME))
         app_feedback_report_models.AppFeedbackReportTicketModel.create(
-            android_ticket_id, self.TICKET_NAME, self.PLATFORM_ANDROID, None, None,
-            self.REPORT_SUBMITTED_TIMESTAMP, self.android_report_id)
+            self.android_ticket_id, self.TICKET_NAME, self.PLATFORM_ANDROID,
+            None, None, self.REPORT_SUBMITTED_TIMESTAMP,
+            [self.android_report_id])
         self.android_ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-                android_ticket_id))
+                self.android_ticket_id))
         self.android_ticket_obj = (
             app_feedback_report_services.get_ticket_from_model(
-                android_ticket_model))
+                self.android_ticket_model))
 
     def test_get_reports_returns_same_report(self):
         report_models = app_feedback_report_services.get_report_models(
@@ -168,9 +176,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         new_report_id_1 = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
-        app_feedback_report_models.create(
-            new_report_id_1, self.PLATFORM_ANDROID
-             self.REPORT_SUBMITTED_TIMESTAMP,
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            new_report_id_1, self.PLATFORM_ANDROID,
+            self.REPORT_SUBMITTED_TIMESTAMP,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.ANDROID_PLATFORM_VERSION,
             self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
@@ -181,7 +189,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         new_report_id_2 = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
-        app_feedback_report_models.create(
+        app_feedback_report_models.AppFeedbackReportModel.create(
             new_report_id_2, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
@@ -201,8 +209,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(new_report_id_2 in report_ids)
 
     def test_get_nonexistent_report_returns_no_report(self):
-        report_models = app_feedback_report_services.get_report_models('bad_id')
-        self.assertEqual(len(report_models), 0)
+        report_models = app_feedback_report_services.get_report_models(
+            ['bad_id'])
+        self.assertIsNone(report_models[0])
 
     def test_get_report_from_model_has_same_report_info(self):
         self.assertEqual(
@@ -266,7 +275,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_context, app_feedback_report_domain.AndroidAppContext))
         self.assertEqual(
             app_context.entry_point.entry_point_name,
-            self.android_report_model.entry_point_name)
+            self.android_report_model.entry_point)
         self.assertEqual(
             app_context.text_language_code,
             self.android_report_model.text_language_code)
@@ -292,7 +301,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_context.event_logs,
             self.android_report_model.android_report_info['event_logs'])
         self.assertEqual(
-            app_context.logcat_ogs,
+            app_context.logcat_logs,
             self.android_report_model.android_report_info['logcat_logs'])
 
     def test_save_report_and_get_from_model_has_new_info(self):
@@ -301,15 +310,15 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         # Add a user in the scrubbed_by field and verify that the updated model
         # is saved to storage.
         self.android_report_obj.scrubbed_by = self.user_id
-        app_feedback_report_services.save_android_app_feedback_report(
+        app_feedback_report_services.save_feedback_report_to_storage(
             self.android_report_obj)
-        scrubed_report_model = app_feedback_report_services.get_report_models(
+        scrubbed_report_models = app_feedback_report_services.get_report_models(
             [self.android_report_id])
         scrubbed_report_obj = (
             app_feedback_report_services.get_report_from_model(
-                scrubbed_report_model))
+                scrubbed_report_models[0]))
 
-        self.assertEqual(scrubed_report_obj.scrubbed_by, self.user_id)
+        self.assertEqual(scrubbed_report_obj.scrubbed_by, self.user_id)
 
     def test_get_ticket_from_model_has_same_ticket_info(self):
         self.assertEqual(
@@ -333,23 +342,34 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         
     def test_get_ticket_from_model_with_github_info_has_same_ticket_info(self):
         report_id = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
-        ticket_id = app_feedback_report_models.generate_id(self.TICKET_NAME)
+        ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                self.TICKET_NAME))
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel(
-                ticket_id, self.TICKET_NAME, self.PLATFORM_ANDROID, 
-                self.PLATFORM_ANDROID, 12, self.REPORT_SUBMITTED_TIMESTAMP,
-                [report_id]))
+                id=ticket_id, ticket_name=self.TICKET_NAME,
+                platform=self.PLATFORM_ANDROID, 
+                github_issue_repo_name=self.PLATFORM_ANDROID,
+                github_issue_number=12, archived=False,
+                newest_report_timestamp=self.REPORT_SUBMITTED_TIMESTAMP,
+                report_ids=[report_id]))
         ticket_obj = app_feedback_report_services.get_ticket_from_model(
-            entity_model)
+            ticket_model)
         
-        self.assertEqual(ticket_obj.id, ticket_id)
+        self.assertEqual(ticket_obj.ticket_id, ticket_id)
+        self.assertEqual(ticket_obj.platform, ticket_model.platform)
         self.assertEqual(
             ticket_obj.github_issue_repo_name,
             ticket_model.github_issue_repo_name)
         self.assertEqual(
             ticket_obj.github_issue_number, ticket_model.github_issue_number)
+        self.assertEqual(ticket_obj.archived, ticket_model.archived)
+        self.assertEqual(
+            ticket_obj.newest_report_creation_timestamp,
+            ticket_model.newest_report_timestamp)
+        self.assertEqual(ticket_obj.reports, ticket_model.report_ids)
         
     def test_get_ticket_from_model_is_archived_has_same_ticket_info(self):
         self.android_ticket_model.archived = True
@@ -358,15 +378,34 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         ticket_obj = app_feedback_report_services.get_ticket_from_model(
             self.android_ticket_model)
         
+        self.assertEqual(ticket_obj.ticket_id, self.android_ticket_model.id)
+        self.assertEqual(
+            ticket_obj.platform, self.android_ticket_model.platform)
+        self.assertEqual(
+            ticket_obj.github_issue_repo_name,
+            self.android_ticket_model.github_issue_repo_name)
+        self.assertEqual(
+            ticket_obj.github_issue_number,
+            self.android_ticket_model.github_issue_number)
+        self.assertEqual(ticket_obj.ticket_id, self.android_ticket_model.id)
         self.assertEqual(ticket_obj.archived, True)
+        self.assertEqual(
+            ticket_obj.newest_report_creation_timestamp,
+            self.android_ticket_model.newest_report_timestamp)
+        self.assertEqual(
+            ticket_obj.reports, self.android_ticket_model.report_ids)
 
-    def test_create_android_report_from_json_returns_object(self):
+    def test_create_android_report_from_json_gets_same_object(self):
         report_obj = (
             app_feedback_report_services.create_android_report_from_json(
                 self.REPORT_JSON))
 
         self.assertTrue(isinstance(
             report_obj, app_feedback_report_domain.AppFeedbackReport))
+        self.assertEqual(report_obj.platform, self.PLATFORM_ANDROID)
+        self.assertEqual(
+            report_obj.submitted_on_timestamp,
+            self.REPORT_SUBMITTED_TIMESTAMP)
 
     def test_create_android_report_from_json_saves_model_to_storage(self):
         report_obj = (
@@ -432,7 +471,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(unticketed_stats_model.platform, self.PLATFORM_ANDROID)
-        self.assertTrue(unticketed_stats_model.total_reports_submitted = 2)
+        self.assertEqual(unticketed_stats_model.total_reports_submitted, 2)
         self._verify_stats_model(
             unticketed_stats_model.daily_param_stats, expected_json)
 
@@ -500,34 +539,60 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_filter_options(self):
         filter_options = app_feedback_report_services.get_all_filter_options()
-        filter_names = filter_options.keys()
+        filter_names = [filter_obj.filter_name for filter_obj in filter_options]
 
-        self.assertTrue('report_type' in filter_names)
-        self.assertEqual(
-            filter_options['report_type'], self.REPORT_TYPE_SUGGESTION)
-        self.assertTrue('platform' in filter_names)
-        self.assertEqual(
-            filter_options['platform'], self.PLATFORM_ANDROID)
-        self.assertTrue('entry_point' in filter_names)
-        self.assertEqual(
-            filter_options['entry_point'], self.ENTRY_POINT_NAVIGATION_DRAWER)
-        self.assertTrue('android_device_model' in filter_names)
-        self.assertEqual(
-            filter_options['android_device_model'], self.ANDROID_DEVICE_MODEL)
-        self.assertTrue('text_lanaguage_code' in filter_names)
-        self.assertEqual(
-            filter_options['text_lanaguage_code'],
-            self.TEXT_LANGUAGE_CODE_ENGLISH)
-        self.assertTrue('audio_language_code' in filter_names)
-        self.assertEqual(
-            filter_options['audio_language_code'],
-            self.AUDIO_LANGUAGE_CODE_ENGLISH)
-        self.assertTrue('android_device_country_locale_code' in filter_names)
-        self.assertEqual(
-            filter_options['android_device_country_locale_code'],
-            self.DEVICE_COUNTRY_LOCALE_CODE_INDIA)
+        for filter_obj in filter_options:
+            self.assertTrue(filter_obj.filter_name in filter_names)
+            expected_val = None
+            if filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.report_type):
+                expected_val = self.REPORT_TYPE_SUGGESTION
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.platform):
+                expected_val = self.PLATFORM_ANDROID
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.entry_point):
+                expected_val = self.ENTRY_POINT_NAVIGATION_DRAWER
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.submitted_on):
+                expected_val = self.REPORT_SUBMITTED_TIMESTAMP
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.android_device_model):
+                expected_val = self.ANDROID_DEVICE_MODEL
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.android_sdk_version):
+                expected_val = self.ANDROID_SDK_VERSION
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.text_language_code):
+                expected_val = self.TEXT_LANGUAGE_CODE_ENGLISH
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.audio_language_code):
+                expected_val = self.AUDIO_LANGUAGE_CODE_ENGLISH
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.platform_version):
+                expected_val = self.ANDROID_PLATFORM_VERSION
+            elif filter_obj.filter_name == (
+                constants.FILTER_FIELD_NAMES.android_device_country_locale_code
+            ):
+                expected_val = self.DEVICE_COUNTRY_LOCALE_CODE_INDIA
+
+            self.assertEqual(filter_obj.filter_options[0], expected_val)
 
     def test_edit_ticket_name_updates_ticket_model(self):
+        self.android_report_obj.ticket_id = self.android_ticket_id
+        new_ticket_name = 'a ticket name'
+        app_feedback_report_services.edit_ticket_name(
+            self.android_ticket_obj, new_ticket_name)
+        
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertEqual(self.android_ticket_obj.ticket_id, new_ticket_model.id)
+        self.assertEqual(new_ticket_model.ticket_name, new_ticket_name)
+        self.assertEqual(self.android_report_obj.ticket_id, new_ticket_model.id)
+
+    def test_edit_ticket_name_does_not_change_ticket_id(self):
         new_ticket_name = 'a new ticket name'
         app_feedback_report_services.edit_ticket_name(
             self.android_ticket_obj, new_ticket_name)
@@ -536,29 +601,20 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 self.android_ticket_id))
 
-        self.assertEqual(self.android_report_obj.report_id, new_ticket_model.id)
+        self.assertEqual(new_ticket_model.ticket_name, new_ticket_name)
+        self.assertEqual(self.android_ticket_obj.ticket_id, new_ticket_model.id)
         self.assertEqual(
             self.android_report_obj.platform, new_ticket_model.platform)
-        self.assertEqual(new_ticket_model.ticket_name, new_ticket_name)
-
-    def test_edit_ticket_name_does_not_change_ticket_model(self):
-        new_ticket_name = 'a new ticket name'
-        app_feedback_report_services.edit_ticket_name(
-            self.android_ticket_obj, new_ticket_name)
-        
-        new_ticket_model = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-                self.android_ticket_id))
-
-        self.assertEqual(self.android_report_obj.report_id, new_ticket_model.id)
-        self.assertEqual(
-            self.android_report_obj.platform, new_ticket_model.platform)
-        self.assertEqual(new_ticket_model.ticket_name, new_ticket_name)
 
     def test_edit_ticket_name_does_not_change_stats_model(self):
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, self.android_ticket_obj)
+
+        # Fetch the stats model before changing the ticket name
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.android_ticket_id))
+                self.android_report_obj.platform, self.android_ticket_id,
+                self.android_report_obj.submitted_on_timestamp))
         old_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
@@ -569,7 +625,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         
         new_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.android_ticket_id))
+                self.android_report_obj.platform, self.android_ticket_id,
+                self.android_report_obj.submitted_on_timestamp))
         new_stats_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 new_stats_id))
@@ -590,7 +647,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_reassign_report_ticket_name_updates_increasing_stats_model(self):
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.android_ticket_id))
+                self.PLATFORM_ANDROID, self.android_ticket_id,
+                self.REPORT_SUBMITTED_TIMESTAMP))
         old_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
@@ -600,13 +658,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_ticket_obj, new_ticket_name)
         new_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                new_ticket_name))
+                self.PLATFORM_ANDROID, new_ticket_name,
+                self.REPORT_SUBMITTED_TIMESTAMP))
         new_stats_model = (
-            app_feedback_report_models.AppFeedbackReport.get_by_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
 
-        parameter_names = (
-            app_feedback_report_constants.ALLOWED_STATS_PARAM_NAMES)
+        parameter_names = constants.ALLOWED_STATS_PARAMETERS
         expected_json = {
             parameter_names.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 1
@@ -639,7 +697,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_reassign_report_ticket_name_updates_decreasing_stats_model(self):
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.android_ticket_id))
+                self.PLATFORM_ANDROID, self.android_ticket_id,
+                self.REPORT_SUBMITTED_TIMESTAMP))
         old_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
@@ -648,11 +707,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_services.edit_ticket_name(
             self.android_ticket_obj, new_ticket_name)
         new_stats_model = (
-            app_feedback_report_models.AppFeedbackReport.get_by_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        parameter_names = (
-            app_feedback_report_constants.ALLOWED_STATS_PARAM_NAMES)
+        parameter_names = constants.ALLOWED_STATS_PARAMETERS
         expected_json = {
             parameter_names.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 0
@@ -685,7 +743,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self):
         old_all_report_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID))
+                self.PLATFORM_ANDROID,
+                constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID,
+                self.REPORT_SUBMITTED_TIMESTAMP))
         old_all_report_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_all_report_stats_id))
@@ -694,11 +754,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_services.edit_ticket_name(
             self.android_ticket_obj, new_ticket_name)
         new_all_reports_stats_model = (
-            app_feedback_report_models.AppFeedbackReport.get_by_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_all_report_stats_id))
 
-        parameter_names = (
-            app_feedback_report_constants.ALLOWED_STATS_PARAM_NAMES)
+        parameter_names = constants.ALLOWED_STATS_PARAMETERS
         expected_json = {
             parameter_names.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 1
@@ -729,56 +788,37 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             expected_json)
 
     def test_scrub_android_report_removes_info(self):
+        app_feedback_report_services.scrub_single_app_feedback_report(
+            self.android_report_obj, self.user_id)
+        scrubbed_report_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.android_report_obj.report_id))
+
         expected_report_dict = {
+            'user_feedback_selected_items': None,
+            'user_feedback_other_text_input': None,
+            'event_logs': None,
+            'logcat_logs': None,
             'package_version_code': 1,
-            'language_locale_code': 'en',
-            'entry_point_info': {
-                'entry_point_name': 'crash',
-            },
-            'text_size': 'MEDIUM_TEXT_SIZE',
+            'android_device_language_locale_code': 'en',
+            'build_fingerprint': 'example_fingerprint_id',
+            'network_type': 'wifi',
+            'text_size': 'medium_text_size',
             'only_allows_wifi_download_and_update': True,
             'automatically_update_topics': False,
-            'is_admin': False
+            'account_is_profile_admin': False
         }
 
-        app_feedback_report_services.scrub_report(
-            self.android_report_id, 'scrubber_user')
-        scrubbed_report_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get(
-                self.android_report_id))
-        self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
+        self.assertEqual(scrubbed_report_model.scrubbed_by, self.user_id)
         self.assertEqual(
             scrubbed_report_model.android_report_info, expected_report_dict)
 
-    def test_scrub_web_report_removes_info(self):
-        app_feedback_report_services.scrub_report(
-            self.web_report_id, 'scrubber_user')
-        scrubbed_report_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get(
-                self.web_report_id))
-        expected_report_dict = {}
-
-        self.assertEqual(scrubbed_report_model.scrubbed_by, 'scrubber_user')
-        self.assertEqual(
-            scrubbed_report_model.web_report_info, expected_report_dict)
-
-    def test_scrubbing_nonexistent_report_raises_exception(self):
-        fake_report_id = '%s.%s.%s' % (
-            self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP.second,
-            'randomInteger123')
-        # Test exception for AppFeedbackReportModel.
-        with self.assertRaisesRegexp(
-            Exception,
-            'The AppFeedbackReportModel trying to be scrubbed does not '
-            'exist.'):
-            app_feedback_report_services.scrub_report(
-                fake_report_id, 'scrubber_user')
-
     def test_scrubbing_on_current_and_expired_reports_only_scrubs_expired(
             self):
-        current_report_id = self._add_current_reports()
+        current_report_id = self._add_current_report()
         expired_report_id = self._add_expiring_android_report()
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            self.user_id)
 
         scrubbed_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
@@ -797,7 +837,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
         current_models = current_models_query.fetch()
         self.assertEqual(len(current_models), 0)
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            'scrubber_user')
 
         stored_models_query = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
@@ -805,8 +846,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(stored_models), 0)
 
     def test_scrubbing_on_no_models_does_not_scrub_models(self):
-        current_report_id = self._add_current_reports()
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        current_report_id = self._add_current_report()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            self.user_id)
 
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
@@ -814,16 +856,17 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_not_scrubbed(current_model)
 
     def test_scrubbing_on_all_expired_models_updates_all_models(self):
-        current_report_id = self._add_expiring_android_report()
-        expired_report_id = self._add_expiring_web_report()
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        android_report_id = self._add_expiring_android_report()
+        web_report_id = self._add_expiring_web_report()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            self.user_id)
 
         android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                ))
+                android_report_id))
         web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                expired_report_id))
+                web_report_id))
 
         self._verify_report_is_scrubbed(
             android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
@@ -833,17 +876,19 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_scrubbing_on_already_scrubbed_models_does_not_scrub_models(
             self):
         self._add_scrubbed_report()
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            self.user_id)
 
         scrubbed_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.SCRUBBED_REPORT_ID))
 
-        self._verify_report_is_scrubbed(scrubbed_model, 'scrubber_user')
+        self._verify_report_is_scrubbed(scrubbed_model, self.user_id)
 
     def test_scrubbing_runs_again_scrubs_newly_added_expired_models(self):
         expired_report_id = self._add_expiring_android_report()
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            self.user_id)
         scrubbed_android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 ))
@@ -851,7 +896,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             scrubbed_android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
 
         self._add_expiring_web_report()
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports()
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            self.user_id)
 
         scrubbed_web_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
@@ -871,11 +917,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(model_entity)
         self.assertIsNone(model_entity.scrubbed_by)
 
-    def _add_current_reports(self):
+    def _add_current_report(self):
         """Adds reports to the model that should not be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_AT_MAX))
+                self.PLATFORM_ANDROID, self.TIMESTAMP_AT_MAX_DAYS))
         current_feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
                 id=report_id,
@@ -905,7 +951,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         """Adds reports to the model that should be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_OVER_MAX))
+                self.PLATFORM_ANDROID, self.TIMESTAMP_OVER_MAX_DAYS))
         expiring_android_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
                 id=report_id,
@@ -916,7 +962,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
+                platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
@@ -934,10 +980,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def _add_expiring_web_report(self):
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_OVER_MAX))
+                self.PLATFORM_ANDROID, self.TIMESTAMP_OVER_MAX_DAYS))
         expiring_web_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
-                id=self.WEB_REPORT_ID_OVER_MAX_DAYS,
+                id=report_id,
                 platform=self.PLATFORM_WEB,
                 ticket_id='%s.%s.%s' % (
                     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
@@ -945,7 +991,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
+                platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
@@ -964,7 +1010,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         """Add an already-scrubbed report to the model."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
         expiring_android_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
                 id=report_id,
@@ -976,7 +1022,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 report_type=self.REPORT_TYPE_SUGGESTION,
                 category=self.CATEGORY_OTHER,
-                platform_version=self.PLATFORM_VERSION,
+                platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
@@ -1013,4 +1059,3 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_json['version_name'],
             expected_json['version_name'])
-

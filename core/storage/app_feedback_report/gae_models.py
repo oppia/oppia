@@ -19,7 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.domain import app_feedback_report_constants
+from core.domain import app_feedback_report_constants as constants
 from core.platform import models
 import feconf
 import python_utils
@@ -50,7 +50,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # feedback corresponds to.
     platform = datastore_services.StringProperty(
         required=True, indexed=True,
-        choices=app_feedback_report_constants.PLATFORM_CHOICES)
+        choices=constants.PLATFORM_CHOICES)
     # The ID of the user that scrubbed this report, if it has been scrubbed.
     scrubbed_by = datastore_services.StringProperty(
         required=False, indexed=True)
@@ -178,7 +178,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         android_schema_version = None
         web_schema_version = None
-        if platform == app_feedback_report_constants.PLATFORM_CHOICE_ANDROID:
+        if platform == constants.PLATFORM_CHOICE_ANDROID:
             android_schema_version = (
                 feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)
         else:
@@ -242,14 +242,14 @@ class AppFeedbackReportModel(base_models.BaseModel):
         must be scrubbed.
 
         Returns:
-            list(str). A list of IDs corresponding to
+        list(AppFeedbackReportModel). A list of IDs corresponding to
             AppFeedbackReportModel entities that need to be scrubbed
         """
         datetime_now = datetime.datetime.utcnow()
-        datetime_before_which_to_scrub = (date_now - datetime.timedelta(
-            days=feconf.APP_FEEDBACK_REPORT_MAX_NUMBER_OF_DAYS))
+        datetime_before_which_to_scrub = datetime_now - (
+            feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS)
         return cls.query(
-            scrubbed_by is None,
+            cls.scrubbed_by is None,
             cls.created_on < datetime_before_which_to_scrub).fetch()
 
     @staticmethod
@@ -363,12 +363,12 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # The platform that the reports in this ticket pertain to.
     platform = datastore_services.StringProperty(
         required=True, indexed=True,
-        choices=app_feedback_report_constants.PLATFORM_CHOICES)
+        choices=constants.PLATFORM_CHOICES)
     # The Github repository that has the associated issue for this ticket. The
     # possible values correspond to GITHUB_REPO_CHOICES.
     github_issue_repo_name = datastore_services.StringProperty(
         required=False, indexed=True,
-        choices=app_feedback_report_constants.GITHUB_REPO_CHOICES)
+        choices=constants.GITHUB_REPO_CHOICES)
     # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
         required=False, indexed=True)
@@ -495,7 +495,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # The platform that these statistics are for.
     platform = datastore_services.StringProperty(
         required=True, indexed=True,
-        choices=app_feedback_report_constants.PLATFORM_CHOICES)
+        choices=constants.PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model.
     stats_tracking_date = datastore_services.DateProperty(
@@ -569,6 +569,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             str. The ID for this entity of the form
             '[platform]:[ticket_id]:[stats_date in YYYY-MM-DD]'.
         """
+        if ticket_id is None:
+            ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
         return '%s:%s:%s' % (
             platform, ticket_id, stats_tracking_date.isoformat())
 

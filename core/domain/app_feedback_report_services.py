@@ -39,7 +39,7 @@ PLATFORM_WEB = (
 
 
 def get_report_models(report_ids):
-    """Fetchs and returns a the AppFeedbackReportModels with the given ids.
+    """Fetches and returns the AppFeedbackReportModels with the given ids.
 
     Args:
         reprot_ids: list(str). The ids for the models to fetch
@@ -47,8 +47,8 @@ def get_report_models(report_ids):
         list(AppFeedbackReportModel). A list of models that correspond to the
         requested reports.
     """
-    return app_feedback_report_models.AppFeedbackReportModel.get_multi(
-        report_ids)
+    return (
+        app_feedback_report_models.AppFeedbackReportModel.get_multi(report_ids))
 
 
 def create_android_report_from_json(report_json):
@@ -92,10 +92,10 @@ def create_android_report_from_json(report_json):
         app_context_json['account_is_profile_admin'],
         app_context_json['event_logs'], app_context_json['logcat_logs'])
 
-    report_datetime = datetime.datetime.utcfromtimestamp(
+    report_datetime = datetime.datetime.fromtimestamp(
         timestamp=report_json['report_submission_timestamp_sec'],
-        tz=datetime.timezone(
-            offset=report_json['report_submission_utc_offset']))
+        tz=TimeZone(
+            utc_offset=report_json['report_submission_utc_offset_hrs']))
     report_id = app_feedback_report_models.AppFeedbackReportModel.generate_id(
         PLATFORM_ANDROID, report_json['report_submission_timestamp_sec'])
     report_obj = app_feedback_report_domain.AppFeedbackReport(
@@ -120,21 +120,21 @@ def _get_entry_point_from_json(entry_point_json):
     """
     entry_point_name = entry_point_json['entry_point_name']
     if entry_point_name == (
-        app_feedback_report_domain.ENTRY_POINT.navigation_drawer):
+        constants.ENTRY_POINT.navigation_drawer):
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
     elif entry_point_name == (
-        app_feedback_report_domain.ENTRY_POINT.lesson_player):
+        app_feedbconstantsack_report_domain.ENTRY_POINT.lesson_player):
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_story_id'],
             entry_point_json['entry_point_exploration_id'])
     elif entry_point_name == (
-        app_feedback_report_domain.ENTRY_POINT.revision_card):
+        constants.ENTRY_POINT.revision_card):
         return app_feedback_report_domain.RevisionCardEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_subtopic_id'])
     elif entry_point_name == (
-        app_feedback_report_domain.ENTRY_POINT.crash):
+        constants.ENTRY_POINT.crash):
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(
@@ -191,7 +191,7 @@ def _update_report_stats_model_in_transaction(
         delta: The amount to increment the stats by, depending on if the report
             is added or removed form the model.
     """
-    parameter_names = app_feedback_report_constants.ALLOWED_STATS_PARAMETERS
+    parameter_names = constants.ALLOWED_STATS_PARAMETERS
     # The stats we want to aggregate on.
     report_type = report_obj.user_supplied_feedback.report_type
     country_locale_code = (
@@ -474,24 +474,24 @@ def _get_entry_point(
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
     """
     if entry_point_name == (
-        app_feedback_report_domain.ENTRY_POINT.navigation_drawer):
+        constants.ENTRY_POINT.navigation_drawer):
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
     elif entry_point_name == (
-        app_feedback_report_domain.ENTRY_POINT.lesson_player):
+        constants.ENTRY_POINT.lesson_player):
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             topic_id, story_id, exploration_id)
     elif entry_point_name == (
-        app_feedback_report_domain.ENTRY_POINT.revision_card):
+        constants.ENTRY_POINT.revision_card):
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             topic_id, subtopic_id)
-    elif entry_point_name == app_feedback_report_domain.ENTRY_POINT.crash:
+    elif entry_point_name == constants.ENTRY_POINT.crash:
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(
             "Received unexpected entry point type.")
 
 
-def scrub_all_unscrubbed_expiring_reports(scrubber_by):
+def scrub_all_unscrubbed_expiring_reports(scrubbed_by):
     """Fetches the reports that are expiring and must be scrubbed.
 
     Args:
@@ -512,8 +512,8 @@ def get_all_expiring_reports_to_scrub():
         objects that need to be scrubbed.
     """
     model_class = app_feedback_report_models.AppFeedbackReportModel
-    model_ids = model_class.get_all_unscrubbed_expiring_reports()
-    model_entities = [model_class.get_by_id(model_id) for model_id in model_ids]
+    model_entities = model_class.get_all_unscrubbed_expiring_reports()
+    # model_entities = [model_class.get_by_id(model_id) for model_id in model_ids]
     return [
         get_report_from_model(model_entity) for model_entity in model_entities]
 
@@ -534,14 +534,10 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     if report.platform == PLATFORM_ANDROID:
         report.app_context.event_logs = None
         report.app_context.logcat_logs = None
-        save_android_feedback_report_to_storage(report)
-    else:
-        raise NotImplementedError(
-            'Saving web report entities to persistent storage has not been '
-            'implemented yet.')
+    save_feedback_report_to_storage(report)
 
 
-def save_android_feedback_report_to_storage(report):
+def save_feedback_report_to_storage(report):
     """Saves the AppFeedbackReport domain object in persistent storage.
 
     Args:
@@ -552,45 +548,70 @@ def save_android_feedback_report_to_storage(report):
     app_context = report.app_context
     entry_point = app_context.entry_point
 
-    android_report_info = {
+    report_info_json = {
         'user_feedback_selected_items': (
             user_supplied_feedback.user_feedback_selected_items),
         'user_feedback_other_text_input': (
-            user_supplied_feedback.user_feedback_other_text_input),
-        'event_logs': app_context.event_logs,
-        'logcat_logs': app_context.logcat_logs,
-        'package_version_code': device_system_context.package_version_code,
-        'android_device_language_locale_code': (
-            device_system_context.device_language_locale_code),
-        'build_fingerprint': device_system_context.build_fingerprint,
-        'network_type': device_system_context.network_type,
-        'text_size': app_context.text_size,
-        'only_allows_wifi_download_and_update': (
-            app_context.only_allows_wifi_download_and_update),
-        'automatically_update_topics': app_context.automatically_update_topics,
-        'account_is_profile_admin': app_context.account_is_profile_admin
+            user_supplied_feedback.user_feedback_other_text_input)
     }
+    if report.platform == PLATFORM_ANDROID:
+        report_info_json = {
+            'user_feedback_selected_items': (
+                user_supplied_feedback.user_feedback_selected_items),
+            'user_feedback_other_text_input': (
+                user_supplied_feedback.user_feedback_other_text_input),
+            'event_logs': app_context.event_logs,
+            'logcat_logs': app_context.logcat_logs,
+            'package_version_code': device_system_context.package_version_code,
+            'android_device_language_locale_code': (
+                device_system_context.device_language_locale_code),
+            'build_fingerprint': device_system_context.build_fingerprint,
+            'network_type': device_system_context.network_type,
+            'text_size': app_context.text_size,
+            'only_allows_wifi_download_and_update': (
+                app_context.only_allows_wifi_download_and_update),
+            'automatically_update_topics': app_context.automatically_update_topics,
+            'account_is_profile_admin': app_context.account_is_profile_admin
+        }
 
     model_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-        report.id)
-
-    if model_entity is None:
-        app_feedback_report_models.AppFeedbackReportModel.create(
-            report.id, report.platform, report.submitted_on_timestamp,
-            user_supplied_feedback.category, device_system_context.version_name,
-            app_context.device_country_locale_code,
-            device_system_context.sdk_version,
-            device_system_context.device_model,
-            entry_point.entry_point_name, entry_point.topic_id,
-            entry_point.story_id, entry_point.exploration_id,
-            entry_point.subtopic_id, app_context.text_language_code,
-            app_context.audio_language_code, android_report_info, None)
+        report.report_id)
+    if report.platform == PLATFORM_ANDROID:
+        if model_entity is None:
+            model_entity = (
+                app_feedback_report_models.AppFeedbackReportModel.create(
+                    report.id, report.platform, report.submitted_on_timestamp,
+                    user_supplied_feedback.category,
+                    device_system_context.version_name,
+                    app_context.device_country_locale_code,
+                    device_system_context.sdk_version,
+                    device_system_context.device_model,
+                    entry_point.entry_point_name, entry_point.topic_id,
+                    entry_point.story_id, entry_point.exploration_id,
+                    entry_point.subtopic_id, app_context.text_language_code,
+                    app_context.audio_language_code, report_info_json, None))
+        else:
+            model_entity.android_report_info = report_info_json
     else:
-        model_entity.ticket_id = report.ticket_id
-        model_entity.scrubbed_by = report.scrubbed_by
-        model_entity.android_report_info = android_report_info
-        model_entity.update_timestamps()
-        model_entity.put()
+        if model_entity is None:
+            model_entity = (
+                app_feedback_report_models.AppFeedbackReportModel.create(
+                    report.id, report.platform, report.submitted_on_timestamp,
+                    user_supplied_feedback.category,
+                    device_system_context.version_name,
+                    app_context.device_country_locale_code,
+                    device_system_context.sdk_version,
+                    device_system_context.device_model,
+                    entry_point.entry_point_name, entry_point.topic_id,
+                    entry_point.story_id, entry_point.exploration_id,
+                    entry_point.subtopic_id, app_context.text_language_code,
+                    app_context.audio_language_code, None, report_info_json))
+        else:
+            model_entity.web_report_info = report_info_json
+
+    model_entity.scrubbed_by = report.scrubbed_by
+    model_entity.update_timestamps()
+    model_entity.put()
 
 
 def get_all_filter_options():
@@ -602,11 +623,11 @@ def get_all_filter_options():
         they can have.
     """
     filter_list = list()
-    for filter_name in app_feedback_report_constants.FILTER_FIELD_NAMES:
-        filter_values = app_feedback_report_models.AppFeedbackReportModel.query(
-            projection=[filter_name], distinct=True)
+    for filter_name in constants.ALLOWED_FILTERS:
+        filter_query = app_feedback_report_models.AppFeedbackReportModel.query(
+            distinct_on=[filter_name]).fetch()
         filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(
-            filter_name, filter_values))
+            filter_name, [model.filter_name for model in filter_query]))
     return filter_list
 
 
@@ -635,8 +656,8 @@ def reassign_ticket(report, new_ticket):
         _save_ticket(ticket_obj)
 
     # Update the report model.
-    report.ticket_id = new_ticket.id
-    save_android_feedback_report_to_storage(report)
+    report.ticket_id = new_ticket.ticket_id
+    save_feedback_report_to_storage(report)
 
     # Update the stats model.
     platform = report.platform
@@ -668,7 +689,7 @@ def edit_ticket_name(ticket, new_name):
         ticket: AppFeedbackReportTicket. The domain object for a ticket.
         new_name: str. The new name to assign the ticket.
     """
-    ticket.ticket_name = name
+    ticket.ticket_name = new_name
     _save_ticket(ticket)
 
 
@@ -678,8 +699,8 @@ def _save_ticket(ticket):
     Returns:
         ticket: AppFeedbackReportTicket. The domain object to save to storage.
     """
-    ticket_model = app_feedback_report_models.AppFeedbackReportTicket.get_by_id(
-        ticket.id)
+    model_class = app_feedback_report_models.AppFeedbackReportTicketModel
+    ticket_model = model_class.get_by_id(ticket.ticket_id)
     ticket_model.ticket_name = ticket.ticket_name
     ticket_model.platform = ticket.platform
     ticket_model.github_issue_repo_name = ticket.github_issue_repo_name
@@ -687,6 +708,17 @@ def _save_ticket(ticket):
     ticket_model.archived = ticket.archived
     ticket_model.newest_report_timestamp = (
         ticket.newest_report_creation_timestamp)
-    ticket_model.report_ids = [report.id for report in ticket.reports]
+    ticket_model.report_ids = [report_id for report_id in ticket.reports]
     ticket_model.update_timestamps()
     ticket_model.put()
+
+
+class TimeZone(datetime.tzinfo):
+    """Constructs a basic timzone object to use with the report submission
+    timestamp to indicate the user's timezone.
+
+    Once Python 3 migration is complete, we should use datetime.timezone objects
+    to indicate timezones in the timestamps.
+    """
+    def __init__(self, utc_offset):
+        self.utcoffset = utc_offset
