@@ -13,3 +13,95 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""Tests for translate services."""
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+from core.domain import translation_domain
+from core.tests import test_utils
+import utils
+
+
+class MachineTranslatedTextTests(test_utils.GenericTestBase):
+    """Tests for the MachineTranslatedTexts domain object."""
+
+    translation = None
+
+    def setup(self):
+        """Setup for MachineTranslatedTexts domain object tests."""
+        super(MachineTranslatedTextTests, self).setUp()
+        self._init_translation()
+
+    def _init_translation(self):
+        """Initialize self.translation with valid default values."""
+        self.translation = translation_domain.MachineTranslatedText(
+            'en', 'es', 'hello world', 'hola mundo')
+        self.translation.validate()
+
+    def test_validate_with_non_string_source_language_code_raises(self):
+        self._init_translation()
+        self.translation.source_language_code = 3
+        expected_error_message = (
+            'Expected source_language_code to be a string, received 3')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            self.translation.validate()
+
+    def test_validate_with_invalid_source_language_code_raises(self):
+        self._init_translation()
+        self.translation.source_language_code = 'ABC'
+        expected_error_message = (
+            'Invalid source language code: ABC')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            self.translation.validate()
+
+    def test_validate_with_non_string_target_language_code_raises(self):
+        self._init_translation()
+        self.translation.target_language_code = 3
+        expected_error_message = (
+            'Expected target_language_code to be a string, received 3')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            self.translation.validate()
+
+    def test_validate_with_invalid_target_language_code_raises(self):
+        self._init_translation()
+        self.translation.target_language_code = 'ABC'
+        expected_error_message = (
+            'Invalid target language code: ABC')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            self.translation.validate()
+
+    def test_validate_with_non_string_origin_text_raises(self):
+        self._init_translation()
+        self.translation.origin_text = 3
+        expected_error_message = (
+            'Expected origin_text to be a string, received 3')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            self.translation.validate()
+
+    def test_validate_with_non_string_translated_text_raises(self):
+        self._init_translation()
+        self.translation.translated_text = 3
+        expected_error_message = (
+            'Expected translated_text to be a string, received 3')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            self.translation.validate()
+
+    def test_to_dict(self):
+        self._init_translation()
+        self.assertEqual(
+            self.translation.to_dict(),
+            {
+                'source_language_code': 'en',
+                'target_language_code': 'es',
+                'origin_text': 'hello world',
+                'translated_text': 'hola mundo'
+            }
+        )
