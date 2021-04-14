@@ -113,8 +113,8 @@
 /core/domain/voiceover_services*.py @sagangwee
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
-/core/domain/translation*.py @sagangwee
-/core/storage/translation/ @sagangwee
+/core/domain/translation*.py @vojtechjelinek
+/core/storage/translation/ @vojtechjelinek
 
 
 # Core documentation
