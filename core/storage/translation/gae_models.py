@@ -20,47 +20,118 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
-from utils import convert_to_hash
+import utils
 
-(base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user])
+(base_models,) = models.Registry.import_models(
+    [models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
+
 class MachineTranslatedTextModel(base_models.BaseModel):
-  """Model for storing machine translations"""
-  # The sha1 hash of the untranslated text.
-  hashed_text = datastore_services.StringProperty(required=True, indexed=True)
-  # The language of the untranslated text.
-  source_language_code = datastore_services.StringProperty(required=True,
-    indexed=True)
-  # The language of the translation.
-  target_language_code = datastore_services.StringProperty(required=True,
-    indexed=True)
-  # The translated text.
-  translated_text = datastore_services.StringProperty(required=True,
-    indexed=False)
+    """Model for storing machine translations"""
 
-  @property
-  def id(self):
-    """A unique id for this model instance."""
-    return f'{self.source_language_code}|{self.target_language_code}|{self.hashed_text}'
+    # The untranslated text.
+    origin_text = datastore_services.StringProperty(required=True)
+    # The language code of the untranslated text.
+    source_language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The language code of the translation.
+    target_language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The translation.
+    translated_text = datastore_services.TextProperty(
+        required=True, indexed=False)
 
-  @staticmethod
-  def get_translation_for_text(cls, source_language_code, target_language_code,
-    origin_text):
-    """Gets MachineTranslatedTextModel by language codes and origin text.
-    Returns None if no translation exists for the given parameters.
+    @classmethod
+    def create(
+            cls, source_language_code, target_language_code, origin_text,
+            translated_text):
+        """Creates a new MachineTranslatedTextModel instance and returns its
+        ID.
 
-    Args:
-        source_language_code: str. The language of the origin_text.
-        target_language_code: str. The language being translated to.
-        origin_text: str. The text to be translated
+        Args:
+            source_language_code: str. The language code of the untranslated
+                text.
+            target_language_code: str. The language code of the translation.
+            origin_text: str. The untranslated text.
+            translated_text: str. The translation.
 
-    Returns:
-        MachineTranslatedTextModel|None. The MachineTranslatedTextModel if a
-        translation exists or None if no translation is found.
-    """
-    hashed_text = convert_to_hash(origin_text)
-    id_ = f'{source_language_code}|{target_language_code}|{hashed_text}'
-    return MachineTranslatedTextModel.get(id_)
+        Returns:
+            MachineTranslatedTextModel. The newly created
+            MachineTranslatedTextModel instance.
+        """
+
+        entity_id = cls._generate_id(
+            source_language_code, target_language_code, origin_text)
+        translation_entity = cls(
+            id=entity_id,
+            source_language_code=source_language_code,
+            target_language_code=target_language_code,
+            origin_text=origin_text,
+            translated_text=translated_text)
+        translation_entity.put()
+        return entity_id
+
+    @classmethod
+    def _generate_id(
+            cls, source_language_code, target_language_code, origin_text):
+        """Generates key for the instance of MachineTranslatedTextModel
+        class in the required format with the arguments provided.
+
+        Args:
+            source_language_code: str. The language code of the untranslated
+                text.
+            target_language_code: str. The language code of the translation.
+            origin_text: str. The untranslated text.
+
+        Returns:
+            str. The generated ID for this entity of the form
+            '[source_language_code]:[target_language_code]:[hashed_text]'.
+        """
+        # max_length is 450, less than maximum key length (500) to allow room
+        # for language_codes.
+        hashed_text = utils.convert_to_hash(origin_text, 450)
+        return (
+            '{%s}:{%s}:{%s}' % (
+                source_language_code, target_language_code, hashed_text)
+        )
+
+    @classmethod
+    def get_translation_for_text(
+            cls, source_language_code, target_language_code, origin_text):
+        """Gets MachineTranslatedTextModel by language codes and origin text.
+        Returns None if no translation exists for the given parameters.
+
+        Args:
+            source_language_code: str. The language of the origin_text.
+            target_language_code: str. The language being translated to.
+            origin_text: str. The text to be translated.
+
+        Returns:
+            MachineTranslatedTextModel|None. The MachineTranslatedTextModel
+            if a translation exists or None if no translation is found.
+        """
+        instance_id = cls._generate_id(
+            source_language_code, target_language_code, origin_text)
+        return cls.get(instance_id)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'hashed_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'source_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })

@@ -223,6 +223,7 @@
         "core.domain.image_validation_services_test"
     ],
     "11": [
+        "core.storage.translation.gae_models_test",
         "core.platform.taskqueue.cloud_taskqueue_services_test",
         "core.platform.cloud_translate.cloud_translate_services_test",
         "core.platform.cloud_translate.dev_mode_cloud_translate_services_test",
