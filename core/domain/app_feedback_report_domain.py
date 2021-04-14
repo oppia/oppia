@@ -1487,20 +1487,3 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The filter options should be a list, received: %r' % (
                     self.filter_options))
-
-
-# class TimeOffset(datetime.tzinfo):
-#     """Constructs a basic timzone object to use with the report submission
-#     timestamp to indicate the user's timezone.
-
-#     Once Python 3 migration is complete, we should use datetime.timezone objects
-#     to indicate timezones in the timestamps.
-#     """
-#     def __init__(self):
-#         super(TimeOffset, self).__init__
-    
-#     def set_offset(self, dt, offset):
-#         self.utcoffset = dt.timedelta(hours=offset)
-
-#     def utcoffset(self, dt):
-#         return self.utcoffset

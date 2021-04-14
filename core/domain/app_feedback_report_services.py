@@ -93,19 +93,14 @@ def create_android_report_from_json(report_json):
         app_context_json['account_is_profile_admin'],
         app_context_json['event_logs'], app_context_json['logcat_logs'])
 
-    # time_offset = app_feedback_report_domain.TimeOffset().set_offset(
-    #         hours=report_json['report_submission_utc_offset_hrs'])
     report_datetime = datetime.datetime.fromtimestamp(
-        timestamp=report_json['report_submission_timestamp_sec'],
-        tz=tz.tzoffset(name='', offset=0)
-        # app_feedback_report_domain.TimeOffset().set_offset(
-        #     offset=report_json['report_submission_utc_offset_hrs'])
-        )
+        report_json['report_submission_timestamp_sec'])
     report_id = app_feedback_report_models.AppFeedbackReportModel.generate_id(
         PLATFORM_ANDROID, report_datetime)
     report_obj = app_feedback_report_domain.AppFeedbackReport(
         report_id, report_json['android_report_info_schema_version'],
-        PLATFORM_ANDROID, report_datetime, None, None,
+        PLATFORM_ANDROID, report_datetime,
+        report_json['report_submission_utc_offset_hrs'], None, None,
         user_supplied_feedback_obj, device_system_context_obj, app_context_obj)
 
     return report_obj
@@ -161,51 +156,42 @@ def store_incoming_report_stats(report_obj):
     all_reports_id = constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID
 
     stats_date = report_obj.submitted_on_timestamp.date()
-    unticketed_stats_entity_id = (
-        app_feedback_report_models.AppFeedbackReportStats.calculate_id(
-            platform, unticketed_id, stats_date))
-    all_reports_entity_id = (
-        app_feedback_report_models.AppFeedbackReportStats.calculate_id(
-            platform, all_reports_id, stats_date))
-
-    # Add new report to the stats models for unticketed reports and all reports.
-    unticketed_stats_entity = (
-        app_feedback_report_models.AppFeedbackReportStats.get_by_id(
-            unticketed_stats_entity_id))
     _update_report_stats_model_in_transaction(
-        unticketed_stats_entity, platform, date,report_obj, delta)
-    all_report_stats_entity = (
-        app_feedback_report_models.AppFeedbackReportStats.get_by_id(
-            all_reports_entity_id))
+        unticketed_id, platform, stats_date, report_obj, 1)
     _update_report_stats_model_in_transaction(
-        all_report_stats_entity, platform, date, report_obj, delta)
+        all_reports_id, platform, stats_date, report_obj, 1)
 
 
 @transaction_services.run_in_transaction_wrapper
 def _update_report_stats_model_in_transaction(
-        stats_model, platform, date, report_obj, delta):
-    """Adds a new report's stats to the stats model.
+        ticket_id, platform, date, report_obj, delta):
+    """Adds a new report's stats to the stats model for a specific ticket's
+    stats.
 
     Args:
-        stats_model: AppFeedbackReportStatsModel. The stats model to add stats
-            to.
+        ticket_id: str. The id of the ticket that we want to update stats for.
         platform: str. The platform of the report being aggregated.
         date: datetime.date. The date of the stats.
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
         delta: The amount to increment the stats by, depending on if the report
             is added or removed form the model.
     """
-    parameter_names = constants.ALLOWED_STATS_PARAMETERS
     # The stats we want to aggregate on.
     report_type = report_obj.user_supplied_feedback.report_type
     country_locale_code = (
-        report_obj.device_system_context.country_locale_code)
+        report_obj.device_system_context.device_country_locale_code)
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
     text_language_code = report_obj.app_context.text_language_code
     audio_language_code = report_obj.app_context.audio_language_code
-    sdk_version = report_obj.device_system_context.sdk_version
+    sdk_version = str(report_obj.device_system_context.sdk_version)
     version_name = report_obj.device_system_context.version_name
 
+    stats_id = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+            platform, ticket_id, date))
+    stats_model = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+            stats_id))
     if stats_model is None:
         if delta < 0:
             raise utils.InvalidInputException(
@@ -214,92 +200,100 @@ def _update_report_stats_model_in_transaction(
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            parameter_names.report_type: {
+            constants.STATS_PARAMETER_NAMES.report_type: {
                 report_type: 1
             },
-            parameter_names.country_locale_code:{
+            constants.STATS_PARAMETER_NAMES.country_locale_code:{
                 country_locale_code: 1
             },
-            parameter_names.entry_point_name: {
+            constants.STATS_PARAMETER_NAMES.entry_point_name: {
                 entry_point_name: 1
             },
-            parameter_names.text_language_code: {
+            constants.STATS_PARAMETER_NAMES.text_language_code: {
                text_language_code: 1
             },
-            parameter_names.audio_language_code: {
+            constants.STATS_PARAMETER_NAMES.audio_language_code: {
                 audio_language_code: 1
             },
-            parameter_names.sdk_version: {
+            constants.STATS_PARAMETER_NAMES.android_sdk_version: {
                 sdk_version: 1
             },
-            parameter_names.version_name: {
+            constants.STATS_PARAMETER_NAMES.version_name: {
                 version_name: 1
             }
         }
-        app_feedback_report_models.AppFeedbackReportStats.create(
-            stats_entity_id, platform, unticketed_id, stats_date, 1,
-            stat_dict)
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            stats_id, platform, ticket_id, date, 0, stats_dict)
+        stats_model = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                stats_id))
     else:
         # Update existing stats model.
         stats_dict = stats_model.daily_param_stats
-        _add_stats_count_for_parameter_value_to_stats_dict(
-            stats_dict, parameter_names.report_type, report_type)
 
-        stats_dict[parameter_names.country_locale_code][country_locale_code] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.report_type] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.country_locale_code][
-                    country_locale_code], delta))
-        stats_dict[parameter_names.entry_point_name][entry_point_name] = (
+                stats_dict[constants.STATS_PARAMETER_NAMES.report_type],
+                report_type, delta))
+        stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.entry_point_name][entry_point_name],
-                delta))
-        stats_dict[parameter_names.audio_language_code][audio_language_code] = (
+                stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code],
+                country_locale_code, delta))
+        stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.audio_language_code][
-                    audio_language_code], delta))
-        stats_dict[parameter_names.text_language_code][text_language_code] = (
+                stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name],
+                entry_point_name, delta))
+        stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.text_language_code][
-                    text_language_code], delta))
-        stats_dict[parameter_names.sdk_version][sdk_version] = (
+                stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code],
+                audio_language_code, delta))
+        stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.sdk_version][sdk_version], delta))
-        stats_dict[parameter_names.version_name][version_name] = (
+                stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code],
+                text_language_code, delta))
+        stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[parameter_names.version_name][version_name], delta))
+                stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version],
+                sdk_version, delta))
+        stats_dict[constants.STATS_PARAMETER_NAMES.version_name] = (
+            _calculate_new_stats_count_for_parameter(
+                stats_dict[constants.STATS_PARAMETER_NAMES.version_name],
+                version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
     stats_model.total_reports_submitted += delta
-    if (
-        report_obj.submitted_on_datetime > 
-        stats_model.newest_report_creation_timestamp):
-        stats_model.newest_report_creation_timestamp = (
-            report_obj.submitted_on_datetime)
 
     stats_model.update_timestamps()
     stats_model.put()
 
 
-def _calculate_new_stats_count_for_parameter(current_count, delta):
+def _calculate_new_stats_count_for_parameter(
+        current_stats_map, current_value, delta):
     """Helper to increment or initialize the stats count for a parameter.
 
     Args:
-        current_count: int|None. The current report count for a given report, or
-            None of there are no reports that satisfied the given value.
+        current_stats_map: dict. The current stats map for the parameter we are
+            updating.
+        current_value: str. The value for the parameter that we are updating
+            the stats of.
         delta: int. The amount to increment the current count by, either -1 or
             +1.
     Returns:
         int. The new report count to put into the stats dict for a single
         parameter value.
     """
-    if current_count is None:
+    if not current_stats_map[current_value]:
+    # if current_count is None:
+        # The stats did not previously have this value.
         if delta < 0:
             raise utils.InvalidInputException(
                 'Cannot decrement a count for a parameter value that does not '
                 'exist for this stats model.')
-        return 1
+        # Update the stats so that it now contains this new value.
+        current_stats_map[current_value] = 1
     else:
-        return current_count + delta
+        current_stats_map[current_value] += delta
+    return current_stats_map
 
 
 def get_report_from_model(report_model):
@@ -369,7 +363,6 @@ def _create_app_daily_stats_from_model_json(daily_param_stats):
         domain objects.
     """
     stats_dict = {}
-    print('@@@@@@@@@@THE PARAM STATS IS %r' % daily_param_stats)
     for (stats_name, stats_values_dict) in daily_param_stats.items():
         # For each parameter possible, create a
         # ReportStatsParameterValueCounts domain object of possible parameter
@@ -518,7 +511,6 @@ def get_all_expiring_reports_to_scrub():
     """
     model_class = app_feedback_report_models.AppFeedbackReportModel
     model_entities = model_class.get_all_unscrubbed_expiring_reports()
-    # model_entities = [model_class.get_by_id(model_id) for model_id in model_ids]
     return [
         get_report_from_model(model_entity) for model_entity in model_entities]
 
@@ -542,7 +534,7 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     save_feedback_report_to_storage(report)
 
 
-def save_feedback_report_to_storage(report):
+def save_feedback_report_to_storage(report, new_incoming_report=False):
     """Saves the AppFeedbackReport domain object in persistent storage.
 
     Args:
@@ -579,42 +571,27 @@ def save_feedback_report_to_storage(report):
             'account_is_profile_admin': app_context.account_is_profile_admin
         }
 
+    if new_incoming_report:
+        app_feedback_report_models.AppFeedbackReportModel.create(
+            report.report_id, report.platform,
+            report.submitted_on_timestamp,
+            report.local_timezone_offset_hrs,
+            user_supplied_feedback.report_type,
+            user_supplied_feedback.category,
+            device_system_context.version_name,
+            device_system_context.device_country_locale_code,
+            device_system_context.sdk_version,
+            device_system_context.device_model,
+            entry_point.entry_point_name, entry_point.topic_id,
+            entry_point.story_id, entry_point.exploration_id,
+            entry_point.subtopic_id, app_context.text_language_code,
+            app_context.audio_language_code, None, None)
     model_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
         report.report_id)
     if report.platform == PLATFORM_ANDROID:
-        if model_entity is None:
-            model_entity = (
-                app_feedback_report_models.AppFeedbackReportModel.create(
-                    report.id, report.platform, report.submitted_on_timestamp,
-                    report.local_timezone_offset_hrs,
-                    user_supplied_feedback.category,
-                    device_system_context.version_name,
-                    app_context.device_country_locale_code,
-                    device_system_context.sdk_version,
-                    device_system_context.device_model,
-                    entry_point.entry_point_name, entry_point.topic_id,
-                    entry_point.story_id, entry_point.exploration_id,
-                    entry_point.subtopic_id, app_context.text_language_code,
-                    app_context.audio_language_code, report_info_json, None))
-        else:
-            model_entity.android_report_info = report_info_json
+        model_entity.android_report_info = report_info_json
     else:
-        if model_entity is None:
-            model_entity = (
-                app_feedback_report_models.AppFeedbackReportModel.create(
-                    report.id, report.platform, report.submitted_on_timestamp,
-                    report.local_timezone_offset_hrs,
-                    user_supplied_feedback.category,
-                    device_system_context.version_name,
-                    app_context.device_country_locale_code,
-                    device_system_context.sdk_version,
-                    device_system_context.device_model,
-                    entry_point.entry_point_name, entry_point.topic_id,
-                    entry_point.story_id, entry_point.exploration_id,
-                    entry_point.subtopic_id, app_context.text_language_code,
-                    app_context.audio_language_code, None, report_info_json))
-        else:
-            model_entity.web_report_info = report_info_json
+        model_entity.web_report_info = report_info_json
 
     model_entity.scrubbed_by = report.scrubbed_by
     model_entity.update_timestamps()
@@ -630,11 +607,11 @@ def get_all_filter_options():
         they can have.
     """
     filter_list = list()
+    model_class = app_feedback_report_models.AppFeedbackReportModel
     for filter_name in constants.ALLOWED_FILTERS:
-        filter_query = app_feedback_report_models.AppFeedbackReportModel.query(
-            distinct_on=[filter_name]).fetch()
+        filter_values = model_class.get_filter_options_for_field(filter_name)
         filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(
-            filter_name, [model.filter_name for model in filter_query]))
+            filter_name, filter_values))
     return filter_list
 
 
@@ -653,40 +630,61 @@ def reassign_ticket(report, new_ticket):
 
     old_ticket_id = report.ticket_id
 
-    # Update the ticket model.
+    # Update the old ticket model to remove the report from the ticket's list of
+    # reports.
     if old_ticket_id is not None:
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 old_ticket_id))
         ticket_obj = get_ticket_from_model(ticket_model)
         ticket_obj.reports.remove(report)
+        if ticket_obj.newest_report_creation_timestamp == (
+            report.submitted_on_timestamp):
+            report_models = get_report_models(ticket_obj.reports)
+            latest_timestamp = report_models[0].submitted_on_datetime
+            for index in range(1, len(report_models)):
+                if report_models[index].submitted_on_datetime > (
+                    latest_timestamp):
+                    latest_timestamp = (
+                        report_models[index].submitted_on_datetime)
+        ticket_obj.newest_report_creation_timestamp = latest_timestamp
         _save_ticket(ticket_obj)
 
-    # Update the report model.
+    # Update the report model to the new ticket id.
     report.ticket_id = new_ticket.ticket_id
     save_feedback_report_to_storage(report)
 
-    # Update the stats model.
+    # Update the stats models.
     platform = report.platform
-    stats_date = report.submitted_on_datetime.date()
+    stats_date = report.submitted_on_timestamp.date()
 
-    stats_id_to_decrement = app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-        platform, old_ticket_id, stats_date)
-    stats_model_to_decrement = app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-        stats_id_to_decrement)
+    if old_ticket_id is None:
+        # If the report was unticked, remove the it from the stats for
+        # unticketed reports.
+        old_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    stats_id_to_decrement = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+            platform, old_ticket_id, stats_date))
+    stats_model_to_decrement = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+            stats_id_to_decrement))
     _update_report_stats_model_in_transaction(
-        stats_model_to_decrement, platform, stats_date, report, -1)
+        old_ticket_id, platform, stats_date, report, -1)
     
     # Get the ID of the ticket to add the report to.
-    new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    if new_ticket is not None:
-        new_ticket_id = new_ticket.ticket_id
-    stats_id_to_increment = app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-        platform, new_ticket_id, stats_date)
-    stats_model_to_increment = app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-        stats_id_to_increment)
+    new_ticket_id = new_ticket.ticket_id
+    if new_ticket is None:
+        # If the report is not assigned to a new ticket, update the stats for
+        # the unticked reports.
+        new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    stats_id_to_increment = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+            platform, new_ticket_id, stats_date))
+    stats_model_to_increment = (
+        app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+            stats_id_to_increment))
     _update_report_stats_model_in_transaction(
-        stats_model_to_increment, platform, stats_date, report, 1)
+        new_ticket_id, platform, stats_date, report, 1)
 
 
 def edit_ticket_name(ticket, new_name):

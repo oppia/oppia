@@ -46,16 +46,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
     # Timestamp in sec since epoch for Mar 12 2021 3:22:17 UTC.
-    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(
-        timestamp=1615519337, tz=tz.tzoffset('', 0))
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615519337)
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TIMESTAMP_AT_MAX_DAYS = datetime.datetime.utcnow() - (
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS)
     TIMESTAMP_OVER_MAX_DAYS = datetime.datetime.utcnow() - (
         feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
         datetime.timedelta(days=2))
-    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(
-        timestamp=1616173836, tz=tz.tzoffset('', 0))
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
         TICKET_CREATION_TIMESTAMP)
     TICKET_NAME = 'a ticket name'
@@ -65,9 +63,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     REPORT_TYPE_SUGGESTION = 'suggestion'
     CATEGORY_OTHER = 'other'
     ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
-    DEVICE_COUNTRY_LOCALE_CODE_INDIA = 'in'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
-    ANDROID_SDK_VERSION = 22
+    ANDROID_SDK_VERSION = 23
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
@@ -115,7 +113,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             "build_fingerprint": "example_fingerprint_id",
             "network_type": "wifi"
         },
-        "report_submission_timestamp_sec": 1610519337,
+        "report_submission_timestamp_sec": 1615519337,
         "report_submission_utc_offset_hrs": 0,
         "system_context": {
             "platform_version": "0.1-alpha-abcdef1234",
@@ -144,7 +142,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.ANDROID_PLATFORM_VERSION,
-            self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
             self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
@@ -181,10 +179,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
         app_feedback_report_models.AppFeedbackReportModel.create(
             new_report_id_1, self.PLATFORM_ANDROID,
-            self.REPORT_SUBMITTED_TIMESTAMP,
+            self.REPORT_SUBMITTED_TIMESTAMP, 0,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.ANDROID_PLATFORM_VERSION,
-            self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
             self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
@@ -197,7 +195,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
             self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
             self.ANDROID_PLATFORM_VERSION,
-            self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
+            self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
             self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
@@ -409,17 +407,20 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             report_obj.submitted_on_timestamp, self.REPORT_SUBMITTED_TIMESTAMP)
 
-    def test_create_android_report_from_json_saves_model_to_storage(self):
+    def test_save_new_android_report_from_json_saves_model_to_storage(
+            self):
         report_obj = (
             app_feedback_report_services.create_android_report_from_json(
                 self.REPORT_JSON))
+        app_feedback_report_services.save_feedback_report_to_storage(
+            report=report_obj, new_incoming_report=True)
         report_id = report_obj.report_id
         report_models = app_feedback_report_services.get_report_models(
             [report_id])
         actual_model = report_models[0]
 
         self.assertEqual(actual_model.id, report_id)
-        # Verify the model's fields based on input JSON.
+        # Verify some of the model's fields based on input JSON.
         self.assertEqual(actual_model.platform, self.PLATFORM_ANDROID)
         self.assertEqual(
             actual_model.submitted_on, self.REPORT_SUBMITTED_TIMESTAMP)
@@ -428,7 +429,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             actual_model.entry_point, self.ENTRY_POINT_NAVIGATION_DRAWER)
 
-    def test_new_report_added_updates_unticketed_stats_model_correctly(self):
+    def test_new_reports_added_updates_unticketed_stats_model_correctly(self):
         report_obj_1 = (
             app_feedback_report_services.create_android_report_from_json(
                 self.REPORT_JSON))
@@ -443,31 +444,31 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.PLATFORM_ANDROID, 
                 constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID,
-                self.REPORT_SUBMITTED_TIMESTAMP))
+                self.REPORT_SUBMITTED_TIMESTAMP.date()))
         unticketed_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 unticketed_stats_id))
         
         expected_json = {
-            parameter_names.report_type: {
+            constants.STATS_PARAMETER_NAMES.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 2
             },
-            parameter_names.country_locale_code:{
+            constants.STATS_PARAMETER_NAMES.country_locale_code:{
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            parameter_names.entry_point_name: {
+            constants.STATS_PARAMETER_NAMES.entry_point_name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER: 2
             },
-            parameter_names.text_language_code: {
+            constants.STATS_PARAMETER_NAMES.text_language_code: {
                self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            parameter_names.audio_language_code: {
+            constants.STATS_PARAMETER_NAMES.audio_language_code: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            parameter_names.sdk_version: {
-                self.ANDROID_SDK_VERSION: 2
+            constants.STATS_PARAMETER_NAMES.android_sdk_version: {
+                str(self.ANDROID_SDK_VERSION): 2
             },
-            parameter_names.version_name: {
+            constants.STATS_PARAMETER_NAMES.version_name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -492,31 +493,31 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.PLATFORM_ANDROID,
                 constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID,
-                self.REPORT_SUBMITTED_TIMESTAMP))
+                self.REPORT_SUBMITTED_TIMESTAMP.date()))
         all_reports_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 all_report_stats_id))
-
+        
         expected_json = {
-            parameter_names.report_type: {
+            constants.STATS_PARAMETER_NAMES.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 2
             },
-            parameter_names.country_locale_code:{
+            constants.STATS_PARAMETER_NAMES.country_locale_code:{
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
-            parameter_names.entry_point_name: {
+            constants.STATS_PARAMETER_NAMES.entry_point_name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER: 2
             },
-            parameter_names.text_language_code: {
+            constants.STATS_PARAMETER_NAMES.text_language_code: {
                self.TEXT_LANGUAGE_CODE_ENGLISH: 2
             },
-            parameter_names.audio_language_code: {
+            constants.STATS_PARAMETER_NAMES.audio_language_code: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 2
             },
-            parameter_names.sdk_version: {
-                self.ANDROID_SDK_VERSION: 2
+            constants.STATS_PARAMETER_NAMES.android_sdk_version: {
+                str(self.ANDROID_SDK_VERSION): 2
             },
-            parameter_names.version_name: {
+            constants.STATS_PARAMETER_NAMES.version_name: {
                 self.ANDROID_PLATFORM_VERSION: 2
             }
         }
@@ -528,14 +529,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             all_reports_stats_model.daily_param_stats, expected_json)
 
     def test_get_all_expiring_reports(self):
-        expiring_report_id_1 = self._add_expiring_android_report()
-        expiring_report_id_2 = self._add_expiring_android_report()
+        expiring_report_id_1 = self._add_expiring_android_report_with_no_scrubber()
+        expiring_report_id_2 = self._add_expiring_android_report_with_no_scrubber()
 
         expiring_reports = (
             app_feedback_report_services.get_all_expiring_reports_to_scrub())
         expiring_report_ids = [report.report_id for report in expiring_reports]
 
-        self.assertEqual(len(expiring_reports), 1)
+        self.assertEqual(len(expiring_reports), 2)
         self.assertTrue(expiring_report_id_1 in expiring_report_ids)
         self.assertTrue(expiring_report_id_2 in expiring_report_ids)
 
@@ -557,7 +558,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 expected_val = self.ENTRY_POINT_NAVIGATION_DRAWER
             elif filter_obj.filter_name == (
                 constants.FILTER_FIELD_NAMES.submitted_on):
-                expected_val = self.REPORT_SUBMITTED_TIMESTAMP
+                expected_val = self.REPORT_SUBMITTED_TIMESTAMP.date()
             elif filter_obj.filter_name == (
                 constants.FILTER_FIELD_NAMES.android_device_model):
                 expected_val = self.ANDROID_DEVICE_MODEL
@@ -576,7 +577,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             elif filter_obj.filter_name == (
                 constants.FILTER_FIELD_NAMES.android_device_country_locale_code
             ):
-                expected_val = self.DEVICE_COUNTRY_LOCALE_CODE_INDIA
+                expected_val = self.COUNTRY_LOCALE_CODE_INDIA
 
             self.assertEqual(filter_obj.filter_options[0], expected_val)
 
@@ -609,14 +610,18 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_obj.platform, new_ticket_model.platform)
 
     def test_edit_ticket_name_does_not_change_stats_model(self):
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
+        self.android_ticket_obj.reports = []
+
         app_feedback_report_services.reassign_ticket(
             self.android_report_obj, self.android_ticket_obj)
-
         # Fetch the stats model before changing the ticket name
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.android_report_obj.platform, self.android_ticket_id,
-                self.android_report_obj.submitted_on_timestamp))
+                self.android_report_obj.platform,
+                self.android_report_obj.ticket_id,
+                self.android_report_obj.submitted_on_timestamp.date()))
         old_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
@@ -628,45 +633,57 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         new_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.android_report_obj.platform, self.android_ticket_id,
-                self.android_report_obj.submitted_on_timestamp))
+                self.android_report_obj.submitted_on_timestamp.date()))
         new_stats_model = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
 
         self.assertEqual(old_stats_id, new_stats_id)
+        self.assertEqual(old_stats_model.ticket_id, new_stats_model.ticket_id)
         self.assertEqual(
             old_stats_model.total_reports_submitted,
             new_stats_model.total_reports_submitted)
         self.assertEqual(
             old_stats_model.platform, new_stats_model.platform)
         self.assertEqual(
-            old_stats_model.newest_report_timestamp,
-            new_stats_model.newest_report_timestamp)
+            old_stats_model.stats_tracking_date,
+            new_stats_model.stats_tracking_date)
         self._verify_stats_model(
             new_stats_model.daily_param_stats,
             old_stats_model.daily_param_stats)
 
-    def test_reassign_report_ticket_name_updates_increasing_stats_model(self):
+    def test_reassign_report_to_ticket_updates_increasing_stats_model(self):
+        new_ticket_id = self._add_new_android_ticket(
+            'ticket_name', ['report_id'])
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                new_ticket_id))
+        new_ticket_obj = app_feedback_report_services.get_ticket_from_model(
+            new_ticket_model)
+
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.PLATFORM_ANDROID, self.android_ticket_id,
-                self.REPORT_SUBMITTED_TIMESTAMP))
+                self.android_report_obj.platform,
+                self.android_report_obj.ticket_id,
+                self.android_report_obj.submitted_on_timestamp.date()))
         old_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        new_ticket_name = 'a new ticket name'
-        app_feedback_report_services.edit_ticket_name(
-            self.android_ticket_obj, new_ticket_name)
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, new_ticket_obj)
         new_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.PLATFORM_ANDROID, new_ticket_name,
-                self.REPORT_SUBMITTED_TIMESTAMP))
+                new_ticket_obj.platform,
+                new_ticket_obj.ticket_id,
+                self.android_report_obj.submitted_on_timestamp.date()))
         new_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
 
-        parameter_names = constants.ALLOWED_STATS_PARAMETERS
+        parameter_names = constants.STATS_PARAMETER_NAMES
         expected_json = {
             parameter_names.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 1
@@ -683,8 +700,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             parameter_names.audio_language_code: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
             },
-            parameter_names.sdk_version: {
-                self.ANDROID_SDK_VERSION: 1
+            parameter_names.android_sdk_version: {
+                str(self.ANDROID_SDK_VERSION): 1
             },
             parameter_names.version_name: {
                 self.ANDROID_PLATFORM_VERSION: 1
@@ -696,23 +713,34 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             new_stats_model.daily_param_stats,
             expected_json)
 
-    def test_reassign_report_ticket_name_updates_decreasing_stats_model(self):
+    def test_reassign_report_to_ticket_updates_decreasing_stats_model(self):
+        new_ticket_id = self._add_new_android_ticket(
+            'ticket_name', ['report_id'])
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                new_ticket_id))
+        new_ticket_obj = app_feedback_report_services.get_ticket_from_model(
+            new_ticket_model)
+
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.PLATFORM_ANDROID, self.android_ticket_id,
-                self.REPORT_SUBMITTED_TIMESTAMP))
+                self.android_report_obj.platform,
+                self.android_report_obj.ticket_id,
+                self.android_report_obj.submitted_on_timestamp.date()))
         old_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        new_ticket_name = 'a new ticket name'
-        app_feedback_report_services.edit_ticket_name(
-            self.android_ticket_obj, new_ticket_name)
-        new_stats_model = (
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, new_ticket_obj)
+        # Get the updated stats from the old model.
+        decremented_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        parameter_names = constants.ALLOWED_STATS_PARAMETERS
+        parameter_names = constants.STATS_PARAMETER_NAMES
         expected_json = {
             parameter_names.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 0
@@ -729,65 +757,51 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             parameter_names.audio_language_code: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            parameter_names.sdk_version: {
-                self.ANDROID_SDK_VERSION: 0
+            parameter_names.android_sdk_version: {
+                str(self.ANDROID_SDK_VERSION): 0
             },
             parameter_names.version_name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }
-        self.assertEqual(new_stats_model.total_reports_submitted, 1)
+        self.assertEqual(decremented_stats_model.total_reports_submitted, 0)
         self._verify_stats_model(
-            new_stats_model.daily_param_stats,
+            decremented_stats_model.daily_param_stats,
             expected_json)
 
-    def test_reassign_report_ticket_name_does_not_change_all_report_stats_model(
+    def test_reassign_report_to_ticket_does_not_change_all_report_stats_model(
             self):
+        new_ticket_id = self._add_new_android_ticket(
+            'ticket_name', ['report_id'])
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                new_ticket_id))
+        new_ticket_obj = app_feedback_report_services.get_ticket_from_model(
+            new_ticket_model)
+
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
         old_all_report_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.PLATFORM_ANDROID,
+                self.android_report_obj.platform,
                 constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID,
-                self.REPORT_SUBMITTED_TIMESTAMP))
-        old_all_report_stats_model = (
+                self.android_report_obj.submitted_on_timestamp.date()))
+        old_all_reports_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_all_report_stats_id))
 
-        new_ticket_name = 'a new ticket name'
-        app_feedback_report_services.edit_ticket_name(
-            self.android_ticket_obj, new_ticket_name)
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, new_ticket_obj)
         new_all_reports_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_all_report_stats_id))
 
-        parameter_names = constants.ALLOWED_STATS_PARAMETERS
-        expected_json = {
-            parameter_names.report_type: {
-                self.REPORT_TYPE_SUGGESTION: 1
-            },
-            parameter_names.country_locale_code:{
-                self.COUNTRY_LOCALE_CODE_INDIA: 1
-            },
-            parameter_names.entry_point_name: {
-                self.ENTRY_POINT_NAVIGATION_DRAWER: 1
-            },
-            parameter_names.text_language_code: {
-               self.TEXT_LANGUAGE_CODE_ENGLISH: 1
-            },
-            parameter_names.audio_language_code: {
-                self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
-            },
-            parameter_names.sdk_version: {
-                self.ANDROID_SDK_VERSION: 1
-            },
-            parameter_names.version_name: {
-                self.ANDROID_PLATFORM_VERSION: 1
-            }
-        }
-
-        self.assertEqual(new_all_reports_stats_model.total_reports_submitted, 1)
+        self.assertEqual(
+            new_all_reports_stats_model.total_reports_submitted,
+            old_all_reports_stats_model.total_reports_submitted)
         self._verify_stats_model(
             new_all_reports_stats_model.daily_param_stats,
-            expected_json)
+            old_all_reports_stats_model.daily_param_stats)
 
     def test_scrub_android_report_removes_info(self):
         app_feedback_report_services.scrub_single_app_feedback_report(
@@ -818,19 +832,18 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_scrubbing_on_current_and_expired_reports_only_scrubs_expired(
             self):
         current_report_id = self._add_current_report()
-        expired_report_id = self._add_expiring_android_report()
+        expired_report_id = self._add_expiring_android_report_with_no_scrubber()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             self.user_id)
 
         scrubbed_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.ANDROID_REPORT_ID_OVER_MAX_DAYS))
+                expired_report_id))
         current_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 current_report_id))
 
-        self._verify_report_is_scrubbed(
-            scrubbed_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+        self._verify_report_is_scrubbed(scrubbed_model, self.user_id)
         self._verify_report_is_not_scrubbed(current_model)
 
     def test_scrubbing_with_no_reports_in_storage_does_not_scrub_storage(
@@ -858,57 +871,57 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_not_scrubbed(current_model)
 
     def test_scrubbing_on_all_expired_models_updates_all_models(self):
-        android_report_id = self._add_expiring_android_report()
-        web_report_id = self._add_expiring_web_report()
+        android_report_id_1 = self._add_expiring_android_report_with_no_scrubber()
+        android_report_id_2 = self._add_expiring_android_report_with_no_scrubber()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             self.user_id)
 
-        android_model = (
+        android_model_1 = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                android_report_id))
-        web_model = (
+                android_report_id_1))
+        android_model_2 = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                web_report_id))
+                android_report_id_2))
 
-        self._verify_report_is_scrubbed(
-            android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
-        self._verify_report_is_scrubbed(
-            web_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+        self._verify_report_is_scrubbed(android_model_1, self.user_id)
+        self._verify_report_is_scrubbed(android_model_2, self.user_id)
 
     def test_scrubbing_on_already_scrubbed_models_does_not_scrub_models(
             self):
-        self._add_scrubbed_report()
+        report_id = self._add_scrubbed_report('scrubber_user')
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             self.user_id)
 
         scrubbed_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                self.SCRUBBED_REPORT_ID))
+                report_id))
 
-        self._verify_report_is_scrubbed(scrubbed_model, self.user_id)
+        self._verify_report_is_scrubbed(scrubbed_model, 'scrubber_user')
 
     def test_scrubbing_runs_again_scrubs_newly_added_expired_models(self):
-        expired_report_id = self._add_expiring_android_report()
+        expired_report_id = (
+            self._add_expiring_android_report_with_no_scrubber())
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             self.user_id)
         scrubbed_android_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-                ))
-        self._verify_report_is_scrubbed(
-            scrubbed_android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
-
-        self._add_expiring_web_report()
-        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
-            self.user_id)
-
-        scrubbed_web_model = (
-            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 expired_report_id))
         self._verify_report_is_scrubbed(
-            scrubbed_web_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+            scrubbed_android_model, self.user_id)
+
+        to_scrub_report_id = (
+            self._add_expiring_android_report_with_no_scrubber())
+        app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
+            'different_user')
+
+        newly_scrubbed_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                to_scrub_report_id))
+        self._verify_report_is_scrubbed(
+            newly_scrubbed_model, 'different_user')
         # Check that the originally-scrubbed model is still valid.
         self._verify_report_is_scrubbed(
-            scrubbed_android_model, feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+            scrubbed_android_model, self.user_id)
 
     def _verify_report_is_scrubbed(self, model_entity, scrubber):
         self.assertIsNotNone(model_entity)
@@ -937,7 +950,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 category=self.CATEGORY_OTHER,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+                    self.COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
                 entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -950,7 +963,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         current_feedback_report_model.put()
         return report_id
 
-    def _add_expiring_android_report(self):
+    def _add_expiring_android_report_with_no_scrubber(self):
         """Adds reports to the model that should be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -968,7 +981,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 category=self.CATEGORY_OTHER,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+                    self.COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
                 entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -981,37 +994,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         expiring_android_report_model.put()
         return report_id
 
-    def _add_expiring_web_report(self):
-        report_id = (
-            app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                self.PLATFORM_ANDROID, self.TIMESTAMP_OVER_MAX_DAYS))
-        expiring_web_report_model = (
-            app_feedback_report_models.AppFeedbackReportModel(
-                id=report_id,
-                platform=self.PLATFORM_WEB,
-                ticket_id='%s.%s.%s' % (
-                    'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
-                    '16CharString1234'),
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
-                local_timezone_offset_hrs=0,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
-                platform_version=self.ANDROID_PLATFORM_VERSION,
-                android_device_country_locale_code=(
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
-                android_device_model=self.ANDROID_DEVICE_MODEL,
-                android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
-                text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
-                audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
-                web_report_info=self.WEB_REPORT_INFO,
-                web_report_info_schema_version=(
-                    self.WEB_REPORT_INFO_SCHEMA_VERSION)))
-        expiring_web_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
-        expiring_web_report_model.put()
-        return report_id
-
-    def _add_scrubbed_report(self):
+    def _add_scrubbed_report(self, scrubber_user):
         """Add an already-scrubbed report to the model."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1020,7 +1003,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel(
                 id=report_id,
                 platform=self.PLATFORM_ANDROID,
-                scrubbed_by='scrubber_user',
+                scrubbed_by=scrubber_user,
                 ticket_id='%s.%s.%s' % (
                     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
                     '16CharString1234'),
@@ -1030,7 +1013,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 category=self.CATEGORY_OTHER,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
-                    self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+                    self.COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
                 entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
@@ -1042,6 +1025,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         expiring_android_report_model.created_on = self.TIMESTAMP_OVER_MAX_DAYS
         expiring_android_report_model.put()
         return report_id
+
+    def _add_new_android_ticket(self, ticket_name, report_ids):
+        """Create an Android report ticket."""
+        android_ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                ticket_name))
+        app_feedback_report_models.AppFeedbackReportTicketModel.create(
+            android_ticket_id, self.TICKET_NAME, self.PLATFORM_ANDROID,
+            None, None, self.REPORT_SUBMITTED_TIMESTAMP, report_ids)
+        return android_ticket_id
 
     def _verify_stats_model(self, stats_json, expected_json):
         self.assertEqual(
@@ -1060,8 +1053,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             stats_json['audio_language_code'],
             expected_json['audio_language_code'])
         self.assertEqual(
-            stats_json['sdk_version'],
-            expected_json['sdk_version'])
+            stats_json['android_sdk_version'],
+            expected_json['android_sdk_version'])
         self.assertEqual(
             stats_json['version_name'],
             expected_json['version_name'])

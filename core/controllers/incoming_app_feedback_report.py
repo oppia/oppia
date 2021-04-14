@@ -51,7 +51,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
                 report_dict))
         report_obj.validate()
         app_feedback_report_services.save_android_feedback_report_to_storage(
-            report_obj)
+            report=report_obj, new_incoming_report=True)
         app_feedback_report_service.store_incoming_report_stats(report_obj)
 
     def _validate_incoming_request(self, headers):
