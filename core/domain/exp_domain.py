@@ -50,6 +50,7 @@ import utils
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
+STATE_PROPERTY_CARD_IS_CHECKPOINT = 'card_is_checkpoint'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
@@ -227,6 +228,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+        STATE_PROPERTY_CARD_IS_CHECKPOINT,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
@@ -704,6 +706,8 @@ class Exploration(python_utils.OBJECT):
             state.next_content_id_index = sdict['next_content_id_index']
 
             state.solicit_answer_details = sdict['solicit_answer_details']
+
+            state.card_is_checkpoint = sdict['card_is_checkpoint']
 
             exploration.states[state_name] = state
 
@@ -1659,6 +1663,27 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v42_dict_to_v43_dict(cls, states_dict, init_state_name):
+        """Converts from version 42 to version 43. Version 43 adds
+        card_is_checkpoint boolean to the state, which allows creators to
+        mark a state as a checkpoint for the learners
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for (state_name, state_dict) in states_dict.items():
+            if state_name == init_state_name:
+                state_dict['card_is_checkpoint'] = True
+            else:
+                state_dict['card_is_checkpoint'] = False
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -1689,7 +1714,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 47
+    CURRENT_EXP_SCHEMA_VERSION = 48
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1712,6 +1737,27 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states'] = cls._convert_states_v41_dict_to_v42_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 42
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
+        """Converts a v47 exploration dict into a v48 exploration dict.
+        Adds card_is_checkpoint to mark a state as a checkpoint for the
+        learners.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v47.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v48.
+        """
+        exploration_dict['schema_version'] = 48
+        exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
+            exploration_dict['states'], exploration_dict['init_state_name'])
+        exploration_dict['states_schema_version'] = 43
 
         return exploration_dict
 
@@ -1755,6 +1801,10 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
                 exploration_dict)
             exploration_schema_version = 47
+        if exploration_schema_version == 47:
+            exploration_dict = cls._convert_v47_dict_to_v48_dict(
+                exploration_dict)
+            exploration_schema_version = 48
 
         return exploration_dict
 

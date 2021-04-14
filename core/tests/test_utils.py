@@ -1749,6 +1749,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1781,6 +1782,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
