@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview limitTo filter for Oppia.
+ * @fileoverview A pipe to limit the number of elements in an array.
  */
 
 import { Pipe, PipeTransform } from '@angular/core';

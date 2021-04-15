@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AlertsService } from 'services/alerts.service';
+import { AlertsService, Message, Warning } from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-warnings-and-alerts',
@@ -28,6 +28,18 @@ export class WarningsAndAlertsComponent {
   constructor(
     private alertsService: AlertsService
   ) {}
+
+  getWarnings(): Warning[] {
+    return this.alertsService.warnings;
+  }
+
+  deleteWarning(warning: Warning): void {
+    this.alertsService.deleteWarning(warning);
+  }
+
+  getMessages(): Message[] {
+    return this.alertsService.messages;
+  }
 }
 
 angular.module('oppia').directive('oppiaWarningsAndAlerts',

@@ -140,14 +140,14 @@ angular.module('oppia').directive('topNavigationBar', [
           ctrl.toggleSidebar = function() {
             /**
              * Note to the developer migrating this directive:
-             * I (@ashutoshc8101) have defined the toggle function in an angular
-             * component (base-content) and passed it into this angularjs
+             * The toggle function is defined in an angular
+             * component (base-content) and is passed into this angularjs
              * directive. This was done to avoid change detection issue
              * which comes with upgradeComponent. When this directive is
              * migrated change detection issue will no longer be there.
-             * So, please remove my method of toggling the sidebar, instead call
-             * this.sidebarStatusService.toggleSidebar() directly from here.
-             * And remove toggleSidebar() from base content component
+             * So, please remove this method of toggling the sidebar, instead
+             * call this.sidebarStatusService.toggleSidebar() directly from
+             * here. And remove toggleSidebar() from base content component
              * Also remove TopNavigationBarWrapperComponent and
              * SideNavigationBarWrapperComponent.
              * Replace the usage of wrapper components with the original

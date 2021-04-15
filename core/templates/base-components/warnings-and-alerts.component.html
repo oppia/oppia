@@ -1,7 +1,7 @@
 <div class="oppia-toast-container toast-top-center">
-  <div *ngFor="let warning of (this.alertsService.warnings | limitTo:5)"
+  <div *ngFor="let warning of (getWarnings() | limitTo:5)"
        class="toast toast-warning oppia-toast">
-    <button type="button" class="toast-close-button protractor-test-close-toast-warning" (click)="this.alertsService.deleteWarning(warning)"
+    <button type="button" class="toast-close-button protractor-test-close-toast-warning" (click)="deleteWarning(warning)"
             role="button">&times;
     </button>
     <div class="toast-message protractor-test-toast-warning-message">
@@ -11,7 +11,7 @@
 </div>
 
 <div>
-  <div *ngFor="let message of this.alertsService.messages; index as idx">
+  <div *ngFor="let message of getMessages(); index as idx">
     <oppia-alert-message [messageObject]="message" [messageIndex]="idx"></oppia-alert-message>
   </div>
 </div>

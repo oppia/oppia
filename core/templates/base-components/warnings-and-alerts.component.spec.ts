@@ -19,11 +19,13 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AlertMessageComponent } from 'components/common-layout-directives/common-elements/alert-message.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
+import { AlertsService, Message, Warning } from 'services/alerts.service';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
 describe('Warnings and Alert Component', () => {
   let fixture: ComponentFixture<WarningsAndAlertsComponent>;
   let componentInstance: WarningsAndAlertsComponent;
+  let alertsService: AlertsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -38,9 +40,32 @@ describe('Warnings and Alert Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WarningsAndAlertsComponent);
     componentInstance = fixture.componentInstance;
+    alertsService = TestBed.inject(AlertsService);
+    alertsService = (alertsService as unknown) as jasmine.SpyObj<AlertsService>;
   });
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
+  });
+
+  it('should get messages', () => {
+    let messages: Message[] =
+      [{ content: 'Test Message', timeout: 100, type: 'success' }];
+    spyOnProperty(alertsService, 'messages').and.returnValue(messages);
+    expect(componentInstance.getMessages()).toEqual(messages);
+  });
+
+  it('should get warnings', () => {
+    let warnings: Warning[] =
+      [{ content: 'Test Warning', type: 'success' }];
+    spyOnProperty(alertsService, 'warnings').and.returnValue(warnings);
+    expect(componentInstance.getWarnings()).toEqual(warnings);
+  });
+
+  it('should delete warning', () => {
+    spyOn(alertsService, 'deleteWarning');
+    let warning: Warning = { content: 'Test Warning', type: 'success' };
+    componentInstance.deleteWarning(warning);
+    expect(alertsService.deleteWarning).toHaveBeenCalled();
   });
 });
