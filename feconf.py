@@ -1388,7 +1388,7 @@ SUGGESTION_TYPE_CHOICES = [
 ]
 
 # Constants used to authenticate Android messages.
-ANDROID_API_KEY = ""
-ANDROID_APP_PACKAGE_NAME = "org.oppia.android"
-ANDROID_APP_VERSION_NAME = "1.0"
+ANDROID_API_KEY = ''
+ANDROID_APP_PACKAGE_NAME = 'org.oppia.android'
+ANDROID_APP_VERSION_NAME = '1.0'
 ANDROID_APP_VERSION_CODE = 1

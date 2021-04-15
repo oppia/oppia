@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.controllers import incoming_app_feedback_report
 from core.tests import test_utils
 from core.platform import models
 
@@ -87,5 +88,19 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
         all_reports = (
             app_feedback_report_models.AppFeedbackReportModel.get_all())
-
         self.assertTrue(len(all_reports), 1)
+
+        report_model = all_reports[0]
+        self.assertEqual(report_model.platform, 'android')
+        self.assertEqual(
+            report_model.submitted_on,
+            datetime.datetime.fromtimestamp(1610519337))
+
+
+    def test_incoming_report_with_invalid_headers_raises_exception(self):
+        with self.assertRaisesRegexp(
+            incoming_app_feedback_report.UnauthorizedRequestException,
+            'The incoming request does not have valid authentication'):
+            self.post_json(
+                url=feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
+                payload=self.payload, csrf_token=self.csrf_token)
