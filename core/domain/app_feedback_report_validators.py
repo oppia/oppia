@@ -21,9 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.domain import base_model_validators
+from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_services
+from core.domain import base_model_validators
 from core.platform import models
+
 import feconf
 import utils
 
@@ -73,7 +75,8 @@ class AppFeedbackReportModelValidator(base_model_validators.BaseModelValidator):
         Args:
             item: datastore_services.Model. AppFeedbackReportModel to validate.
         """
-        if item.platform == PLATFORM_ANDROID:
+        if item.platform == (
+                app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
             if not (
                     feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION <=
                     item.android_report_info_schema_version <=
@@ -253,8 +256,8 @@ class AppFeedbackReportTicketModelValidator(
                 ' which is greater than the time when the job was run' % (
                     item.id, item.newest_report_timestamp))
         if (
-            item.newest_report_timestamp <
-            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME):
+                item.newest_report_timestamp <
+                feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME):
             cls._add_error(
                 'newest_report_timestamp %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),
@@ -371,7 +374,7 @@ class AppFeedbackReportStatsModelValidator(
                 'which is greater than the time when the job was run' % (
                     item.id, item.stats_tracking_date))
         if item.stats_tracking_date < (
-            feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.date()):
+                feconf.EARLIEST_APP_FEEDBACK_REPORT_DATETIME.date()):
             cls._add_error(
                 'stats_tracking_date %s' % (
                     base_model_validators.ERROR_CATEGORY_DATETIME_CHECK),

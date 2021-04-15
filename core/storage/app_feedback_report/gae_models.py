@@ -267,26 +267,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
             list(str). The possible values that the field name can have.
         """
         query = cls.query(projection=[filter_name], distinct=True)
-        if filter_name == constants.FILTER_FIELD_NAMES.report_type:
+        if filter_name == constants.FilterFieldNames.report_type:
             return [model.report_type for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.platform:
+        elif filter_name == constants.FilterFieldNames.platform:
             return [model.platform for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.entry_point:
+        elif filter_name == constants.FilterFieldNames.entry_point:
             return [model.entry_point for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.submitted_on:
+        elif filter_name == constants.FilterFieldNames.submitted_on:
             return [model.submitted_on.date() for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.android_device_model:
+        elif filter_name == constants.FilterFieldNames.android_device_model:
             return [model.android_device_model for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.android_sdk_version:
+        elif filter_name == constants.FilterFieldNames.android_sdk_version:
             return [model.android_sdk_version for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.text_language_code:
+        elif filter_name == constants.FilterFieldNames.text_language_code:
             return [model.text_language_code for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.audio_language_code:
+        elif filter_name == constants.FilterFieldNames.audio_language_code:
             return [model.audio_language_code for model in query]
-        elif filter_name == constants.FILTER_FIELD_NAMES.platform_version:
+        elif filter_name == constants.FilterFieldNames.platform_version:
             return [model.platform_version for model in query]
         elif filter_name == (
-            constants.FILTER_FIELD_NAMES.android_device_country_locale_code):
+            constants.FilterFieldNames.android_device_country_locale_code):
             return [model.android_device_country_locale_code for model in query]
         
 

@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 
 import feconf
@@ -45,28 +44,35 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         if not report_dict:
             raise utils.InvalidInputException(
                 'A report must be sent in the request.')
-        
+
         report_obj = (
-            app_feedback_report_service.create_android_report_from_json(
+            app_feedback_report_services.create_android_report_from_json(
                 report_dict))
         report_obj.validate()
         app_feedback_report_services.save_android_feedback_report_to_storage(
             report=report_obj, new_incoming_report=True)
-        app_feedback_report_service.store_incoming_report_stats(report_obj)
+        app_feedback_report_services.store_incoming_report_stats(report_obj)
 
     def _validate_incoming_request(self, headers):
+        """Verifies the headers from the incoming request.
+
+        Args:
+            headers: list(str). The headers to validate from the request.
+        """
         api_key = headers['api_key']
         app_package_name = headers['app_package_name']
         app_version_name = headers['app_version_name']
         app_version_code = headers['app_version_code']
-        if api_key != feconf.ANDROID_API_KEY or (
-            app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or (
-                app_version_name != feconf.ANDROID_APP_PACKAGE_NAME or (
-                    app_version_code != feconf.ANDROID_APP_VERSION_CODE))):
+        if (
+            api_key != feconf.ANDROID_API_KEY or
+            app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or
+            app_version_name != feconf.ANDROID_APP_PACKAGE_NAME or
+            app_version_code != feconf.ANDROID_APP_VERSION_CODE):
             return False
         return True
 
 
 class UnauthorizedRequestException(Exception):
     """Error class for an unauthorized request."""
+
     pass

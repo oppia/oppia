@@ -23,14 +23,10 @@ import datetime
 
 from core.domain import app_feedback_report_constants
 from core.domain import app_feedback_report_domain
-from core.domain import app_feedback_report_services
-from core.domain import exp_domain
-from core.domain import story_services
-from core.tests import test_utils
 from core.platform import models
+from core.tests import test_utils
 
 import feconf
-import python_utils
 import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
@@ -46,8 +42,8 @@ TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
 TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
     TICKET_CREATION_TIMESTAMP)
 
-PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_ANDROID
-PLATFORM_WEB = app_feedback_report_constants.PLATFORM_WEB
+PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
+PLATFORM_WEB = app_feedback_report_constants.PLATFORM_CHOICE_WEB
 TICKET_NAME = 'ticket name'
 TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
@@ -104,8 +100,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
         android_user_supplied_feedback = (
             app_feedback_report_domain.UserSuppliedFeedback(
-                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER, USER_SELECTED_ITEMS,
-                USER_TEXT_INPUT))
+                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER,
+                USER_SELECTED_ITEMS, USER_TEXT_INPUT))
         android_device_system_context = (
             app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
@@ -121,7 +117,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 False, False, EVENT_LOGS, LOGCAT_LOGS))
         self.android_report_obj = app_feedback_report_domain.AppFeedbackReport(
             self.android_report_id, ANDROID_REPORT_INFO_SCHEMA_VERSION,
-            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, TICKET_ID, None,
+            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, 0, TICKET_ID, None,
             android_user_supplied_feedback, android_device_system_context,
             android_app_context)
 
@@ -130,8 +126,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 PLATFORM_WEB, REPORT_SUBMITTED_TIMESTAMP))
         web_user_supplied_feedback = (
             app_feedback_report_domain.UserSuppliedFeedback(
-                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER, USER_SELECTED_ITEMS,
-                USER_TEXT_INPUT))
+                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER,
+                USER_SELECTED_ITEMS, USER_TEXT_INPUT))
         device_system_context = (
             app_feedback_report_domain.DeviceSystemContext(
                 WEB_PLATFORM_VERSION, LANGUAGE_LOCALE_CODE_ENGLISH))
@@ -142,9 +138,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 LANGUAGE_LOCALE_CODE_ENGLISH))
         self.web_report_obj = app_feedback_report_domain.AppFeedbackReport(
             self.android_report_id, ANDROID_REPORT_INFO_SCHEMA_VERSION,
-            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, TICKET_ID, None,
+            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, 0, TICKET_ID, None,
             web_user_supplied_feedback, device_system_context, app_context)
-
 
     def test_to_dict_android_report(self):
         expected_report_id = self.android_report_id
@@ -166,7 +161,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'device_system_context': {
                 'version_name': ANDROID_PLATFORM_VERSION,
                 'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
-                'device_country_locale_code':COUNTRY_LOCALE_CODE_INDIA,
+                'device_country_locale_code': COUNTRY_LOCALE_CODE_INDIA,
                 'device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
                 'device_model': ANDROID_DEVICE_MODEL,
                 'sdk_version': ANDROID_SDK_VERSION,
@@ -240,6 +235,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         """Checks that the feedback report passes validation.
 
         Args:
+            report_obj: AppFeedbackReport. The domain object to validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -254,8 +250,8 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         super(UserSuppliedFeedbackDomainTests, self).setUp()
         self.user_supplied_feedback = (
             app_feedback_report_domain.UserSuppliedFeedback(
-                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER, USER_SELECTED_ITEMS,
-                USER_TEXT_INPUT))
+                REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER,
+                USER_SELECTED_ITEMS, USER_TEXT_INPUT))
 
     def test_to_dict(self):
         expected_dict = {
@@ -285,7 +281,6 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.user_supplied_feedback,
             'Report cannot have selection options for category ')
-
 
     def test_validation_selection_items_is_none_for_selection_category_fails(
             self):
@@ -320,6 +315,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         """Checks that the user supplied feeedback passes validation.
 
         Args:
+            feedback_obj: UserSuppliedFeedback. The domain object to validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -345,12 +341,6 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
             expected_dict, self.device_system_context.to_dict())
 
     def test_validation_raises_not_implemented_error(self):
-        """Checks that the device system context passes validation.
-
-        Args:
-            expected_error_substring: str. String that should be a substring
-                of the expected error message.
-        """
         with self.assertRaisesRegexp(
             NotImplementedError,
             'Subclasses of DeviceSystemContext should implement domain '
@@ -495,6 +485,8 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
         """Checks that the Android device system context passes validation.
 
         Args:
+            context_obj: AndroidDeviceSystemContext. The domain object to
+                validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -535,7 +527,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+                app_feedback_report_constants.EntryPoint.navigation_drawer)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -545,7 +537,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)):
+                app_feedback_report_constants.EntryPoint.navigation_drawer)):
             self.entry_point.validate()
 
 
@@ -560,7 +552,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player),
+                app_feedback_report_constants.EntryPoint.lesson_player),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -573,7 +565,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player))
+                app_feedback_report_constants.EntryPoint.lesson_player))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -601,6 +593,8 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         """Checks that the entry point passes validation.
 
         Args:
+            entry_point_obj: LessonPlayerEntryPoint. The domain object to
+                validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -620,7 +614,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.revision_card),
+                app_feedback_report_constants.EntryPoint.revision_card),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -632,7 +626,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.revision_card))
+                app_feedback_report_constants.EntryPoint.revision_card))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -651,6 +645,8 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         """Checks that the entry point passes validation.
 
         Args:
+            entry_point_obj: RevisionCardEntryPoint. The domain object to
+                validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -669,7 +665,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.crash)
+                app_feedback_report_constants.EntryPoint.crash)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -679,10 +675,10 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.crash)):
+                app_feedback_report_constants.EntryPoint.crash)):
             self.entry_point.validate()
 
-    
+
 class AppContextDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -698,7 +694,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
+                    app_feedback_report_constants.EntryPoint.navigation_drawer
                 ),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -710,7 +706,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
     def test_validation_raises_exception(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-           'Subclasses of AppContext should implement their own validation'):
+            'Subclasses of AppContext should implement their own validation'):
             self.app_context.validate()
 
 
@@ -730,7 +726,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
+                    app_feedback_report_constants.EntryPoint.navigation_drawer
                 ),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -760,12 +756,13 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.app_context, 'Should have a logcat log list')
 
-
     def _assert_validation_error(
             self, app_context_obj, expected_error_substring):
         """Checks that the app context passes validation.
 
         Args:
+            app_context_obj: AndroidAppContext. The domain object to
+                validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -778,7 +775,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AppFeedbackReportTicketDomainTests, self).setUp()
-        
+
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
                 TICKET_NAME))
@@ -805,8 +802,8 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
                 False, False, EVENT_LOGS, LOGCAT_LOGS))
         self.android_report_obj = app_feedback_report_domain.AppFeedbackReport(
             self.android_report_id, ANDROID_REPORT_INFO_SCHEMA_VERSION,
-            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, self.ticket_id, None,
-            android_user_supplied_feedback, android_device_system_context,
+            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, 0, self.ticket_id,
+            None, android_user_supplied_feedback, android_device_system_context,
             android_app_context)
 
         self.ticket_obj = app_feedback_report_domain.AppFeedbackReportTicket(
@@ -857,6 +854,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
         """Checks that the ticket passes validation.
 
         Args:
+            ticket_obj: AppFeedbackReportTicket. The domain object to validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -869,7 +867,7 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AppFeedbackReportStatsDomainTests, self).setUp()
-        
+
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
                 TICKET_NAME))
@@ -938,14 +936,14 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             'stats_tracking_date': REPORT_SUBMITTED_TIMESTAMP.isoformat(),
             'total_reports_submitted': 1,
             'daily_param_stats': {
-                'platform': { PLATFORM_ANDROID: 1 },
-                'report_type': { REPORT_TYPE_SUGGESTION: 1 },
-                'country_local_code': { COUNTRY_LOCALE_CODE_INDIA: 1 },
-                'entry_point_name': { ENTRY_POINT_NAVIGATION_DRAWER: 1 },
-                'text_language_code': { LANGUAGE_LOCALE_CODE_ENGLISH: 1 },
-                'audio_language_code': { LANGUAGE_LOCALE_CODE_ENGLISH: 1 },
-                'sdk_version': { ANDROID_SDK_VERSION: 1 },
-                'version_name': { ANDROID_PLATFORM_VERSION: 1 }
+                'platform': {PLATFORM_ANDROID: 1},
+                'report_type': {REPORT_TYPE_SUGGESTION: 1},
+                'country_local_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
+                'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
+                'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
+                'audio_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
+                'sdk_version': {ANDROID_SDK_VERSION: 1},
+                'version_name': {ANDROID_PLATFORM_VERSION: 1}
             }
         }
         self.assertDictEqual(expected_dict, self.stats_obj.to_dict())
@@ -971,6 +969,7 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
         """Checks that the stats object passes validation.
 
         Args:
+            stats_obj: AppFeedbackReportStats. The domain object to validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -980,7 +979,7 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
 
 
 class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
-    
+
     def test_to_dict(self):
         counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
             {
@@ -1016,6 +1015,8 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
         """Checks that the parameter counts passes validation.
 
         Args:
+            counts_obj: ReportStatsParameterValueCounts. The domain object to
+                validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
@@ -1053,14 +1054,15 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
             'The filter options should be a list')
 
     def _assert_validation_error(
-            self, counts_obj, expected_error_substring):
+            self, filter_obj, expected_error_substring):
         """Checks that the parameter counts passes validation.
 
         Args:
+            filter_obj: AppFeedbackReportFilter. The domain object to
+                validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
-            counts_obj.validate()
-
+            filter_obj.validate()

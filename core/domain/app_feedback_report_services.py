@@ -20,13 +20,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-from dateutil import tz
 
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 
 import feconf
+import python_utils
 import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
@@ -43,7 +43,8 @@ def get_report_models(report_ids):
     """Fetches and returns the AppFeedbackReportModels with the given ids.
 
     Args:
-        reprot_ids: list(str). The ids for the models to fetch
+        report_ids: list(str). The ids for the models to fetch.
+
     Returns:
         list(AppFeedbackReportModel). A list of models that correspond to the
         requested reports.
@@ -58,7 +59,8 @@ def create_android_report_from_json(report_json):
 
     Args:
         report_json: dict. The JSON for the app feedback report.
-    Return:
+
+    Returns:
         AppFeedbackReport. The domain object for an Android feedback report.
     """
     user_supplied_feedback_json = report_json['user_supplied_feedback']
@@ -73,7 +75,7 @@ def create_android_report_from_json(report_json):
     device_context_json = report_json['device_context']
     device_system_context_obj = (
         app_feedback_report_domain.AndroidDeviceSystemContext(
-            system_context_json['platform_version'], 
+            system_context_json['platform_version'],
             system_context_json['package_version_code'],
             system_context_json['android_device_country_locale_code'],
             system_context_json['android_device_language_locale_code'],
@@ -112,28 +114,26 @@ def _get_entry_point_from_json(entry_point_json):
 
     Args:
         entry_point_json: dict. The JSON data of the entry point.
+
     Returns:
         EntryPoint. The EntryPoint domain object representing the entry point.
+
     Raises:
         InvalidInputException. The given entry point is invalid.
     """
     entry_point_name = entry_point_json['entry_point_name']
-    if entry_point_name == (
-        constants.ENTRY_POINT.navigation_drawer):
+    if entry_point_name == constants.EntryPoint.navigation_drawer:
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == (
-        app_feedbconstantsack_report_domain.ENTRY_POINT.lesson_player):
+    elif entry_point_name == constants.ENTRY_POINT.lesson_player:
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_story_id'],
             entry_point_json['entry_point_exploration_id'])
-    elif entry_point_name == (
-        constants.ENTRY_POINT.revision_card):
+    elif entry_point_name == constants.EntryPoint.revision_card:
         return app_feedback_report_domain.RevisionCardEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_subtopic_id'])
-    elif entry_point_name == (
-        constants.ENTRY_POINT.crash):
+    elif entry_point_name == constants.EntryPoint.crash:
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(
@@ -173,8 +173,8 @@ def _update_report_stats_model_in_transaction(
         platform: str. The platform of the report being aggregated.
         date: datetime.date. The date of the stats.
         report_obj: AppFeedbackReport. AppFeedbackReport domain object.
-        delta: The amount to increment the stats by, depending on if the report
-            is added or removed form the model.
+        delta: int. The amount to increment the stats by, depending on if the
+            report is added or removed from the model.
     """
     # The stats we want to aggregate on.
     report_type = report_obj.user_supplied_feedback.report_type
@@ -183,7 +183,8 @@ def _update_report_stats_model_in_transaction(
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
     text_language_code = report_obj.app_context.text_language_code
     audio_language_code = report_obj.app_context.audio_language_code
-    sdk_version = str(report_obj.device_system_context.sdk_version)
+    sdk_version = python_utils.UNICODE(
+        report_obj.device_system_context.sdk_version)
     version_name = report_obj.device_system_context.version_name
 
     stats_id = (
@@ -200,25 +201,25 @@ def _update_report_stats_model_in_transaction(
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            constants.STATS_PARAMETER_NAMES.report_type: {
+            constants.StatsParameterNames.report_type: {
                 report_type: 1
             },
-            constants.STATS_PARAMETER_NAMES.country_locale_code:{
+            constants.StatsParameterNames.country_locale_code: {
                 country_locale_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.entry_point_name: {
+            constants.StatsParameterNames.entry_point_name: {
                 entry_point_name: 1
             },
-            constants.STATS_PARAMETER_NAMES.text_language_code: {
-               text_language_code: 1
+            constants.StatsParameterNames.text_language_code: {
+                text_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.audio_language_code: {
+            constants.StatsParameterNames.audio_language_code: {
                 audio_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.android_sdk_version: {
+            constants.StatsParameterNames.android_sdk_version: {
                 sdk_version: 1
             },
-            constants.STATS_PARAMETER_NAMES.version_name: {
+            constants.StatsParameterNames.version_name: {
                 version_name: 1
             }
         }
@@ -231,33 +232,33 @@ def _update_report_stats_model_in_transaction(
         # Update existing stats model.
         stats_dict = stats_model.daily_param_stats
 
-        stats_dict[constants.STATS_PARAMETER_NAMES.report_type] = (
+        stats_dict[constants.StatsParameterNames.report_type] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.report_type],
+                stats_dict[constants.StatsParameterNames.report_type],
                 report_type, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code] = (
+        stats_dict[constants.StatsParameterNames.country_locale_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code],
+                stats_dict[constants.StatsParameterNames.country_locale_code],
                 country_locale_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name] = (
+        stats_dict[constants.StatsParameterNames.entry_point_name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name],
+                stats_dict[constants.StatsParameterNames.entry_point_name],
                 entry_point_name, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code] = (
+        stats_dict[constants.StatsParameterNames.audio_language_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code],
+                stats_dict[constants.StatsParameterNames.audio_language_code],
                 audio_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code] = (
+        stats_dict[constants.StatsParameterNames.text_language_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code],
+                stats_dict[constants.StatsParameterNames.text_language_code],
                 text_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version] = (
+        stats_dict[constants.StatsParameterNames.android_sdk_version] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version],
+                stats_dict[constants.StatsParameterNames.android_sdk_version],
                 sdk_version, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.version_name] = (
+        stats_dict[constants.StatsParameterNames.version_name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.version_name],
+                stats_dict[constants.StatsParameterNames.version_name],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
@@ -278,12 +279,12 @@ def _calculate_new_stats_count_for_parameter(
             the stats of.
         delta: int. The amount to increment the current count by, either -1 or
             +1.
+
     Returns:
         int. The new report count to put into the stats dict for a single
         parameter value.
     """
     if not current_stats_map[current_value]:
-    # if current_count is None:
         # The stats did not previously have this value.
         if delta < 0:
             raise utils.InvalidInputException(
@@ -303,14 +304,20 @@ def get_report_from_model(report_model):
     Args:
         report_model: AppFeedbackReportModel. The model loaded from the
             datastore.
+
     Returns:
         AppFeedbackReport. An AppFeedbackReport domain object corresponding to
         the given model.
+
+    Raises:
+        NotImplementedError. The web report domain object needs to be
+            implemented.
     """
     if report_model.platform == PLATFORM_ANDROID:
         return _get_android_report_from_model(report_model)
     else:
-        return _get_web_report_from_model(report_model)
+        raise NotImplementedError(
+            'Web app feedback report domain objects must be defined.')
 
 
 def get_ticket_from_model(ticket_model):
@@ -320,6 +327,7 @@ def get_ticket_from_model(ticket_model):
     Args:
         ticket_model: AppFeedbackReportTicketModel. The model loaded from the
             datastore.
+
     Returns:
         AppFeedbackReportTicket. An AppFeedbackReportTicket domain object
         corresponding to the given model.
@@ -336,8 +344,9 @@ def get_stats_from_model(stats_model):
     model loaded from the the data.
 
     Args:
-        report_model: AppFeedbackReportStatsModel. The model loaded from the
+        stats_model: AppFeedbackReportStatsModel. The model loaded from the
             datastore.
+
     Returns:
         AppFeedbackReportDailyStats. An AppFeedbackReportDailyStats domain
         object corresponding tothe given model.
@@ -358,6 +367,7 @@ def _create_app_daily_stats_from_model_json(daily_param_stats):
 
     Args:
         daily_param_stats: dict. The stats data from the model.
+
     Returns:
         dict. A dict mapping param names to ReportStatsParameterValueCounts
         domain objects.
@@ -374,7 +384,7 @@ def _create_app_daily_stats_from_model_json(daily_param_stats):
         counts_obj = (
             app_feedback_report_domain.ReportStatsParameterValueCounts(
                 parameter_counts))
-        stats_dict[parameter_name] = counts_obj
+        stats_dict[stats_name] = counts_obj
     return stats_dict
 
 
@@ -385,11 +395,12 @@ def _get_android_report_from_model(android_report_model):
     Args:
         android_report_model: AppFeedbackReportModel. The model to convert to a
             domain object.
+
     Returns:
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
     """
     if android_report_model.android_report_info_schema_version < (
-        feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
+            feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION):
         raise NotImplementedError(
             'Android app feedback report migrations must be added for new '
             'report schemas implemented.')
@@ -430,26 +441,6 @@ def _get_android_report_from_model(android_report_model):
         user_supplied_feedback, device_system_context, app_context)
 
 
-def _get_web_report_from_model(web_report_model):
-    """Creates a domain object that represents a web feedback report from
-    the model given.
-
-    Args:
-        web_report_model: AppFeedbackReportModel. The model to convert to a
-            domain object.
-    Raises:
-        NotImplementedError. The domain object for web reports has not been
-            defined yet.
-    """
-    raise NotImplementedError(
-        'Web app feedback report domain objects must be defined.')
-    if web_report_model.android_report_info_schema_version < (
-        feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION):
-        raise NotImplementedError(
-            'Web app feedback report migrations must be added for new '
-            'report schemas implemented.')
-
-
 def _get_entry_point(
         entry_point_name, topic_id, story_id, exploration_id, subtopic_id):
     """Creates a domain object that represents an entry point to the feedback
@@ -468,25 +459,23 @@ def _get_entry_point(
         subtopic_id: int|None. The ID of the subtopic that is being played when
             the report was initiated or None if there was no active subtopic
             when the report was started.
+
     Returns:
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
     """
-    if entry_point_name == (
-        constants.ENTRY_POINT.navigation_drawer):
+    if entry_point_name == constants.EntryPoint.navigation_drawer:
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == (
-        constants.ENTRY_POINT.lesson_player):
+    elif entry_point_name == constants.EntryPoint.lesson_player:
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             topic_id, story_id, exploration_id)
-    elif entry_point_name == (
-        constants.ENTRY_POINT.revision_card):
-        return app_feedback_report_domain.LessonPlayerEntryPoint(
+    elif entry_point_name == constants.EntryPoint.revision_card:
+        return app_feedback_report_domain.RevisionCardEntryPoint(
             topic_id, subtopic_id)
-    elif entry_point_name == constants.ENTRY_POINT.crash:
+    elif entry_point_name == constants.EntryPoint.crash:
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(
-            "Received unexpected entry point type.")
+            'Received unexpected entry point type.')
 
 
 def scrub_all_unscrubbed_expiring_reports(scrubbed_by):
@@ -539,6 +528,8 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
 
     Args:
         report: AppFeedbackReport. The domain object of the report to save.
+        new_incoming_report: bool. Whether the report is a new incoming report
+            that does not have a corresponding model entity.
     """
     user_supplied_feedback = report.user_supplied_feedback
     device_system_context = report.device_system_context
@@ -567,7 +558,8 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
             'text_size': app_context.text_size,
             'only_allows_wifi_download_and_update': (
                 app_context.only_allows_wifi_download_and_update),
-            'automatically_update_topics': app_context.automatically_update_topics,
+            'automatically_update_topics': (
+                app_context.automatically_update_topics),
             'account_is_profile_admin': app_context.account_is_profile_admin
         }
 
@@ -619,7 +611,7 @@ def reassign_ticket(report, new_ticket):
     """Reassign the ticket the report is associated with.
 
     Args:
-        report: AppFeedbackReport. The domain Object
+        report: AppFeedbackReport. The report being assigned to a new ticket.
         new_ticket: AppFeedbackReportTicket|None. The ticket domain object to
             reassign the report to or None if removing the report form a ticket
             wihtout reassigning.
@@ -639,12 +631,12 @@ def reassign_ticket(report, new_ticket):
         ticket_obj = get_ticket_from_model(ticket_model)
         ticket_obj.reports.remove(report)
         if ticket_obj.newest_report_creation_timestamp == (
-            report.submitted_on_timestamp):
+                report.submitted_on_timestamp):
             report_models = get_report_models(ticket_obj.reports)
             latest_timestamp = report_models[0].submitted_on_datetime
-            for index in range(1, len(report_models)):
+            for index in python_utils.RANGE(1, len(report_models)):
                 if report_models[index].submitted_on_datetime > (
-                    latest_timestamp):
+                        latest_timestamp):
                     latest_timestamp = (
                         report_models[index].submitted_on_datetime)
         ticket_obj.newest_report_creation_timestamp = latest_timestamp
@@ -662,27 +654,15 @@ def reassign_ticket(report, new_ticket):
         # If the report was unticked, remove the it from the stats for
         # unticketed reports.
         old_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    stats_id_to_decrement = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-            platform, old_ticket_id, stats_date))
-    stats_model_to_decrement = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-            stats_id_to_decrement))
     _update_report_stats_model_in_transaction(
         old_ticket_id, platform, stats_date, report, -1)
-    
+
     # Get the ID of the ticket to add the report to.
     new_ticket_id = new_ticket.ticket_id
     if new_ticket is None:
         # If the report is not assigned to a new ticket, update the stats for
         # the unticked reports.
         new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    stats_id_to_increment = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-            platform, new_ticket_id, stats_date))
-    stats_model_to_increment = (
-        app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
-            stats_id_to_increment))
     _update_report_stats_model_in_transaction(
         new_ticket_id, platform, stats_date, report, 1)
 
