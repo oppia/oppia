@@ -21,11 +21,15 @@
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { EditabilityService } from 'services/editability.service';
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
+interface EventData {
+  event: Event;
+  index: string
+}
 @Component({
   selector: 'oppia-response-header',
   templateUrl: './response-header.component.html'
@@ -33,15 +37,16 @@ import { AppConstants } from 'app.constants';
 export class ResponseHeaderComponent {
   @Input() index: string;
   @Input() outcome: { labelledAsCorrect: void, dest: string };
-  @Input() summary: string;
+  @Input() sumsummarymary: string;
   @Input() shortSummary: string;
   @Input() isActive: boolean;
-  @Input() onDeleteFn: string;
-  @Input() numRules: boolean;
+  @Output() onDeleteFn: EventEmitter<EventData> = new EventEmitter();
+  @Input() numRules: number;
   @Input() isResponse: boolean;
-  @Input() showWarning: string;
+  @Input() showWarning: (arg0: string) => boolean;
   @Input() navigateToState: string;
   editabilityService: EditabilityService;
+  eventData: EventData;
   constructor(
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
@@ -80,8 +85,11 @@ export class ResponseHeaderComponent {
   }
 
   deleteResponse(evt: Event): void {
-    this.onDeleteFn;
-    (this.index, evt);
+    this.eventData = {
+      index: this.index,
+      event: evt
+    };
+    this.onDeleteFn.emit(this.eventData);
   }
   ngOnInit(): void {
     this.editabilityService = new EditabilityService;

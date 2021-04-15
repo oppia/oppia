@@ -43,7 +43,7 @@
                  class="oppia-rule-tab protractor-test-oppia-solution-tab">
                 <oppia-response-header (summary)="getSolutionSummary()"
                                        (short-summary)="getSolutionSummary()"
-                                       [on-delete-fn]="deleteSolution">
+                                       [on-delete-fn]="deleteSolution($index, $event)">
                 </oppia-response-header>
               </a>
 

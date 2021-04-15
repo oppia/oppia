@@ -37,7 +37,7 @@
                                        (summary)="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
                                        (short-summary)="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
                                        [is-active]="$index === activeAnswerGroupIndex"
-                                       [on-delete]-fn="deleteAnswerGroup"
+                                       (on-delete-fn)="deleteAnswerGroup($index, $event)"
                                        [outcome]="answerGroup.outcome"
                                        [navigate-to-state]="navigateToState"
                                        [num-rules]="answerGroup.rules.length"
