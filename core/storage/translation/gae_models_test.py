@@ -64,12 +64,13 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
             {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'hashed_origin_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'hashed_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'origin_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'source_language_code':
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'target_language_code':
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'translated_text': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
