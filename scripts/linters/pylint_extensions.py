@@ -2111,9 +2111,6 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
-
-
-
 class DisallowDunderMetaclassChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "__metaclass__" and
     enforcing use of "python_utils.with_metaclass()" instead.
@@ -2154,9 +2151,9 @@ class StringConcatenationChecker(checkers.BaseChecker):
     name = 'no-string-concatenation'
     priority = -1
     msgs = {
-        'C0034': (
-            'at string %s, use string interpolation (\'string1%%s\' %% string2)'
-            ' rather than string concatenation (\'string1\' + \'string2\').',
+        'C0035': (
+            'Avoid using string concatenation and replace it with string '
+            'interpolation instead.',
             'no-string-concatenation',
             'Enforce use of string interpolation over string concatenation.',
         ),
@@ -2189,6 +2186,7 @@ class StringConcatenationChecker(checkers.BaseChecker):
                     args=(operand.as_string()),
                     node=node)
                 break
+
 
 def register(linter):
     """Registers the checker with pylint.
