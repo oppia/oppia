@@ -295,10 +295,6 @@ def _check_shards_match_tests(include_load_tests=True):
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
-    os.environ['DATASTORE_EMULATOR_HOST'] = 'localhost:8089'
-    os.environ['DATASTORE_HOST'] = 'http://localhost:8089'
-    os.environ['DATASTORE_PROJECT_ID'] = 'dev-project-id'
-    os.environ['DATASTORE_USE_PROJECT_ID_AS_APP_ID'] = 'true'
 
     with common.managed_cloud_datastore_emulator():
         for directory in common.DIRS_TO_ADD_TO_SYS_PATH:

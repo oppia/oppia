@@ -25,10 +25,11 @@ import logging
 import feconf
 
 from google.api_core import retry
+from google.auth.credentials import AnonymousCredentials
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-CLIENT = tasks_v2.CloudTasksClient()
+CLIENT = tasks_v2.CloudTasksClient(credentials=AnonymousCredentials())
 
 
 def create_http_task(
