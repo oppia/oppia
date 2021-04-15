@@ -543,6 +543,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
             ' form: *args: list(*). Description.',
             'malformed-args-argument',
             'The parameter is incorrectly formatted.'
+        ),
+        'W9039': (
+            'Docstring should be formatting in the following form: Argument:',
+            'malformed-docstring',
+            'The docstring is incorrectly formatted.'
         )
     }
 
@@ -829,6 +834,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
         """
         if node.doc:
             docstring = node.doc.splitlines()
+            for line in docstring:
+                if re.search(br'^(\s+(Args|Raises|Returns|Yields))', line):
+                    if (len(line.split()) != 1 or
+                            not re.search(br'\s+\S+:', line)):
+                        self.add_message('malformed-docstring', node=node)
             # Check for space after """ in docstring.
             if len(docstring[0]) > 0 and docstring[0][0] == b' ':
                 self.add_message('space-after-triple-quote', node=node)
