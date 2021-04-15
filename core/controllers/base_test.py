@@ -880,7 +880,6 @@ class I18nDictsTests(test_utils.GenericTestBase):
                     self.assertTrue(key.startswith('"I18N_'))
                     if not key.startswith('"I18N_'):
                         self.log_line('Bad line in file: %s' % filename)
-                print(filename)
                 self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
