@@ -1779,7 +1779,7 @@ class Exploration(python_utils.OBJECT):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initalize a
                 State domain object.
-            init_state_name: str. Name of the first state
+            init_state_name: str. Name of the first state.
 
         Returns:
             dict. The converted states_dict.
@@ -1788,7 +1788,6 @@ class Exploration(python_utils.OBJECT):
             state_dict['card_is_checkpoint'] = bool(
                 state_name == init_state_name)
         return states_dict
-
 
     @classmethod
     def update_states_from_model(
