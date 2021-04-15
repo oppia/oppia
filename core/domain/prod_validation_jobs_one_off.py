@@ -774,8 +774,7 @@ class MachineTranslatedTextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [
-            translation_models.MachineTranslatedTextModel]
+        return [translation_models.MachineTranslatedTextModel]
 
 
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
