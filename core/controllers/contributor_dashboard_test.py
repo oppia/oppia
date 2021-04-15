@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_services
@@ -483,6 +484,90 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                     'content': ''
                 }
             }
+        }
+        self.assertEqual(output, expected_output)
+
+
+class MachineTranslatedStateTextsHandler(test_utils.GenericTestBase):
+    """Tests for MachineTranslatedStateTextsHandler"""
+
+    def setUp(self):
+        super(MachineTranslatedStateTextsHandler, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.exp_id = exp_fetchers.get_new_exploration_id()
+        exp = self.save_new_valid_exploration(
+            self.exp_id,
+            self.owner_id,
+            title='title',
+            category='category',
+            end_state_name='End State'
+        )
+
+        self.publish_exploration(self.owner_id, exp.id)
+
+    def test_handler_with_invalid_language_code_raises_exception(self):
+        self.get_json('/machine_translated_state_texts_handler', params={
+            'exp_id': self.exp_id,
+            'state_name': 'End State',
+            'content_ids': '["content"]',
+            'target_language_code': 'invalid_language_code'
+        }, expected_status_int=400)
+
+    def test_handler_with_invalid_exploration_id_returns_not_found(self):
+        self.get_json('/machine_translated_state_texts_handler', params={
+            'exp_id': 'invalid_exploration_id',
+            'state_name': 'End State',
+            'content_ids': '["content"]',
+            'target_language_code': 'es'
+        }, expected_status_int=404)
+
+    def test_handler_with_invalid_state_name_returns_not_found(self):
+        self.get_json('/machine_translated_state_texts_handler', params={
+            'exp_id': self.exp_id,
+            'state_name': 'invalid_state_name',
+            'content_ids': '["content"]',
+            'target_language_code': 'es'
+        }, expected_status_int=404)
+
+    def test_handler_with_invalid_content_id_returns_not_found(self):
+        self.get_json('/machine_translated_state_texts_handler', params={
+            'exp_id': self.exp_id,
+            'state_name': 'End State',
+            'content_ids': '["invalid_content_id"]',
+            'target_language_code': 'es'
+        }, expected_status_int=404)
+
+    def test_handler_with_valid_input_returns_translation(self):
+        exp_services.update_exploration(
+            self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'Please continue.'
+                }
+            })], 'Changes content.')
+
+        output = self.get_json(
+            '/machine_translated_state_texts_handler',
+            params={
+                'exp_id': self.exp_id,
+                'state_name': 'Introduction',
+                'content_ids': '["content"]',
+                'target_language_code': 'es'
+            },
+            expected_status_int=200
+        )
+        expected_output = {
+            'translated_texts': {'content': 'Por favor continua.'}
         }
         self.assertEqual(output, expected_output)
 

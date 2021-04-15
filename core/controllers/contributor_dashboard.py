@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -25,6 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
+from core.domain import translation_services
 from core.domain import user_services
 import feconf
 import utils
@@ -258,6 +261,45 @@ class TranslatableTextHandler(base.BaseHandler):
         return any(
             s.change.state_name == state_name and
             s.change.content_id == content_id for s in suggestions)
+
+
+class MachineTranslatedTextHandler(base.BaseHandler):
+    """Provide a machine translation of exploration content."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        exp_id = self.request.get('exp_id')
+        state_name = self.request.get('state_name')
+        content_ids = json.loads(self.request.get('content_ids'))
+        target_language_code = self.request.get('target_language_code')
+
+        # TODO(#12341): Tidy up this logic once we have a canonical list of
+        # language codes.
+        if not utils.is_supported_audio_language_code(
+                target_language_code
+            ) and not utils.is_valid_language_code(
+                target_language_code
+            ):
+            raise self.InvalidInputException(
+                'Invalid target_language_code: %s' % target_language_code)
+
+        translated_texts = {}
+        for content_id in content_ids:
+            translated_text = (
+                translation_services.get_machine_translation_for_content_id(
+                    exp_id, state_name, content_id, target_language_code
+                )
+            )
+            if translated_text is not None:
+                translated_texts[content_id] = translated_text
+        if translated_texts:
+            self.values = {'translated_texts': translated_texts}
+            self.render_json(self.values)
+        else:
+            raise self.PageNotFoundException()
 
 
 class UserContributionRightsDataHandler(base.BaseHandler):

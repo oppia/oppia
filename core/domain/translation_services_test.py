@@ -83,7 +83,7 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 )
             )
 
-    def test_get_machine_translation_with_existing_translation_doesnt_call_cloud_translate_services(self):
+    def test_get_machine_translation_checks_datastore_first(self):
        with self.swap_to_always_raise(
             cloud_translate_services.CLIENT,
             'translate',
@@ -95,7 +95,8 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 'texto para traducir'
             )
 
-    def test_get_machine_translation_with_new_translation_creates_datastore_entry(self):
+    def test_get_machine_translation_with_new_translation_saves_translation(
+            self):
         translated_text = translation_services.get_machine_translation(
             'en', 'fr', 'hello world')
         self.assertEqual(translated_text, 'Bonjour le monde')
@@ -111,21 +112,21 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         )
         self.assertEqual(translated_text, 'Por favor continua.')
 
-    def test_machine_translation_for_content_id_with_invalid_exploration_id_returns_none(self):
+    def test_get_machine_translation_for_content_id_with_invalid_exploration_id_returns_none(self): # pylint: disable=line-too-long
         translated_text = (
             translation_services.get_machine_translation_for_content_id(
                 'invalid_exp_id', 'Introduction', 'content', 'es')
         )
         self.assertIsNone(translated_text)
 
-    def test_machine_translation_for_content_id_with_invalid_state_name_returns_none(self):
+    def test_get_machine_translation_for_content_id_with_invalid_state_name_returns_none(self): # pylint: disable=line-too-long
         translated_text = (
             translation_services.get_machine_translation_for_content_id(
                 self.exp_id, 'invalid_state_name', 'content', 'es')
         )
         self.assertIsNone(translated_text)
 
-    def test_machine_translation_for_content_id_with_invalid_content_id_returns_none(self):
+    def test_get_machine_translation_for_content_id_with_invalid_content_id_returns_none(self): # pylint: disable=line-too-long
         translated_text = (
             translation_services.get_machine_translation_for_content_id(
                 self.exp_id, 'Introduction', 'invalid_content_id', 'es')
