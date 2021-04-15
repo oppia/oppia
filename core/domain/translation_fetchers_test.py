@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import translation_domain
+from core.domain import translation_fetchers
 from core.platform import models
 from core.tests import test_utils
 
@@ -37,12 +38,22 @@ class TranslationFetchersTests(test_utils.GenericTestBase):
         model_instance = translation_models.MachineTranslatedTextModel.get(
             model_id)
         self.assertEqual(
-            translation_domain.MachineTranslatedText(
-                model_instance.source_language_code,
-                model_instance.target_language_code,
-                model_instance.origin_text,
-                model_instance.translated_text
-            ).to_dict(),
+            translation_fetchers.get_translation_from_model(
+                model_instance).to_dict(),
             translation_domain.MachineTranslatedText(
                 'en', 'es', 'hello world', 'hola mundo').to_dict()
         )
+
+    def test_get_translation_for_text_with_no_translation_returns_none(self):
+        translation = translation_fetchers.get_translation_for_text(
+            'en', 'es', 'untranslated_text')
+        self.assertIsNone(translation)
+
+    def test_get_translation_for_text_with_existing_translation(
+            self):
+        translation_models.MachineTranslatedTextModel.create(
+            'en', 'es', 'hello world', 'hola mundo')
+        translation = translation_fetchers.get_translation_for_text(
+            'en', 'es', 'hello world'
+        )
+        self.assertEqual(translation.translated_text, 'hola mundo')

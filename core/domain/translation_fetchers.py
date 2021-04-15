@@ -44,6 +44,7 @@ def get_translation_from_model(translation_model):
         translation_model.origin_text,
         translation_model.translated_text)
 
+
 def get_translation_for_text(
         source_language_code, target_language_code, origin_text):
     """Gets MachineTranslatedText by language codes and origin text.
@@ -64,4 +65,6 @@ def get_translation_for_text(
             source_language_code, target_language_code, origin_text
         )
     )
-    return return get_translation_from_model(translation_model)
+    if translation_model is None:
+        return None
+    return get_translation_from_model(translation_model)

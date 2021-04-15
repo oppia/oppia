@@ -123,7 +123,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
         hashed_origin_text = utils.convert_to_hash(origin_text, 50)
         instance_id = cls._generate_id(
             source_language_code, target_language_code, hashed_origin_text)
-        return cls.get(instance_id)
+        return cls.get(instance_id, strict=False)
 
     @staticmethod
     def get_deletion_policy():
