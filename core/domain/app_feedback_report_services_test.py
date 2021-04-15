@@ -98,7 +98,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             'entry_point': {
                 'entry_point_name': 'navigation_drawer'
             },
-            'text_size': 'larg_text_size',
+            'text_size': 'large_text_size',
             'text_language_code': 'en',
             'audio_language_code': 'en',
             'only_allows_wifi_download_and_update': True,

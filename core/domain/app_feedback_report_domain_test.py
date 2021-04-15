@@ -49,8 +49,8 @@ TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
 REPORT_TYPE_SUGGESTION = 'suggestion'
 REPORT_TYPE_ISSUE = 'issue'
-CATEGORY_SUGGESTION_OTHER = 'suggestion_other'
-CATEGORY_ISSUE_TOPICS = 'issue_topics'
+CATEGORY_SUGGESTION_OTHER = 'other_suggestion'
+CATEGORY_ISSUE_TOPICS = 'topics_issue'
 ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
 COUNTRY_LOCALE_CODE_INDIA = 'in'
 ANDROID_DEVICE_MODEL = 'Pixel 4a'

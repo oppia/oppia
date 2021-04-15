@@ -54,7 +54,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
     REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'suggestion_other'
+    CATEGORY_OTHER = 'other_suggestion'
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
@@ -550,7 +550,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
     REPORT_IDS_LIST = [REPORT_ID]
     TICKET_NAME = 'example ticket name'
     REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'suggestion_other'
+    CATEGORY_OTHER = 'other_suggestion'
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'

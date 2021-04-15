@@ -44,11 +44,11 @@ STATS_ID_DELIMITER = ':'
 
 ReportType = utils.create_enum('suggestion', 'issue', 'crash')
 Category = utils.create_enum(
-    'suggestion_new_feature', 'suggestion_new_language', 'suggestion_other',
-    'issue_lesson_question', 'issue_language_general', 'issue_language_audio',
-    'issue_language_text', 'issue_topics', 'issue_profile', 'issue_other',
-    'crash_lesson_player', 'crash_practice_questions', 'crash_options_page',
-    'crash_profile_page', 'crash_other')
+    'feature_suggestion', 'language_suggestion', 'other_suggestion',
+    'lesson_question_issue', 'language_general_issue', 'language_audio_issue',
+    'language_text_issue', 'topics_issue', 'profile_issue', 'other_issue',
+    'lesson_player_crash', 'practice_questions_crash', 'options_page_crash',
+    'profile_page_crash', 'other_crash')
 EntryPoint = utils.create_enum(
     'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
 StatsParameterNames = utils.create_enum(
@@ -73,21 +73,21 @@ AndroidNetworkTypes = utils.create_enum('wifi', 'cellular', 'none')
 ALLOWED_REPORT_TYPES = [
     ReportType.suggestion, ReportType.issue, ReportType.crash]
 ALLOWED_CATEGORIES = [
-    Category.suggestion_new_feature, Category.suggestion_new_language,
-    Category.suggestion_other, Category.issue_language_general,
-    Category.issue_language_audio, Category.issue_language_text,
-    Category.issue_topics, Category.issue_profile, Category.issue_other,
-    Category.crash_lesson_player, Category.crash_practice_questions,
-    Category.crash_options_page, Category.crash_profile_page,
-    Category.crash_other]
+    Category.feature_suggestion, Category.language_suggestion,
+    Category.other_suggestion, Category.language_general_issue,
+    Category.language_audio_issue, Category.language_text_issue,
+    Category.topics_issue, Category.profile_issue, Category.other_issue,
+    Category.lesson_player_crash, Category.practice_questions_crash,
+    Category.options_page_crash, Category.profile_issue_page_crash,
+    Category.other_crash]
 ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
-    Category.suggestion_other, Category.issue_other,
-    Category.crash_lesson_player, Category.crash_practice_questions,
-    Category.crash_options_page, Category.crash_profile_page,
-    Category.crash_other]
+    Category.other_suggestion, Category.other_issue,
+    Category.lesson_player_crash, Category.practice_questions_crash,
+    Category.options_page_crash, Category.profile_issue_page_crash,
+    Category.other_crash]
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
-    Category.issue_language_audio, Category.issue_language_text,
-    Category.issue_topics, Category.issue_profile, Category.issue_other]
+    Category.language_audio_issue, Category.language_text_issue,
+    Category.topics_issue, Category.profile_issue]
 ALLOWED_STATS_PARAMETERS = [
     StatsParameterNames.report_type,
     StatsParameterNames.country_locale_code,
