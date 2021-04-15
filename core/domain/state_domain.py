@@ -2732,7 +2732,6 @@ class State(python_utils.OBJECT):
         Args:
             linked_skill_id: str. The linked skill id to state.
         """
-
         self.linked_skill_id = linked_skill_id
 
     def update_interaction_customization_args(self, customization_args_dict):

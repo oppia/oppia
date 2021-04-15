@@ -114,12 +114,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-
-        for change in draft_change_list:
-            if (change.property_name ==
-                    exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod

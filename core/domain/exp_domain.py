@@ -1697,7 +1697,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v43_dict_to_v44_dict(cls, states_dict):
         """Converts from version 43 to 44. Version 44 contains
-        linked skil id.
+        linked skill id.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,

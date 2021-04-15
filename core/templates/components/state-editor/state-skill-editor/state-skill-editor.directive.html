@@ -14,14 +14,14 @@
       <div ng-if="!StateSkillService.displayed">
         <button type="button"
                 class="btn btn-secondary oppia-add-skill-button protractor-test-open-add-skill-modal"
-                ng-click="addSkillModal()">
+                ng-click="addSkillModalAsync()">
           + ADD SKILL
         </button>
       </div>
       <div ng-if="StateSkillService.displayed">
         <button type="button"
                 class="btn btn-secondary oppia-change-skill-button protractor-test-open-add-skill-modal"
-                ng-click="addSkillModal()">
+                ng-click="addSkillModalAsync()">
           CHANGE SKILL
         </button>
         <div class="skill-description-card" ng-if="StateSkillService.displayed">

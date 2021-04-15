@@ -31,7 +31,7 @@ import { UtilsService } from 'services/utils.service';
 export class StateSkillService extends StatePropertyService<string> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
-    this.setterMethodKey = 'saveLinkedSkill';
+    this.setterMethodKey = 'saveLinkedSkillId';
   }
 }
 

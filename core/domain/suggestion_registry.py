@@ -895,7 +895,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         return []
 
     def convert_html_in_suggestion_change(self, conversion_fn):
-        """Checks for HTML fields in the suggestion change  and converts it
+        """Checks for HTML fields in the suggestion change and converts it
         according to the conversion function.
 
         Args:
@@ -911,7 +911,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                         'question_state_data_schema_version'] < 38),
                 state_uses_old_rule_template_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 44)
+                        'question_state_data_schema_version'] < 43)
             )
         )
 
