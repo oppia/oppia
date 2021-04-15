@@ -61,7 +61,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'other'
+    CATEGORY_OTHER = 'other_suggestion'
     ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'

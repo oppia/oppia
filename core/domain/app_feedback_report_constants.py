@@ -41,6 +41,7 @@ TIMEZONE_MAXIMUM_OFFSET = 14
 REPORT_ID_DELIMITER = '.'
 TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
+ANDROID_VERSION_NAME_DELIMITER = '-'
 
 ReportType = utils.create_enum('suggestion', 'issue', 'crash')
 Category = utils.create_enum(
@@ -60,16 +61,14 @@ FilterFieldNames = utils.create_enum(
     'android_device_model', 'android_sdk_version', 'text_language_code',
     'audio_language_code', 'platform_version',
     'android_device_country_locale_code')
-
 AndroidTextSize = utils.create_enum(
     'text_size_unspecified', 'small_text_size', 'medium_text_size',
     'large_text_size', 'extra_large_text_size')
+AndroidNetworkTypes = utils.create_enum('wifi', 'cellular', 'none')
+
 ANDROID_ENTRY_POINT = [
     EntryPoint.navigation_drawer, EntryPoint.lesson_player,
     EntryPoint.revision_card, EntryPoint.crash]
-ANDROID_VERSION_NAME_DELIMITER = '-'
-AndroidNetworkTypes = utils.create_enum('wifi', 'cellular', 'none')
-
 ALLOWED_REPORT_TYPES = [
     ReportType.suggestion, ReportType.issue, ReportType.crash]
 ALLOWED_CATEGORIES = [
@@ -78,12 +77,13 @@ ALLOWED_CATEGORIES = [
     Category.language_audio_issue, Category.language_text_issue,
     Category.topics_issue, Category.profile_issue, Category.other_issue,
     Category.lesson_player_crash, Category.practice_questions_crash,
-    Category.options_page_crash, Category.profile_issue_page_crash,
+    Category.options_page_crash, Category.profile_page_crash,
     Category.other_crash]
 ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
+    Category.feature_suggestion, Category.language_suggestion,
     Category.other_suggestion, Category.other_issue,
     Category.lesson_player_crash, Category.practice_questions_crash,
-    Category.options_page_crash, Category.profile_issue_page_crash,
+    Category.options_page_crash, Category.profile_page_crash,
     Category.other_crash]
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
     Category.language_audio_issue, Category.language_text_issue,
