@@ -20,7 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
-from core.domain import translation_domain
+from core.domain import translation_fetchers
 from core.platform import models
 from core.platform.cloud_translate import cloud_translate_services
 
@@ -44,10 +44,7 @@ class MachineTranslatedTextModelValidator(
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return translation_domain.MachineTranslatedText(
-            item.source_language_code, item.target_language_code,
-            item.origin_text, item.translated_text
-        )
+        return translation_fetchers.get_translation_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

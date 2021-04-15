@@ -14,33 +14,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for machine translation models validators."""
+"""Functions for converting translation models into domain objects."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import prod_validation_jobs_one_off
+from core.domain import translation_domain
 from core.platform import models
-from core.tests import test_utils
-
-datastore_services = models.Registry.import_datastore_services()
 
 (translation_models,) = models.Registry.import_models([
     models.NAMES.translation])
 
 
-class MachineTranslationModelValidatorTests(test_utils.AuditJobsTestBase):
+def get_translation_from_model(translation_model):
+    """Returns a MachineTranslatedText object given a
+    MachineTranslatedTextModel loaded from the datastore.
 
-    def setUp(self):
-        super(MachineTranslationModelValidatorTests, self).setUp()
-        translation_models.MachineTranslatedTextModel.create(
-            'en', 'es', 'hello world', 'hola mundo')
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .MachineTranslatedTextModelAuditOneOffJob)
+    Args:
+        translation_model: MachineTranslatedTextModel. The
+            MachineTranslatedTextModel loaded from the datastore.
 
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated MachineTranslatedTextModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+    Returns:
+        MachineTranslatedText. A MachineTranslatedText object corresponding to
+        the given MachineTranslatedTextModel.
+    """
+    return translation_domain.MachineTranslatedText(
+        translation_model.source_language_code,
+        translation_model.target_language_code,
+        translation_model.origin_text,
+        translation_model.translated_text)

@@ -14,33 +14,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for machine translation models validators."""
+"""Tests for translation fetchers."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import prod_validation_jobs_one_off
+from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
-
-datastore_services = models.Registry.import_datastore_services()
 
 (translation_models,) = models.Registry.import_models([
     models.NAMES.translation])
 
 
-class MachineTranslationModelValidatorTests(test_utils.AuditJobsTestBase):
+class TranslationFetchersTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(MachineTranslationModelValidatorTests, self).setUp()
-        translation_models.MachineTranslatedTextModel.create(
-            'en', 'es', 'hello world', 'hola mundo')
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .MachineTranslatedTextModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated MachineTranslatedTextModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+    def test_get_translation_from_model(self):
+        model_id = (
+            translation_models.MachineTranslatedTextModel.create(
+                'en', 'es', 'hello world', 'hola mundo')
+        )
+        model_instance = translation_models.MachineTranslatedTextModel.get(
+            model_id)
+        self.assertEqual(
+            translation_domain.MachineTranslatedText(
+                model_instance.source_language_code,
+                model_instance.target_language_code,
+                model_instance.origin_text,
+                model_instance.translated_text
+            ).to_dict(),
+            translation_domain.MachineTranslatedText(
+                'en', 'es', 'hello world', 'hola mundo').to_dict()
+        )
