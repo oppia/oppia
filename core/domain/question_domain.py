@@ -1039,10 +1039,12 @@ class Question(python_utils.OBJECT):
         MathEquationInput. The customization arg will allow creators to choose
         whether to render the division sign (÷) instead of a fraction for the
         division operation.
+
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initialize a State domain object.
+
         Returns:
             dict. The converted question_state_dict.
         """
@@ -1064,9 +1066,11 @@ class Question(python_utils.OBJECT):
         """Converts from version 43 to version 44. Version 44 adds
         card_is_checkpoint boolean to the state, which allows creators to
         mark a state as a checkpoint for the learners
+
         Args:
             question_state_dict: dict. A dict representation of
-                question_state_data
+                question_state_data.
+
         Returns:
             dict. The converted question_state_dict.
         """

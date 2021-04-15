@@ -1744,10 +1744,12 @@ class Exploration(python_utils.OBJECT):
         MathEquationInput. The customization arg will allow creators to choose
         whether to render the division sign (÷) instead of a fraction for the
         division operation.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -1772,18 +1774,19 @@ class Exploration(python_utils.OBJECT):
         """Converts from version 43 to version 44. Version 44 adds
         card_is_checkpoint boolean to the state, which allows creators to
         mark a state as a checkpoint for the learners
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initalize a
                 State domain object.
+            init_state_name: str. Name of the first state
+
         Returns:
             dict. The converted states_dict.
         """
         for (state_name, state_dict) in states_dict.items():
-            if state_name == init_state_name:
-                state_dict['card_is_checkpoint'] = True
-            else:
-                state_dict['card_is_checkpoint'] = False
+            state_dict['card_is_checkpoint'] = bool(
+                state_name == init_state_name)
         return states_dict
 
 
@@ -1873,9 +1876,11 @@ class Exploration(python_utils.OBJECT):
         """Converts a v48 exploration dict into a v49 exploration dict.
         Adds card_is_checkpoint to mark a state as a checkpoint for the
         learners.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v48.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v49.

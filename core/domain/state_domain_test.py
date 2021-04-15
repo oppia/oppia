@@ -3596,7 +3596,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(init_state.solicit_answer_details, True)
 
     def test_validate_state_card_is_checkpoint(self):
-        """Test validation of card_is_checkpoint"""
+        """Test validation of card_is_checkpoint."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
