@@ -23,7 +23,6 @@ import datetime
 
 from core.domain import base_model_validators
 from core.platform import models
-import feconf
 
 (
     base_models, email_models, feedback_models,

@@ -592,13 +592,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
-        # Setup for GeneralFeedbackReplyToId.
-        user_two_fake_hash_lambda_one = (
-            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_1)
-
-        user_two_deterministic_hash_lambda_two = (
-            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_2)
-
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_1_id',
             target_type='exploration',
