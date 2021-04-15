@@ -967,7 +967,7 @@ class Exploration(python_utils.OBJECT):
         if not self.states[self.init_state_name].card_is_checkpoint:
             raise utils.ValidationError(
                 'Expected card_is_checkpoint of first state to be True'
-                'but found it to be %s'
+                ' but found it to be %s'
                 % self.states[self.init_state_name].card_is_checkpoint
             )
 
@@ -1744,12 +1744,10 @@ class Exploration(python_utils.OBJECT):
         MathEquationInput. The customization arg will allow creators to choose
         whether to render the division sign (÷) instead of a fraction for the
         division operation.
-
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-
         Returns:
             dict. The converted states_dict.
         """
@@ -1768,6 +1766,26 @@ class Exploration(python_utils.OBJECT):
             })
 
         return states_dict
+
+    @classmethod
+    def _convert_states_v43_dict_to_v44_dict(cls, states_dict, init_state_name):
+        """Converts from version 43 to version 44. Version 44 adds
+        card_is_checkpoint boolean to the state, which allows creators to
+        mark a state as a checkpoint for the learners
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+        Returns:
+            dict. The converted states_dict.
+        """
+        for (state_name, state_dict) in states_dict.items():
+            if state_name == init_state_name:
+                state_dict['card_is_checkpoint'] = True
+            else:
+                state_dict['card_is_checkpoint'] = False
+        return states_dict
+
 
     @classmethod
     def update_states_from_model(
@@ -1800,7 +1818,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 48
+    CURRENT_EXP_SCHEMA_VERSION = 49
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1851,6 +1869,25 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v48_dict_to_v49_dict(cls, exploration_dict):
+        """Converts a v48 exploration dict into a v49 exploration dict.
+        Adds card_is_checkpoint to mark a state as a checkpoint for the
+        learners.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v48.
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v49.
+        """
+        exploration_dict['schema_version'] = 49
+        exploration_dict['states'] = cls._convert_states_v43_dict_to_v44_dict(
+            exploration_dict['states'], exploration_dict['init_state_name'])
+        exploration_dict['states_schema_version'] = 44
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -1890,15 +1927,16 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
                 exploration_dict)
             exploration_schema_version = 47
-        if exploration_schema_version == 47:
-            exploration_dict = cls._convert_v47_dict_to_v48_dict(
-                exploration_dict)
-            exploration_schema_version = 48
 
         if exploration_schema_version == 47:
             exploration_dict = cls._convert_v47_dict_to_v48_dict(
                 exploration_dict)
             exploration_schema_version = 48
+
+        if exploration_schema_version == 48:
+            exploration_dict = cls._convert_v48_dict_to_v49_dict(
+                exploration_dict)
+            exploration_schema_version = 49
 
         return exploration_dict
 

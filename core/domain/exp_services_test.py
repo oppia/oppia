@@ -1359,6 +1359,7 @@ states:
             filename: %s
             needs_update: false
     solicit_answer_details: false
+    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         ca_placeholder_2: {}
@@ -1396,6 +1397,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1895,6 +1897,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
@@ -1935,6 +1938,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
@@ -1998,6 +2002,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
@@ -2038,6 +2043,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
@@ -2320,6 +2326,7 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
+card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -2364,6 +2371,7 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
+card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -2409,6 +2417,7 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
+card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -3066,6 +3075,39 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
+
+    def test_update_card_is_checkpoint(self):
+        """Test updating of card_is_checkpoint."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.card_is_checkpoint, True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                False),
+            '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.card_is_checkpoint, False)
+
+    def test_update_card_is_checkpoint_with_non_bool_fails(self):
+        """Test updating of card_is_checkpoint with non bool value."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.card_is_checkpoint, True)
+        with self.assertRaisesRegexp(
+            Exception, (
+                'Expected solicit_answer_details to be a bool, received ')):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID, _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                    'abc'),
+                '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.card_is_checkpoint, True)
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""

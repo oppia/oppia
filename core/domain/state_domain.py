@@ -3123,7 +3123,7 @@ class State(python_utils.OBJECT):
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
-            False, False, 0)
+            False, is_initial_state, 0)
 
     @classmethod
     def convert_html_fields_in_state(

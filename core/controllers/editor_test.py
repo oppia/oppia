@@ -304,6 +304,7 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
+card_is_checkpoint: false
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -345,6 +346,7 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
+card_is_checkpoint: false
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -386,6 +388,7 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
+card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -429,6 +432,7 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
+card_is_checkpoint: false
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
