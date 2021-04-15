@@ -31,7 +31,7 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
         model_id = translation_models.MachineTranslatedTextModel.create(
             source_language_code='en',
             target_language_code='es',
-            origin_text='hello world',
+            source_text='hello world',
             translated_text='hola mundo'
         )
         translation_model = (
@@ -43,7 +43,7 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
         model_id = translation_models.MachineTranslatedTextModel.create(
             source_language_code='en',
             target_language_code='en',
-            origin_text='hello world',
+            source_text='hello world',
             translated_text='hello world'
         )
         self.assertIsNone(model_id)
@@ -52,7 +52,7 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
         translation_models.MachineTranslatedTextModel.create(
             source_language_code='en',
             target_language_code='es',
-            origin_text='hello world',
+            source_text='hello world',
             translated_text='hola mundo'
         )
         translation = (
@@ -60,7 +60,7 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
             .get_translation_for_text(
                 source_language_code='en',
                 target_language_code='es',
-                origin_text='hello world',
+                source_text='hello world',
             )
         )
         self.assertIsNotNone(translation)
@@ -73,7 +73,7 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
             .get_translation_for_text(
                 source_language_code='en',
                 target_language_code='fr',
-                origin_text='hello world',
+                source_text='hello world',
             )
         )
         self.assertIsNone(translation)
@@ -97,9 +97,9 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
             {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'hashed_origin_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'hashed_source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'origin_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'source_language_code':
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'target_language_code':

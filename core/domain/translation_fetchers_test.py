@@ -40,7 +40,7 @@ class TranslationFetchersTests(test_utils.GenericTestBase):
             translation_domain.MachineTranslatedText(
                 model_instance.source_language_code,
                 model_instance.target_language_code,
-                model_instance.origin_text,
+                model_instance.source_text,
                 model_instance.translated_text
             ).to_dict(),
             translation_domain.MachineTranslatedText(

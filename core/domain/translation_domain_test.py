@@ -72,10 +72,20 @@ class MachineTranslatedTextTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_message):
             self.translation.validate()
 
-    def test_validate_with_non_string_origin_text_raises(self):
-        self.translation.origin_text = 3
+    def test_validate_with_same_source_target_language_codes_raises(self):
+        self.translation.target_language_code = 'en'
+        self.translation.source_language_code = 'en'
         expected_error_message = (
-            'Expected origin_text to be a string, received 3')
+            'Expected source_language_code to be different from '
+            'target_language_code: "en" = "en"')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            self.translation.validate()
+
+    def test_validate_with_non_string_source_text_raises(self):
+        self.translation.source_text = 3
+        expected_error_message = (
+            'Expected source_text to be a string, received 3')
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_message):
             self.translation.validate()
@@ -94,7 +104,7 @@ class MachineTranslatedTextTests(test_utils.GenericTestBase):
             {
                 'source_language_code': 'en',
                 'target_language_code': 'es',
-                'origin_text': 'hello world',
+                'source_text': 'hello world',
                 'translated_text': 'hola mundo'
             }
         )

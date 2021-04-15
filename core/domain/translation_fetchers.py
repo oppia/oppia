@@ -41,5 +41,5 @@ def get_translation_from_model(translation_model):
     return translation_domain.MachineTranslatedText(
         translation_model.source_language_code,
         translation_model.target_language_code,
-        translation_model.origin_text,
+        translation_model.source_text,
         translation_model.translated_text)
