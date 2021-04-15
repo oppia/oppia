@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import print_function  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import inspect
 import io
 import os
 import sys
@@ -76,7 +77,7 @@ def string_io(buffer_value=b''):
     return StringIO(buffer_value) # pylint: disable=disallowed-function-calls
 
 
-def get_args_of_function(function_node, args_to_ignore):
+def get_args_of_function_node(function_node, args_to_ignore):
     """Extracts the arguments from a function definition.
 
     Args:
@@ -137,9 +138,9 @@ def url_join(base_url, relative_url):
         str. The full URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urljoin(base_url, relative_url) # pylint: disable=disallowed-function-calls
 
 
@@ -154,9 +155,9 @@ def url_split(urlstring):
         tuple(str). The components of a URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlsplit(urlstring) # pylint: disable=disallowed-function-calls
 
 
@@ -173,9 +174,9 @@ def url_parse(urlstring):
         tuple(str). The components of a URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlparse(urlstring) # pylint: disable=disallowed-function-calls
 
 
@@ -191,9 +192,9 @@ def url_unsplit(url_parts):
         str. The complete URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlunsplit(url_parts) # pylint: disable=disallowed-function-calls
 
 
@@ -210,9 +211,9 @@ def parse_query_string(query_string):
         lists of values for each name.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.parse_qs(query_string) # pylint: disable=disallowed-function-calls
 
 
@@ -228,13 +229,10 @@ def urllib_unquote(content):
         str. The unquoted string.
     """
     try:
-        import urllib
-
-        return urllib.unquote(content) # pylint: disable=disallowed-function-calls
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse
-
-        return urllib.urlparse.unquote(content) # pylint: disable=disallowed-function-calls
+        import urllib as urlparse
+    return urlparse.unquote(content)
 
 
 def url_quote(content):
@@ -248,10 +246,10 @@ def url_quote(content):
         str. The quoted string.
     """
     try:
-        import urllib as urlparse_quote
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse as urlparse_quote
-    return urlparse_quote.quote(content)
+        import urllib as urlparse
+    return urlparse.quote(content)
 
 
 def url_unquote_plus(content):
@@ -266,13 +264,10 @@ def url_unquote_plus(content):
         str. The unquoted string.
     """
     try:
-        import urllib
-
-        return urllib.unquote_plus(content)
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse
-
-        return urllib.parse.unquote_plus(content)
+        import urllib as urlparse
+    return urlparse.unquote_plus(content)
 
 
 def url_encode(query, doseq=False):
@@ -289,10 +284,10 @@ def url_encode(query, doseq=False):
         str. The 'url-encoded' string.
     """
     try:
-        import urllib as urlparse_urlencode
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse as urlparse_urlencode
-    return urlparse_urlencode.urlencode(query, doseq)
+        import urllib as urlparse
+    return urlparse.urlencode(query, doseq)
 
 
 def url_retrieve(source_url, filename=None):
@@ -309,21 +304,17 @@ def url_retrieve(source_url, filename=None):
     """
     context = ssl.create_default_context(cafile=certifi.where())
     try:
-        import urllib
-
+        import urllib.request as urlrequest
+    except ImportError:
+        import urllib as urlrequest
         # Change the User-Agent to prevent servers from blocking requests.
         # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
-        urllib.URLopener.version = (
+        urlrequest.URLopener.version = (
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
             'Gecko/20100101 Firefox/47.0'
         )
-        return urllib.urlretrieve(
-            source_url, filename=filename, context=context)
-    except ImportError:
-        import urllib.request
-
-        return urllib.request.urlretrieve(
-            source_url, filename=filename, context=context)
+    return urlrequest.urlretrieve(
+        source_url, filename=filename, context=context)
 
 
 def url_open(source_url):
@@ -339,13 +330,10 @@ def url_open(source_url):
     """
     context = ssl.create_default_context(cafile=certifi.where())
     try:
-        import urllib2
-
-        return urllib2.urlopen(source_url, context=context)
+        import urllib.request as urlrequest
     except ImportError:
-        import urllib.request
-
-        return urllib.request.urlopen(source_url, context=context)
+        import urllib2 as urlrequest
+    return urlrequest.urlopen(source_url, context=context)
 
 
 def url_request(source_url, data, headers):
@@ -362,13 +350,10 @@ def url_request(source_url, data, headers):
         Request. The 'Request' object.
     """
     try:
-        import urllib2
-
-        return urllib2.Request(source_url, data, headers)
+        import urllib.request as urlrequest
     except ImportError:
-        import urllib.request
-
-        return urllib.request.Request(source_url)
+        import urllib2 as urlrequest
+    return urlrequest.Request(source_url, data, headers)
 
 
 def divide(number1, number2):
@@ -385,13 +370,12 @@ def divide(number1, number2):
     return past.utils.old_div(number1, number2)
 
 
-def with_metaclass(class1, class2):
-    """This function makes a dummy metaclass for one level of class
-    instantiation that replaces itself with the actual metaclass.
+def with_metaclass(meta, *bases):
+    """Python 2 & 3 helper for installing metaclasses.
 
-    Use it like this::
+    Example:
 
-        class BaseForm():
+        class BaseForm(python_utils.OBJECT):
             pass
 
         class FormType(type):
@@ -401,13 +385,18 @@ def with_metaclass(class1, class2):
             pass
 
     Args:
-        class1: class. The metaclass.
-        class2: class. The baseclass.
+        meta: type. The metaclass to install on the derived class.
+        *bases: tuple(class). The base classes to install on the derived class.
+            When empty, `object` will be the sole base class.
 
     Returns:
-        class. The base class with a metaclass.
+        class. A proxy class that mutates the classes which inherit from it to
+        install the input meta class and inherit from the input base classes.
+        The proxy class itself does not actually become one of the base classes.
     """
-    return future.utils.with_metaclass(class1, class2)
+    if not bases:
+        bases = (OBJECT,)
+    return future.utils.with_metaclass(meta, *bases)
 
 
 def convert_to_bytes(string_to_convert):
@@ -487,3 +476,24 @@ def reraise_exception():
 def is_string(value):
     """Returns whether value has a string type."""
     return isinstance(value, six.string_types)
+
+
+def get_args_of_function(func):
+    """Returns the argument names of the function.
+
+    Args:
+        func: function. The function to inspect.
+
+    Returns:
+        list(str). The names of the function's arguments.
+
+    Raises:
+        TypeError. The input argument is not a function.
+    """
+    try:
+        # Python 3.
+        return [p.name for p in inspect.signature(func).parameters
+                if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
+    except AttributeError:
+        # Python 2.
+        return inspect.getargspec(func).args

@@ -33,7 +33,7 @@ import re
 
 from core.platform import models
 import feconf
-from jobs import jobs_utils
+from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
 
@@ -41,14 +41,15 @@ import apache_beam as beam
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
 
 class ValidateDeletedModel(beam.DoFn):
     """DoFn to check whether models marked for deletion are stale.
 
-    Deleted models do not use a decorator for registration. This DoFn must be
-    called explicitly by runners.
+    Doesn't use the AuditsExisting decorator because it audits deleted models,
+    not existing ones.
     """
 
     def process(self, input_model):
@@ -60,7 +61,7 @@ class ValidateDeletedModel(beam.DoFn):
         Yields:
             ModelExpiredError. An error class for expired models.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
 
         expiration_date = (
             datetime.datetime.utcnow() -
@@ -74,12 +75,20 @@ class ValidateDeletedModel(beam.DoFn):
 class ValidateBaseModelId(beam.DoFn):
     """DoFn to validate model ids.
 
-    Models with special ID checks should derive from this class and override the
-    MODEL_ID_REGEX attribute or the entire process() method, then decorate it to
-    target the appropriate model(s).
+    IMPORTANT: Models with special ID checks should derive from this class and
+    override __init__() to assign a different value to self._regex, or replace
+    the process() method entirely. Be sure to decorate the new class with that
+    specific model type.
     """
 
-    MODEL_ID_REGEX = re.compile('^[A-Za-z0-9-_]{1,%s}$')
+    def __init__(self):
+        super(ValidateBaseModelId, self).__init__()
+        # IMPORTANT: Only picklable objects can be stored on DoFns! This is
+        # because DoFns are serialized with pickle when run on a pipeline (and
+        # might be run on many different machines). Any other types assigned to
+        # self, like compiled re patterns, ARE LOST AFTER DESERIALIZATION!
+        # https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled
+        self._pattern = BASE_MODEL_ID_PATTERN
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
@@ -91,11 +100,10 @@ class ValidateBaseModelId(beam.DoFn):
         Yields:
             ModelIdRegexError. An error class for models with invalid IDs.
         """
-        model = jobs_utils.clone_model(input_model)
-        regex = self.MODEL_ID_REGEX
+        model = job_utils.clone_model(input_model)
 
-        if not regex.match(model.id):
-            yield audit_errors.ModelIdRegexError(model, regex.pattern)
+        if not re.match(self._pattern, model.id):
+            yield audit_errors.ModelIdRegexError(model, self._pattern)
 
 
 @audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
@@ -115,7 +123,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
         Yields:
             ModelInvalidCommitStatus. Error for commit_type validation.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
 
         expected_post_commit_is_private = (
             model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
@@ -125,8 +133,7 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
 
 @audit_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelTimestamps(beam.DoFn):
-    """DoFn to check whether created_on and last_updated timestamps are
-    valid.
+    """DoFn to check whether created_on and last_updated timestamps are valid.
     """
 
     def process(self, input_model):
@@ -141,7 +148,7 @@ class ValidateModelTimestamps(beam.DoFn):
             InconsistentTimestampsError. Error for models with inconsistent
             timestamps.
         """
-        model = jobs_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model)
         if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
             yield audit_errors.InconsistentTimestampsError(model)
 

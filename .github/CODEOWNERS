@@ -472,6 +472,7 @@
 /core/templates/pages/logout-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
+/core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
