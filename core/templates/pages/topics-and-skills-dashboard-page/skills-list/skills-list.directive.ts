@@ -27,7 +27,7 @@ require(
   'delete-skill-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
-  'topic-selector.directive.ts');
+  'select-topics.component.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
@@ -40,9 +40,6 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'skills-list/unassign-skill-from-topics-modal.controller.ts');
-require(
-  'pages/topics-and-skills-dashboard-page/topic-selector/' +
-  'topic-selector.directive.ts');
 require('services/alerts.service.ts');
 
 require(

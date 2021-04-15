@@ -142,19 +142,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
-        'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
-        'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
-                   'or \'fdescribe\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(iit|fit)\('),
-        'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
         'message': 'In tests, please use \'angular.mock.inject\' instead of '
                    '\'inject\'',
@@ -430,12 +417,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'object\):'),
         'message': 'Please use python_utils.OBJECT.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'__metaclass__'),
-        'message': 'Please use python_utils.with_metaclass().',
         'excluded_files': (),
         'excluded_dirs': ()
     },

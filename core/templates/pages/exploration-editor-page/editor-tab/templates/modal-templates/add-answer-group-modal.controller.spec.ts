@@ -28,6 +28,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
 describe('Add Answer Group Modal Controller', function() {
   importAllAngularServices();
@@ -44,7 +46,6 @@ describe('Add Answer Group Modal Controller', function() {
   var currentInteractionId = 'Continue';
   var existingContentIds = [];
   var stateName = 'State Name';
-
   var testSubscriptions: Subscription;
 
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
@@ -110,7 +111,8 @@ describe('Add Answer Group Modal Controller', function() {
     $scope.updateAnswerGroupFeedback({
       feedback: feedback
     });
-
+    const eventBusGroup = new EventBusGroup(TestBed.inject(EventBusService));
+    eventBusGroup.emit(new ObjectFormValidityChangeEvent({value: true}));
     expect($scope.feedbackEditorIsOpen).toBe(true);
     expect($scope.tmpOutcome.feedback).toBe(feedback);
   });

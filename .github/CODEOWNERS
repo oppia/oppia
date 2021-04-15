@@ -82,6 +82,10 @@
 /buf.gen.yaml @oppia/ml
 
 
+# App Feedback Reporting project
+/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
+
+
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep
@@ -437,11 +441,7 @@
 
 
 # Infrastructure.
-/jobs/__init__.py @brianrodri
-/jobs/base_model_*.py @brianrodri
-/jobs/jobs_utils.py @brianrodri
-/jobs/jobs_test_utils.py @brianrodri
-/jobs/jobs_utils_test.py @brianrodri
+/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -472,6 +472,7 @@
 /core/templates/pages/logout-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
+/core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
