@@ -42,7 +42,7 @@ class MockStoryEditorNavigationService {
     return;
   };
 }
-fdescribe('Story Preview tab', () => {
+describe('Story Preview tab', () => {
   let component: StoryPreviewTabComponent;
   let fixture: ComponentFixture<StoryPreviewTabComponent>;
   let story: Story = null;
