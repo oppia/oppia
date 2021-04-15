@@ -164,7 +164,7 @@
                                                [get-thumbnail-icon-url]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_icon_url"
                                                [get-thumbnail-bg-color]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_bg_color"
                                                [show-learner-dashboard-icons-if-possible]="true"
-                                         [is-container-narrow]="true">
+                                               [is-container-narrow]="true">
                 </oppia-collection-summary-tile>
                 <oppia-exploration-summary-tile ng-if="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].activity_type == 'exploration'"
                                                 [get-exploration-id]="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].id"
