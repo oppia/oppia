@@ -21,7 +21,7 @@ import { EventEmitter, Pipe } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryPreviewTabComponent } from './story-preview-tab.component';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 
@@ -42,12 +42,12 @@ class MockStoryEditorNavigationService {
     return;
   };
 }
-describe('Story Preview tab', () => {
+fdescribe('Story Preview tab', () => {
   let component: StoryPreviewTabComponent;
   let fixture: ComponentFixture<StoryPreviewTabComponent>;
-  let story = null;
-  let storyInitializedEventEmitter = null;
-  let storyReinitializedEventEmitter = null;
+  let story: Story = null;
+  let storyInitializedEventEmitter: EventEmitter<void> = null;
+  let storyReinitializedEventEmitter: EventEmitter<void> = null;
   let storyObjectFactory = null;
   let storyEditorStateService: StoryEditorStateService;
   beforeEach(() => {
