@@ -442,7 +442,7 @@ def get_chrome_driver_version():
         ]
     try:
         proc = subprocess.Popen(popen_args, stdout=subprocess.PIPE)
-        output = proc.stdout.readline()
+        output = str(proc.stdout.readline())
     except OSError:
         # For the error message for the mac command, we need to add the
         # backslashes in. This is because it is likely that a user will try to
