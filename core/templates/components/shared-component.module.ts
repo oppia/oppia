@@ -71,7 +71,6 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { SkillDescriptionEditorComponent } from 'pages/skill-editor-page/editor-tab/skill-description-editor/skill-description-editor.component';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 
@@ -124,7 +123,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
-    SkillDescriptionEditorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
@@ -153,7 +151,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SkillDescriptionEditorComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
@@ -179,7 +176,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ImageUploaderComponent,
     OnScreenKeyboardComponent,
     SharingLinksComponent,
-    SkillDescriptionEditorComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
