@@ -138,9 +138,9 @@ def url_join(base_url, relative_url):
         str. The full URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urljoin(base_url, relative_url) # pylint: disable=disallowed-function-calls
 
 
@@ -155,9 +155,9 @@ def url_split(urlstring):
         tuple(str). The components of a URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlsplit(urlstring) # pylint: disable=disallowed-function-calls
 
 
@@ -174,9 +174,9 @@ def url_parse(urlstring):
         tuple(str). The components of a URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlparse(urlstring) # pylint: disable=disallowed-function-calls
 
 
@@ -192,9 +192,9 @@ def url_unsplit(url_parts):
         str. The complete URL.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.urlunsplit(url_parts) # pylint: disable=disallowed-function-calls
 
 
@@ -211,9 +211,9 @@ def parse_query_string(query_string):
         lists of values for each name.
     """
     try:
-        import urlparse
-    except ImportError:
         import urllib.parse as urlparse
+    except ImportError:
+        import urlparse
     return urlparse.parse_qs(query_string) # pylint: disable=disallowed-function-calls
 
 
@@ -229,13 +229,10 @@ def urllib_unquote(content):
         str. The unquoted string.
     """
     try:
-        import urllib
-
-        return urllib.unquote(content) # pylint: disable=disallowed-function-calls
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse
-
-        return urllib.urlparse.unquote(content) # pylint: disable=disallowed-function-calls
+        import urllib as urlparse
+    return urlparse.unquote(content)
 
 
 def url_quote(content):
@@ -249,10 +246,10 @@ def url_quote(content):
         str. The quoted string.
     """
     try:
-        import urllib as urlparse_quote
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse as urlparse_quote
-    return urlparse_quote.quote(content)
+        import urllib as urlparse
+    return urlparse.quote(content)
 
 
 def url_unquote_plus(content):
@@ -267,13 +264,10 @@ def url_unquote_plus(content):
         str. The unquoted string.
     """
     try:
-        import urllib
-
-        return urllib.unquote_plus(content)
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse
-
-        return urllib.parse.unquote_plus(content)
+        import urllib as urlparse
+    return urlparse.unquote_plus(content)
 
 
 def url_encode(query, doseq=False):
@@ -290,10 +284,10 @@ def url_encode(query, doseq=False):
         str. The 'url-encoded' string.
     """
     try:
-        import urllib as urlparse_urlencode
+        import urllib.parse as urlparse
     except ImportError:
-        import urllib.parse as urlparse_urlencode
-    return urlparse_urlencode.urlencode(query, doseq)
+        import urllib as urlparse
+    return urlparse.urlencode(query, doseq)
 
 
 def url_retrieve(source_url, filename=None):
@@ -310,21 +304,17 @@ def url_retrieve(source_url, filename=None):
     """
     context = ssl.create_default_context(cafile=certifi.where())
     try:
-        import urllib
-
+        import urllib.request as urlrequest
+    except ImportError:
+        import urllib as urlrequest
         # Change the User-Agent to prevent servers from blocking requests.
         # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
-        urllib.URLopener.version = (
+        urlrequest.URLopener.version = (
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
             'Gecko/20100101 Firefox/47.0'
         )
-        return urllib.urlretrieve(
-            source_url, filename=filename, context=context)
-    except ImportError:
-        import urllib.request
-
-        return urllib.request.urlretrieve(
-            source_url, filename=filename, context=context)
+    return urlrequest.urlretrieve(
+        source_url, filename=filename, context=context)
 
 
 def url_open(source_url):
@@ -340,13 +330,10 @@ def url_open(source_url):
     """
     context = ssl.create_default_context(cafile=certifi.where())
     try:
-        import urllib2
-
-        return urllib2.urlopen(source_url, context=context)
+        import urllib.request as urlrequest
     except ImportError:
-        import urllib.request
-
-        return urllib.request.urlopen(source_url, context=context)
+        import urllib2 as urlrequest
+    return urlrequest.urlopen(source_url, context=context)
 
 
 def url_request(source_url, data, headers):
@@ -363,13 +350,10 @@ def url_request(source_url, data, headers):
         Request. The 'Request' object.
     """
     try:
-        import urllib2
-
-        return urllib2.Request(source_url, data, headers)
+        import urllib.request as urlrequest
     except ImportError:
-        import urllib.request
-
-        return urllib.request.Request(source_url)
+        import urllib2 as urlrequest
+    return urlrequest.Request(source_url, data, headers)
 
 
 def divide(number1, number2):
