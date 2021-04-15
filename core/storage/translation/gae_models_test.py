@@ -28,7 +28,6 @@ from core.tests import test_utils
 
 class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
     def test_create_model(self):
-
         translation_models.MachineTranslatedTextModel.create(
             source_language_code='en',
             target_language_code='es',

@@ -24,14 +24,14 @@ from core.tests import test_utils
 import utils
 
 
-class MachineTranslatedTextTests(test_utils.GenericTestBase):
+class MachineTranslatedTextsTests(test_utils.GenericTestBase):
     """Tests for the MachineTranslatedTexts domain object."""
 
     translation = None
 
     def setup(self):
         """Setup for MachineTranslatedTexts domain object tests."""
-        super(MachineTranslatedTextTests, self).setUp()
+        super(MachineTranslatedTextsTests, self).setUp()
         self._init_translation()
 
     def _init_translation(self):

@@ -32,7 +32,9 @@ class MachineTranslatedTextModel(base_models.BaseModel):
     """Model for storing machine translations. Model instances have a key
     generated from the source and target language codes, followed by a sha-1
     hash of the origin text formated as follows:
-        '[source_language_code]:[target_language_code]:[hashed_origin_text]'
+
+        [source_language_code]:[target_language_code]:[hashed_origin_text]
+
     See MachineTranslatedTextModel._generate_id() below for details."""
 
     # The untranslated text.
@@ -65,11 +67,8 @@ class MachineTranslatedTextModel(base_models.BaseModel):
             translated_text: str. The translation.
 
         Returns:
-            MachineTranslatedTextModel. The newly created
-            MachineTranslatedTextModel instance.
+            str. The id of the newly created MachineTranslatedTextInstance.
         """
-        # max_length is 450, less than maximum key length (500) to allow room
-        # for language_codes.
         hashed_origin_text = utils.convert_to_hash(origin_text, 50)
         entity_id = cls._generate_id(
             source_language_code, target_language_code, hashed_origin_text)
@@ -87,8 +86,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
     def _generate_id(
             cls, source_language_code, target_language_code,
             hashed_origin_text):
-        """Generates a key for the instance of MachineTranslatedTextModel
-        class in the required format with the arguments provided.
+        """Generates a valid key for a MachineTranslatedTextModel.
 
         Args:
             source_language_code: str. The language code of the untranslated
@@ -98,6 +96,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
 
         Returns:
             str. The generated ID for this entity of the form
+
             [source_language_code]:[target_language_code]:[hashed_origin_text].
         """
 
@@ -133,7 +132,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model does not contain user data."""
+        """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod

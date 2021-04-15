@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for machine translations retrieved from Google Cloud
-Translate."""
+"""Domain objects related to translations."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -53,7 +52,6 @@ class MachineTranslatedText(python_utils.OBJECT):
             ValidationError. One or more attributes of the MachineTranslatedText
                 are invalid.
         """
-        # validate source_language_code.
         if not isinstance(self.source_language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected source_language_code to be a string, received %s' %
@@ -69,7 +67,6 @@ class MachineTranslatedText(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid source language code: %s' % self.source_language_code)
 
-        # validate target_language_code.
         if not isinstance(self.target_language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected target_language_code to be a string, received %s' %
@@ -85,14 +82,12 @@ class MachineTranslatedText(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid target language code: %s' % self.target_language_code)
 
-        # validate origin_text.
         if not isinstance(self.origin_text, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected origin_text to be a string, received %s' %
                 self.origin_text
             )
 
-        # validate translated_text.
         if not isinstance(self.translated_text, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected translated_text to be a string, received %s' %
@@ -100,7 +95,7 @@ class MachineTranslatedText(python_utils.OBJECT):
             )
 
     def to_dict(self):
-        """Convert the MachineTranslatedText domain instance into a dictionary
+        """Converts the MachineTranslatedText domain instance into a dictionary
         form with its keys as the attributes of this class.
 
         Returns:
