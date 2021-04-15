@@ -100,23 +100,18 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           }
 
           ctrl.onKeypress = function(evt) {
-            if (evt.which === 38 || evt.which === 40) {
+            if (evt.keyCode === 13) {
               if (
                 Object.keys(ctrl.floatForm.floatValue.$error).length !== 0) {
                 //ctrl.isUserCurrentlyTyping = false;
                 //FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
                 if(NumericInputValidationService.isCustomizationArgTrue() === 1 && evt.which === 40) {
-                  //ctrl.isUserCurrentlyTyping = false;
-                  //FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
-                  console.log("Prevent!");
-                  evt.reset();
+                  evt.preventDefault();
                 }
               } else {
-                console.log("Prevent2!");
                 SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
               }
             } else {
-              console.log("Prevent3!");
               ctrl.isUserCurrentlyTyping = true;
             }
           };
