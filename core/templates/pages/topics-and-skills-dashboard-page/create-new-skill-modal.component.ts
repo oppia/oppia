@@ -21,7 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
@@ -117,7 +117,8 @@ export class CreateNewSkillModalComponent {
   }
 
   saveConceptCardExplanation(): void {
-    const explanationObject = this.subtitledHtmlObjectFactory.createDefault(
+    const explanationObject: SubtitledHtml =
+    this.subtitledHtmlObjectFactory.createDefault(
       this.bindableDict.displayedConceptCardExplanation,
       AppConstants.COMPONENT_NAME_EXPLANATION);
     this.newExplanationObject = explanationObject.toBackendDict();
