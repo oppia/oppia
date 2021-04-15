@@ -29,9 +29,10 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class MachineTranslatedTextModel(base_models.BaseModel):
-    """Model for storing machine translations. Model instances have a key
-    generated from the source and target language codes, followed by a SHA-1
-    hash of the origin text formated as follows:
+    """Model for storing machine generated translations for the purpose of
+    preventing duplicate generation. Model instances have a key generated from
+    the source and target language codes, followed by a SHA-1 hash of the
+    untranslated (origin) text formated as follows:
 
         [source_language_code]:[target_language_code]:[hashed_origin_text]
 
@@ -67,8 +68,11 @@ class MachineTranslatedTextModel(base_models.BaseModel):
             translated_text: str. The translation.
 
         Returns:
-            str. The id of the newly created MachineTranslatedTextInstance.
+            str|None. The id of the newly created
+            MachineTranslatedTextInstance, or None if the .
         """
+        if source_language_code is target_language_code:
+            return None
         hashed_origin_text = utils.convert_to_hash(origin_text, 50)
         entity_id = cls._generate_id(
             source_language_code, target_language_code, hashed_origin_text)
@@ -107,7 +111,6 @@ class MachineTranslatedTextModel(base_models.BaseModel):
     def get_translation_for_text(
             cls, source_language_code, target_language_code, origin_text):
         """Gets MachineTranslatedTextModel by language codes and origin text.
-        Returns None if no translation exists for the given parameters.
 
         Args:
             source_language_code: str. The language of the origin_text.
@@ -121,7 +124,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
         hashed_origin_text = utils.convert_to_hash(origin_text, 50)
         instance_id = cls._generate_id(
             source_language_code, target_language_code, hashed_origin_text)
-        return cls.get(instance_id)
+        return cls.get(instance_id, strict=False)
 
     @staticmethod
     def get_deletion_policy():
