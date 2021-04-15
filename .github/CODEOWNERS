@@ -84,8 +84,7 @@
 
 # App Feedback Reporting project
 /core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
-/core/controllers/incoming_app_feedback_report.py @BenHenning @vinitamurthi
-/core/controllers/incoming_app_feedback_report_test.py @BenHenning @vinitamurthi
+/core/controllers/incoming_app_feedback_report*.py @BenHenning @vinitamurthi
 
 
 # Audio and Translation team.

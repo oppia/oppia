@@ -1055,7 +1055,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, filter_obj, expected_error_substring):
-        """Checks that the parameter counts passes validation.
+        """Checks that the filter object passes validation.
 
         Args:
             filter_obj: AppFeedbackReportFilter. The domain object to

@@ -220,25 +220,6 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(all_jobs), 1)
         self.assertEqual(all_jobs[0].job_type, 'IndexAllActivitiesJobManager')
 
-    def test_cron_scrub_reports_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-
-        with self.testapp_swap:
-            self.get_html_response(
-                '/cron/models/app_feedback_report/scrub_reports')
-
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
-        self.assertEqual(len(all_jobs), 1)
-        self.assertEqual(
-            all_jobs[0].job_type, 'ScrubAppFeedbackReportsOneOffJob')
-
     def test_clean_data_items_of_completed_map_reduce_jobs(self):
         observed_log_messages = []
 

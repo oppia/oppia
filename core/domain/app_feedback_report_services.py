@@ -33,10 +33,8 @@ import utils
     [models.NAMES.app_feedback_report])
 transaction_services = models.Registry.import_transaction_services()
 
-PLATFORM_ANDROID = (
-    constants.PLATFORM_CHOICE_ANDROID)
-PLATFORM_WEB = (
-    constants.PLATFORM_CHOICE_WEB)
+PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
+PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
 
 
 def get_report_models(report_ids):
@@ -124,7 +122,7 @@ def _get_entry_point_from_json(entry_point_json):
     entry_point_name = entry_point_json['entry_point_name']
     if entry_point_name == constants.EntryPoint.navigation_drawer:
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == constants.ENTRY_POINT.lesson_player:
+    elif entry_point_name == constants.EntryPoint.lesson_player:
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_story_id'],
@@ -183,6 +181,7 @@ def _update_report_stats_model_in_transaction(
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
     text_language_code = report_obj.app_context.text_language_code
     audio_language_code = report_obj.app_context.audio_language_code
+    # All the keys in the stats dict must be a string.
     sdk_version = python_utils.UNICODE(
         report_obj.device_system_context.sdk_version)
     version_name = report_obj.device_system_context.version_name

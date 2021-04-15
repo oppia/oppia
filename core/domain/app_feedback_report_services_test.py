@@ -679,27 +679,26 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
 
-        parameter_names = constants.StatsParameterNames
         expected_json = {
-            parameter_names.report_type: {
+            constants.StatsParameterNames.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 1
             },
-            parameter_names.country_locale_code: {
+            constants.StatsParameterNames.country_locale_code: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 1
             },
-            parameter_names.entry_point_name: {
+            constants.StatsParameterNames.entry_point_name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER: 1
             },
-            parameter_names.text_language_code: {
+            constants.StatsParameterNames.text_language_code: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 1
             },
-            parameter_names.audio_language_code: {
+            constants.StatsParameterNames.audio_language_code: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 1
             },
-            parameter_names.android_sdk_version: {
+            constants.StatsParameterNames.android_sdk_version: {
                 python_utils.UNICODE(self.ANDROID_SDK_VERSION): 1
             },
-            parameter_names.version_name: {
+            constants.StatsParameterNames.version_name: {
                 self.ANDROID_PLATFORM_VERSION: 1
             }
         }
@@ -733,27 +732,26 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
 
-        parameter_names = constants.StatsParameterNames
         expected_json = {
-            parameter_names.report_type: {
+            constants.StatsParameterNames.report_type: {
                 self.REPORT_TYPE_SUGGESTION: 0
             },
-            parameter_names.country_locale_code: {
+            constants.StatsParameterNames.country_locale_code: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
-            parameter_names.entry_point_name: {
+            constants.StatsParameterNames.entry_point_name: {
                 self.ENTRY_POINT_NAVIGATION_DRAWER: 0
             },
-            parameter_names.text_language_code: {
+            constants.StatsParameterNames.text_language_code: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
             },
-            parameter_names.audio_language_code: {
+            constants.StatsParameterNames.audio_language_code: {
                 self.AUDIO_LANGUAGE_CODE_ENGLISH: 0
             },
-            parameter_names.android_sdk_version: {
+            constants.StatsParameterNames.android_sdk_version: {
                 python_utils.UNICODE(self.ANDROID_SDK_VERSION): 0
             },
-            parameter_names.version_name: {
+            constants.StatsParameterNames.version_name: {
                 self.ANDROID_PLATFORM_VERSION: 0
             }
         }
