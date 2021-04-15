@@ -82,9 +82,9 @@ class MachineTranslatedTextModel(base_models.BaseModel):
         translation_entity.put()
         return entity_id
 
+    @staticmethod
     def _generate_id(
-            cls, source_language_code, target_language_code,
-            hashed_origin_text):
+            source_language_code, target_language_code, hashed_origin_text):
         """Generates a valid key for a MachineTranslatedTextModel.
 
         Args:
