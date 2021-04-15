@@ -30,6 +30,7 @@ interface IconsArray {
     'thumbnailIconUrl': string;
     'thumbnailBgColor': string;
 }
+
 @Component({
   selector: 'oppia-story-preview-tab',
   templateUrl: './story-preview-tab.component.html'
@@ -44,8 +45,7 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     private storyEditorStateService: StoryEditorStateService,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlService: UrlService,
-  ) {
-  }
+  ) {}
 
   directiveSubscriptions = new Subscription();
   initEditor(): void {
