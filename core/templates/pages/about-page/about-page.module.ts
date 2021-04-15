@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AboutPageComponent } from './about-page.component';
+import { AboutPageSectionComponent } from './about-page-section.component'
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -37,6 +38,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ],
   declarations: [
     AboutPageComponent,
+    AboutPageSectionComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
@@ -64,6 +66,7 @@ class AboutPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+//import { import } from 'mathjs';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

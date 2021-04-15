@@ -1,5 +1,14 @@
 <div class="about-page">
-  <div class="oppia-about-page-section-one">
+  <oppia-about-page-section
+  [i18nHeading]="'I18N_ABOUT_PAGE_TITLE_SECTION_ONE'"
+  [i18nParagraph]="'I18N_ABOUT_PAGE_SECTION_ONE_CONTENT'"
+  [i18nButtonText]="'I18N_ACTION_VISIT_CLASSROOM'"
+  [imageFilename]="'/about/study.png'"
+  [onClickButton]="onClickVisitClassroomButton"
+  ></oppia-about-page-section>
+
+
+  <!--<div class="oppia-about-page-section-one">
     <div class="oppia-about-section-one-image oppia-about-page-section-one-right">
       <picture class="oppia-about-study-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/about/study.webp')">
@@ -17,7 +26,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </div>-->
   <div class="oppia-about-page-section-two">
     <div class="oppia-about-section-two-top">
       <div class="oppia-section-two-content">

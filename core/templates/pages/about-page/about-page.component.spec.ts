@@ -21,6 +21,7 @@ import { EventEmitter, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AboutPageComponent } from './about-page.component';
+import { AboutPageSectionComponent } from './about-page-section.component'
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -65,7 +66,7 @@ describe('About Page', () => {
   let userService: UserService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [AboutPageComponent, MockTranslatePipe],
+      declarations: [AboutPageComponent, AboutPageSectionComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
