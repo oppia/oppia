@@ -1809,8 +1809,7 @@ title: Title
             stack.enter_context(self.swap(
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
-            print(self.id())
-            client = ndb.Client(namespace=self.id()[-100:])
+            client = ndb.Client(project=feconf.OPPIA_PROJECT_ID, namespace=self.id()[-100:])
             stack.enter_context(client.context())
 
             super(GenericTestBase, self).run(result=result)
