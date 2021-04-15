@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
 import { AlgebraicExpressionEditorComponent } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
@@ -45,6 +46,7 @@ import { DirectivesModule } from 'components/../directives/directives.module';
 import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.component';
 import { ListOfUnicodeStringEditorComponent } from './templates/list-of-unicode-string-editor.component';
 import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-string-editor.component';
+import { MathEquationEditorComponent } from './templates/math-equation-editor.component';
 
 
 @NgModule({
@@ -57,7 +59,8 @@ import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-st
     GraphInputInteractionModule,
     DynamicContentModule,
     DirectivesModule,
-    NgbModalModule
+    NgbModalModule,
+    NgxTrimDirectiveModule
   ],
   declarations: [
     AlgebraicExpressionEditorComponent,
@@ -76,6 +79,7 @@ import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-st
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
+    MathEquationEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
   entryComponents: [
@@ -95,6 +99,7 @@ import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-st
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
+    MathEquationEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
   exports: [
@@ -114,6 +119,7 @@ import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-st
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
+    MathEquationEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
 })
