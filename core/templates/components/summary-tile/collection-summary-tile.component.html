@@ -1,11 +1,11 @@
-<learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                         [activityType]="activityTypeCollection"
-                         [activityId]="getCollectionId"
-                         [activityTitle]="getCollectionTitle"
-                         [isContainerNarrow]="isContainerNarrow"
-                         [activityActive]="collectionIsCurrentlyHoveredOver"
-                         [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
-</learner-dashboard-icons>
+<oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+                               [activityType]="activityTypeCollection"
+                               [activityId]="getCollectionId"
+                               [activityTitle]="getCollectionTitle"
+                               [isContainerNarrow]="isContainerNarrow"
+                               [activityActive]="collectionIsCurrentlyHoveredOver"
+                               [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+</oppia-learner-dashboard-icons>
 <mat-card class="oppia-activity-summary-tile protractor-test-collection-card"
          [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
   <a [href]="getCollectionLink()" class="thumbnail">

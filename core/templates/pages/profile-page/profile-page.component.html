@@ -95,19 +95,19 @@
 
   <md-card class="oppia-profile-content-card">
     <md-content class="oppia-profile-portfolio-container">
-      <exploration-summary-tile ng-repeat="expl in $ctrl.getExplorationsToDisplay() track by $index"
-                                [get-exploration-id]="expl.id"
-                                [get-exploration-title]="expl.title"
-                                [get-last-updated-msec]="expl.lastUpdatedMsec"
-                                [get-objective]="expl.objective"
-                                [get-category]="expl.category"
-                                [get-ratings]="expl.ratings"
-                                [get-thumbnail-icon-url]="expl.thumbnailIconUrl"
-                                [get-thumbnail-bg-color]="expl.thumbnailBgColor"
-                                [get-num-views]="expl.numViews"
-                                [is-community-owned]="expl.communityOwned"
-                                [mobile-cutoff-px]="610">
-      </exploration-summary-tile>
+      <oppia-exploration-summary-tile ng-repeat="expl in $ctrl.getExplorationsToDisplay() track by $index"
+                                      [get-exploration-id]="expl.id"
+                                      [get-exploration-title]="expl.title"
+                                      [get-last-updated-msec]="expl.lastUpdatedMsec"
+                                      [get-objective]="expl.objective"
+                                      [get-category]="expl.category"
+                                      [get-ratings]="expl.ratings"
+                                      [get-thumbnail-icon-url]="expl.thumbnailIconUrl"
+                                      [get-thumbnail-bg-color]="expl.thumbnailBgColor"
+                                      [get-num-views]="expl.numViews"
+                                      [is-community-owned]="expl.communityOwned"
+                                      [mobile-cutoff-px]="610">
+      </oppia-exploration-summary-tile>
 
       <div ng-if="$ctrl.userEditedExplorations.length === 0" translate="I18N_PROFILE_NO_EXPLORATIONS">
         <br><em></em>

@@ -26,7 +26,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
 
 @Component({
-  selector: 'collection-summary-tile',
+  selector: 'oppia-collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
 })
 export class CollectionSummaryTileComponent implements OnInit {
@@ -96,5 +96,5 @@ export class CollectionSummaryTileComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'collectionSummaryTile', downgradeComponent(
+  'oppiaCollectionSummaryTile', downgradeComponent(
     {component: CollectionSummaryTileComponent}));

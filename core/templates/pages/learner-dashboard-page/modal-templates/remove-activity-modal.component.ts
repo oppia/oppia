@@ -25,7 +25,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 
 @Component({
-  selector: 'remove-activity-modal',
+  selector: 'oppia-remove-activity-modal',
   templateUrl: './remove-activity-modal.component.html',
 })
 export class RemoveActivityModalComponent implements OnInit {
@@ -89,6 +89,6 @@ export class RemoveActivityModalComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'removeActivityModalComponent',
+  'oppiaRemoveActivityModalComponent',
   downgradeComponent(
     {component: RemoveActivityModalComponent}));

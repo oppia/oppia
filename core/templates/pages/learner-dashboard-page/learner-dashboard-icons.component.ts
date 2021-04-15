@@ -28,7 +28,7 @@ import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 @Component({
-  selector: 'learner-dashboard-icons',
+  selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
 })
 export class LearnerDashboardIconsComponent implements OnInit {
@@ -162,5 +162,5 @@ export class LearnerDashboardIconsComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'learnerDashboardIcons', downgradeComponent(
+  'oppiaLearnerDashboardIcons', downgradeComponent(
     {component: LearnerDashboardIconsComponent}));

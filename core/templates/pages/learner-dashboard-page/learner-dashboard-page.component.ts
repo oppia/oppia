@@ -44,7 +44,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 
 @Component({
-  selector: 'learner-dashboard-page',
+  selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
   styleUrls: [],
   animations: [
@@ -617,5 +617,5 @@ export class LearnerDashboardPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'learnerDashboardPage', downgradeComponent(
+  'oppiaLearnerDashboardPage', downgradeComponent(
     {component: LearnerDashboardPageComponent}));

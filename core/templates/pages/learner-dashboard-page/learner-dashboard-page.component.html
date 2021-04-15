@@ -250,17 +250,17 @@
                  container="body"
                  placement="top">
               </i>
-              <exploration-summary-tile [getExplorationId]="tile.id"
-                                        [getExplorationTitle]="tile.title"
-                                        [getLastUpdatedMsec]="tile.lastUpdatedMsec"
-                                        [getObjective]="tile.objective"
-                                        [getCategory]="tile.category"
-                                        [getRatings]="tile.ratings"
-                                        [getNumViews]="tile.numViews"
-                                        [getThumbnailIconUrl]="tile.thumbnailIconUrl"
-                                        [getThumbnailBgColor]="tile.thumbnailBgColor"
-                                        class="protractor-test-exp-summary-tile">
-              </exploration-summary-tile>
+              <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                              [getExplorationTitle]="tile.title"
+                                              [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                              [getObjective]="tile.objective"
+                                              [getCategory]="tile.category"
+                                              [getRatings]="tile.ratings"
+                                              [getNumViews]="tile.numViews"
+                                              [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                              [getThumbnailBgColor]="tile.thumbnailBgColor"
+                                              class="protractor-test-exp-summary-tile">
+              </oppia-exploration-summary-tile>
             </div>
           </ng-container>
 
@@ -300,17 +300,17 @@
           <ng-container *ngIf="getVisibleExplorationList(startCompletedExpIndex).length !== 0">
             <div *ngFor="let tile of getVisibleExplorationList(startCompletedExpIndex) | sortBy: isCurrentExpSortDescending: getValueOfExplorationSortKey(); trackBy: tile?.id"
                  class="oppia-exploration-summary-tile-container">
-              <exploration-summary-tile [getExplorationId]="tile.id"
-                                        [getExplorationTitle]="tile.title"
-                                        [getLastUpdatedMsec]="tile.lastUpdatedMsec"
-                                        [getObjective]="tile.objective"
-                                        [getCategory]="tile.category"
-                                        [getRatings]="tile.ratings"
-                                        [getNumViews]="tile.numViews"
-                                        [getThumbnailIconUrl]="tile.thumbnailIconUrl"
-                                        [getThumbnailBgColor]="tile.thumbnailBgColor"
-                                        class="protractor-test-exp-summary-tile">
-              </exploration-summary-tile>
+              <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                              [getExplorationTitle]="tile.title"
+                                              [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                              [getObjective]="tile.objective"
+                                              [getCategory]="tile.category"
+                                              [getRatings]="tile.ratings"
+                                              [getNumViews]="tile.numViews"
+                                              [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                              [getThumbnailBgColor]="tile.thumbnailBgColor"
+                                              class="protractor-test-exp-summary-tile">
+              </oppia-exploration-summary-tile>
             </div>
           </ng-container>
 
@@ -361,17 +361,17 @@
                  container="body"
                  placement="top">
               </i>
-              <exploration-summary-tile [getExplorationId]="tile.id"
-                                        [getExplorationTitle]="tile.title"
-                                        [getLastUpdatedMsec]="tile.lastUpdatedMsec"
-                                        [getObjective]="tile.objective"
-                                        [getCategory]="tile.category"
-                                        [getRatings]="tile.ratings"
-                                        [getNumViews]="tile.numViews"
-                                        [getThumbnailIconUrl]="tile.thumbnailIconUrl"
-                                        [getThumbnailBgColor]="tile.thumbnailBgColor"
-                                        class="oppia-exploration-summary-tile protractor-test-exp-summary-tile">
-              </exploration-summary-tile>
+              <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                              [getExplorationTitle]="tile.title"
+                                              [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                              [getObjective]="tile.objective"
+                                              [getCategory]="tile.category"
+                                              [getRatings]="tile.ratings"
+                                              [getNumViews]="tile.numViews"
+                                              [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                              [getThumbnailBgColor]="tile.thumbnailBgColor"
+                                              class="oppia-exploration-summary-tile protractor-test-exp-summary-tile">
+              </oppia-exploration-summary-tile>
             </div>
           </ng-container>
         </div>
@@ -413,16 +413,15 @@
                container="body"
                placement="top">
             </i>
-            <collection-summary-tile
-                                     [getCollectionId]="tile.id"
-                                     [getCollectionTitle]="tile.title"
-                                     [getLastUpdatedMsec]="tile.lastUpdatedMsec"
-                                     [getObjective]="tile.objective"
-                                     [getNodeCount]="tile.nodeCount"
-                                     [getCategory]="tile.category"
-                                     [getThumbnailIconUrl]="tile.thumbnailIconUrl"
-                                     [getThumbnailBgColor]="tile.thumbnailBgColor">
-            </collection-summary-tile>
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
           </div>
 
           <div class="oppia-learner-dashboard-page-portfolio"
@@ -471,15 +470,15 @@
                container="body"
                placement="top">
             </i>
-            <collection-summary-tile [getCollectionId]="tile.id"
-                                     [getCollectionTitle]="tile.title"
-                                     [getLastUpdatedMsec]="tile.lastUpdatedMsec"
-                                     [getObjective]="tile.objective"
-                                     [getNodeCount]="tile.nodeCount"
-                                     [getCategory]="tile.category"
-                                     [getThumbnailIconUrl]="tile.thumbnailIconUrl"
-                                     [getThumbnailBgColor]="tile.thumbnailBgColor">
-            </collection-summary-tile>
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
           </div>
         </div>
 
@@ -516,16 +515,15 @@
 
           <div *ngFor="let tile of completedCollectionsList"
                class="oppia-exploration-summary-tile-container">
-            <collection-summary-tile
-                                     [getCollectionId]="tile.id"
-                                     [getCollectionTitle]="tile.title"
-                                     [getLastUpdatedMsec]="tile.lastUpdatedMsec"
-                                     [getObjective]="tile.objective"
-                                     [getNodeCount]="tile.nodeCount"
-                                     [getCategory]="tile.category"
-                                     [getThumbnailIconUrl]="tile.thumbnailIconUrl"
-                                     [getThumbnailBgColor]="tile.thumbnailBgColor">
-            </collection-summary-tile>
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
           </div>
 
           <div class="oppia-learner-dashboard-page-portfolio"

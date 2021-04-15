@@ -21,7 +21,7 @@ import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'learner-dashboard-suggestion-modal',
+  selector: 'oppia-learner-dashboard-suggestion-modal',
   templateUrl: './learner-dashboard-suggestion-modal.component.html',
   styleUrls: []
 })
@@ -40,6 +40,6 @@ export class LearnerDashboardSuggestionModalComponent {
 }
 
 angular.module('oppia').directive(
-  'learnerDashboardSuggestionModalComponent',
+  'oppiaLearnerDashboardSuggestionModalComponent',
   downgradeComponent(
     {component: LearnerDashboardSuggestionModalComponent}));

@@ -22,7 +22,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 @Component({
-  selector: 'learner-playlist-modal',
+  selector: 'oppia-learner-playlist-modal',
   templateUrl: './learner-playlist-modal.component.html',
   styleUrls: []
 })
@@ -60,6 +60,6 @@ export class LearnerPlaylistModalComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'learnerPlaylistModalComponent',
+  'oppiaLearnerPlaylistModalComponent',
   downgradeComponent(
     {component: LearnerPlaylistModalComponent}));

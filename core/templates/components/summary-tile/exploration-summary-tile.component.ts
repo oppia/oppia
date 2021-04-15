@@ -30,10 +30,8 @@ import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { Subscription } from 'rxjs';
 
-
-
 @Component({
-  selector: 'exploration-summary-tile',
+  selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
 })
 export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
@@ -205,5 +203,5 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 }
 
 angular.module('oppia').directive(
-  'explorationSummaryTile', downgradeComponent(
+  'oppiaExplorationSummaryTile', downgradeComponent(
     {component: ExplorationSummaryTileComponent}));

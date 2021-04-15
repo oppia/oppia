@@ -104,7 +104,7 @@ export class LearnerPlaylistBackendApiService {
     modelRef.componentInstance.activityType = activityType;
     modelRef.result.then((playlistUrl) => {
       // eslint-disable-next-line dot-notation
-      this.http.delete<void>(playlistUrl).toPromise().then();
+      this.http.delete<void>(playlistUrl).toPromise();
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
           activityId);
