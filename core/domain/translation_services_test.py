@@ -70,25 +70,22 @@ class TranslationServiceTests(test_utils.GenericTestBase):
             })], 'Changes content.')
 
     def test_machine_translation_with_invalid_language_code_raises_exception(
-        self):
+            self):
         with self.assertRaisesRegexp(
             ValueError, 'Invalid target language code: invalid_language_code'
         ):
-            translated_text = (
-                translation_services.get_machine_translation_for_content_id(
-                    self.exp_id,
-                    'Introduction',
-                    'content',
-                    'invalid_language_code'
-                )
+            translation_services.get_machine_translation_for_content_id(
+                self.exp_id,
+                'Introduction',
+                'content',
+                'invalid_language_code'
             )
 
     def test_get_machine_translation_checks_datastore_first(self):
-       with self.swap_to_always_raise(
+        with self.swap_to_always_raise(
             cloud_translate_services.CLIENT,
             'translate',
-            error=AssertionError
-        ):
+            error=AssertionError):
             self.assertEqual(
                 translation_services.get_machine_translation(
                     'en', 'es', 'text to translate'),

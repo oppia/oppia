@@ -30,7 +30,7 @@ cloud_translate_services = models.Registry.import_cloud_translate_services()
 
 
 def get_machine_translation_for_content_id(
-    exploration_id, state_name, content_id, target_language_code):
+        exploration_id, state_name, content_id, target_language_code):
     """Gets a machine translation for the given exploration state content id,
     in the given language.
 
@@ -60,11 +60,14 @@ def get_machine_translation_for_content_id(
     return get_machine_translation(
         exp.language_code, target_language_code, origin_text)
 
-def get_machine_translation(source_language_code, target_language_code, origin_text):
+
+def get_machine_translation(
+        source_language_code, target_language_code, origin_text):
     """Gets a machine translation of the origin text for the given source and
     target languages.
+
     Args:
-        source_langauge_code: str. An allowlisted language code.
+        source_language_code: str. An allowlisted language code.
         target_language_code: str. An allowlisted language code.
         origin_text: str. The text to be translated.
 
@@ -94,4 +97,3 @@ def get_machine_translation(source_language_code, target_language_code, origin_t
         translated_text
     )
     return translated_text
-
