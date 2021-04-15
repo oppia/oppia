@@ -230,6 +230,7 @@
         "core.domain.translation_domain_test",
         "core.domain.translation_validators_test",
         "core.domain.translation_fetchers_test",
+        "core.domain.translation_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
         "scripts.regenerate_requirements_test",
