@@ -51,10 +51,11 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     private guppyInitializationService: GuppyInitializationService,
     private mathInteractionsService: MathInteractionsService,
     private eventBusService: EventBusService
-  ) { }
+  ) {
+    this.eventBusGroup = new EventBusGroup(this.eventBusService);
+  }
 
   ngOnInit(): void {
-    this.eventBusGroup = new EventBusGroup(this.eventBusService);
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
     if (this.value === null) {

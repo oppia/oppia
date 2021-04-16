@@ -22,7 +22,9 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+
 import { FocusOnDirective } from './focus-on.directive';
+import { MathJaxDirective } from './mathjax.directive';
 import { NgInitDirective } from './ng-init.directive';
 
 @NgModule({
@@ -33,11 +35,13 @@ import { NgInitDirective } from './ng-init.directive';
   ],
   declarations: [
     FocusOnDirective,
+    MathJaxDirective,
     NgInitDirective
   ],
   entryComponents: [],
   exports: [
     FocusOnDirective,
+    MathJaxDirective,
     NgInitDirective
   ],
 })

@@ -36,7 +36,7 @@ require('objects/templates/list-of-unicode-string-editor.component.ts');
 require('objects/templates/logic-error-category-editor.component.ts');
 require('objects/templates/logic-question-editor.component.ts');
 require('objects/templates/math-equation-editor.component.ts');
-require('objects/templates/math-expression-content-editor.directive.ts');
+require('objects/templates/math-expression-content-editor.component.ts');
 require('objects/templates/music-phrase-editor.directive.ts');
 require('objects/templates/nonnegative-int-editor.directive.ts');
 require('objects/templates/normalized-string-editor.directive.ts');

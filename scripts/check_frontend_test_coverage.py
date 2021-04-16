@@ -143,6 +143,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'logic-question-editor.directive.ts',
     'math-expression-content-editor.component.ts',
     'mathjax-bind.directive.ts',
+    'mathjax.directive.ts',
     'messenger.service.ts',
     'misconception-editor.directive.ts',
     'music-notes-input-rules.service.ts',

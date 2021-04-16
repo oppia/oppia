@@ -47,6 +47,9 @@ import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.compo
 import { ListOfUnicodeStringEditorComponent } from './templates/list-of-unicode-string-editor.component';
 import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-string-editor.component';
 import { MathEquationEditorComponent } from './templates/math-equation-editor.component';
+import { LogicErrorCategoryEditorComponent } from './templates/logic-error-category-editor.component';
+import { LogicQuestionEditorComponent } from './templates/logic-question-editor.component';
+import { MathExpressionContentEditorComponent } from './templates/math-expression-content-editor.component';
 
 
 @NgModule({
@@ -79,7 +82,10 @@ import { MathEquationEditorComponent } from './templates/math-equation-editor.co
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
     MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
   entryComponents: [
@@ -99,7 +105,10 @@ import { MathEquationEditorComponent } from './templates/math-equation-editor.co
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
     MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
   exports: [
@@ -119,7 +128,10 @@ import { MathEquationEditorComponent } from './templates/math-equation-editor.co
     ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
     ListOfTabsEditorComponent,
     ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
     MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
 })

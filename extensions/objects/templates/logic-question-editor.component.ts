@@ -48,13 +48,15 @@ export class LogicQuestionEditorComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    const assumptionsString = logicProofShared.displayExpressionArray(
+      this.value.assumptions,
+      logicProofData.BASE_STUDENT_LANGUAGE.operators);
+    const targetString = logicProofShared.displayExpression(
+      this.value.results[0],
+      logicProofData.BASE_STUDENT_LANGUAGE.operators);
     this.localValue = {
-      assumptionsString: logicProofShared.displayExpressionArray(
-        this.value.assumptions,
-        logicProofData.BASE_STUDENT_LANGUAGE.operators),
-      targetString: logicProofShared.displayExpression(
-        this.value.results[0],
-        logicProofData.BASE_STUDENT_LANGUAGE.operators),
+      assumptionsString,
+      targetString,
       errorMessage: '',
       proofString: this.value.default_proof_string
     };
