@@ -1709,8 +1709,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'content', '<p>resubmit change content html</p>').to_dict()
 
         add_question_change_dict = {
-            'cmd': question_domain
-                    .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),

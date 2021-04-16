@@ -2807,9 +2807,10 @@ def can_update_suggestions(handler):
         if suggestion is None:
             raise self.PageNotFoundException
 
-        # TODO(#11735): Currently, only checks whether users can review translation
-        # sugeestions. Another check should be added to check whether users can review
-        # question suggestions if the suggestion type is add question.
+        # TODO(#11735): Currently, only checks whether users can review
+        # translation sugeestions. Another check should be added to check
+        # whether users can review question suggestions if the suggestion
+        # type is add question.
         if suggestion.suggestion_type == (
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(

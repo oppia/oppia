@@ -30,9 +30,9 @@ from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import suggestion_services
-from core.platform import models
 import feconf
 import utils
+
 
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
     """Returns a dict of target_id to exploration opportunity summary dict.
@@ -163,7 +163,7 @@ class UpdateSuggestionHandler(base.BaseHandler):
             InvalidInputException. The 'translation_html' parameter is missing.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if (suggestion.is_handled):
+        if suggestion.is_handled:
             raise self.InvalidInputException(
                 'The suggestion with id %s has been accepted or rejected'
                 % (suggestion_id)

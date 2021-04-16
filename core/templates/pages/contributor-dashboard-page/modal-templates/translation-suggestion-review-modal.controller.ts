@@ -56,7 +56,6 @@ angular.module('oppia').controller(
       };
 
       $scope.updateSuggestion = function() {
-        console.log($scope.editedContentHtml);
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
