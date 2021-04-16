@@ -287,9 +287,14 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
         if self._type == 'server_mode':
             for _, mode in self._conditions:
+                invalid_server_mode = False
                 try:
-                    getattr(SERVER_MODES, mode)
+                    server_mode = getattr(SERVER_MODES, mode)
+                    if server_mode not in ALLOWED_SERVER_MODES:
+                        invalid_server_mode = True
                 except AttributeError:
+                    invalid_server_mode = True
+                if invalid_server_mode:
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))
@@ -725,9 +730,14 @@ class PlatformParameter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
+        invalid_feature_stage = False
         try:
-            getattr(FEATURE_STAGES, self._feature_stage)
+            feature_stage = getattr(FEATURE_STAGES, self._feature_stage)
+            if feature_stage not in ALLOWED_FEATURE_STAGES:
+                invalid_feature_stage = True
         except AttributeError:
+            invalid_feature_stage = True
+        if invalid_feature_stage:
             raise utils.ValidationError(
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
