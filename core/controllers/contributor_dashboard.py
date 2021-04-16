@@ -263,7 +263,7 @@ class TranslatableTextHandler(base.BaseHandler):
             s.change.content_id == content_id for s in suggestions)
 
 
-class MachineTranslatedTextHandler(base.BaseHandler):
+class MachineTranslatedStateTextsHandler(base.BaseHandler):
     """Provide a machine translation of exploration content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

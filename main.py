@@ -342,7 +342,7 @@ URLS = MAPREDUCE_HANDLERS + [
         story_viewer.StoryPage),
     get_redirect_route(
         r'/machine_translated_state_texts_handler',
-        contributor_dashboard.MachineTranslatedTextHandler),
+        contributor_dashboard.MachineTranslatedStateTextsHandler),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
