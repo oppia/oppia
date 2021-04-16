@@ -1814,6 +1814,7 @@ class Exploration(python_utils.OBJECT):
                     dicts used to initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
+            init_state_name: str. Name of initial state.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -1826,7 +1827,6 @@ class Exploration(python_utils.OBJECT):
         else:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'])
-
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
