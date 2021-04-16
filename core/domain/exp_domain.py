@@ -966,11 +966,9 @@ class Exploration(python_utils.OBJECT):
         # Check if first state is a checkpoint or not.
         if not self.states[self.init_state_name].card_is_checkpoint:
             raise utils.ValidationError(
-                'Expected card_is_checkpoint of first state %s to be True'
+                'Expected card_is_checkpoint of first state to be True'
                 ' but found it to be %s'
-                % (
-                    self.init_state_name,
-                    self.states[self.init_state_name].card_is_checkpoint)
+                % (self.states[self.init_state_name].card_is_checkpoint)
             )
 
         # Check if end states are checkpoint.
