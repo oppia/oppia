@@ -2552,8 +2552,6 @@ written_translations:
         # Download version 2.
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_0_ID, version=2, width=50)
-        print(dict_output)
-        print(self.SAMPLE_EXPORTED_DICT)
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
         # Download version 3.
@@ -4582,23 +4580,24 @@ title: Old Title
             exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
 
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'init_state_name',
-                'new_value': 'State'
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'State',
-                'property_name': 'card_is_checkpoint',
-                'new_value': True
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                'property_name': 'card_is_checkpoint',
-                'new_value': False
-            })
+            self.albert_id, self.NEW_EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'init_state_name',
+                    'new_value': 'State',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'State',
+                    'property_name': 'card_is_checkpoint',
+                    'new_value': True,
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'property_name': 'card_is_checkpoint',
+                    'new_value': False,
+                }),
             ], 'Changed init_state_name and checkpoints.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
