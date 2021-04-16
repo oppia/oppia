@@ -30,17 +30,22 @@ datastore_services = models.Registry.import_datastore_services()
 
 class MachineTranslatedTextModel(base_models.BaseModel):
     """Model for storing machine generated translations for the purpose of
-    preventing duplicate generation. Model instances have a deterministic key
-    generated from the source and target language codes, followed by a SHA-1
-    hash of the untranslated source text formated as follows:
+    preventing duplicate generation. Machine translations are used for reference
+    purpose only and therefore are context agnostic. Model instances are mapped
+    by a deterministic key generated from the source and target language codes,
+    followed by a SHA-1 hash of the untranslated source text formated as
+    follows:
 
-        [source_language_code]:[target_language_code]:[hashed_source_text]
+        [source_language_code].[target_language_code].[hashed_source_text]
 
-    See MachineTranslatedTextModel._generate_id() below for details."""
+    See MachineTranslatedTextModel._generate_id() below for details.
+    The same origin text, source_language_code, and target_language_code always
+    maps to the same key and therefore always returns the same translated_text.
+    """
 
     # The untranslated source text.
     source_text = datastore_services.TextProperty(required=True, indexed=False)
-    # An SHA-1 hash of the source text. This can be used to index the datastore
+    # A SHA-1 hash of the source text. This can be used to index the datastore
     # by source text.
     hashed_source_text = datastore_services.StringProperty(
         required=True, indexed=True)
@@ -114,10 +119,10 @@ class MachineTranslatedTextModel(base_models.BaseModel):
             str. The deterministically generated identifier for this entity of
             the form:
 
-            [source_language_code]:[target_language_code]:[hashed_source_text]
+            [source_language_code].[target_language_code].[hashed_source_text]
         """
         return (
-            '%s:%s:%s' % (
+            '%s.%s.%s' % (
                 source_language_code, target_language_code, hashed_source_text)
         )
 
