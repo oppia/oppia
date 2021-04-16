@@ -520,6 +520,7 @@
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
+/core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681

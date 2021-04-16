@@ -11,7 +11,7 @@
   <p>
     Formula the student must prove:<br>
     <input type="text"
-           [trim]="false" 
+           [trim]="false"
            [(ngModel)]="localValue.targetString"
            placeholder="Enter a formula."
            id="logicQuestionTarget"
@@ -25,5 +25,6 @@
             [(ngModel)]="localValue.proofString"
             placeholder="If this is an example, enter a proof."
             id="logicQuestionProof"
-            (change)="changeProof()"></textarea>
+            (change)="changeProof()">
+  </textarea>
 </div>
