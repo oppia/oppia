@@ -167,7 +167,7 @@ class MockValidateModelDomainObjectInstancesWithNeutral(
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return 'neutral'
+        return base_model_audits.VALIDATION_MODES.neutral
 
 
 class MockValidateModelDomainObjectInstancesWithStrict(
@@ -176,7 +176,7 @@ class MockValidateModelDomainObjectInstancesWithStrict(
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return 'strict'
+        return base_model_audits.VALIDATION_MODES.strict
 
 
 class MockValidateModelDomainObjectInstancesWithNonStrict(
@@ -185,7 +185,7 @@ class MockValidateModelDomainObjectInstancesWithNonStrict(
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return 'non_strict'
+        return base_model_audits.VALIDATION_MODES.non_strict
 
 
 class MockValidateModelDomainObjectInstancesWithInvalid(
