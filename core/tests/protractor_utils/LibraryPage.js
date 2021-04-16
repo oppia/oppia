@@ -196,9 +196,6 @@ var LibraryPage = function() {
   };
 
   this.clickExplorationObjective = async function() {
-    await waitFor.elementToBeClickable(
-      explorationObjective,
-      'Exploration Objective takes too long to be clickable');
     await action.click('Exploration objective', explorationObjective);
   };
 
