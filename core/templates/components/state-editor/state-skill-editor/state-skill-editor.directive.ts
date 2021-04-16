@@ -17,9 +17,6 @@
 */
 
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-next-content-id-index.service');
-require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('components/skill-selector/select-skill-modal.controller.ts');
@@ -35,22 +32,20 @@ angular.module('oppia').directive('stateSkillEditor', [
       restrict: 'E',
       scope: {
         onSaveLinkedSkillId: '=',
-        onSaveStateContent: '=',
-        onSaveNextContentIdIndex: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
+        onSaveStateContent: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-skill-editor/' +
         'state-skill-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'StateNextContentIdIndexService', 'StateSkillService',
-        'StoryEditorStateService', 'TopicsAndSkillsDashboardBackendApiService',
+        'StateSkillService', 'StoryEditorStateService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
-            StateNextContentIdIndexService, StateSkillService,
-            StoryEditorStateService, TopicsAndSkillsDashboardBackendApiService,
+            StateSkillService, StoryEditorStateService,
+            TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService) {
           var ctrl = this;
           var categorizedSkills = null;
@@ -88,12 +83,9 @@ angular.module('oppia').directive('stateSkillEditor', [
                 StateSkillService.displayed = result.id;
                 StateSkillService.saveDisplayedValue();
                 $scope.onSaveLinkedSkillId(result.id);
-                StateNextContentIdIndexService.saveDisplayedValue();
-                $scope.onSaveNextContentIdIndex(
-                  StateNextContentIdIndexService.displayed);
               } catch (err) {
                 AlertsService.addInfoMessage(
-                  'Given skill is already a prerequisite skill', 5000);
+                  err, 5000);
               }
             }, function() {
               // Note to developers:
@@ -115,7 +107,9 @@ angular.module('oppia').directive('stateSkillEditor', [
               StateSkillService.saveDisplayedValue();
               $scope.onSaveLinkedSkillId(StateSkillService.displayed);
             }, function() {
-              AlertsService.clearWarnings();
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -133,8 +127,6 @@ angular.module('oppia').directive('stateSkillEditor', [
             $scope.StateSkillService = StateSkillService;
             $scope.skillCardIsShown = (
               !WindowDimensionsService.isWindowNarrow());
-            $scope.skillDescription = null;
-            $scope.skillId = null;
             _init();
           };
         }
