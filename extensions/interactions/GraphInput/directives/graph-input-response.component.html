@@ -23,7 +23,7 @@
             [attr.y1]="graph.vertices[edge.src].y"
             [attr.x2]="graph.vertices[edge.dst].x - GRAPH_INPUT_LEFT_MARGIN"
             [attr.y2]="graph.vertices[edge.dst].y"
-            [style.stroke]="'black'" [style.strokeWidth]= "EDGE_WIDTH">
+            [style.stroke]="'black'" [style.strokeWidth]="EDGE_WIDTH">
       </line>
       <polygon *ngIf="graph.isDirected"
                [attr.points]="getDirectedEdgeArrowPoints(idx)"

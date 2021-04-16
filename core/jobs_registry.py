@@ -120,6 +120,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
     story_jobs_one_off.DescriptionLengthAuditOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
+    story_jobs_one_off.StoryExplorationsAuditOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.DeleteStoryCommitLogsOneOffJob,
     suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,
@@ -228,6 +229,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
+    prod_validation_jobs_one_off.MachineTranslatedTextModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
     prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
     (

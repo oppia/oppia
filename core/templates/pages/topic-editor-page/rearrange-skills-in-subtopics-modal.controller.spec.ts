@@ -17,6 +17,8 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
@@ -26,9 +28,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var topic = null;
   var $uibModalInstance = null;
   var TopicEditorStateService = null;
-  var SkillSummaryObjectFactory = null;
   var TopicUpdateService;
-  var SubtopicObjectFactory;
   var TopicObjectFactory;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
@@ -39,12 +39,10 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     $uibModalInstance = $injector.get('$uibModal');
     $scope = $rootScope.$new();
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
     topic._subtopics = [subtopic];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
@@ -69,7 +67,7 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   });
 
   it('should record skill summary to move and subtopic Id', function() {
-    var skillSummary = SkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummary.create(
       '1', 'Skill description');
     ctrl.onMoveSkillStart(1, skillSummary);
     expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
