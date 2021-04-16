@@ -19,18 +19,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
-from core.tests import test_utils
 from core.platform.bulk_email import dev_mode_bulk_email_services
-
-import feconf
-import python_utils
+from core.tests import test_utils
 
 
 class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
     """Tests for mailchimp services."""
-
-    def setUp(self):
-        super(DevModeBulkEmailServicesUnitTests, self).setUp()
 
     def test_add_or_update_user_status(self):
         observed_log_messages = []
@@ -44,8 +38,8 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
             self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '
-                'preference in the service provider\'s db to True. Cannot '
-                'access API, since this is a dev environment.'])
+                 'preference in the service provider\'s db to True. Cannot '
+                 'access API, since this is a dev environment.'])
 
             observed_log_messages = []
             dev_mode_bulk_email_services.add_or_update_user_status(
@@ -53,8 +47,8 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
             self.assertItemsEqual(
                 observed_log_messages,
                 ['Updated status of email ID test@example.com\'s bulk email '
-                'preference in the service provider\'s db to False. Cannot '
-                'access API, since this is a dev environment.'])
+                 'preference in the service provider\'s db to False. Cannot '
+                 'access API, since this is a dev environment.'])
 
     def test_permanently_delete_user(self):
         observed_log_messages = []
@@ -68,5 +62,5 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
             self.assertItemsEqual(
                 observed_log_messages,
                 ['Email ID test@example.com permanently deleted from bulk '
-                'email provider\'s db. Cannot access API, since this is a '
-                'dev environment'])
+                 'email provider\'s db. Cannot access API, since this is a '
+                 'dev environment'])

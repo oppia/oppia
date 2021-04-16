@@ -449,9 +449,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             observed_log_messages,
             ['Updated status of email ID %s\'s bulk email '
-            'preference in the service provider\'s db to False. Cannot access '
-            'API, since this is a dev environment.' % user_email])
-
+             'preference in the service provider\'s db to False. Cannot access '
+             'API, since this is a dev environment.' % user_email])
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEqual(

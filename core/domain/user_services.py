@@ -1403,7 +1403,6 @@ def update_email_preferences(
             id=user_id)
         email_preferences_model.site_updates = False
 
-    old_site_updates_preference = email_preferences_model.site_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
     email_preferences_model.feedback_message_notifications = (

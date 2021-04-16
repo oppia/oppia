@@ -449,10 +449,8 @@ MAILGUN_DOMAIN_NAME = None
 
 # Audience ID of the mailing list for Oppia in Mailchimp.
 MAILCHIMP_AUDIENCE_ID = None
-
 # Mailchimp API Key.
 MAILCHIMP_API_KEY = None
-
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
 

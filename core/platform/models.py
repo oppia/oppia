@@ -290,8 +290,8 @@ class _Gae(Platform):
         elif (
                 feconf.BULK_EMAIL_SERVICE_PROVIDER ==
                 feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP):
-            from core.platform.bulk_email import mailchimp_email_services
-            return mailchimp_email_services
+            from core.platform.bulk_email import mailchimp_bulk_email_services
+            return mailchimp_bulk_email_services
         else:
             raise Exception(
                 'Invalid bulk email service provider: %s' % (
