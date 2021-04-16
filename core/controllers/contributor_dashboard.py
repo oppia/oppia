@@ -270,11 +270,31 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        """Handles GET requests."""
+        """Handles GET requests. Responds with a mapping from content id to
+        translation of form:
+            dict('translated_texts', dict(str, str|None))
+        If no translation is found for a given content id, that id is mapped to
+        None.
+        """
         exp_id = self.request.get('exp_id')
+        if not exp_id:
+            raise self.InvalidInputException('Missing exp_id')
+
         state_name = self.request.get('state_name')
-        content_ids = json.loads(self.request.get('content_ids'))
+        if not state_name:
+            raise self.InvalidInputException('Missing state_name')
+
+        content_ids_string = self.request.get('content_ids')
+        content_ids = None
+        try:
+            content_ids = json.loads(content_ids_string)
+        except:
+            raise self.InvalidInputException(
+                'Improperly formatted content_ids %s' % content_ids_string)
+
         target_language_code = self.request.get('target_language_code')
+        if not target_language_code:
+            raise self.InvalidInputException('Missing target_language_code')
 
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
@@ -286,20 +306,28 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid target_language_code: %s' % target_language_code)
 
+        exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
+        if exp is None:
+            raise self.PageNotFoundException('Invalid exp_id: %s' % exp_id)
+        state_names_to_content_id_mapping = exp.get_translatable_text(
+            target_language_code)
+        if not state_names_to_content_id_mapping.has_key(state_name):
+            raise self.PageNotFoundException(
+                'Invalid state_name: %s' % state_name)
+        content_id_mapping = state_names_to_content_id_mapping[state_name]
         translated_texts = {}
         for content_id in content_ids:
-            translated_text = (
-                translation_services.get_machine_translation_for_content_id(
-                    exp_id, state_name, content_id, target_language_code
+            if content_id_mapping.has_key(content_id):
+                source_text = content_id_mapping[content_id]
+                translated_texts[content_id] = (
+                    translation_services.get_machine_translation(
+                        exp.language_code, target_language_code, source_text)
                 )
-            )
-            if translated_text is not None:
-                translated_texts[content_id] = translated_text
-        if translated_texts:
-            self.values = {'translated_texts': translated_texts}
-            self.render_json(self.values)
-        else:
-            raise self.PageNotFoundException()
+            else:
+                translated_texts[content_id] = None
+
+        self.values = {'translated_texts': translated_texts}
+        self.render_json(self.values)
 
 
 class UserContributionRightsDataHandler(base.BaseHandler):

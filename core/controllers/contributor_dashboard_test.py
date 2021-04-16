@@ -488,11 +488,11 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(output, expected_output)
 
 
-class MachineTranslatedStateTextsHandler(test_utils.GenericTestBase):
+class MachineTranslatedStateTextsHandlerTests(test_utils.GenericTestBase):
     """Tests for MachineTranslatedStateTextsHandler"""
 
     def setUp(self):
-        super(MachineTranslatedStateTextsHandler, self).setUp()
+        super(MachineTranslatedStateTextsHandlerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -520,6 +520,13 @@ class MachineTranslatedStateTextsHandler(test_utils.GenericTestBase):
             'target_language_code': 'invalid_language_code'
         }, expected_status_int=400)
 
+    def test_handler_with_no_target_language_code_raises_exception(self):
+        self.get_json('/machine_translated_state_texts_handler', params={
+            'exp_id': self.exp_id,
+            'state_name': 'End State',
+            'content_ids': '["content"]',
+        }, expected_status_int=400)
+
     def test_handler_with_invalid_exploration_id_returns_not_found(self):
         self.get_json('/machine_translated_state_texts_handler', params={
             'exp_id': 'invalid_exploration_id',
@@ -527,6 +534,13 @@ class MachineTranslatedStateTextsHandler(test_utils.GenericTestBase):
             'content_ids': '["content"]',
             'target_language_code': 'es'
         }, expected_status_int=404)
+
+    def test_handler_with_no_exploration_id_raises_exception(self):
+        self.get_json('/machine_translated_state_texts_handler', params={
+            'state_name': 'End State',
+            'content_ids': '["content"]',
+            'target_language_code': 'es'
+        }, expected_status_int=400)
 
     def test_handler_with_invalid_state_name_returns_not_found(self):
         self.get_json('/machine_translated_state_texts_handler', params={
@@ -536,13 +550,58 @@ class MachineTranslatedStateTextsHandler(test_utils.GenericTestBase):
             'target_language_code': 'es'
         }, expected_status_int=404)
 
-    def test_handler_with_invalid_content_id_returns_not_found(self):
+    def test_handler_with_no_state_name_raises_exception(self):
+        self.get_json('/machine_translated_state_texts_handler', params={
+            'exp_id': self.exp_id,
+            'content_ids': '["content"]',
+            'target_language_code': 'es'
+        }, expected_status_int=400)
+
+    def test_handler_with_invalid_content_ids_returns_none(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'content_ids': '["invalid_content_id"]',
+                'target_language_code': 'es'
+            }, expected_status_int=200
+        )
+        expected_output = {
+            'translated_texts': {'invalid_content_id': None}
+        }
+        self.assertEqual(output, expected_output)
+
+    def test_handler_with_invalid_content_ids_format_returns_raises_exception(
+            self):
         self.get_json('/machine_translated_state_texts_handler', params={
             'exp_id': self.exp_id,
             'state_name': 'End State',
-            'content_ids': '["invalid_content_id"]',
+            'content_ids': 'invalid_format',
             'target_language_code': 'es'
-        }, expected_status_int=404)
+        }, expected_status_int=400)
+
+    def test_handler_with_empty_content_ids_returns_empty_response_dict(self):
+        output = self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'content_ids': '[]',
+                'target_language_code': 'es'
+            }, expected_status_int=200
+        )
+        expected_output = {
+            'translated_texts': {}
+        }
+        self.assertEqual(output, expected_output)
+
+    def test_handler_with_missing_content_ids_raises_exception(self):
+        self.get_json(
+            '/machine_translated_state_texts_handler', params={
+                'exp_id': self.exp_id,
+                'state_name': 'End State',
+                'target_language_code': 'en'
+            }, expected_status_int=400
+        )
 
     def test_handler_with_valid_input_returns_translation(self):
         exp_services.update_exploration(

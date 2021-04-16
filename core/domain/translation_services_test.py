@@ -19,9 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
 from core.domain import translation_fetchers
 from core.domain import translation_services
 from core.platform import models
@@ -40,46 +37,27 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         translation_models.MachineTranslatedTextModel.create(
             'en', 'es', 'text to translate', 'texto para traducir')
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.set_admins([self.ADMIN_USERNAME])
-
-        self.exp_id = exp_fetchers.get_new_exploration_id()
-        exp = self.save_new_valid_exploration(
-            self.exp_id,
-            self.owner_id,
-            title='title',
-            category='category',
-            end_state_name='End State'
-        )
-
-        self.publish_exploration(self.owner_id, exp.id)
-        exp_services.update_exploration(
-            self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'Introduction',
-                'new_value': {
-                    'content_id': 'content',
-                    'html': 'Please continue.'
-                }
-            })], 'Changes content.')
+    def test_get_machine_translation_with_same_source_and_target_language_code(
+            self):
+        translated_text = translation_services.get_machine_translation(
+            'en', 'en', 'text to translate')
+        self.assertEqual(translated_text, 'text to translate')
+        translation = translation_fetchers.get_translation_for_text(
+            'en', 'en', 'text to translate')
+        self.assertIsNone(translation)
 
     def test_machine_translation_with_invalid_language_code_raises_exception(
             self):
         with self.assertRaisesRegexp(
             ValueError, 'Invalid target language code: invalid_language_code'
         ):
-            translation_services.get_machine_translation_for_content_id(
-                self.exp_id,
-                'Introduction',
-                'content',
-                'invalid_language_code'
-            )
+            translation_services.get_machine_translation(
+                'en', 'invalid_language_code', 'text to translate')
+        with self.assertRaisesRegexp(
+            ValueError, 'Invalid source language code: invalid_language_code'
+        ):
+            translation_services.get_machine_translation(
+                'invalid_language_code', 'es', 'text to translate')
 
     def test_get_machine_translation_checks_datastore_first(self):
         with self.swap_to_always_raise(
@@ -101,31 +79,3 @@ class TranslationServiceTests(test_utils.GenericTestBase):
             'en', 'fr', 'hello world')
         self.assertIsNotNone(translation)
         self.assertEqual(translation.translated_text, 'Bonjour le monde')
-
-    def test_get_machine_translation_for_content_id_with_valid_input(self):
-        translated_text = (
-            translation_services.get_machine_translation_for_content_id(
-                self.exp_id, 'Introduction', 'content', 'es')
-        )
-        self.assertEqual(translated_text, 'Por favor continua.')
-
-    def test_get_machine_translation_is_none_if_exp_id_is_invalid(self):
-        translated_text = (
-            translation_services.get_machine_translation_for_content_id(
-                'invalid_exp_id', 'Introduction', 'content', 'es')
-        )
-        self.assertIsNone(translated_text)
-
-    def test_get_machine_translation_is_none_if_state_name_is_invalid(self):
-        translated_text = (
-            translation_services.get_machine_translation_for_content_id(
-                self.exp_id, 'invalid_state_name', 'content', 'es')
-        )
-        self.assertIsNone(translated_text)
-
-    def test_get_machine_translation_is_none_if_content_id_is_invalid(self):
-        translated_text = (
-            translation_services.get_machine_translation_for_content_id(
-                self.exp_id, 'Introduction', 'invalid_content_id', 'es')
-        )
-        self.assertIsNone(translated_text)

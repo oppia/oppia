@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import exp_fetchers
 from core.domain import translation_fetchers
 from core.platform import models
 
@@ -27,38 +26,6 @@ cloud_translate_services = models.Registry.import_cloud_translate_services()
 
 (translation_models,) = models.Registry.import_models([
     models.NAMES.translation])
-
-
-def get_machine_translation_for_content_id(
-        exploration_id, state_name, content_id, target_language_code):
-    """Gets a machine translation for the given exploration state content id,
-    in the given language.
-
-    Args:
-        exploration_id: str. The id of the exploration being translated.
-        state_name: str. The name of the state being translated.
-        content_id: str. The content id of the state content being translated.
-        target_language_code: str. The language code for the target
-            translation language. Must be different from source_language_code.
-
-    Returns:
-        str|None. The translated text or None if no translation is found.
-    """
-    exp = exp_fetchers.get_exploration_by_id(exploration_id, strict=False)
-    if exp is None:
-        return None
-    state_names_to_content_id_mapping = exp.get_translatable_text(
-        target_language_code)
-
-    if state_name not in state_names_to_content_id_mapping:
-        return None
-    content_id_mapping = state_names_to_content_id_mapping[state_name]
-    if content_id not in content_id_mapping:
-        return None
-    source_text = content_id_mapping[content_id]
-
-    return get_machine_translation(
-        exp.language_code, target_language_code, source_text)
 
 
 def get_machine_translation(
