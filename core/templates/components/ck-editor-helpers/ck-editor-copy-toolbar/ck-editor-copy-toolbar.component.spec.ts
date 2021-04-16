@@ -81,6 +81,12 @@ describe('CkEditor copy toolbar', () => {
     expect(blurSpy).toHaveBeenCalled();
   });
 
+  it('should revert cursor to normal when modal is closed', () => {
+    component.ngOnDestroy();
+    fixture.detectChanges();
+    expect(document.body.style.cursor).not.toBe('copy');
+  })
+
   afterEach(() => {
     document.body.removeChild(dummyRichTextEditor);
   });
