@@ -673,7 +673,7 @@ class AuditFirebaseImportReadinessOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         # The reduce() function must be static, so we manually create a "cls"
         # variable instead of changing the function into a classmethod.
-        cls = PopulateFirebaseAccountsOneOffJob
+        cls = AuditFirebaseImportReadinessOneOffJob
 
         if key == cls.SYSTEM_COMMITTER_ACK:
             yield (cls.SYSTEM_COMMITTER_ACK, values)
