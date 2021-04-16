@@ -68,7 +68,7 @@ class StorageModelAuditJobsTest(test_utils.GenericTestBase):
             # for base models. The audit jobs for subclasses of base models
             # cover the test cases for base models, so extra audit jobs
             # for base models are not required.
-            if module_name.value == 'base_model':
+            if module_name == models.NAMES.base_model:
                 continue
             (module, ) = models.Registry.import_models([module_name])
             for member_name, member_obj in inspect.getmembers(module):

@@ -81,18 +81,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                [
-                                    '=',
-                                    SERVER_MODES.dev.value
-                                ],
-                                [
-                                    '=',
-                                    SERVER_MODES.test.value
-                                ],
-                                [
-                                    '=',
-                                    SERVER_MODES.prod.value
-                                ]
+                                ['=', SERVER_MODES.dev.value],
+                                ['=', SERVER_MODES.test.value],
+                                ['=', SERVER_MODES.prod.value]
                             ]
                         }
                     ],
@@ -200,19 +191,13 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                [
-                                    '=',
-                                    SERVER_MODES.prod.value
-                                ]
+                                ['=', SERVER_MODES.prod.value]
                             ],
                         },
                         {
                             'type': 'platform_type',
                             'conditions': [
-                                [
-                                    '=',
-                                    'Backend'
-                                ]
+                                ['=', 'Backend']
                             ],
                         }
                     ],
@@ -238,10 +223,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                [
-                                    '=',
-                                    FEATURE_STAGES.dev.value
-                                ]
+                                ['=', FEATURE_STAGES.dev.value]
                             ]
                         }
                     ],
