@@ -19,18 +19,17 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface CollectionPlaythroughBackendDict {
-  'next_exploration_id': string | null;
+  'next_exploration_id': string;
   'completed_exploration_ids': string[];
 }
 
 export class CollectionPlaythrough {
-  _nextExplorationId: string | null;
+  _nextExplorationId: string;
   _completedExplorationIds: string[];
 
   // Stores information about a current playthrough of a collection for a
   // user.
-  constructor(
-      nextExplorationId: string | null, completedExplorationIds: string[]) {
+  constructor(nextExplorationId: string, completedExplorationIds: string[]) {
     this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
   }
@@ -44,7 +43,7 @@ export class CollectionPlaythrough {
   }
 
   static create(
-      nextExplorationId: string | null,
+      nextExplorationId: string,
       completedExplorationIds: string[]): CollectionPlaythrough {
     return new CollectionPlaythrough(
       nextExplorationId, cloneDeep(completedExplorationIds));
@@ -52,7 +51,7 @@ export class CollectionPlaythrough {
 
   // Returns the upcoming exploration ID. Changes to this are not
   // reflected in the collection.
-  getNextExplorationId(): string | null {
+  getNextExplorationId(): string {
     return this._nextExplorationId;
   }
 

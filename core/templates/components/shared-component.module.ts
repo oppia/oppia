@@ -68,10 +68,9 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
-import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
@@ -121,7 +120,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     LazyLoadingComponent,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
-    OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -155,7 +153,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     ImageUploaderComponent,
-    OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
     SkillMasteryViewerComponent,
@@ -185,8 +182,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     PromoBarComponent,
     ImageUploaderComponent,
     OnScreenKeyboardComponent,
-    OutcomeFeedbackEditorComponent,
-    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,

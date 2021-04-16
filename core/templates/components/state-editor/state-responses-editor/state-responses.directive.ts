@@ -31,7 +31,7 @@ require(
   'outcome-destination-editor.directive.ts');
 require(
   'components/state-directives/outcome-editor/' +
-  'outcome-feedback-editor.component.ts');
+  'outcome-feedback-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +

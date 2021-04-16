@@ -92,13 +92,13 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Processing query...');
 
           AdminTaskManagerService.startTask();
-          ctrl.userRolesResult = {};
+          ctrl.result = {};
           AdminBackendApiService.viewUsersRoleAsync(
             formResponse.filterCriterion, formResponse.role,
             formResponse.username
           ).then((userRoles) => {
-            ctrl.userRolesResult = userRoles;
-            if (Object.keys(ctrl.userRolesResult).length === 0) {
+            ctrl.result = userRoles;
+            if (Object.keys(ctrl.result).length === 0) {
               ctrl.resultRolesVisible = false;
               ctrl.setStatusMessage('No results.');
             } else {
@@ -161,13 +161,11 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
-          ctrl.contributionReviewersResult = {};
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then((usersObject) => {
-              ctrl.contributionReviewersResult.usernames = (
-                usersObject.usernames);
+              ctrl.result.usernames = usersObject.usernames;
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
@@ -185,7 +183,7 @@ angular.module('oppia').directive('adminRolesTab', [
                 contributionRights.can_review_translation_for_language_codes);
               voiceoverLanguages = getLanguageDescriptions(
                 contributionRights.can_review_voiceover_for_language_codes);
-              ctrl.contributionReviewersResult = {
+              ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
                 questions: contributionRights.can_review_questions,
@@ -196,7 +194,6 @@ angular.module('oppia').directive('adminRolesTab', [
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
-              refreshFormData();
             }, handleErrorResponse);
           }
           AdminTaskManagerService.finishTask();
@@ -331,8 +328,7 @@ angular.module('oppia').directive('adminRolesTab', [
           refreshFormData();
           ctrl.resultRolesVisible = false;
           ctrl.contributionReviewersDataFetched = false;
-          ctrl.userRolesResult = {};
-          ctrl.contributionReviewersResult = {};
+          ctrl.result = {};
           ctrl.setStatusMessage('');
 
           ctrl.languageCodesAndDescriptions = (
@@ -383,11 +379,9 @@ angular.module('oppia').directive('adminRolesTab', [
           });
         };
 
-        ctrl.clearResults = function() {
+        ctrl.clearReviewersData = function() {
           ctrl.contributionReviewersDataFetched = false;
-          ctrl.resultRolesVisible = false;
-          ctrl.userRolesResult = {};
-          ctrl.contributionReviewersResult = {};
+          ctrl.result = {};
         };
       }]
     };

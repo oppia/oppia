@@ -28,8 +28,11 @@ import utils
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
 TEST_SUITES_NOT_RUN_IN_CI = [
-    'full', 'adminPage', 'library', 'publication',
-    'topicsAndSkillsDashboard', 'topicAndStoryEditor',
+    'full', 'accessibility', 'adminPage',
+    'classroomPageFileUploadFeatures', 'collections',
+    'contributorDashboard', 'featureGating', 'fileUploadExtensions',
+    'fileUploadFeatures', 'library', 'navigation', 'playVoiceovers',
+    'publication', 'topicsAndSkillsDashboard', 'topicAndStoryEditor',
     'topicAndStoryEditorFileUploadFeatures', 'topicAndStoryViewer']
 
 

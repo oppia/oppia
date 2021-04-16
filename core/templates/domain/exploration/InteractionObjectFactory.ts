@@ -347,9 +347,8 @@ export class InteractionObjectFactory {
   _createFromNumericExpressionInputCustomizationArgsBackendDict(
       caBackendDict: NumericExpressionInputCustomizationArgsBackendDict
   ): NumericExpressionInputCustomizationArgs {
-    const { useFractionForDivision, placeholder } = caBackendDict;
+    const { placeholder } = caBackendDict;
     return {
-      useFractionForDivision,
       placeholder: {
         value: this.subtitledUnicodeFactory.createFromBackendDict(
           placeholder.value)

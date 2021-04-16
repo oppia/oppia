@@ -61,9 +61,6 @@ def main(args=None):
             'Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
-            # If the google cloud version is updated here, the corresponding
-            # lines (GAE_DIR and GCLOUD_PATH) in release_constants.json should
-            # also be updated.
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',

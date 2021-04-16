@@ -22,7 +22,7 @@ require(
   'outcome-destination-editor.directive.ts');
 require(
   'components/state-directives/outcome-editor/' +
-  'outcome-feedback-editor.component.ts');
+  'outcome-feedback-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 
 require(

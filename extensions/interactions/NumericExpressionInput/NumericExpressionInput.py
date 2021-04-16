@@ -45,12 +45,4 @@ class NumericExpressionInput(base.BaseInteraction):
             'content_id': None,
             'unicode_str': 'Type an expression here, using only numbers.'
         }
-    }, {
-        'name': 'useFractionForDivision',
-        'description': (
-            'Represent division using fractions (rather than ÷).'),
-        'schema': {
-            'type': 'bool'
-        },
-        'default_value': False
     }]

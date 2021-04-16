@@ -43,7 +43,6 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   warningText: string = '';
   @Input() customOskLettersWithValue: string = '';
   @Input() savedSolution: string;
-  @Input() useFractionForDivisionWithValue: string;
 
   constructor(
     private algebraicExpressionInputRulesService:
@@ -89,8 +88,6 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   ngOnInit(): void {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
-    this.guppyConfigurationService.changeDivSymbol(
-      JSON.parse(this.useFractionForDivisionWithValue || 'false'));
     this.guppyInitializationService.setCustomOskLetters(
       this.htmlEscaperService.escapedJsonToObj(
         this.customOskLettersWithValue) as string[]

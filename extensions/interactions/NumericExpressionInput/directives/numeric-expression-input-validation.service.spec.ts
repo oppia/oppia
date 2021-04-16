@@ -71,7 +71,6 @@ describe('NumericExpressionInputValidationService', () => {
     });
 
     customizationArgs = {
-      useFractionForDivision: false,
       placeholder: {
         value: new SubtitledUnicode(
           'Type an expression here, using only numbers.', 'ca_placeholder_0')

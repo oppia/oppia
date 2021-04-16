@@ -245,7 +245,7 @@ describe('Interactions', function() {
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
       'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',
-      true, 'IsEquivalentTo', '(16(x^12))/(4x^2)');
+      true, 'IsEquivalentTo', '(16(x^12))/4x^2');
     // Expecting answer to be 4x^10.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');

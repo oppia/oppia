@@ -32,8 +32,8 @@
     </div>
 
     <div ng-if="feedbackEditorIsOpen">
-      <oppia-outcome-feedback-editor [outcome]="tmpOutcome">
-      </oppia-outcome-feedback-editor>
+      <outcome-feedback-editor outcome="tmpOutcome">
+      </outcome-feedback-editor>
     </div>
     <br>
 
@@ -64,7 +64,7 @@
   <button class="btn btn-success" ng-click="saveResponse(true)" ng-disabled="(isInvalid || addAnswerGroupForm.outcomeDetailsForm.$invalid) || isSelfLoopWithNoFeedback(tmpOutcome)">Save and Add Another</button>
 </div>
 <style>
-  oppia-outcome-feedback-editor {
+  outcome-feedback-editor {
     margin-top: 50px;
   }
   rule-editor {

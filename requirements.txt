@@ -30,14 +30,14 @@ git+git://github.com/oppia/firebase-admin-python@8d6deee889733d09ef5327d78c09e4d
 funcsigs==1.0.2           # via apache-beam, mock
 future==0.18.2            # via -r requirements.in, apache-beam
 futures==3.3.0            # via apache-beam, google-api-core, grpcio, pyarrow
-google-api-core[grpc,grpcgcp]==1.22.4  # via firebase-admin, google-api-python-client, google-cloud-bigquery, google-cloud-bigtable, google-cloud-core, google-cloud-datastore, google-cloud-dlp, google-cloud-firestore, google-cloud-language, google-cloud-pubsub, google-cloud-spanner, google-cloud-tasks, google-cloud-translate, google-cloud-videointelligence, google-cloud-vision
+google-api-core[grpc,grpcgcp]==1.22.4  # via firebase-admin, google-api-python-client, google-cloud-bigquery, google-cloud-bigtable, google-cloud-core, google-cloud-datastore, google-cloud-dlp, google-cloud-firestore, google-cloud-language, google-cloud-pubsub, google-cloud-spanner, google-cloud-tasks, google-cloud-videointelligence, google-cloud-vision
 google-api-python-client==1.12.8  # via firebase-admin
 google-apitools==0.5.31   # via apache-beam
 google-auth-httplib2==0.0.4  # via google-api-python-client
 google-auth==1.22.1       # via apache-beam, google-api-core, google-api-python-client, google-auth-httplib2, google-cloud-storage
 google-cloud-bigquery==1.28.0  # via apache-beam
 google-cloud-bigtable==1.7.0  # via apache-beam
-google-cloud-core==1.5.0  # via apache-beam, google-cloud-bigquery, google-cloud-bigtable, google-cloud-datastore, google-cloud-firestore, google-cloud-spanner, google-cloud-storage, google-cloud-translate
+google-cloud-core==1.5.0  # via apache-beam, google-cloud-bigquery, google-cloud-bigtable, google-cloud-datastore, google-cloud-firestore, google-cloud-spanner, google-cloud-storage
 google-cloud-datastore==1.15.3  # via apache-beam
 google-cloud-dlp==1.0.0   # via apache-beam
 google-cloud-firestore==1.9.0  # via firebase-admin
@@ -46,7 +46,6 @@ google-cloud-pubsub==1.7.0  # via apache-beam
 google-cloud-spanner==1.19.1  # via apache-beam
 google-cloud-storage==1.35.0  # via firebase-admin
 google-cloud-tasks==1.5.0  # via -r requirements.in
-google-cloud-translate==2.0.1  # via -r requirements.in
 google-cloud-videointelligence==1.16.1  # via apache-beam
 google-cloud-vision==1.0.0  # via apache-beam
 google-resumable-media==1.2.0  # via google-cloud-bigquery, google-cloud-storage

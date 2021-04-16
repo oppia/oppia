@@ -69,7 +69,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
     });
 
     customizationArgs = {
-      useFractionForDivision: false,
       customOskLetters: {
         value: ['x', 'y', 'a', 'b']
       }
@@ -198,7 +197,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }, 'AlgebraicExpressionInput')
     ];
     customizationArgs = {
-      useFractionForDivision: false,
       customOskLetters: {
         value: ['y', 'a', 'b']
       }
@@ -224,7 +222,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }, 'AlgebraicExpressionInput')
     ];
     customizationArgs = {
-      useFractionForDivision: false,
       customOskLetters: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
       }
