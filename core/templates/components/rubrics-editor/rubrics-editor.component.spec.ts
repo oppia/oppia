@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
-import { Rubric } from 'domain/skill/RubricObjectFactory';
+import { Rubric } from 'domain/skill/rubric.model';
 import { RubricsEditorComponent } from './rubrics-editor.component';
 
 describe('Rubrics Editor Component', () => {

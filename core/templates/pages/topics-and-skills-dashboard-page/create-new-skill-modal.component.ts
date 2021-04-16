@@ -21,8 +21,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { Rubric } from 'domain/skill/rubric.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { ContextService } from 'services/context.service';
@@ -35,9 +35,9 @@ import { TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashb
 })
 export class CreateNewSkillModalComponent {
   rubrics = [
-    this.rubricObjectFactory.create(constants.SKILL_DIFFICULTIES[0], []),
-    this.rubricObjectFactory.create(constants.SKILL_DIFFICULTIES[1], ['']),
-    this.rubricObjectFactory.create(constants.SKILL_DIFFICULTIES[2], [])];
+    Rubric.create(constants.SKILL_DIFFICULTIES[0], []),
+    Rubric.create(constants.SKILL_DIFFICULTIES[1], ['']),
+    Rubric.create(constants.SKILL_DIFFICULTIES[2], [])];
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
@@ -52,11 +52,9 @@ export class CreateNewSkillModalComponent {
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private rubricObjectFactory: RubricObjectFactory,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
     private skillObjectFactory: SkillObjectFactory,
-    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
@@ -118,7 +116,7 @@ export class CreateNewSkillModalComponent {
 
   saveConceptCardExplanation(): void {
     const explanationObject: SubtitledHtml =
-    this.subtitledHtmlObjectFactory.createDefault(
+    SubtitledHtml.createDefault(
       this.bindableDict.displayedConceptCardExplanation,
       AppConstants.COMPONENT_NAME_EXPLANATION);
     this.newExplanationObject = explanationObject.toBackendDict();

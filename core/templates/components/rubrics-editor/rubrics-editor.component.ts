@@ -20,7 +20,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angu
 import { downgradeComponent } from '@angular/upgrade/static';
 import constants from 'assets/constants';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { Rubric } from 'domain/skill/RubricObjectFactory';
+import { Rubric } from 'domain/skill/rubric.model';
 import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 interface Explanation {

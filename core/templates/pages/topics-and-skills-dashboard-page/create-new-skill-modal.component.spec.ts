@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
-import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { ContextService } from 'services/context.service';
@@ -39,7 +39,7 @@ describe('Create new skill modal', () => {
   let skillEditorStateService: SkillEditorStateService;
   let skillCreationService: SkillCreationService;
 
-  class MockSubtitledHtmlObjectFactory {
+  class MockSubtitledHtml {
     createDefault(
         displayedConceptCardExplanation: string,
         explanation: string
@@ -66,8 +66,8 @@ describe('Create new skill modal', () => {
         NgbActiveModal,
         ChangeDetectorRef,
         {
-          provide: SubtitledHtmlObjectFactory,
-          useClass: MockSubtitledHtmlObjectFactory
+          provide: SubtitledHtml,
+          useClass: MockSubtitledHtml
         }
       ]
     }).compileComponents();
