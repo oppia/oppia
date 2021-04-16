@@ -13,26 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * subtopic page data domain objects.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-  RecordedVoiceoversObjectFactory
-} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+  RecordedVoiceovers
+} from 'domain/exploration/recorded-voiceovers.model';
 
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml
+} from 'domain/exploration/subtitled-html.model';
 
 export interface SubtopicPageContentsBackendDict {
   'subtitled_html': SubtitledHtmlBackendDict;
@@ -78,34 +73,20 @@ export class SubtopicPageContents {
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
     };
   }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SubtopicPageContentsObjectFactory {
-  constructor(
-    private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
-    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
-
-  createDefault(): SubtopicPageContents {
-    var recordedVoiceovers = this.recordedVoiceoversObjectFactory.createEmpty();
+  static createDefault(): SubtopicPageContents {
+    var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     recordedVoiceovers.addContentId('content');
     return new SubtopicPageContents(
-      this.subtitledHtmlObjectFactory.createDefault('', 'content'),
+      SubtitledHtml.createDefault('', 'content'),
       recordedVoiceovers);
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: SubtopicPageContentsBackendDict): SubtopicPageContents {
     return new SubtopicPageContents(
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         backendDict.subtitled_html),
-      this.recordedVoiceoversObjectFactory.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         backendDict.recorded_voiceovers));
   }
 }
-
-angular.module('oppia').factory(
-  'SubtopicPageContentsObjectFactory',
-  downgradeInjectable(SubtopicPageContentsObjectFactory));
