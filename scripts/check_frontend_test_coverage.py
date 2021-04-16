@@ -488,6 +488,7 @@ def check_coverage_changes():
                 ' name and add the new file name in the denylist in'
                 ' the file scripts/check_frontend_test_coverage.py.\n'
                 .format(test_name))
+
     if errors:
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('Frontend Coverage Checks Not Passed.')

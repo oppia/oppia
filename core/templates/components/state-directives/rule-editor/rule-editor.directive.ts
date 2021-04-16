@@ -272,6 +272,15 @@ angular.module('oppia').directive('ruleEditor', [
 
           ctrl.$onInit = function() {
             ctrl.isInvalid = false;
+            /**
+             * Rule editors are usually used in two ways. Inline or in a modal.
+             * When in a modal, the save button is in the modal html and when
+             * inline it is in the rule editors template. When listening to the
+             * object validity change event, we need to know which button to
+             * disable. If we are inline, we disable the button in the
+             * rule-editor template. Which is why we using the if condition
+             * below.
+             */
             if (ctrl.isEditingRuleInline()) {
               const eventBusGroup: EventBusGroup = new EventBusGroup(
                 EventBusService);
