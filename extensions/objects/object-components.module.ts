@@ -50,6 +50,9 @@ import { MathEquationEditorComponent } from './templates/math-equation-editor.co
 import { LogicErrorCategoryEditorComponent } from './templates/logic-error-category-editor.component';
 import { LogicQuestionEditorComponent } from './templates/logic-question-editor.component';
 import { MathExpressionContentEditorComponent } from './templates/math-expression-content-editor.component';
+import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
+import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
+import { NumberWithUnitsEditorComponent } from './templates/number-with-units-editor.component';
 
 
 @NgModule({
@@ -86,6 +89,9 @@ import { MathExpressionContentEditorComponent } from './templates/math-expressio
     LogicQuestionEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NumberWithUnitsEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
   entryComponents: [
@@ -109,6 +115,9 @@ import { MathExpressionContentEditorComponent } from './templates/math-expressio
     LogicQuestionEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NumberWithUnitsEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
   exports: [
@@ -132,6 +141,9 @@ import { MathExpressionContentEditorComponent } from './templates/math-expressio
     LogicQuestionEditorComponent,
     MathEquationEditorComponent,
     MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NumberWithUnitsEditorComponent,
     SetOfUnicodeStringEditorComponent
   ],
 })
