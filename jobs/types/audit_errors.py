@@ -152,6 +152,16 @@ class ModelIdRegexError(BaseAuditError):
         self.message = 'id does not match the expected regex=%r' % regex_string
 
 
+class ModelDomainObjectValidateError(BaseAuditError):
+    """Error class for domain object validation errors."""
+
+    def __init__(self, model, error_message):
+        super(ModelDomainObjectValidateError, self).__init__(model)
+        self.message = (
+            'Entity fails domain validation with the '
+            'error: %s' % error_message)
+
+
 class ModelExpiredError(BaseAuditError):
     """Error class for expired models."""
 
