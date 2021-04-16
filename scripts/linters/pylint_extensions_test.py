@@ -819,6 +819,22 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_no_period_at_end)
 
+    def test_malformed_docstring(self):
+        node_malformed_docstring = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"This is a docstring.
+
+                    Args: arg: variable. Description.
+                \"\"\"
+        """)
+
+        message = testutils.Message(
+            msg_id='malformed-docstring', node=node_malformed_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_malformed_docstring)
+
     def test_no_newline_at_end_of_multi_line_docstring(self):
         node_no_newline_at_end = astroid.extract_node(
             u"""def func(arg): #@

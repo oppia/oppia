@@ -834,12 +834,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
         """
         if node.doc:
             docstring = node.doc.splitlines()
-            for (line_num, line) in enumerate(docstring):
-                if (re.search(br'^(\s+(Args|Raises|Returns|Yields))', line) and
-                        docstring[line_num - 1].strip() == b''):
-                    if (len(line.split()) != 1 or
-                            not re.search(br'\s+\S+:', line)):
-                        self.add_message('malformed-docstring', node=node)
+            for line in docstring:
+                if (line.strip().startswith(
+                        (b'Args:', b'Raises:', b'Returns:', b'Yields:')) and
+                        len(line.split()) != 1):
+                    self.add_message('malformed-docstring', node=node)
             # Check for space after """ in docstring.
             if len(docstring[0]) > 0 and docstring[0][0] == b' ':
                 self.add_message('space-after-triple-quote', node=node)

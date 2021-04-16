@@ -71,7 +71,8 @@ def _print_color_message(message):
 def check_if_on_ci():
     """Check if the script is running on a CI server.
 
-    Returns: bool. Whether we are running on a CI server.
+    Returns:
+        bool. Whether we are running on a CI server.
     """
     for info in CI_INFO.values():
         ci_identifier = info['env']['identifier']
