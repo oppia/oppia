@@ -85,7 +85,7 @@ describe('CkEditor copy toolbar', () => {
     component.ngOnDestroy();
     fixture.detectChanges();
     expect(document.body.style.cursor).not.toBe('copy');
-  })
+  });
 
   afterEach(() => {
     document.body.removeChild(dummyRichTextEditor);
