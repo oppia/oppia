@@ -270,7 +270,8 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
 
     SAMPLE_JSON_CONTENT = {
         'State A': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -304,7 +305,6 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
-card_is_checkpoint: false
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -312,7 +312,8 @@ written_translations:
     default_outcome: {}
 """),
         'State B': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -346,7 +347,6 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
-card_is_checkpoint: false
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -354,7 +354,8 @@ written_translations:
     default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
-            """classifier_model_id: null
+            """card_is_checkpoint: true
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -388,7 +389,6 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
-card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -398,7 +398,8 @@ written_translations:
     }
 
     SAMPLE_STATE_STRING = (
-        """classifier_model_id: null
+        """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -432,7 +433,6 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
-card_is_checkpoint: false
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
