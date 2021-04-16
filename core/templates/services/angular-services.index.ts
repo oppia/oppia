@@ -72,13 +72,10 @@ import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObject
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from 'domain/exploration/ParamTypeObjectFactory';
-import { RecordedVoiceoversObjectFactory } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
@@ -104,8 +101,6 @@ import { ReviewTestBackendApiService } from 'domain/review_test/review-test-back
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
-import { ShortSkillSummaryObjectFactory } from 'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
@@ -127,15 +122,11 @@ import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
 import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
-import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
-import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -578,14 +569,11 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
-  ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
-  ['RecordedVoiceoversObjectFactory', RecordedVoiceoversObjectFactory],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
   ['ResponsesService', ResponsesService],
-  ['RubricObjectFactory', RubricObjectFactory],
   ['RuleObjectFactory', RuleObjectFactory],
   ['SVMPredictionService', SVMPredictionService],
   ['SchemaDefaultValueService', SchemaDefaultValueService],
@@ -596,7 +584,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['SearchService', SearchService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
-  ['ShortSkillSummaryObjectFactory', ShortSkillSummaryObjectFactory],
   ['SidebarStatusService', SidebarStatusService],
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillBackendApiService', SkillBackendApiService],
@@ -650,11 +637,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
-  ['SubtitledHtmlObjectFactory', SubtitledHtmlObjectFactory],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
-  ['SubtopicObjectFactory', SubtopicObjectFactory],
-  ['SubtopicPageContentsObjectFactory', SubtopicPageContentsObjectFactory],
-  ['SubtopicPageObjectFactory', SubtopicPageObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
@@ -697,7 +680,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
   ['VersionTreeService', VersionTreeService],
-  ['VoiceoverObjectFactory', VoiceoverObjectFactory],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
   ['WinnowingPreprocessingService', WinnowingPreprocessingService],

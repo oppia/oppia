@@ -24,8 +24,7 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from './voiceover.model';
 
 describe('States Object Factory', () => {
   let sof: StateObjectFactory = null;
@@ -36,7 +35,6 @@ describe('States Object Factory', () => {
   let secondState = null;
   let statesWithCyclicOutcomeDict = null;
   let statesWithAudioAndWrittenTranslationsDict = null;
-  let vof = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,7 +42,6 @@ describe('States Object Factory', () => {
     });
     ssof = TestBed.get(StatesObjectFactory);
     sof = TestBed.get(StateObjectFactory);
-    vof = TestBed.get(VoiceoverObjectFactory);
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
@@ -675,18 +672,18 @@ describe('States Object Factory', () => {
       statesWithAudioAndWrittenTranslationsDict);
     expect(statesWithAudioAndWrittenTranslations.getAllVoiceovers('hi-en'))
       .toEqual({
-        'first state': [vof.createFromBackendDict({
+        'first state': [Voiceover.createFromBackendDict({
           filename: 'myfile3.mp3',
           file_size_bytes: 0.8,
           needs_update: false,
           duration_secs: 0.8
-        }), vof.createFromBackendDict({
+        }), Voiceover.createFromBackendDict({
           filename: 'myfile8.mp3',
           file_size_bytes: 1.2,
           needs_update: false,
           duration_secs: 1.2
         })],
-        'second state': [vof.createFromBackendDict({
+        'second state': [Voiceover.createFromBackendDict({
           filename: 'myfile2.mp3',
           file_size_bytes: 0.8,
           needs_update: false,
