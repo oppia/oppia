@@ -19,13 +19,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { Subtopic } from 'domain/topic/subtopic.model';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants.ts';
+  'pages/practice-session-page/practice-session-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 

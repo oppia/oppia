@@ -25,8 +25,8 @@ import { UrlInterpolationService } from
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
-import { ReadOnlySubtopicPageObjectFactory } from
-  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+import { ReadOnlySubtopicPageData } from
+  'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -46,8 +46,6 @@ let component: SubtopicViewerNavbarBreadcrumbComponent;
 let fixture: ComponentFixture<SubtopicViewerNavbarBreadcrumbComponent>;
 
 describe('Subtopic viewer navbar breadcrumb component', function() {
-  let readOnlySubtopicPageObjectFactory = null;
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SubtopicViewerNavbarBreadcrumbComponent],
@@ -59,7 +57,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
             fetchSubtopicDataAsync: () => (
               new Promise((resolve) => {
                 resolve(
-                  readOnlySubtopicPageObjectFactory.createFromBackendDict({
+                  ReadOnlySubtopicPageData.createFromBackendDict({
                     subtopic_title: 'Subtopic Title',
                     page_contents: {
                       subtitled_html: {
@@ -82,8 +80,6 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
         UrlInterpolationService,
       ],
     }).compileComponents();
-    readOnlySubtopicPageObjectFactory = TestBed.get(
-      ReadOnlySubtopicPageObjectFactory);
   }));
 
   beforeEach(() => {

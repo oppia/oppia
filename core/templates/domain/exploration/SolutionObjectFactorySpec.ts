@@ -25,11 +25,11 @@ import {
 } from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe.ts';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {

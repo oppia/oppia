@@ -16,7 +16,6 @@
  * @fileoverview Directive for the skill rubric editor.
  */
 
-require('domain/skill/RubricObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');

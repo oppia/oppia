@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
+ * @fileoverview Model for creating frontend instances of
  * rubrics.
  */
 
@@ -23,9 +23,6 @@ export interface RubricBackendDict {
 }
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export class Rubric {
   _difficulty: string;
@@ -54,22 +51,14 @@ export class Rubric {
   setExplanations(newExplanations: string[]): void {
     this._explanations = cloneDeep(newExplanations);
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RubricObjectFactory {
-  createFromBackendDict(rubricBackendDict: RubricBackendDict): Rubric {
+  static createFromBackendDict(rubricBackendDict: RubricBackendDict): Rubric {
     return new Rubric(
       rubricBackendDict.difficulty,
       rubricBackendDict.explanations);
   }
-  create(difficulty: string, explanations: string[]): Rubric {
+
+  static create(difficulty: string, explanations: string[]): Rubric {
     return new Rubric(difficulty, explanations);
   }
 }
-
-angular.module('oppia').factory(
-  'RubricObjectFactory',
-  downgradeInjectable(RubricObjectFactory));

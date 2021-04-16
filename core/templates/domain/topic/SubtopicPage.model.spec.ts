@@ -13,28 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SubtopicPageObjectFactory.
+ * @fileoverview Tests for subtopic-page Model.
  */
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtopicPageObjectFactory } from
-  'domain/topic/SubtopicPageObjectFactory';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
-describe('Subtopic page object factory', () => {
-  let subtopicPageObjectFactory: SubtopicPageObjectFactory = null;
-
+describe('Subtopic page Model', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SubtopicPageObjectFactory]
+      providers: [SubtopicPage]
     });
-
-    subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
   });
 
   it('should be able to create a subtopic page object with given topic and ' +
     'subtopic id', () => {
-    var subtopicPage = subtopicPageObjectFactory.createDefault(
+    var subtopicPage = SubtopicPage.createDefault(
       'topic_id', 2);
     expect(subtopicPage.getId()).toBe('topic_id-2');
     expect(subtopicPage.getTopicId()).toBe('topic_id');
@@ -45,7 +40,7 @@ describe('Subtopic page object factory', () => {
   it('should be able to create an interstitial subtopic page object',
     () => {
       var subtopicPage =
-        subtopicPageObjectFactory.createInterstitialSubtopicPage();
+      SubtopicPage.createInterstitialSubtopicPage();
       expect(subtopicPage.getId()).toEqual(null);
       expect(subtopicPage.getTopicId()).toEqual(null);
       expect(subtopicPage.getPageContents()).toEqual(null);
@@ -53,7 +48,7 @@ describe('Subtopic page object factory', () => {
     });
 
   it('should be able to copy from another subtopic page', () => {
-    var firstSubtopicPage = subtopicPageObjectFactory.createFromBackendDict({
+    var firstSubtopicPage = SubtopicPage.createFromBackendDict({
       id: 'topic_id-1',
       topic_id: 'topic_id',
       page_contents: {
@@ -70,7 +65,7 @@ describe('Subtopic page object factory', () => {
       language_code: 'en'
     });
 
-    var secondSubtopicPage = subtopicPageObjectFactory.createFromBackendDict({
+    var secondSubtopicPage = SubtopicPage.createFromBackendDict({
       id: 'topic_id2-2',
       topic_id: 'topic_id2',
       page_contents: {

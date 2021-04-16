@@ -28,8 +28,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+
 // ^^^ This block is to be removed.
 
 require('directives/angular-html-bind.directive.ts');
@@ -79,7 +78,7 @@ describe('Question misconception editor component', function() {
       'onSaveTaggedMisconception');
     var onSaveAnswerGroupFeedbackSpy = jasmine.createSpy(
       'onSaveAnswerGroupFeedback');
-    var outcome = new OutcomeObjectFactory(new SubtitledHtmlObjectFactory());
+    var outcome = new OutcomeObjectFactory();
     var rules = new RuleObjectFactory();
     mockMisconceptionObject = {
       abc: [

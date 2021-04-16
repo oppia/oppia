@@ -25,9 +25,6 @@ import {
   ReadOnlyTopicBackendDict,
   ReadOnlyTopicObjectFactory
 } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 import { UrlInterpolationService } from
@@ -52,9 +49,7 @@ export class TopicViewerBackendApiService {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
       });
-    var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
-      new ShortSkillSummaryObjectFactory());
+    var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
     this.http.get<ReadOnlyTopicBackendDict>(topicDataUrl).toPromise().then(
       (response) => {
         let readOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(

@@ -22,9 +22,8 @@ import { Injectable } from '@angular/core';
 
 import {
   ReadOnlySubtopicPageData,
-  ReadOnlySubtopicPageObjectFactory,
   SubtopicDataBackendDict
-} from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';
 import { UrlInterpolationService } from
@@ -36,7 +35,6 @@ import { UrlInterpolationService } from
 export class SubtopicViewerBackendApiService {
   constructor(
     private http: HttpClient,
-    private readOnlySubtopicPageFactory: ReadOnlySubtopicPageObjectFactory,
     private urlInterpolation: UrlInterpolationService) {}
 
   private _fetchSubtopicData(
@@ -55,7 +53,7 @@ export class SubtopicViewerBackendApiService {
     this.http.get<SubtopicDataBackendDict>(subtopicDataUrl).toPromise()
       .then(response => {
         let subtopicDataObject = (
-          this.readOnlySubtopicPageFactory.createFromBackendDict(
+          ReadOnlySubtopicPageData.createFromBackendDict(
             response));
         if (successCallback) {
           successCallback(subtopicDataObject);

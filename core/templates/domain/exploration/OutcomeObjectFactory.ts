@@ -22,9 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml
+} from 'domain/exploration/subtitled-html.model';
 import { ParamChangeBackendDict } from
   'domain/exploration/ParamChangeObjectFactory';
 
@@ -93,14 +92,14 @@ export class Outcome {
   providedIn: 'root'
 })
 export class OutcomeObjectFactory {
-  constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
+  constructor() {}
 
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
       paramChanges: readonly ParamChangeBackendDict[]): Outcome {
     return new Outcome(
       dest,
-      this.subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         feedbackText, feedbackTextId),
       false,
       paramChanges,
@@ -111,7 +110,7 @@ export class OutcomeObjectFactory {
   createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         outcomeDict.feedback),
       outcomeDict.labelled_as_correct,
       outcomeDict.param_changes,

@@ -20,8 +20,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/subtitled-html.model';
 import { WorkedExampleObjectFactory } from
   'domain/skill/WorkedExampleObjectFactory';
 
@@ -30,12 +30,10 @@ describe('Concept card object factory', () => {
   let conceptCardDict;
   let example1;
   let example2;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
     conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
     workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
 
     example1 = {
@@ -80,18 +78,18 @@ describe('Concept card object factory', () => {
     let conceptCard =
           conceptCardObjectFactory.createFromBackendDict(conceptCardDict);
     expect(conceptCard.getExplanation()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'test explanation', 'explanation'));
     expect(conceptCard.getWorkedExamples()).toEqual([
       workedExampleObjectFactory.create(
-        subtitledHtmlObjectFactory.createDefault(
+        SubtitledHtml.createDefault(
           'worked example question 1', 'worked_example_q_1'),
-        subtitledHtmlObjectFactory.createDefault(
+        SubtitledHtml.createDefault(
           'worked example explanation 1', 'worked_example_e_1')),
       workedExampleObjectFactory.create(
-        subtitledHtmlObjectFactory.createDefault(
+        SubtitledHtml.createDefault(
           'worked example question 2', 'worked_example_q_2'),
-        subtitledHtmlObjectFactory.createDefault(
+        SubtitledHtml.createDefault(
           'worked example explanation 2', 'worked_example_e_2'))
     ]);
   });
@@ -106,7 +104,7 @@ describe('Concept card object factory', () => {
     let conceptCard =
         conceptCardObjectFactory.createInterstitialConceptCard();
     expect(conceptCard.getExplanation()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'Loading review material', 'explanation'));
     expect(conceptCard.getWorkedExamples()).toEqual([]);
   });

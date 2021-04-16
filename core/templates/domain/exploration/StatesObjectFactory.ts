@@ -25,7 +25,7 @@ import {
   State
 } from 'domain/state/StateObjectFactory';
 import { AppConstants } from 'app.constants';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from 'domain/exploration/voiceover.model';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
