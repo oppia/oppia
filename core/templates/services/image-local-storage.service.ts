@@ -19,13 +19,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AlertsService } from './alerts.service';
-import { ImageUploadHelperService } from './image-upload-helper.service';
+import { AlertsService } from 'services/alerts.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-export interface ImagesData {
+export class ImagesData {
   filename: string;
   imageBlob: Blob;
 }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,18 +37,18 @@ export class ImageLocalStorageService {
   // minimum limit, for all browsers, per hostname, that can be stored in
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
   // the limit below.
-  MAX_IMAGES_STORABLE = 5 * 1024 / 100;
-  thumbnailBgColor = null;
+  MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
+  thumbnailBgColor: string = null;
 
   constructor(
     private alertsService: AlertsService,
-    private imageUploadHelperService: ImageUploadHelperService
-  ) {}
+    private imageUploadHelperService: ImageUploadHelperService,
+    private windowRef: WindowRef) {}
 
   getObjectUrlForImage(filename: string): string {
     const urlCreator = URL || webkitURL;
     const imageBlob = this.imageUploadHelperService.convertImageDataToImageFile(
-      window.sessionStorage.getItem(filename));
+      this.windowRef.nativeWindow.sessionStorage.getItem(filename));
     return urlCreator.createObjectURL(imageBlob);
   }
 
@@ -65,23 +67,24 @@ export class ImageLocalStorageService {
         'creation.');
       return;
     }
-    window.sessionStorage.setItem(filename, rawImage);
+    this.windowRef.nativeWindow.sessionStorage.setItem(filename, rawImage);
     this.storedImageFilenames.push(filename);
   }
 
   deleteImage(filename: string): void {
-    window.sessionStorage.removeItem(filename);
+    this.windowRef.nativeWindow.sessionStorage.removeItem(filename);
     const index = this.storedImageFilenames.indexOf(filename);
     this.storedImageFilenames.splice(index, 1);
   }
 
-  getStoredImagesData(): {filename: string, imageBlob: Blob}[] {
-    const returnData: {filename: string, imageBlob: Blob}[] = [];
+  getStoredImagesData(): ImagesData[] {
+    const returnData = [];
     for (const idx in this.storedImageFilenames) {
       returnData.push({
         filename: this.storedImageFilenames[idx],
         imageBlob: this.imageUploadHelperService.convertImageDataToImageFile(
-          window.sessionStorage.getItem(this.storedImageFilenames[idx]))
+          this.windowRef.nativeWindow.sessionStorage.getItem(
+            this.storedImageFilenames[idx]))
       });
     }
     return returnData;
@@ -94,11 +97,13 @@ export class ImageLocalStorageService {
   setThumbnailBgColor(bgColor: string): void {
     this.thumbnailBgColor = bgColor;
   }
+
   getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
   }
+
   flushStoredImagesData(): void {
-    window.sessionStorage.clear();
+    this.windowRef.nativeWindow.sessionStorage.clear();
     this.storedImageFilenames.length = 0;
     this.thumbnailBgColor = null;
   }
