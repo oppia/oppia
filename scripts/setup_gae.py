@@ -61,9 +61,12 @@ def main(args=None):
             'Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
+            # If the google cloud version is updated here, the corresponding
+            # lines (GAE_DIR and GCLOUD_PATH) in release_constants.json should
+            # also be updated.
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-304.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
@@ -72,21 +75,21 @@ def main(args=None):
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0/'))
         tar.close()
 
-        # This command installs specific google cloud components for the google
-        # cloud sdk to prevent the need for developers to install it themselves
-        # when the app engine development server starts up. The --quiet
-        # parameter specifically tells the gcloud program to autofill all
-        # prompts with default values. In this case, that means accepting all
-        # installations of gcloud packages.
-        subprocess.call([
-            common.GCLOUD_PATH,
-            'components', 'install', 'cloud-datastore-emulator',
-            'app-engine-python', 'app-engine-python-extras', '--quiet'])
-
         os.remove('gcloud-sdk.tar.gz')
+
+    # This command installs specific google cloud components for the google
+    # cloud sdk to prevent the need for developers to install it themselves when
+    # the app engine development server starts up. The --quiet parameter
+    # specifically tells the gcloud program to autofill all prompts with default
+    # values. In this case, that means accepting all installations of gcloud
+    # packages.
+    subprocess.call([
+        common.GCLOUD_PATH,
+        'components', 'install', 'beta', 'cloud-datastore-emulator',
+        'app-engine-python', 'app-engine-python-extras', '--quiet'])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

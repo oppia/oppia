@@ -1097,6 +1097,39 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
+    def swap_with_call_counter(
+            self, obj, attr, raises=None, returns=None, call_through=False):
+        """Swap obj.attr with a CallCounter instance.
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            raises: Exception|None. The exception raised by the swapped
+                function. If None, then no exception is raised.
+            returns: *. The return value of the swapped function.
+            call_through: bool. Whether to call through to the real function,
+                rather than use a stub implementation. If True, the `raises` and
+                `returns` arguments will be ignored.
+
+        Yields:
+            CallCounter. A CallCounter instance that's installed as obj.attr's
+            implementation while within the context manager returned.
+        """
+        if call_through:
+            impl = obj.attr
+        else:
+            def impl(*_, **__):
+                """Behaves according to the given values."""
+                if raises is not None:
+                    # Pylint thinks we're trying to raise `None` even though
+                    # we've explicitly checked for it above.
+                    raise raises # pylint: disable=raising-bad-type
+                return returns
+        call_counter = CallCounter(impl)
+        with self.swap(obj, attr, call_counter):
+            yield call_counter
+
+    @contextlib.contextmanager
     def swap_with_checks(
             self, obj, attr, new_value, expected_args=None,
             expected_kwargs=None, called=True):
@@ -1308,6 +1341,8 @@ class AppEngineTestBase(TestBase):
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
     def tearDown(self):
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
         super(AppEngineTestBase, self).tearDown()
 
@@ -1464,7 +1499,7 @@ class GenericTestBase(AppEngineTestBase):
     TODO(#12135): Split this enormous test base into smaller, focused pieces.
     """
 
-    # NOTE: For tests that do not/can not use the default super-admin, authors
+    # NOTE: For tests that do not/can not use the default super admin, authors
     # can override the following class-level constant.
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
 
@@ -1822,11 +1857,6 @@ title: Title
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
-
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        super(GenericTestBase, self).tearDown()
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -2472,7 +2502,8 @@ title: Title
     def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, state_names, interaction_ids,
             title='A title', category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
@@ -2489,6 +2520,8 @@ title: Title
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            correctness_feedback_enabled: bool. Whether the correctness feedback
+                is enabled or not for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -2503,6 +2536,7 @@ title: Title
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
 
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
@@ -2510,6 +2544,9 @@ title: Title
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
+            if correctness_feedback_enabled:
+                from_state.interaction.default_outcome.labelled_as_correct = (
+                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)

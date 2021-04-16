@@ -24,8 +24,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from
+  'domain/exploration/recorded-voiceovers.model';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -44,7 +44,6 @@ describe('Display Solution Modal Controller', function() {
   var HintsAndSolutionManagerService = null;
   var interactionObjectFactory = null;
   var playerTranscriptService = null;
-  var recordedVoiceoversObjectFactory = null;
   var SolutionObjectFactory = null;
   var stateCardObjectFactory = null;
   var writtenTranslationsObjectFactory = null;
@@ -60,8 +59,6 @@ describe('Display Solution Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
@@ -100,7 +97,7 @@ describe('Display Solution Modal Controller', function() {
       hints: [],
       id: 'TextInput'
     });
-    var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
+    var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     var writtenTranslations = writtenTranslationsObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
