@@ -1520,7 +1520,6 @@ def can_modify_exploration_roles(handler):
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
-
         if rights_manager.check_can_modify_activity_roles(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
