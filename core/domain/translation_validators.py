@@ -38,7 +38,7 @@ class MachineTranslatedTextModelValidator(
         language_codes_regex = '(%s)' % '|'.join(
             cloud_translate_services.LANGUAGE_CODE_ALLOWLIST)
         # Valid id: [source_language_code]:[target_language_code]:[hashed_text].
-        regex_string = '^%s:%s:.+$' % (
+        regex_string = '^%s\\.%s\\..+$' % (
             language_codes_regex, language_codes_regex)
         return regex_string
 

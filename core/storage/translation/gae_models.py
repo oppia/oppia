@@ -36,7 +36,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
     followed by a SHA-1 hash of the untranslated source text formated as
     follows:
 
-        [source_language_code]:[target_language_code]:[hashed_source_text]
+        [source_language_code].[target_language_code].[hashed_source_text]
 
     See MachineTranslatedTextModel._generate_id() below for details.
     The same origin text, source_language_code, and target_language_code always
@@ -119,10 +119,10 @@ class MachineTranslatedTextModel(base_models.BaseModel):
             str. The deterministically generated identifier for this entity of
             the form:
 
-            [source_language_code]:[target_language_code]:[hashed_source_text]
+            [source_language_code].[target_language_code].[hashed_source_text]
         """
         return (
-            '%s:%s:%s' % (
+            '%s.%s.%s' % (
                 source_language_code, target_language_code, hashed_source_text)
         )
 
