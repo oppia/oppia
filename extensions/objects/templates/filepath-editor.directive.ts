@@ -807,8 +807,9 @@ angular.module('oppia').directive('filepathEditor', [
           }
         };
 
-        const processGIFImage =  function(
-          imageDataURI, width, height, processFrameCallback, successCallback) {
+        const processGIFImage = function(
+            imageDataURI, width, height, processFrameCallback,
+            successCallback) {
           // Looping through individual gif frames can take a while
           // especially if there are a lot. Changing the cursor will let the
           // user know that something is happening.
@@ -838,10 +839,10 @@ angular.module('oppia').directive('filepathEditor', [
                 ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
                 ctx.globalCompositeOperation = 'source-over';
               }
+              let dataURL = sourceCanvas.toDataURL('image/png');
               let updatedFrame = (
                 processFrameCallback ?
-                await processFrameCallback(sourceCanvas.toDataURL('image/png')):
-                sourceCanvas.toDataURL('image/png'));
+                await processFrameCallback(dataURL) : dataURL);
               frames.push(updatedFrame);
             }
             gifshot.createGIF({
