@@ -58,6 +58,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       event => {
         if (event.message.modalId === $scope.modalId) {
           $scope.isInvalid = event.message.value;
+          $scope.$applyAsync();
         }
       });
     $scope.feedbackEditorIsOpen = false;
