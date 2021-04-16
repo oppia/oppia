@@ -109,21 +109,21 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         )
         self.assertEqual(translated_text, 'Por favor continua.')
 
-    def test_get_machine_translation_for_content_id_with_invalid_exploration_id_returns_none(self): # pylint: disable=line-too-long
+    def test_get_machine_translation_is_none_if_exp_id_is_invalid(self):
         translated_text = (
             translation_services.get_machine_translation_for_content_id(
                 'invalid_exp_id', 'Introduction', 'content', 'es')
         )
         self.assertIsNone(translated_text)
 
-    def test_get_machine_translation_for_content_id_with_invalid_state_name_returns_none(self): # pylint: disable=line-too-long
+    def test_get_machine_translation_is_none_if_state_name_is_invalid(self):
         translated_text = (
             translation_services.get_machine_translation_for_content_id(
                 self.exp_id, 'invalid_state_name', 'content', 'es')
         )
         self.assertIsNone(translated_text)
 
-    def test_get_machine_translation_for_content_id_with_invalid_content_id_returns_none(self): # pylint: disable=line-too-long
+    def test_get_machine_translation_is_none_if_content_id_is_invalid(self):
         translated_text = (
             translation_services.get_machine_translation_for_content_id(
                 self.exp_id, 'Introduction', 'invalid_content_id', 'es')

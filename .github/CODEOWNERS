@@ -112,7 +112,6 @@
 /core/domain/opportunity*.py @sagangwee
 /core/domain/translation*.py @vojtechjelinek
 /core/domain/voiceover_services*.py @sagangwee
-/core/storage/translation/ @vojtechjelinek
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 

@@ -83,7 +83,7 @@ class MachineTranslatedText(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid target language code: %s' % self.target_language_code)
 
-        if self.source_language_code is self.target_language_code:
+        if self.source_language_code == self.target_language_code:
             raise utils.ValidationError(
                 (
                     'Expected source_language_code to be different from '
