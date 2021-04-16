@@ -13,20 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * subtopic page domain objects.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   SubtopicPageContentsBackendDict,
-  SubtopicPageContents,
-  SubtopicPageContentsObjectFactory
-} from 'domain/topic/SubtopicPageContentsObjectFactory';
+  SubtopicPageContents
+} from 'domain/topic/subtopic-page-contents.model';
 
 export interface SubtopicPageBackendDict {
   'id': string;
@@ -40,7 +35,8 @@ export class SubtopicPage {
     private id: string,
     private topicId: string,
     private pageContents: SubtopicPageContents,
-    private languageCode: string) {}
+    private languageCode: string,
+  ) {}
 
   // Returns the id of the subtopic page.
   getId(): string {
@@ -77,43 +73,31 @@ export class SubtopicPage {
     this.pageContents = cloneDeep(otherSubtopicPage.getPageContents());
     this.languageCode = otherSubtopicPage.getLanguageCode();
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class SubtopicPageObjectFactory {
-  constructor(
-    private subtopicPageContentsObjectFactory:
-      SubtopicPageContentsObjectFactory) {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
       subtopicPageBackendDict: SubtopicPageBackendDict): SubtopicPage {
     return new SubtopicPage(
       subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
-      this.subtopicPageContentsObjectFactory.createFromBackendDict(
+      SubtopicPageContents.createFromBackendDict(
         subtopicPageBackendDict.page_contents),
-      subtopicPageBackendDict.language_code
+      subtopicPageBackendDict.language_code,
     );
   }
 
-  private getSubtopicPageId(topicId: string, subtopicId: number): string {
+  static getSubtopicPageId(topicId: string, subtopicId: number): string {
     return topicId + '-' + subtopicId.toString();
   }
 
-  createDefault(topicId: string, subtopicId: number): SubtopicPage {
+  static createDefault(topicId: string, subtopicId: number): SubtopicPage {
     return new SubtopicPage(
       this.getSubtopicPageId(topicId, subtopicId),
-      topicId, this.subtopicPageContentsObjectFactory.createDefault(),
+      topicId, SubtopicPageContents.createDefault(),
       'en');
   }
 
   // Create an interstitial subtopic page that would be displayed in the
   // editor until the actual subtopic page is fetched from the backend.
-  createInterstitialSubtopicPage(): SubtopicPage {
+  static createInterstitialSubtopicPage(): SubtopicPage {
     return new SubtopicPage(null, null, null, 'en');
   }
 }
-
-angular.module('oppia').factory(
-  'SubtopicPageObjectFactory', downgradeInjectable(SubtopicPageObjectFactory));
