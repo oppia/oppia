@@ -140,7 +140,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'list-of-tabs-editor.component.ts',
     'list-of-unicode-string-editor.component.ts',
     'logic-error-category-editor.component.ts',
-    'logic-question-editor.directive.ts',
+    'logic-question-editor.component.ts',
     'math-expression-content-editor.component.ts',
     'mathjax-bind.directive.ts',
     'mathjax.directive.ts',
