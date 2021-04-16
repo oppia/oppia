@@ -2152,7 +2152,8 @@ class StringConcatenationChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0035': (
-            'Avoid using string concatenation and replace it with string '
+            'at %s, avoid using string concatenation and replace it with '
+            'string '
             'interpolation instead.',
             'no-string-concatenation',
             'Enforce use of string interpolation over string concatenation.',
