@@ -32,7 +32,7 @@ import python_utils
     improvements_models, job_models, opportunity_models,
     question_models, recommendations_models, skill_models,
     stats_models, story_models, subtopic_models,
-    suggestion_models, topic_models, user_models
+    suggestion_models, topic_models, translation_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.activity, models.NAMES.app_feedback_report, models.NAMES.audit,
     models.NAMES.auth, models.NAMES.classifier, models.NAMES.collection,
@@ -41,7 +41,7 @@ import python_utils
     models.NAMES.opportunity, models.NAMES.question,
     models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
     models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.topic, models.NAMES.translation, models.NAMES.user
 ])
 
 VALIDATION_STATUS_SUCCESS = 'fully-validated'
@@ -767,6 +767,14 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
     def entity_classes_to_map_over(cls):
         return [
             subtopic_models.SubtopicPageCommitLogEntryModel]
+
+
+class MachineTranslatedTextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates MachineTranslatedTextModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [translation_models.MachineTranslatedTextModel]
 
 
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
