@@ -966,9 +966,10 @@ class Exploration(python_utils.OBJECT):
         # Check if first state is a checkpoint or not.
         if not self.states[self.init_state_name].card_is_checkpoint:
             raise utils.ValidationError(
-                'Expected card_is_checkpoint of first state to be True'
+                'Expected card_is_checkpoint of first state %s to be True'
                 ' but found it to be %s'
-                % self.states[self.init_state_name].card_is_checkpoint
+                % (self.init_state_name,
+                   self.states[self.init_state_name].card_is_checkpoint)
             )
 
         # Check if end states are checkpoint.
@@ -1346,12 +1347,16 @@ class Exploration(python_utils.OBJECT):
         Args:
             init_state_name: str. The new name of the initial state.
         """
+        old_init_state_name = self.init_state_name
         if init_state_name not in self.states:
             raise Exception(
                 'Invalid new initial state name: %s; '
                 'it is not in the list of states %s for this '
                 'exploration.' % (init_state_name, list(self.states.keys())))
         self.init_state_name = init_state_name
+        if old_init_state_name in self.states:
+            self.states[old_init_state_name].card_is_checkpoint = False
+        self.init_state.card_is_checkpoint = True
 
     def update_auto_tts_enabled(self, auto_tts_enabled):
         """Update whether automatic text-to-speech is enabled.
@@ -1418,7 +1423,6 @@ class Exploration(python_utils.OBJECT):
 
         if self.init_state_name == old_state_name:
             self.update_init_state_name(new_state_name)
-
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
         for other_state_name in self.states:
