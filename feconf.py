@@ -1388,8 +1388,8 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
-# Constants used to authenticate Android messages.
+# Constants used to authenticate Android messages as request headers.
 ANDROID_API_KEY = ''
 ANDROID_APP_PACKAGE_NAME = 'org.oppia.android'
 ANDROID_APP_VERSION_NAME = '1.0'
-ANDROID_APP_VERSION_CODE = 1
+ANDROID_APP_VERSION_CODE = '1'

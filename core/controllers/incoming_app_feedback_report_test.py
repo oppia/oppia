@@ -19,6 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+import types
+
+from core.domain import exp_services
 from core.controllers import incoming_app_feedback_report
 from core.tests import test_utils
 from core.platform import models
@@ -60,11 +64,15 @@ REPORT_JSON = {
     'user_supplied_feedback': {
         'report_type': 'suggestion',
         'category': 'language_suggestion',
-        'user_feedback_selected_items': [],
+        'user_feedback_selected_items': None,
         'user_feedback_other_text_input': 'french'
     }
 }
 
+ANDROID_API_KEY_STRING = str(feconf.ANDROID_API_KEY)
+ANDROID_APP_PACKAGE_NAME_STRING = str(feconf.ANDROID_APP_PACKAGE_NAME)
+ANDROID_APP_VERSION_NAME_STRING = str(feconf.ANDROID_APP_VERSION_NAME)
+ANDROID_APP_VERSION_CODE_STRING = str(feconf.ANDROID_APP_VERSION_CODE)
 
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
@@ -73,24 +81,36 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         self.payload = {
             'report': REPORT_JSON
         }
+        # Webapp header values must be Python str types otherwise an
+        # AssertionError for "not a string" is thrown.
         self.headers = {
-            'api_key': feconf.ANDROID_API_KEY,
-            'app_package_name': feconf.ANDROID_APP_PACKAGE_NAME,
-            'app_version_name': feconf.ANDROID_APP_VERSION_NAME,
-            'app_version_code': feconf.ANDROID_APP_VERSION_CODE
+            'api_key': ANDROID_API_KEY_STRING,
+            'app_package_name': ANDROID_APP_PACKAGE_NAME_STRING,
+            'app_version_name': ANDROID_APP_VERSION_NAME_STRING,
+            'app_version_code': ANDROID_APP_VERSION_CODE_STRING
         }
-        self.csrf_token = self.get_new_csrf_token()
 
     def test_incoming_report_saves_to_storage(self):
-        self.login(self.ADMIN_EMAIL)
-        self.post_json(
-            feconf.INCOMING_APP_FEEDBACK_REPORT_URL, self.payload,
-            csrf_token=self.csrf_token)
+        # Use str-type representations of the authentication values since webapp
+        # requires the header values to be str-types.
+        with self.swap(feconf, 'ANDROID_API_KEY', ANDROID_API_KEY_STRING):
+            with self.swap(
+                    feconf, 'ANDROID_APP_PACKAGE_NAME',
+                    ANDROID_APP_PACKAGE_NAME_STRING):
+                with self.swap(
+                        feconf, 'ANDROID_APP_VERSION_NAME',
+                        ANDROID_APP_VERSION_NAME_STRING):
+                    with self.swap(
+                            feconf, 'ANDROID_APP_VERSION_CODE',
+                            ANDROID_APP_VERSION_CODE_STRING):
+                        self.post_json(
+                            feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
+                            self.payload, headers=self.headers,
+                            csrf_token=self.get_new_csrf_token())
 
         all_reports = (
-            app_feedback_report_models.AppFeedbackReportModel.get_all())
-        self.assertTrue(len(all_reports), 1)
-
+            app_feedback_report_models.AppFeedbackReportModel.get_all().fetch())
+        self.assertEqual(len(all_reports), 1)
         report_model = all_reports[0]
 
         self.assertEqual(report_model.platform, 'android')
@@ -98,12 +118,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             report_model.submitted_on,
             datetime.datetime.fromtimestamp(1615519337))
 
-
-    # def test_incoming_report_with_invalid_headers_raises_exception(self):
-    #     with self.assertRaisesRegexp(
-    #         incoming_app_feedback_report.UnauthorizedRequestException,
-    #         'The incoming request does not have valid authentication'):
-    #         self.post_json(
-    #             url=feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
-    #             payload=self.payload, csrf_token=self.csrf_token)
+    def test_incoming_report_with_invalid_headers_raises_exception(self):
+        # Send a request without headers to act as "incorrect headers".
+        self.post_json(
+            feconf.INCOMING_APP_FEEDBACK_REPORT_URL, self.payload,
+            csrf_token=self.get_new_csrf_token(), expected_status_int=500)
 

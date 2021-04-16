@@ -87,8 +87,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel(
                 id='%s.%s.%s' % (
                     self.PLATFORM_ANDROID,
-                    int(
-                        self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
+                    int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
                     'randomInteger123'),
                 platform=self.PLATFORM_ANDROID,
                 scrubbed_by=self.USER_ID,
@@ -168,8 +167,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         # Test Exception for AppFeedbackReportModel.
         with self.assertRaisesRegexp(
             Exception, 'The id generator for AppFeedbackReportModel is '
-            'producing too many collisions.'
-        ):
+            'producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 app_feedback_report_models.AppFeedbackReportModel,

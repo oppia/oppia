@@ -35,10 +35,10 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         Verifies that the incoming message is from Oppia Android based on the
         request header and stores the feedback report.
         """
-        # if not self._validate_incoming_request(self.payload.get('headers')):
-        #     raise UnauthorizedRequestException(
-        #         'The incoming request does not have valid authentication for '
-        #         'Oppia Android.')
+        if not self._has_valid_android_request_headers(self.request.headers):
+            raise UnauthorizedRequestException(
+                'The incoming request does not have valid authentication for '
+                'Oppia Android.')
 
         report_dict = self.payload.get('report')
         if not report_dict:
@@ -49,25 +49,27 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
             app_feedback_report_services.create_android_report_from_json(
                 report_dict))
         report_obj.validate()
-        app_feedback_report_services.save_android_feedback_report_to_storage(
+        app_feedback_report_services.save_feedback_report_to_storage(
             report=report_obj, new_incoming_report=True)
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
-    def _validate_incoming_request(self, headers):
+        return self.render_json({})
+
+    def _has_valid_android_request_headers(self, headers):
         """Verifies the headers from the incoming request.
 
         Args:
             headers: list(str). The headers to validate from the request.
         """
-        api_key = headers['api_key']
-        app_package_name = headers['app_package_name']
-        app_version_name = headers['app_version_name']
-        app_version_code = headers['app_version_code']
+        api_key = headers.get('api_key')
+        app_package_name = headers.get('app_package_name')
+        app_version_name = headers.get('app_version_name')
+        app_version_code = headers.get('app_version_code')
         if (
-            api_key != feconf.ANDROID_API_KEY or
-            app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or
-            app_version_name != feconf.ANDROID_APP_PACKAGE_NAME or
-            app_version_code != feconf.ANDROID_APP_VERSION_CODE):
+                api_key != feconf.ANDROID_API_KEY or
+                app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or
+                app_version_name != feconf.ANDROID_APP_VERSION_NAME or
+                app_version_code != feconf.ANDROID_APP_VERSION_CODE):
             return False
         return True
 
