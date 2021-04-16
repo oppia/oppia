@@ -1062,7 +1062,7 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def _convert_states_v43_dict_to_v44_dict(cls, question_state_dict):
+    def _convert_state_v43_dict_to_v44_dict(cls, question_state_dict):
         """Converts from version 43 to version 44. Version 44 adds
         card_is_checkpoint boolean to the state, which allows creators to
         mark a state as a checkpoint for the learners
@@ -1074,9 +1074,7 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        for state_dict in question_state_dict.itervalues():
-            state_dict['solicit_answer_details'] = False
-
+        question_state_dict['card_is_checkpoint'] = False
         return question_state_dict
 
     @classmethod
