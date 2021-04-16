@@ -2754,7 +2754,7 @@ def get_decorator_for_accepting_suggestion(decorator):
 
 
 def can_update_suggestions(handler):
-    """Decorator to check whether the current user can update the suggestions.
+    """Decorator to check whether the current user can update suggestions.
 
     Args:
         handler: function. The function to be decorated.
@@ -2783,8 +2783,7 @@ def can_update_suggestions(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            function. The handler for updating a
-            suggestion.
+            function. The handler for updating a suggestion.
 
         Raises:
             NotLoggedInException. The user is not logged in.
@@ -2808,6 +2807,9 @@ def can_update_suggestions(handler):
         if suggestion is None:
             raise self.PageNotFoundException
 
+        # TODO(#11735): Currently, only checks whether users can review translation
+        # sugeestions. Another check should be added to check whether users can review
+        # question suggestions if the suggestion type is add question.
         if suggestion.suggestion_type == (
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(
@@ -2815,12 +2817,12 @@ def can_update_suggestions(handler):
                     language_code=suggestion.change.language_code):
                 return handler(self, suggestion_id, **kwargs)
 
-        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
-            return handler(self, suggestion_id, **kwargs)
+            if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+                return handler(self, suggestion_id, **kwargs)
 
-        if suggestion_services.check_can_resubmit_suggestion(
-                suggestion_id, self.user_id):
-            return handler(self, suggestion_id, **kwargs)
+            if suggestion_services.check_can_resubmit_suggestion(
+                    suggestion_id, self.user_id):
+                return handler(self, suggestion_id, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(
             'You are not allowed to update the suggestion.')

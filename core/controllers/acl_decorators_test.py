@@ -28,6 +28,7 @@ from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -1637,8 +1638,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     """Tests for can_update_suggestion decorator."""
 
-    owner_username = 'owner'
-    owner_email = 'owner@example.com'
+    admin_username = 'adn'
+    admin_email = 'admin@example.com'
     author_username = 'author'
     author_email = 'author@example.com'
     reviewer_email = 'reviewer@example.com'
@@ -1667,15 +1668,15 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         super(DecoratorForUpdatingSuggestionTests, self).setUp()
         self.signup(self.author_email, self.author_username)
         self.signup(self.user_email, self.username)
-        self.signup(self.owner_email, self.owner_username)
+        self.signup(self.admin_email, self.admin_username)
         self.signup(self.reviewer_email, 'reviewer1')
         self.author_id = self.get_user_id_from_email(self.author_email)
-        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.admin_id = self.get_user_id_from_email(self.admin_email)
         self.reviewer_id = self.get_user_id_from_email(
             self.reviewer_email)
-        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         self.author = user_services.get_user_actions_info(self.author_id)
-        user_services.update_user_role(self.owner_id, feconf.ROLE_ID_ADMIN)
+        user_services.update_user_role(self.admin_id, feconf.ROLE_ID_ADMIN)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -1707,43 +1708,72 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.resubmit_change_content = state_domain.SubtitledHtml(
             'content', '<p>resubmit change content html</p>').to_dict()
 
+        add_question_change_dict = {
+            'cmd': question_domain
+                    .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': 'skill_123',
+            'skill_difficulty': 0.3
+        }
+        self.save_new_skill('skill_123', self.admin_id)
+
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, self.TARGET_TYPE,
             self.exploration_id, self.target_version_id,
             self.author_id,
             self.change_dict, '')
-        suggestion = suggestion_services.query_suggestions(
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_123', feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.admin_id, add_question_change_dict,
+            'test description')
+
+        suggestion_01 = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', self.exploration_id)])[0]
-        self.suggestion_id = suggestion.suggestion_id
+        suggestion_02 = suggestion_services.query_suggestions(
+            [('author_id', self.admin_id),
+             ('target_id', 'skill_123')])[0]
+        self.suggestion_id_01 = suggestion_01.suggestion_id
+        self.suggestion_id_02 = suggestion_02.suggestion_id
         self.logout()
 
     def test_author_can_update_suggestion(self):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.suggestion_id)
-        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+            response = self.get_json('/mock/%s' % self.suggestion_id_01)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_01)
         self.logout()
 
-    def test_owner_can_update_suggestion(self):
-        self.login(self.owner_email)
+    def test_admin_can_update_suggestion(self):
+        self.login(self.admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.suggestion_id)
-        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+            response = self.get_json('/mock/%s' % self.suggestion_id_01)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_01)
         self.logout()
 
     def test_reviewer_can_update_suggestion(self):
         self.login(self.reviewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.suggestion_id)
-        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+            response = self.get_json('/mock/%s' % self.suggestion_id_01)
+        self.assertEqual(response['suggestion_id'], self.suggestion_id_01)
         self.logout()
 
     def test_non_author_cannot_update_suggestion(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s' % self.suggestion_id, expected_status_int=401)
+                '/mock/%s' % self.suggestion_id_01, expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You are not allowed to update the suggestion.')
@@ -1752,7 +1782,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_guest_cannot_update_suggestion(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s' % self.suggestion_id, expected_status_int=401)
+                '/mock/%s' % self.suggestion_id_01, expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
@@ -1768,13 +1798,23 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'It must contain 3 parts separated by \'.\'')
         self.logout()
 
-    def test_suggestions_with_no_suggestions_are_rejected(self):
+    def test_non_existent_suggestion_cannot_be_updated(self):
         self.login(self.reviewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % 'exploration.exp1.' +
                 'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
                 expected_status_int=404)
+        self.logout()
+
+    def test_non_translation_suggestions_are_rejected(self):
+        self.login(self.admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.suggestion_id_02, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You are not allowed to update the suggestion.')
         self.logout()
 
 

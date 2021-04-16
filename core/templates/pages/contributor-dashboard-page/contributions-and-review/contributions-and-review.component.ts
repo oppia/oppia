@@ -134,9 +134,6 @@ angular.module('oppia').component('contributionsAndReview', {
         var translationContributionsSummaryList = [];
         Object.keys(suggestionIdToSuggestions).forEach(function(key) {
           var suggestion = suggestionIdToSuggestions[key].suggestion;
-          if (!suggestion.change.translation_html) {
-            return;
-          }
           var details = suggestionIdToSuggestions[key].details;
           var subheading = '';
           if (details === null) {

@@ -1329,7 +1329,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2'],
-                ['TextInput'], category='Algebra'))
+                ['TextInput'], category='Algebra',
+                correctness_feedback_enabled=True))
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content</p>').to_dict()

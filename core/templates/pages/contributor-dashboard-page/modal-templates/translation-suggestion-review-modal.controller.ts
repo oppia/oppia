@@ -56,9 +56,10 @@ angular.module('oppia').controller(
       };
 
       $scope.updateSuggestion = function() {
+        console.log($scope.editedContentHtml);
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
-        ContributionAndReviewService.updateTranslationSuggestion(
+        ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
           updatedTranslation,
           (success) => {
@@ -88,7 +89,7 @@ angular.module('oppia').controller(
 
         var commitMessage = `${contentType} section of "${stateName}" card`;
         if ($scope.translationUpdated) {
-          commitMessage = commitMessage + ' (With Edits)';
+          commitMessage = commitMessage + ' (with edits)';
         }
 
         return commitMessage;

@@ -48,6 +48,27 @@ export interface HTMLSchema {
     'ui_config': UiConfig;
 }
 
+export class TranslationError {
+  constructor(
+    private _hasUncopiedImgs: boolean,
+    private _hasDuplicateAltTexts: boolean,
+    private _hasDuplicateDescriptions: boolean,
+    private _hasUntranslatedElements: boolean) {}
+
+  get hasDuplicateDescriptions(): boolean {
+    return this._hasDuplicateDescriptions;
+  }
+  get hasDuplicateAltTexts(): boolean {
+    return this._hasDuplicateAltTexts;
+  }
+  get hasUncopiedImgs(): boolean {
+    return this._hasUncopiedImgs;
+  }
+  get hasUntranslatedElements(): boolean {
+    return this._hasUntranslatedElements;
+  }
+}
+
 @Component({
   selector: 'oppia-translation-modal',
   templateUrl: './translation-modal.component.html'
@@ -69,6 +90,10 @@ export class TranslationModalComponent {
   };
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
+  hasImgCopyError = false;
+  hasImgTextError = false;
+  triedToCopyText = false;
+  incompleteTranslationError = false;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -123,12 +148,29 @@ export class TranslationModalComponent {
     return this.HTML_SCHEMA;
   }
 
-  onContentClick(event: MouseEvent): void {
+  onContentClick(event: MouseEvent) {
+    const paragraphCopyValidation = this.validateParagraphCopy(event);
+    if (paragraphCopyValidation) {
+      return this.triedToCopyText = true;
+    }
     if (this.isCopyModeActive()) {
       event.stopPropagation();
     }
     this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
   }
+
+  validateParagraphCopy = function($event) {
+    // Mathematical equations are also wrapped by <p> elements.
+    // Hence, math elements should be allowed to be copied.
+    // See issue #11683.
+    const paragraphChildrenElements: HTMLElement[] = (
+      $event.target.localName === 'p') ? Array.from(
+        $event.target.children) : [];
+    const triedTextCopy = $event.target.localName === 'p' && !(
+      paragraphChildrenElements.some(
+        child => child.localName === 'oppia-noninteractive-math'));
+    return triedTextCopy;
+  };
 
   isCopyModeActive(): boolean {
     return this.ckEditorCopyContentService.copyModeActive;
@@ -156,7 +198,113 @@ export class TranslationModalComponent {
     this.previousTranslationAvailable = textAndAvailability.more;
   }
 
+  getElementTexts = function(elements, type) {
+    const textWrapperLength = 6;
+    const attributes = Array.from(elements, function(element: HTMLElement) {
+      if (element.localName === 'oppia-noninteractive-image') {
+        const attribute = element.attributes[type].value;
+        return attribute.substring(
+          textWrapperLength, attribute.length - textWrapperLength);
+      }
+    });
+    return attributes.filter(attribute => attribute);
+  };
+
+  copiedAllElements = function(
+      originalElements, translatedElements) {
+    const hasMatchingTranslatedElement = (element) => (
+      translatedElements.includes(element));
+    return originalElements.every(hasMatchingTranslatedElement);
+  };
+
+  hasSomeDuplicateElements = function(
+      originalElements, translatedElements) {
+    if (originalElements.length === 0) {
+      return false;
+    }
+    const hasMatchingTranslatedElement = (element) => (
+      translatedElements.includes(element) && originalElements.length > 0);
+    return originalElements.some(hasMatchingTranslatedElement);
+  };
+
+  getTexts = function(rawText) {
+    const foundImageFilePaths = this.getElementTexts(
+      rawText, 'filepath-with-value');
+    const foundImageAlts = this.getElementTexts(
+      rawText, 'alt-with-value');
+    const foundImageDescriptions = this.getElementTexts(
+      rawText, 'caption-with-value');
+
+    return {
+      foundImageFilePaths,
+      foundImageAlts,
+      foundImageDescriptions
+    };
+  };
+
+  isTranslationCompleted = function(
+      originalElements: [HTMLElement], translatedElements: [HTMLElement]) {
+    const originalHtmlElements = Array.from(
+      originalElements, element => element.nodeName);
+    const translatedHtmlElements = Array.from(
+      translatedElements, element => element.nodeName);
+
+    for (const originalElement of originalHtmlElements) {
+      if (
+        !(translatedHtmlElements.some(
+          element => element === originalElement)) ||
+        originalHtmlElements.filter(
+          element => element === originalElement).length >
+          translatedHtmlElements.filter(
+            element => element === originalElement).length
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  validateTranslation = function(
+    textToTranslate, translatedText): TranslationError {
+  const translatedElements = this.getTexts(translatedText);
+  const originalElements = this.getTexts(textToTranslate);
+
+  const hasUncopiedImgs = !this.copiedAllElements(
+    originalElements.foundImageFilePaths,
+    translatedElements.foundImageFilePaths);
+  const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
+    originalElements.foundImageAlts,
+    translatedElements.foundImageAlts);
+  const hasDuplicateDescriptions = this.hasSomeDuplicateElements(
+    originalElements.foundImageDescriptions,
+    translatedElements.foundImageDescriptions);
+  const hasUntranslatedElements = !(this.isTranslationCompleted(
+    textToTranslate, translatedText));
+
+  return new TranslationError(
+    hasUncopiedImgs, hasDuplicateAltTexts,
+    hasDuplicateDescriptions, hasUntranslatedElements);
+};
   suggestTranslatedText(): void {
+    const originalElements = angular.element(
+      this.textToTranslate);
+    const translatedElements = angular.element(
+      this.activeWrittenTranslation.html);
+
+    const translationError = this.validateTranslation(
+      originalElements, translatedElements);
+
+    this.hasImgCopyError = translationError.hasUncopiedImgs;
+    this.hasImgTextError = translationError.hasDuplicateAltTexts ||
+      translationError.hasDuplicateDescriptions;
+    this.incompleteTranslationError = translationError.
+      hasUntranslatedElements;
+
+    if (this.hasImgCopyError || this.hasImgTextError ||
+      this.incompleteTranslationError || this.uploadingTranslation ||
+      this.loadingData) {
+      return;
+    }
     if (!this.uploadingTranslation && !this.loadingData) {
       this.siteAnalyticsService
         .registerContributorDashboardSubmitSuggestionEvent('Translation');

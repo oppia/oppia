@@ -123,7 +123,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));
       },
-      updateTranslationSuggestion: function(
+      updateTranslationSuggestionAsync: async function(
           suggestionId, translationHtml,
           onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
