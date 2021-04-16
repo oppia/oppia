@@ -13,32 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SubtopicDataObjectFactory.
+ * @fileoverview Tests for SubtopicData Model.
  */
 
-import { TestBed } from '@angular/core/testing';
 
-import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
+import { SubtopicPageContents } from
+  'domain/topic/subtopic-page-contents.model';
 
-import { ReadOnlySubtopicPageObjectFactory } from
-  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+import { ReadOnlySubtopicPageData } from
+  'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
     var _sampleSubtopicData = null;
-    let readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory =
-      (null);
-    let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
-      null;
 
     beforeEach(() => {
-      readOnlySubtopicPageObjectFactory = TestBed.get(
-        ReadOnlySubtopicPageObjectFactory
-      );
-      subtopicPageContentsObjectFactory = TestBed.get(
-        SubtopicPageContentsObjectFactory);
-
       var sampleSubtopicDataBackendDict = {
         topic_id: 'topic_id',
         topic_name: 'topic',
@@ -64,7 +53,7 @@ describe('Subtopic data object factory', () => {
         }
       };
 
-      _sampleSubtopicData = readOnlySubtopicPageObjectFactory.
+      _sampleSubtopicData = ReadOnlySubtopicPageData.
         createFromBackendDict(sampleSubtopicDataBackendDict);
     });
 
@@ -74,7 +63,7 @@ describe('Subtopic data object factory', () => {
       expect(_sampleSubtopicData.getNextSubtopic()).toEqual(null);
       expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
       expect(_sampleSubtopicData.getPageContents()).toEqual(
-        subtopicPageContentsObjectFactory.createFromBackendDict({
+        SubtopicPageContents.createFromBackendDict({
           subtitled_html: {
             html: 'test content',
             content_id: 'content'
