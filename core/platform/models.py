@@ -34,7 +34,7 @@ NAMES = utils.create_enum(
     'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
     'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
     'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'story', 'subtopic', 'suggestion', 'topic', 'user')
+    'story', 'subtopic', 'suggestion', 'topic', 'translation', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
@@ -150,6 +150,9 @@ class _Gae(Platform):
             elif name == NAMES.topic:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)
+            elif name == NAMES.translation:
+                from core.storage.translation import gae_models as translation_models # pylint: disable=line-too-long
+                returned_models.append(translation_models)
             elif name == NAMES.user:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
