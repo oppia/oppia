@@ -218,7 +218,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'ck-editor-copy-content-service.spec.ts',
             'core/templates/tests/unit-test-utils.ts',
             'core/templates/directives/mathjax.directive.ts',
-            'extensions/objects/templates/math-expression-content-editor.component.ts'),
+            'extensions/objects/templates/' +
+            'math-expression-content-editor.component.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
