@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of
+ * @fileoverview Model for creating new frontend instances of
  * Voiceover domain objects.
  */
 export interface VoiceoverBackendDict {
@@ -22,9 +22,6 @@ export interface VoiceoverBackendDict {
   'file_size_bytes': number;
   'needs_update': boolean;
 }
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export class Voiceover {
   filename: string;
@@ -62,19 +59,14 @@ export class Voiceover {
       duration_secs: this.durationSecs
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class VoiceoverObjectFactory {
-  createNew(
+  static createNew(
       filename: string, fileSizeBytes: number,
       durationSecs: number): Voiceover {
     return new Voiceover(filename, fileSizeBytes, false, durationSecs);
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       translationBackendDict: VoiceoverBackendDict): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,
@@ -83,6 +75,3 @@ export class VoiceoverObjectFactory {
       translationBackendDict.duration_secs);
   }
 }
-
-angular.module('oppia').factory(
-  'VoiceoverObjectFactory', downgradeInjectable(VoiceoverObjectFactory));
