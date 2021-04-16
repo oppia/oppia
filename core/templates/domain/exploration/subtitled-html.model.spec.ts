@@ -13,19 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the SubtitledHtml object factory.
+ * @fileoverview Unit tests for the subtitled-html model.
  */
 
-import { SubtitledHtmlObjectFactory, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/subtitled-html.model';
 
-describe('SubtitledHtml object factory', () => {
-  let shof: SubtitledHtmlObjectFactory, subtitledHtml: SubtitledHtml;
+describe('SubtitledHtml model', () => {
+  let subtitledHtml: SubtitledHtml;
 
   beforeEach(() => {
-    shof = new SubtitledHtmlObjectFactory();
-
-    subtitledHtml = shof.createFromBackendDict({
+    subtitledHtml = SubtitledHtml.createFromBackendDict({
       content_id: 'content_id',
       html: '<p>some html</p>'
     });
@@ -61,7 +59,8 @@ describe('SubtitledHtml object factory', () => {
   });
 
   it('should create default object', () => {
-    const defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
+    const defaultSubtitledHtml =
+     SubtitledHtml.createDefault('test html', 'content_id');
     expect(defaultSubtitledHtml.html).toEqual('test html');
     expect(defaultSubtitledHtml.contentId).toEqual('content_id');
   });
