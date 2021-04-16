@@ -41,19 +41,21 @@ def get_translation_from_model(translation_model):
     return translation_domain.MachineTranslatedText(
         translation_model.source_language_code,
         translation_model.target_language_code,
-        translation_model.origin_text,
+        translation_model.source_text,
         translation_model.translated_text)
 
 
 def get_translation_for_text(
-        source_language_code, target_language_code, origin_text):
-    """Gets MachineTranslatedText by language codes and origin text.
+        source_language_code, target_language_code, source_text):
+    """Gets MachineTranslatedText by language codes and source text.
     Returns None if no translation exists for the given parameters.
 
     Args:
-        source_language_code: str. The language of the origin_text.
-        target_language_code: str. The language being translated to.
-        origin_text: str. The text to be translated.
+        source_language_code: str. The language code for the source text
+            language. Must be different from target_language_code.
+        target_language_code: str. The language code for the target translation
+            language. Must be different from source_language_code.
+        source_text: str. The untranslated source text.
 
     Returns:
         MachineTranslatedText|None. The MachineTranslatedText
@@ -62,7 +64,7 @@ def get_translation_for_text(
 
     translation_model = (
         translation_models.MachineTranslatedTextModel.get_translation_for_text(
-            source_language_code, target_language_code, origin_text
+            source_language_code, target_language_code, source_text
         )
     )
     if translation_model is None:

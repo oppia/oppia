@@ -27,22 +27,23 @@ class MachineTranslatedText(python_utils.OBJECT):
     """Domain object for machine translation of exploration content."""
 
     def __init__(
-            self, source_language_code, target_language_code, origin_text,
+            self, source_language_code, target_language_code, source_text,
             translated_text):
         """Initializes a MachineTranslatedText domain object.
 
         Args:
-            source_language_code: str. The code that represents the language of
-                the original text.
-            target_language_code: str. The code that represents the language of
-                the translated text.
-            origin_text: str. The original text to be translated.
+            source_language_code: str. The language code for the source text
+                language. Must be different from target_language_code.
+            target_language_code: str. The language code for the target
+                translation language. Must be different from
+                source_language_code.
+            source_text: str. The untranslated source text.
             translated_text: str. The machine generated translation of the
-                original text.
+                source text into the target language.
         """
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
-        self.origin_text = origin_text
+        self.source_text = source_text
         self.translated_text = translated_text
 
     def validate(self):
@@ -82,10 +83,17 @@ class MachineTranslatedText(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid target language code: %s' % self.target_language_code)
 
-        if not isinstance(self.origin_text, python_utils.BASESTRING):
+        if self.source_language_code is self.target_language_code:
             raise utils.ValidationError(
-                'Expected origin_text to be a string, received %s' %
-                self.origin_text
+                (
+                    'Expected source_language_code to be different from '
+                    'target_language_code: "%s" = "%s"') % (
+                        self.source_language_code, self.target_language_code))
+
+        if not isinstance(self.source_text, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected source_text to be a string, received %s' %
+                self.source_text
             )
 
         if not isinstance(self.translated_text, python_utils.BASESTRING):
@@ -105,6 +113,6 @@ class MachineTranslatedText(python_utils.OBJECT):
         return {
             'source_language_code': self.source_language_code,
             'target_language_code': self.target_language_code,
-            'origin_text': self.origin_text,
+            'source_text': self.source_text,
             'translated_text': self.translated_text
         }

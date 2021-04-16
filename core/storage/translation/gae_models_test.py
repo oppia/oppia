@@ -28,21 +28,55 @@ from core.tests import test_utils
 
 class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
     def test_create_model(self):
-        translation_models.MachineTranslatedTextModel.create(
+        model_id = translation_models.MachineTranslatedTextModel.create(
             source_language_code='en',
             target_language_code='es',
-            origin_text='hello world',
+            source_text='hello world',
             translated_text='hola mundo'
         )
         translation_model = (
+            translation_models.MachineTranslatedTextModel.get(model_id))
+        self.assertEqual(translation_model.translated_text, 'hola mundo')
+
+    def test_create_model_with_same_source_target_language_codes_returns_none(
+            self):
+        model_id = translation_models.MachineTranslatedTextModel.create(
+            source_language_code='en',
+            target_language_code='en',
+            source_text='hello world',
+            translated_text='hello world'
+        )
+        self.assertIsNone(model_id)
+
+    def test_get_translation_for_text_with_existing_translation(self):
+        translation_models.MachineTranslatedTextModel.create(
+            source_language_code='en',
+            target_language_code='es',
+            source_text='hello world',
+            translated_text='hola mundo'
+        )
+        translation = (
             translation_models.MachineTranslatedTextModel
             .get_translation_for_text(
-                'en',
-                'es',
-                'hello world'
+                source_language_code='en',
+                target_language_code='es',
+                source_text='hello world',
             )
         )
-        self.assertEqual(translation_model.translated_text, 'hola mundo')
+        self.assertIsNotNone(translation)
+        self.assertEqual(translation.translated_text, 'hola mundo')
+
+    def test_get_translation_for_text_with_no_existing_translation_returns_none(
+            self):
+        translation = (
+            translation_models.MachineTranslatedTextModel
+            .get_translation_for_text(
+                source_language_code='en',
+                target_language_code='fr',
+                source_text='hello world',
+            )
+        )
+        self.assertIsNone(translation)
 
     def test_get_deletion_policy_not_applicable(self):
         self.assertEqual(
@@ -63,9 +97,9 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
             {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'hashed_origin_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'hashed_source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'origin_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'source_language_code':
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'target_language_code':

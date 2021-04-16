@@ -38,7 +38,8 @@ def get_machine_translation_for_content_id(
         exploration_id: str. The id of the exploration being translated.
         state_name: str. The name of the state being translated.
         content_id: str. The content id of the state content being translated.
-        target_language_code: str. An allowlisted language code.
+        target_language_code: str. The language code for the target
+            translation language. Must be different from source_language_code.
 
     Returns:
         str. The translated text.
@@ -55,21 +56,23 @@ def get_machine_translation_for_content_id(
     state = state_names_to_content_id_mapping[state_name]
     if content_id not in state:
         return None
-    origin_text = state[content_id]
+    source_text = state[content_id]
 
     return get_machine_translation(
-        exp.language_code, target_language_code, origin_text)
+        exp.language_code, target_language_code, source_text)
 
 
 def get_machine_translation(
-        source_language_code, target_language_code, origin_text):
-    """Gets a machine translation of the origin text for the given source and
+        source_language_code, target_language_code, source_text):
+    """Gets a machine translation of the source text for the given source and
     target languages.
 
     Args:
-        source_language_code: str. An allowlisted language code.
-        target_language_code: str. An allowlisted language code.
-        origin_text: str. The text to be translated.
+        source_language_code: str. The language code for the source text
+            language. Must be different from target_language_code.
+        target_language_code: str. The language code for the target
+            translation language. Must be different from source_language_code.
+        source_text: str. The untranslated source text.
 
     Raises:
         ValueError. Invalid language code.
@@ -82,18 +85,18 @@ def get_machine_translation(
     translation = translation_fetchers.get_translation_for_text(
         source_language_code,
         target_language_code,
-        origin_text.strip()
+        source_text.strip()
     )
     if translation is not None:
         return translation.translated_text
 
     translated_text = cloud_translate_services.translate_text(
-        origin_text, source_language_code, target_language_code)
+        source_text, source_language_code, target_language_code)
 
     translation_models.MachineTranslatedTextModel.create(
         source_language_code,
         target_language_code,
-        origin_text,
+        source_text,
         translated_text
     )
     return translated_text
