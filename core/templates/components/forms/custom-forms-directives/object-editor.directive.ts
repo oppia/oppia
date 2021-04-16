@@ -58,7 +58,6 @@ angular.module('oppia').directive('objectEditor', [
           'filepath',
           'fraction',
           'graph',
-          // 'graph-property',
           'html',
           'image-with-regions',
         ];

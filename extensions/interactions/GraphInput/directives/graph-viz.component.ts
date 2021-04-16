@@ -20,15 +20,15 @@
  * followed by the name of the arg.
  */
 
-import { 
-  AfterViewInit, 
-  Component, 
-  ElementRef, 
-  EventEmitter, 
-  HostListener, 
-  Input, 
-  OnInit, 
-  Output 
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output
 } from '@angular/core';
 import { GraphAnswer } from 'interactions/answer-defs';
 import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';

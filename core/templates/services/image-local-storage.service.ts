@@ -18,6 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+
 import { AlertsService } from './alerts.service';
 import { ImageUploadHelperService } from './image-upload-helper.service';
 
@@ -29,7 +30,7 @@ export interface ImagesData {
   providedIn: 'root'
 })
 export class ImageLocalStorageService {
-  storedImageFilenames = [];
+  storedImageFilenames: string[] = [];
   // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
   // minimum limit, for all browsers, per hostname, that can be stored in
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
@@ -43,7 +44,7 @@ export class ImageLocalStorageService {
   ) {}
 
   getObjectUrlForImage(filename: string): string {
-    const urlCreator = window.URL || window.webkitURL;
+    const urlCreator = URL || webkitURL;
     const imageBlob = this.imageUploadHelperService.convertImageDataToImageFile(
       window.sessionStorage.getItem(filename));
     return urlCreator.createObjectURL(imageBlob);

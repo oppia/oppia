@@ -16,7 +16,6 @@
  * @fileoverview Unit test for ImageLocalStorageService.
  */
 
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { AlertsService } from './alerts.service';
@@ -78,7 +77,7 @@ describe('ImageLocalStorageService', () => {
       imageLocalStorageService.getStoredImagesData().length).toEqual(0);
   });
 
-  it('should return correctly check whether file exist in storage', function() {
+  it('should return correctly check whether file exist in storage', () => {
     expect(imageLocalStorageService.isInStorage(imageFilename)).toBeFalse();
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
     expect(imageLocalStorageService.isInStorage(imageFilename)).toBeTrue();
