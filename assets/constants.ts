@@ -5213,6 +5213,11 @@ export default {
     "relatedLanguages": ["uk"],
     "direction": "ltr"
   }, {
+    "id": "ur",
+    "description": "Urdu",
+    "relatedLanguages": ["ur"],
+    "direction": "rtl"
+  }, {
     "id": "vi",
     "description": "Vietnamese",
     "relatedLanguages": ["vi"],
