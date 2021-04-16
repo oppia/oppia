@@ -975,12 +975,13 @@ class Exploration(python_utils.OBJECT):
         for state_name, state in self.states.items():
             interaction = state.interaction
             if interaction.id == 'EndExploration':
-                if self.states[state_name].card_is_checkpoint:
-                    raise utils.ValidationError(
-                        'Expected card_is_checkpoint of end state to be False'
-                        'but found it to be %s'
-                        % self.states[state_name].card_is_checkpoint
-                    )
+                if state_name != self.init_state_name:
+                    if self.states[state_name].card_is_checkpoint:
+                        raise utils.ValidationError(
+                            'Expected card_is_checkpoint of end state to be '
+                            'False but found it to be %s'
+                            % self.states[state_name].card_is_checkpoint
+                        )
 
         # Check if checkpoint count is at max 8 and atleast 1.
         checkpoint_count = 0

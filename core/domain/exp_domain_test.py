@@ -490,6 +490,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
         init_state.update_interaction_default_outcome(default_outcome)
+        self._assert_validation_error(
+            exploration, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False')
+        init_state.update_card_is_checkpoint(True)
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -853,7 +857,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.states = {
             exploration.init_state_name: (
                 state_domain.State.create_default_state(
-                    exploration.init_state_name))
+                    exploration.init_state_name, is_initial_state=True))
         }
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name], 'TextInput')
@@ -2744,6 +2748,7 @@ param_specs: {}
 schema_version: 49
 states:
   (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -2798,7 +2803,6 @@ states:
         feedback_1: {}
         rule_input_3: {}
     solicit_answer_details: false
-    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         ca_placeholder_2: {}
@@ -2807,6 +2811,7 @@ states:
         feedback_1: {}
         rule_input_3: {}
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -2865,7 +2870,6 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
@@ -3010,6 +3014,7 @@ param_specs: {}
 schema_version: 49
 states:
   (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -3084,6 +3089,7 @@ states:
         feedback_1: {}
         solution: {}
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3257,6 +3263,7 @@ param_specs: {}
 schema_version: 49
 states:
   (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -3341,6 +3348,7 @@ states:
         feedback_1: {}
         solution: {}
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3384,7 +3392,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'eid', title=exp_title, category='Category')
         exploration.add_states([second_state_name])
 
-        def _get_default_state_dict(content_str, dest_name):
+        def _get_default_state_dict(content_str, dest_name, is_init_state):
             """Gets the default state dict of the exploration."""
             return {
                 'next_content_id_index': 0,
@@ -3400,6 +3408,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 'solicit_answer_details': False,
+                'card_is_checkpoint': is_init_state,
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
@@ -3435,9 +3444,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
                     feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-                    feconf.DEFAULT_INIT_STATE_NAME),
+                    feconf.DEFAULT_INIT_STATE_NAME, True),
                 second_state_name: _get_default_state_dict(
-                    '', second_state_name),
+                    '', second_state_name, False),
             },
             'param_changes': [],
             'param_specs': {},

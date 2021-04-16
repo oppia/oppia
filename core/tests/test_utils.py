@@ -1722,6 +1722,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1749,12 +1750,12 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1782,7 +1783,6 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}

@@ -1863,6 +1863,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1897,13 +1898,13 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1938,7 +1939,6 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
@@ -1968,6 +1968,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -2002,13 +2003,13 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
   Renamed state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -2043,7 +2044,6 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
-    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
@@ -2292,7 +2292,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """
 
     _SAMPLE_INIT_STATE_CONTENT = (
-        """classifier_model_id: null
+        """card_is_checkpoint: true
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2326,7 +2327,6 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
-card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -2337,7 +2337,8 @@ written_translations:
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2371,7 +2372,6 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
-card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -2383,7 +2383,8 @@ written_translations:
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2417,7 +2418,6 @@ recorded_voiceovers:
     content: {}
     default_outcome: {}
 solicit_answer_details: false
-card_is_checkpoint: true
 written_translations:
   translations_mapping:
     ca_placeholder_0: {}
@@ -2552,6 +2552,8 @@ written_translations:
         # Download version 2.
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_0_ID, version=2, width=50)
+        print(dict_output)
+        print(self.SAMPLE_EXPORTED_DICT)
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
         # Download version 3.
@@ -3082,14 +3084,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.card_is_checkpoint, True)
         exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State1',
+            })], 'Add state name')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].card_is_checkpoint, False)
+
+        exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name,
+                'State1',
                 exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                False),
+                True),
             '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
-            exploration.init_state.card_is_checkpoint, False)
+            exploration.states['State1'].card_is_checkpoint, True)
 
     def test_update_card_is_checkpoint_with_non_bool_fails(self):
         """Test updating of card_is_checkpoint with non bool value."""
@@ -3098,7 +3109,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.card_is_checkpoint, True)
         with self.assertRaisesRegexp(
             Exception, (
-                'Expected solicit_answer_details to be a bool, received ')):
+                'Expected card_is_checkpoint to be a bool, received ')):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name,
@@ -4575,7 +4586,20 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'init_state_name',
                 'new_value': 'State'
-            })], 'Changed init_state_name.')
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State',
+                'property_name': 'card_is_checkpoint',
+                'new_value': True
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'property_name': 'card_is_checkpoint',
+                'new_value': False
+            })
+            ], 'Changed init_state_name and checkpoints.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.init_state_name, 'State')
