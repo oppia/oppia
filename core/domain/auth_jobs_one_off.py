@@ -643,3 +643,48 @@ class PopulateFirebaseAccountsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def strip_uid_prefix(cls, user_id):
         """Removes the 'uid_' prefix from a user_id and returns the result."""
         return user_id[4:] if user_id.startswith('uid_') else user_id
+
+
+class AuditFirebaseImportReadinessOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to confirm whether users are ready for Firebase import."""
+
+    SYSTEM_COMMITTER_ACK = 'INFO: SYSTEM_COMMITTER_ID skipped'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user):
+        # The map() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = AuditFirebaseImportReadinessOneOffJob
+
+        gae_auth_id = gae_auth_services.get_auth_id_from_user_id(user.id)
+        # NOTE: This committer ID is a legacy ACL-bypass that we no longer
+        # depend on. Because it is obsolete, we do not want it to have a
+        # Firebase account associated with it, or even consider it for import.
+        if gae_auth_id == feconf.SYSTEM_COMMITTER_ID:
+            yield (cls.SYSTEM_COMMITTER_ACK, user.id)
+        else:
+            yield ('[DELETED]' if user.deleted else user.email, user.id)
+
+    @staticmethod
+    def reduce(key, values):
+        # The reduce() function must be static, so we manually create a "cls"
+        # variable instead of changing the function into a classmethod.
+        cls = PopulateFirebaseAccountsOneOffJob
+
+        if key == cls.SYSTEM_COMMITTER_ACK:
+            yield (cls.SYSTEM_COMMITTER_ACK, values)
+            return
+
+        # NOTE: These are only sorted to make unit tests simpler.
+        joined_user_ids = ', '.join(sorted(values))
+
+        if key == '[DELETED]':
+            yield ('ERROR: Found deleted users', joined_user_ids)
+        else:
+            email = key
+            if len(values) > 1:
+                yield ('ERROR: %s is a shared email' % email, joined_user_ids)
