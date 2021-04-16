@@ -34,24 +34,11 @@ describe('Create new skill modal', () => {
   let contextService: ContextService;
   let changeDetectorRef: ChangeDetectorRef;
   let skillObjectFactory: SkillObjectFactory;
-  let testObj: object = { test: 'object' };
+  let testObj: SubtitledHtml = SubtitledHtml
+    .createDefault('test_html', 'test_id');
   let ngbActiveModal: NgbActiveModal;
   let skillEditorStateService: SkillEditorStateService;
   let skillCreationService: SkillCreationService;
-
-  class MockSubtitledHtml {
-    createDefault(
-        displayedConceptCardExplanation: string,
-        explanation: string
-    ): { html: string, toBackendDict: () => void } {
-      return {
-        html: 'test_html',
-        toBackendDict: () => {
-          return testObj;
-        }
-      };
-    }
-  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -65,10 +52,6 @@ describe('Create new skill modal', () => {
       providers: [
         NgbActiveModal,
         ChangeDetectorRef,
-        {
-          provide: SubtitledHtml,
-          useClass: MockSubtitledHtml
-        }
       ]
     }).compileComponents();
   }));
@@ -161,10 +144,14 @@ describe('Create new skill modal', () => {
   });
 
   it('should save concept card explanation', () => {
+    spyOn(SubtitledHtml, 'createDefault').and.returnValue(testObj);
     componentInstance.saveConceptCardExplanation();
     expect(componentInstance.bindableDict.displayedConceptCardExplanation)
       .toEqual('test_html');
-    expect(componentInstance.newExplanationObject).toEqual(testObj);
+    expect(componentInstance.newExplanationObject).toEqual({
+      html: 'test_html',
+      content_id: 'test_id'
+    });
   });
 
   it('should create new skill modal', () => {
