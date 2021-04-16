@@ -34,10 +34,6 @@ from core.platform import models
 import feconf
 import utils
 
-(suggestion_models,) = (
-    models.Registry.import_models(
-        [models.NAMES.suggestion]))
-
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
     """Returns a dict of target_id to exploration opportunity summary dict.
 
