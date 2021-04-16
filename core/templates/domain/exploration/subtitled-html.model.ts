@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of SubtitledHtml
+ * @fileoverview Model for creating new frontend instances of SubtitledHtml
  * domain objects.
  */
-
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface SubtitledHtmlBackendDict {
   'content_id': string;
@@ -62,23 +59,13 @@ export class SubtitledHtml {
   set html(html: string) {
     this._html = html;
   }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SubtitledHtmlObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }
 
-  createDefault(html: string, contentId: string): SubtitledHtml {
+  static createDefault(html: string, contentId: string): SubtitledHtml {
     return new SubtitledHtml(html, contentId);
   }
 }
-
-angular.module('oppia').factory(
-  'SubtitledHtmlObjectFactory',
-  downgradeInjectable(SubtitledHtmlObjectFactory));
