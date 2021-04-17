@@ -41,8 +41,8 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
         '$scope', '$timeout', '$window', 'FocusManagerService',
         'SchemaFormSubmittedService',
         function(
-          $scope, $timeout, $window, FocusManagerService,
-          SchemaFormSubmittedService) {
+            $scope, $timeout, $window, FocusManagerService,
+            SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
           ctrl.onKeypress = function(evt) {
