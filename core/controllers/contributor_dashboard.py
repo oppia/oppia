@@ -293,7 +293,6 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
                 missing or improperly formatted.
             404 (Not Found): PageNotFoundException. At least one identifier does
                 not correspond to an entry in the datastore.
-
         """
         exp_id = self.request.get('exp_id')
         if not exp_id:

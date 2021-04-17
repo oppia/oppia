@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.controllers import base
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -537,7 +536,7 @@ class MachineTranslatedStateTextsHandlerTests(test_utils.GenericTestBase):
             'Missing target_language_code')
 
     def test_handler_with_invalid_exploration_id_returns_not_found(self):
-        output = self.get_json(
+        self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': 'invalid_exploration_id',
                 'state_name': 'End State',
@@ -557,7 +556,7 @@ class MachineTranslatedStateTextsHandlerTests(test_utils.GenericTestBase):
             'Missing exp_id')
 
     def test_handler_with_invalid_state_name_returns_not_found(self):
-        output = self.get_json(
+        self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
                 'state_name': 'invalid_state_name',

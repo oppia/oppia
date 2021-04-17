@@ -46,7 +46,6 @@ def get_machine_translation(
     Returns:
         str|None. The translated text or None if no translation is found.
     """
-
     translation = translation_fetchers.get_machine_translation(
         source_language_code,
         target_language_code,
