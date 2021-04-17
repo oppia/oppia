@@ -103,9 +103,7 @@ import { HammerGestureConfig } from '@angular/platform-browser';
 import * as hammer from 'hammerjs';
 import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
 import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
-import { TranslatePipe } from 'filters/translate.pipe';
-import { FocusOnDirective } from '../directives/focus-on.directive';
-import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
+import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = {
@@ -140,6 +138,7 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CustomFormsComponentsModule,
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
@@ -170,9 +169,7 @@ const toastrConfig = {
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
-    FocusOnDirective,
     OppiaFooterDirective,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
@@ -200,7 +197,6 @@ const toastrConfig = {
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TopNavigationBarComponent,
     TopNavigationBarWrapperComponent,
-    TranslatePipe,
     TruncatePipe,
     WarningsAndAlertsComponent,
     PromoBarComponent,
@@ -256,7 +252,6 @@ const toastrConfig = {
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
-    FocusOnDirective,
     OppiaFooterDirective,
     LimitToPipe,
     LoadingMessageComponent,
@@ -278,7 +273,6 @@ const toastrConfig = {
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TopNavigationBarWrapperComponent,
-    TranslatePipe,
     WarningsAndAlertsComponent,
     PromoBarComponent,
     WrapTextWithEllipsisPipe,

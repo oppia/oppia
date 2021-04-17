@@ -68,6 +68,7 @@ angular.module('oppia').controller('Base', [
       $rootScope.DEV_MODE = DEV_MODE;
       // If this is nonempty, the whole page goes into 'Loading...' mode.
       LoaderService.hideLoadingScreen();
+      $rootScope.$applyAsync();
 
       CsrfTokenService.initializeToken();
       MetaTagCustomizationService.addMetaTags([
