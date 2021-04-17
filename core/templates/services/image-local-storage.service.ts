@@ -23,7 +23,7 @@ import { AlertsService } from 'services/alerts.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-export class ImagesData {
+export interface ImagesData {
   filename: string;
   imageBlob: Blob;
 }
