@@ -13,18 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Delete Skill Modal.
+ * @fileoverview Unit tests for Unassign Skill Modal.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AssignedSkill, AssignedSkillBackendDict } from 'domain/skill/assigned-skill.model';
+import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { DeleteSkillModalComponent } from './delete-skill-modal.component';
+import { UnassignSkillFromTopicsModalComponent } from './unassign-skill-from-topics-modal.component';
 
-describe('Assign Skill to Topic Modal Component', () => {
-  let fixture: ComponentFixture<DeleteSkillModalComponent>;
-  let componentInstance: DeleteSkillModalComponent;
+describe('Unassing SKill Modal', () => {
+  let fixture: ComponentFixture<UnassignSkillFromTopicsModalComponent>;
+  let componentInstance: UnassignSkillFromTopicsModalComponent;
+  let ngbActiveModal: NgbActiveModal;
   let skillBackendDict: AssignedSkillBackendDict = {
     topic_id: 'test_id',
     topic_name: 'topic_name',
@@ -33,6 +34,7 @@ describe('Assign Skill to Topic Modal Component', () => {
   };
   const testSkills: AssignedSkill[] = [AssignedSkill
     .createFromBackendDict(skillBackendDict)];
+
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     fetchTopicAssignmentsForSkillAsync(skillId: string) {
@@ -47,7 +49,7 @@ describe('Assign Skill to Topic Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DeleteSkillModalComponent
+        UnassignSkillFromTopicsModalComponent
       ],
       providers: [
         NgbActiveModal,
@@ -60,10 +62,11 @@ describe('Assign Skill to Topic Modal Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteSkillModalComponent);
+    fixture = TestBed.createComponent(UnassignSkillFromTopicsModalComponent);
     componentInstance = fixture.componentInstance;
-    componentInstance.topicsAssignments = [];
-    componentInstance.skillId = '';
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbActiveModal = (ngbActiveModal as unknown) as
+      jasmine.SpyObj<NgbActiveModal>;
   });
 
   it('should create', () => {
@@ -76,20 +79,34 @@ describe('Assign Skill to Topic Modal Component', () => {
     expect(componentInstance.fetchTopicAssignmentsForSkill).toHaveBeenCalled();
   });
 
-  it('should show topic assignments', () => {
-    componentInstance.topicsAssignmentsAreFetched = true;
-    componentInstance.topicsAssignments.length = 4;
-    expect(componentInstance.showTopicsAssignments()).toBeTrue();
-    componentInstance.topicsAssignments.length = 0;
-    expect(componentInstance.showTopicsAssignments()).toBeFalse();
-    componentInstance.topicsAssignmentsAreFetched = false;
-    expect(componentInstance.showTopicsAssignments()).toBeFalse();
+  it('should close', () => {
+    spyOn(ngbActiveModal, 'close');
+    componentInstance.selectedTopicNames = ['Topic 1'];
+    componentInstance.topicsAssignments = {
+      'Topic 1': null
+    };
+    componentInstance.close();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith(
+      componentInstance.selectedTopics);
   });
 
-  it('should fetch Topic Assignments for Skill', () => {
-    componentInstance.topicsAssignmentsAreFetched = false;
+  it('should select topic to unassign', () => {
+    componentInstance.selectedTopicToUnassign('abc');
+    expect(componentInstance.selectedTopicNames.indexOf('abc'))
+      .toBeGreaterThan(-1);
+    componentInstance.selectedTopicToUnassign('abc');
+    expect(componentInstance.selectedTopicNames.indexOf('abc')).toEqual(-1);
+  });
+
+  it('should fetch topic assignments for skill', () => {
     componentInstance.fetchTopicAssignmentsForSkill();
-    expect(componentInstance.topicsAssignments).toEqual(testSkills);
+    let assignments = {};
+    assignments[skillBackendDict.topic_name] = {
+      subtopicId: skillBackendDict.subtopic_id,
+      topicVersion: skillBackendDict.topic_version,
+      topicId: skillBackendDict.topic_id
+    };
+    expect(componentInstance.topicsAssignments).toEqual(assignments);
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
   });
 });
