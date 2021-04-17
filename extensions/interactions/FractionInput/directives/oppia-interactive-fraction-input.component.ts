@@ -29,7 +29,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 
 import { FractionInputRulesService } from './fraction-input-rules.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 @Component({
   selector: 'oppia-interactive-fraction-input',
   templateUrl: './fraction-input-interaction.component.html',
@@ -41,6 +41,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() allowNonzeroIntegerPartWithValue: string = '';
   @Input() customPlaceholderWithValue: string = '';
   @Input() savedSolution: string;
+  @Input() labelForFocusTarget: () => string;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
   allowImproperFraction: boolean = true;
@@ -59,6 +60,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
     private fractionObjectFactory: FractionObjectFactory,
+    private focusManagerService: FocusManagerService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService
   ) {
@@ -109,6 +111,9 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log(this.labelForFocusTarget)
+    // let focusLabel = this.labelForFocusTarget();
+    // console.log(focusLabel)
     const {
       requireSimplestForm,
       allowImproperFraction,
@@ -132,7 +137,13 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswerFn, isAnswerValid);
-  }
+
+    setTimeout(
+      () => {
+        let focusLabel: string = this.labelForFocusTarget;
+        this.focusManagerService.setFocus(focusLabel);
+      }, 50);
+   }
 
   private getAttributesObject() {
     return {

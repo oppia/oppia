@@ -19,12 +19,13 @@
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require('services/schema-form-submitted.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedIntEditor', [
   function() {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {labelForFocusTarget: '&'},
       bindToController: {
         localValue: '=',
         isDisabled: '&',
@@ -37,18 +38,36 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
       template: require('./schema-based-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
+        '$scope', '$timeout', '$window', 'FocusManagerService',
         'SchemaFormSubmittedService',
-        function(SchemaFormSubmittedService) {
+        function($scope, $timeout, $window, FocusManagerService, 
+          SchemaFormSubmittedService) {
           var ctrl = this;
+          var labelForFocus = $scope.labelForFocusTarget();
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };
+
+          ctrl.addFocusWithoutScroll = function(label) {
+            FocusManagerService.setFocus(label);
+            // To ensure window scrolls back only 
+            // after focus has been applied.
+            $timeout(function() {
+              $window.scrollTo(0, 0);
+            }, 5);
+          };
+
           ctrl.$onInit = function() {
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0;
             }
+            // So that focus is applied after all the functions in 
+            // main thread have executed.
+            $timeout(function() {
+              ctrl.addFocusWithoutScroll(labelForFocus);
+            }, 50);
           };
         }
       ]

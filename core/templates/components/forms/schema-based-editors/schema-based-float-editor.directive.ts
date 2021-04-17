@@ -30,7 +30,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {labelForFocusTarget: '&'},
       bindToController: {
         localValue: '=',
         isDisabled: '&',
@@ -42,12 +42,15 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$timeout', 'FocusManagerService', 'NumericInputValidationService',
+        '$scope', '$timeout', '$window', 'FocusManagerService',
+        'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
-            $timeout, FocusManagerService, NumericInputValidationService,
+            $scope, $timeout, $window, FocusManagerService,
+            NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
+          var labelForFocus = $scope.labelForFocusTarget();
           ctrl.validate = function(localValue) {
             return (
               !angular.isUndefined(localValue) &&
@@ -62,6 +65,15 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.onInputFocus) {
               ctrl.onInputFocus();
             }
+          };
+
+          ctrl.addFocusWithoutScroll = function(label) {
+            FocusManagerService.setFocus(label);
+            // To ensure window scrolls back only 
+            // after focus has been applied.
+            $timeout(function() {
+              $window.scrollTo(0, 0);
+            }, 5);
           };
 
           ctrl.onBlur = function() {
@@ -106,6 +118,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               ctrl.isUserCurrentlyTyping = true;
             }
           };
+
           ctrl.$onInit = function() {
             ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;
@@ -116,6 +129,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
+            // So that focus is applied after all the functions in 
+            // main thread have executed.
+            $timeout(function() {
+              ctrl.addFocusWithoutScroll(labelForFocus);
+            }, 50);
             // This prevents the red 'invalid input' warning message from
             // flashing at the outset.
             $timeout(function() {
