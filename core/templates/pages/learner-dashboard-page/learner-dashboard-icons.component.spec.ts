@@ -469,7 +469,8 @@ describe('Learner Dashboard Icons Component', () => {
     let activityType = 'exploration';
 
     const learnerPlaylistSpy =
-      spyOn(learnerDashboardActivityBackendApiService,
+      spyOn(
+        learnerDashboardActivityBackendApiService,
         'removeFromLearnerPlaylistModal')
         .and.returnValue(null);
 
@@ -489,7 +490,8 @@ describe('Learner Dashboard Icons Component', () => {
     let activityType = 'collection';
 
     const learnerPlaylistSpy =
-      spyOn(learnerDashboardActivityBackendApiService,
+      spyOn(
+        learnerDashboardActivityBackendApiService,
         'removeFromLearnerPlaylistModal')
         .and.returnValue(null);
 
