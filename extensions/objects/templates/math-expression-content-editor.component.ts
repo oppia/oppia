@@ -43,7 +43,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   numberOfElementsInQueue: number;
   svgString: string;
   active: boolean;
-  localValue: {label: string};
+  localValue: {label: string} = {label: ''};
 
   constructor(
     private alertsService: AlertsService,
@@ -90,12 +90,12 @@ export class MathExpressionContentEditorComponent implements OnInit {
     outputElement.innerHTML += script;
     // Naturally MathJax works asynchronously, but we can add processes
     // which we want to happen synchronously into the MathJax Hub Queue.
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement]);
     this.numberOfElementsInQueue++;
     MathJax.Hub.Queue(function() {
-      if (outputElement[0].getElementsByTagName('svg')[0] !== undefined) {
+      if (outputElement.getElementsByTagName('svg')[0] !== undefined) {
         this.svgString = (
-          outputElement[0].getElementsByTagName('svg')[0].outerHTML);
+          outputElement.getElementsByTagName('svg')[0].outerHTML);
       }
       this.numberOfElementsInQueue--;
       // We need to ensure that all the typepsetting requests in the

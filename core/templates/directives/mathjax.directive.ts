@@ -18,18 +18,21 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-import {Directive, ElementRef, Input} from '@angular/core';
+import {Directive, ElementRef, Input, OnChanges} from '@angular/core';
 @Directive({
   selector: '[oppiaMathJax]'
 })
-export class MathJaxDirective {
+export class MathJaxDirective implements OnChanges {
   @Input('oppiaMathJax') texExpression: string;
 
   constructor(private el: ElementRef) {
   }
 
   ngOnChanges(): void {
-    this.el.nativeElement.innerHTML = this.texExpression;
+    let s = document.createElement('script');
+    s.type = 'math/tex';
+    s.text = this.texExpression === undefined ? '' : this.texExpression;
+    this.el.nativeElement.innerHTML = s.outerHTML;
     MathJax.Hub.Queue(['Reprocess', MathJax.Hub, this.el.nativeElement]);
   }
 }
