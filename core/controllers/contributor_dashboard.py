@@ -264,7 +264,7 @@ class TranslatableTextHandler(base.BaseHandler):
 
 
 class MachineTranslatedStateTextsHandler(base.BaseHandler):
-    """Provide a machine translation of exploration content."""
+    """Provides a machine translation of exploration content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -275,6 +275,25 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
             dict('translated_texts', dict(str, str|None))
         If no translation is found for a given content id, that id is mapped to
         None.
+
+        Params:
+            exp_id: str. The ID of exploration being translated.
+            state_name: str. The name of the exploration state being translated.
+            content_ids: str[]. The content IDs of the texts to be translated.
+            target_language_code: str. The language code of the target
+                translation language.
+
+        Data Response:
+            dict('translated_texts', dict(str, str|None))
+            A dictionary containing the translated texts stored as a mapping
+                from content ID to the translated text.
+
+        Raises:
+            400 (Bad Request): InvalidInputException. At least one input is
+                missing or improperly formatted.
+            404 (Not Found): PageNotFoundException. At least one identifier does
+                not correspond to an entry in the datastore.
+
         """
         exp_id = self.request.get('exp_id')
         if not exp_id:
@@ -290,7 +309,7 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
             content_ids = json.loads(content_ids_string)
         except:
             raise self.InvalidInputException(
-                'Improperly formatted content_ids %s' % content_ids_string)
+                'Improperly formatted content_ids: %s' % content_ids_string)
 
         target_language_code = self.request.get('target_language_code')
         if not target_language_code:
@@ -308,12 +327,11 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
-            raise self.PageNotFoundException('Invalid exp_id: %s' % exp_id)
+            raise self.PageNotFoundException()
         state_names_to_content_id_mapping = exp.get_translatable_text(
             target_language_code)
         if not state_names_to_content_id_mapping.has_key(state_name):
-            raise self.PageNotFoundException(
-                'Invalid state_name: %s' % state_name)
+            raise self.PageNotFoundException()
         content_id_mapping = state_names_to_content_id_mapping[state_name]
         translated_texts = {}
         for content_id in content_ids:
