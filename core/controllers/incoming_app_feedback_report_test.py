@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.domain import exp_services
 from core.controllers import incoming_app_feedback_report
 from core.tests import test_utils
 from core.platform import models
@@ -90,8 +89,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         }
 
     def test_incoming_report_saves_to_storage(self):
-        # Use str-type representations of the authentication values since webapp
-        # requires the header values to be str-types.
+        # Use str-type representations of the valid authentication values since
+        # webapp requires the header values to be str-types, so they must have
+        # parity for the tests correctly check these fields.
         with self.swap(feconf, 'ANDROID_API_KEY', ANDROID_API_KEY_STRING):
             with self.swap(
                     feconf, 'ANDROID_APP_PACKAGE_NAME',
@@ -122,4 +122,3 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.INCOMING_APP_FEEDBACK_REPORT_URL, self.payload,
             csrf_token=self.get_new_csrf_token(), expected_status_int=500)
-
