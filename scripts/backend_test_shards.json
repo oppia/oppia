@@ -260,6 +260,7 @@
         "core.platform.auth.gae_auth_services_test",
         "core.storage.skill.gae_models_test",
         "core.platform.taskqueue.cloud_tasks_emulator_test",
+        "core.platform.cloud_translate.cloud_translate_emulator_test",
         "core.storage.config.gae_models_test",
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",
