@@ -20,10 +20,10 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('State Editor Refresh Service', () => {
-  let stateEditorRefreshService = null;
+  let stateEditorRefreshService: StateEditorRefreshService;
 
   beforeEach(() => {
     stateEditorRefreshService = TestBed.get(StateEditorRefreshService);

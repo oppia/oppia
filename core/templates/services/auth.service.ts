@@ -137,7 +137,7 @@ export class AuthService {
     const creds = await this.authServiceImpl.getRedirectResultAsync();
     if (creds?.user) {
       const idToken = await creds.user.getIdToken();
-      this.authBackendApiService.beginSessionAsync(idToken);
+      await this.authBackendApiService.beginSessionAsync(idToken);
       return true;
     } else {
       return false;
