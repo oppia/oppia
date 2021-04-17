@@ -332,11 +332,12 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
             target_language_code)
         if not state_names_to_content_id_mapping.has_key(state_name):
             raise self.PageNotFoundException()
-        content_id_mapping = state_names_to_content_id_mapping[state_name]
+        content_id_to_text_mapping = (
+            state_names_to_content_id_mapping[state_name])
         translated_texts = {}
         for content_id in content_ids:
-            if content_id_mapping.has_key(content_id):
-                source_text = content_id_mapping[content_id]
+            if content_id_to_text_mapping.has_key(content_id):
+                source_text = content_id_to_text_mapping[content_id]
                 translated_texts[content_id] = (
                     translation_services.get_machine_translation(
                         exp.language_code, target_language_code, source_text)
