@@ -990,7 +990,7 @@ class Exploration(python_utils.OBJECT):
                 checkpoint_count = checkpoint_count + 1
         if checkpoint_count > 8 or checkpoint_count == 0:
             raise utils.ValidationError(
-                'Expected checkpoint count to be atleast 1 and atmax 8'
+                'Expected checkpoint count to be atleast 1 and atmax 8 '
                 'but found it to be %s'
                 % checkpoint_count
             )
@@ -1004,7 +1004,10 @@ class Exploration(python_utils.OBJECT):
         # For every state which is marked as a checkpoint and is not the initial
         # state we remove it from the states dict. Then we make a list of
         # unseen states. If all end states are unseen on removing a state,
-        # this means that the removed state is not bypassable.
+        # this means that after removing the state it is impossible to reach
+        # any end states, thus the user cannot bypass that state. Now, if the
+        # unseen states list contains atleast one end state then, the state is
+        # bypassble.
         for state_name, state in self.states.items():
             if state_name == self.init_state_name:
                 continue
@@ -1030,14 +1033,12 @@ class Exploration(python_utils.OBJECT):
                                 if (dest_state not in curr_queue and
                                         dest_state not in processed_queue):
                                     curr_queue.append(dest_state)
-
-                if len(new_states) != len(processed_queue):
-                    unseen_states = list(
-                        set(new_states.keys()) - set(processed_queue))
-                    if not all(state in unseen_states for state in end_states):
-                        raise utils.ValidationError(
-                            'Cannot make %s a checkpoint as it is '
-                            'bypassable' % state_name)
+                unseen_states = list(
+                    set(new_states.keys()) - set(processed_queue))
+                if not all(state in unseen_states for state in end_states):
+                    raise utils.ValidationError(
+                        'Cannot make %s a checkpoint as it is '
+                        'bypassable' % state_name)
 
         if strict:
             warnings_list = []

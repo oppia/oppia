@@ -490,11 +490,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
         init_state.update_interaction_default_outcome(default_outcome)
-        self._assert_validation_error(
-            exploration, 'Expected card_is_checkpoint of first state to '
-            'be True but found it to be False')
         init_state.update_card_is_checkpoint(True)
-        exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
         # Note: The state must keep its default_outcome, otherwise it will
@@ -886,6 +882,122 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 {'obj_type': 'UnicodeString'})
         }
         exploration.validate()
+
+        # Test checkpoints
+        new_state = state_domain.State.create_default_state('Introduction')
+        self.set_interaction_for_state(new_state, 'TextInput')
+        exploration.init_state_name = 'Introduction'
+        exploration.states = {
+            exploration.init_state_name: new_state
+        }
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'TextInput')
+
+        init_state = exploration.states[exploration.init_state_name]
+
+        # Test whether a state with init card having card_is_checkpoint as false
+        # is invalid.
+        self._assert_validation_error(
+            exploration, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False')
+        init_state.update_card_is_checkpoint(True)
+        exploration.validate()
+
+        # Test if end state having card_is_checkpoint as false is invalid.
+        end_state = state_domain.State.create_default_state('End')
+        self.set_interaction_for_state(end_state, 'EndExploration')
+
+        end_state.update_interaction_default_outcome(None)
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest = exploration.init_state_name
+        init_state.update_interaction_default_outcome(default_outcome)
+
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'End': end_state
+        }
+        end_state.update_card_is_checkpoint(True)
+        self._assert_validation_error(
+            exploration, 'Expected card_is_checkpoint of end state to '
+            'be False but found it to be True')
+        end_state.update_card_is_checkpoint(False)
+        exploration.validate()
+
+        # Test when first state having card_is_checkpoint has EndExploration
+        # interaction.
+        exploration.init_state_name = 'End'
+        exploration.states = {
+            exploration.init_state_name: end_state
+        }
+        end_state.update_card_is_checkpoint(True)
+        exploration.validate()
+        end_state.update_card_is_checkpoint(False)
+
+        # Restore exploration
+        exploration.init_state_name = 'Introduction'
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'End': end_state
+        }
+
+        # Test if checkpoint count validation
+        for i in range(8):
+            exploration.add_states(['State%s' % i])
+            exploration.states['State%s' % i].card_is_checkpoint = True
+        self._assert_validation_error(
+            exploration, 'Expected checkpoint count to be atleast 1 and atmax '
+            '8 but found it to be 9'
+        )
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'End': end_state
+        }
+        exploration.validate()
+
+        # Test if a unreachable state having card_is_checkpoint as True is
+        # invalid.
+        unreachable_state = state_domain.State.create_default_state('Unreachable')
+        self.set_interaction_for_state(unreachable_state, 'TextInput')
+
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'End': end_state,
+            'Unreachable': unreachable_state
+        }
+        exploration.states['Unreachable'].card_is_checkpoint = True
+        answer_group_dict = {
+            'outcome': {
+                'dest': 'End',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_1',
+                        'normalizedStrSet': ['Test']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups([answer_group_dict])
+        self._assert_validation_error(
+            exploration, 'Cannot make Unreachable a checkpoint as it is '
+            'bypassable'
+        )
+        init_state.update_interaction_answer_groups([])
+        exploration.validate()
+
 
     def test_tag_validation(self):
         """Test validation of exploration tags."""
