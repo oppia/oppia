@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: protractor-video
-          path: /home/runner/work/oppia/core/protractor-video
+          path: /home/runner/work/oppia/oppia/core/protractor-video

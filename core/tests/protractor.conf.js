@@ -346,7 +346,7 @@ exports.config = {
       '-y',
       '-r', '30',
       '-f', 'x11grab',
-      '-s', '1366x768',
+      '-s', '1024x768',
       '-i', process.env.DISPLAY,
       '-g', '300',
       '-vcodec', 'qtrle',
@@ -355,7 +355,6 @@ exports.config = {
     if(_ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter(new VideoReporter({
         baseDirectory: path.resolve(__dirname, '../protractor-video'),
-        singleVideo: true,
         ffmpegArgs: ffmpegArguments
       }));
     }
