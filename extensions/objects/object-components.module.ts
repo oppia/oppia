@@ -42,7 +42,7 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
 import { IntEditorComponent } from './templates/int-editor.component';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { ListOfSetsOfTranslatableHtmlContentIdsEditorComponent } from './templates/list-of-sets-of-translatable-html-content-ids-editor.component';
-import { DirectivesModule } from 'components/../directives/directives.module';
+import { DirectivesModule } from 'directives/directives.module';
 import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.component';
 import { ListOfUnicodeStringEditorComponent } from './templates/list-of-unicode-string-editor.component';
 import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-string-editor.component';
