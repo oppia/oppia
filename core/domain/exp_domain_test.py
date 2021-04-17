@@ -883,7 +883,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
-        # Test checkpoints
+        # Test checkpoints.
         new_state = state_domain.State.create_default_state('Introduction')
         self.set_interaction_for_state(new_state, 'TextInput')
         exploration.init_state_name = 'Introduction'
@@ -933,15 +933,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
         end_state.update_card_is_checkpoint(False)
 
-        # Restore exploration
+        # Restore exploration.
         exploration.init_state_name = 'Introduction'
         exploration.states = {
             exploration.init_state_name: new_state,
             'End': end_state
         }
 
-        # Test if checkpoint count validation
-        for i in range(8):
+        # Test if checkpoint count validation.
+        for i in python_utils.RANGE(8):
             exploration.add_states(['State%s' % i])
             exploration.states['State%s' % i].card_is_checkpoint = True
         self._assert_validation_error(
@@ -956,7 +956,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Test if a unreachable state having card_is_checkpoint as True is
         # invalid.
-        unreachable_state = state_domain.State.create_default_state('Unreachable')
+        unreachable_state = state_domain.State.create_default_state(
+            'Unreachable')
         self.set_interaction_for_state(unreachable_state, 'TextInput')
 
         exploration.states = {
@@ -997,7 +998,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state.update_interaction_answer_groups([])
         exploration.validate()
-
 
     def test_tag_validation(self):
         """Test validation of exploration tags."""
