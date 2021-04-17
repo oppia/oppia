@@ -40,7 +40,8 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
       controller: [
         '$scope', '$timeout', '$window', 'FocusManagerService',
         'SchemaFormSubmittedService',
-        function($scope, $timeout, $window, FocusManagerService,
+        function(
+          $scope, $timeout, $window, FocusManagerService,
           SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
