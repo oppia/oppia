@@ -111,9 +111,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log(this.labelForFocusTarget)
-    // let focusLabel = this.labelForFocusTarget();
-    // console.log(focusLabel)
     const {
       requireSimplestForm,
       allowImproperFraction,
@@ -143,7 +140,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
         let focusLabel: string = this.labelForFocusTarget;
         this.focusManagerService.setFocus(focusLabel);
       }, 50);
-   }
+  }
 
   private getAttributesObject() {
     return {

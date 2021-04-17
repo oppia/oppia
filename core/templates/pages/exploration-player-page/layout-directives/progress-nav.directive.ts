@@ -98,7 +98,7 @@ angular.module('oppia').directive('progressNav', [
                 $timeout(() => {
                   ctrl.addFocusWithoutScroll('ctn-btn');
                 }, 0);
-              };
+              }
             }
 
             $scope.helpCardHasContinueButton = false;
