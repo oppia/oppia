@@ -127,7 +127,7 @@ class MachineTranslatedTextModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_translation_for_text(
+    def get_machine_translation(
             cls, source_language_code, target_language_code, source_text):
         """Gets MachineTranslatedTextModel by language codes and source text.
 

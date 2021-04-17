@@ -45,7 +45,7 @@ def get_translation_from_model(translation_model):
         translation_model.translated_text)
 
 
-def get_translation_for_text(
+def get_machine_translation(
         source_language_code, target_language_code, source_text):
     """Gets MachineTranslatedText by language codes and source text.
     Returns None if no translation exists for the given parameters.
@@ -63,7 +63,7 @@ def get_translation_for_text(
     """
 
     translation_model = (
-        translation_models.MachineTranslatedTextModel.get_translation_for_text(
+        translation_models.MachineTranslatedTextModel.get_machine_translation(
             source_language_code, target_language_code, source_text
         )
     )

@@ -48,7 +48,7 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(model_id)
 
-    def test_get_translation_for_text_with_existing_translation(self):
+    def test_get_machine_translation_with_existing_translation(self):
         translation_models.MachineTranslatedTextModel.create(
             source_language_code='en',
             target_language_code='es',
@@ -57,7 +57,7 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
         )
         translation = (
             translation_models.MachineTranslatedTextModel
-            .get_translation_for_text(
+            .get_machine_translation(
                 source_language_code='en',
                 target_language_code='es',
                 source_text='hello world',
@@ -66,11 +66,11 @@ class MachineTranslatedTextModelTests(test_utils.GenericTestBase):
         self.assertIsNotNone(translation)
         self.assertEqual(translation.translated_text, 'hola mundo')
 
-    def test_get_translation_for_text_with_no_existing_translation_returns_none(
+    def test_get_machine_translation_with_no_existing_translation_returns_none(
             self):
         translation = (
             translation_models.MachineTranslatedTextModel
-            .get_translation_for_text(
+            .get_machine_translation(
                 source_language_code='en',
                 target_language_code='fr',
                 source_text='hello world',

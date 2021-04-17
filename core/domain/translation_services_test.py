@@ -42,7 +42,7 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         translated_text = translation_services.get_machine_translation(
             'en', 'en', 'text to translate')
         self.assertEqual(translated_text, 'text to translate')
-        translation = translation_fetchers.get_translation_for_text(
+        translation = translation_fetchers.get_machine_translation(
             'en', 'en', 'text to translate')
         self.assertIsNone(translation)
 
@@ -75,7 +75,7 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         translated_text = translation_services.get_machine_translation(
             'en', 'fr', 'hello world')
         self.assertEqual(translated_text, 'Bonjour le monde')
-        translation = translation_fetchers.get_translation_for_text(
+        translation = translation_fetchers.get_machine_translation(
             'en', 'fr', 'hello world')
         self.assertIsNotNone(translation)
         self.assertEqual(translation.translated_text, 'Bonjour le monde')
