@@ -5,27 +5,27 @@
       <h3 class="oppia-exp-skill-card-header">
         Skill
       </h3>
-      <i class="fa fa-caret-down" ng-if="!skillCardIsShown" aria-hidden="true">
+      <i class="fa fa-caret-down" ng-if="!skillEditorIsShown" aria-hidden="true">
       </i>
-      <i class="fa fa-caret-up" ng-if="skillCardIsShown" aria-hidden="true">
+      <i class="fa fa-caret-up" ng-if="skillEditorIsShown" aria-hidden="true">
       </i>
     </div>
-    <div class="oppia-add-skill-button-container" ng-if="skillCardIsShown">
-      <div ng-if="!StateSkillService.displayed">
+    <div class="oppia-add-skill-button-container" ng-if="skillEditorIsShown">
+      <div ng-if="!StateLinkedSkillIdService.displayed">
         <button type="button"
                 class="btn btn-secondary oppia-add-skill-button protractor-test-open-add-skill-modal"
-                ng-click="addSkillModalAsync()">
+                ng-click="addSkill()">
           + ADD SKILL
         </button>
       </div>
-      <div ng-if="StateSkillService.displayed">
+      <div ng-if="StateLinkedSkillIdService.displayed">
         <button type="button"
                 class="btn btn-secondary oppia-change-skill-button protractor-test-open-add-skill-modal"
-                ng-click="addSkillModalAsync()">
+                ng-click="addSkill()">
           CHANGE SKILL
         </button>
-        <div class="skill-description-card" ng-if="StateSkillService.displayed">
-          <a ng-href="<[getSkillEditorUrl()]>" target="_blank" rel="noopener" class="skill-link"><[StateSkillService.displayed]></a>
+        <div class="skill-description-card" ng-if="StateLinkedSkillIdService.displayed">
+          <a ng-href="<[getSkillEditorUrl()]>" target="_blank" rel="noopener" class="skill-link"><[StateLinkedSkillIdService.displayed]></a>
           <span class="oppia-delete-response-button oppia-transition-200"
                 ng-click="deleteSkill()">
             <i class="material-icons md-18">&#xE5CD;</i>

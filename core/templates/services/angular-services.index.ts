@@ -34,7 +34,7 @@ import { StateGraphLayoutService } from 'components/graph-services/graph-layout.
 import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
-import { StateSkillService } from 'components/state-editor/state-editor-properties-services/state-skill.service';
+import { StateLinkedSkillIdService } from 'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
@@ -600,7 +600,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateCardObjectFactory', StateCardObjectFactory],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
-  ['StateSkillService', StateSkillService],
+  ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],

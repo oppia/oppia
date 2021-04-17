@@ -98,19 +98,19 @@ angular.module('oppia').directive('stateEditor', [
       controller: [
         '$http', '$scope', 'ContextService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
-        'StateHintsService', 'StateInteractionIdService', 'StateNameService',
-        'StateNextContentIdIndexService',
-        'StateParamChangesService', 'StateSkillService',
-        'StateSolicitAnswerDetailsService',
-        'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
+        'StateHintsService', 'StateInteractionIdService',
+        'StateLinkedSkillIdService', 'StateNameService',
+        'StateNextContentIdIndexService', 'StateParamChangesService',
+        'StateSolicitAnswerDetailsService', 'StateSolutionService',
+        'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
             $http, $scope, ContextService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
-            StateHintsService, StateInteractionIdService, StateNameService,
-            StateNextContentIdIndexService,
-            StateParamChangesService, StateSkillService,
-            StateSolicitAnswerDetailsService,
-            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
+            StateHintsService, StateInteractionIdService,
+            StateLinkedSkillIdService, StateNameService,
+            StateNextContentIdIndexService, StateParamChangesService,
+            StateSolicitAnswerDetailsService, StateSolutionService,
+            WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var updateInteractionVisibility = function(newInteractionId) {
@@ -141,7 +141,11 @@ angular.module('oppia').directive('stateEditor', [
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
             ctrl.explorationId = ContextService.getExplorationId();
-            $http.get('/createhandler/data/' + ctrl.explorationId)
+            ctrl.explorationUrl = UrlInterpolationService.interpolateUrl(
+              '/createhandler/data/<exploration_id>', {
+                exploration_id: ctrl.explorationId
+              });
+            $http.get(ctrl.explorationUrl)
               .then(function(response) {
                 $scope.explorationIsLinkedToStory = (
                   response.data.exploration_is_linked_to_story);
@@ -167,7 +171,7 @@ angular.module('oppia').directive('stateEditor', [
                   StateEditorService.setInteraction(stateData.interaction);
                   StateContentService.init(
                     $scope.stateName, stateData.content);
-                  StateSkillService.init(
+                  StateLinkedSkillIdService.init(
                     $scope.stateName, stateData.linkedSkillId);
                   StateHintsService.init(
                     $scope.stateName, stateData.interaction.hints);

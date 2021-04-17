@@ -105,7 +105,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v43_dict_to_v44_dict(cls, draft_change_list):
-        """Converts draft change list from state version 42 to 43.
+        """Converts draft change list from state version 42 to 43. State
+        version 44 adds a linked skill id variable to the
+        state, for which there should be no changes to drafts.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

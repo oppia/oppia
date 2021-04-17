@@ -39,12 +39,12 @@ angular.module('oppia').directive('stateSkillEditor', [
         'state-skill-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'StateSkillService', 'StoryEditorStateService',
+        'StateLinkedSkillIdService', 'StoryEditorStateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService',
         function(
             $rootScope, $scope, $uibModal, AlertsService,
-            StateSkillService, StoryEditorStateService,
+            StateLinkedSkillIdService, StoryEditorStateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService) {
           var ctrl = this;
@@ -53,13 +53,16 @@ angular.module('oppia').directive('stateSkillEditor', [
           var _init = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
               .then(function(response) {
+                // CategorizedSkills: a dict of categorized ShortSkillSummary.
+                // UntriagedSkillSummaries:  array of Untriaged SkillSummary.
                 categorizedSkills = response.categorizedSkillsDict;
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
                 $rootScope.$applyAsync();
               });
           };
 
-          $scope.addSkillModalAsync = async function() {
+          $scope.addSkill = function() {
+            // SortedSkillSummaries: array of sorted SkillSummaryBackendDict.
             var sortedSkillSummaries = (
               StoryEditorStateService.getSkillSummaries());
             var allowSkillsFromOtherTopics = true;
@@ -80,12 +83,11 @@ angular.module('oppia').directive('stateSkillEditor', [
               size: 'xl'
             }).result.then(function(result) {
               try {
-                StateSkillService.displayed = result.id;
-                StateSkillService.saveDisplayedValue();
+                StateLinkedSkillIdService.displayed = result.id;
+                StateLinkedSkillIdService.saveDisplayedValue();
                 $scope.onSaveLinkedSkillId(result.id);
               } catch (err) {
-                AlertsService.addInfoMessage(
-                  err, 5000);
+                AlertsService.addInfoMessage(err, 5000);
               }
             }, function() {
               // Note to developers:
@@ -103,9 +105,9 @@ angular.module('oppia').directive('stateSkillEditor', [
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
-              StateSkillService.displayed = null;
-              StateSkillService.saveDisplayedValue();
-              $scope.onSaveLinkedSkillId(StateSkillService.displayed);
+              StateLinkedSkillIdService.displayed = null;
+              StateLinkedSkillIdService.saveDisplayedValue();
+              $scope.onSaveLinkedSkillId(StateLinkedSkillIdService.displayed);
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -114,18 +116,22 @@ angular.module('oppia').directive('stateSkillEditor', [
           };
 
           $scope.getSkillEditorUrl = function() {
-            if (StateSkillService.displayed) {
-              return '/skill_editor/' + StateSkillService.displayed;
+            if (StateLinkedSkillIdService.displayed) {
+              ctrl.skillId = UrlInterpolationService.interpolateUrl(
+                '/skill_editor/<skill_id>', {
+                  skill_id: StateLinkedSkillIdService.displayed
+                });
+              return ctrl.skillId;
             }
           };
 
           $scope.toggleSkillEditor = function() {
-            $scope.skillCardIsShown = !$scope.skillCardIsShown;
+            $scope.skillEditorIsShown = !$scope.skillEditorIsShown;
           };
 
           ctrl.$onInit = function() {
-            $scope.StateSkillService = StateSkillService;
-            $scope.skillCardIsShown = (
+            $scope.StateLinkedSkillIdService = StateLinkedSkillIdService;
+            $scope.skillEditorIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             _init();
           };

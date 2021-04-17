@@ -28,7 +28,7 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StateSkillService extends StatePropertyService<string> {
+export class StateLinkedSkillIdService extends StatePropertyService<string> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveLinkedSkillId';
@@ -36,4 +36,4 @@ export class StateSkillService extends StatePropertyService<string> {
 }
 
 angular.module('oppia').factory(
-  'StateSkillService', downgradeInjectable(StateSkillService));
+  'StateLinkedSkillIdService', downgradeInjectable(StateLinkedSkillIdService));

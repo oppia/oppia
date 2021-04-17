@@ -34,7 +34,7 @@ describe('State skill editor directive', function() {
   var ExplorationStatesService = null;
   var StateEditorService = null;
   var StateObjectFactory = null;
-  var StateSkillService = null;
+  var StateLinkedSkillIdService = null;
   var StoryEditorStateService = null;
   var WindowDimensionsService = null;
 
@@ -47,7 +47,7 @@ describe('State skill editor directive', function() {
     ExplorationStatesService = $injector.get('ExplorationStatesService');
     StateEditorService = $injector.get('StateEditorService');
     StateObjectFactory = $injector.get('StateObjectFactory');
-    StateSkillService = $injector.get('StateSkillService');
+    StateLinkedSkillIdService = $injector.get('StateLinkedSkillIdService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
 
@@ -150,7 +150,7 @@ describe('State skill editor directive', function() {
 
   it('should open add skill modal for adding skill', function() {
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-    $scope.addSkillModalAsync();
+    $scope.addSkill();
     expect(modalSpy).toHaveBeenCalled();
   });
 
@@ -161,8 +161,9 @@ describe('State skill editor directive', function() {
     });
     var modalSpy = spyOn($uibModal, 'open').and.returnValue(
       {result: deferred.promise});
-    var skillServiceSpy = spyOn(StateSkillService, 'saveDisplayedValue');
-    $scope.addSkillModalAsync();
+    var skillServiceSpy = spyOn(
+      StateLinkedSkillIdService, 'saveDisplayedValue');
+    $scope.addSkill();
     $rootScope.$apply();
     expect(modalSpy).toHaveBeenCalled();
     expect(skillServiceSpy).toHaveBeenCalled();
@@ -178,9 +179,9 @@ describe('State skill editor directive', function() {
     var modalSpy = spyOn($uibModal, 'open').and.returnValue(
       {result: deferred.promise});
     var skillServiceSpy = spyOn(
-      StateSkillService, 'saveDisplayedValue').and.throwError(
+      StateLinkedSkillIdService, 'saveDisplayedValue').and.throwError(
       'Error');
-    $scope.addSkillModalAsync();
+    $scope.addSkill();
     $rootScope.$apply();
     expect(modalSpy).toHaveBeenCalled();
     expect(alertsSpy).toHaveBeenCalled();
@@ -188,11 +189,12 @@ describe('State skill editor directive', function() {
   });
 
   it('should not add skill when dismissing add skill model', function() {
-    var skillServiceSpy = spyOn(StateSkillService, 'saveDisplayedValue');
+    var skillServiceSpy = spyOn(
+      StateLinkedSkillIdService, 'saveDisplayedValue');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
-    $scope.addSkillModalAsync();
+    $scope.addSkill();
     $rootScope.$apply();
     expect(skillServiceSpy).not.toHaveBeenCalled();
   });
@@ -212,7 +214,7 @@ describe('State skill editor directive', function() {
       {result: deferred.promise});
     var alertsSpy = spyOn(AlertsService, 'clearWarnings');
     var skillServiceSpy = spyOn(
-      StateSkillService,
+      StateLinkedSkillIdService,
       'saveDisplayedValue');
     $scope.deleteSkill();
     $rootScope.$apply();
@@ -222,7 +224,8 @@ describe('State skill editor directive', function() {
   });
 
   it('should not delete skill when dismissing delete skill model', function() {
-    var skillServiceSpy = spyOn(StateSkillService, 'saveDisplayedValue');
+    var skillServiceSpy = spyOn(
+      StateLinkedSkillIdService, 'saveDisplayedValue');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -231,15 +234,15 @@ describe('State skill editor directive', function() {
     expect(skillServiceSpy).not.toHaveBeenCalled();
   });
 
-  it('should toggle skill card', function() {
-    $scope.skillCardIsShown = true;
+  it('should toggle skill editor', function() {
+    $scope.skillEditorIsShown = true;
     $scope.toggleSkillEditor();
-    expect($scope.skillCardIsShown).toEqual(false);
+    expect($scope.skillEditorIsShown).toEqual(false);
   });
 
   it('should return skill editor URL', function() {
-    StateSkillService.displayed = 'skill_1';
-    StateSkillService.saveDisplayedValue();
+    StateLinkedSkillIdService.displayed = 'skill_1';
+    StateLinkedSkillIdService.saveDisplayedValue();
     var skillEditorUrl = $scope.getSkillEditorUrl();
     expect(skillEditorUrl).toEqual('/skill_editor/skill_1');
   });

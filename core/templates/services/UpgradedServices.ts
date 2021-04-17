@@ -389,7 +389,7 @@ import { StateClassifierMappingService } from
 import { StateContentService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-content.service';
-import { StateSkillService } from
+import { StateLinkedSkillIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from
@@ -885,8 +885,9 @@ export class UpgradedServices {
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
-    upgradedServices['StateSkillService'] = new StateSkillService(
-      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateLinkedSkillIdService'] =
+      new StateLinkedSkillIdService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateCustomizationArgsService'] =
       new StateCustomizationArgsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);

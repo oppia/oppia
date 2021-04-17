@@ -2323,8 +2323,8 @@ class State(python_utils.OBJECT):
                 particular answer while playing the exploration.
             next_content_id_index: int. The next content_id index to use for
                 generation of new content_ids.
-            linked_skill_id: str or Null. The linked skill ID associated with
-                this State.
+            linked_skill_id: str or None. The linked skill ID associated with
+                this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
