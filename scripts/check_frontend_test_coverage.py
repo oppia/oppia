@@ -323,7 +323,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'svm-prediction.service.ts',
     'teacher.ts',
     'teacher2.ts',
-    'text_classifier.ts',
     'thumbnail-uploader.directive.ts',
     'top-navigation-bar.directive.ts',
     'topic-creation.service.ts',
