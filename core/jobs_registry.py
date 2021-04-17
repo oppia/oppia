@@ -53,6 +53,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
+    auth_jobs_one_off.AuditFirebaseImportReadinessOneOffJob,
     auth_jobs_one_off.PopulateFirebaseAccountsOneOffJob,
     auth_jobs_one_off.SeedFirebaseOneOffJob,
     auth_jobs_one_off.SyncFirebaseAccountsOneOffJob,
