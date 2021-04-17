@@ -17,7 +17,7 @@
  */
 
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { Schema } from 'services/schema-default-value.service';
@@ -46,27 +46,30 @@ require(
   'interaction-details-cache.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+require('services/context.service');
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModal', '$uibModalInstance',
-  'EditorFirstTimeEventsService',
+  'ContextService', 'EditorFirstTimeEventsService',
   'InteractionDetailsCacheService', 'InteractionObjectFactory',
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'StateNextContentIdIndexService',
   'UrlInterpolationService',
   'showMarkAllAudioAsNeedingUpdateModalIfRequired',
+  'ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES',
   'ALLOWED_INTERACTION_CATEGORIES',
   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
   'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   'INTERACTION_SPECS',
   function(
       $controller, $injector, $scope, $uibModal, $uibModalInstance,
-      EditorFirstTimeEventsService,
+      ContextService, EditorFirstTimeEventsService,
       InteractionDetailsCacheService, InteractionObjectFactory,
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
       showMarkAllAudioAsNeedingUpdateModalIfRequired,
+      ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES,
       ALLOWED_INTERACTION_CATEGORIES,
       ALLOWED_QUESTION_INTERACTION_CATEGORIES,
       COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
@@ -92,6 +95,9 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     if (StateEditorService.isInQuestionMode()) {
       $scope.ALLOWED_INTERACTION_CATEGORIES = (
         ALLOWED_QUESTION_INTERACTION_CATEGORIES);
+    } else if (ContextService.isExplorationLinkedToStory()) {
+      $scope.ALLOWED_INTERACTION_CATEGORIES = (
+        ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES);
     } else {
       $scope.ALLOWED_INTERACTION_CATEGORIES = (
         ALLOWED_INTERACTION_CATEGORIES);
@@ -409,6 +415,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         $scope.originalContentIdToContent = $scope.getContentIdToContent(
           StateCustomizationArgsService.displayed);
       }
+      $scope.explorationIsLinkedToStory = (
+        ContextService.isExplorationLinkedToStory());
     };
 
     $scope.init();
