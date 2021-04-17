@@ -101,6 +101,7 @@ export class LogicQuestionEditorComponent implements OnInit {
         results: builtQuestion.results,
         default_proof_string: this.localValue.proofString
       };
+      this.valueChanged.emit(this.value);
       this.localValue.errorMessage = '';
     } catch (err) {
       this.localValue.errorMessage = err.message;

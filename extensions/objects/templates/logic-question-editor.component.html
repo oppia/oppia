@@ -6,7 +6,7 @@
            [(ngModel)]="localValue.assumptionsString"
            placeholder="Enter a list of formulas."
            id="logicQuestionAssumptions"
-           (change)="changeAssumptions()">
+           (keyup)="changeAssumptions()">
   </p>
   <p>
     Formula the student must prove:<br>
@@ -15,7 +15,7 @@
            [(ngModel)]="localValue.targetString"
            placeholder="Enter a formula."
            id="logicQuestionTarget"
-           (change)="changeTarget()">
+           (keyup)="changeTarget()">
   </p>
   <p>
     <div class="logic-proof-mistake-message">{{localValue.errorMessage}}</div>
@@ -25,6 +25,6 @@
             [(ngModel)]="localValue.proofString"
             placeholder="If this is an example, enter a proof."
             id="logicQuestionProof"
-            (change)="changeProof()">
+            (keyup)="changeProof()">
   </textarea>
 </div>
