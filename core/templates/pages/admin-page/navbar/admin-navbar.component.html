@@ -89,7 +89,7 @@
                   <li *ngFor="let tab of ADMIN_TAB_URLS | keyvalue">
                     <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab"
                        [href]="tab.value">
-                      {{tab.key}}
+                      {{ tab.key }}
                     </a>
                   </li>
                 </ul>
@@ -191,7 +191,7 @@
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        [href]="profileUrl"
                        class="dropdown-item oppia-dropdown-item-text">
-                      <strong>{{username}}</strong>
+                      <strong>{{ username }}</strong>
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">

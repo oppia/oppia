@@ -30,7 +30,7 @@ import { FeedbackThreadSummary } from 'domain/feedback_thread/feedback-thread-su
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
+import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
@@ -155,8 +155,8 @@ export class LearnerDashboardPageComponent implements OnInit {
     private focusManagerService: FocusManagerService,
     private learnerDashboardBackendApiService:
       LearnerDashboardBackendApiService,
-    private learnerPlaylistBackendApiService:
-      LearnerPlaylistBackendApiService,
+    private learnerDashboardActivityBackendApiService:
+      LearnerDashboardActivityBackendApiService,
     private loaderService: LoaderService,
     private suggestionModalForLearnerDashboardService:
       SuggestionModalForLearnerDashboardService,
@@ -550,7 +550,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   openRemoveActivityModal(
       sectionNameI18nId: string, subsectionName: string,
       activity: LearnerExplorationSummary | CollectionSummary): void {
-    this.learnerPlaylistBackendApiService.removeActivityModal(
+    this.learnerDashboardActivityBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
       activity.id, activity.title)
       .then(() => {

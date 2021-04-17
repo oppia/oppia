@@ -3,7 +3,7 @@
    [hidden]="!(canActivityBeAddedToLearnerPlaylist(activityId) && !isContainerNarrow)" (click)="addToLearnerPlaylist(activityId, activityType)"
    (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)"
    aria-hidden="true"
-   ngbTooltip="{{'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate}}"
+   ngbTooltip="{{ 'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate }}"
    container="body"
    placement="left">
 </i>
@@ -20,21 +20,21 @@
    (click)="removeFromLearnerPlaylist(activityId, activityTitle, activityType)"
    aria-hidden="true"
    (mouseleave)="enablePlaylistTooltip()"
-   ngbTooltip="{{'I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate}}"
+   ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate }}"
    container="body"
    placement="left">
 </i>
 <i class="oppia-learner-dashboard-icon far fa-check-circle"
    *ngIf="belongsToCompletedActivities()"
    aria-hidden="true"
-   ngbTooltip="{{'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate}}"
+   ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
    container="body"
    placement="left">
 </i>
 <i class="oppia-learner-dashboard-icon fas fa-spinner"
    *ngIf="belongsToIncompleteActivities()"
    aria-hidden="true"
-   ngbTooltip="{{'I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate}}"
+   ngbTooltip="{{ 'I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate }}"
    container="body"
    tooltipClass="library-incomplete-activity-tooltip"
    placement="left">

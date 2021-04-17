@@ -41,7 +41,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
+import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
@@ -68,7 +68,7 @@ class MockTrunctePipe {
   }
 }
 
-class MockLearnerPlaylistBackendApiService {
+class MockLearnerDashboardActivityBackendApiService {
   removeActivityModal(): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
@@ -298,8 +298,8 @@ describe('Learner dashboard page', () => {
           FocusManagerService,
           LearnerDashboardBackendApiService,
           {
-            provide: LearnerPlaylistBackendApiService,
-            useClass: MockLearnerPlaylistBackendApiService
+            provide: LearnerDashboardActivityBackendApiService,
+            useClass: MockLearnerDashboardActivityBackendApiService
           },
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,

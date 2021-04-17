@@ -27,9 +27,9 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
   templateUrl: './delete-misconception-modal.component.html',
   styleUrls: []
 }) export class DeleteMisconceptionModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
-  skill: Skill;
-  index: number;
+    extends ConfirmOrCancelModal implements OnInit {
+    skill: Skill;
+    index: number;
 
   constructor(
     private skillEditorStateService: SkillEditorStateService,

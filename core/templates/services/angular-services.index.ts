@@ -85,7 +85,7 @@ import { StatsReportingBackendApiService } from 'domain/exploration/stats-report
 import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
+import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
@@ -495,7 +495,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],
   ['LearnerParamsService', LearnerParamsService],
-  ['LearnerPlaylistBackendApiService', LearnerPlaylistBackendApiService],
+  ['LearnerDashboardActivityBackendApiService', LearnerDashboardActivityBackendApiService],
   ['SuggestionModalForLearnerDashboardService',
     SuggestionModalForLearnerDashboardService],
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],

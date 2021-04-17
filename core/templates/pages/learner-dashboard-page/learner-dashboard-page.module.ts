@@ -25,7 +25,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
-import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 
@@ -37,12 +36,10 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
   ],
   declarations: [
     OppiaAngularRootComponent,
-    LearnerDashboardSuggestionModalComponent,
     LearnerDashboardPageComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    LearnerDashboardSuggestionModalComponent,
     LearnerDashboardPageComponent,
   ],
   providers: [

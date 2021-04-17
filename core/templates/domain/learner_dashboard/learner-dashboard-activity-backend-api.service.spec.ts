@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for LearnerPlaylistBackendApiService.
+ * @fileoverview Tests for LearnerDashboardActivityBackendApiService.
  */
 
 import { async, fakeAsync, flushMicrotasks, TestBed } from
@@ -24,8 +24,8 @@ import { HttpClientTestingModule, HttpTestingController } from
 
 import { AlertsService } from 'services/alerts.service';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import { LearnerPlaylistBackendApiService } from
-  'domain/learner_dashboard/learner-playlist-backend-api.service';
+import { LearnerDashboardActivityBackendApiService } from
+  'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
@@ -47,7 +47,8 @@ class MockRemoveActivityNgbModalRef {
 }
 
 describe('Learner playlist Backend Api service ', () => {
-  let learnerPlaylistBackendApiService: LearnerPlaylistBackendApiService;
+  let learnerDashboardActivityBackendApiService:
+    LearnerDashboardActivityBackendApiService;
   let http: HttpTestingController;
   let activityId = '1';
   let activityType = 'exploration';
@@ -62,8 +63,8 @@ describe('Learner playlist Backend Api service ', () => {
   }));
 
   beforeEach(() => {
-    learnerPlaylistBackendApiService =
-      TestBed.inject(LearnerPlaylistBackendApiService);
+    learnerDashboardActivityBackendApiService =
+      TestBed.inject(LearnerDashboardActivityBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
     http = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
@@ -84,7 +85,7 @@ describe('Learner playlist Backend Api service ', () => {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+    learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
       activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
@@ -104,7 +105,7 @@ describe('Learner playlist Backend Api service ', () => {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+    learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
       activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
@@ -124,7 +125,7 @@ describe('Learner playlist Backend Api service ', () => {
       belongs_to_subscribed_activities: true,
       playlist_limit_exceeded: false
     };
-    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+    learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
       activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
@@ -144,7 +145,7 @@ describe('Learner playlist Backend Api service ', () => {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: true
     };
-    learnerPlaylistBackendApiService.addToLearnerPlaylist(
+    learnerDashboardActivityBackendApiService.addToLearnerPlaylist(
       activityId, activityType);
     let req = http.expectOne(
       '/learnerplaylistactivityhandler/exploration/1');
@@ -177,7 +178,7 @@ describe('Learner playlist Backend Api service ', () => {
           result: Promise.resolve('success')
         });
     });
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
+    learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
       '0', 'title', 'exploration', learnerDashboardActivityIds);
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -202,7 +203,7 @@ describe('Learner playlist Backend Api service ', () => {
         collection_playlist_ids: []
       });
 
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
+    learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
       '0', 'title', 'exploration', learnerDashboardActivityIds);
     flushMicrotasks();
 
@@ -231,7 +232,7 @@ describe('Learner playlist Backend Api service ', () => {
         collection_playlist_ids: ['0', '1', '2']
       });
 
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
+    learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
       '0', 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
 
@@ -261,7 +262,7 @@ describe('Learner playlist Backend Api service ', () => {
         collection_playlist_ids: ['0', '1', '2']
       });
 
-    learnerPlaylistBackendApiService.removeFromLearnerPlaylistModal(
+    learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
       activityId, 'title', 'collection', learnerDashboardActivityIds);
     flushMicrotasks();
 
@@ -270,7 +271,7 @@ describe('Learner playlist Backend Api service ', () => {
 
   it('should opena a modal to remove an exploration from learner playlist' +
     ' when calling removeActivityModal', fakeAsync(() => {
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -286,20 +287,20 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerPlaylistBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
 
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBe('removed');
   }));
 
   it('should opena a modal to remove a collection from learner playlist' +
     ' when calling removeActivityModal', fakeAsync(() => {
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -315,19 +316,19 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerPlaylistBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBe('removed');
   }));
 
   it('should opena a modal to remove an exploration from incomplete playlist' +
     ' when calling removeActivityModal', fakeAsync(() => {
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -343,20 +344,20 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerPlaylistBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
 
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBe('removed');
   }));
 
   it('should opena a modal to remove a collection from incomplete playlist' +
     ' when calling removeActivityModal', fakeAsync(() => {
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -372,19 +373,19 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerPlaylistBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBe('removed');
   }));
 
   it('should not open a modal if cancel button is clicked' +
     ' when calling removeActivityModal', fakeAsync(() => {
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -400,13 +401,13 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerPlaylistBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModal(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(learnerPlaylistBackendApiService.removeActivityModalStatus)
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBe('canceled');
   }));
 });

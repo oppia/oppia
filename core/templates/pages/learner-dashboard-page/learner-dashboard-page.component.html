@@ -13,15 +13,15 @@
             [ngStyle]="checkMobileView() ? {'margin-bottom': '10px'} : {'margin-bottom': '40px'}">
       <div class="stats-card">
         <p class="stat-description">Completed Explorations</p>
-        <h1 class="stat-value">{{completedExplorationsList && completedExplorationsList.length}}</h1>
+        <h1 class="stat-value">{{ completedExplorationsList && completedExplorationsList.length }}</h1>
       </div>
       <div class="stats-card">
         <p class="stat-description">Completed Collections</p>
-        <h1 class="stat-value">{{completedCollectionsList && completedCollectionsList.length}}</h1>
+        <h1 class="stat-value">{{ completedCollectionsList && completedCollectionsList.length }}</h1>
       </div>
       <div class="stats-card">
         <p class="stat-description">Subscriptions</p>
-        <h1 class="stat-value">{{subscriptionsList && subscriptionsList.length}}</h1>
+        <h1 class="stat-value">{{ subscriptionsList && subscriptionsList.length }}</h1>
       </div>
     </mat-card>
   </div>
@@ -129,7 +129,7 @@
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK | translate"></span>
-          <span *ngIf="numberOfUnreadThreads !== 0">({{numberOfUnreadThreads}})</span>
+          <span *ngIf="numberOfUnreadThreads !== 0">({{ numberOfUnreadThreads }})</span>
         </h4>
       </mat-card>
     </div>
@@ -183,7 +183,7 @@
                   (change)="setSubscriptionSortingOptions(currentSubscribersSortType)">
             <option *ngFor="let user of SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS | keyvalue"
                     [value]="user.value['key'] ">
-              {{ user.value['i18nId'] | translate}}
+              {{ user.value['i18nId'] | translate }}
             </option>
           </select>
           <span class="sort-order fas"
@@ -201,7 +201,7 @@
                   (change)="setFeedbackSortingOptions(currentFeedbackThreadsSortType)">
             <option *ngFor="let thread of FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS | keyvalue"
                     [value]="thread.value['key']">
-              {{ thread.value['i18nId'] | translate}}
+              {{ thread.value['i18nId'] | translate }}
             </option>
           </select>
           <span class="sort-order fas"
@@ -270,7 +270,7 @@
                (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
                &#xE5C4;
             </i>
-            Showing {{startIncompleteExpIndex + 1}} - {{Math.min(startIncompleteExpIndex + PAGE_SIZE, incompleteExplorationsList.length)}} of {{incompleteExplorationsList.length}}
+            Showing {{ startIncompleteExpIndex + 1 }} - {{ Math.min(startIncompleteExpIndex + PAGE_SIZE, incompleteExplorationsList.length) }} of {{ incompleteExplorationsList.length }}
             <i class="material-icons md-18"
                (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
                &#xE5C8;
@@ -320,7 +320,7 @@
                (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
                &#xE5C4;
             </i>
-            Showing {{startCompletedExpIndex + 1}} - {{Math.min(startCompletedExpIndex + PAGE_SIZE, completedExplorationsList.length)}} of {{completedExplorationsList.length}}
+            Showing {{ startCompletedExpIndex + 1 }} - {{ Math.min(startCompletedExpIndex + PAGE_SIZE, completedExplorationsList.length) }} of {{ completedExplorationsList.length }}
             <i class="material-icons md-18"
                (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
                &#xE5C8;
@@ -429,7 +429,7 @@
             <i class="material-icons md-18"
                (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C4;
             </i>
-            Showing {{startIncompleteCollectionIndex + 1}} - {{Math.min(startIncompleteCollectionIndex + PAGE_SIZE, incompleteCollectionsList.length)}} of {{incompleteCollectionsList.length}}
+            Showing {{ startIncompleteCollectionIndex + 1 }} - {{ Math.min(startIncompleteCollectionIndex + PAGE_SIZE, incompleteCollectionsList.length )}} of {{ incompleteCollectionsList.length }}
             <i class="material-icons md-18" (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
           </div>
         </div>
@@ -489,7 +489,7 @@
             </span>
             <span>
               <ul>
-                <li *ngFor="let title of completedToIncompleteCollections">{{title}}</li>
+                <li *ngFor="let title of completedToIncompleteCollections">{{ title }}</li>
               </ul>
             </span>
           </span>
@@ -532,7 +532,7 @@
                (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">
                &#xE5C4;
             </i>
-            Showing {{startCompletedCollectionIndex + 1}} - {{Math.min(startCompletedCollectionIndex + PAGE_SIZE, completedCollectionsList.length)}} of {{completedCollectionsList.length}}
+            Showing {{ startCompletedCollectionIndex + 1 }} - {{ Math.min(startCompletedCollectionIndex + PAGE_SIZE, completedCollectionsList.length) }} of {{ completedCollectionsList.length }}
             <i class="material-icons md-18"
                (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">
                &#xE5C8;
@@ -557,7 +557,7 @@
           <mat-card class="oppia-subscription-card oppia-subscription-container-list"
                    *ngFor="let subscription of subscriptionsList | sortBy: isCurrentSubscriptionSortDescending: getValueOfSubscriptionSortKey()">
             <a class="oppia-subscription-profile-link"
-               href="/profile/{{subscription.username}}"
+               href="/profile/{{ subscription.username }}"
                target="_blank"
                rel="noopener">
               <img [src]="decodePngURIData(subscription.pictureDataUrl)"
@@ -568,12 +568,12 @@
                           container="body"
                           triggers="showUsernamePopover(subscription.username)"
                           ngbPopover="subscription.username">
-                    {{subscription.username| truncate:10}}
+                    {{ subscription.username| truncate:10 }}
                   </strong>
                 </div>
                 <div class="oppia-impact-text">
                   <span>Impact: </span>
-                  <span class="protractor-test-impact-number">{{subscription.impact || 0}}</span>
+                  <span class="protractor-test-impact-number">{{ subscription.impact || 0 }}</span>
                 </div>
               </span>
             </a>
@@ -599,14 +599,14 @@
                 (click)="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
                 class="oppia-feedback-tab-row protractor-test-feedback-thread">
               <td width="10%">
-                <span [ngClass]="getLabelClass(thread.status)">{{getHumanReadableStatus(thread.status)}}</span>
+                <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status) }}</span>
               </td>
               <td width="20%">
                 <span *ngIf="thread.totalMessageCount > 1">
                   <span *ngIf="thread.authorSecondLastMessage">
-                    <span *ngIf="thread.secondLastMessageIsRead">{{thread.authorSecondLastMessage | truncate:7}}, </span>
+                    <span *ngIf="thread.secondLastMessageIsRead">{{ thread.authorSecondLastMessage | truncate:7 }}, </span>
                     <span *ngIf="!thread.secondLastMessageIsRead">
-                      <strong>{{thread.authorSecondLastMessage | truncate:7}}, </strong>
+                      <strong>{{ thread.authorSecondLastMessage | truncate:7 }}, </strong>
                     </span>
                   </span>
                   <span *ngIf="!thread.authorSecondLastMessage">
@@ -616,26 +616,26 @@
                   </span>
                 </span>
                 <span *ngIf="thread.authorLastMessage">
-                  <span *ngIf="thread.lastMessageIsRead">{{thread.authorLastMessage | truncate:7}}</span>
+                  <span *ngIf="thread.lastMessageIsRead">{{ thread.authorLastMessage | truncate:7 }}</span>
                   <span *ngIf="!thread.lastMessageIsRead">
-                    <strong>{{thread.authorLastMessage | truncate:7}}</strong>
+                    <strong>{{ thread.authorLastMessage | truncate:7 }}</strong>
                   </span>
                 </span>
                 <span *ngIf="!thread.authorLastMessage">
                   <span [innerHTML]="'I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR' | translate"></span>
                 </span>
-                <span class="feedback-thread-message-count">({{thread.totalMessageCount}})</span>
+                <span class="feedback-thread-message-count">({{ thread.totalMessageCount }})</span>
               </td>
               <td width="50%">
-                <span *ngIf="thread.totalMessageCount > 1 && thread.secondLastMessageIsRead && thread.lastMessageIsRead">{{thread.explorationTitle}} -</span>
-                <span class="protractor-test-feedback-exploration" *ngIf="thread.totalMessageCount === 1 && thread.lastMessageIsRead">{{thread.explorationTitle}} -</span>
+                <span *ngIf="thread.totalMessageCount > 1 && thread.secondLastMessageIsRead && thread.lastMessageIsRead">{{ thread.explorationTitle }} -</span>
+                <span class="protractor-test-feedback-exploration" *ngIf="thread.totalMessageCount === 1 && thread.lastMessageIsRead">{{ thread.explorationTitle }} -</span>
                 <span *ngIf="thread.totalMessageCount === 1 && !thread.lastMessageIsRead">
-                  <strong>{{thread.explorationTitle}} -</strong>
+                  <strong>{{ thread.explorationTitle }} -</strong>
                 </span>
                 <span *ngIf="thread.totalMessageCount > 1 && (!thread.lastMessageIsRead || !thread.secondLastMessageIsRead)">
-                  <strong>{{thread.explorationTitle}} -</strong>
+                  <strong>{{ thread.explorationTitle }} -</strong>
                 </span>
-                <span *ngIf="thread.lastMessageText">{{thread.lastMessageText | truncate:50}}</span>
+                <span *ngIf="thread.lastMessageText">{{ thread.lastMessageText | truncate:50 }}</span>
                 <span *ngIf="!thread.lastMessageText && thread.totalMessageCount !== 1">
                   <i [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(thread.status)}">
                   </i>
@@ -645,7 +645,7 @@
                 </span>
               </td>
               <td width="20%">
-                <span>{{getLocaleAbbreviatedDatetimeString(thread.lastUpdatedMsecs)}}</span>
+                <span>{{ getLocaleAbbreviatedDatetimeString(thread.lastUpdatedMsecs) }}</span>
               </td>
             </tr>
           </table>
@@ -656,11 +656,11 @@
                 <button (click)="showAllThreads()"
                         class="btn btn-secondary oppia-btn-secondary">
                   <i class="material-icons oppia-vcenter"
-                     title="{{'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate}}">
+                     title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
                      &#xE5CB;
                   </i>
                 </button>
-                <span class="oppia-exploration-title">{{explorationTitle}}</span>
+                <span class="oppia-exploration-title">{{ explorationTitle }}</span>
               </td>
             </tr>
             <tr *ngIf="loadingFeedbacks">
@@ -693,7 +693,7 @@
 
                       <span *ngIf="message.authorUsername"
                             class="feedback-message-author-name">
-                        <strong>{{message.authorUsername}}</strong>
+                        <strong>{{ message.authorUsername }}</strong>
                       </span>
                       <span *ngIf="!message.authorUsername"
                             class="feedback-message-author-name">
@@ -706,7 +706,7 @@
                       </span>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3">
-                      <span>{{getLocaleAbbreviatedDatetimeString(message.createdOnMsecs)}}</span>
+                      <span>{{ getLocaleAbbreviatedDatetimeString(message.createdOnMsecs) }}</span>
                     </div>
                   </div>
 
@@ -714,7 +714,7 @@
                     <div class="col-sm-2 feedback-message-spacing oppia-feedback-message-spacing"></div>
                     <div class="col-sm-10 feedback-thread-message-body">
                       <div>
-                        <span class="protractor-test-feedback-message" *ngIf="message.text">{{message.text}}</span>
+                        <span class="protractor-test-feedback-message" *ngIf="message.text">{{ message.text }}</span>
                         <button *ngIf="message.currentContentHtml"
                                 class="btn btn-primary oppia-dashboard-view-suggestion-button"
                                 (click)="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
@@ -742,7 +742,7 @@
                   <div class="col-sm-11">
                     <div class="feedback-thread-new-message">
                       <textarea class="form-control feedback-thread-reply-box"
-                                placeholder="{{'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate}}" [(ngModel)]="newMessage.text">
+                                placeholder="{{ 'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate }}" [(ngModel)]="newMessage.text">
                       </textarea>
                     </div>
                     <div>

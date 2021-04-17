@@ -43,7 +43,7 @@ interface LearnerPlaylistResponseObject {
 @Injectable({
   providedIn: 'root'
 })
-export class LearnerPlaylistBackendApiService {
+export class LearnerDashboardActivityBackendApiService {
   successfullyAdded: boolean;
   addToLearnerPlaylistUrl: string;
   removeActivityModalStatus: string;
@@ -152,6 +152,6 @@ export class LearnerPlaylistBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'LearnerPlaylistBackendApiService',
-  downgradeInjectable(LearnerPlaylistBackendApiService)
+  'LearnerDashboardActivityBackendApiService',
+  downgradeInjectable(LearnerDashboardActivityBackendApiService)
 );

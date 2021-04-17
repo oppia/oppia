@@ -20,7 +20,7 @@ import { async, ComponentFixture, fakeAsync, TestBed, tick } from
   '@angular/core/testing';
 
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { LearnerPlaylistBackendApiService } from 'domain/learner_dashboard/learner-playlist-backend-api.service';
+import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 import { LearnerDashboardIconsComponent } from './learner-dashboard-icons.component';
@@ -42,8 +42,8 @@ describe('Learner Dashboard Icons Component', () => {
 
   let learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService;
-  let learnerPlaylistBackendApiService:
-    LearnerPlaylistBackendApiService;
+  let learnerDashboardActivityBackendApiService:
+    LearnerDashboardActivityBackendApiService
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -58,7 +58,7 @@ describe('Learner Dashboard Icons Component', () => {
       ],
       providers: [
         LearnerDashboardIdsBackendApiService,
-        LearnerPlaylistBackendApiService
+        LearnerDashboardActivityBackendApiService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -69,8 +69,8 @@ describe('Learner Dashboard Icons Component', () => {
     component = fixture.componentInstance;
     learnerDashboardIdsBackendApiService =
       TestBed.inject(LearnerDashboardIdsBackendApiService);
-    learnerPlaylistBackendApiService =
-      TestBed.inject(LearnerPlaylistBackendApiService);
+    learnerDashboardActivityBackendApiService =
+      TestBed.inject(LearnerDashboardActivityBackendApiService);
     fixture.detectChanges();
   });
 
@@ -469,7 +469,7 @@ describe('Learner Dashboard Icons Component', () => {
     let activityType = 'exploration';
 
     const learnerPlaylistSpy =
-      spyOn(learnerPlaylistBackendApiService, 'removeFromLearnerPlaylistModal')
+      spyOn(learnerDashboardActivityBackendApiService, 'removeFromLearnerPlaylistModal')
         .and.returnValue(null);
 
     component.removeFromLearnerPlaylist(
@@ -488,7 +488,7 @@ describe('Learner Dashboard Icons Component', () => {
     let activityType = 'collection';
 
     const learnerPlaylistSpy =
-      spyOn(learnerPlaylistBackendApiService, 'removeFromLearnerPlaylistModal')
+      spyOn(learnerDashboardActivityBackendApiService, 'removeFromLearnerPlaylistModal')
         .and.returnValue(null);
 
     component.removeFromLearnerPlaylist(
@@ -515,7 +515,7 @@ describe('Learner Dashboard Icons Component', () => {
       });
 
     const learnerPlaylistSpy =
-      spyOn(learnerPlaylistBackendApiService, 'addToLearnerPlaylist')
+      spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
         .and.returnValue(true);
 
     component.addToLearnerPlaylist(
@@ -544,7 +544,7 @@ describe('Learner Dashboard Icons Component', () => {
       });
 
     const learnerPlaylistSpy =
-      spyOn(learnerPlaylistBackendApiService, 'addToLearnerPlaylist')
+      spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
         .and.returnValue(true);
 
     component.addToLearnerPlaylist(
@@ -573,7 +573,7 @@ describe('Learner Dashboard Icons Component', () => {
       });
 
     const learnerPlaylistSpy =
-      spyOn(learnerPlaylistBackendApiService, 'addToLearnerPlaylist')
+      spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
         .and.returnValue(false);
 
     component.addToLearnerPlaylist(
@@ -602,7 +602,7 @@ describe('Learner Dashboard Icons Component', () => {
       });
 
     const learnerPlaylistSpy =
-      spyOn(learnerPlaylistBackendApiService, 'addToLearnerPlaylist')
+      spyOn(learnerDashboardActivityBackendApiService, 'addToLearnerPlaylist')
         .and.returnValue(false);
 
     component.addToLearnerPlaylist(
