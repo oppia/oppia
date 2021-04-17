@@ -34,7 +34,6 @@ import { LazyLoadingComponent } from
 import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { SkillSelectorComponent } from
   './skill-selector/skill-selector.component';
@@ -46,7 +45,6 @@ import { KeyboardShortcutHelpModalComponent } from
   'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
-import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 import { StorySummaryTileDirective } from
   './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from
@@ -65,7 +63,7 @@ import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
-import { FocusOnDirective } from '../directives/focus-on.directive';
+import { DirectivesModule } from '../directives/directives.module';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { ToastrModule } from 'ngx-toastr';
@@ -85,6 +83,8 @@ import { SideNavigationBarComponent } from './common-layout-directives/navigatio
 import { BaseContentComponent } from '../base-components/base-content.component';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { TranslateModule } from 'filters/translate.module';
+import { SharedFormsModule } from './forms/shared-forms.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -103,6 +103,9 @@ import { HammerGestureConfig } from '@angular/platform-browser';
 import * as hammer from 'hammerjs';
 import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
 import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
+import { TranslatePipe } from 'filters/translate.pipe';
+import { FocusOnDirective } from '../directives/focus-on.directive';
+import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = {
@@ -135,15 +138,18 @@ const toastrConfig = {
 
 @NgModule({
   imports: [
-    CommonModule,
     BrowserModule,
+    CommonModule,
     MaterialModule,
+    DirectivesModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
+    SharedFormsModule,
+    TranslateModule,
     ...firebaseAuthModules,
   ],
 
@@ -180,7 +186,6 @@ const toastrConfig = {
     SideNavigationBarWrapperComponent,
     OnScreenKeyboardComponent,
     PromoBarComponent,
-    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -217,7 +222,6 @@ const toastrConfig = {
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
-    ImageUploaderComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     SideNavigationBarComponent,
@@ -236,11 +240,14 @@ const toastrConfig = {
   exports: [
     // Modules.
     DynamicContentModule,
+    DirectivesModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
+    SharedFormsModule,
+    TranslateModule,
     // Components, directives, and pipes.
     AlertMessageComponent,
     AudioFileUploaderComponent,
@@ -248,14 +255,12 @@ const toastrConfig = {
     BaseContentComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
-    SchemaBasedEditorDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
     OppiaFooterDirective,
     LimitToPipe,
     LoadingMessageComponent,
     PromoBarComponent,
-    ImageUploaderComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     SchemaBasedEditorDirective,
