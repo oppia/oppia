@@ -45,7 +45,7 @@ class TranslationFetchersTests(test_utils.GenericTestBase):
         )
 
     def test_get_machine_translation_with_no_translation_returns_none(self):
-        translation = translation_fetchers.get_machine_translation(
+        translation = translation_fetchers.get_machine_translated_text(
             'en', 'es', 'untranslated_text')
         self.assertIsNone(translation)
 
@@ -53,7 +53,7 @@ class TranslationFetchersTests(test_utils.GenericTestBase):
             self):
         translation_models.MachineTranslatedTextModel.create(
             'en', 'es', 'hello world', 'hola mundo')
-        translation = translation_fetchers.get_machine_translation(
+        translation = translation_fetchers.get_machine_translated_text(
             'en', 'es', 'hello world'
         )
         self.assertEqual(translation.translated_text, 'hola mundo')
