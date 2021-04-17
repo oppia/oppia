@@ -29,7 +29,7 @@ require('domain/classroom/classroom-backend-api.service');
 require('domain/learner_dashboard/learner-dashboard-activity-ids.model.ts');
 require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
-require('domain/learner_dashboard/learner-playlist-backend-api.service.ts');
+require('domain/learner_dashboard/learner-dashboard-activity-backend-api.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/keyboard-shortcut.service.ts');
