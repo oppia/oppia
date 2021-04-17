@@ -136,43 +136,44 @@ export class SkillsListComponent {
         backdrop: 'static'
       });
     modalRef.componentInstance.skillId = skillId;
-    modalRef.result.then((topicsToUnassign: TopicAssignmentsSummary) => {
-      for (let topic in topicsToUnassign) {
-        let changeList: BackendChangeObject[] = [];
-        if (topicsToUnassign[topic].subtopicId) {
+    modalRef.result.then(
+      (topicsToUnassign: {[key: string]: TopicAssignmentsSummary}) => {
+        for (let topic in topicsToUnassign) {
+          let changeList: BackendChangeObject[] = [];
+          if (topicsToUnassign[topic].subtopicId) {
+            changeList.push({
+              cmd: 'remove_skill_id_from_subtopic',
+              subtopic_id: topicsToUnassign[topic].subtopicId,
+              skill_id: skillId
+            });
+          }
+
           changeList.push({
-            cmd: 'remove_skill_id_from_subtopic',
-            subtopic_id: topicsToUnassign[topic].subtopicId,
-            skill_id: skillId
+            cmd: 'remove_uncategorized_skill_id',
+            uncategorized_skill_id: skillId
+          });
+
+          this.editableTopicBackendApiService.updateTopic(
+            topicsToUnassign[topic].topicId,
+            topicsToUnassign[topic].topicVersion.toString(),
+            `Unassigned skill with id ${skillId} from the topic.`,
+            changeList
+          ).then(() => {
+            setTimeout(() => {
+              this.topicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.emit(true);
+            }, 100);
+          }).then(() => {
+            let successToast: string = (
+              'The skill has been unassigned to the topic.');
+            this.alertsService.addSuccessMessage(successToast, 1000);
           });
         }
-
-        changeList.push({
-          cmd: 'remove_uncategorized_skill_id',
-          uncategorized_skill_id: skillId
-        });
-
-        this.editableTopicBackendApiService.updateTopic(
-          topicsToUnassign[topic].topicId,
-          topicsToUnassign[topic].topicVersion,
-          `Unassigned skill with id ${skillId} from the topic.`,
-          changeList
-        ).then(() => {
-          setTimeout(() => {
-            this.topicsAndSkillsDashboardBackendApiService.
-              onTopicsAndSkillsDashboardReinitialized.emit(true);
-          }, 100);
-        }).then(() => {
-          let successToast: string = (
-            'The skill has been unassigned to the topic.');
-          this.alertsService.addSuccessMessage(successToast, 1000);
-        });
-      }
-    }, () => {
+      }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
-    });
+      });
   }
 
   assignSkillToTopic(skill: AugmentedSkillSummary): void {

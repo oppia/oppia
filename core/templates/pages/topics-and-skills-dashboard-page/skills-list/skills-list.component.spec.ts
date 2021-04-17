@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the skills list component.
  */
 
+import { EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -24,52 +25,137 @@ import { MatRadioModule } from '@angular/material/radio';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
+import { AugmentedSkillSummary, AugmentedSkillSummaryBackendDict } from 'domain/skill/augmented-skill-summary.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
-import { UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
+import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 import { SelectTopicsComponent } from '../topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Skills List Component', () => {
+describe('Skills List Component', () => {
   let fixture: ComponentFixture<SkillsListComponent>;
   let componentInstance: SkillsListComponent;
   let topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService;
+    MockTopicsAndSkillsDashboardBackendApiService;
   let alertsService: AlertsService;
   let mockNgbModal: MockNgbModal;
   let mockSkillBackendApiService: MockSkillBackendApiService;
+  let augmentedSkillSummaryBackendDict: AugmentedSkillSummaryBackendDict = {
+    id: 'test_id',
+    description: 'description',
+    language_code: 'sadf',
+    version: 10,
+    misconception_count: 0,
+    worked_examples_count: 1,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 3,
+    topic_names: ['a'],
+    classroom_names: ['a']
+  };
+  let topicAssignmentsSummary: { [key: string]: TopicAssignmentsSummary } = {
+    topic1: {
+      subtopicId: 12,
+      topicVersion: 7,
+      topicId: 'topic_id'
+    }
+  };
+
 
   class MockNgbModal {
+    modal: string;
     success: boolean = true;
     open(content, options) {
-      return {
-        componentInstance: {
-          skillId: ''
-        },
-        result: {
-          then: (
-              successCallback: () => void,
-              errorCallback: () => void
-          ) => {
-            if (this.success) {
-              successCallback();
-            } else {
-              errorCallback();
-            }
-            return {
-              then: (callback: () => void) => {
-                callback();
+      if (this.modal === 'delete_skill') {
+        return {
+          componentInstance: {
+            skillId: ''
+          },
+          result: {
+            then: (
+                successCallback: () => void,
+                errorCallback: () => void
+            ) => {
+              if (this.success) {
+                successCallback();
+              } else {
+                errorCallback();
               }
-            };
+              return {
+                then: (callback: () => void) => {
+                  callback();
+                }
+              };
+            }
           }
-        }
-      };
+        };
+      } else if (this.modal === 'merge_skill') {
+        return {
+          componentInstance: {
+            skillSummaries: null,
+            skill: null,
+            categorizedSkills: null,
+            allowSkillsFromOtherTopics: null,
+            untriagedSkillSummaries: null
+          },
+          result: {
+            then: (
+                successCallback: (result) => void,
+                cancelCallback: () => void
+            ) => {
+              if (this.success) {
+                successCallback({
+                  skill: {},
+                  supersedingSkillId: 'test_id'
+                });
+              } else {
+                cancelCallback();
+              }
+            }
+          }
+        };
+      } else if (this.modal === 'unassign_skill') {
+        return {
+          componentInstance: {
+            skillId: '',
+          },
+          result: {
+            then: (
+                successCallback: (topicsToUnassign) => void,
+                cancelCallback: () => void
+            ) => {
+              if (this.success) {
+                successCallback(topicAssignmentsSummary);
+              } else {
+                cancelCallback();
+              }
+            }
+          }
+        };
+      } else if (this.modal === 'assign_skill_to_topic') {
+        return {
+          componentInstance: {
+            topicSummaries: null
+          },
+          result: {
+            then: (
+                successCallback: (topicsToUnassign) => void,
+                cancelCallback: () => void
+            ) => {
+              if (this.success) {
+                successCallback(['test_id', 'b', 'c']);
+              } else {
+                cancelCallback();
+              }
+            }
+          }
+        };
+      }
     }
   }
 
@@ -86,6 +172,52 @@ fdescribe('Skills List Component', () => {
               } else {
                 callback('');
               }
+            }
+          };
+        }
+      };
+    }
+  }
+
+  class MockTopicsAndSkillsDashboardBackendApiService {
+    error: boolean = false;
+    onTopicsAndSkillsDashboardReinitialized: EventEmitter<boolean> =
+    new EventEmitter();
+    mergeSkillsAsync(skillId: string, supersedingSkillId: string) {
+      return {
+        then: (
+            successCallback: () => void,
+            errorCallback: (errorMessage: { error: { error: string } }) => void
+        ) => {
+          if (this.error) {
+            errorCallback({
+              error: {
+                error: 'error'
+              }
+            });
+          } else {
+            successCallback();
+          }
+        }
+      };
+    }
+  }
+
+  class MockEditableBackendApiService {
+    updateTopic(
+        topicId: string,
+        topicVersion: number,
+        msg: string,
+        changeList: []
+    ) {
+      return {
+        then: (
+            successCallback: () => void
+        ) => {
+          successCallback();
+          return {
+            then: (successCallback: () => void) => {
+              successCallback();
             }
           };
         }
@@ -117,12 +249,18 @@ fdescribe('Skills List Component', () => {
           provide: NgbModal,
           useClass: MockNgbModal
         },
-        EditableTopicBackendApiService,
+        {
+          provide: EditableTopicBackendApiService,
+          useClass: MockEditableBackendApiService
+        },
         {
           provide: SkillBackendApiService,
           useClass: MockSkillBackendApiService
         },
-        TopicsAndSkillsDashboardBackendApiService
+        {
+          provide: TopicsAndSkillsDashboardBackendApiService,
+          useClass: MockTopicsAndSkillsDashboardBackendApiService
+        }
       ]
     }).compileComponents();
   }));
@@ -137,11 +275,9 @@ fdescribe('Skills List Component', () => {
     componentInstance.mergeableSkillSummaries = [];
     componentInstance.untriagedSkillSummaries = [];
 
-    topicsAndSkillsDashboardBackendApiService =
-      TestBed.inject(TopicsAndSkillsDashboardBackendApiService);
     topicsAndSkillsDashboardBackendApiService = (
-      topicsAndSkillsDashboardBackendApiService as unknown) as
-      jasmine.SpyObj<TopicsAndSkillsDashboardBackendApiService>;
+      TestBed.inject(TopicsAndSkillsDashboardBackendApiService) as
+    unknown) as jasmine.SpyObj<MockTopicsAndSkillsDashboardBackendApiService>;
     alertsService = TestBed.inject(AlertsService);
     alertsService = (alertsService as unknown) as jasmine.SpyObj<AlertsService>;
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as
@@ -188,6 +324,7 @@ fdescribe('Skills List Component', () => {
   });
 
   it('should delete skill', fakeAsync(() => {
+    mockNgbModal.modal = 'delete_skill';
     spyOn(
       topicsAndSkillsDashboardBackendApiService
         .onTopicsAndSkillsDashboardReinitialized, 'emit');
@@ -207,7 +344,104 @@ fdescribe('Skills List Component', () => {
   }));
 
   it('should cancel delete skil modal', () => {
+    mockNgbModal.modal = 'delete_skill';
     mockNgbModal.success = false;
     componentInstance.deleteSkill('test_skill');
   });
+
+  it('should merge skill', fakeAsync(() => {
+    mockNgbModal.modal = 'merge_skill';
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized,
+      'emit'
+    );
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.mergeSkill(
+      AugmentedSkillSummary
+        .createFromBackendDict(augmentedSkillSummaryBackendDict));
+    tick(300);
+    expect(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized.emit).toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalled();
+    topicsAndSkillsDashboardBackendApiService.error = true;
+    componentInstance.mergeSkill(
+      AugmentedSkillSummary
+        .createFromBackendDict(augmentedSkillSummaryBackendDict));
+  }));
+
+  it('should handle cancel on merge skill modal', fakeAsync(() => {
+    mockNgbModal.modal = 'merge_skill';
+    mockNgbModal.success = false;
+    componentInstance.mergeSkill(
+      AugmentedSkillSummary.createFromBackendDict(
+        augmentedSkillSummaryBackendDict));
+  }));
+
+  it('should unassign skill', fakeAsync(() => {
+    mockNgbModal.modal = 'unassign_skill';
+    let skillId: string = 'test_skill';
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized, 'emit');
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.unassignSkill(skillId);
+    tick(500);
+    expect(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized.emit)
+      .toHaveBeenCalledWith(true);
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'The skill has been unassigned to the topic.'
+      , 1000);
+    mockNgbModal.success = false;
+    componentInstance.unassignSkill('skill_id');
+  }));
+
+  it('should assign skill to topic', fakeAsync(() => {
+    mockNgbModal.modal = 'assign_skill_to_topic';
+    componentInstance.editableTopicSummaries = [new TopicSummary(
+      'test_id',
+      'asd',
+      1,
+      2,
+      3,
+      4,
+      23,
+      'sadf',
+      'asdf',
+      12,
+      21,
+      123,
+      23,
+      true,
+      false,
+      'sad',
+      'asdf',
+      'asdf',
+      'sdf'
+    )];
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized, 'emit');
+    spyOn(alertsService, 'addSuccessMessage');
+    componentInstance.assignSkillToTopic(
+      AugmentedSkillSummary.createFromBackendDict(
+        augmentedSkillSummaryBackendDict)
+    );
+    tick(500);
+    expect(
+      topicsAndSkillsDashboardBackendApiService
+        .onTopicsAndSkillsDashboardReinitialized.emit)
+      .toHaveBeenCalledWith(true);
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'The skill has been assigned to the topic.',
+      1000
+    );
+    mockNgbModal.success = false;
+    componentInstance.assignSkillToTopic(
+      AugmentedSkillSummary.createFromBackendDict(
+        augmentedSkillSummaryBackendDict));
+  }));
 });
