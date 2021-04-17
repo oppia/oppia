@@ -13,50 +13,43 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the graph interaction components.
+ * @fileoverview Module for the Custom Form components.
  */
+
 import 'core-js/es7/reflect';
 import 'zone.js';
-
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { GraphVizComponent } from './directives/graph-viz.component';
-import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
-import { ResponseGraphInput } from './directives/oppia-response-graph-input.component';
-import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
-import { TranslateModule } from 'filters/translate.module';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { MaterialModule } from 'components/material.module';
-import { DirectivesModule } from 'components/../directives/directives.module';
+import { TranslateModule } from 'filters/translate.module';
+import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
+import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    FormsModule,
     MaterialModule,
-    DirectivesModule,
-    TranslateModule
+    DynamicContentModule,
+    NgbTooltipModule,
+    NgbModalModule,
+    FormsModule,
+    TranslateModule,
+    CustomFormsComponentsModule
   ],
   declarations: [
-    InteractiveGraphInput,
-    GraphVizComponent,
-    ResponseGraphInput,
-    ShortResponseGraphInput
+    SchemaBasedEditorDirective
   ],
   entryComponents: [
-    InteractiveGraphInput,
-    GraphVizComponent,
-    ResponseGraphInput,
-    ShortResponseGraphInput
   ],
   exports: [
-    InteractiveGraphInput,
-    GraphVizComponent,
-    ResponseGraphInput,
-    ShortResponseGraphInput
+    CustomFormsComponentsModule,
+    SchemaBasedEditorDirective
   ],
 })
 
-export class GraphInputInteractionModule { }
+export class SharedFormsModule { }
