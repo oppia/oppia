@@ -16,45 +16,52 @@
  * @fileoverview Unit test for ImageLocalStorageService.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { AlertsService } from './alerts.service';
+import { ImageLocalStorageService } from './image-local-storage.service';
+import { ImageUploadHelperService } from './image-upload-helper.service';
+
 
 describe('ImageLocalStorageService', () => {
   let alertsService: AlertsService = null;
-  let imageLocalStorageService: ImageLocalStorageService;
-  const sampleImageData = 'data:image/png;base64,xyz';
-  const imageFilename = 'filename';
-  const mockImageUploadHelperService = {
-    convertImageDataToImageFile: (imageData) => {}
-  };
+  let imageLocalStorageService: ImageLocalStorageService = null;
+  let sampleImageData = 'data:image/png;base64,xyz';
+  let imageFilename = 'filename';
+  let imageUploadHelperService: ImageUploadHelperService;
+  class MockImageUploadHelperService {
+    convertImageDataToImageFile(imageData) {
+      return imageData;
+    }
+  }
 
   beforeEach(() => {
-    spyOn(mockImageUploadHelperService, 'convertImageDataToImageFile');
     TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: ImageUploadHelperService,
-          useValue: mockImageUploadHelperService
-        }
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [{
+        provide: ImageUploadHelperService,
+        useClass: MockImageUploadHelperService
+      }]
     });
+  });
+
+  beforeEach(() => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     alertsService = TestBed.inject(AlertsService);
+    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
   });
 
   it(
     'should call helper service function correctly when getting' +
     ' object url', () => {
+      const imageUploaderSpy = spyOn(
+        imageUploadHelperService, 'convertImageDataToImageFile');
       spyOn(URL, 'createObjectURL').and.returnValue('objectUrl');
       imageLocalStorageService.saveImage(imageFilename, sampleImageData);
       expect(
         imageLocalStorageService.getObjectUrlForImage(imageFilename)
       ).toBe('objectUrl');
-      expect(
-        mockImageUploadHelperService.convertImageDataToImageFile
-      ).toHaveBeenCalledWith(sampleImageData);
+      expect(imageUploaderSpy).toHaveBeenCalledWith(sampleImageData);
     }
   );
 
