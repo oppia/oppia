@@ -83,8 +83,6 @@ INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 
 # PY filepaths.
-INVALID_METACLASS_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_metaclass.py')
 INVALID_OBJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_object.py')
 INVALID_REQUEST_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_request.py')
 INVALID_NO_NEWLINE_FILEPATH = os.path.join(
@@ -439,16 +437,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             ['Line 25: Please use python_utils.OBJECT.'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_metaclass(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_METACLASS_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 46: Please use python_utils.with_metaclass().'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

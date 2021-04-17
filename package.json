@@ -59,7 +59,7 @@
     "css-loader": "^5.0.0",
     "dotenv": "^8.1.0",
     "dtslint": "^4.0.0",
-    "eslint": "^7.1.0",
+    "eslint": "^7.23.0",
     "eslint-plugin-angular": "^4.0.1",
     "eslint-plugin-html": "^6.0.0",
     "eslint-plugin-oppia": "file:./scripts/linters/custom_eslint_checks",
