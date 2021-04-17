@@ -526,7 +526,6 @@ import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { QuestionValidationService } from './question-validation.service';
-import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -706,16 +705,6 @@ export class UpgradedServices {
     upgradedServices['EndExplorationValidationService'] =
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['ExplorationCreationService'] =
-      new ExplorationCreationService(
-        upgradedServices['CsrfTokenService'],
-        upgradedServices['AlertsService'],
-        upgradedServices['SiteAnalyticsService'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['LoaderService'],
-        upgradedServices['WindowRef'],
-        upgradedServices['explorationCreationBackendApiService'],
-        upgradedServices['NgbModal']);
     upgradedServices['ExpressionSyntaxTreeService'] =
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']);

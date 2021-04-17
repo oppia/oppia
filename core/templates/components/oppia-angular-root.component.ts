@@ -552,9 +552,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static endExplorationRulesService: EndExplorationRulesService;
   static endExplorationValidationService: EndExplorationValidationService;
   static explorationDiffService: ExplorationDiffService;
-  static explorationCreationBackendApiService:
-    ExplorationCreationBackendApiService;
-  static explorationCreationService: ExplorationCreationService;
   static explorationFeaturesBackendApiService:
     ExplorationFeaturesBackendApiService;
   static explorationFeaturesService: ExplorationFeaturesService;
@@ -1178,10 +1175,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.endExplorationValidationService);
     OppiaAngularRootComponent.explorationDiffService = (
       this.explorationDiffService);
-    OppiaAngularRootComponent.explorationCreationBackendApiService = (
-      this.explorationCreationBackendApiService);
-    OppiaAngularRootComponent.explorationCreationService = (
-      this.explorationCreationService);
     OppiaAngularRootComponent.explorationFeaturesBackendApiService = (
       this.explorationFeaturesBackendApiService);
     OppiaAngularRootComponent.explorationFeaturesService = (
