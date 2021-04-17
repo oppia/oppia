@@ -39,7 +39,6 @@ import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut
 import { SharingLinksComponent } from './common-layout-directives/common-elements/sharing-links.component';
 import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
 import { SkillSelectorComponent } from './skill-selector/skill-selector.component';
-
 import { ProfileLinkImageComponent } from 'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
@@ -51,14 +50,13 @@ import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summ
 import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
+import { DirectivesModule } from '../directives/directives.module';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
-import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
 
 // Directives.
-import { FocusOnDirective } from '../directives/focus-on.directive';
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
 
@@ -78,6 +76,8 @@ import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-edito
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { TranslateModule } from 'filters/translate.module';
+import { SharedFormsModule } from './forms/shared-forms.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -95,15 +95,18 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
 @NgModule({
   imports: [
-    CommonModule,
     BrowserModule,
+    CommonModule,
     MaterialModule,
+    DirectivesModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
     MaterialModule,
     ObjectComponentsModule,
+    SharedFormsModule,
+    TranslateModule,
     ...firebaseAuthModules,
   ],
 
@@ -119,8 +122,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
-    FocusOnDirective,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
@@ -129,7 +130,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
-    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -167,7 +167,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
-    ImageUploaderComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
@@ -186,22 +185,22 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   exports: [
     // Modules.
     DynamicContentModule,
+    DirectivesModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
+    SharedFormsModule,
+    TranslateModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
-    SchemaBasedEditorDirective,
     FilterForMatchingSubstringPipe,
-    FocusOnDirective,
     PromoBarComponent,
-    ImageUploaderComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     SchemaBasedEditorDirective,
@@ -225,6 +224,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     LoadingDotsComponent,
     PromoBarComponent,
     WrapTextWithEllipsisPipe,
+    PromoBarComponent,
+    WrapTextWithEllipsisPipe
   ],
 })
 
