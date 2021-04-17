@@ -35,6 +35,8 @@ import { MathInteractionsService } from 'services/math-interactions.service';
   templateUrl: './algebraic-expression-editor.component.html'
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
+  @Input() modalId: symbol;
+
   @Input() value;
   @Output() valueChanged: EventEmitter<string> = new EventEmitter<string>();
   warningText: string = '';
@@ -136,7 +138,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       this.warningText = '';
     }
     this.eventBusGroup.emit(new ObjectFormValidityChangeEvent(
-      {value: !answerIsValid}));
+      {value: !answerIsValid, modalId: this.modalId}));
     return answerIsValid;
   }
 

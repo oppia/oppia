@@ -45,6 +45,7 @@ abstract class EventWithMessage<T> extends BaseEvent {
 
 export interface ObjectFormValidityChangeEventMessage {
   value: boolean;
+  modalId: symbol;
 }
 
 export class ObjectFormValidityChangeEvent

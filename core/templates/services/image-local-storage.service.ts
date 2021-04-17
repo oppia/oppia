@@ -16,14 +16,14 @@
  * @fileoverview Service for managing images in localStorage.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AlertsService } from 'services/alerts.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-export class ImagesData {
+export interface ImagesData {
   filename: string;
   imageBlob: Blob;
 }
@@ -53,10 +53,10 @@ export class ImageLocalStorageService {
   }
 
   /**
-     * Saves the image data in localStorage.
-     * @param {string} filename - Filename of the image.
-     * @param {string} rawImage - Raw base64/URLEncoded data of the image.
-     */
+   * Saves the image data in localStorage.
+   * @param {string} filename - Filename of the image.
+   * @param {string} rawImage - Raw base64/URLEncoded data of the image.
+   */
   saveImage(filename: string, rawImage: string): void {
     if (this.storedImageFilenames.length + 1 > this.MAX_IMAGES_STORABLE) {
       // Since the service is going to be used in the create modal for
@@ -64,7 +64,7 @@ export class ImageLocalStorageService {
       // local storage would no longer be used.
       this.alertsService.addInfoMessage(
         'Image storage limit reached. More images can be added after ' +
-          'creation.');
+        'creation.');
       return;
     }
     this.windowRef.nativeWindow.sessionStorage.setItem(filename, rawImage);

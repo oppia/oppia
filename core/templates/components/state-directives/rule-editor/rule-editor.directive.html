@@ -29,7 +29,7 @@
             <object-editor obj-type="DragAndDropPositiveInt" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-            <object-editor obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" class="text-dark"></object-editor>
+            <object-editor modal-id="$ctrl.modalId" obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" class="text-dark"></object-editor>
           </span>
           <span ng-if="item.type == 'noneditable'">
             <[item.text]>
@@ -42,7 +42,7 @@
   <div class="oppia-rule-save-cancel-buttons" ng-if="$ctrl.isEditingRuleInline()">
     <div class="float-right">
       <button type="button" class="btn btn-default" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
+      <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid || $ctrl.isInvalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
     </div>
 
     <div class="oppia-clear"></div>

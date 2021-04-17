@@ -20,95 +20,105 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
+
+@Component({
+  selector: 'custom-osk-letters-editor',
+  templateUrl: './custom-osk-letters-editor.component.html',
+  styleUrls: []
+})
+export class CustomOskLettersEditorComponent implements OnInit {
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  latinLowerCase = [
+    'qwertyuiop'.split(''), 'asdfghjkl'.split(''), 'zxcvbnm'.split('')];
+  latinUpperCase = this.latinLowerCase.map((x) => x.map(y => y.toUpperCase()));
+  private greekSymbolsLowercase = Object.values(
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(0, 23);
+  greekLowerCase = [
+    this.greekSymbolsLowercase.slice(0, 8),
+    this.greekSymbolsLowercase.slice(8, 16),
+    this.greekSymbolsLowercase.slice(16, 23),
+  ];
+  private greekSymbolsUppercase = Object.values(
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(23, 33);
+  greekUpperCase = [
+    this.greekSymbolsUppercase.slice(0, 5),
+    this.greekSymbolsUppercase.slice(5, 10)
+  ];
+
+  latinTab = AppConstants.CUSTOM_LETTERS_LATIN_TAB;
+  greekTab = AppConstants.CUSTOM_LETTERS_GREEK_TAB;
+
+  alwaysEditable = true;
+  lettersAreLowercase = true;
+  currentTab = this.latinTab;
+
+  constructor(
+    private guppyInitializationService: GuppyInitializationService,
+    private windowRef: WindowRef
+  ) {}
+
+  updateLettersList(letter: string): void {
+    let index = this.value.indexOf(letter);
+    if (index === -1) {
+      this.value.push(letter);
+    } else {
+      this.value.splice(index, 1);
+    }
+    this.guppyInitializationService.setCustomOskLetters(this.value);
+  }
+
+  getRemainingLettersCount(): number {
+    return Math.max(
+      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value.length, 0);
+  }
+
+  isCustomizationArgOpen(): boolean {
+    return document.getElementsByClassName(
+      'custom-letters-div').length !== 0;
+  }
+
+  keyDownCallBack(e: KeyboardEvent): void {
+    if (this.isCustomizationArgOpen()) {
+      let keyPressed = e.key;
+      if (keyPressed === 'Shift') {
+        this.lettersAreLowercase = false;
+      } else if (keyPressed === 'Backspace') {
+        this.value.pop();
+      } else if (
+        this.latinLowerCase.join('').replace(/,/g, '').indexOf(
+          keyPressed.toLowerCase()) !== -1 &&
+        this.value.indexOf(keyPressed) === -1) {
+        this.updateLettersList(keyPressed);
+      }
+    }
+  }
+
+  keyUpCallBack(e: KeyboardEvent): void {
+    if (this.isCustomizationArgOpen()) {
+      let keyPressed = e.key;
+      if (keyPressed === 'Shift') {
+        this.lettersAreLowercase = true;
+      }
+    }
+  }
+
+  ngOnInit(): void {
+    this.windowRef.nativeWindow.addEventListener(
+      'keydown', (e) => this.keyDownCallBack(e));
+    this.windowRef.nativeWindow.addEventListener(
+      'keyup', (e) => this.keyUpCallBack(e));
+  }
+}
+
 require('services/guppy-initialization.service.ts');
 
-angular.module('oppia').component('customOskLettersEditor', {
-  bindings: {
-    value: '='
-  },
-  template: require('./custom-osk-letters-editor.component.html'),
-  controller: [
-    '$scope', '$window', 'GuppyInitializationService',
-    'CUSTOM_LETTERS_GREEK_TAB', 'CUSTOM_LETTERS_LATIN_TAB',
-    'GREEK_LETTER_NAMES_TO_SYMBOLS', 'MAX_CUSTOM_LETTERS_FOR_OSK',
-    function(
-        $scope, $window, GuppyInitializationService,
-        CUSTOM_LETTERS_GREEK_TAB, CUSTOM_LETTERS_LATIN_TAB,
-        GREEK_LETTER_NAMES_TO_SYMBOLS, MAX_CUSTOM_LETTERS_FOR_OSK) {
-      const ctrl = this;
-      ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
-      ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
-      let greekSymbolsLowercase = Object.values(
-        GREEK_LETTER_NAMES_TO_SYMBOLS).slice(0, 23);
-      ctrl.greekLowerCase = [
-        greekSymbolsLowercase.slice(0, 8).join(''),
-        greekSymbolsLowercase.slice(8, 16).join(''),
-        greekSymbolsLowercase.slice(16, 23).join(''),
-      ];
-      let greekSymbolsUppercase = Object.values(
-        GREEK_LETTER_NAMES_TO_SYMBOLS).slice(23, 33);
-      ctrl.greekUpperCase = [
-        greekSymbolsUppercase.slice(0, 5).join(''),
-        greekSymbolsUppercase.slice(5, 10).join('')
-      ];
-
-      ctrl.latinTab = CUSTOM_LETTERS_LATIN_TAB;
-      ctrl.greekTab = CUSTOM_LETTERS_GREEK_TAB;
-
-      ctrl.updateLettersList = function(letter) {
-        let index = ctrl.value.indexOf(letter);
-        if (index === -1) {
-          ctrl.value.push(letter);
-        } else {
-          ctrl.value.splice(index, 1);
-        }
-        GuppyInitializationService.setCustomOskLetters(ctrl.value);
-      };
-
-      ctrl.getRemainingLettersCount = function() {
-        return Math.max(MAX_CUSTOM_LETTERS_FOR_OSK - ctrl.value.length, 0);
-      };
-
-      ctrl.isCustomizationArgOpen = function() {
-        return document.getElementsByClassName(
-          'custom-letters-div').length !== 0;
-      };
-
-      ctrl.keyDownCallBack = function(e) {
-        if (ctrl.isCustomizationArgOpen()) {
-          let keyPressed = e.key;
-          if (keyPressed === 'Shift') {
-            ctrl.lettersAreLowercase = false;
-          } else if (keyPressed === 'Backspace') {
-            ctrl.value.pop();
-          } else if (
-            ctrl.latinLowerCase.join('').indexOf(
-              keyPressed.toLowerCase()) !== -1 &&
-            ctrl.value.indexOf(keyPressed) === -1) {
-            ctrl.updateLettersList(keyPressed);
-          }
-          $scope.$apply();
-        }
-      };
-
-      ctrl.keyUpCallBack = function(e) {
-        if (ctrl.isCustomizationArgOpen()) {
-          let keyPressed = e.key;
-          if (keyPressed === 'Shift') {
-            ctrl.lettersAreLowercase = true;
-            $scope.$apply();
-          }
-        }
-      };
-
-      $window.addEventListener('keydown', ctrl.keyDownCallBack);
-      $window.addEventListener('keyup', ctrl.keyUpCallBack);
-
-      ctrl.$onInit = function() {
-        ctrl.alwaysEditable = true;
-        ctrl.lettersAreLowercase = true;
-        ctrl.currentTab = ctrl.latinTab;
-      };
-    }
-  ]
-});
+angular.module('oppia').directive(
+  'customOskLettersEditor', downgradeComponent({
+    component: CustomOskLettersEditorComponent
+  }));

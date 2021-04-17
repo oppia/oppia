@@ -24,6 +24,7 @@ interface ObjectEditorCustomScope extends ng.IScope {
   objType?: string;
   schema: CustomSchema;
   initArgs?: Object;
+  modalId: symbol;
   getInitArgs?: (() => Object);
   alwaysEditable?: boolean;
   isEditable?: boolean;
@@ -41,6 +42,7 @@ angular.module('oppia').directive('objectEditor', [
         alwaysEditable: '@',
         initArgs: '=',
         isEditable: '@',
+        modalId: '<',
         objType: '@',
         getSchema: '&schema',
         value: '='
@@ -50,7 +52,14 @@ angular.module('oppia').directive('objectEditor', [
           'algebraic-expression',
           'boolean',
           'code-string',
-          'coord-two-dim'
+          'coord-two-dim',
+          'custom-osk-letters',
+          'drag-and-drop-positive-int',
+          'filepath',
+          'fraction',
+          'graph',
+          'html',
+          'image-with-regions',
         ];
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
@@ -74,8 +83,9 @@ angular.module('oppia').directive('objectEditor', [
             element.html(
               '<' + directiveName +
               '-editor [always-editable]="alwaysEditable"' +
-              ' get-init-args="getInitArgs()" get-is-editable="' +
-              'getIsEditable()" get-schema="getSchema()"' +
+              ' [init-args]="initArgs" [is-editable]="' +
+              'isEditable" [schema]="getSchema()"' +
+              '[modal-id]="modalId"' +
               '(value-changed)="updateValue($event)" [value]="value"></' +
               directiveName + '-editor>');
             $compile(element.contents())(scope);
