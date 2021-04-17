@@ -39,8 +39,10 @@ class TranslationServiceTests(test_utils.GenericTestBase):
 
     def test_get_machine_translation_with_same_source_and_target_language_code(
             self):
-        translated_text = translation_services.get_machine_translation(
-            'en', 'en', 'text to translate')
+        translated_text = (
+            translation_services.get_and_cache_machine_translation(
+                'en', 'en', 'text to translate')
+        )
         self.assertEqual(translated_text, 'text to translate')
         translation = translation_fetchers.get_machine_translation(
             'en', 'en', 'text to translate')
@@ -51,12 +53,12 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             ValueError, 'Invalid target language code: invalid_language_code'
         ):
-            translation_services.get_machine_translation(
+            translation_services.get_and_cache_machine_translation(
                 'en', 'invalid_language_code', 'text to translate')
         with self.assertRaisesRegexp(
             ValueError, 'Invalid source language code: invalid_language_code'
         ):
-            translation_services.get_machine_translation(
+            translation_services.get_and_cache_machine_translation(
                 'invalid_language_code', 'es', 'text to translate')
 
     def test_get_machine_translation_checks_datastore_first(self):
@@ -65,15 +67,17 @@ class TranslationServiceTests(test_utils.GenericTestBase):
             'translate',
             error=AssertionError):
             self.assertEqual(
-                translation_services.get_machine_translation(
+                translation_services.get_and_cache_machine_translation(
                     'en', 'es', 'text to translate'),
                 'texto para traducir'
             )
 
     def test_get_machine_translation_with_new_translation_saves_translation(
             self):
-        translated_text = translation_services.get_machine_translation(
-            'en', 'fr', 'hello world')
+        translated_text = (
+            translation_services.get_and_cache_machine_translation(
+                'en', 'fr', 'hello world')
+        )
         self.assertEqual(translated_text, 'Bonjour le monde')
         translation = translation_fetchers.get_machine_translation(
             'en', 'fr', 'hello world')

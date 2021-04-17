@@ -28,10 +28,11 @@ cloud_translate_services = models.Registry.import_cloud_translate_services()
     models.NAMES.translation])
 
 
-def get_machine_translation(
+def get_and_cache_machine_translation(
         source_language_code, target_language_code, source_text):
     """Gets a machine translation of the source text for the given source and
-    target languages.
+    target languages. If no translation exists in the datastore for the given
+    input, calls cloud_translate_services.
 
     Args:
         source_language_code: str. The language code for the source text

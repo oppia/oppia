@@ -338,7 +338,7 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
             if content_id_to_text_mapping.has_key(content_id):
                 source_text = content_id_to_text_mapping[content_id]
                 translated_texts[content_id] = (
-                    translation_services.get_machine_translation(
+                    translation_services.get_and_cache_machine_translation(
                         exp.language_code, target_language_code, source_text)
                 )
             else:

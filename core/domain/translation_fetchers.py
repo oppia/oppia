@@ -61,7 +61,6 @@ def get_machine_translation(
         MachineTranslatedText|None. The MachineTranslatedText
         if a translation exists or None if no translation is found.
     """
-
     translation_model = (
         translation_models.MachineTranslatedTextModel.get_machine_translation(
             source_language_code, target_language_code, source_text
