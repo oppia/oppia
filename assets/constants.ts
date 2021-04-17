@@ -4919,6 +4919,10 @@ export default {
     "description": "yкраїнська (Ukrainian)",
     "direction": "ltr"
   }, {
+    "code": "ur",
+    "description": "اُردُو (Urdu)",
+    "direction": "rtl"
+  }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
     "direction": "ltr"
@@ -5212,6 +5216,11 @@ export default {
     "description": "Ukrainian",
     "relatedLanguages": ["uk"],
     "direction": "ltr"
+  }, {
+    "id": "ur",
+    "description": "Urdu",
+    "relatedLanguages": ["ur"],
+    "direction": "rtl"
   }, {
     "id": "vi",
     "description": "Vietnamese",
