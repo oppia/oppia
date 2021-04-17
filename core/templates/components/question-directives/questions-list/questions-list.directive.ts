@@ -46,7 +46,6 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
@@ -61,6 +60,7 @@ require('services/image-local-storage.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
 
@@ -92,7 +92,7 @@ angular.module('oppia').directive('questionsList', [
         'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
-        'ShortSkillSummaryObjectFactory', 'SkillBackendApiService',
+        'SkillBackendApiService',
         'SkillEditorRoutingService',
         'UtilsService', 'WindowDimensionsService',
         'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
@@ -104,7 +104,7 @@ angular.module('oppia').directive('questionsList', [
             MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionUndoRedoService,
             QuestionValidationService, QuestionsListService,
-            ShortSkillSummaryObjectFactory, SkillBackendApiService,
+            SkillBackendApiService,
             SkillEditorRoutingService,
             UtilsService, WindowDimensionsService,
             DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
@@ -405,7 +405,7 @@ angular.module('oppia').directive('questionsList', [
                           misconception);
                       });
                     ctrl.associatedSkillSummaries.push(
-                      ShortSkillSummaryObjectFactory.create(
+                      ShortSkillSummary.create(
                         skillDict.id, skillDict.description));
                   });
                 }
@@ -543,7 +543,7 @@ angular.module('oppia').directive('questionsList', [
               }
 
               ctrl.associatedSkillSummaries.push(
-                ShortSkillSummaryObjectFactory.create(
+                ShortSkillSummary.create(
                   summary.id, summary.description));
               ctrl.skillLinkageModificationsArray = [];
               ctrl.skillLinkageModificationsArray.push({

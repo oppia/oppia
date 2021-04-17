@@ -110,7 +110,9 @@
 # Contributor Dashboard project.
 /core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
+/core/domain/translation*.py @vojtechjelinek
 /core/domain/voiceover_services*.py @sagangwee
+/core/storage/translation/ @vojtechjelinek
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 
@@ -255,6 +257,7 @@
 /core/templates/components/profile-link-directives/ @srijanreddy98
 /core/templates/components/summary-tile/ @srijanreddy98
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
+/core/templates/directives/directives.module.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
@@ -472,6 +475,7 @@
 /core/templates/pages/logout-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
+/core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98

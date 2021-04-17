@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0034.
+presubmit checks. Next message id would be C0035.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -2109,6 +2109,36 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                     break
 
 
+class DisallowDunderMetaclassChecker(checkers.BaseChecker):
+    """Custom pylint checker prohibiting use of "__metaclass__" and
+    enforcing use of "python_utils.with_metaclass()" instead.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'no-dunder-metaclass'
+    priority = -1
+    msgs = {
+        'C0034': (
+            'Please use python_utils.with_metaclass() instead of __metaclass__',
+            'no-dunder-metaclass',
+            'Enforce usage of python_utils.with_metaclass() '
+            'instead of __metaclass__'
+        )
+    }
+
+    def visit_classdef(self, node):
+        """Visit each class definition in a module and check if there is a
+        __metaclass__ present.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+        """
+        if '__metaclass__' in node.locals:
+            self.add_message('no-dunder-metaclass', node=node)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -2131,3 +2161,4 @@ def register(linter):
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
+    linter.register_checker(DisallowDunderMetaclassChecker(linter))
