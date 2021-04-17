@@ -790,3 +790,94 @@ class SeedFirebaseOneOffJobTests(FirebaseOneOffJobTestBase):
             ],
             ['SUCCESS: Firebase accounts deleted', 7],
         ])
+
+
+class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
+
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+    ENABLE_AUTH_SERVICES_STUB = False
+
+    def count_one_off_jobs_in_queue(self):
+        """Returns the number of one off jobs in the taskqueue."""
+        return self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+
+    def run_one_off_job(self):
+        """Begins the one off job and asserts it completes as expected.
+
+        Returns:
+            *. The output of the one off job.
+        """
+        job_id = auth_jobs.AuditFirebaseImportReadinessOneOffJob.create_new()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        auth_jobs.AuditFirebaseImportReadinessOneOffJob.enqueue(job_id)
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        return sorted(
+            ast.literal_eval(o) for o in
+            auth_jobs.AuditFirebaseImportReadinessOneOffJob.get_output(job_id))
+
+    def create_user(self, user_id, email, deleted=False):
+        """Creates a new user with the provided ID and email address.
+
+        Args:
+            user_id: str. The user's ID.
+            email: str. The user's email address.
+            deleted: bool. Value for the user's deleted property.
+        """
+        user_models.UserSettingsModel(
+            id=user_id, email=email, deleted=deleted,
+            role=feconf.ROLE_ID_EXPLORATION_EDITOR,
+            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
+        ).put()
+
+    def test_users_with_distinct_emails_returns_empty_output(self):
+        self.create_user('u1', 'u1@test.com')
+        self.create_user('u2', 'u2@test.com')
+
+        self.assertEqual(self.run_one_off_job(), [])
+
+    def test_users_with_same_email_are_reported(self):
+        self.create_user('u1', 'a@test.com')
+        self.create_user('u2', 'a@test.com')
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ERROR: a@test.com is a shared email', 'u1, u2'],
+        ])
+
+    def test_deleted_users_are_reported(self):
+        self.create_user('u1', 'u1@test.com', deleted=True)
+        self.create_user('u2', 'u2@test.com', deleted=True)
+        self.create_user('u3', 'u3@test.com', deleted=False)
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ERROR: Found deleted users', 'u1, u2'],
+        ])
+
+    def test_system_committer_is_ignored_by_duplicate_email_check(self):
+        self.create_user('xx', 'admin@test.com')
+        self.create_user('yy', 'admin@test.com')
+        auth_models.UserAuthDetailsModel(
+            id='xx', gae_id=feconf.SYSTEM_COMMITTER_ID
+        ).put()
+        auth_models.UserIdentifiersModel(
+            id=feconf.SYSTEM_COMMITTER_ID, user_id='xx'
+        ).put()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['INFO: SYSTEM_COMMITTER_ID skipped', ['xx']],
+        ])
+
+    def test_system_committer_is_ignored_by_deleted_check(self):
+        self.create_user('u1', 'admin@test.com', deleted=True)
+        auth_models.UserAuthDetailsModel(
+            id='u1', gae_id=feconf.SYSTEM_COMMITTER_ID
+        ).put()
+        auth_models.UserIdentifiersModel(
+            id=feconf.SYSTEM_COMMITTER_ID, user_id='u1'
+        ).put()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['INFO: SYSTEM_COMMITTER_ID skipped', ['u1']],
+        ])
