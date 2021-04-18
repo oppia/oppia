@@ -31,6 +31,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import re
 
+from core.domain import rights_manager
 from core.platform import models
 import feconf
 from jobs import job_utils
@@ -139,6 +140,7 @@ class ValidateExplorationsArePublic(beam.DoFn):
 
     def process(self, field_name_to_external_model_references):
         """Function validates that explorations for model are public.
+
         Args:
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
@@ -151,6 +153,7 @@ class ValidateExplorationsArePublic(beam.DoFn):
                 with the field name 'exp_ids'. This dict is used for
                 validation of External Model properties linked to the
                 storage model.
+
         Yields:
             ModelExplorationIsPrivateError. An error class for.
             ModelExplorationNotExistError. An error class for.
@@ -165,13 +168,13 @@ class ValidateExplorationsArePublic(beam.DoFn):
         for exploration_model_reference in exploration_model_references:
             exploration_model = exploration_model_reference.model_instance
             if exploration_model is None or exploration_model.deleted:
-                yield errors.ModelExplorationNotExistError(
+                yield audit_errors.ModelExplorationNotExistError(
                     exploration_model_reference)
         private_exp_ids = [
             exp_id for exp_id in exp_ids if (
                 rights_manager.is_exploration_private(exp_id))]
         if private_exp_ids:
-            yield errors.ModelExplorationIsPrivateError(private_exp_ids)
+            yield audit_errors.ModelExplorationIsPrivateError(private_exp_ids)
 
 
 @audit_decorators.AuditsExisting(base_models.BaseModel)
