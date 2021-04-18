@@ -4860,6 +4860,10 @@ export default {
     "description": "polszczyzna (Polish)",
     "direction": "ltr"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)",
+    "direction": "rtl"
+  }, {
     "code": "pt",
     "description": "português (Portuguese)",
     "direction": "ltr"
@@ -5021,7 +5025,7 @@ export default {
     "id": "prs",
     "description": "Dari",
     "relatedLanguages": ["prs"],
-    "direction": "ltr"
+    "direction": "rtl"
   }, {
     "id": "nl",
     "description": "Dutch",
