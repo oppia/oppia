@@ -2937,7 +2937,7 @@ def is_from_oppia_ml(handler):
 
 def can_update_suggestions(handler):
     """Decorator to check whether the current user can update suggestions.
-    
+
     Args:
         handler: function. The function to be decorated.
 
