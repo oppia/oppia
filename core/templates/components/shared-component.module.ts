@@ -66,7 +66,6 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { DirectivesModule } from '../directives/directives.module';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
@@ -131,7 +130,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     PromoBarComponent,
     RubricsEditorComponent,
-    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -189,7 +187,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CreateNewSkillModalComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
-    SchemaBasedEditorDirective,
     FocusOnDirective,
     PromoBarComponent,
     RubricsEditorComponent,
