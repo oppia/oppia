@@ -76,6 +76,7 @@ import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { TranslateModule } from 'filters/translate.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -127,6 +128,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     PromoBarComponent,
     SharingLinksComponent,
+    SideNavigationBarComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -156,6 +158,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
+    SideNavigationBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
@@ -185,6 +188,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     SchemaBasedEditorDirective,
+    SideNavigationBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
