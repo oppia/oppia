@@ -171,6 +171,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def mock_accept_does_nothing(self, unused_arg):
         pass
 
+    def edit_before_pre_accept_validate(self, suggestion):
+        """Edits suggestion immediately before pre-accept validation."""
+        suggestion.score_category = 'invalid_score_category'
+        suggestion.pre_accept_validate()
+
     def test_create_new_suggestion_successfully(self):
         expected_suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread_1',
@@ -538,13 +543,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
-        # Invalidating the suggestion.
-        suggestion.score_category = 'invalid_score_category'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected score_category to be of the form '
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
-            suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
+            with self.swap(
+                suggestion_registry.SuggestionEditStateContent,
+                'pre_accept_validate',
+                self.edit_before_pre_accept_validate(suggestion)):
+                suggestion_services.accept_suggestion(
+                    self.suggestion_id, self.reviewer_id,
+                    self.COMMIT_MESSAGE, None)
 
     def test_accept_suggestion_no_commit_message_failure(self):
         self.mock_create_suggestion(self.target_id)
@@ -1285,7 +1294,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
@@ -1294,7 +1303,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2'],
-                ['TextInput'], category='Algebra'))
+                ['TextInput'], category='Algebra',
+                correctness_feedback_enabled=True))
 
         self.old_content = state_domain.SubtitledHtml(
             'content', '<p>old content</p>').to_dict()

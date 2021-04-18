@@ -46,7 +46,7 @@ describe('rich-text components', function() {
     await users.createAndLoginUser(
       'user@richTextComponents.com', 'userRichTextComponents');
 
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendBoldText('bold');
@@ -125,7 +125,7 @@ describe('Interactions', function() {
   it('should pass their own test suites', async function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
@@ -212,7 +212,7 @@ describe('Interactions', function() {
      */
     await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));
@@ -245,7 +245,7 @@ describe('Interactions', function() {
     // Proper Latex styling for rule spec is required.
     await explorationEditorMainTab.addResponse(
       'AlgebraicExpressionInput', await forms.toRichText('Good job!'), 'End',
-      true, 'IsEquivalentTo', '(16(x^12))/4x^2');
+      true, 'IsEquivalentTo', '(16(x^12))/(4x^2)');
     // Expecting answer to be 4x^10.
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');

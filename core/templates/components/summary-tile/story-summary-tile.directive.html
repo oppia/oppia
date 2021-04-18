@@ -31,7 +31,10 @@
       <a ng-href="<[$ctrl.getStoryLink()]>" ng-class="{'disabled-link': !$ctrl.classroomUrlFragment}"><[$ctrl.storySummary.getTitle()]> </a>
     </strong>
     <span class="oppia-chapters-count">
-       <[$ctrl.nodeCount]> <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span><[($ctrl.nodeCount > 1) ? 's' : '']>
+      <span translate="I18N_TOPIC_VIEWER_CHAPTERS"
+            translate-values="{count: $ctrl.nodeCount}"
+            translate-interpolation="messageformat">
+      </span>
     </span>
   </div>
   <div class="story-details">
@@ -186,7 +189,7 @@
   }
 
   story-summary-tile a {
-    color: #000000;
+    color: #000;
     cursor: pointer;
   }
 

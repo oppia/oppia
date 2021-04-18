@@ -444,6 +444,21 @@ def update_exploration_opportunities(old_story, new_story):
     delete_exploration_opportunities(list(deleted_exp_ids))
 
 
+def delete_exp_opportunities_corresponding_to_story(story_id):
+    """Deletes the ExplorationOpportunitySummaryModel models which corresponds
+    to the given story_id.
+
+    Args:
+        story_id: str. The ID of the story.
+    """
+    exp_opprtunity_model_class = (
+        opportunity_models.ExplorationOpportunitySummaryModel)
+    exp_opportunity_models = exp_opprtunity_model_class.get_all().filter(
+        exp_opprtunity_model_class.story_id == story_id
+    )
+    exp_opprtunity_model_class.delete_multi(exp_opportunity_models)
+
+
 def get_translation_opportunities(language_code, cursor):
     """Returns a list of opportunities available for translation in a specific
     language.

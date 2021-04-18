@@ -31,6 +31,7 @@ import { ContentLanguageSelectorComponent } from
 import { SkillEditorNavbarBreadcrumbComponent } from 'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misconception-modal.component';
 
 @NgModule({
   imports: [
@@ -41,11 +42,13 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   declarations: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
+    DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
+    DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent
   ],
   providers: [

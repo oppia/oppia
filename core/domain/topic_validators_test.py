@@ -785,7 +785,7 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         manager1_email = 'user@manager1.com'
         manager2_email = 'user@manager2.com'
@@ -798,8 +798,8 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.manager1_id = self.get_user_id_from_email(manager1_email)
         self.manager2_id = self.get_user_id_from_email(manager2_email)
 
-        self.manager1 = user_services.UserActionsInfo(self.manager1_id)
-        self.manager2 = user_services.UserActionsInfo(self.manager2_id)
+        self.manager1 = user_services.get_user_actions_info(self.manager1_id)
+        self.manager2 = user_services.get_user_actions_info(self.manager2_id)
 
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,

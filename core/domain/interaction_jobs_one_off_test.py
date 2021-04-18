@@ -56,11 +56,12 @@ def run_job_for_deleted_exp(
     output or error condition.
     """
     job_id = job_class.create_new()
-    # Check there is one job in the taskqueue corresponding to
-    # delete_exploration_from_subscribed_users.
+    # Check there are two jobs in the taskqueue corresponding to
+    # delete_explorations_from_user_models and
+    # delete_explorations_from_activities.
     self.assertEqual(
         self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
     job_class.enqueue(job_id)
     self.assertEqual(
         self.count_jobs_in_mapreduce_taskqueue(
@@ -91,7 +92,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -101,7 +102,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         """Checks output pairs are produced only for
         desired interactions.
         """
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -895,7 +896,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -906,7 +907,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         """Checks (exp, state) pairs are produced correctly for ItemSelection
         interactions.
         """
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1087,7 +1088,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         """Checks (exp, state) pairs are produced correctly for DragAndDropSort
         interactions.
         """
-        owner = user_services.UserActionsInfo(self.albert_id)
+        owner = user_services.get_user_actions_info(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 

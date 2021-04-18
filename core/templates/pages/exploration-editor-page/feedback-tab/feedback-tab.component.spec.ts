@@ -40,6 +40,7 @@ describe('Feedback Tab Component', function() {
   var $q = null;
   var $scope = null;
   var $uibModal = null;
+  var $rootScope = null;
   var alertsService = null;
   var changeListService = null;
   var dateTimeFormatService = null;
@@ -70,7 +71,6 @@ describe('Feedback Tab Component', function() {
     $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));
-    $provide.value('RouterService', {});
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
@@ -80,7 +80,7 @@ describe('Feedback Tab Component', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
     editabilityService = $injector.get('EditabilityService');

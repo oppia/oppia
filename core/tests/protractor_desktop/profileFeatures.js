@@ -149,7 +149,8 @@ describe('Visiting user profile page', function() {
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
-      EXPLORATION.language
+      EXPLORATION.language,
+      true
     );
 
     await creatorDashboardPage.get();
@@ -207,7 +208,8 @@ describe('Playing the exploration', function() {
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
-      EXPLORATION.language
+      EXPLORATION.language,
+      true
     );
     await users.logout();
   });

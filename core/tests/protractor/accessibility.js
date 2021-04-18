@@ -547,7 +547,8 @@ describe('screenreader and keyboard user accessibility features', function() {
         EXPLORATION.title,
         EXPLORATION.category,
         EXPLORATION.objective,
-        EXPLORATION.language
+        EXPLORATION.language,
+        true
       );
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');

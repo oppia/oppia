@@ -28,6 +28,8 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
+require('Polyfills.ts');
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require(
@@ -38,7 +40,7 @@ require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/navbar/' +
-  'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts'
+  'topics-and-skills-dashboard-navbar-breadcrumb.component.ts'
 );
 require(
   'pages/topics-and-skills-dashboard-page/' +

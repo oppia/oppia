@@ -52,7 +52,7 @@ describe('Exploration translation and voiceover tab', function() {
       'superUser@translationTab.com', 'superUser');
     await users.logout();
     await users.login('user@editorTab.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(await forms.toRichText(
@@ -121,7 +121,6 @@ describe('Exploration translation and voiceover tab', function() {
       await users.login('voiceArtist@translationTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorMainTab.exitTutorial();
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.expectSelectedLanguageToBe(
         'English');
@@ -136,10 +135,8 @@ describe('Exploration translation and voiceover tab', function() {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.changeLanguage('Hindi');
-    await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
     await users.logout();
   });
@@ -149,7 +146,6 @@ describe('Exploration translation and voiceover tab', function() {
       await users.login('voiceArtist@translationTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorMainTab.exitTutorial();
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.changeLanguage('English');
       await explorationEditorTranslationTab.expectContentTabContentToMatch(
@@ -167,7 +163,6 @@ describe('Exploration translation and voiceover tab', function() {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToTranslationTab();
     let expEditorTranslationTab = explorationEditorTranslationTab;
 
@@ -196,9 +191,7 @@ describe('Exploration translation and voiceover tab', function() {
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorMainTab.exitTutorial();
       await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.exitTutorial();
       await explorationEditorTranslationTab.changeLanguage('Hindi');
       await explorationEditorTranslationTab.switchToTranslationMode();
       await explorationEditorTranslationTab.navigateToFeedbackTab();
@@ -216,7 +209,6 @@ describe('Exploration translation and voiceover tab', function() {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.changeLanguage('Hindi');
     await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
@@ -227,9 +219,7 @@ describe('Exploration translation and voiceover tab', function() {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorMainTab.exitTutorial();
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.changeLanguage('Hindi');
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
 
@@ -247,9 +237,7 @@ describe('Exploration translation and voiceover tab', function() {
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorMainTab.exitTutorial();
       await explorationEditorPage.navigateToTranslationTab();
-      await expEditorTranslationTab.exitTutorial();
       await expEditorTranslationTab.changeLanguage('Hindi');
       await expEditorTranslationTab.switchToTranslationMode();
 

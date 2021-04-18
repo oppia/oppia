@@ -9,11 +9,11 @@
         <div class="form-group">
           <label for="audioTranslationFileField" class="col-lg-2 col-md-2 col-sm-2 float-left">Audio File</label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <audio-file-uploader id="audioTranslationFileField"
-                                 dropped-file="droppedFile"
-                                 on-file-changed="updateUploadedFile"
-                                 on-file-cleared="clearUploadedFile">
-            </audio-file-uploader>
+            <oppia-audio-file-uploader id="audioTranslationFileField"
+                                       [dropped-file]="droppedFile"
+                                       (file-change)="updateUploadedFile($event)"
+                                       (file-clear)="clearUploadedFile()">
+            </oppia-audio-file-uploader>
             <div ng-if="isAudioAvailable"
                  class="oppia-updated-audio-file-upload-message">
               <strong>Note:</strong> Uploading a new audio file will replace the existing audio file.

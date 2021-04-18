@@ -28,7 +28,6 @@ require(
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
-require('services/question-validation.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
@@ -52,13 +51,16 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.questionId = questionId;
     $scope.skill = skill;
     $scope.skillDifficulty = skillDifficulty;
-    $scope.skillDifficultyString = Object.entries(
-      SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
-      entry => entry[1] === skillDifficulty)[0];
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
     ContextService.setImageSaveDestinationToLocalStorage();
+    $scope.setDifficultyString = function(skillDifficulty) {
+      $scope.skillDifficultyString = Object.entries(
+        SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
+        entry => entry[1] === skillDifficulty)[0];
+    };
+    $scope.setDifficultyString(skillDifficulty);
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
@@ -81,7 +83,29 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       return QuestionValidationService.isQuestionValid(
         $scope.question, $scope.misconceptionsBySkill);
     };
-
+    $scope.skillId = $scope.skill.getId();
+    $scope.onClickChangeDifficulty = function() {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/topic-editor-page/modal-templates/' +
+          'select-skill-and-difficulty-modal.template.html'),
+        backdrop: true,
+        resolve: {
+          skillId: () => $scope.skillId
+        },
+        controller: (
+          'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
+      }).result.then(function(result) {
+        if (AlertsService.warnings.length === 0) {
+          $scope.skillDifficulty = result.skillDifficulty;
+          $scope.setDifficultyString($scope.skillDifficulty);
+        }
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    };
     $scope.cancel = function() {
       if (QuestionUndoRedoService.hasChanges()) {
         $uibModal.open({
