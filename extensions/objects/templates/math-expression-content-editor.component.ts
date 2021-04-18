@@ -92,7 +92,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // which we want to happen synchronously into the MathJax Hub Queue.
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement]);
     this.numberOfElementsInQueue++;
-    MathJax.Hub.Queue(function() {
+    MathJax.Hub.Queue(() => {
       if (outputElement.getElementsByTagName('svg')[0] !== undefined) {
         this.svgString = (
           outputElement.getElementsByTagName('svg')[0].outerHTML);
