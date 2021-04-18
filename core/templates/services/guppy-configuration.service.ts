@@ -19,12 +19,68 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
-
 const SYMBOLS_TO_REMOVE = [
   'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
   'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point',
   'infinity', 'leq', 'less', 'geq', 'greater', 'neq'];
+
+const MULTIPLICATION_SYMBOL_DICT = {
+  output: {
+    latex: '\\times',
+    asciimath: '*'
+  },
+  keys: ['*'],
+  attrs: {
+    group: 'operations',
+    type: '*'
+  },
+  ast: {
+    type: 'operator'
+  }
+};
+
+const FRACTION_SYMBOL_DICT = {
+  output: {
+    latex: '\\frac{{$1}}{{$2}}',
+    small_latex: '\\frac{{$1}}{{$2}}',
+    asciimath: '/',
+    text: '({$1})/({$2})'
+  },
+  input: 1,
+  keys: ['/'],
+  attrs: {
+    type: 'fraction',
+    group: 'functions'
+  },
+  args: [{
+    up: '1',
+    down: '2',
+    name: 'numerator',
+    small: 'yes'
+  }, {
+    up: '1',
+    down: '2',
+    'delete': '1',
+    name: 'denominator',
+    small: 'yes'
+  }]
+};
+
+const DIVISION_SYMBOL_DICT = {
+  output: {
+    latex: '\\div',
+    asciimath: '/',
+    text: '/'
+  },
+  keys: ['/'],
+  attrs: {
+    group: 'operations',
+    type: '/'
+  },
+  ast: {
+    type: 'operator'
+  }
+};
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +88,7 @@ const SYMBOLS_TO_REMOVE = [
 export class GuppyConfigurationService {
   static serviceIsInitialized = false;
 
-  constructor(private deviceInfoService: DeviceInfoService) {}
+  constructor() {}
 
   init(): void {
     if (GuppyConfigurationService.serviceIsInitialized) {
@@ -40,22 +96,7 @@ export class GuppyConfigurationService {
     }
 
     Guppy.remove_global_symbol('*');
-    Guppy.add_global_symbol(
-      '*',
-      {
-        output: {
-          latex: '\\times',
-          asciimath: '*'
-        },
-        keys: ['*'],
-        attrs: {
-          group: 'operations',
-          type: '*'
-        },
-        ast: {
-          type: 'operator'
-        }
-      });
+    Guppy.add_global_symbol('*', MULTIPLICATION_SYMBOL_DICT);
 
     // Remove symbols since they are not supported.
     for (let symbol of SYMBOLS_TO_REMOVE) {
@@ -66,6 +107,12 @@ export class GuppyConfigurationService {
       'empty_content',
       '\\color{grey}{\\text{\\small{Type a formula here.}}}');
     GuppyConfigurationService.serviceIsInitialized = true;
+  }
+
+  changeDivSymbol(useFraction: boolean = false): void {
+    Guppy.add_global_symbol(
+      '/', useFraction ? FRACTION_SYMBOL_DICT : DIVISION_SYMBOL_DICT
+    );
   }
 }
 

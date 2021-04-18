@@ -30,8 +30,8 @@ import { OutcomeObjectFactory } from
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory.ts';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
@@ -327,6 +327,7 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
+        useFractionForDivision: false,
         placeholder: {
           value: {
             content_id: 'ca_placeholder_0',
@@ -341,6 +342,7 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
+      useFractionForDivision: false,
       placeholder: {
         value: new SubtitledUnicode(
           'Type an expression here, using only numbers.', 'ca_placeholder_0')
