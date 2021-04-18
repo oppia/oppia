@@ -237,11 +237,6 @@ import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { LearnerDashboardActivityBackendApiService } from
-  'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { SuggestionModalForLearnerDashboardService } from
-  // eslint-disable-next-line max-len
-  'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerParamsService } from
@@ -596,10 +591,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static learnerAnswerDetailsBackendApiService:
     LearnerAnswerDetailsBackendApiService;
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
-  static learnerDashboardActivityBackendApiService:
-    LearnerDashboardActivityBackendApiService;
-  static suggestionModalForLearnerDashboardService:
-    SuggestionModalForLearnerDashboardService;
   static learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService;
   static learnerParamsService: LearnerParamsService;
@@ -879,10 +870,6 @@ private learnerActionObjectFactory: LearnerActionObjectFactory,
 private learnerAnswerDetailsBackendApiService:
   LearnerAnswerDetailsBackendApiService,
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
-private learnerDashboardActivityBackendApiService:
-  LearnerDashboardActivityBackendApiService,
-private suggestionModalForLearnerDashboardService:
-  SuggestionModalForLearnerDashboardService,
 private learnerDashboardIdsBackendApiService:
   LearnerDashboardIdsBackendApiService,
 private learnerParamsService: LearnerParamsService,
@@ -1236,10 +1223,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.learnerAnswerDetailsBackendApiService);
     OppiaAngularRootComponent.learnerDashboardBackendApiService = (
       this.learnerDashboardBackendApiService);
-    OppiaAngularRootComponent.learnerDashboardActivityBackendApiService = (
-      this.learnerDashboardActivityBackendApiService);
-    OppiaAngularRootComponent.suggestionModalForLearnerDashboardService = (
-      this.suggestionModalForLearnerDashboardService);
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = (
       this.learnerDashboardIdsBackendApiService);
     OppiaAngularRootComponent.learnerParamsService = this.learnerParamsService;

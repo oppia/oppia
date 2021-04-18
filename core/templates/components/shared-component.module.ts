@@ -28,6 +28,11 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { TranslateModule } from 'filters/translate.module';
+import { SharedFormsModule } from './forms/shared-forms.module';
+import { DirectivesModule } from 'directives/directives.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
+
 
 // Components.
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
@@ -50,15 +55,16 @@ import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summ
 import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
-import { DirectivesModule } from '../directives/directives.module';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
-import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
-import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
+
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -66,17 +72,11 @@ import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/trunca
 import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 
 // Services.
 import { AuthService } from 'services/auth.service';
-import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
-import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ObjectComponentsModule } from 'objects/object-components.module';
-import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
-import { TranslateModule } from 'filters/translate.module';
-import { SharedFormsModule } from './forms/shared-forms.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -145,10 +145,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
     SortByPipe,
-    LearnerDashboardIconsComponent,
-    LearnerPlaylistModalComponent,
-    RemoveActivityModalComponent,
     PromoBarComponent,
+    LearnerDashboardIconsComponent
   ],
 
   entryComponents: [
@@ -172,12 +170,10 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
-    LearnerDashboardIconsComponent,
-    LearnerPlaylistModalComponent,
-    RemoveActivityModalComponent,
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    LearnerDashboardIconsComponent
   ],
 
   exports: [
@@ -215,14 +211,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
-    LearnerDashboardIconsComponent,
-    LearnerPlaylistModalComponent,
-    RemoveActivityModalComponent,
     LoadingDotsComponent,
     PromoBarComponent,
     WrapTextWithEllipsisPipe,
     PromoBarComponent,
-    WrapTextWithEllipsisPipe
+    WrapTextWithEllipsisPipe,
+    LearnerDashboardIconsComponent
   ],
 })
 

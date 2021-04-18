@@ -27,6 +27,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
 @NgModule({
   imports: [
@@ -37,10 +38,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
   declarations: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    RemoveActivityModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    RemoveActivityModalComponent
   ],
   providers: [
     {
