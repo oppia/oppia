@@ -76,6 +76,7 @@ import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { TranslateModule } from 'filters/translate.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -120,6 +121,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FilterForMatchingSubstringPipe,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    LoadingMessageComponent,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
@@ -146,7 +148,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    LazyLoadingComponent, LoadingMessageComponent,
+    LoadingDotsComponent, SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
@@ -180,6 +183,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
+    LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     PromoBarComponent,
     OnScreenKeyboardComponent,
