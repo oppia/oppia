@@ -84,7 +84,7 @@ describe('CkEditor copy toolbar', () => {
   it('should revert cursor to normal when modal is closed', () => {
     component.toggleToolActive();
     fixture.detectChanges();
- 
+
     expect(document.body.style.cursor).toBe('copy');
 
     component.ngOnDestroy();
