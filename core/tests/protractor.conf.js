@@ -346,7 +346,7 @@ exports.config = {
       '-y',
       '-r', '30',
       '-f', 'x11grab',
-      '-s', '1024x768',
+      '-s', '1366x768',
       '-i', process.env.DISPLAY,
       '-g', '300',
       '-vcodec', 'qtrle',
