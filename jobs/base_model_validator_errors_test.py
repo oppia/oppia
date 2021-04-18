@@ -164,7 +164,7 @@ class ModelExpiredErrorTests(ValidatorErrorTestBase):
         self.assertEqual(error.message, msg)
 
 
-class ModelInvalidCommitStatusErrorTests(ValidatorErrorTestBase):
+class ModelInvalidCommitStatusTests(ValidatorErrorTestBase):
     def test_model_invalid_commit_status(self):
         model1 = base_models.BaseCommitLogEntryModel(
             id='123',

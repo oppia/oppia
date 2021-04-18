@@ -32,7 +32,6 @@ import datetime
 import re
 
 from core.domain import cron_services
-from core.domain import rights_manager
 from core.platform import models
 import feconf
 from jobs import base_model_validator_errors as errors
@@ -69,7 +68,7 @@ class ValidateModelIdWithRegex(beam.DoFn):
 
 
 class ValidatePostCommitIsPrivate(beam.DoFn):
-    """DoFn to check if post_commit_status is private when
+    """DoFn to check if post_commmit_status is private when
     post_commit_is_private is true and vice-versa.
     """
 
@@ -113,48 +112,6 @@ class ValidateDeleted(beam.DoFn):
 
         if model.last_updated < expiration_date:
             yield errors.ModelExpiredError(model)
-
-
-class ValidateExplorationsArePublic(beam.DoFn):
-    """DoFn to check whether explorations for model are public."""
-
-    def process(self, field_name_to_external_model_references):
-        """Function validates that explorations for model are public.
-
-        Args:
-            field_name_to_external_model_references:
-                dict(str, (list(ExternalModelReference))).
-                A dict keyed by field name. The field name represents
-                a unique identifier provided by the storage
-                model to which the external model is associated. Each value
-                contains a list of ExternalModelReference objects corresponding
-                to the field_name. For examples, all the external Exploration
-                Models corresponding to a storage model can be associated
-                with the field name 'exp_ids'. This dict is used for
-                validation of External Model properties linked to the
-                storage model.
-
-        Yields:
-            ModelExplorationIsPrivateError. An error class for.
-            ModelExplorationNotExistError. An error class for.
-        """
-        if 'exploration_ids' not in field_name_to_external_model_references:
-            return
-
-        exp_ids = []
-        exploration_model_references = (
-            field_name_to_external_model_references['exploration_ids'])
-
-        for exploration_model_reference in exploration_model_references:
-            exploration_model = exploration_model_reference.model_instance
-            if exploration_model is None or exploration_model.deleted:
-                yield errors.ModelExplorationNotExistError(
-                    exploration_model_reference)
-        private_exp_ids = [
-            exp_id for exp_id in exp_ids if (
-                rights_manager.is_exploration_private(exp_id))]
-        if private_exp_ids:
-            yield errors.ModelExplorationIsPrivateError(private_exp_ids)
 
 
 class ValidateModelTimeFields(beam.DoFn):

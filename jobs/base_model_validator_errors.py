@@ -93,40 +93,6 @@ class ModelInvalidCommitStatusError(ModelValidationError):
         return self._message
 
 
-class ModelExplorationNotExistError(ModelValidationError):
-    """Error class for non-existing exploration model."""
-
-    def __init__(self, model_reference):
-        super(ModelExplorationNotExistError, self).__init__(model_reference)
-        exploration_model = model_reference.model_instance
-        model_class = model_reference.model_class
-        model_id = model_reference.model_id
-        if exploration_model is None or exploration_model.deleted:
-            self._message = (
-                '%s based on field explorations_ids having value %s, expected '
-                'model %s with id %s but it doesn\'t exist' % (
-                    self.base_message, model_id, model_class.__name__, model_id)
-            )
-
-    @property
-    def message(self):
-        return self._message
-
-
-class ModelExplorationIsPrivateError(ModelValidationError):
-    """Error class for private exploration models."""
-
-    def __init__(self, private_exp_id):
-        super(ModelExplorationIsPrivateError, self).__init__(private_exp_id)
-        self._message = (
-            '%s Explorations with ids %s are private' % (
-                self.base_message, private_exp_id))
-
-    @property
-    def message(self):
-        return self._message
-
-
 class ModelMutatedDuringJobError(ModelValidationError):
     """Error class for current time model validation errors."""
 
