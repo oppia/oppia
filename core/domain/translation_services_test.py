@@ -34,7 +34,7 @@ class TranslationServiceTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TranslationServiceTests, self).setUp()
-        translation_models.MachineTranslatedTextModel.create(
+        translation_models.MachineTranslationModel.create(
             'en', 'es', 'text to translate', 'texto para traducir')
 
     def test_get_machine_translation_with_same_source_and_target_language_code(

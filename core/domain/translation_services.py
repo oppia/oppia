@@ -58,7 +58,7 @@ def get_and_cache_machine_translation(
     translated_text = cloud_translate_services.translate_text(
         source_text, source_language_code, target_language_code)
 
-    translation_models.MachineTranslatedTextModel.create(
+    translation_models.MachineTranslationModel.create(
         source_language_code,
         target_language_code,
         source_text,

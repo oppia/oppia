@@ -24,19 +24,19 @@ from core.tests import test_utils
 import utils
 
 
-class MachineTranslatedTextTests(test_utils.GenericTestBase):
-    """Tests for the MachineTranslatedText domain object."""
+class MachineTranslationTests(test_utils.GenericTestBase):
+    """Tests for the MachineTranslation domain object."""
 
     translation = None
 
     def setUp(self):
-        """Setup for MachineTranslatedTexts domain object tests."""
-        super(MachineTranslatedTextTests, self).setUp()
+        """Setup for MachineTranslation domain object tests."""
+        super(MachineTranslationTests, self).setUp()
         self._init_translation()
 
     def _init_translation(self):
         """Initialize self.translation with valid default values."""
-        self.translation = translation_domain.MachineTranslatedText(
+        self.translation = translation_domain.MachineTranslation(
             'en', 'es', 'hello world', 'hola mundo')
         self.translation.validate()
 

@@ -27,18 +27,18 @@ from core.platform import models
 
 
 def get_translation_from_model(translation_model):
-    """Returns a MachineTranslatedText object given a
-    MachineTranslatedTextModel loaded from the datastore.
+    """Returns a MachineTranslation object given a
+    MachineTranslationModel loaded from the datastore.
 
     Args:
-        translation_model: MachineTranslatedTextModel. The
-            MachineTranslatedTextModel loaded from the datastore.
+        translation_model: MachineTranslationModel. The
+            MachineTranslationModel loaded from the datastore.
 
     Returns:
-        MachineTranslatedText. A MachineTranslatedText object corresponding to
-        the given MachineTranslatedTextModel.
+        MachineTranslation. A MachineTranslation object corresponding to
+        the given MachineTranslationModel.
     """
-    return translation_domain.MachineTranslatedText(
+    return translation_domain.MachineTranslation(
         translation_model.source_language_code,
         translation_model.target_language_code,
         translation_model.source_text,
@@ -47,7 +47,7 @@ def get_translation_from_model(translation_model):
 
 def get_machine_translated_text(
         source_language_code, target_language_code, source_text):
-    """Gets MachineTranslatedText by language codes and source text.
+    """Gets MachineTranslation by language codes and source text.
     Returns None if no translation exists for the given parameters.
 
     Args:
@@ -58,11 +58,11 @@ def get_machine_translated_text(
         source_text: str. The untranslated source text.
 
     Returns:
-        MachineTranslatedText|None. The MachineTranslatedText
+        MachineTranslation|None. The MachineTranslation
         if a translation exists or None if no translation is found.
     """
     translation_model = (
-        translation_models.MachineTranslatedTextModel.get_machine_translation(
+        translation_models.MachineTranslationModel.get_machine_translation(
             source_language_code, target_language_code, source_text
         )
     )

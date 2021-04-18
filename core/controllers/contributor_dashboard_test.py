@@ -488,11 +488,11 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(output, expected_output)
 
 
-class MachineTranslatedStateTextsHandlerTests(test_utils.GenericTestBase):
-    """Tests for MachineTranslatedStateTextsHandler"""
+class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
+    """Tests for MachineTranslationStateTextsHandler"""
 
     def setUp(self):
-        super(MachineTranslatedStateTextsHandlerTests, self).setUp()
+        super(MachineTranslationStateTextsHandlerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -576,16 +576,33 @@ class MachineTranslatedStateTextsHandlerTests(test_utils.GenericTestBase):
             'Missing state_name')
 
     def test_handler_with_invalid_content_ids_returns_none(self):
+        exp_services.update_exploration(
+            self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'End State',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'Please continue.'
+                }
+            })], 'Changes content.')
+
         output = self.get_json(
             '/machine_translated_state_texts_handler', params={
                 'exp_id': self.exp_id,
                 'state_name': 'End State',
-                'content_ids': '["invalid_content_id"]',
+                'content_ids': '["invalid_content_id", "content"]',
                 'target_language_code': 'es'
             }, expected_status_int=200
         )
         expected_output = {
-            'translated_texts': {'invalid_content_id': None}
+            'translated_texts': {
+                'content': 'Por favor continua.',
+                'invalid_content_id': None
+            },
+            'errors': {
+                'invalid_content_id': 'Invalid content_id: invalid_content_id'
+            }
         }
         self.assertEqual(output, expected_output)
 
@@ -612,7 +629,8 @@ class MachineTranslatedStateTextsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=200
         )
         expected_output = {
-            'translated_texts': {}
+            'translated_texts': {},
+            'errors': {}
         }
         self.assertEqual(output, expected_output)
 
@@ -652,7 +670,8 @@ class MachineTranslatedStateTextsHandlerTests(test_utils.GenericTestBase):
         )
 
         expected_output = {
-            'translated_texts': {'content': 'Por favor continua.'}
+            'translated_texts': {'content': 'Por favor continua.'},
+            'errors': {}
         }
         self.assertEqual(output, expected_output)
 
