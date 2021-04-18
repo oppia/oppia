@@ -85,6 +85,7 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
     while (this.value.length > 0 && (
       this.value[this.value.length - 1].length === 0)) {
       this.value.pop();
+      this.valueChanged.emit(this.value);
     }
     this.validateOrdering();
   }
