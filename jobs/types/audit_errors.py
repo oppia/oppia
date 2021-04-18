@@ -130,6 +130,15 @@ class InvalidCommitStatusError(BaseAuditError):
     def __init__(self, model):
         super(InvalidCommitStatusError, self).__init__(model)
         self.message = (
+            'post_commit_status is %s' % model.post_commit_status)
+
+
+class InvalidPrivateCommitStatusError(BaseAuditError):
+    """Error class for commit models with inconsistent private status values."""
+
+    def __init__(self, model):
+        super(InvalidPrivateCommitStatusError, self).__init__(model)
+        self.message = (
             'post_commit_status="%s" but post_commit_is_private=%r' % (
                 model.post_commit_status, model.post_commit_is_private))
 
