@@ -134,6 +134,32 @@ class InvalidCommitStatusError(BaseAuditError):
                 model.post_commit_status, model.post_commit_is_private))
 
 
+class ModelExplorationNotExistError(BaseAuditError):
+    """Error class for non-existing exploration model."""
+
+    def __init__(self, model):
+        super(ModelExplorationNotExistError, self).__init__(model)
+        exploration_model = model.model_instance
+        model_class = model.model_class
+        model_id = model.model_id
+        if exploration_model is None or exploration_model.deleted:
+            self.message = (
+                '%s based on field explorations_ids having value %s, expected '
+                'model %s with id %s but it doesn\'t exist' % (
+                    self.base_message, model_id, model_class.__name__, model_id)
+            )
+
+
+class ModelExplorationIsPrivateError(BaseAuditError):
+    """Error class for private exploration models."""
+
+    def __init__(self, private_exp_id):
+        super(ModelExplorationIsPrivateError, self).__init__(private_exp_id)
+        self.message = (
+            '%s Explorations with ids %s are private' % (
+                self.base_message, private_exp_id))
+
+
 class ModelMutatedDuringJobError(BaseAuditError):
     """Error class for models mutated during a job."""
 
