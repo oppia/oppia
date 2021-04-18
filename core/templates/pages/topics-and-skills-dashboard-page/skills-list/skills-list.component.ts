@@ -155,7 +155,7 @@ export class SkillsListComponent {
 
           this.editableTopicBackendApiService.updateTopic(
             topicsToUnassign[topic].topicId,
-            topicsToUnassign[topic].topicVersion.toString(),
+            topicsToUnassign[topic].topicVersion,
             `Unassigned skill with id ${skillId} from the topic.`,
             changeList
           ).then(() => {
@@ -196,7 +196,7 @@ export class SkillsListComponent {
         for (let j = 0; j < topicSummaries.length; j++) {
           if (topicSummaries[j].id === topicIds[i]) {
             this.editableTopicBackendApiService.updateTopic(
-              topicIds[i], topicSummaries[j].version.toString(),
+              topicIds[i], topicSummaries[j].version,
               'Added skill with id ' + skillId + ' to topic.',
               changeList
             ).then(() => {
