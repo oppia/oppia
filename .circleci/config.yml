@@ -19,9 +19,6 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      - e2e_miscellaneous_tests:
-          requires:
-            - e2e_navigation_and_misc
       - e2e_new_structure_tests:
           requires:
             - e2e_navigation_and_misc
@@ -45,14 +42,8 @@ commands:
     description: "Install Chrome"
     steps:
       - run:
-          name:  Install chrome version 88.0.4324.96-1
-          command: |
-            sudo apt-get update
-            sudo apt-get install lsb-release
-            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_88.0.4324.96-1_amd64.deb
-            sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-            sudo dpkg -i google-chrome.deb
-            google-chrome --version
+          name: Install chrome
+          command: python -m scripts.install_chrome_for_ci
 
   merge_target_branch:
     description: "Merge to target branch"
@@ -145,21 +136,16 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - run:
-          name: Run e2e navigation test
-          command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-      - check_release_changelog_update_branch
+      - install_chrome
       - run:
           name: Run e2e admin page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="adminPage"
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -177,12 +163,12 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e publication test
           command: |
@@ -191,50 +177,6 @@ jobs:
           name: Run e2e library test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
-      - run:
-          name: Run e2e collections test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
-      - run:
-          name: Run e2e accessibility page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-      - upload_screenshots
-
-  e2e_miscellaneous_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - check_release_changelog_update_branch
-      - merge_target_branch
-      - install_chrome
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Set up python by installing protobuf and enum
-          command: pip install enum34==1.1.10 protobuf==3.13.0
-      - run:
-          name: Run e2e file upload features test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadFeatures" --prod_env
-      - run:
-          name: Run e2e play voiceovers test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env
-      - run:
-          name: Run e2e file upload extensions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env
-      - run:
-          name: Run e2e contributor dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
-      # Feature Gating test suites must run in non-production environment because
-      # the dummy_feature being used must not be enabled in production environment.
-      - run:
-          name: Run e2e feature gating test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
       - upload_screenshots
 
   e2e_new_structure_tests:
@@ -243,12 +185,12 @@ jobs:
       - checkout
       - check_release_changelog_update_branch
       - merge_target_branch
-      - install_chrome
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - install_chrome
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
@@ -257,10 +199,6 @@ jobs:
           name: Run e2e topics and story editor
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
-      - run:
-          name: Run e2e classroom page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures" --prod_env
       - run:
           name: Run e2e topic and story editor test
           command: |

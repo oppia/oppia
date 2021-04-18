@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import user_query_domain
 from core.platform import models
@@ -35,14 +36,13 @@ def _get_user_query_from_model(user_query_model):
     Returns:
         UserQuery. User query domain object.
     """
-    user_query_params = user_query_domain.UserQueryParams(
-        user_query_model.inactive_in_last_n_days,
-        user_query_model.has_not_logged_in_for_n_days,
-        user_query_model.created_at_least_n_exps,
-        user_query_model.created_fewer_than_n_exps,
-        user_query_model.edited_at_least_n_exps,
-        user_query_model.edited_fewer_than_n_exps
-    )
+    attributes = {
+        predicate['backend_attr']: getattr(
+            user_query_model, predicate['backend_attr'])
+        for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    }
+    user_query_params = user_query_domain.UserQueryParams(**attributes)
+
     return user_query_domain.UserQuery(
         user_query_model.id,
         user_query_params,
@@ -106,20 +106,13 @@ def _save_user_query(user_query):
     user_query.validate()
 
     user_query_dict = {
-        'inactive_in_last_n_days': user_query.params.inactive_in_last_n_days,
-        'has_not_logged_in_for_n_days': (
-            user_query.params.has_not_logged_in_for_n_days),
-        'created_at_least_n_exps': user_query.params.created_at_least_n_exps,
-        'created_fewer_than_n_exps': (
-            user_query.params.created_fewer_than_n_exps),
-        'edited_at_least_n_exps': user_query.params.edited_at_least_n_exps,
-        'edited_fewer_than_n_exps': user_query.params.edited_fewer_than_n_exps,
         'submitter_id': user_query.submitter_id,
         'query_status': user_query.status,
         'user_ids': user_query.user_ids,
         'sent_email_model_id': user_query.sent_email_model_id,
         'deleted': user_query.deleted
     }
+    user_query_dict.update(dict(user_query.params._asdict()))
 
     user_query_model = (
         user_models.UserQueryModel.get(user_query.id, strict=False))
@@ -135,38 +128,18 @@ def _save_user_query(user_query):
     return user_query_model.id
 
 
-def save_new_user_query(
-        submitter_id, inactive_in_last_n_days=None,
-        has_not_logged_in_for_n_days=None, created_at_least_n_exps=None,
-        created_fewer_than_n_exps=None, edited_at_least_n_exps=None,
-        edited_fewer_than_n_exps=None):
+def save_new_user_query(submitter_id, query_params):
     """Saves a new user query.
 
     Args:
         submitter_id: str. ID of the UserQueryModel instance.
-        inactive_in_last_n_days: int. Number of days user is inactive.
-        has_not_logged_in_for_n_days: int. Number of days user hasn't logged in.
-        created_at_least_n_exps: int. Minimum number of explorations created
-            by user.
-        created_fewer_than_n_exps: int. Maximum number of explorations created
-            by user.
-        edited_at_least_n_exps: int|None. Minimum number of
-            explorations edited by user.
-        edited_fewer_than_n_exps: int|None. Maximum number of
-            explorations edited by user.
+        query_params: dict. Parameters of the UserQueryParams collection.
 
     Returns:
         str. The ID of the newly saved user query.
     """
     query_id = user_models.UserQueryModel.get_new_id('')
-    user_query_params = user_query_domain.UserQueryParams(
-        inactive_in_last_n_days=inactive_in_last_n_days,
-        has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
-        created_at_least_n_exps=created_at_least_n_exps,
-        created_fewer_than_n_exps=created_fewer_than_n_exps,
-        edited_at_least_n_exps=edited_at_least_n_exps,
-        edited_fewer_than_n_exps=edited_fewer_than_n_exps
-    )
+    user_query_params = user_query_domain.UserQueryParams(**query_params)
     user_query = (
         user_query_domain.UserQuery.create_default(
             query_id, user_query_params, submitter_id))

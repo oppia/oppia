@@ -171,7 +171,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               StoryEditorStateService.saveStory(
-                commitMessage, null, function(errorMessage) {
+                commitMessage, () => {
+                  $rootScope.$applyAsync();
+                }, function(errorMessage) {
                   AlertsService.addInfoMessage(errorMessage, 5000);
                 }
               );

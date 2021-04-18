@@ -18,12 +18,10 @@
  */
 
 var action = require('../protractor_utils/action.js');
-var users = require('../protractor_utils/users.js');
 var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function() {
   var chapterTitleList = element.all(by.css('.protractor-chapter-title'));
-  var loginButton = element(by.css('.protractor-test-login-button'));
   var lessonCompletedIcons = element.all(
     by.css('.protractor-test-lesson-icon-completed'));
   var lessonUncompletedIcons = element.all(
@@ -54,11 +52,6 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
     expect(await lessonUncompletedIcons.count()).toEqual(count);
-  };
-
-  this.login = async function(email, username) {
-    await action.click('Login button', loginButton);
-    await users.completeLoginFlowFromStoryViewerPage(email, username);
   };
 };
 

@@ -26,7 +26,7 @@ require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 
-require('domain/skill/RubricObjectFactory.ts');
+require('domain/skill/rubric.model.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -40,7 +40,7 @@ require(
     'skills-list.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
-    'topics-list.directive.ts');
+    'topics-list.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
     'topics-and-skills-dashboard-page.service');
@@ -50,6 +50,7 @@ require(
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 import { Subscription } from 'rxjs';
 import debounce from 'lodash/debounce';
@@ -61,13 +62,15 @@ import { TopicsAndSkillsDashboardFilter } from
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$scope', '$timeout', 'AlertsService', 'SkillCreationService',
+    '$rootScope', '$scope', '$timeout', 'AlertsService',
+    'FocusManagerService', 'SkillCreationService',
     'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
     'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
     'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
-        $rootScope, $scope, $timeout, AlertsService, SkillCreationService,
+        $rootScope, $scope, $timeout, AlertsService,
+        FocusManagerService, SkillCreationService,
         TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, WindowDimensionsService,
         FATAL_ERROR_CODES, SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
@@ -94,6 +97,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                 return summary.canEditTopic === true;
               }
             ));
+            FocusManagerService.setFocus('createTopicBtn');
             ctrl.totalSkillCount = response.totalSkillCount;
             ctrl.skillsCategorizedByTopics = (
               response.categorizedSkillsDict);
@@ -115,6 +119,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                       ctrl.untriagedSkillSummaries.length !== 0) {
               ctrl.activeTab = ctrl.TAB_NAME_SKILLS;
               ctrl.initSkillDashboard();
+              FocusManagerService.setFocus('createSkillBtn');
             }
             ctrl.classrooms = response.allClassroomNames;
             // Adding the if checks since karma tests adds
@@ -172,8 +177,10 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.filterObject.reset();
         if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
           ctrl.goToPageNumber(ctrl.topicPageNumber);
+          FocusManagerService.setFocus('createTopicBtn');
         } else if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
           ctrl.initSkillDashboard();
+          FocusManagerService.setFocus('createSkillBtn');
         }
       };
 

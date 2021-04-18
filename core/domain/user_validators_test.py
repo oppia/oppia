@@ -30,6 +30,7 @@ from core.domain import feedback_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -778,7 +779,13 @@ class ExpUserLastPlaythroughModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_private_exploration(self):
-        rights_manager.unpublish_exploration(self.owner, '0')
+        exp_rights_model = exp_models.ExplorationRightsModel.get('0')
+        exp_rights_model.status = constants.ACTIVITY_STATUS_PRIVATE
+        exp_rights_model.update_timestamps()
+        exp_rights_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Make exploration private',
+            [{'cmd': rights_domain.CMD_CHANGE_EXPLORATION_STATUS}])
         expected_output = [
             (
                 u'[u\'failed validation check for public exploration check '
@@ -2150,7 +2157,13 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
-        rights_manager.unpublish_exploration(self.owner, '0')
+        exp_rights_model = exp_models.ExplorationRightsModel.get('0')
+        exp_rights_model.status = constants.ACTIVITY_STATUS_PRIVATE
+        exp_rights_model.update_timestamps()
+        exp_rights_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Make exploration private',
+            [{'cmd': rights_domain.CMD_CHANGE_EXPLORATION_STATUS}])
         expected_output = [
             (
                 u'[u\'failed validation check for public exploration check '
@@ -2353,7 +2366,13 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_private_exploration(self):
-        rights_manager.unpublish_exploration(self.owner, '1')
+        exp_rights_model = exp_models.ExplorationRightsModel.get('1')
+        exp_rights_model.status = constants.ACTIVITY_STATUS_PRIVATE
+        exp_rights_model.update_timestamps()
+        exp_rights_model.commit(
+            feconf.SYSTEM_COMMITTER_ID,
+            'Make exploration private',
+            [{'cmd': rights_domain.CMD_CHANGE_EXPLORATION_STATUS}])
         expected_output = [(
             u'[u\'failed validation check for explorations in completed '
             'node check of StoryProgressModel\', [u"Entity id %s: '
@@ -2403,9 +2422,11 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.user_query_id = user_query_services.save_new_user_query(
-            self.admin_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.admin_id, {
+                'inactive_in_last_n_days': 10,
+                'created_at_least_n_exps': 5,
+                'has_not_logged_in_for_n_days': 30
+            })
 
         self.model_instance = user_models.UserQueryModel.get_by_id(
             self.user_query_id)
@@ -2417,6 +2438,8 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             user_query_services.send_email_to_qualified_users(
                 self.user_query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
+        self.model_instance = user_models.UserQueryModel.get_by_id(
+            self.user_query_id)
         self.sent_mail_id = self.model_instance.sent_email_model_id
 
         self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
@@ -2580,9 +2603,11 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.user_query_id = user_query_services.save_new_user_query(
-            self.admin_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.admin_id, {
+                'inactive_in_last_n_days': 10,
+                'created_at_least_n_exps': 5,
+                'has_not_logged_in_for_n_days': 30
+            })
 
         query_model = user_models.UserQueryModel.get_by_id(
             self.user_query_id)
@@ -2596,6 +2621,8 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.model_instance = user_models.UserBulkEmailsModel.get_by_id(
             self.user_id)
+        query_model = user_models.UserQueryModel.get_by_id(
+            self.user_query_id)
         self.sent_mail_id = query_model.sent_email_model_id
         self.job_class = (
             prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob)

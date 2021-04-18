@@ -7,8 +7,8 @@
           <span ng-if="inTranslationMode">Translations</span> for language:
         </strong>
       </span>
-      <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
-              ng-options="language.id as language.description for language in languageCodesAndDescriptions">
+      <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector oppia-autofocus" ng-change="changeTranslationLanguage()" ng-model="languageCode"
+              ng-options="language.id as language.description for language in languageCodesAndDescriptions" focus-on="audioTranslationLanguageCodeField">
       </select>
     </div>
     <div ng-if="canShowTabModeSwitcher()" class="oppia-mode-change-section">

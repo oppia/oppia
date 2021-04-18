@@ -31,7 +31,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-
 describe('State Name Editor component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -42,9 +41,7 @@ describe('State Name Editor component', function() {
   var routerService = null;
   var stateEditorService = null;
   var stateNameService = null;
-
   var mockExternalSaveEventEmitter = null;
-
   var mockExplorationData = {
     explorationId: 0,
     autosaveChangeList: function() {}
@@ -90,7 +87,6 @@ describe('State Name Editor component', function() {
     $rootScope = $injector.get('$rootScope');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
-
     spyOn(mockExplorationData, 'autosaveChangeList');
     spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
 
@@ -212,7 +208,6 @@ describe('State Name Editor component', function() {
     });
     ctrl.$onInit();
   }));
-
   afterEach(() => {
     ctrl.$onDestroy();
   });

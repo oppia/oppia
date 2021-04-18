@@ -35,7 +35,7 @@
           <div class="story-node-description">
             <label for="storyNodeDescription" class="form-heading">Chapter description*</label>
             <textarea id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
-                      ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
+                      ng-model="editableDescription" ng-blur="updateDescription(editableDescription)" focus-on="storyNodeDesc"
                       placeholder="Enter the description for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_DESCRIPTION]>" ng-trim="false">
             </textarea>
             <span class="oppia-input-box-subtitle">
@@ -95,7 +95,7 @@
           <div ng-if="chapterPreviewCardIsShown">
             <preview-thumbnail name="editableTitle"
                                aspect-ratio="'16:9'"
-                               filename = "getThumbnailFilename()"
+                               filename="getThumbnailFilename()"
                                description="editableDescription"
                                thumbnail-bg-color="getThumbnailBgColor()"
                                bg-color="getThumbnailBgColor()">

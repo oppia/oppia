@@ -973,3 +973,74 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the number of ratio terms used by each state of an
+    exploration.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            interaction = state.interaction
+            exp_and_state_key = '%s %s' % (
+                item.id, state_name)
+            if interaction.id == 'RatioExpressionInput':
+                number_of_terms = (
+                    interaction.customization_args['numberOfTerms'].value)
+                if number_of_terms > 10:
+                    yield (
+                        python_utils.UNICODE(number_of_terms), exp_and_state_key
+                    )
+
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class ExpSnapshotsDeletionJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that attempts to delete explorations that have no parent
+    ExplorationModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationSnapshotContentModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotContentModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+        ]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsDeletionJob, cls).enqueue(job_id, shard_count=16)
+
+    @staticmethod
+    def map(model):
+        class_name = model.__class__.__name__
+        exp_id = model.get_unversioned_instance_id()
+        exp_model = exp_models.ExplorationModel.get(exp_id, strict=False)
+        if exp_model is None:
+            model.delete()
+            yield ('SUCCESS_DELETED - %s' % class_name, 1)
+        else:
+            yield ('SUCCESS_PASS - %s' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
