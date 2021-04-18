@@ -583,7 +583,7 @@ p:last-child {
 .oppia-rte p {
   line-height: 1.2;
   margin-bottom: 18px;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
@@ -1763,7 +1763,7 @@ pre.oppia-pre-wrapped-text {
   font-weight: 500;
   letter-spacing: 0.7px;
   margin-left: 5px;
-  margin-right: 0px;
+  margin-right: 0;
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
@@ -1919,7 +1919,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rte p:last-child {
-  margin: 0px;
+  margin: 0;
 }
 
 .oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
@@ -1987,6 +1987,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-interaction-preview {
   height: 100%;
   opacity: 0.5;
+  outline: none;
   padding: 4px;
   position: absolute;
   width: 100%;
