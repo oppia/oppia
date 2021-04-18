@@ -118,7 +118,7 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback());
+          (_expId, _languageCode, successCallback) => successCallback());
         component.ngOnInit();
       }));
 
@@ -132,7 +132,7 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('es');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback());
+          (_expId, _languageCode, successCallback) => successCallback());
         component.ngOnInit();
       }));
 
@@ -144,7 +144,7 @@ describe('Translation Modal Component', () => {
 
     it('should set context correctly', fakeAsync(() => {
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback());
+        (_expId, _languageCode, successCallback) => successCallback());
       component.ngOnInit();
       expect(contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
@@ -192,7 +192,7 @@ describe('Translation Modal Component', () => {
       () => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback());
+          (_expId, _languageCode, successCallback) => successCallback());
         component.ngOnInit();
         expect(component.getHtmlSchema().ui_config.language)
           .toBe('ar');
@@ -205,7 +205,7 @@ describe('Translation Modal Component', () => {
     let propagationSpy: jasmine.Spy<() => void>;
     beforeEach(fakeAsync(() => {
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback());
+        (_expId, _languageCode, successCallback) => successCallback());
       broadcastSpy = spyOn(
         ckEditorCopyContentService, 'broadcastCopy').and.stub();
 

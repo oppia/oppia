@@ -107,7 +107,7 @@ describe('ExplorationStatesService', function() {
   importAllAngularServices();
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
-      _ExplorationStatesService_, __StateSolicitAnswerDetailsService_) {
+      _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;

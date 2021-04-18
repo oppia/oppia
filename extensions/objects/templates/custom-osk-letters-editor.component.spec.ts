@@ -27,7 +27,7 @@ describe('OnScreenKeyboard', function() {
     $provide.value(
       'GuppyInitializationService', new GuppyInitializationService());
   }));
-  beforeEach(angular.mock.inject(function(_$injector, $componentController) {
+  beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('customOskLettersEditor');
     let mockDiv = document.createElement('div');
     mockDiv.setAttribute('class', 'custom-letters-div');
@@ -37,7 +37,7 @@ describe('OnScreenKeyboard', function() {
     ctrl.value = [];
   }));
 
-  it('should update letters list', function() {
+  fit('should update letters list', function() {
     expect(ctrl.value).toEqual([]);
     expect(ctrl.getRemainingLettersCount()).toBe(10);
     ctrl.updateLettersList('z');
