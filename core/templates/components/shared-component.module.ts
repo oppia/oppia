@@ -63,7 +63,7 @@ import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { AuthService } from 'services/auth.service';
 import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
-import { DirectivesModule } from '../directives/directives.module';
+import { DirectivesModule } from 'directives/directives.module';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';

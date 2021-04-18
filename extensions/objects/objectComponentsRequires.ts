@@ -28,19 +28,19 @@ require('objects/templates/graph-editor.component.ts');
 require('objects/templates/graph-property-editor.component.ts');
 require('objects/templates/html-editor.component.ts');
 require('objects/templates/image-with-regions-editor.component.ts');
-require('objects/templates/int-editor.directive.ts');
+require('objects/templates/int-editor.component.ts');
 // eslint-disable-next-line max-len
 require('objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component.ts');
-require('objects/templates/list-of-tabs-editor.directive.ts');
-require('objects/templates/list-of-unicode-string-editor.directive.ts');
-require('objects/templates/logic-error-category-editor.directive.ts');
-require('objects/templates/logic-question-editor.directive.ts');
+require('objects/templates/list-of-tabs-editor.component.ts');
+require('objects/templates/list-of-unicode-string-editor.component.ts');
+require('objects/templates/logic-error-category-editor.component.ts');
+require('objects/templates/logic-question-editor.component.ts');
 require('objects/templates/math-equation-editor.component.ts');
-require('objects/templates/math-expression-content-editor.directive.ts');
-require('objects/templates/music-phrase-editor.directive.ts');
-require('objects/templates/nonnegative-int-editor.directive.ts');
+require('objects/templates/math-expression-content-editor.component.ts');
+require('objects/templates/music-phrase-editor.component.ts');
+require('objects/templates/nonnegative-int-editor.component.ts');
 require('objects/templates/normalized-string-editor.directive.ts');
-require('objects/templates/number-with-units-editor.directive.ts');
+require('objects/templates/number-with-units-editor.component.ts');
 require('objects/templates/numeric-expression-editor.component.ts');
 require('objects/templates/parameter-name-editor.directive.ts');
 require('objects/templates/position-of-terms-editor.component.ts');
@@ -57,7 +57,7 @@ require(
   'objects/templates/translatable-set-of-normalized-string-editor.component.ts');
 require(
   'objects/templates/translatable-set-of-unicode-string-editor.component.ts');
-require('objects/templates/set-of-unicode-string-editor.directive.ts');
+require('objects/templates/set-of-unicode-string-editor.component.ts');
 require('objects/templates/skill-selector-editor.directive.ts');
 require('objects/templates/subtitled-html-editor.directive.ts');
 require('objects/templates/subtitled-unicode-editor.directive.ts');
