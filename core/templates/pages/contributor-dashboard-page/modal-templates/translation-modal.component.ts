@@ -65,9 +65,9 @@ export class TranslationModalComponent {
   previousTranslationAvailable: boolean = false;
   viewCompletedTranslationsModalOpen: boolean = false;
   loadingCompletedTranslations: boolean = true;
-  translationsList: Array<string> = [];
+  translationsList: string[] = [];
   noTranslationComplete: boolean = false;
-  contentList: Array<string> = [];
+  contentList: string[] = [];
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
@@ -191,11 +191,10 @@ export class TranslationModalComponent {
   }
 
   loadCompletedTranslations(): void {
-    // Call the service here and make it work
-    this.translationsList = ['<p> Translation 1 </p>', 
-    '<p> Translation 1 </p>'];
-    this.contentList = ['<p> Content 1', '<p>Content 2</p>']
-    
+    // Call the service here and make it work.
+    this.translationsList = ['<p> Translation 1 </p>',
+      '<p> Translation 1 </p>'];
+    this.contentList = ['<p> Content 1', '<p>Content 2</p>'];
     if (this.translationsList.length > 0) {
       this.noTranslationComplete = false;
     }
@@ -210,7 +209,7 @@ export class TranslationModalComponent {
     if (this.loadingCompletedTranslations) {
       this.loadCompletedTranslations();
     }
-    this.viewCompletedTranslationsModalOpen = 
+    this.viewCompletedTranslationsModalOpen =
       !this.viewCompletedTranslationsModalOpen;
   }
 }
