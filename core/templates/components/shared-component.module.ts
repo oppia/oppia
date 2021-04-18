@@ -197,6 +197,7 @@ const toastrConfig = {
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
+    TranslateModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     AlertMessageComponent,
