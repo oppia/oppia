@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import cron_services
-import feconf
 import python_utils
 
 
@@ -80,24 +79,6 @@ class ModelInvalidCommitStatusError(ModelValidationError):
 
     def __init__(self, model):
         super(ModelInvalidCommitStatusError, self).__init__(model)
-        if model.post_commit_status not in [
-                feconf.POST_COMMIT_STATUS_PUBLIC,
-                feconf.POST_COMMIT_STATUS_PRIVATE]:
-            self._message = (
-                '%s Post commit status %s is invalid'
-                % (self.base_message, model.post_commit_status)
-            )
-
-    @property
-    def message(self):
-        return self._message
-
-
-class ModelInvalidPrivateCommitStatusError(ModelValidationError):
-    """Error class for private commit_status validation errors."""
-
-    def __init__(self, model):
-        super(ModelInvalidPrivateCommitStatusError, self).__init__(model)
         if model.post_commit_is_private:
             self._message = (
                 '%s Post commit status is public but '
