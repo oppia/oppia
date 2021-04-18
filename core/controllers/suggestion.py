@@ -384,6 +384,7 @@ class UpdateSuggestionHandler(base.BaseHandler):
     @acl_decorators.can_update_suggestions
     def put(self, suggestion_id):
         """Handles PUT requests.
+
         Raises:
             InvalidInputException. The suggestion is already handled.
             InvalidInputException. The 'translation_html' parameter is missing.

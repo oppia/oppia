@@ -1266,9 +1266,11 @@ def _update_suggestion_counts_in_community_contribution_stats(
     _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount)
 
+
 def update_translation_suggestion(suggestion_id, translation_html):
     """Updates the change.translation_html of translation suggestion with the
         given suggestion_id.
+
     Args:
         suggestion_id: str. The id of the suggestion to be updated.
         translation_html: str. The new translation html.

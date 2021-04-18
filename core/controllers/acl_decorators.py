@@ -2937,13 +2937,16 @@ def is_from_oppia_ml(handler):
 
 def can_update_suggestions(handler):
     """Decorator to check whether the current user can update suggestions.
+    
     Args:
         handler: function. The function to be decorated.
+
     Returns:
         function. The newly decorated function that has common checks and
         permissions specified by passed in decorator. This function is allowed
         to be called for users who have the rights to accept suggestions and
         the suggesters who made their own suggestions.
+
     Raises:
         NotLoggedInException. The user is not logged in.
         UnauthorizedUserException. The user does not have credentials to
@@ -2956,11 +2959,14 @@ def can_update_suggestions(handler):
             self, suggestion_id, **kwargs):
         """Returns a handler to test whether a
         suggestion can be updated based on the user's roles.
+
         Args:
             suggestion_id: str. The suggestion id.
             **kwargs: *. Keyword arguments.
+
         Returns:
             function. The handler for updating a suggestion.
+
         Raises:
             NotLoggedInException. The user is not logged in.
             UnauthorizedUserException. The user does not have credentials to

@@ -80,7 +80,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
         self.normal_useer_id = self.get_user_id_from_email(
-             self.NORMAL_USER_EMAIL)
+            self.NORMAL_USER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
