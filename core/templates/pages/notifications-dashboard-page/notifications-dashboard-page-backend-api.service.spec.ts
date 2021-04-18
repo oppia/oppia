@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
-import { NotificationsDashboardBackendDict, NotificationsDashboardPageBackendApiService } from './notifications-dashboard-page-backend-api.service';
-
 /**
  * @fileoverview Unit tests for Backend Api Service for notifications dashboard
  *  page.
  */
+
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
+import { NotificationsDashboardBackendDict, NotificationsDashboardPageBackendApiService } from './notifications-dashboard-page-backend-api.service';
 
 describe('Notifications dashboard backend api service', () => {
   let notificationsDashboardPageBackendApiService:
