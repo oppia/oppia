@@ -374,3 +374,38 @@ class SuggestionListHandler(base.BaseHandler):
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
+
+
+class UpdateSuggestionHandler(base.BaseHandler):
+    """"Handles update operations relating to suggestions."""
+
+    # TODO(#11735): Currently, only handles the translation suggestion
+    # updates. This needs to update to generally handle the suggestions.
+    @acl_decorators.can_update_suggestions
+    def put(self, suggestion_id):
+        """Handles PUT requests.
+        Raises:
+            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The 'translation_html' parameter is missing.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.is_handled:
+            raise self.InvalidInputException(
+                'The suggestion with id %s has been accepted or rejected'
+                % (suggestion_id)
+            )
+
+        if self.payload.get('translation_html') is None:
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' is missing.'
+            )
+
+        if self.payload.get('translation_html').isdigit():
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' is invalid.'
+            )
+
+        suggestion_services.update_translation_suggestion(
+            suggestion_id, self.payload.get('translation_html'))
+
+        self.render_json(self.values)
