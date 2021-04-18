@@ -25,7 +25,6 @@ import re
 import python_utils
 
 from . import js_ts_linter
-from . import warranted_angular_security_bypasses
 
 from .. import build
 from .. import common
@@ -128,18 +127,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'In tests, please do not use browser.waitForAngular().',
         'excluded_files': (),
         'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'bypass'),
-        'message': 'The use of the word "bypass" is not allowed, ' +
-                   'particularly with regards to bypassSecurityTrustHTML() ' +
-                   'and similar functions in Angular.',
-        'excluded_files': (
-            warranted_angular_security_bypasses
-            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES),
-        'excluded_dirs': (
-            warranted_angular_security_bypasses
-            .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
         'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
