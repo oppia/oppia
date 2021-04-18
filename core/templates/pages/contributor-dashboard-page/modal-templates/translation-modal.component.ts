@@ -63,6 +63,11 @@ export class TranslationModalComponent {
   textToTranslate = '';
   languageDescription: string;
   previousTranslationAvailable: boolean = false;
+  viewCompletedTranslationsModalOpen: boolean = false;
+  loadingCompletedTranslations: boolean = true;
+  translationsList: Array<string> = [];
+  noTranslationComplete: boolean = false;
+  contentList: Array<string> = [];
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
@@ -183,6 +188,30 @@ export class TranslationModalComponent {
     if (!this.moreAvailable) {
       this.close();
     }
+  }
+
+  loadCompletedTranslations(): void {
+    // Call the service here and make it work
+    this.translationsList = ['<p> Translation 1 </p>', 
+    '<p> Translation 1 </p>'];
+    this.contentList = ['<p> Content 1', '<p>Content 2</p>']
+    
+    if (this.translationsList.length > 0) {
+      this.noTranslationComplete = false;
+    }
+    if (this.translationsList.length > 10) {
+      this.translationsList.splice(10);
+      this.contentList.splice(10);
+    }
+    this.loadingCompletedTranslations = false;
+  }
+
+  toggleViewCompletedTranslationsModal(): void {
+    if (this.loadingCompletedTranslations) {
+      this.loadCompletedTranslations();
+    }
+    this.viewCompletedTranslationsModalOpen = 
+      !this.viewCompletedTranslationsModalOpen;
   }
 }
 

@@ -43,6 +43,40 @@
         </schema-based-editor>
       </div>
     </div>
+    <div class="oppia-view-completed-translations-section">
+      <div className="oppia-view-completed-translations-button-row">
+        <button class="btn btn-primary oppia-view-completed-translations-button"
+                (click)="toggleViewCompletedTranslationsModal()">
+          <span *ngIf="!viewCompletedTranslationsModalOpen">
+            View Completed Translations
+          </span>
+          <span *ngIf="viewCompletedTranslationsModalOpen">
+            Hide Completed Translations
+          </span>
+        </button>
+      </div>
+      <div class="oppia-completed-translations-table" *ngIf="viewCompletedTranslationsModalOpen">
+        <div class="oppia-translations-and-content-row" *ngIf="!noTranslationComplete && !loadingCompletedTranslations">
+          <div class="oppia-completed-translations-table-heading">Original Content</div>
+          <div class="oppia-completed-translations-table-heading">Translated Content</div>
+        </div>
+        <div class="oppia-translations-and-content-row"
+             *ngFor="let content of contentList; let i = index">
+          <div class="oppia-translations-and-content-column-left">
+            <angular-html-bind-wrapper [htmlData]="content"></angular-html-bind-wrapper>
+          </div>
+          <div class="oppia-translations-and-content-column-right">
+            <angular-html-bind-wrapper [htmlData]="translationsList[i]"></angular-html-bind>
+          </div>
+        </div>
+        <div *ngIf="noTranslationComplete && !loadingCompletedTranslations">
+          <p>No completed Translations are available</p>
+        </div>
+        <div *ngIf="noTranslationComplete && loadingCompletedTranslations">
+          <p>Loading...</p>
+        </div>
+      </div>
+    </div>
     <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>
         <li *ngFor="let tip of TRANSLATION_TIPS[activeLanguageCode]">{{tip}}
@@ -159,5 +193,41 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  .oppia-view-completed-translations-button {
+    display: block;
+    float: right;
+  }
+  .oppia-view-completed-translations-button-row {
+    background-color: #009688;
+    width: 100%;
+  }
+  .oppia-completed-translations-table {
+    margin-top: 10px;
+  }
+  .oppia-view-completed-translations-section {
+    display: flex;
+    flex-direction: column;
+  }
+  .oppia-translations-and-content-row {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    display: flex;
+  }
+  .oppia-translations-and-content-column-left {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    padding-right: 6px;
+    width: 50%;
+  }
+  .oppia-translations-and-content-column-right {
+    padding: 12px;
+    padding-left: 6px;
+    width: 50%;
+  }
+  .oppia-completed-translations-table-heading {
+    background-color: #ccc;
+    font-weight: 700;
+    padding: 12px;
+    width: 50%;
   }
 </style>
