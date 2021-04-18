@@ -33,8 +33,6 @@ import { baseInteractionValidationService } from
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -57,17 +55,14 @@ describe('Interaction validator', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new OutcomeObjectFactory(),
         new RuleObjectFactory()));
     $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
     $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
+      'OutcomeObjectFactory', new OutcomeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector, unused$rootScope) {

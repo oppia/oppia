@@ -32,7 +32,7 @@ import { TranslatePipe } from 'filters/translate.pipe';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
-import { RecordedVoiceoversObjectFactory } from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
@@ -58,7 +58,6 @@ describe('Content language selector component', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let playerTranscriptService: PlayerTranscriptService;
-  let recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory;
   let stateCardObjectFactory: StateCardObjectFactory;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
@@ -84,8 +83,6 @@ describe('Content language selector component', () => {
       ContentTranslationLanguageService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
     imagePreloaderService = TestBed.get(ImagePreloaderService);
@@ -112,7 +109,7 @@ describe('Content language selector component', () => {
     const card = stateCardObjectFactory.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null,
-      recordedVoiceoversObjectFactory.createEmpty(),
+      RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
@@ -134,7 +131,7 @@ describe('Content language selector component', () => {
     const card = stateCardObjectFactory.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null,
-      recordedVoiceoversObjectFactory.createEmpty(),
+      RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content');
     card.addInputResponsePair({

@@ -16,54 +16,68 @@
  * @fileoverview Unit tests for the custom OSK letters component.
  */
 
-import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { CustomOskLettersEditorComponent } from './custom-osk-letters-editor.component';
 
 describe('OnScreenKeyboard', function() {
-  let ctrl = null;
+  let component: CustomOskLettersEditorComponent;
+  let fixture: ComponentFixture<CustomOskLettersEditorComponent>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'GuppyInitializationService', new GuppyInitializationService());
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('customOskLettersEditor');
-    let mockDiv = document.createElement('div');
-    mockDiv.setAttribute('class', 'custom-letters-div');
-    let $document = angular.element(document);
-    $document.find('body').append(mockDiv.outerHTML);
-    ctrl.$onInit();
-    ctrl.value = [];
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        imports: [HttpClientTestingModule],
+        declarations: [CustomOskLettersEditorComponent],
+      }
+    ).compileComponents();
   }));
 
-  fit('should update letters list', function() {
-    expect(ctrl.value).toEqual([]);
-    expect(ctrl.getRemainingLettersCount()).toBe(10);
-    ctrl.updateLettersList('z');
-    expect(ctrl.value).toEqual(['z']);
-    expect(ctrl.getRemainingLettersCount()).toBe(9);
-    ctrl.updateLettersList('alpha');
-    expect(ctrl.value).toEqual(['z', 'alpha']);
-    expect(ctrl.getRemainingLettersCount()).toBe(8);
-    ctrl.updateLettersList('z');
-    expect(ctrl.value).toEqual(['alpha']);
-    expect(ctrl.getRemainingLettersCount()).toBe(9);
-    ctrl.updateLettersList('alpha');
-    expect(ctrl.value).toEqual([]);
-    expect(ctrl.getRemainingLettersCount()).toBe(10);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      CustomOskLettersEditorComponent);
+    component = fixture.componentInstance;
+    component.value = [];
+    component.ngOnInit();
+  });
+
+  it('should update letters list', function() {
+    expect(component.value).toEqual([]);
+    expect(component.getRemainingLettersCount()).toBe(10);
+    component.updateLettersList('z');
+    expect(component.value).toEqual(['z']);
+    expect(component.getRemainingLettersCount()).toBe(9);
+    component.updateLettersList('alpha');
+    expect(component.value).toEqual(['z', 'alpha']);
+    expect(component.getRemainingLettersCount()).toBe(8);
+    component.updateLettersList('z');
+    expect(component.value).toEqual(['alpha']);
+    expect(component.getRemainingLettersCount()).toBe(9);
+    component.updateLettersList('alpha');
+    expect(component.value).toEqual([]);
+    expect(component.getRemainingLettersCount()).toBe(10);
   });
 
   it('should correctly identify keyboard events', function() {
-    ctrl.lettersAreLowercase = true;
-    ctrl.keyDownCallBack({key: 'Shift'});
-    expect(ctrl.lettersAreLowercase).toBeFalse();
-    ctrl.keyUpCallBack({key: 'Shift'});
-    expect(ctrl.lettersAreLowercase).toBeTrue();
+    component.lettersAreLowercase = true;
+    component.keyDownCallBack({key: 'Shift'} as unknown as KeyboardEvent);
+    expect(component.lettersAreLowercase).toBeFalse();
+    component.keyUpCallBack({key: 'Shift'} as unknown as KeyboardEvent);
+    expect(component.lettersAreLowercase).toBeTrue();
 
-    ctrl.value = ['x'];
-    ctrl.keyDownCallBack({key: 'Backspace'});
-    expect(ctrl.value.length).toBe(0);
-    ctrl.keyDownCallBack({key: 'x'});
+    component.value = ['x'];
+    component.keyDownCallBack({key: 'Backspace'} as unknown as KeyboardEvent);
+    expect(component.value.length).toBe(0);
+    component.keyDownCallBack({key: 'x'} as unknown as KeyboardEvent);
+    let event: Event = new KeyboardEvent('keydown', {
+      code: 'a'
+    });
+    window.dispatchEvent(event);
+    fixture.detectChanges();
+    event = new KeyboardEvent('keyup', {
+      code: 'a'
+    });
+    window.dispatchEvent(event);
+    fixture.detectChanges();
   });
 });

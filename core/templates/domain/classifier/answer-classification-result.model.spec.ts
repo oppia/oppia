@@ -18,8 +18,6 @@
 
 import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 
 describe('Answer classification result model', () => {
@@ -27,8 +25,7 @@ describe('Answer classification result model', () => {
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
   beforeEach(() => {
-    oof = new OutcomeObjectFactory(
-      new SubtitledHtmlObjectFactory());
+    oof = new OutcomeObjectFactory();
     DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
   });
 
