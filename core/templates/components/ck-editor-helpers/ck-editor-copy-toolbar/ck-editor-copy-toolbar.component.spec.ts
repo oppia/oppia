@@ -85,7 +85,6 @@ describe('CkEditor copy toolbar', () => {
     component.toggleToolActive();
     fixture.detectChanges();
     expect(document.body.style.cursor).toBe('copy');
-    
     component.ngOnDestroy();
     fixture.detectChanges();
     expect(document.body.style.cursor).not.toBe('copy');
