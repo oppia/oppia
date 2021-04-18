@@ -75,6 +75,10 @@ import { PromoBarComponent } from './common-layout-directives/common-elements/pr
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { ToastrModule } from 'ngx-toastr';
+import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
+import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
+import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -89,6 +93,20 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   {provide: AngularFireAuth, useValue: null},
 ];
 
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
@@ -99,6 +117,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     ...firebaseAuthModules,
   ],
@@ -109,6 +128,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   declarations: [
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
@@ -118,6 +138,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    LimitToPipe,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent,
@@ -133,6 +154,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     WrapTextWithEllipsisPipe,
+    WarningsAndAlertsComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -142,6 +164,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   entryComponents: [
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     BackgroundBannerComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
@@ -161,6 +184,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    WarningsAndAlertsComponent
   ],
 
   exports: [
@@ -173,12 +197,14 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ObjectComponentsModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
     SchemaBasedEditorDirective,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
+    LimitToPipe,
     PromoBarComponent,
     ImageUploaderComponent,
     OnScreenKeyboardComponent,
@@ -192,6 +218,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TranslatePipe,
+    WarningsAndAlertsComponent,
     WrapTextWithEllipsisPipe,
   ],
 })

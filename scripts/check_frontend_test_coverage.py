@@ -37,7 +37,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'admin-misc-tab.directive.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
-    'alert-message.directive.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
     'answer-group-editor.directive.ts',
@@ -352,7 +351,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'version-diff-visualization.directive.ts',
     'version-tree.service.ts',
     'voiceover-recording.service.ts',
-    'warnings-and-alerts.directive.ts',
     'worked-example-editor.directive.ts',
 ]
 
