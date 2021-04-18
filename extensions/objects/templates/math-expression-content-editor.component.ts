@@ -84,10 +84,10 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // possible if we don't add a script tag. The code below is similar
     // to how the math equations are rendered in the mathjaxBind
     // directive (see mathjax-bind.directive.ts).
-    const script = '<script type="math/tex">' +
-      inputLatexString === undefined ? '' : inputLatexString + '</script>';
-    outputElement.innerHTML = '';
-    outputElement.innerHTML += script;
+    const s = document.createElement('script');
+    s.type = 'math/tex';
+    s.text = inputLatexString === undefined ? '' : inputLatexString;
+    outputElement.innerHTML = s.outerHTML;
     // Naturally MathJax works asynchronously, but we can add processes
     // which we want to happen synchronously into the MathJax Hub Queue.
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement]);
