@@ -28,6 +28,7 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { PendingAccountDeletionPageComponent } from './pending-account-deletion-page.component';
+import { TranslateModule } from 'filters/translate.module';
 
 @NgModule({
   imports: [
@@ -65,7 +66,6 @@ class GetStartedPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { TranslateModule } from 'filters/translate.module';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
