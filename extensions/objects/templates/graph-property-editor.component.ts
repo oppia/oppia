@@ -29,7 +29,7 @@ angular.module('oppia').directive('graphPropertyEditor', [
       bindToController: {
         value: '='
       },
-      template: require('./graph-property-editor.directive.html'),
+      template: require('./graph-property-editor.component.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
