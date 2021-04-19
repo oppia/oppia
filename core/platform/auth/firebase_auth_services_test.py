@@ -1286,9 +1286,10 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
         self.assertIsNone(
             firebase_auth_services.get_user_id_from_auth_id('aid'))
-        self.assertIsNotNone(
+        self.assertEqual(
             firebase_auth_services.get_user_id_from_auth_id(
-                'aid', include_deleted=True))
+                'aid', include_deleted=True),
+            'uid')
         self.firebase_sdk_stub.assert_is_disabled('aid')
 
     def test_disable_association_warns_when_firebase_fails_to_update_user(self):
@@ -1310,6 +1311,10 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         self.assert_matches_regexps(logs, ['could not update'])
         self.assertIsNone(
             firebase_auth_services.get_user_id_from_auth_id('aid'))
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id(
+                'aid', include_deleted=True),
+            'uid')
         self.firebase_sdk_stub.assert_is_not_disabled('aid')
 
     def test_disable_association_gives_up_when_auth_assocs_do_not_exist(self):
@@ -1405,6 +1410,8 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         with self.swap_delete_user_to_always_fail():
             firebase_auth_services.delete_external_auth_associations(
                 self.user_id)
+
+        self.firebase_sdk_stub.assert_is_user(self.AUTH_ID)
 
         self.assertFalse(
             firebase_auth_services
