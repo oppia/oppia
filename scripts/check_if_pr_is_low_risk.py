@@ -25,6 +25,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import json
 import re
+import sys
 
 import python_utils
 from scripts import common
@@ -62,9 +63,13 @@ def load_diff(url):
         url: str. URL of the diff on GitHub.
 
     Returns:
-        list(str). List of the right-stripped lines of the diff.
+        list(str). List of the right-stripped lines of the diff. This
+        list is empty if the response code from the GitHub API is not
+        200.
     """
     response = python_utils.url_request(url, None, None)
+    if response.getcode() != 200:
+        return []
     lines = [line.rstrip() for line in response]
     response.close()
     return lines
@@ -79,13 +84,17 @@ def lookup_pr(owner, repo, pull_number):
         pull_number: str. PR number.
 
     Returns:
-        dict. JSON object returned by the GitHub API v3.
+        dict. JSON object returned by the GitHub API v3. This is an
+        empty dictionary if the response code from the GitHub API is not
+        200.
     """
     request = python_utils.url_request(
         GITHUB_API_PR_ENDPOINT % (owner, repo, pull_number),
         None,
         {'Accept': 'application/vnd.github.v3+json'})
     response = python_utils.url_open(request)
+    if response.getcode() != 200:
+        return {}
     pr = json.load(response)
     response.close()
     return pr
@@ -109,7 +118,7 @@ def parse_diff(diff):
     for line in diff:
         if line.startswith('diff --git '):
             match = re.match(
-                '^diff --git a/(?P<old>) b/(?P<new>)$', line)
+                '^diff --git a/(?P<old>[\w.]+) b/(?P<new>[\w.]+)$', line)
             old, new = match.group('old', 'new')
             file_diffs[old, new] = []
             file_diff_started = False
@@ -118,7 +127,7 @@ def parse_diff(diff):
             file_diff_started = True
             continue
         if bool(old) and bool(new) and file_diff_started:
-            fild_diffs[old, new].append(line)
+            file_diffs[old, new].append(line)
     for old, new in file_diffs:
         lines = file_diffs[old, new]
         i_start = -1
@@ -152,14 +161,17 @@ def check_if_pr_is_translation_pr(pr):
     source_repo = pr['head']['repo']['full_name']
     if source_repo != 'oppia/oppia':
         return 'Source repo is not oppia/oppia'
-    pr_source_branch = pr['head']['ref']
+    source_branch = pr['head']['ref']
     if source_branch != 'translatewiki-prs':
         return 'Source branch is not translatewiki-prs'
-    diff = parse_diff(load_diff(pr['diff_url']))
+    raw_diff = load_diff(pr['diff_url'])
+    if not raw_diff:
+        return 'Failed to load PR diff from GitHub API'
+    diff = parse_diff(raw_diff)
     for old, new in diff:
         if not old == new:
             return 'File name change: %s -> %s' % (old, new)
-        if not re.match(old, '^assets/i18n/[a-z-]+.json$'):
+        if not re.match('^assets/i18n/[a-z-]+.json$', old):
             return 'File %s changed and not low-risk' % old
     return ''
 
@@ -189,12 +201,15 @@ def check_if_pr_is_changelog_pr(pr):
     source_repo = pr['head']['repo']['full_name']
     if source_repo != 'oppia/oppia':
         return 'Source repo is not oppia/oppia'
-    pr_source_branch = pr['head']['ref']
-    if re.match(
+    source_branch = pr['head']['ref']
+    if not re.match(
             '^update-changelog-for-release-v[0-9.]+$',
             source_branch):
         return 'Source branch does not indicate a changelog PR'
-    diff = parse_diff(load_diff(pr['diff_url']))
+    raw_diff = load_diff(pr['diff_url'])
+    if not raw_diff:
+        return 'Failed to load PR diff from GitHub API'
+    diff = parse_diff(raw_diff)
     for old, new in diff:
         if not old == new:
             return 'File name change: %s -> %s' % (old, new)
@@ -203,30 +218,30 @@ def check_if_pr_is_changelog_pr(pr):
         elif old == 'package.json':
             lines = diff[old, new]
             if len(lines) != 2:
-                return 'Too many lines changed in package.json'
+                return 'Only 1 line should change in package.json'
             if not (
-                    re.match(
-                        '-  "version": "[0-9].[0-9].[0-9]",',
-                        line[0],
-                    ) and re.match(
-                        '+  "version": "[0-9].[0-9].[0-9]",',
-                        line[0],
-                    )):
+                    bool(re.match(
+                        r'-  "version": "[0-9]\.[0-9]\.[0-9]",',
+                        lines[0],
+                    )) and bool(re.match(
+                        r'\+  "version": "[0-9]\.[0-9]\.[0-9]",',
+                        lines[1],
+                    ))):
                 return 'package.json changes not low-risk'
 
         elif old == 'core/templates/pages/about-page/about-page.constants.ts':
             for line in diff[old, new]:
-                if not re.match(r'+    \'[A-Za-z ]\',', line):
+                if not re.match(r'\+    \'[A-Za-z ]+\',', line):
                     return 'about-page.constants.ts changes not low-risk'
         else:
             return 'File %s changed and not low-risk' % old
     return ''
 
 
-LOW_RISK_CHECKERS = {
-    'translatewiki': check_if_pr_is_translation_pr,
-    'changelog': check_if_pr_is_changelog_pr,
-}
+LOW_RISK_CHECKERS = (
+    ('translatewiki', check_if_pr_is_translation_pr),
+    ('changelog', check_if_pr_is_changelog_pr),
+)
 
 
 def main(tokens=None):
@@ -239,10 +254,12 @@ def main(tokens=None):
     args = parser.parse_args(tokens)
     parsed_url = parse_pr_url(args.pr_url)
     if not parsed_url:
-        raise RuntimeError('Failed to parse PR URL %s', args.pr_url)
+        raise RuntimeError('Failed to parse PR URL %s' % args.pr_url)
     owner, repo, number = parsed_url
     pr = lookup_pr(owner, repo, number)
-    for low_risk_type, low_risk_checker in LOW_RISK_CHECKERS.items():
+    if not pr:
+        raise RuntimeError('Failed to load PR from GitHub API')
+    for low_risk_type, low_risk_checker in LOW_RISK_CHECKERS:
         reason_not_low_risk = low_risk_checker(pr)
         if reason_not_low_risk:
             python_utils.PRINT(
@@ -250,10 +267,10 @@ def main(tokens=None):
                 (low_risk_type, reason_not_low_risk))
         else:
             python_utils.PRINT('PR is low-risk. Skipping some CI checks.')
-            exit(0)
+            return 0
     python_utils.PRINT('PR is not low-risk. Running all CI checks.')
-    exit(1)
+    return 1
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())  # pragma: no cover
