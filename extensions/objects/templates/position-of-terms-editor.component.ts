@@ -19,32 +19,41 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
-angular.module('oppia').component('positionOfTermsEditor', {
-  bindings: {
-    value: '='
-  },
-  template: require('./position-of-terms-editor.component.html'),
-  controller: ['POSITION_OF_TERMS_MAPPING',
-    function(POSITION_OF_TERMS_MAPPING) {
-      const ctrl = this;
+export interface PositionOfTerm {
+  readonly name: 'string';
+  readonly humanReadableName: 'string';
+}
+@Component({
+  selector: 'position-of-terms-editor',
+  templateUrl: './position-of-terms-editor.component.html',
+  styleUrls: []
+})
+export class PositionOfTermsEditorComponent implements OnInit {
+  @Input() modalId: symbol;
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  alwaysEditable = true;
+  positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
+  localValue: PositionOfTerm;
+  constructor() { }
 
-      ctrl.onChangePosition = function() {
-        ctrl.value = ctrl.localValue.name;
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.alwaysEditable = true;
-
-        ctrl.positionOfTerms = POSITION_OF_TERMS_MAPPING;
-
-        ctrl.localValue = ctrl.positionOfTerms[2];
-        for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
-          if (ctrl.positionOfTerms[i].name === ctrl.value) {
-            ctrl.localValue = ctrl.positionOfTerms[i];
-          }
-        }
-      };
+  ngOnInit(): void {
+    this.localValue = this.positionOfTerms[2] as unknown as PositionOfTerm;
+    for (let i = 0; i < this.positionOfTerms.length; i++) {
+      if (this.positionOfTerms[i].name === this.value) {
+        this.localValue = this.positionOfTerms[i] as unknown as PositionOfTerm;
+      }
     }
-  ]
-});
+  }
+  onChangePosition(): void {
+    this.value = this.localValue.name;
+    this.valueChanged.emit(this.value);
+  }
+}
+angular.module('oppia').directive('positionOfTermsEditor', downgradeComponent({
+  component: PositionOfTermsEditorComponent
+}));
