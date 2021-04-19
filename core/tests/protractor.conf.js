@@ -339,7 +339,8 @@ exports.config = {
       }));
     }
 
-    // Adding a video reporter
+      // Adding a video reporter. For more information see
+      // https://www.npmjs.com/package/protractor-video-reporter
     var _ADD_VIDEO_REPORTER = true;
 
     var ffmpegArguments = [
