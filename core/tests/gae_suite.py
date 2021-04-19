@@ -28,7 +28,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import os
 import sys
-import unittest
+import unittest2
 
 sys.path.insert(1, os.getcwd())
 
@@ -55,7 +55,7 @@ def create_test_suites(test_target=None):
     if test_target and '/' in test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    loader = unittest.TestLoader()
+    loader = unittest2.TestLoader()
     return (
         [loader.loadTestsFromName(test_target)]
         if test_target else [loader.discover(
@@ -96,7 +96,7 @@ def main(args=None):
 
     suites = create_test_suites(test_target=parsed_args.test_target)
 
-    results = [unittest.TextTestRunner(verbosity=2).run(suite)
+    results = [unittest2.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]
 
     for result in results:
