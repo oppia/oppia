@@ -28,7 +28,6 @@ import re
 import sys
 
 import python_utils
-from scripts import common
 
 
 GITHUB_API_PR_ENDPOINT = (
@@ -118,7 +117,7 @@ def parse_diff(diff):
     for line in diff:
         if line.startswith('diff --git '):
             match = re.match(
-                '^diff --git a/(?P<old>[\w.]+) b/(?P<new>[\w.]+)$', line)
+                r'^diff --git a/(?P<old>[\w.]+) b/(?P<new>[\w.]+)$', line)
             old, new = match.group('old', 'new')
             file_diffs[old, new] = []
             file_diff_started = False
@@ -176,6 +175,44 @@ def check_if_pr_is_translation_pr(pr):
     return ''
 
 
+def _check_changelog_pr_diff(diff):
+    """Check whether a changelog PR diff is valid.
+
+    Args:
+        diff: dict(tuple(str, str), list(str)). PR diff.
+
+    Returns:
+        str. If the diff is not valid for a low-risk changelog PR, an
+        error message explaining why. Otherwise, an empty string.
+    """
+    for old, new in diff:
+        if not old == new:
+            return 'File name change: %s -> %s' % (old, new)
+        if old in ('AUTHORS', 'CONTRIBUTORS', 'CHANGELOG'):
+            pass
+        elif old == 'package.json':
+            lines = diff[old, new]
+            if len(lines) != 2:
+                return 'Only 1 line should change in package.json'
+            if not (
+                    bool(re.match(
+                        r'-  "version": "[0-9]\.[0-9]\.[0-9]",',
+                        lines[0],
+                    )) and bool(re.match(
+                        r'\+  "version": "[0-9]\.[0-9]\.[0-9]",',
+                        lines[1],
+                    ))):
+                return 'package.json changes not low-risk'
+
+        elif old == 'core/templates/pages/about-page/about-page.constants.ts':
+            for line in diff[old, new]:
+                if not re.match(r'\+    \'[A-Za-z ]+\',', line):
+                    return 'about-page.constants.ts changes not low-risk'
+        else:
+            return 'File %s changed and not low-risk' % old
+    return ''
+
+
 def check_if_pr_is_changelog_pr(pr):
     """Check if a PR is low-risk by virtue of being a changelog PR.
 
@@ -210,32 +247,7 @@ def check_if_pr_is_changelog_pr(pr):
     if not raw_diff:
         return 'Failed to load PR diff from GitHub API'
     diff = parse_diff(raw_diff)
-    for old, new in diff:
-        if not old == new:
-            return 'File name change: %s -> %s' % (old, new)
-        if old in ('AUTHORS', 'CONTRIBUTORS', 'CHANGELOG'):
-            pass
-        elif old == 'package.json':
-            lines = diff[old, new]
-            if len(lines) != 2:
-                return 'Only 1 line should change in package.json'
-            if not (
-                    bool(re.match(
-                        r'-  "version": "[0-9]\.[0-9]\.[0-9]",',
-                        lines[0],
-                    )) and bool(re.match(
-                        r'\+  "version": "[0-9]\.[0-9]\.[0-9]",',
-                        lines[1],
-                    ))):
-                return 'package.json changes not low-risk'
-
-        elif old == 'core/templates/pages/about-page/about-page.constants.ts':
-            for line in diff[old, new]:
-                if not re.match(r'\+    \'[A-Za-z ]+\',', line):
-                    return 'about-page.constants.ts changes not low-risk'
-        else:
-            return 'File %s changed and not low-risk' % old
-    return ''
+    return _check_changelog_pr_diff(diff)
 
 
 LOW_RISK_CHECKERS = (
@@ -251,7 +263,7 @@ def main(tokens=None):
         'pr_url',
         help='The URL of the pull request.'
     )
-    args = parser.parse_args(tokens)
+    args = parser.parse_args(args=tokens)
     parsed_url = parse_pr_url(args.pr_url)
     if not parsed_url:
         raise RuntimeError('Failed to parse PR URL %s' % args.pr_url)
@@ -273,4 +285,5 @@ def main(tokens=None):
 
 
 if __name__ == '__main__':
+    # This line cannot be covered.
     sys.exit(main())  # pragma: no cover

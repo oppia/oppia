@@ -17,31 +17,18 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import atexit
-import contextlib
-import functools
-import os
-import re
-import signal
-import subprocess
-import sys
-import time
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-
 from core.tests import test_utils
-import feconf
 import python_utils
 
-from scripts import build
-from scripts import common
-from scripts import flake_checker
-from scripts import install_third_party_libs
 from scripts import check_if_pr_is_low_risk
 
-import contextlib2
+# We import StringIO directly instead of using python_utils.string_io
+# because we need to inherit from StringIO, so we need the StringIO
+# class. python_utils.string_io returns a StringIO object.
+try:
+    from StringIO import StringIO  # pylint: disable=import-only-modules
+except ImportError:
+    from io import StringIO  # pylint: disable=import-only-modules
 
 
 class MockResponse(StringIO):
@@ -183,13 +170,10 @@ class LookupPrTests(test_utils.GenericTestBase):
             data = '{"a": "foo", "b": 10}'
             return MockResponse(data=data)
 
-        request = python_utils.url_request(
-            self.url, None, self.headers)
-
-        url_request_swap = self.swap(
+        url_open_swap = self.swap(
             python_utils, 'url_open', mock_url_open)
 
-        with url_request_swap:
+        with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
                 'oppia', 'oppia', '1')
 
@@ -202,16 +186,12 @@ class LookupPrTests(test_utils.GenericTestBase):
     def test_pr_not_found(self):
 
         def mock_url_open(unused_request):
-            data = '{"a": "foo", "b": 10}'
             return MockResponse(code=404)
 
-        request = python_utils.url_request(
-            self.url, None, self.headers)
-
-        url_request_swap = self.swap(
+        url_open_swap = self.swap(
             python_utils, 'url_open', mock_url_open)
 
-        with url_request_swap:
+        with url_open_swap:
             pr = check_if_pr_is_low_risk.lookup_pr(
                 'oppia', 'oppia', '1')
 
@@ -276,6 +256,8 @@ class ParseDiffTests(test_utils.GenericTestBase):
                 '+    print(s.lower())',
             ],
         }
+        self.assertEqual(parsed, expected_parsed)
+
 
 def _make_pr(source_repo, source_branch, diff_url):
     """Create a PR JSON object."""
@@ -330,7 +312,6 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 
     def test_fork_pr_is_not_low_risk(self):
         diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
 
         pr = _make_pr(
             'foo/oppia',
@@ -343,7 +324,6 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 
     def test_other_branch_pr_is_not_low_risk(self):
         diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
 
         pr = _make_pr(
             'oppia/oppia',
@@ -781,7 +761,7 @@ class MainTests(test_utils.GenericTestBase):
                     'Provided PR to checker does not match expected PR.')
             return 'Source branch does not indicate a changelog PR'
 
-        MOCK_LOW_RISK_CHECKERS = (
+        mock_low_risk_checkers = (
             ('changelog', mock_check_if_pr_is_changelog_pr),
             ('translatewiki', mock_check_if_pr_is_translation_pr),
         )
@@ -798,7 +778,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
         low_risk_checkers_swap = self.swap(
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
-            MOCK_LOW_RISK_CHECKERS)
+            mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
             python_utils, 'PRINT', python_utils.PRINT, expected_args=[
                 (
@@ -811,7 +791,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap, print_swap:
             with low_risk_checkers_swap:
-                code = check_if_pr_is_low_risk.main([url])
+                code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 0)
 
     def test_low_risk_changelog(self):
@@ -839,7 +819,7 @@ class MainTests(test_utils.GenericTestBase):
                     'Provided PR to checker does not match expected PR.')
             return ''
 
-        MOCK_LOW_RISK_CHECKERS = (
+        mock_low_risk_checkers = (
             ('translatewiki', mock_check_if_pr_is_translation_pr),
             ('changelog', mock_check_if_pr_is_changelog_pr),
         )
@@ -856,7 +836,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
         low_risk_checkers_swap = self.swap(
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
-            MOCK_LOW_RISK_CHECKERS)
+            mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
             python_utils, 'PRINT', python_utils.PRINT, expected_args=[
                 (
@@ -869,7 +849,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap, print_swap:
             with low_risk_checkers_swap:
-                code = check_if_pr_is_low_risk.main([url])
+                code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 0)
 
     def test_risky_translation(self):
@@ -897,7 +877,7 @@ class MainTests(test_utils.GenericTestBase):
                     'Provided PR to checker does not match expected PR.')
             return 'Source branch does not indicate a changelog PR'
 
-        MOCK_LOW_RISK_CHECKERS = (
+        mock_low_risk_checkers = (
             ('translatewiki', mock_check_if_pr_is_translation_pr),
             ('changelog', mock_check_if_pr_is_changelog_pr),
         )
@@ -914,7 +894,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
         low_risk_checkers_swap = self.swap(
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
-            MOCK_LOW_RISK_CHECKERS)
+            mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
             python_utils, 'PRINT', python_utils.PRINT, expected_args=[
                 (
@@ -931,7 +911,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap, print_swap:
             with low_risk_checkers_swap:
-                code = check_if_pr_is_low_risk.main([url])
+                code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 1)
 
     def test_risky_changelog(self):
@@ -959,7 +939,7 @@ class MainTests(test_utils.GenericTestBase):
                     'Provided PR to checker does not match expected PR.')
             return 'Invalid change foo'
 
-        MOCK_LOW_RISK_CHECKERS = (
+        mock_low_risk_checkers = (
             ('translatewiki', mock_check_if_pr_is_translation_pr),
             ('changelog', mock_check_if_pr_is_changelog_pr),
         )
@@ -976,7 +956,7 @@ class MainTests(test_utils.GenericTestBase):
             ])
         low_risk_checkers_swap = self.swap(
             check_if_pr_is_low_risk, 'LOW_RISK_CHECKERS',
-            MOCK_LOW_RISK_CHECKERS)
+            mock_low_risk_checkers)
         print_swap = self.swap_with_checks(
             python_utils, 'PRINT', python_utils.PRINT, expected_args=[
                 (
@@ -993,7 +973,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap, print_swap:
             with low_risk_checkers_swap:
-                code = check_if_pr_is_low_risk.main([url])
+                code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 1)
 
     def test_url_parsing_failure(self):
@@ -1010,9 +990,10 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap:
             with self.assertRaisesRegexp(
-                    RuntimeError,
-                    'Failed to parse PR URL %s' % url):
-                check_if_pr_is_low_risk.main([url])
+                RuntimeError,
+                'Failed to parse PR URL %s' % url,
+            ):
+                check_if_pr_is_low_risk.main(tokens=[url])
 
     def test_pr_loading_failure(self):
         url = 'https://github.com/oppia/oppia/pull/1'
@@ -1036,6 +1017,7 @@ class MainTests(test_utils.GenericTestBase):
 
         with parse_url_swap, lookup_pr_swap:
             with self.assertRaisesRegexp(
-                    RuntimeError,
-                    'Failed to load PR from GitHub API'):
-                check_if_pr_is_low_risk.main([url])
+                RuntimeError,
+                'Failed to load PR from GitHub API',
+            ):
+                check_if_pr_is_low_risk.main(tokens=[url])
