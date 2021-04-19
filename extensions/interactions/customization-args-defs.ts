@@ -19,7 +19,7 @@
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { SubtitledHtmlBackendDict, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
@@ -41,11 +41,13 @@ interface ReadableMusicNote {
 }
 
 export interface AlgebraicExpressionInputCustomizationArgs {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
 }
 export interface AlgebraicExpressionInputCustomizationArgsBackendDict {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
@@ -287,11 +289,13 @@ export interface LogicProofCustomizationArgs {
 
 
 export interface MathEquationInputCustomizationArgsBackendDict {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
 }
 export interface MathEquationInputCustomizationArgs {
+  useFractionForDivision: boolean;
   customOskLetters: {
     value: string[];
   };
@@ -394,11 +398,13 @@ export interface TextInputCustomizationArgs {
 
 
 export interface NumericExpressionInputCustomizationArgsBackendDict {
+  useFractionForDivision: boolean;
   placeholder: {
     value: SubtitledUnicodeBackendDict;
   };
 }
 export interface NumericExpressionInputCustomizationArgs {
+  useFractionForDivision: boolean;
   placeholder: {
     value: SubtitledUnicode;
   };
