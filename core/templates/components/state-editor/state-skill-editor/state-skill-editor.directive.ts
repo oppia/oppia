@@ -53,8 +53,16 @@ angular.module('oppia').directive('stateSkillEditor', [
           var _init = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
               .then(function(response) {
-                // CategorizedSkills: a dict of categorized ShortSkillSummary.
-                // UntriagedSkillSummaries:  array of Untriaged SkillSummary.
+                /**
+                 * CategorizedSkills: dict.
+                 *   {[topicName: string]:
+                 *      {uncategorized: ShortSkillSummary[];
+                 *      [subtopicName: string]: ShortSkillSummary[];
+                 *      };
+                 *   }
+                 * UntriagedSkillSummaries: list(SkillSummary). A list of all
+                 * untriaged skills on the topic and skills dashboard page.
+                 */
                 categorizedSkills = response.categorizedSkillsDict;
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
                 $rootScope.$applyAsync();
@@ -62,7 +70,6 @@ angular.module('oppia').directive('stateSkillEditor', [
           };
 
           $scope.addSkill = function() {
-            // SortedSkillSummaries: array of sorted SkillSummaryBackendDict.
             var sortedSkillSummaries = (
               StoryEditorStateService.getSkillSummaries());
             var allowSkillsFromOtherTopics = true;
@@ -117,11 +124,10 @@ angular.module('oppia').directive('stateSkillEditor', [
 
           $scope.getSkillEditorUrl = function() {
             if (StateLinkedSkillIdService.displayed) {
-              ctrl.skillId = UrlInterpolationService.interpolateUrl(
+              return UrlInterpolationService.interpolateUrl(
                 '/skill_editor/<skill_id>', {
                   skill_id: StateLinkedSkillIdService.displayed
                 });
-              return ctrl.skillId;
             }
           };
 
