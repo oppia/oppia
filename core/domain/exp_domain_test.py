@@ -966,7 +966,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Unreachable': unreachable_state
         }
         exploration.states['Unreachable'].card_is_checkpoint = True
-        answer_group_dict = {
+        answer_group_dicts = [
+            {
             'outcome': {
                 'dest': 'End',
                 'feedback': {
@@ -982,16 +983,41 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'inputs': {
                     'x': {
                         'contentId': 'rule_input_1',
-                        'normalizedStrSet': ['Test']
+                        'normalizedStrSet': ['Test1']
                     }
                 },
                 'rule_type': 'Contains'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
-        }
+            },
+            {
+            'outcome': {
+                'dest': 'Unreachable',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_2',
+                        'normalizedStrSet': ['Test2']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+            }
+        ]
 
-        init_state.update_interaction_answer_groups([answer_group_dict])
+        init_state.update_interaction_answer_groups(answer_group_dicts)
         self._assert_validation_error(
             exploration, 'Cannot make Unreachable a checkpoint as it is '
             'bypassable'
