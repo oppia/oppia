@@ -27,7 +27,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { StateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 
