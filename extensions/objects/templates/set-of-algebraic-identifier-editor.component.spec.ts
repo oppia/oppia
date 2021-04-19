@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the set of algebraic identifier component.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { SetOfAlgebraicIdentifierEditorComponent } from './set-of-algebraic-identifier-editor.component';
 
@@ -26,7 +27,8 @@ describe('SetOfAlgebraicIdentifier', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [SetOfAlgebraicIdentifierEditorComponent]
+      declarations: [SetOfAlgebraicIdentifierEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 

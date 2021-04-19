@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the position of terms component.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { PositionOfTerm, PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
 
@@ -25,7 +26,8 @@ describe('PositionOfTerms', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [PositionOfTermsEditorComponent]
+      declarations: [PositionOfTermsEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 

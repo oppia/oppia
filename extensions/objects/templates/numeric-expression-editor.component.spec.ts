@@ -20,6 +20,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NumericExpressionEditorComponent } from './numeric-expression-editor.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('NumericExpressionEditor', () => {
   let fixture: ComponentFixture<NumericExpressionEditorComponent>;
@@ -53,10 +54,11 @@ describe('NumericExpressionEditor', () => {
   }
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [NumericExpressionEditorComponent]
+      declarations: [NumericExpressionEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents;
   }));
-  beforeEach(angular.mock.inject(waitForAsync(() => {
+  beforeEach((waitForAsync(() => {
     fixture = TestBed.createComponent(NumericExpressionEditorComponent);
     component = fixture.componentInstance;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
@@ -85,7 +87,10 @@ describe('NumericExpressionEditor', () => {
   });
 
   it('should initialize component.value with an empty string', () => {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
     component.value = null;
+    MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
   });
@@ -115,7 +120,8 @@ describe('NumericExpressionEditor', () => {
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
-
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
   });
