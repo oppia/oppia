@@ -25,7 +25,7 @@ describe('Notifications dashboard backend api service', () => {
   let notificationsDashboardPageBackendApiService:
   NotificationsDashboardPageBackendApiService;
   let httpTestingController: HttpTestingController;
-  let responseData: NotificationsDashboardBackendDict = {
+  let expectedResponseData: NotificationsDashboardBackendDict = {
     is_admin: true,
     is_moderator: true,
     is_super_admin: true,
@@ -59,7 +59,7 @@ describe('Notifications dashboard backend api service', () => {
     let req = httpTestingController
       .expectOne('/notificationsdashboardhandler/data');
     expect(req.request.method).toEqual('GET');
-    req.flush(responseData);
+    req.flush(expectedResponseData);
     flushMicrotasks();
   }));
 });
