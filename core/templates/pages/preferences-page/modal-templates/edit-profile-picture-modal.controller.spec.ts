@@ -96,6 +96,12 @@ describe('EditProfilePictureModalController', function() {
 
         expect($scope.croppedImageDataUrl).toBe(mockUrl);
         expect($uibModalInstance.close).toHaveBeenCalledWith(mockUrl);
+
+        $scope.remove();
+
+        expect($scope.uploadedImage).toBe(null);
+        expect($scope.croppedImageDataUrl).toBe('');
+
         document.body.removeChild(dummyDiv);
         done();
       }, 800);
