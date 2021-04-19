@@ -32,7 +32,8 @@ def get_and_cache_machine_translation(
         source_language_code, target_language_code, source_text):
     """Gets a machine translation of the source text for the given source and
     target languages. If no translation exists in the datastore for the given
-    input, calls cloud_translate_services.
+    input, generates a machine translation using cloud_translate_services and
+    saves the translation to the datastore.
 
     Args:
         source_language_code: str. The language code for the source text

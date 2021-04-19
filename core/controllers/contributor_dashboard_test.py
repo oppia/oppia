@@ -595,6 +595,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=200
         )
+
         expected_output = {
             'translated_texts': {
                 'content': 'Por favor continua.',
