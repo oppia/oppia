@@ -54,16 +54,21 @@ angular.module('oppia').directive('stateSkillEditor', [
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
               .then(function(response) {
                 /**
-                 * CategorizedSkills: dict.
+                 * CategorizedSkills has the following format:
                  *   {[topicName: string]:
                  *      {uncategorized: ShortSkillSummary[];
                  *      [subtopicName: string]: ShortSkillSummary[];
                  *      };
                  *   }
-                 * UntriagedSkillSummaries: list(SkillSummary). A list of all
-                 * untriaged skills on the topic and skills dashboard page.
+                 * It represents the categorized skills on the
+                 * topic-and-skill-dashboard page
                  */
                 categorizedSkills = response.categorizedSkillsDict;
+                /**
+                 * UntriagedSkillSummaries: A list of SkillSummary objects
+                 * corresponding to all untriaged skills on the
+                 * topic-and-skill-dashboard page.
+                */
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
                 $rootScope.$applyAsync();
               });
