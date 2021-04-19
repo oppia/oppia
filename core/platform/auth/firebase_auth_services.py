@@ -283,13 +283,11 @@ def get_auth_id_from_user_id(user_id, include_deleted=False):
         assoc_by_user_id_model.firebase_auth_id)
 
 
-def get_multi_auth_ids_from_user_ids(user_ids, include_deleted=False):
+def get_multi_auth_ids_from_user_ids(user_ids):
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
         user_ids: list(str). The user IDs.
-        include_deleted: bool. Whether to return the ID of models marked for
-            deletion.
 
     Returns:
         list(str|None). The auth IDs associated with each of the given user IDs,
@@ -297,8 +295,7 @@ def get_multi_auth_ids_from_user_ids(user_ids, include_deleted=False):
     """
     return [
         None if model is None else model.firebase_auth_id
-        for model in auth_models.UserAuthDetailsModel.get_multi(
-            user_ids, include_deleted=include_deleted)
+        for model in auth_models.UserAuthDetailsModel.get_multi(user_ids)
     ]
 
 
@@ -322,13 +319,11 @@ def get_user_id_from_auth_id(auth_id, include_deleted=False):
         assoc_by_auth_id_model.user_id)
 
 
-def get_multi_user_ids_from_auth_ids(auth_ids, include_deleted=False):
+def get_multi_user_ids_from_auth_ids(auth_ids):
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
         auth_ids: list(str). The auth IDs.
-        include_deleted: bool. Whether to return the ID of models marked for
-            deletion.
 
     Returns:
         list(str|None). The user IDs associated with each of the given auth IDs,
@@ -336,8 +331,7 @@ def get_multi_user_ids_from_auth_ids(auth_ids, include_deleted=False):
     """
     return [
         None if model is None else model.user_id
-        for model in auth_models.UserIdByFirebaseAuthIdModel.get_multi(
-            auth_ids, include_deleted=include_deleted)
+        for model in auth_models.UserIdByFirebaseAuthIdModel.get_multi(auth_ids)
     ]
 
 
