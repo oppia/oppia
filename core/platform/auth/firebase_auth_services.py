@@ -210,9 +210,6 @@ def delete_external_auth_associations(user_id):
         user_id: str. The unique ID of the user whose associations should be
             deleted.
     """
-    # NOTE: We use get_multi(include_deleted=True) because get() returns None
-    # for models with deleted=True, but we need to make changes to those models
-    # when managing deletion.
     auth_id = get_auth_id_from_user_id(user_id, include_deleted=True)
     if auth_id is None:
         return
@@ -240,9 +237,6 @@ def verify_external_auth_associations_are_deleted(user_id):
         bool. True if and only if we have successfully verified that all
         external associations have been deleted.
     """
-    # NOTE: We use get_multi(include_deleted=True) because get() returns None
-    # for models with deleted=True, but we need to make changes to those models
-    # when managing deletion.
     auth_id = get_auth_id_from_user_id(user_id, include_deleted=True)
     if auth_id is None:
         return True
@@ -347,9 +341,6 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
     """
     auth_id, user_id = auth_id_user_id_pair
 
-    # NOTE: We use get_multi(include_deleted=True) because get() returns None
-    # for models with deleted=True, but we need to make changes to those models
-    # when managing deletion.
     user_id_collision = get_user_id_from_auth_id(auth_id, include_deleted=True)
     if user_id_collision is not None:
         raise Exception('auth_id=%r is already associated with user_id=%r' % (
