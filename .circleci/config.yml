@@ -77,6 +77,13 @@ commands:
                 git pull origin $target_branch --no-edit
               fi
             fi
+  
+  check_memory_usage:
+    description: "Checking max memory usage to debug out-of-memory issues"
+    steps:
+      - run:
+          name: Checking Memory Usage
+          command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
 
   check_release_changelog_update_branch:
     description: "Skip job for release changelog update PRs"
@@ -156,6 +163,7 @@ jobs:
             - oppia/build/
             - oppia/third_party/generated/
       - upload_screenshots
+      - check_memory_usage
 
   e2e_library_and_collections:
     <<: *job_defaults
@@ -178,6 +186,7 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
       - upload_screenshots
+      - check_memory_usage
 
   e2e_new_structure_tests:
     <<: *job_defaults
@@ -208,6 +217,7 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
       - upload_screenshots
+      - check_memory_usage
 
 notify:
   webhooks:
