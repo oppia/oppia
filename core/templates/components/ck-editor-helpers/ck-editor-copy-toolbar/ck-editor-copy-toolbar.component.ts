@@ -53,6 +53,10 @@ export class CkEditorCopyToolbarComponent {
         });
     }
   }
+
+  ngOnDestroy(): void {
+    this.document.body.style.cursor = '';
+  }
 }
 
 angular.module('oppia').directive(
