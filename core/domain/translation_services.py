@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.domain import translation_fetchers
 from core.platform import models
 
@@ -42,9 +44,6 @@ def get_and_cache_machine_translation(
             translation language. Must be different from source_language_code.
         source_text: str. The untranslated source text.
 
-    Raises:
-        ValueError. Invalid language code.
-
     Returns:
         str|None. The translated text or None if no translation is found.
     """
@@ -56,13 +55,19 @@ def get_and_cache_machine_translation(
     if translation is not None:
         return translation.translated_text
 
-    translated_text = cloud_translate_services.translate_text(
-        source_text, source_language_code, target_language_code)
+    translated_text = None
+    try:
+        translated_text = cloud_translate_services.translate_text(
+            source_text, source_language_code, target_language_code)
+    except ValueError as e: # Language code not allowlisted
+        logging.error(e)
 
-    translation_models.MachineTranslationModel.create(
-        source_language_code,
-        target_language_code,
-        source_text,
-        translated_text
-    )
+    if translated_text is not None:
+        translation_models.MachineTranslationModel.create(
+            source_language_code,
+            target_language_code,
+            source_text,
+            translated_text
+        )
+
     return translated_text

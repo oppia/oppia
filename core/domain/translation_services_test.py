@@ -48,18 +48,18 @@ class TranslationServiceTests(test_utils.GenericTestBase):
             'en', 'en', 'text to translate')
         self.assertIsNone(translation)
 
-    def test_machine_translation_with_invalid_language_code_raises_exception(
+    def test_machine_translation_with_non_allowlisted_language_returns_none(
             self):
-        with self.assertRaisesRegexp(
-            ValueError, 'Invalid target language code: invalid_language_code'
-        ):
+        translated_text = (
             translation_services.get_and_cache_machine_translation(
-                'en', 'invalid_language_code', 'text to translate')
-        with self.assertRaisesRegexp(
-            ValueError, 'Invalid source language code: invalid_language_code'
-        ):
+                'en', 'hi', 'text to translate')
+        )
+        self.assertIsNone(translated_text)
+        translated_text = (
             translation_services.get_and_cache_machine_translation(
-                'invalid_language_code', 'es', 'text to translate')
+                'hi', 'en', 'text to translate')
+        )
+        self.assertIsNone(translated_text)
 
     def test_get_machine_translation_checks_datastore_first(self):
         with self.swap_to_always_raise(
