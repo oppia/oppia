@@ -107,3 +107,54 @@ class GetModelKindTests(test_utils.TestBase):
         self.assertRaisesRegexp(
             TypeError, 'not a model type',
             lambda: job_utils.get_model_kind(123))
+
+
+class GetModelPropertyTests(test_utils.TestBase):
+
+    def test_get_id_from_datastore_model(self):
+        model = FooModel(id='123')
+        self.assertEqual(job_utils.get_model_property(model, 'id'), '123')
+
+    def test_get_property_from_datastore_model(self):
+        model = FooModel(prop='abc')
+        self.assertEqual(job_utils.get_model_property(model, 'prop'), 'abc')
+
+    def test_get_missing_property_from_datastore_model(self):
+        model = FooModel()
+        self.assertEqual(job_utils.get_model_property(model, 'prop'), None)
+
+    def test_get_id_from_cloud_datastore_entity(self):
+        entity = cloud_datastore_types.Entity(
+            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
+        self.assertEqual(job_utils.get_model_property(entity, 'id'), '123')
+
+    def test_get_property_from_cloud_datastore_entity(self):
+        entity = cloud_datastore_types.Entity(
+            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
+        entity['prop'] = 'abc'
+        self.assertEqual(job_utils.get_model_property(entity, 'prop'), 'abc')
+
+    def test_get_missing_property_from_cloud_datastore_entity(self):
+        entity = cloud_datastore_types.Entity(
+            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
+        self.assertEqual(job_utils.get_model_property(entity, 'prop'), None)
+
+    def test_get_property_from_bad_value(self):
+        with self.assertRaisesRegexp(TypeError, 'not a model instance'):
+            job_utils.get_model_property(123, 'prop')
+
+
+class GetModelIdTests(test_utils.TestBase):
+
+    def test_get_id_from_datastore_model(self):
+        model = FooModel(id='123')
+        self.assertEqual(job_utils.get_model_id(model), '123')
+
+    def test_get_id_from_cloud_datastore_entity(self):
+        entity = cloud_datastore_types.Entity(
+            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
+        self.assertEqual(job_utils.get_model_id(entity), '123')
+
+    def test_get_id_from_bad_value(self):
+        with self.assertRaisesRegexp(TypeError, 'not a model instance'):
+            job_utils.get_model_id(123)
