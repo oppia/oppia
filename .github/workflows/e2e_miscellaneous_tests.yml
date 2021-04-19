@@ -29,7 +29,7 @@ jobs:
         run: python -m scripts.install_third_party_libs
       - name: Check if PR is low-risk
         run: |
-          python -m scripts.check_if_pr_is_low_risk ${{ github.event.pull_request.html_url }} || false
+          python -m scripts.check_if_pr_is_low_risk ${{ github.event.pull_request.html_url }} && true
           echo "low_risk=${?}" >> $GITHUB_ENV
       - name: Install chrome
         if: ${{ env.low_risk != 0 }}
