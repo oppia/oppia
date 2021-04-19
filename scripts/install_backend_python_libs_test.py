@@ -577,6 +577,53 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'google_cloud_datastore-1.13.0.dist-info'
             ])
 
+    def test_correct_metadata_directory_names_do_not_throw_error(self):
+        def mock_find_distributions(paths): # pylint: disable=unused-argument
+            return [
+                Distribution('dependency-1', '1.5.1', {}),
+                Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency-5', '0.5.3', {}),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                }),
+            ]
+
+        def mock_list_dir(path): # pylint: disable=unused-argument
+            return [
+                'dependency-1-1.5.1.dist-info',
+                'dependency_1-1.5.1.dist-info',
+                'dependency2-5.0.0.egg-info',
+                'dependency_5-5.0.0.egg-info',
+                'dependency-5-5.0.0-py2.7.egg-info',
+                'dependency_5-5.0.0-py2.7.egg-info',
+            ]
+
+        def mock_is_dir(path): # pylint: disable=unused-argument
+            return True
+        swap_find_distributions = self.swap(
+            pkg_resources, 'find_distributions', mock_find_distributions)
+        swap_list_dir = self.swap(
+            os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(
+            os.path, 'isdir', mock_is_dir
+        )
+
+        metadata_exception = self.assertRaisesRegexp(
+            Exception,
+            'The python library dependency5 was installed without the correct '
+            'metadata folders which may indicate that the convention for '
+            'naming the metadata folders have changed. Please go to '
+            '`scripts/install_backend_python_libs` and modify our '
+            'assumptions in the '
+            '_get_possible_normalized_metadata_directory_names'
+            ' function for what metadata directory names can be.')
+        with swap_find_distributions, swap_list_dir, metadata_exception:
+            with swap_is_dir:
+                install_backend_python_libs.validate_metadata_directories()
+
     def test_exception_raised_when_metadata_directory_names_are_missing(self):
         def mock_find_distributions(paths): # pylint: disable=unused-argument
             return [
