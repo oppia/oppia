@@ -260,6 +260,7 @@
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
 /core/templates/directives/directives.module.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/directives/ng-init.directive.ts @srijanreddy98
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
 /core/templates/services/attribution.service*.ts @srijanreddy98
@@ -522,6 +523,7 @@
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
+/core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
