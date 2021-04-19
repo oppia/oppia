@@ -441,17 +441,11 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
     # such situations, the return value of get_multi_auth_ids_from_user_ids
     # would be None, so that isn't strong enough to determine whether we need to
     # create a new model rather than update an existing one.
-    #
-    # NOTE: We use get_multi(include_deleted=True) because get() returns None
-    # for models with deleted=True, but we need to make changes to those models
-    # when managing deletion.
-    existing_assoc_by_user_id_models = (
-        auth_models.UserAuthDetailsModel.get_multi(
-            user_ids, include_deleted=True))
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id)
         for auth_id, user_id, assoc_by_user_id_model in python_utils.ZIP(
-            auth_ids, user_ids, existing_assoc_by_user_id_models)
+            auth_ids, user_ids,
+            auth_models.UserAuthDetailsModel.get_multi(user_ids))
         if (assoc_by_user_id_model is None or
             assoc_by_user_id_model.firebase_auth_id is None)
     ]
@@ -507,10 +501,7 @@ def seed_firebase():
     ]
     assoc_by_user_id_models = [
         model for model in auth_models.UserAuthDetailsModel.get_multi(
-            # NOTE: We use get_multi(include_deleted=True) because get() returns
-            # None for models with deleted=True, but we need to make changes to
-            # those models when managing deletion.
-            user_ids_with_admin_email, include_deleted=True)
+            user_ids_with_admin_email)
         if model is not None and model.gae_id != feconf.SYSTEM_COMMITTER_ID
     ]
     if len(assoc_by_user_id_models) != 1:
@@ -530,12 +521,8 @@ def seed_firebase():
         assoc_by_user_id_model.update_timestamps(update_last_updated_time=False)
         assoc_by_user_id_model.put()
 
-    # NOTE: We use get_multi(include_deleted=True) because get() returns None
-    # for models with deleted=True, but we need to make changes to those models
-    # when managing deletion.
-    (assoc_by_auth_id_model,) = (
-        auth_models.UserIdByFirebaseAuthIdModel.get_multi(
-            [auth_id], include_deleted=True))
+    assoc_by_auth_id_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
     if assoc_by_auth_id_model is None:
         auth_models.UserIdByFirebaseAuthIdModel(
             id=auth_id, user_id=user_id).put()
