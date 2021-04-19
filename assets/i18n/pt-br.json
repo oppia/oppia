@@ -459,7 +459,7 @@
 	"I18N_PREFERENCES_CANCEL_BUTTON": "Cancelar",
 	"I18N_PREFERENCES_CHANGE_PICTURE": "Alterar imagem do perfil",
 	"I18N_PREFERENCES_EMAIL": "Email",
-	"I18N_PREFERENCES_EMAIL_CLARIFICATION": "Por favor indique abaixo quando você gostaria de receber emails de Oppa. Você poderá sempre alterar suas preferências nesta página ou seguindo as instruções de cancelamento da inscrição cintidas em casda email",
+	"I18N_PREFERENCES_EMAIL_CLARIFICATION": "Por favor indique abaixo quando você gostaria de receber emails de Oppa. Você poderá sempre alterar suas preferências nesta página ou seguindo as instruções de cancelamento da inscrição contidas em cada email",
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Somente moderadores e administradores do site podem ver seu endereço de e-mail.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS": "Receber e-mails quando alguém lhe der direitos de edição para uma exploração",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Receber e-mails quando alguém lhe enviar feedback sobre uma exploração",
