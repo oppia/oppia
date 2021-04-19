@@ -30,7 +30,6 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 import feconf
-import python_utils
 import utils
 
 
@@ -280,7 +279,7 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
         None.
 
         Params:
-            exp_id: str. The ID of exploration being translated.
+            exp_id: str. The ID of the exploration being translated.
             state_name: str. The name of the exploration state being translated.
             content_ids: str[]. The content IDs of the texts to be translated.
             target_language_code: str. The language code of the target
@@ -288,17 +287,12 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
 
         Data Response:
 
-            dict(
-                'translated_texts', dict(str, str|None),
-                'errors': dict(str, str)
-            )
+            dict('translated_texts': dict(str, str|None))
 
             A dictionary containing the translated texts stored as a mapping
                 from content ID to the translated text. If an error occured
                 during retrieval of some content translations, but not others,
-                failed translations are mapped to None and the message is
-                returned in the 'errors' dict as a mapping from content id to
-                error message.
+                failed translations are mapped to None.
 
         Raises:
             400 (Bad Request): InvalidInputException. At least one input is
@@ -346,23 +340,19 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
         content_id_to_text_mapping = (
             state_names_to_content_id_mapping[state_name])
         translated_texts = {}
-        errors = {}
         for content_id in content_ids:
-            try:
-                if content_id not in content_id_to_text_mapping:
-                    raise LookupError('Invalid content_id: %s' % content_id)
-                source_text = content_id_to_text_mapping[content_id]
-                translated_texts[content_id] = (
-                    translation_services.get_and_cache_machine_translation(
-                        exp.language_code, target_language_code, source_text)
-                )
-            except Exception as e:
+            if content_id not in content_id_to_text_mapping:
                 translated_texts[content_id] = None
-                errors[content_id] = python_utils.UNICODE(e)
+                continue
+
+            source_text = content_id_to_text_mapping[content_id]
+            translated_texts[content_id] = (
+                translation_services.get_and_cache_machine_translation(
+                    exp.language_code, target_language_code, source_text)
+            )
 
         self.values = {
-            'translated_texts': translated_texts,
-            'errors': errors
+            'translated_texts': translated_texts
         }
         self.render_json(self.values)
 
