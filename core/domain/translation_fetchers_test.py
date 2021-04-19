@@ -32,28 +32,28 @@ class TranslationFetchersTests(test_utils.GenericTestBase):
 
     def test_get_translation_from_model(self):
         model_id = (
-            translation_models.MachineTranslatedTextModel.create(
+            translation_models.MachineTranslationModel.create(
                 'en', 'es', 'hello world', 'hola mundo')
         )
-        model_instance = translation_models.MachineTranslatedTextModel.get(
+        model_instance = translation_models.MachineTranslationModel.get(
             model_id)
         self.assertEqual(
             translation_fetchers.get_translation_from_model(
                 model_instance).to_dict(),
-            translation_domain.MachineTranslatedText(
+            translation_domain.MachineTranslation(
                 'en', 'es', 'hello world', 'hola mundo').to_dict()
         )
 
-    def test_get_translation_for_text_with_no_translation_returns_none(self):
-        translation = translation_fetchers.get_translation_for_text(
+    def test_get_machine_translation_with_no_translation_returns_none(self):
+        translation = translation_fetchers.get_machine_translated_text(
             'en', 'es', 'untranslated_text')
         self.assertIsNone(translation)
 
-    def test_get_translation_for_text_with_existing_translation(
+    def test_get_machine_translation_for_cached_translation_returns_from_cache(
             self):
-        translation_models.MachineTranslatedTextModel.create(
+        translation_models.MachineTranslationModel.create(
             'en', 'es', 'hello world', 'hola mundo')
-        translation = translation_fetchers.get_translation_for_text(
+        translation = translation_fetchers.get_machine_translated_text(
             'en', 'es', 'hello world'
         )
         self.assertEqual(translation.translated_text, 'hola mundo')

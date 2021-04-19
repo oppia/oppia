@@ -769,12 +769,12 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
             subtopic_models.SubtopicPageCommitLogEntryModel]
 
 
-class MachineTranslatedTextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates MachineTranslatedTextModel."""
+class MachineTranslationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates MachineTranslationModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [translation_models.MachineTranslatedTextModel]
+        return [translation_models.MachineTranslationModel]
 
 
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):

@@ -286,6 +286,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
+        r'%s' % feconf.MACHINE_TRANSLATION_DATA_URL,
+        contributor_dashboard.MachineTranslationStateTextsHandler),
+    get_redirect_route(
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler),
     get_redirect_route(
@@ -340,9 +343,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
-    get_redirect_route(
-        r'/machine_translated_state_texts_handler',
-        contributor_dashboard.MachineTranslatedStateTextsHandler),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,

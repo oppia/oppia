@@ -30,6 +30,7 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 import feconf
+import python_utils
 import utils
 
 
@@ -263,8 +264,8 @@ class TranslatableTextHandler(base.BaseHandler):
             s.change.content_id == content_id for s in suggestions)
 
 
-class MachineTranslatedStateTextsHandler(base.BaseHandler):
-    """Provide a machine translation of exploration content."""
+class MachineTranslationStateTextsHandler(base.BaseHandler):
+    """Provides a machine translation of exploration content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -272,9 +273,38 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests. Responds with a mapping from content id to
         translation of form:
+
             dict('translated_texts', dict(str, str|None))
+
         If no translation is found for a given content id, that id is mapped to
         None.
+
+        Params:
+            exp_id: str. The ID of exploration being translated.
+            state_name: str. The name of the exploration state being translated.
+            content_ids: str[]. The content IDs of the texts to be translated.
+            target_language_code: str. The language code of the target
+                translation language.
+
+        Data Response:
+
+            dict(
+                'translated_texts', dict(str, str|None),
+                'errors': dict(str, str)
+            )
+
+            A dictionary containing the translated texts stored as a mapping
+                from content ID to the translated text. If an error occured
+                during retrieval of some content translations, but not others,
+                failed translations are mapped to None and the message is
+                returned in the 'errors' dict as a mapping from content id to
+                error message.
+
+        Raises:
+            400 (Bad Request): InvalidInputException. At least one input is
+                missing or improperly formatted.
+            404 (Not Found): PageNotFoundException. At least one identifier does
+                not correspond to an entry in the datastore.
         """
         exp_id = self.request.get('exp_id')
         if not exp_id:
@@ -285,12 +315,12 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
             raise self.InvalidInputException('Missing state_name')
 
         content_ids_string = self.request.get('content_ids')
-        content_ids = None
+        content_ids = []
         try:
             content_ids = json.loads(content_ids_string)
         except:
             raise self.InvalidInputException(
-                'Improperly formatted content_ids %s' % content_ids_string)
+                'Improperly formatted content_ids: %s' % content_ids_string)
 
         target_language_code = self.request.get('target_language_code')
         if not target_language_code:
@@ -308,25 +338,32 @@ class MachineTranslatedStateTextsHandler(base.BaseHandler):
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
-            raise self.PageNotFoundException('Invalid exp_id: %s' % exp_id)
+            raise self.PageNotFoundException()
         state_names_to_content_id_mapping = exp.get_translatable_text(
             target_language_code)
-        if not state_names_to_content_id_mapping.has_key(state_name):
-            raise self.PageNotFoundException(
-                'Invalid state_name: %s' % state_name)
-        content_id_mapping = state_names_to_content_id_mapping[state_name]
+        if state_name not in state_names_to_content_id_mapping:
+            raise self.PageNotFoundException()
+        content_id_to_text_mapping = (
+            state_names_to_content_id_mapping[state_name])
         translated_texts = {}
+        errors = {}
         for content_id in content_ids:
-            if content_id_mapping.has_key(content_id):
-                source_text = content_id_mapping[content_id]
+            try:
+                if content_id not in content_id_to_text_mapping:
+                    raise LookupError('Invalid content_id: %s' % content_id)
+                source_text = content_id_to_text_mapping[content_id]
                 translated_texts[content_id] = (
-                    translation_services.get_machine_translation(
+                    translation_services.get_and_cache_machine_translation(
                         exp.language_code, target_language_code, source_text)
                 )
-            else:
+            except Exception as e:
                 translated_texts[content_id] = None
+                errors[content_id] = python_utils.UNICODE(e)
 
-        self.values = {'translated_texts': translated_texts}
+        self.values = {
+            'translated_texts': translated_texts,
+            'errors': errors
+        }
         self.render_json(self.values)
 
 
