@@ -61,8 +61,10 @@ export class PositiveIntEditorComponent implements OnInit {
   }
 
   updateValue(newValue: number): void {
-    this.value = newValue;
-    this.valueChanged.emit(this.value);
+    setTimeout(() => {
+      this.value = newValue;
+      this.valueChanged.emit(this.value);
+    });
   }
 }
 angular.module('oppia').directive('positiveIntEditor', downgradeComponent({

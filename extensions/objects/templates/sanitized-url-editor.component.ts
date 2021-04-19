@@ -52,8 +52,10 @@ export class SanitizedUrlEditorComponent {
   }
 
   updateValue(newValue: unknown): void {
-    this.value = newValue;
-    this.valueChanged.emit(this.value);
+    setTimeout(() => {
+      this.value = newValue;
+      this.valueChanged.emit(this.value);
+    });
   }
 }
 angular.module('oppia').directive('sanitizedUrlEditor', downgradeComponent({

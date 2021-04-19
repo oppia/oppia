@@ -38,13 +38,15 @@ export class RealEditorComponent implements OnInit {
   }
 
   updateValue(newValue: number | string): void {
-    if (newValue === '' || newValue === null) {
-      // A new rule.
-      this.value = 0.0;
+    setTimeout(() => {
+      if (newValue === '' || newValue === null) {
+        // A new rule.
+        this.value = 0.0;
+        this.valueChanged.emit(this.value);
+      }
+      this.value = newValue;
       this.valueChanged.emit(this.value);
-    }
-    this.value = newValue;
-    this.valueChanged.emit(this.value);
+    });
   }
 
   ngOnInit(): void {

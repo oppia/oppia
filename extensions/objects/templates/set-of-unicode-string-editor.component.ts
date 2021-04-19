@@ -54,8 +54,10 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
   }
 
   updateValue(value: unknown): void {
-    this.value = value;
-    this.valueChanged.emit(this.value);
+    setTimeout(() => {
+      this.value = value;
+      this.valueChanged.emit(this.value);
+    });
   }
 }
 

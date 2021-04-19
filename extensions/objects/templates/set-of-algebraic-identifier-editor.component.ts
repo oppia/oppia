@@ -81,8 +81,10 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   }
 
   updateValue(newValue: unknown): void {
-    this.value = newValue;
-    this.valueChanged.emit(this.value);
+    setTimeout(() => {
+      this.value = newValue;
+      this.valueChanged.emit(this.value);
+    });
   }
 }
 require('services/guppy-initialization.service.ts');
