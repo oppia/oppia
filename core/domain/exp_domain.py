@@ -983,12 +983,12 @@ class Exploration(python_utils.OBJECT):
                             % self.states[state_name].card_is_checkpoint
                         )
 
-        # Check if checkpoint count is at max 8 and atleast 1.
+        # Check if checkpoint count is between 1 and 8, inclusive.
         checkpoint_count = 0
         for state_name, state in self.states.items():
             if state.card_is_checkpoint:
                 checkpoint_count = checkpoint_count + 1
-        if checkpoint_count > 8 or checkpoint_count == 0:
+        if not 1 <= checkpoint_count <= 8:
             raise utils.ValidationError(
                 'Expected checkpoint count to be atleast 1 and atmax 8 '
                 'but found it to be %s'
@@ -996,18 +996,18 @@ class Exploration(python_utils.OBJECT):
             )
 
         # Check if a state marked as checkpoint is bypassable.
-        end_states = []
+        end_state_names = []
         for state_name, state in self.states.items():
             if state.interaction.id == 'EndExploration':
-                end_states.append(state_name)
+                end_state_names.append(state_name)
 
         # For every state which is marked as a checkpoint and is not the initial
         # state we remove it from the states dict. Then we make a list of
         # unseen states. If all end states are unseen on removing a state,
         # this means that after removing the state it is impossible to reach
-        # any end states, thus the user cannot bypass that state. Now, if the
-        # unseen states list contains atleast one end state then, the state is
-        # bypassble.
+        # any end states, thus the user cannot bypass that state. However, if
+        # the unseen states list contains at least one end state, then the state
+        # is bypassable.
         for state_name, state in self.states.items():
             if state_name == self.init_state_name:
                 continue
@@ -1017,7 +1017,10 @@ class Exploration(python_utils.OBJECT):
                 processed_queue = []
                 curr_queue = [self.init_state_name]
 
-                while curr_queue and curr_queue[0] != state_name:
+                while curr_queue:
+                    if curr_queue[0] == state_name:
+                        curr_queue.pop(0)
+                        continue
                     curr_state_name = curr_queue[0]
                     curr_queue = curr_queue[1:]
                     if not curr_state_name in processed_queue:
@@ -1035,7 +1038,7 @@ class Exploration(python_utils.OBJECT):
                                     curr_queue.append(dest_state)
                 unseen_states = list(
                     set(new_states.keys()) - set(processed_queue))
-                if not all(state in unseen_states for state in end_states):
+                if not all(state in unseen_states for state in end_state_names):
                     raise utils.ValidationError(
                         'Cannot make %s a checkpoint as it is '
                         'bypassable' % state_name)
