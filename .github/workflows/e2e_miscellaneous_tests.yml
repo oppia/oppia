@@ -27,7 +27,7 @@ jobs:
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
-      - name: Install chrome version 88.0.4324.96-1
+      - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
       - name: Run e2e File Upload Features Test
