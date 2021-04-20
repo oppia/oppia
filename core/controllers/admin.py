@@ -845,8 +845,9 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddContributionRightsHandler(base.BaseHandler):
-    """Handles adding contribution rights for contributor dashboard page."""
+class ContributionRightsHandler(base.BaseHandler):
+    """Handles adding and removing contribution rights for contributor
+    dashboard pages."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -908,12 +909,6 @@ class AddContributionRightsHandler(base.BaseHandler):
                 user_id, category, language_code=language_code)
         self.render_json({})
 
-
-class RemoveContributionRightsHandler(base.BaseHandler):
-    """Handles removing contribution rights for contributor dashboard."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_access_admin_page
     def put(self):
         username = self.payload.get('username', None)
@@ -956,14 +951,16 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                     user_id, language_code)
             elif (category ==
                   constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
-                if not user_services.can_review_question_suggestions(user_id):
+                if not user_services.can_review_question_suggestions(
+                        user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to review question.' % (
                             username))
                 user_services.remove_question_review_rights(user_id)
             elif (category ==
                   constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
-                if not user_services.can_submit_question_suggestions(user_id):
+                if not user_services.can_submit_question_suggestions(
+                        user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to submit question.' % (
                             username))
