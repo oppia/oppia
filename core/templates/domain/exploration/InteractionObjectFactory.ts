@@ -55,6 +55,7 @@ import {
   NumberWithUnitsCustomizationArgs,
   NumericExpressionInputCustomizationArgs,
   NumericInputCustomizationArgs,
+  NumericInputCustomizationArgsBackendDict,
   PencilCodeEditorCustomizationArgs,
   RatioExpressionInputCustomizationArgs,
   RatioExpressionInputCustomizationArgsBackendDict,
@@ -368,6 +369,21 @@ export class InteractionObjectFactory {
           placeholder.value)
       }
     };
+  }
+
+  _createFromNumericInputCustomizationArgsBackendDict(
+    caBackendDict: NumericInputCustomizationArgsBackendDict
+  ): NumericInputCustomizationArgs {
+  const { input, placeholder } = caBackendDict;
+  return {
+    placeholder: {
+      value: this.subtitledUnicodeFactory.createFromBackendDict(
+        placeholder.value)
+    },
+    input: {
+      value: true
+    }
+  };
   }
 
   convertFromCustomizationArgsBackendDict(
