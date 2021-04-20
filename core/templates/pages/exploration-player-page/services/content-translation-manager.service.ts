@@ -29,7 +29,7 @@ import { StateCard } from
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
