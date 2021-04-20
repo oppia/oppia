@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for EditThumbnailModalController.
  */
 
+import { async, discardPeriodicTasks, fakeAsync, flush, tick, waitForAsync } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Edit Thumbnail Modal Controller', function() {
@@ -88,8 +89,8 @@ describe('Edit Thumbnail Modal Controller', function() {
       expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
     });
 
-  it('should load a image file in onchange event and save it if it\'s a' +
-    ' svg file', function(done) {
+    it('should load a image file in onchange event and save it if it\'s a' +
+    ' svg file', () => {
     // This spy is to be sure that an image element will be returned from
     // document.querySelector method.
     spyOn(document, 'querySelector').and.callFake(function() {
@@ -121,15 +122,7 @@ describe('Edit Thumbnail Modal Controller', function() {
     expect($scope.invalidImageWarningIsShown).toBe(true);
     $scope.onFileChanged(file);
 
-    // The setTimeout is being used here to not conflict with $timeout.flush
-    // for fadeIn Jquery method. This first setTimeout is to wait the default
-    // time for fadeOut Jquery method to complete, which is 400 miliseconds.
-    // 800ms is being used instead of 400ms just to be sure that fadeOut callbak
-    // is already executed.
-    // Ref: https://api.jquery.com/fadeout/
-    setTimeout(function() {
-      $timeout.flush();
-      done();
+    waitForAsync(() => {
       // ---- Dispatch on load event ----
       image.dispatchEvent(new Event('load'));
 
@@ -144,7 +137,7 @@ describe('Edit Thumbnail Modal Controller', function() {
       // ---- Save information ----
       $scope.confirm();
       expect($uibModalInstance.close).toHaveBeenCalled();
-    }, 800);
+    });
   });
 
   it('should not load file if it is not a svg type', function() {
