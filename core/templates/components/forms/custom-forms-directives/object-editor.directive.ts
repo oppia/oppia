@@ -60,6 +60,18 @@ angular.module('oppia').directive('objectEditor', [
           'graph',
           'html',
           'image-with-regions',
+          'int-editor',
+          'list-of-sets-of-translatable-html-content-ids',
+          'list-of-tabs',
+          'list-of-unicode-string',
+          'logic-error-category',
+          'logic-question',
+          'math-equation',
+          'math-expression-content',
+          'set-of-unicode-string',
+          'music-phrase',
+          'number-with-units',
+          'non-negative-int'
         ];
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
