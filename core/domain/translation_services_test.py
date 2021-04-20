@@ -60,6 +60,8 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 'hi', 'en', 'text to translate')
         )
         self.assertIsNone(translated_text)
+        # Ensure that no translation is cached when returning none (no
+        # translation found).
         self.assertIsNone(
             translation_models.MachineTranslationModel.get_machine_translation(
                 'en', 'hi', 'text to translated'

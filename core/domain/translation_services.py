@@ -61,8 +61,8 @@ def get_and_cache_machine_translation(
             source_text, source_language_code, target_language_code)
     # An error here indicates a valid, but not allowlisted language code, or an
     # error raised by the Google Cloud Translate API. The error is logged
-    # instead of raised to provide a consistent return type of "None" for a
-    # failed translation.
+    # instead of raised to provide an uninterrupted end user experience while
+    # still providing error context on the back-end.
     except ValueError as e:
         logging.error(e)
 
