@@ -41,7 +41,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() allowNonzeroIntegerPartWithValue: string = '';
   @Input() customPlaceholderWithValue: string = '';
   @Input() savedSolution: string;
-  @Input() labelForFocusTarget: () => string;
+  @Input() labelForFocusTarget: string;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
   allowImproperFraction: boolean = true;
