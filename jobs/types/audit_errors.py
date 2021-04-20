@@ -204,3 +204,26 @@ class ModelRelationshipError(BaseAuditError):
             'but no such model exists' % (
                 id_property, python_utils.convert_to_bytes(target_id),
                 target_kind))
+
+
+class CommitCmdsNoneError(BaseAuditError):
+    """Error class for None Commit Cmds."""
+
+    def __init__(self, model):
+        super(CommitCmdsNoneError, self).__init__(model)  
+        self.message = (
+                ERROR_CATEGORY_COMMIT_CMD_CHECK,
+                'Entity id %s: No commit command domain object defined '
+                'for entity with commands: %s' % (model.id, model.commit_cmds))
+
+
+class CommitCmdsValidateError(BaseAuditError):
+    """Error class for wrong commit cmmds """ # to update
+
+    def __init__(self, cmd_name, model, commit_cmd_dict, e):
+        super(CommitCmdsValidateError, self).__init__(model)
+        self.message = (
+                    'commit cmd %s check' % cmd_name,
+                    'Entity id %s: Commit command domain validation for '
+                    'command: %s failed with error: %s' % (
+                        model.id, commit_cmd_dict, e))  

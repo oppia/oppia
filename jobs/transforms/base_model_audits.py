@@ -227,3 +227,54 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                         validation_type))
         except Exception as e:
             yield audit_errors.ModelDomainObjectValidateError(input_model, e)
+
+
+@audit_decorators.AuditsExisting(base_models.BaseSnapshotMetadataModel)
+class ValidateCommitCmdsSchema(beam.DoFn):
+    """DoFn to validate schema of commit commands in commit_cmds dict.
+    """
+
+    def _get_change_domain_class(self, unused_item):
+        """Returns a Change domain class.
+
+        This should be implemented by subclasses.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            change_domain.BaseChange. A domain object class for the
+            changes made by commit commands of the model.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
+        """
+        raise NotImplementedError(
+            'The _get_change_domain_class() method is missing from the derived '
+            'class. It should be implemented in the derived class.')
+
+    def process(self, input_model):
+        """Validates schema of commit commands in commit_cmds dict.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+        """
+        model = job_utils.clone_model(input_model)
+        change_domain_object = self._get_change_domain_class(model)
+        if change_domain_object is None:
+            # This is for cases where id of the entity is invalid
+            # and no commit command domain object is found for the entity.
+            # For example, if a CollectionCommitLogEntryModel does
+            # not have id starting with collection/rights, there is
+            # no commit command domain object defined for this model.
+            yield audit_errors.CommitCmdsNoneError(model)
+            return
+        for commit_cmd_dict in model.commit_cmds:
+            if not commit_cmd_dict:
+                continue
+            try:
+                change_domain_object(commit_cmd_dict)
+            except Exception as e:
+                cmd_name = commit_cmd_dict.get('cmd')
+                yield audit_errors.CommitCmdsValidateError(
+                    cmd_name, model, commit_cmd_dict, e)
