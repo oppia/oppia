@@ -605,7 +605,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  fit('should get the data of contribution rights given the role' +
+  it('should get the data of contribution rights given the role' +
     'when calling viewContributionReviewersAsync', fakeAsync(() => {
     let category = 'voiceover';
     let languageCode = 'en';
