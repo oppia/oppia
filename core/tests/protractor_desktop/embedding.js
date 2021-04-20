@@ -334,10 +334,10 @@ describe('Embedding', function() {
 
       // This error is to be ignored as 'idToBeReplaced' is not a valid
       // exploration id. It appears just after the page loads.
-      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
-        'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
-        'locale=en#version=0.0.1&secret=';
+      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/scripts\/' +
+        'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+        '\'http://localhost:9001/\' in a frame because it set ' +
+        '\'X-Frame-Options\' to \'deny\'.';
       await general.checkForConsoleErrors([errorToIgnore]);
     });
 });
