@@ -675,7 +675,7 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/linters/pre_commit_linter.py in sync with the modifications.
+# in scripts/linters/codeowner_linter.py in sync with the modifications.
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
 # 8 lines.
 /core/templates/services/svg-sanitizer.service.ts @BenHenning
