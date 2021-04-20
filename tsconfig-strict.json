@@ -112,7 +112,7 @@
     "core/templates/pages/exploration-player-page/services/learner-params.service.ts",
     "core/templates/pages/exploration-player-page/services/learner-params.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/learner-view-info-backend-api.service.ts",
-    "core/templates/pages/exploration-player-page/services/learner-view-info-backend-api-service.spec.ts",
+    "core/templates/pages/exploration-player-page/services/learner-view-info-backend-api.service.spec.ts",
     "core/templates/services/app.service.ts",
     "core/templates/services/app.service.spec.ts",
     "core/templates/services/audio-bar-status.service.ts",
