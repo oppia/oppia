@@ -88,7 +88,8 @@ angular.module('oppia').directive('progressNav', [
                 $scope.displayedCard.getInteractionCustomizationArgs();
               $scope.interactionId = $scope.displayedCard.getInteractionId();
               if ($scope.interactionId === 'Continue') {
-                // To ensure that focus is added only after
+                // To ensure that focus is added after all functions in main thread
+                // executed.
                 $timeout(() => {
                   FocusManagerService.setFocusWithoutScroll('continue-btn');
                 }, 0);

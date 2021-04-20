@@ -89,6 +89,6 @@ describe('Focus Manager Service', () => {
     focusManagerService.setFocusWithoutScroll(focusLabel);
     flush();
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(focusLabel);
-    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith(0,0);
+    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith(0, 0);
   }));
 });

@@ -36,8 +36,8 @@ export class FocusManagerService {
   constructor(
       private deviceInfoService: DeviceInfoService,
       private idGenerationService: IdGenerationService,
-      private windowRef: WindowRef  = new WindowRef(),
-      ) {}
+      private windowRef: WindowRef = new WindowRef(),
+  ) {}
   clearFocus(): void {
     this.setFocus(AppConstants.LABEL_FOR_CLEARING_FOCUS);
   }
@@ -65,10 +65,10 @@ export class FocusManagerService {
   setFocusWithoutScroll(name: string): void {
     this.setFocus(name);
     setTimeout(() => {
-      this.windowRef.nativeWindow.scrollTo(0,0);
-    },5);
+      this.windowRef.nativeWindow.scrollTo(0, 0);
+    }, 5);
   }
-  
+
   get onFocus(): EventEmitter<string> {
     return this.focusEventEmitter;
   }
