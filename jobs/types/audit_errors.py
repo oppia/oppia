@@ -212,9 +212,9 @@ class CommitCmdsNoneError(BaseAuditError):
     def __init__(self, model):
         super(CommitCmdsNoneError, self).__init__(model)  
         self.message = (
-                ERROR_CATEGORY_COMMIT_CMD_CHECK,
-                'Entity id %s: No commit command domain object defined '
-                'for entity with commands: %s' % (model.id, model.commit_cmds))
+            ERROR_CATEGORY_COMMIT_CMD_CHECK,
+            'Entity id %s: No commit command domain object defined '
+            'for entity with commands: %s' % (model.id, model.commit_cmds))
 
 
 class CommitCmdsValidateError(BaseAuditError):
@@ -223,7 +223,7 @@ class CommitCmdsValidateError(BaseAuditError):
     def __init__(self, cmd_name, model, commit_cmd_dict, e):
         super(CommitCmdsValidateError, self).__init__(model)
         self.message = (
-                    'commit cmd %s check' % cmd_name,
-                    'Entity id %s: Commit command domain validation for '
-                    'command: %s failed with error: %s' % (
-                        model.id, commit_cmd_dict, e))  
+            'commit cmd %s check' % cmd_name,
+            'Entity id %s: Commit command domain validation for '
+            'command: %s failed with error: %s' % (
+                model.id, commit_cmd_dict, e))  
