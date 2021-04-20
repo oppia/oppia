@@ -19,11 +19,11 @@
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 
-describe('Winnowing preprocessing functions', () => {
+fdescribe('Winnowing preprocessing functions', () => {
   describe('Test winnowing preprocessing functions', () => {
-    var winnowingPreprocessingService: WinnowingPreprocessingService;
+    var wps: WinnowingPreprocessingService;
     beforeEach(() => {
-      winnowingPreprocessingService = new WinnowingPreprocessingService();
+      wps = new WinnowingPreprocessingService();
     });
 
     it('should generate k-gram hashes correctly.', () => {
@@ -33,7 +33,7 @@ describe('Winnowing preprocessing functions', () => {
       var tokens = ['a', 'b', 'a', 'c', 'b'];
       var expectedHashes = [3, 11, 7];
       var generatedHashes =
-       winnowingPreprocessingService.getKGramHashes(tokens, tokenToId, 3);
+       wps.getKGramHashes(tokens, tokenToId, 3);
 
       expect(generatedHashes.length).toEqual(3);
       expect(generatedHashes).toEqual(expectedHashes);
@@ -43,7 +43,7 @@ describe('Winnowing preprocessing functions', () => {
       var kGramHashes = [3, 11, 7, 10, 8, 6];
       var expectedFingerprint = [[3, 0], [7, 2], [6, 5]];
       var fingerprint =
-       winnowingPreprocessingService.getFingerprintFromHashes(
+       wps.getFingerprintFromHashes(
          kGramHashes, 5, 3);
 
       expect(fingerprint.length).toEqual(3);
