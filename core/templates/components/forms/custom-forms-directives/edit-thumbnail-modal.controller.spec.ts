@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for EditThumbnailModalController.
  */
 
-import { async, discardPeriodicTasks, fakeAsync, flush, tick, waitForAsync } from '@angular/core/testing';
+import { waitForAsync } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Edit Thumbnail Modal Controller', function() {
@@ -43,7 +43,6 @@ describe('Edit Thumbnail Modal Controller', function() {
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $q = $injector.get('$q');
     const $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss'], {
@@ -89,7 +88,7 @@ describe('Edit Thumbnail Modal Controller', function() {
       expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
     });
 
-    it('should load a image file in onchange event and save it if it\'s a' +
+  it('should load a image file in onchange event and save it if it\'s a' +
     ' svg file', () => {
     // This spy is to be sure that an image element will be returned from
     // document.querySelector method.
