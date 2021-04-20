@@ -18,6 +18,7 @@
 
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
  @Component({
    selector: 'oppia-loading-message',
    templateUrl: './loading-message.component.html'
