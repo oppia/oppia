@@ -20,6 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+import { ChangeDetectorRef } from '@angular/core';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -50,7 +51,8 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     'around the = sign.');
   SCHEMA: SetOfAlgebraicIdentifierEditorSchema;
   constructor(
-    private guppyInitializationService: GuppyInitializationService) { }
+    private guppyInitializationService: GuppyInitializationService,
+    private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     let customOskLetters = (
@@ -81,10 +83,12 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   }
 
   updateValue(newValue: unknown): void {
-    setTimeout(() => {
-      this.value = newValue;
-      this.valueChanged.emit(this.value);
-    });
+    if (this.value === newValue) {
+      return;
+    }
+    this.value = newValue;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 require('services/guppy-initialization.service.ts');

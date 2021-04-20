@@ -16,7 +16,7 @@
  * @fileoverview Directive for sanitized URL editor.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface SanitizedUrlSchema {
@@ -47,15 +47,19 @@ export class SanitizedUrlEditorComponent {
     }
   };
 
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+
   getSchema(): SanitizedUrlSchema {
     return this.schema;
   }
 
   updateValue(newValue: unknown): void {
-    setTimeout(() => {
-      this.value = newValue;
-      this.valueChanged.emit(this.value);
-    });
+    if (this.value === newValue) {
+      return;
+    }
+    this.value = newValue;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 angular.module('oppia').directive('sanitizedUrlEditor', downgradeComponent({

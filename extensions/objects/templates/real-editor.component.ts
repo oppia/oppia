@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive for real editor.
  */
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 interface RealSchema {
   type: string;
@@ -31,22 +31,26 @@ export class RealEditorComponent implements OnInit {
   schema: RealSchema = {
     type: 'float'
   };
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   getSchema(): RealSchema {
     return this.schema;
   }
 
   updateValue(newValue: number | string): void {
-    setTimeout(() => {
-      if (newValue === '' || newValue === null) {
-        // A new rule.
-        this.value = 0.0;
-        this.valueChanged.emit(this.value);
-      }
-      this.value = newValue;
+    if (this.value === newValue) {
+      return;
+    }
+    if (newValue === '' || newValue === null) {
+      // A new rule.
+      this.value = 0.0;
       this.valueChanged.emit(this.value);
-    });
+      this.changeDetectorRef.detectChanges();
+      return;
+    }
+    this.value = newValue;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 
   ngOnInit(): void {

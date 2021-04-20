@@ -19,7 +19,7 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface PositiveIntSchema {
@@ -48,7 +48,7 @@ export class PositiveIntEditorComponent implements OnInit {
       id: 'is_integer'
     }]
   };
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     if (!this.value) {
@@ -61,10 +61,12 @@ export class PositiveIntEditorComponent implements OnInit {
   }
 
   updateValue(newValue: number): void {
-    setTimeout(() => {
-      this.value = newValue;
-      this.valueChanged.emit(this.value);
-    });
+    if (this.value === newValue) {
+      return;
+    }
+    this.value = newValue;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 angular.module('oppia').directive('positiveIntEditor', downgradeComponent({

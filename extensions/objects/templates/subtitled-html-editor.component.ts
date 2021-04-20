@@ -16,7 +16,7 @@
  * @fileoverview Directive for Subtitled Html editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface SubtitledHtmlEditorSchema {
@@ -35,7 +35,7 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
   SCHEMA: SubtitledHtmlEditorSchema;
 
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     const uiConfig = (
@@ -52,10 +52,12 @@ export class SubtitledHtmlEditorComponent implements OnInit {
   }
 
   updateValue(newValue: unknown): void {
-    setTimeout(() => {
-      this.value._html = newValue;
-      this.valueChanged.emit(this.value);
-    });
+    if (this.value._html === newValue) {
+      return;
+    }
+    this.value._html = newValue;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 

@@ -20,7 +20,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -42,6 +42,8 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
     }]
   };
 
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+
   ngOnInit(): void {
     if (!this.value) {
       this.value = [];
@@ -54,10 +56,12 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
   }
 
   updateValue(value: unknown): void {
-    setTimeout(() => {
-      this.value = value;
-      this.valueChanged.emit(this.value);
-    });
+    if (this.value === value) {
+      return;
+    }
+    this.value = value;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 
