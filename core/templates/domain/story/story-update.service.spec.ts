@@ -21,14 +21,14 @@ import { HttpClientTestingModule } from
 import { TestBed } from '@angular/core/testing';
 
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { StoryUpdateService } from 'domain/story/story-update.service.ts';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
+import { StoryUpdateService } from 'domain/story/story-update.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 
 describe('Story update service', () => {
-  let storyObjectFactory: StoryObjectFactory = null;
-  let storyUpdateService: StoryUpdateService = null;
-  let undoRedoService: UndoRedoService = null;
-  let _sampleStory = null;
+  let storyObjectFactory: StoryObjectFactory;
+  let storyUpdateService: StoryUpdateService;
+  let undoRedoService: UndoRedoService;
+  let _sampleStory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -324,7 +324,7 @@ describe('Story update service', () => {
     storyUpdateService.deleteStoryNode(_sampleStory, 'node_1');
     // Initial node should not be deleted.
     storyUpdateService.deleteStoryNode(_sampleStory, 'node_2');
-    expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual(null);
+    expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual('');
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(0);
 
     expect(() => {

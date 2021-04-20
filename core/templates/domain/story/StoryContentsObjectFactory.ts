@@ -31,6 +31,10 @@ export interface StoryContentsBackendDict {
   'nodes': StoryNodeBackendDict[];
 }
 
+interface NodeTitles {
+  [key: string]: string
+}
+
 export class StoryContents {
   _initialNodeId: string;
   _nodes: StoryNode[];
@@ -72,18 +76,18 @@ export class StoryContents {
         return nodes[i].getId();
       }
     }
-    return null;
+    return '';
   }
 
   rearrangeNodeInStory(fromIndex: number, toIndex: number): void {
-    const nodeToMove = this._nodes[fromIndex];
+    const nodeToMove: StoryNode = this._nodes[fromIndex];
     this._nodes.splice(fromIndex, 1);
     this._nodes.splice(toIndex, 0, nodeToMove);
   }
 
   getNodeIdsToTitleMap(nodeIds: string[]): {} {
     var nodes = this._nodes;
-    var nodeTitles = {};
+    var nodeTitles: NodeTitles = {};
     for (var i = 0; i < nodes.length; i++) {
       if (nodeIds.indexOf(nodes[i].getId()) !== -1) {
         nodeTitles[nodes[i].getId()] = nodes[i].getTitle();
@@ -192,7 +196,7 @@ export class StoryContents {
     }
     if (nodeId === this._initialNodeId) {
       if (this._nodes.length === 1) {
-        this._initialNodeId = null;
+        this._initialNodeId = '';
       } else {
         throw new Error('Cannot delete initial story node');
       }

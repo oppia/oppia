@@ -46,7 +46,30 @@ export class CollectionNode {
   static createFromExplorationId(explorationId: string): CollectionNode {
     return CollectionNode.create({
       exploration_id: explorationId,
-      exploration_summary: null
+      exploration_summary: {
+        category: '',
+        community_owned: false,
+        activity_type: '',
+        last_updated_msec: 0,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        id: '',
+        created_on_msec: 0,
+        human_readable_contributors_summary: {},
+        language_code: '',
+        num_views: 0,
+        objective: '',
+        status: '',
+        tags: [''],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: '',
+      }
     });
   }
 
@@ -63,14 +86,14 @@ export class CollectionNode {
     if (this._explorationSummaryObject) {
       return this._explorationSummaryObject.title;
     } else {
-      return null;
+      return '';
     }
   }
 
   // Returns whether the exploration referenced by this node is known to exist
   // in the backend. This property is immutable.
   doesExplorationExist(): boolean {
-    return this._explorationSummaryObject !== null;
+    return this._explorationSummaryObject.category !== '';
   }
 
   // Returns whether the exploration referenced by this node is private and
@@ -81,14 +104,15 @@ export class CollectionNode {
       return this._explorationSummaryObject.status === (
         AppConstants.ACTIVITY_STATUS_PRIVATE);
     } else {
-      return undefined;
+      return false;
     }
   }
 
   // Returns a raw exploration summary object, as supplied by the backend for
   // frontend exploration summary tile displaying. Changes to the returned
   // object are not reflected in this domain object. The value returned by
-  // this function is null if doesExplorationExist() returns false.
+  // this function is an object with empty values
+  // if doesExplorationExist() returns false.
   getExplorationSummaryObject(): LearnerExplorationSummaryBackendDict {
     // TODO(bhenning): This should be represented by a
     // frontend summary domain object that is also shared with

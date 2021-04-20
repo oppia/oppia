@@ -147,7 +147,30 @@ describe('Collection node model', () => {
       let collectionNodeBackendObject:
         CollectionNodeBackendDict = {
           exploration_id: 'exp_id0',
-          exploration_summary: null
+          exploration_summary: {
+            category: '',
+            community_owned: false,
+            activity_type: '',
+            last_updated_msec: 1,
+            ratings: {
+              1: 1,
+              2: 1,
+              3: 1,
+              4: 1,
+              5: 1,
+            },
+            id: '',
+            created_on_msec: 1,
+            human_readable_contributors_summary: {},
+            language_code: '',
+            num_views: 1,
+            objective: '',
+            status: '',
+            tags: ['tag1', 'tag2'],
+            thumbnail_bg_color: '',
+            thumbnail_icon_url: '',
+            title: ''
+          }
         };
 
       let collectionNode: CollectionNode = CollectionNode.create(
@@ -155,9 +178,9 @@ describe('Collection node model', () => {
 
       let summaryObject = collectionNode.getExplorationSummaryObject();
 
-      expect(summaryObject).toBeNull();
-      expect(collectionNode.getExplorationTitle()).toBeNull();
-      expect(collectionNode.isExplorationPrivate()).toBeUndefined();
+      expect(summaryObject).not.toBeNull();
+      expect(collectionNode.getExplorationTitle()).toBe('');
+      expect(collectionNode.isExplorationPrivate()).toBeFalse();
 
       collectionNode.setExplorationSummaryObject(
         explorationSummaryBackendObject);

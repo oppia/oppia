@@ -101,10 +101,14 @@ export class ParamSpecs {
    *    consumption.
    */
   toBackendDict(): ParamSpecsBackendDict {
-    var paramSpecsBackendDict = {};
-    this.forEach((paramName, paramSpec) => {
-      paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
-    });
+    var paramSpecsBackendDict: ParamSpecsBackendDict = {};
+    this.forEach(
+      (
+          paramName: string | number,
+          paramSpec: { toBackendDict: () => ParamSpecBackendDict; }
+      ) => {
+        paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
+      });
     return paramSpecsBackendDict;
   }
 }
@@ -123,7 +127,7 @@ export class ParamSpecsObjectFactory {
    */
   createFromBackendDict(
       paramSpecsBackendDict: ParamSpecsBackendDict): ParamSpecs {
-    var paramDict = {};
+    var paramDict: ParamDict = {};
     Object.keys(paramSpecsBackendDict).forEach((paramName) => {
       paramDict[paramName] = this.paramSpecObjectFactory.createFromBackendDict(
         paramSpecsBackendDict[paramName]);
