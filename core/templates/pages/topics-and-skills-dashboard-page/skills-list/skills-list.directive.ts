@@ -265,7 +265,7 @@ angular.module('oppia').directive('skillsList', [
                 // that the merged skills are not shown anymore.
                 $timeout(function() {
                   TopicsAndSkillsDashboardBackendApiService.
-                    onTopicsAndSkillsDashboardReinitialized.emit();
+                    onTopicsAndSkillsDashboardReinitialized.emit(true);
                   var successToast = 'Merged Skills.';
                   AlertsService.addSuccessMessage(successToast, 1000);
                 }, 100);
