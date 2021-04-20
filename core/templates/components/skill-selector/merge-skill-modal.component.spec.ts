@@ -68,12 +68,6 @@ describe('Merge Skill Modal', () => {
     });
   });
 
-  it('should save', () => {
-    spyOn(componentInstance, 'confirm');
-    componentInstance.save();
-    expect(componentInstance.confirm).toHaveBeenCalled();
-  });
-
   it('should set selected skill id', () => {
     componentInstance.setSelectedSkillId('skill_id');
     expect(componentInstance.selectedSkillId).toEqual('skill_id');

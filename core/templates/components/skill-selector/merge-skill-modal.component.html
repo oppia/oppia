@@ -15,7 +15,11 @@
   </oppia-skill-selector>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-success protractor-test-confirm-skill-selection-button" (click)="save()" [disabled]="!selectedSkillId">Done</button>
+  <button class="btn btn-success protractor-test-confirm-skill-selection-button"
+          (click)="confirm()"
+          [disabled]="!selectedSkillId">
+    Done
+  </button>
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
 </div>
 

@@ -48,10 +48,6 @@ export class MergeSkillModalComponent extends ConfirmOrCancelModal {
     });
   }
 
-  save(): void {
-    this.confirm();
-  }
-
   setSelectedSkillId(skillId: string): void {
     this.selectedSkillId = skillId;
   }
