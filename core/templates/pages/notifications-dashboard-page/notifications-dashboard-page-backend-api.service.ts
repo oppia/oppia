@@ -20,6 +20,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface Notification {
+  type: string,
+  'activity_id': string,
+  'activity_title': string,
+  'author_id': string,
+  subject: string
+}
+
 export interface NotificationsDashboardBackendDict {
   'is_admin': boolean,
   'is_moderator': boolean,
@@ -27,7 +35,7 @@ export interface NotificationsDashboardBackendDict {
   'is_topic_manager': boolean,
   'job_queued_msec': number,
   'last_seen_msec': number,
-  'recent_notifications': []
+  'recent_notifications': Notification[]
   'user_email': string,
   'username': string
 }

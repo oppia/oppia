@@ -28,7 +28,7 @@
             <span class="oppia-notification-author-username">
               <strong>
                 <span>
-                  {{notification.author_username}}
+                  {{ notification.author_username }}
                 </span>
                 <span *ngIf="!notification.author_username">
                   Anonymous
@@ -41,12 +41,12 @@
                 left a comment on
               </span>
               <span class="oppia-notification-activity-title">
-                {{notification.activity_title}}
+                {{ notification.activity_title }}
               </span>
             </span>
           </div>
           <div class="oppia-notification-last-updated">
-            {{getLocaleAbbreviatedDatetimeString(notification.last_updated_ms)}}
+            {{ getLocaleAbbreviatedDatetimeString(notification.last_updated_ms) }}
           </div>
         </mat-card>
       </a>
