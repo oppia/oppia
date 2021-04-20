@@ -19,7 +19,7 @@
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 
-fdescribe('Winnowing preprocessing functions', () => {
+describe('Winnowing preprocessing functions', () => {
   describe('Test winnowing preprocessing functions', () => {
     var wps: WinnowingPreprocessingService;
     beforeEach(() => {
