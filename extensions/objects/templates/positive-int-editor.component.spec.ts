@@ -40,6 +40,7 @@ describe('PositiveInt', function() {
     component.ngOnInit();
     expect(component.value).toEqual(1);
     component.updateValue(2);
+    component.updateValue(2);
     expect(component.value).toEqual(2);
   });
 });
