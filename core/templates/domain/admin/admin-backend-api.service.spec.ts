@@ -605,7 +605,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should get the data of contribution rights given the role' +
+  fit('should get the data of contribution rights given the role' +
     'when calling viewContributionReviewersAsync', fakeAsync(() => {
     let category = 'voiceover';
     let languageCode = 'en';
@@ -626,6 +626,13 @@ describe('Admin backend api service', () => {
 
     expect(successHandler).toHaveBeenCalledWith(result);
     expect(failHandler).not.toHaveBeenCalled();
+
+    category = 'question';
+    languageCode = null;
+
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(
       '/getcontributorusershandler' +
