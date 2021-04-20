@@ -211,7 +211,8 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
 
     base_path = os.path.join(os.getcwd(), test_path or '')
     result = []
-    excluded_dirs = ['.git', 'third_party', 'core/tests', 'node_modules']
+    excluded_dirs = [
+        '.git', 'third_party', 'core/tests', 'node_modules', 'venv']
     for root in os.listdir(base_path):
         if any([s in root for s in excluded_dirs]):
             continue
