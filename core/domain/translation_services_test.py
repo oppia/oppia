@@ -60,6 +60,16 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 'hi', 'en', 'text to translate')
         )
         self.assertIsNone(translated_text)
+        self.assertIsNone(
+            translation_models.MachineTranslationModel.get_machine_translation(
+                'en', 'hi', 'text to translated'
+            )
+        )
+        self.assertIsNone(
+            translation_models.MachineTranslationModel.get_machine_translation(
+                'hi', 'en', 'text to translated'
+            )
+        )
 
     def test_get_machine_translation_checks_datastore_first(self):
         with self.swap_to_always_raise(
