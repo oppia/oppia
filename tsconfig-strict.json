@@ -20,6 +20,7 @@
     "paths": {
       "app.constants": ["core/templates/app.constants"],
       "components/*": ["core/templates/components/*"],
+      "directives/*": ["core/templates/directives/*"],
       "domain/*": ["core/templates/domain/*"],
       "expressions/*": ["core/templates/expressions/*"],
       "app-events/*": ["core/templates/app-events/*"],
@@ -47,6 +48,8 @@
     "core/templates/domain/collection/collection-rights.model.spec.ts",
     "core/templates/domain/collection/collection-summary.model.ts",
     "core/templates/domain/collection/collection-summary.model.spec.ts",
+    "core/templates/domain/collection/guest-collection-progress.model.ts",
+    "core/templates/domain/collection/guest-collection-progress.model.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
