@@ -29,7 +29,7 @@
   <p ng-if="$ctrl.invalid.body" class="invalid-input">Please enter a valid email body</p>
   <p ng-if="$ctrl.invalid.maxRecipients" class="invalid-input">Please enter valid number of recipients</p>
   <p ng-if="$ctrl.errorHasOccurred" class="invalid-input">There was an error processing your request. Please report this bug.</p>
-  <form ng-class = "{'disable-form': $ctrl.submitIsInProgress}" ng-submit="$ctrl.submitEmail()">
+  <form ng-class="{'disable-form': $ctrl.submitIsInProgress}" ng-submit="$ctrl.submitEmail()">
     Email subject: <textarea rows="2" cols="10" placeholder="Enter email subject here..." ng-model="$ctrl.emailSubject"></textarea>
     <br>
     Email body: <textarea rows="15" cols="20" placeholder="Enter email body here..." ng-model="emailBody"></textarea>
