@@ -105,12 +105,11 @@ def establish_auth_session(request, response):
         response: webapp2.Response. The response to establish the new session
             upon.
     """
-    cookie_claims = (
-        _get_auth_claims_from_session_cookie(_get_session_cookie(request)))
+    claims = _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
     # If the request already contains a valid session cookie, then there's no
     # action necessary; the session is already established.
-    if cookie_claims is not None:
+    if claims is not None:
         return
 
     fresh_cookie = firebase_auth.create_session_cookie(
@@ -449,8 +448,11 @@ def grant_super_admin_privileges(user_id):
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
         raise ValueError('user_id=%s has no Firebase account' % user_id)
-    firebase_admin.auth.set_custom_user_claims(
-        auth_id, '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN)
+    custom_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
+    firebase_auth.set_custom_user_claims(auth_id, custom_claims)
+    # NOTE: Revoke session cookies and ID tokens of the user so they are forced
+    # to log back in to obtain their updated privileges.
+    firebase_auth.revoke_refresh_tokens(auth_id)
 
 
 def revoke_super_admin_privileges(user_id):
@@ -462,7 +464,10 @@ def revoke_super_admin_privileges(user_id):
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
         raise ValueError('user_id=%s has no Firebase account' % user_id)
-    firebase_admin.auth.set_custom_user_claims(auth_id, None)
+    firebase_auth.set_custom_user_claims(auth_id, None)
+    # NOTE: Revoke session cookies and ID tokens of the user so they are forced
+    # to log back in to obtain their updated privileges.
+    firebase_auth.revoke_refresh_tokens(auth_id)
 
 
 def seed_firebase():
@@ -519,23 +524,23 @@ def seed_firebase():
     custom_claims = '{"role":"%s"}' % feconf.FIREBASE_ROLE_SUPER_ADMIN
 
     try:
-        user = firebase_admin.auth.get_user_by_email(feconf.ADMIN_EMAIL_ADDRESS)
-    except firebase_admin.auth.UserNotFoundError:
+        user = firebase_auth.get_user_by_email(feconf.ADMIN_EMAIL_ADDRESS)
+    except firebase_auth.UserNotFoundError:
         create_new_firebase_account = True
     else:
         if user.uid != auth_id:
-            firebase_admin.auth.update_user(user.uid, disabled=True)
-            firebase_admin.auth.delete_user(user.uid)
+            firebase_auth.update_user(user.uid, disabled=True)
+            firebase_auth.delete_user(user.uid)
             create_new_firebase_account = True
         else:
-            firebase_admin.auth.set_custom_user_claims(user.uid, custom_claims)
+            firebase_auth.set_custom_user_claims(user.uid, custom_claims)
             create_new_firebase_account = False
 
     if create_new_firebase_account:
-        firebase_admin.auth.import_users([
-            firebase_admin.auth.ImportUserRecord(
+        firebase_auth.import_users([
+            firebase_auth.ImportUserRecord(
                 auth_id, email=feconf.ADMIN_EMAIL_ADDRESS,
-                custom_claims=custom_claims)
+                custom_claims=custom_claims),
         ])
 
 
@@ -593,20 +598,26 @@ def _get_auth_claims_from_session_cookie(cookie):
         AuthClaims|None. The claims from the session cookie, if available.
         Otherwise returns None.
     """
-    # It's OK for a session cookie to be None, it just means that the request
-    # isn't authenticated.
-    if cookie:
-        try:
-            return _create_auth_claims(
-                firebase_auth.verify_session_cookie(cookie))
-        # NOTE: Session cookies only provide temporary authentication, so they
-        # are expected to become obsolete over time. The following errors are
-        # situations where this can happen.
-        except (
-                firebase_auth.ExpiredSessionCookieError,
-                firebase_auth.RevokedSessionCookieError):
-            # NOTE: logging.exception appends the stack trace automatically.
-            logging.exception('User session has ended and must be renewed')
+    # It's OK for a session cookie to be None or empty, it just means that the
+    # request hasn't been authenticated.
+    if not cookie:
+        return None
+    # NOTE: Session cookies only provide temporary authentication, so they are
+    # expected to become obsolete over time. The following errors are situations
+    # where this will occur.
+    expected_session_cookie_errors = (
+        firebase_auth.ExpiredSessionCookieError,
+        firebase_auth.RevokedSessionCookieError,
+    )
+    try:
+        claims = firebase_auth.verify_session_cookie(cookie, check_revoked=True)
+    except expected_session_cookie_errors:
+        logging.warn('User session has ended and must be renewed')
+    except firebase_exceptions.FirebaseError:
+        logging.exception(
+            'Failed to verify the session cookie; request will be unauthorized')
+    else:
+        return _create_auth_claims(claims)
     return None
 
 
