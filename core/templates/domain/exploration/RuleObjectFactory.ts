@@ -79,20 +79,20 @@ export class RuleObjectFactory {
       ruleDict: RuleBackendDict, interactionId: string
   ): Rule {
     let ruleType = ruleDict.rule_type;
-    let ruleInputTypes = {};
+    let ruleInputTypes: RuleInputTypes = {};
 
     let ruleDescription = INTERACTION_SPECS[
       interactionId].rule_descriptions[ruleType];
 
     const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (ruleDescription.match(PATTERN)) {
-      const varName = ruleDescription.match(PATTERN)[1];
+      const varName: string = ruleDescription.match(PATTERN)[1];
       let varType = ruleDescription.match(PATTERN)[2];
       if (varType) {
         varType = varType.substring(1);
       }
 
-      ruleInputTypes[varName] = varType;
+      ruleInputTypes[parseInt(varName)] = varType;
       ruleDescription = ruleDescription.replace(PATTERN, ' ');
     }
     return new Rule(ruleType, ruleDict.inputs, ruleInputTypes);

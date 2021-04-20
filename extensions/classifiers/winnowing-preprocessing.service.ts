@@ -62,15 +62,15 @@ export class WinnowingPreprocessingService {
       kGramHashes: number[], T: number, K: number): number[][] {
     // Generate fingerprint of a document from its k-gram hashes.
     var windowSize = T - K + 1;
-    var fingerprintHashesIndex = new Set();
+    var fingerprintHashesIndex: Set<number> = new Set();
     for (var i = 0; i < kGramHashes.length - windowSize + 1; i += 1) {
-      var windowHashes = kGramHashes.slice(i, i + windowSize);
-      var minHashValue = Math.min.apply(Math, windowHashes);
-      var minHashIndex = i + windowHashes.indexOf(minHashValue);
+      var windowHashes: number[] = kGramHashes.slice(i, i + windowSize);
+      var minHashValue: number = Math.min.apply(Math, windowHashes);
+      var minHashIndex: number = i + windowHashes.indexOf(minHashValue);
       fingerprintHashesIndex.add(minHashIndex);
     }
 
-    var fingerprint = [];
+    var fingerprint: number[][] = [[], []];
     fingerprintHashesIndex.forEach((hashIndex: number) => {
       fingerprint.push([kGramHashes[hashIndex], hashIndex]);
     });

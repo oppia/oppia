@@ -21,7 +21,7 @@ import { WinnowingPreprocessingService } from
 
 describe('Winnowing preprocessing functions', () => {
   describe('Test winnowing preprocessing functions', () => {
-    var service;
+    var service: WinnowingPreprocessingService;
     beforeEach(() => {
       service = new WinnowingPreprocessingService();
     });
