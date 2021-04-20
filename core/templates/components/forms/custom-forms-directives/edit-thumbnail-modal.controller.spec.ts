@@ -22,7 +22,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Edit Thumbnail Modal Controller', function() {
   let $q = null;
   let $scope = null;
-  let $timeout = null;
   let $uibModalInstance = null;
 
   const allowedBgColors = true;
