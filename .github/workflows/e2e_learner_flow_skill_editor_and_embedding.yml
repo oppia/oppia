@@ -25,24 +25,23 @@ jobs:
         run: pip install wheel==0.35.0
       - name: Install third party
         run: python -m scripts.install_third_party_libs
-      - name: Check if PR is low-risk
-        run: |
-          python -m scripts.check_if_pr_is_low_risk ${{ github.event.pull_request.html_url }} && true
-          echo "low_risk=${?}" >> $GITHUB_ENV
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Install chrome
-        if: ${{ env.low_risk != 0 }}
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
       - name: Run Learner Flow E2E Test
-        if: ${{ env.low_risk != 0 }}
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="learner" --prod_env
       - name: Run Skill Editor E2E Test
-        if: ${{ env.low_risk != 0 }}
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="skillEditor" --prod_env
       - name: Run Embedding E2E Test
-        if: ${{ env.low_risk != 0 }}
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="embedding" --prod_env
       - name: Uploading protractor-screenshots as Artifacts
-        if: ${{ env.low_risk != 0 && always() }}
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots
