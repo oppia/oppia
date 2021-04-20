@@ -1,0 +1,61 @@
+<oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
+                               [activityType]="activityTypeCollection"
+                               [activityId]="getCollectionId"
+                               [activityTitle]="getCollectionTitle"
+                               [isContainerNarrow]="isContainerNarrow"
+                               [activityActive]="collectionIsCurrentlyHoveredOver"
+                               [isAddToPlaylistIconShown]="!isOwnedByCurrentUser">
+</oppia-learner-dashboard-icons>
+<mat-card class="oppia-activity-summary-tile protractor-test-collection-card"
+         [ngClass]="{'oppia-activity-playlist-tile': isPlaylistTile}" [style.padding]="0">
+  <a [href]="getCollectionLink()" class="thumbnail">
+    <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
+      <img class="collection-corner-image" [src]="getStaticImageUrl('/general/collection_corner.svg')" alt="">
+      <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+      <h3 class="activity-title protractor-test-collection-summary-tile-title">{{ getCollectionTitle || defaultEmptyTitle }}</h3>
+    </div>
+
+    <div [ngStyle]="isPlaylistTile && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
+      <div class="objective">
+        {{ getObjective | truncateAndCapitalize: 95 }}
+        <span *ngIf="!getObjective">No objective specified.</span>
+      </div>
+      <ul class="metrics layout-align-space-between-center layout-row">
+        <li>
+          <span>
+            COLLECTION ({{ getNodeCount }})
+          </span>
+        </li>
+        <li>
+          <span>
+            <span class="oppia-icon-accessibility-label">Last Updated</span>
+            {{ getLastUpdatedDatetime() }}
+          </span>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="!isPlaylistTile" class="title-section-mask"
+         (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)">
+    </div>
+  </a>
+</mat-card>
+
+<style>
+  .oppia-activity-summary-tile {
+    position: relative;
+    z-index: 5;
+  }
+
+  .oppia-activity-summary-tile .thumbnail {
+    text-decoration: none;
+  }
+
+  .oppia-activity-summary-tile .thumbnail-image {
+    top: 15.5%;
+  }
+
+  .oppia-activity-summary-tile .collection-corner-image {
+    position: absolute;
+    width: 36px;
+  }
+</style>

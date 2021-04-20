@@ -22,8 +22,8 @@ require(
   'components/question-directives/question-player/services/' +
   'question-player-state.service.ts');
 require('components/ratings/rating-display/rating-display.directive.ts');
-require('components/summary-tile/exploration-summary-tile.directive.ts');
-require('components/summary-tile/collection-summary-tile.directive.ts');
+require('components/summary-tile/exploration-summary-tile.component.ts');
+require('components/summary-tile/collection-summary-tile.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +

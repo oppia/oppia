@@ -24,7 +24,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/collection-summary-tile.directive.ts');
+require('components/summary-tile/collection-summary-tile.component.ts');
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
@@ -33,6 +33,7 @@ require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/creator-dashboard-backend-api.service.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
   'suggestion-modal-for-creator-view.service.ts');
@@ -43,7 +44,6 @@ require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/suggestions.service.ts');
 require('services/user.service.ts');
-
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').component('creatorDashboardPage', {
