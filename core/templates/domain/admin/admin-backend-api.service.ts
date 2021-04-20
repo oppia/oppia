@@ -349,11 +349,9 @@ export class AdminBackendApiService {
       category: string, languageCode: string
   ): Promise<ViewContributionBackendResponse> {
     let params = {};
-    if (languageCode == null) 
-    {
+    if (languageCode == null) {
       params = { category: category };
-    } else 
-    {
+    } else {
       params = {
         category: category,
         language_code: languageCode
