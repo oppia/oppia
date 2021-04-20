@@ -23,22 +23,27 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+
+import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    LearnerDashboardPageComponent,
+    RemoveActivityModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    LearnerDashboardPageComponent,
+    RemoveActivityModalComponent
   ],
   providers: [
     {
