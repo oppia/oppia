@@ -119,3 +119,32 @@ angular.module('oppia').directive('select2Dropdown', [
     };
   }
 ]);
+
+// import { Directive, ElementRef, Injector, Input, Output, EventEmitter } from '@angular/core';
+// import { UpgradeComponent } from '@angular/upgrade/static';
+// import { Schema } from 'services/schema-default-value.service';
+
+// @Directive({
+//   selector: 'select2-dropdown'
+// })
+// export class Select2DropdownDirective extends UpgradeComponent {
+//   // @Input() schema: () => Schema;
+//   // @Input() isDisabled: () => boolean;
+//   // @Input() localValue;
+//   // @Output() localValueChange: EventEmitter<unknown> = new EventEmitter();
+//   // @Input() labelForFocusTarget: () => string;
+//   // @Input() onInputBlur: () => void;
+//   // @Input() onInputFocus: () => void;
+//   @Input() allowMultipleChoices: () => boolean;
+//   @Input() choices;
+//   @Output() choicesChange: EventEmitter<unknown> = new EventEmitter();
+//   @Input() dropdownCssClass: () => string;
+//   @Input() formatNewSelection:
+
+//   constructor(
+//       elementRef: ElementRef,
+//       injector: Injector) {
+//     super('select2Dropdown', elementRef, injector);
+//   }
+// }
+

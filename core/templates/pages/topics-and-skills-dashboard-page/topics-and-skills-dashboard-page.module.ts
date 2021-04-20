@@ -41,13 +41,15 @@ import { SelectTopicsComponent } from './topic-selector/select-topics.component'
     OppiaAngularRootComponent,
     TopicsListComponent,
     DeleteTopicModalComponent,
-    SelectTopicsComponent
+    SelectTopicsComponent,
+    TopicsAndSkillsDashboardPageComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     TopicsListComponent,
     DeleteTopicModalComponent,
-    SelectTopicsComponent
+    SelectTopicsComponent,
+    TopicsAndSkillsDashboardPageComponent
   ],
   providers: [
     {
@@ -70,6 +72,7 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
