@@ -23,6 +23,8 @@ import feconf
 from jobs import job_utils
 import python_utils
 
+ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
+
 
 class BaseAuditError(python_utils.OBJECT):
     """Base class for model audit errors.
@@ -210,7 +212,7 @@ class CommitCmdsNoneError(BaseAuditError):
     """Error class for None Commit Cmds."""
 
     def __init__(self, model):
-        super(CommitCmdsNoneError, self).__init__(model)  
+        super(CommitCmdsNoneError, self).__init__(model)
         self.message = (
             ERROR_CATEGORY_COMMIT_CMD_CHECK,
             'Entity id %s: No commit command domain object defined '
@@ -218,7 +220,7 @@ class CommitCmdsNoneError(BaseAuditError):
 
 
 class CommitCmdsValidateError(BaseAuditError):
-    """Error class for wrong commit cmmds """ # to update
+    """Error class for wrong commit cmmds."""
 
     def __init__(self, cmd_name, model, commit_cmd_dict, e):
         super(CommitCmdsValidateError, self).__init__(model)
@@ -226,4 +228,4 @@ class CommitCmdsValidateError(BaseAuditError):
             'commit cmd %s check' % cmd_name,
             'Entity id %s: Commit command domain validation for '
             'command: %s failed with error: %s' % (
-                model.id, commit_cmd_dict, e))  
+                model.id, commit_cmd_dict, e))

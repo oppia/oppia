@@ -258,7 +258,7 @@ class ValidateCommitCmdsSchema(beam.DoFn):
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
-        
+
         Yields:
             CommitCmdsNoneError. Error for invalid commit cmds id.
             CommitCmdsValidateError. Error for wrong commit cmds.
