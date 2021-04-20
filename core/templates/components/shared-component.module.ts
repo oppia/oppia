@@ -66,7 +66,6 @@ import { PromoBarComponent } from './common-layout-directives/common-elements/pr
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
-import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 import { FocusOnDirective } from '../directives/focus-on.directive';
 
 
@@ -134,7 +133,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkTextComponent,
     PromoBarComponent,
     RubricsEditorComponent,
-    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -204,7 +202,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
-    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
