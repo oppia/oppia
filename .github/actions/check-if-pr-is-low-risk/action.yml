@@ -3,7 +3,7 @@ description: 'This action checks whether a PR is low-risk, which means we can sk
 outputs:
   is-low-risk:
     description: '0 if PR is low risk, 1 otherwise.'
-    value ${{ steps.check-risk.outputs.is-low-risk }}
+    value: ${{ steps.check-risk.outputs.is-low-risk }}
 runs:
   using: 'composite'
   steps:
