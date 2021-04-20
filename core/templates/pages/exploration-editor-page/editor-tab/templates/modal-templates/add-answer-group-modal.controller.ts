@@ -16,7 +16,8 @@
  * @fileoverview Controller for add answer group modal.
  */
 
-import { Subscription } from 'rxjs';
+import { EventBusGroup } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -28,19 +29,20 @@ require(
   'state-editor.service.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/RuleObjectFactory.ts');
+require('app-events/event-bus.service');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require('services/generate-content-id.service.ts');
 
 angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
-  'GenerateContentIdService', 'OutcomeObjectFactory',
+  'EventBusService', 'GenerateContentIdService', 'OutcomeObjectFactory',
   'PopulateRuleContentIdsService', 'RuleObjectFactory', 'StateEditorService',
   'addState', 'currentInteractionId', 'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
-      GenerateContentIdService, OutcomeObjectFactory,
+      EventBusService, GenerateContentIdService, OutcomeObjectFactory,
       PopulateRuleContentIdsService, RuleObjectFactory, StateEditorService,
       addState, currentInteractionId, stateName, COMPONENT_NAME_FEEDBACK,
       INTERACTION_SPECS) {
@@ -48,13 +50,17 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    const eventBusGroup: EventBusGroup = new EventBusGroup(EventBusService);
+    $scope.modalId = Symbol();
     $scope.isInvalid = false;
-    $scope.directiveSubscriptions = new Subscription();
-    $scope.directiveSubscriptions.add(
-      StateEditorService.onObjectFormValidityChange.subscribe(
-        value => $scope.isInvalid = value
-      )
-    );
+    eventBusGroup.on(
+      ObjectFormValidityChangeEvent,
+      event => {
+        if (event.message.modalId === $scope.modalId) {
+          $scope.isInvalid = event.message.value;
+          $scope.$applyAsync();
+        }
+      });
     $scope.feedbackEditorIsOpen = false;
     $scope.addState = addState;
     $scope.questionModeEnabled = (
@@ -112,7 +118,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
       });
 
       $scope.$on('$destroy', function() {
-        $scope.directiveSubscriptions.unsubscribe();
+        eventBusGroup.unsubscribe();
       });
     };
   }
