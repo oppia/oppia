@@ -27,6 +27,9 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { TopicsListComponent } from './topics-list/topics-list.component';
+import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
+import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 
 @NgModule({
   imports: [
@@ -35,10 +38,16 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicsListComponent,
+    DeleteTopicModalComponent,
+    SelectTopicsComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    TopicsListComponent,
+    DeleteTopicModalComponent,
+    SelectTopicsComponent
   ],
   providers: [
     {

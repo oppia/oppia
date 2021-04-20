@@ -18,60 +18,65 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+// Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { BackgroundBannerComponent } from
-  './common-layout-directives/common-elements/background-banner.component';
-import { AttributionGuideComponent } from
-  './common-layout-directives/common-elements/attribution-guide.component';
-import { LazyLoadingComponent } from
-  './common-layout-directives/common-elements/lazy-loading.component';
-import { LoadingDotsComponent } from
-  './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
-import { TranslatePipe } from 'filters/translate.pipe';
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
-import { SkillSelectorComponent } from
-  './skill-selector/skill-selector.component';
-import { SkillMasteryViewerComponent } from
-  './skill-mastery/skill-mastery.component';
-import { ExplorationEmbedButtonModalComponent } from
-  './button-directives/exploration-embed-button-modal.component';
-import { KeyboardShortcutHelpModalComponent } from
-  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
-import { SharingLinksComponent } from
-  './common-layout-directives/common-elements/sharing-links.component';
-import { ImageUploaderComponent } from './forms/custom-forms-directives/image-uploader.component';
-import { StorySummaryTileDirective } from
-  './summary-tile/story-summary-tile.directive';
-import { SubtopicSummaryTileDirective } from
-  './summary-tile/subtopic-summary-tile.directive';
-import { SocialButtonsComponent } from
-  'components/button-directives/social-buttons.component';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationSummaryTileDirective } from
-  './summary-tile/exploration-summary-tile.directive';
-import { ProfileLinkImageComponent } from
-  'components/profile-link-directives/profile-link-image.component';
-import { ProfileLinkTextComponent } from
-  'components/profile-link-directives/profile-link-text.component';
+import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { TranslateModule } from 'filters/translate.module';
+import { SharedFormsModule } from './forms/shared-forms.module';
+import { DirectivesModule } from 'directives/directives.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
+
+
+// Components.
+import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
+import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
+import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
+import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
+import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
+import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
+import { SharingLinksComponent } from './common-layout-directives/common-elements/sharing-links.component';
+import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
+import { SkillSelectorComponent } from './skill-selector/skill-selector.component';
+import { ProfileLinkImageComponent } from 'components/profile-link-directives/profile-link-image.component';
+import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
+import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
+import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
+import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
-import { AuthService } from 'services/auth.service';
-import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
-import { FocusOnDirective } from '../directives/focus-on.directive';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
-import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
-import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+
+// Directives.
+import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
+import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
+
+
+// Pipes.
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/truncate-and-capitalize.pipe';
+import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
+import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+
+
+// Services.
+import { AuthService } from 'services/auth.service';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -89,13 +94,18 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
 @NgModule({
   imports: [
-    CommonModule,
     BrowserModule,
+    CommonModule,
     MaterialModule,
+    DirectivesModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    MaterialModule,
+    ObjectComponentsModule,
+    SharedFormsModule,
+    TranslateModule,
     ...firebaseAuthModules,
   ],
 
@@ -107,17 +117,18 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    ExplorationSummaryTileComponent,
+    CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
-    ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
-    FocusOnDirective,
-    ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
+    OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    PromoBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -126,17 +137,23 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    WrapTextWithEllipsisPipe,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TranslatePipe,
+    TruncateAndCapitalizePipe,
+    SummarizeNonnegativeNumberPipe,
     TruncatePipe,
-    PromoBarComponent
+    SortByPipe,
+    PromoBarComponent,
+    LearnerDashboardIconsComponent
   ],
 
   entryComponents: [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    ExplorationSummaryTileComponent,
+    CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
@@ -146,8 +163,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
-    ImageUploaderComponent,
+    OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
+    PromoBarComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
@@ -155,23 +173,31 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    LearnerDashboardIconsComponent
   ],
 
   exports: [
     // Modules.
     DynamicContentModule,
+    DirectivesModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ObjectComponentsModule,
+    SharedFormsModule,
+    TranslateModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
-    ExplorationSummaryTileDirective,
+    ExplorationSummaryTileComponent,
+    CollectionSummaryTileComponent,
+    LazyLoadingComponent,
     FilterForMatchingSubstringPipe,
-    FocusOnDirective,
-    ImageUploaderComponent,
+    PromoBarComponent,
     OnScreenKeyboardComponent,
+    OutcomeFeedbackEditorComponent,
+    SchemaBasedEditorDirective,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
@@ -181,8 +207,16 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TranslatePipe,
-    PromoBarComponent
+    TruncateAndCapitalizePipe,
+    TruncatePipe,
+    SummarizeNonnegativeNumberPipe,
+    SortByPipe,
+    LoadingDotsComponent,
+    PromoBarComponent,
+    WrapTextWithEllipsisPipe,
+    PromoBarComponent,
+    WrapTextWithEllipsisPipe,
+    LearnerDashboardIconsComponent
   ],
 })
 
