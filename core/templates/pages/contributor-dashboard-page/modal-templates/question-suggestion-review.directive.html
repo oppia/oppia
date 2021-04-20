@@ -10,7 +10,7 @@
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-suggestion">
+    <div id="questionSuggestionDiv" class="oppia-question-suggestion">
       <div>
         <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
         <div ng-if="skillRubricExplanations.length > 0">
@@ -64,7 +64,7 @@
   }
   .oppia-question-suggestion {
     height: 100%;
-    overflow: scroll;
+    overflow: auto;
   }
   .oppia-reviewer-actions {
     border-top: 1px solid #e5e5e5;

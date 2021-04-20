@@ -121,7 +121,19 @@ angular.module('oppia').directive('stateEditor', [
             $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
           };
 
+          var questionSuggestionDiv = angular.element(
+            document.getElementById('questionSuggestionDiv'));
+          questionSuggestionDiv.on('scroll', function() {
+            if (questionSuggestionDiv.scrollTop() > 50) {
+              $scope.isSticky = true;
+            } else {
+              $scope.isSticky = false;
+            }
+            $scope.$applyAsync();
+          });
+
           ctrl.$onInit = function() {
+            $scope.isSticky = false;
             $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg');
             $scope.currentStateIsTerminal = false;
