@@ -148,7 +148,9 @@
         <picture>
           <source type="image/webp" [srcset]="getStaticImageUrl('/sidebar/medium.webp')">
           <source type="image/png" [srcset]="getStaticImageUrl('/sidebar/medium.png')">
-          <img [src]="getStaticImageUrl('/sidebar/medium.png')" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
+          <img [src]="getStaticImageUrl('/sidebar/medium.png')" 
+               class="oppia-sidebar-menu-icon"
+               alt="Oppia Blog">
         </picture>
         <span>{{ 'I18N_SIDEBAR_BLOG' | translate }}</span>
       </a>
@@ -164,9 +166,13 @@
     <li>
       <a href="http://oppiafoundation.org/" target="_blank" rel="noopener">
         <picture>
-          <source type="image/webp" [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')">
-          <source type="image/png" [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')">
-          <img [src]="getStaticImageUrl('/sidebar/oppia-foundation-logo.png')" class="oppia-sidebar-menu-icon" alt="Oppia Foundation">
+          <source type="image/webp"
+                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')">
+          <source type="image/png"
+                  [srcset]="this.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')">
+          <img [src]="getStaticImageUrl('/sidebar/oppia-foundation-logo.png')"
+               class="oppia-sidebar-menu-icon"
+               alt="Oppia Foundation">
         </picture>
         <span>{{ 'I18N_SIDEBAR_OPPIA_FOUNDATION' | translate }}</span>
       </a>
