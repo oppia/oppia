@@ -2,6 +2,7 @@ var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
+var childProcess = require('child_process');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
@@ -336,6 +337,27 @@ exports.config = {
         reportFailedUrl: true,
         preserveDirectory: true
       }));
+    }
+
+    var ADD_VIDEO_REPORTER = true;
+    var spw = '';
+    var ffmpegArgs = ['-video_size','1024x768','-framerate','25','-f','x11grab']
+
+    if (ADD_VIDEO_REPORTER) {
+      jasmine.getEnv().addReporter({
+        jasmineStarted: (result) => {
+          var name = result.fullName + Math.floor(Math.random() * 10) + '.mp4';
+          var vidPath = path.resolve('__dirname', '../protractor-video/') + '/' + name;
+          ffmpegArgs.push(vidPath);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.stdout.on('data',function(data) {console.log(data);});
+          spw.stderr.on('data',function(data) {console.error(data)});
+          spw.on('close',function(data){console.log(data)});
+        },
+        jasmineDone: () => {
+          spw.kill();
+        }
+      });
     }
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
