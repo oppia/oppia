@@ -49,8 +49,8 @@ commands:
     description: "Install ffmpeg"
     steps:
       - run:
-        name: Install ffmpeg
-        command: sudo apt install ffmpeg
+          name: Install ffmpeg
+          command: sudo apt install ffmpeg
 
   merge_target_branch:
     description: "Merge to target branch"
