@@ -260,6 +260,38 @@ class TranslatableTextHandler(base.BaseHandler):
             s.change.content_id == content_id for s in suggestions)
 
 
+class CompletedTranslationsHandler(base.BaseHandler):
+    """Provides translated content for lessons in a given language which
+    can be used as a reference while translating.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles get requests.
+
+        Args: None
+        
+        Raises: InvalidInputException. exp_id or language_code is not valid
+        """
+        language_code = self.request.get('language_code')
+        exp_id = self.request.get('exp_id')
+
+        if not utils.is_supported_audio_language_code(language_code):
+            raise self.InvalidInputException('Invalid language_code: %s' % (
+                language_code))
+
+        if not opportunity_services.is_exploration_available_for_contribution(
+                exp_id):
+            raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
+
+        exp = exp_fetchers.get_exploration_by_id(exp_id)
+        translated_text_and_content = exp.get_completed_translations(
+            language_code)
+        self.values = translated_text_and_content
+        self.render_json(self.values)
+
 class UserContributionRightsDataHandler(base.BaseHandler):
     """Provides contribution rights of the logged in user in translation,
     voiceover and question category on the contributor dashboard.

@@ -116,3 +116,61 @@ class MachineTranslatedText(python_utils.OBJECT):
             'source_text': self.source_text,
             'translated_text': self.translated_text
         }
+
+class CompletedTranslation(python_utils.OBJECT):
+    """The domain object for Completed Translation."""
+
+    def __init__(
+            self, translation_content, original_content):
+        """Constructs a CompletedTransaltion domain object.
+
+        Args:
+            translation_content: str. The translation as a string .
+            original_content: str. The original content which is translated.
+        """
+        self.translation = translation_content
+        self.content = original_content
+        self.validate()
+
+    def validate(self):
+        """Validates various properties of the object.
+
+        Raises:
+            ValidationError. One or more attributes of the object are invalid.
+        """
+        if not isinstance(self.translation, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected transaltion to be a string, received %s' %
+                self.translation)
+        if not isinstance(self.content, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected content to be a string, received %s' %
+                self.content)
+
+    @classmethod
+    def from_dict(cls, completed_translation_dict):
+        """Return a CompletedTranslation domain object from a dict.
+
+        Args:
+            completed_translation_dict: dict. The dict representation of a
+                CompletedTranslation object.
+
+        Returns:
+            CompletedTranslation. The corresponding CompletedTranslation domain object.
+        """
+        return cls(
+            completed_translation_dict['translation'],
+            completed_translation_dict['content'])
+
+    def to_dict(self):
+        """Returns a copy of the object as a dictionary. It includes all
+        necessary information to represent a CompletedTranslation.
+
+        Returns:
+            dict. A dict mapping the fields of CompletedTranslation instance which
+            are required.
+        """
+        return {
+            'translation': self.translation,
+            'content': self.content,
+        }

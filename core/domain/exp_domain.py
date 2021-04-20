@@ -34,6 +34,7 @@ from constants import constants
 from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
+from core.domain import translation_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -1396,6 +1397,50 @@ class Exploration(python_utils.OBJECT):
 
         return state_names_to_content_id_mapping
 
+    def get_completed_translations(self, language_code):
+        """Returns all the contents along with the corresponding
+        translations for which translation in the given language has 
+        been completed.
+
+        Args:
+            language_code: str. The language code in which translation is
+                required.
+        Returns:
+            list(CompletedTranslation). A list of CompletedTranslation object. The object has 
+            content: str. Translation content stiring
+            translation: str. Translated Text string.
+        """
+        completed_translations_and_content = []
+        for state_name, state in self.states.items():
+            translations_and_ids = state.get_translated_text_and_ids(
+                language_code)
+            # First appending all the 'content' type translations to the 
+            # completed_translations_and_ids.
+            for content_id, translated_text in translations_and_ids:
+                if(len(translations_and_ids) > 10):
+                    break
+                if(content_id == 'content'):
+                    completedTranslation = translation_domain.CompletedTranslation(
+                        translated_text,self.get_content_html(state_name, content_id))
+                    completed_translations_and_content.append(
+                        completedTranslation.to_dict())
+
+        for state_name, state in self.states.items():
+            translations_and_ids = state.get_translated_text_and_ids(
+                language_code)
+            # If the 'content' type translations are lesser than 10
+            # appending any available type of translations
+            for content_id, translated_text in translations_and_ids:
+                if(len(translations_and_ids) > 10):
+                    break
+                if(content_id != 'content'):
+                    completedTranslation = translation_domain.CompletedTranslation(
+                        translated_text,self.get_content_html(state_name, content_id))
+                    completed_translations_and_content.append(
+                        completedTranslation.to_dict())
+
+        return completed_translations_and_content
+        
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
