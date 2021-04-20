@@ -30,7 +30,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
     return {
       restrict: 'E',
-      scope: {labelForFocusTarget: '&'},
+      scope: {
+        labelForFocusTarget: '&'
+      },
       bindToController: {
         localValue: '=',
         isDisabled: '&',
@@ -42,11 +44,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', '$window', 'FocusManagerService',
+        '$scope', '$timeout', 'FocusManagerService',
         'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
-            $scope, $timeout, $window, FocusManagerService,
+            $scope, $timeout, FocusManagerService,
             NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
@@ -65,15 +67,6 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.onInputFocus) {
               ctrl.onInputFocus();
             }
-          };
-
-          ctrl.addFocusWithoutScroll = function(label) {
-            FocusManagerService.setFocus(label);
-            // To ensure window scrolls back only
-            // after focus has been applied.
-            $timeout(function() {
-              $window.scrollTo(0, 0);
-            }, 5);
           };
 
           ctrl.onBlur = function() {
@@ -132,7 +125,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {
-              ctrl.addFocusWithoutScroll(labelForFocus);
+              FocusManagerService.setFocusWithoutScroll(labelForFocus);
             }, 50);
             // This prevents the red 'invalid input' warning message from
             // flashing at the outset.

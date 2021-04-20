@@ -31,29 +31,20 @@ angular.module('oppia').directive('schemaBasedExpressionEditor', [
       restrict: 'E',
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', '$window',
+        '$scope', '$timeout',
         'FocusManagerService',
         function(
-            $scope, $timeout, $window,
+            $scope, $timeout,
             FocusManagerService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
-
-          ctrl.addFocusWithoutScroll = function(label) {
-            FocusManagerService.setFocus(label);
-            // To ensure window scrolls back only
-            // after focus has been applied.
-            $timeout(function() {
-              $window.scrollTo(0, 0);
-            }, 5);
-          };
 
           ctrl.$onInit = function() {
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {
-              ctrl.addFocusWithoutScroll(labelForFocus);
-            }, 50);
+              FocusManagerService.setFocusWithoutScroll(labelForFocus);
+            }, 5);
           };
         }
       ]

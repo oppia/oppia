@@ -34,7 +34,9 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
   function() {
     return {
       restrict: 'E',
-      scope: {labelForFocusTarget: '&'},
+      scope: {
+        labelForFocusTarget: '&'
+      },
       bindToController: {
         localValue: '=',
         isDisabled: '&',
@@ -48,12 +50,12 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$sce', '$scope', '$timeout', '$translate',
-        '$window', 'DeviceInfoService', 'FocusManagerService',
+        'DeviceInfoService', 'FocusManagerService',
         'SchemaFormSubmittedService',
         'StateCustomizationArgsService',
         function(
             $filter, $sce, $scope, $timeout, $translate,
-            $window, DeviceInfoService, FocusManagerService,
+            DeviceInfoService, FocusManagerService,
             SchemaFormSubmittedService,
             StateCustomizationArgsService) {
           var ctrl = this;
@@ -63,15 +65,6 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             if (evt.keyCode === 13) {
               SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
-          };
-
-          ctrl.addFocusWithoutScroll = function(label) {
-            FocusManagerService.setFocus(label);
-            // To ensure window scrolls back only
-            // after focus has been applied.
-            $timeout(function() {
-              $window.scrollTo(0, 0);
-            }, 5);
           };
 
           ctrl.getPlaceholder = function() {
@@ -161,8 +154,8 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {
-              ctrl.addFocusWithoutScroll(labelForFocus);
-            }, 50);
+              FocusManagerService.setFocusWithoutScroll(labelForFocus);
+            }, 5);
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();

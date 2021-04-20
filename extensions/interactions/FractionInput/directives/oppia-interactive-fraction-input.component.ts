@@ -138,8 +138,8 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     setTimeout(
       () => {
         let focusLabel: string = this.labelForFocusTarget;
-        this.focusManagerService.setFocus(focusLabel);
-      }, 50);
+        this.focusManagerService.setFocusWithoutScroll(focusLabel);
+      }, 5);
   }
 
   private getAttributesObject() {

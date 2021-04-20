@@ -50,14 +50,14 @@ angular.module('oppia').directive('progressNav', [
       },
       template: require('./progress-nav.directive.html'),
       controller: [
-        '$scope', '$timeout', '$window', 'BrowserCheckerService',
+        '$scope', '$timeout', 'BrowserCheckerService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
         'FocusManagerService',
         'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
         'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
         function(
-            $scope, $timeout, $window, BrowserCheckerService,
+            $scope, $timeout, BrowserCheckerService,
             ExplorationEngineService, ExplorationPlayerStateService,
             FocusManagerService,
             PlayerPositionService, PlayerTranscriptService, UrlService,
@@ -69,13 +69,6 @@ angular.module('oppia').directive('progressNav', [
           var interactionIsInline = true;
           var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
             'ItemSelectionInput', 'MultipleChoiceInput'];
-
-          ctrl.addFocusWithoutScroll = function(label) {
-            FocusManagerService.setFocus(label);
-            $timeout(function() {
-              $window.scrollTo(0, 0);
-            }, 5);
-          };
 
           var updateDisplayedCardInfo = function() {
             transcriptLength = PlayerTranscriptService.getNumCards();
@@ -95,8 +88,9 @@ angular.module('oppia').directive('progressNav', [
                 $scope.displayedCard.getInteractionCustomizationArgs();
               $scope.interactionId = $scope.displayedCard.getInteractionId();
               if ($scope.interactionId === 'Continue') {
+                // To ensure that focus is added only after
                 $timeout(() => {
-                  ctrl.addFocusWithoutScroll('ctn-btn');
+                  FocusManagerService.setFocusWithoutScroll('continue-btn');
                 }, 0);
               }
             }
