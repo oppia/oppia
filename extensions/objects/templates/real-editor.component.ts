@@ -38,7 +38,9 @@ export class RealEditorComponent implements OnInit {
   }
 
   updateValue(newValue: number | string): void {
-    if (this.value === newValue) {
+    if (
+      this.value === newValue ||
+      (newValue === '' || newValue === null) && this.value === 0.0) {
       return;
     }
     if (newValue === '' || newValue === null) {
