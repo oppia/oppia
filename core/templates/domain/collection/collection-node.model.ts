@@ -83,7 +83,7 @@ export class CollectionNode {
   // This property is immutable. The value returned by this function is
   // null if doesExplorationExist() returns false.
   getExplorationTitle(): string {
-    if (this._explorationSummaryObject) {
+    if (this.doesExplorationExist()) {
       return this._explorationSummaryObject.title;
     } else {
       return '';
@@ -100,7 +100,7 @@ export class CollectionNode {
   // not published. This property is immutable. The value returned by this
   // function is undefined if doesExplorationExist() returns false.
   isExplorationPrivate(): boolean {
-    if (this._explorationSummaryObject) {
+    if (this.doesExplorationExist()) {
       return this._explorationSummaryObject.status === (
         AppConstants.ACTIVITY_STATUS_PRIVATE);
     } else {
