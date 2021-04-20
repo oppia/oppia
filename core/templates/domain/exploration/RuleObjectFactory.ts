@@ -92,7 +92,7 @@ export class RuleObjectFactory {
         varType = varType.substring(1);
       }
 
-      ruleInputTypes[parseInt(varName)] = varType;
+      ruleInputTypes[varName] = varType;
       ruleDescription = ruleDescription.replace(PATTERN, ' ');
     }
     return new Rule(ruleType, ruleDict.inputs, ruleInputTypes);
