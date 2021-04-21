@@ -147,13 +147,9 @@ jobs:
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
       - run:
-          name: Run e2e publication test
-          command: |
-            python -m scripts.run_e2e_tests --suite="publication" --deparallelize-terser --skip-install --server_log_level="info" --prod_env
-      - run:
           name: Run e2e library test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --deparallelize_terser --suite="library" --prod_env
       - persist_to_workspace:
           root: /home/circleci/
           paths:
