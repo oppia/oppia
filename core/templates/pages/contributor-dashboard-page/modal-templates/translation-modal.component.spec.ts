@@ -23,6 +23,7 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
@@ -35,7 +36,7 @@ class MockChangeDetectorRef {
 }
 
 describe('Translation Modal Component', () => {
-  let contextService: ContextService;
+  let oppiaAngularRootComponent: OppiaAngularRootComponent;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
@@ -64,6 +65,7 @@ describe('Translation Modal Component', () => {
       ],
       providers: [
         NgbActiveModal,
+        ContextService,
         {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef
@@ -71,6 +73,7 @@ describe('Translation Modal Component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+    OppiaAngularRootComponent.contextService = TestBed.get(ContextService);
   }));
 
   beforeEach(() => {
@@ -79,7 +82,6 @@ describe('Translation Modal Component', () => {
     component.opportunity = opportunity;
     httpTestingController = TestBed.inject(HttpTestingController);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
-    contextService = TestBed.inject(ContextService);
     activeModal = TestBed.inject(NgbActiveModal);
     translateTextService = TestBed.inject(TranslateTextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -146,10 +148,10 @@ describe('Translation Modal Component', () => {
       spyOn(translateTextService, 'init').and.callFake(
         (expId, languageCode, successCallback) => successCallback());
       component.ngOnInit();
-      expect(contextService.getEntityType()).toBe(
+      expect(OppiaAngularRootComponent.contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
-      expect(contextService.getEntityId()).toBe('1');
-      expect(contextService.imageSaveDestination).toBe(
+      expect(OppiaAngularRootComponent.contextService.getEntityId()).toBe('1');
+      expect(OppiaAngularRootComponent.contextService.imageSaveDestination).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
@@ -428,13 +430,34 @@ describe('Translation Modal Component', () => {
         flushMicrotasks();
       }));
 
-    it('should reset the image save destination', () => {
+    it('should not reset the image save destination', () => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
-      expect(contextService.imageSaveDestination).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      expect(
+        OppiaAngularRootComponent.contextService.imageSaveDestination
+      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
       component.suggestTranslatedText();
-      expect(contextService.imageSaveDestination).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      expect(
+        OppiaAngularRootComponent.contextService.imageSaveDestination
+      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     });
+
+    it('should reset the image save destination', fakeAsync(() => {
+      component.suggestTranslatedText();
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.getAll('payload')[0]).toEqual(
+        JSON.stringify(expectedPayload));
+      req.flush({
+        error: 'Error'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+      component.suggestTranslatedText();
+      expect(
+        OppiaAngularRootComponent.contextService.imageSaveDestination
+      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    }));
   });
 });
