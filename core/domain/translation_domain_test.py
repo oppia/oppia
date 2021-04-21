@@ -108,3 +108,30 @@ class MachineTranslatedTextTests(test_utils.GenericTestBase):
                 'translated_text': 'hola mundo'
             }
         )
+
+class CompletedTranslationTest(test_utils.GenericTestBase):
+    """Tests for the CompletedTranslation domain object."""
+
+    def setUp(self):
+        super(CompletedTranslationTest, self).setUp()
+        self.valid_skill_opportunity = (
+            translation_domain.CompletedTranslation.from_dict({
+                'translation': '<p>Translation 1</p>',
+                'content': '<p>Content 1</p>'
+            }))
+
+    def test_to_and_from_dict_works_correctly(self):
+        completed_translation_dict = {
+            'translation': '<p>Translation 1</p>',
+            'content': '<p>Content 1</p>'
+        }
+
+        completed_translation = (translation_domain.CompletedTranslation
+            .from_dict(completed_translation_dict))
+
+        self.assertTrue(isinstance(
+            completed_translation, translation_domain.CompletedTranslation))
+        self.assertEqual(completed_translation.to_dict(), {
+            'translation': '<p>Translation 1</p>',
+            'content': '<p>Content 1</p>'
+        })

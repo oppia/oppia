@@ -487,6 +487,125 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(output, expected_output)
 
 
+class CompletedTranslationsHandlerTest(test_utils.GenericTestBase):
+    """Unit test for the CompletedTranslationsHandler"""
+
+    def setUp(self):
+        super(CompletedTranslationsHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        explorations = [self.save_new_valid_exploration(
+            '%s' % i,
+            self.owner_id,
+            title='title %d' % i,
+            category='category%d' % i,
+            end_state_name='End State',
+            correctness_feedback_enabled=True
+        ) for i in python_utils.RANGE(2)]
+
+        for exp in explorations:
+            self.publish_exploration(self.owner_id, exp.id)
+
+        topic = topic_domain.Topic.create_default_topic(
+            '0', 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
+
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            'title %d' % i,
+            'description %d' % i,
+            '0',
+            'title-%s' % chr(97 + i)
+        ) for i in python_utils.RANGE(2)]
+
+        for index, story in enumerate(stories):
+            story.language_code = 'en'
+            story_services.save_new_story(self.owner_id, story)
+            topic_services.add_canonical_story(
+                self.owner_id, topic.id, story.id)
+            topic_services.publish_story(topic.id, story.id, self.admin_id)
+            story_services.update_story(
+                self.owner_id, story.id, [story_domain.StoryChange({
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'Node1',
+                }), story_domain.StoryChange({
+                    'cmd': 'update_story_node_property',
+                    'property_name': 'exploration_id',
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': explorations[index].id
+                })], 'Changes.')
+
+    def test_handler_with_invalid_language_code_raises_exception(self):
+        self.get_json('/getcompletedtranslationshandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        }, expected_status_int=200)
+
+        self.get_json('/getcompletedtranslationshandler', params={
+            'language_code': 'invalid_lang_code',
+            'exp_id': '0'
+        }, expected_status_int=400)
+
+    def test_handler_with_exp_id_not_for_contribution_raises_exception(self):
+        self.get_json('/getcompletedtranslationshandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        }, expected_status_int=200)
+
+        new_exp = exp_domain.Exploration.create_default_exploration(
+            'not_for_contribution')
+        exp_services.save_new_exploration(self.owner_id, new_exp)
+
+        self.get_json('/getcompletedtranslationshandler', params={
+            'language_code': 'hi',
+            'exp_id': 'not_for_contribution'
+        }, expected_status_int=400)
+
+    def test_handler_returns_correct_data(self):
+        exp_services.update_exploration(
+            self.owner_id, '0', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': '<p>Test content</p>'
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p>Test content</p>',
+                'translation_html': '<p>Translated text</p>'
+            })], 'Changes content and adds translation')
+
+        output = self.get_json('/getcompletedtranslationshandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        })
+
+        expected_output = [{
+            'content': '<p>Test content</p>',
+            'translation': '<p>Translated text</p>'
+        }]
+        self.assertEqual(output, expected_output)
+                
 class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     """Test for the UserContributionRightsDataHandler."""
 
