@@ -68,16 +68,14 @@ export class TranslateTextBackendApiService {
   }
 
   async fetchCompletedTranslationsAndTextAsync(
-    expId: string, languageCode: string): 
+      expId: string, languageCode: string):
       Promise<CompletedTranslation[]> {
-    console.log(languageCode, expId);
-    return this.http.get('/getcompletedtranslationshandler',{
+    return this.http.get('/getcompletedtranslationshandler', {
       params: {
         exp_id: expId,
         language_code: languageCode
       }
     }).toPromise().then((body) => {
-      console.log(body);
       return body;
     }, (errorResponse) => {
       return errorResponse.error;

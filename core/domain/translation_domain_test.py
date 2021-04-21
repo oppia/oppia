@@ -126,7 +126,8 @@ class CompletedTranslationTest(test_utils.GenericTestBase):
             'content': '<p>Content 1</p>'
         }
 
-        completed_translation = (translation_domain.CompletedTranslation
+        completed_translation = (
+            translation_domain.CompletedTranslation
             .from_dict(completed_translation_dict))
 
         self.assertTrue(isinstance(

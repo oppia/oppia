@@ -183,12 +183,13 @@ export class TranslateTextService {
       translationHtml,
       imagesData).then(successCallback);
   }
-  
-  loadCompletedTranslationsText(expId, languageCode) {
+
+  loadCompletedTranslationsText(
+      expId: string, languageCode: string): void {
     this.translateTextBackedApiService.
-      fetchCompletedTranslationsAndTextAsync(expId, languageCode).
-        then((recievedTranslationsAndTextArray) => {
-        this.completedTranslationsArray = recievedTranslationsAndTextArray;
+    fetchCompletedTranslationsAndTextAsync(expId, languageCode).
+      then((recievedTranslationsAndTextArray) => {
+      this.completedTranslationsArray = recievedTranslationsAndTextArray;
     });
   }
 

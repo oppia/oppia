@@ -16,33 +16,32 @@
  * @fileoverview Frontend Model for completed translation.
  */
 
- export interface CompletedTranslationBackendDict {
+export interface CompletedTranslationBackendDict {
   'translation': string;
   'content': string;
 }
-  
-  export class CompletedTranslation {
-    translation: string;
-    content: string;
-    
-    constructor(
-        translation: string, content: string) {
-      this.translation = translation;
-      this.content = content;
-    }
-  
-    static createFromBackendDict(
-        backendDict: CompletedTranslationBackendDict): CompletedTranslation {
-      return new CompletedTranslation(
-        backendDict.translation, backendDict.content);
-    }
-  
-    getTranslation(): string {
-      return this.translation;
-    }
-  
-    getContent(): string {
-      return this.content;
-    }
+
+export class CompletedTranslation {
+  translation: string;
+  content: string;
+   
+  constructor(
+      translation: string, content: string) {
+    this.translation = translation;
+    this.content = content;
+  }
+
+  static createFromBackendDict(
+      backendDict: CompletedTranslationBackendDict): CompletedTranslation {
+    return new CompletedTranslation(
+      backendDict.translation, backendDict.content);
   }
   
+  getTranslation(): string {
+    return this.translation;
+  }
+
+  getContent(): string {
+    return this.content;
+  }
+}

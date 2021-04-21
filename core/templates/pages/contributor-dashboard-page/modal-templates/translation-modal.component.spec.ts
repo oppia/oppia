@@ -167,7 +167,7 @@ describe('Translation Modal Component', () => {
         .and.callThrough();
       spyOn(translateTextService, 'loadCompletedTranslationsText').and.
         callFake((expId, languageCode) => {});
-        component.ngOnInit();
+      component.ngOnInit();
       expect(component.loadingData).toBeTrue();
       expect(translateTextService.init).toHaveBeenCalled();
 
@@ -303,7 +303,7 @@ describe('Translation Modal Component', () => {
         }
       };
       spyOn(translateTextService, 'loadCompletedTranslationsText').and.
-          callFake((expId, languageCode) => {});
+        callFake((expId, languageCode) => {});
       component.ngOnInit();
 
       const sampleStateWiseContentMapping = {
@@ -454,27 +454,23 @@ describe('Translation Modal Component', () => {
   });
 
   describe('on clicking the view completed translations button', () => {
-    beforeEach(fakeAsync(() => {
-      
-    }));
     afterEach(() => {
       httpTestingController.verify();
     });
     it('should open view completed translations modal if closed', fakeAsync(
       () => {
-        
         component.viewCompletedTranslationsModalOpen = false;
         component.toggleViewCompletedTranslationsModal();
         expect(component.viewCompletedTranslationsModalOpen).toBe(true);
       }
-    ))
+    ));
     it('should close view completed translations modal if open', fakeAsync(
       () => {
         component.viewCompletedTranslationsModalOpen = true;
         component.toggleViewCompletedTranslationsModal();
         expect(component.viewCompletedTranslationsModalOpen).toBe(false);
       }
-    ))
+    ));
     it('should set the load the completed translations correctly', fakeAsync(
       () => {
         spyOn(translateTextService, 'init').and.callFake(
@@ -502,7 +498,8 @@ describe('Translation Modal Component', () => {
           toHaveBeenCalled();
         expect(component.loadingCompletedTranslations).toBe(false);
         expect(component.noTranslationComplete).toBe(false);
-        expect(component.completedTranslationsList).toBe(sampleCompletedTranslations);
+        expect(component.completedTranslationsList).
+          toBe(sampleCompletedTranslations);
       }));
-  })
+  });
 });

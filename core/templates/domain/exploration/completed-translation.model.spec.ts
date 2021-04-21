@@ -16,34 +16,34 @@
  * @fileoverview Unit tests for CompletedTranslationModel.
  */
 
- import { CompletedTranslation, CompletedTranslationBackendDict } from
- 'domain/exploration/completed-translation.model';
+import { CompletedTranslation, CompletedTranslationBackendDict } from
+'domain/exploration/completed-translation.model';
 
 describe('Completed Translation model', () => {
- describe('CompletedTranslationModel', () => {
-   let backendDict: CompletedTranslationBackendDict;
+  describe('CompletedTranslationModel', () => {
+    let backendDict: CompletedTranslationBackendDict;
 
-   beforeEach(() => {
-     backendDict = {
-       translation: 'translation',
-       content: 'content',
-      };
-   });
+    beforeEach(() => {
+      backendDict = {
+        translation: 'translation',
+        content: 'content',
+        };
+    });
 
-   it('should return correct translation', () => {
-    let completedTranslation = (
-      CompletedTranslation.createFromBackendDict(backendDict));
+    it('should return correct translation', () => {
+      let completedTranslation = (
+        CompletedTranslation.createFromBackendDict(backendDict));
 
-    expect(completedTranslation.getTranslation()).toEqual(
-      'translation');
+      expect(completedTranslation.getTranslation()).toEqual(
+        'translation');
+    });
+
+    it('should return correct content', () => {
+      let completedTranslation = (
+        CompletedTranslation.createFromBackendDict(backendDict));
+
+      expect(completedTranslation.getContent()).toEqual(
+        'content');
+    });
   });
-
-  it('should return correct content', () => {
-    let completedTranslation = (
-      CompletedTranslation.createFromBackendDict(backendDict));
-
-    expect(completedTranslation.getContent()).toEqual(
-      'content');
-  });
- });
 });

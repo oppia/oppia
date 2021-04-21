@@ -149,14 +149,15 @@ class CompletedTranslation(python_utils.OBJECT):
 
     @classmethod
     def from_dict(cls, completed_translation_dict):
-        """Return a CompletedTranslation domain object from a dict.
+        """Returns a CompletedTranslation domain object from a dict.
 
         Args:
             completed_translation_dict: dict. The dict representation of a
                 CompletedTranslation object.
 
         Returns:
-            CompletedTranslation. The corresponding CompletedTranslation domain object.
+            CompletedTranslation. The corresponding CompletedTranslation
+            domain object.
         """
         return cls(
             completed_translation_dict['translation'],
@@ -167,8 +168,8 @@ class CompletedTranslation(python_utils.OBJECT):
         necessary information to represent a CompletedTranslation.
 
         Returns:
-            dict. A dict mapping the fields of CompletedTranslation instance which
-            are required.
+            dict. A dict mapping the fields of CompletedTranslation instance
+            which are required.
         """
         return {
             'translation': self.translation,

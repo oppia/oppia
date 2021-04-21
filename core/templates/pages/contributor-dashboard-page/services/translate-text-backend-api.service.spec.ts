@@ -243,5 +243,5 @@ describe('TranslateTextBackendApiService', () => {
       req.error(errorEvent);
       flushMicrotasks();
     }));
-  })
+  });
 });

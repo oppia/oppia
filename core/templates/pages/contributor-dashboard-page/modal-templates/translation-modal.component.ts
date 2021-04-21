@@ -28,7 +28,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { AppConstants } from 'app.constants';
-import { CompletedTranslation } from 'domain/exploration/CompletedTranslation.model';
+import { CompletedTranslation } from 'domain/exploration/completed-translation.model';
 import constants from 'assets/constants';
 
 class UiConfig {
@@ -100,7 +100,7 @@ export class TranslationModalComponent {
     this.contextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription = (
       this.translationLanguageService.getActiveLanguageDescription());
-      this.translateTextService.init(
+    this.translateTextService.init(
       this.opportunity.id,
       this.translationLanguageService.getActiveLanguageCode(),
       () => {
@@ -120,7 +120,8 @@ export class TranslationModalComponent {
       }
     };
     this.translateTextService.
-      loadCompletedTranslationsText(this.opportunity.id, 
+      loadCompletedTranslationsText(
+        this.opportunity.id,
         this.translationLanguageService.getActiveLanguageCode());
   }
 

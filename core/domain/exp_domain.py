@@ -1399,15 +1399,17 @@ class Exploration(python_utils.OBJECT):
 
     def get_completed_translations(self, language_code):
         """Returns all the contents along with the corresponding
-        translations for which translation in the given language has 
+        translations for which translation in the given language has
         been completed.
 
         Args:
             language_code: str. The language code in which translation is
                 required.
+
         Returns:
-            list(CompletedTranslation). A list of CompletedTranslation object. The object has 
-            content: str. Translation content stiring
+            list(CompletedTranslation). A list of CompletedTranslation object.
+            The object contians
+            content: str. Translation content string.
             translation: str. Translated Text string.
         """
         completed_translations_and_content = []
@@ -1417,28 +1419,28 @@ class Exploration(python_utils.OBJECT):
             # First appending all the 'content' type translations to the 
             # completed_translations_and_ids.
             for content_id, translated_text in translations_and_ids:
-                if(len(translations_and_ids) > 10):
+                if len(translations_and_ids) > 10:
                     break
-                if(content_id == 'content'):
-                    completedTranslation = translation_domain.CompletedTranslation(
-                        translated_text,self.get_content_html(state_name, content_id))
+                if content_id == 'content':
+                    completed_translation = (translation_domain.
+                        CompletedTranslation(translated_text,
+                        self.get_content_html(state_name, content_id)))
                     completed_translations_and_content.append(
-                        completedTranslation.to_dict())
+                        completed_translation.to_dict())
 
         for state_name, state in self.states.items():
             translations_and_ids = state.get_translated_text_and_ids(
                 language_code)
             # If the 'content' type translations are lesser than 10
-            # appending any available type of translations
+            # appending any available type of translations.
             for content_id, translated_text in translations_and_ids:
-                if(len(translations_and_ids) > 10):
+                if len(translations_and_ids) > 10:
                     break
-                if(content_id != 'content'):
+                if content_id != 'content':
                     completedTranslation = translation_domain.CompletedTranslation(
                         translated_text,self.get_content_html(state_name, content_id))
                     completed_translations_and_content.append(
                         completedTranslation.to_dict())
-
         return completed_translations_and_content
         
     def get_trainable_states_dict(self, old_states, exp_versions_diff):

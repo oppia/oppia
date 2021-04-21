@@ -605,7 +605,7 @@ class CompletedTranslationsHandlerTest(test_utils.GenericTestBase):
             'translation': '<p>Translated text</p>'
         }]
         self.assertEqual(output, expected_output)
-                
+
 class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     """Test for the UserContributionRightsDataHandler."""
 

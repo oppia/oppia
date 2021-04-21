@@ -270,10 +270,8 @@ class CompletedTranslationsHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles get requests.
-
         Args: None
-        
-        Raises: InvalidInputException. exp_id or language_code is not valid
+        Raises: InvalidInputException. exp_id or language_code is not valid.
         """
         language_code = self.request.get('language_code')
         exp_id = self.request.get('exp_id')

@@ -3033,13 +3033,13 @@ class State(python_utils.OBJECT):
         # translations which needs update.
 
         return content_id_to_html
-    
+
     def get_translated_text_and_ids(self, language_code):
         """Returns all the html that has been translated in a
-        a given language and their ids corresponding to translations.
+        a given language and their ids corresponding to translations.        
         
         Args:
-            language_code: str. The ISO 639-1 language code of the language.
+            language_code: str. The ISO 639-1 language code of the language.        
         
         Returns:
             list(tuple(str, str)). A list of tuples with first element
@@ -3047,7 +3047,7 @@ class State(python_utils.OBJECT):
         """
         translated_content_ids = (
             self.written_translations.
-                get_content_ids_that_are_correctly_translated(language_code))
+            get_content_ids_that_are_correctly_translated(language_code))
         translations_and_ids = []
         for content_id in translated_content_ids:
             translations_and_ids.append(
@@ -3056,12 +3056,14 @@ class State(python_utils.OBJECT):
         return translations_and_ids
 
     def get_translated_content_with_content_id(self, content_id, language_code):
-        """returns the translation corresponding to the given content id
+        """Returns the translation corresponding to the given content id
         in the language.
+        
         Args:
             content_id: str. The content id of the completed translation in the
                 given language.
             language_code: str. The ISO 639-1 language code of the language.
+        
         Returns:
             tuple(str, list(str)) A tuple containing two elements. The
             first element is the content id string and the second element
