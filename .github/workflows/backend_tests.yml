@@ -36,12 +36,12 @@ jobs:
       - name: Install coverage and configparser
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install coverage configparser
+      - name: Test html
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -c "import html; print(html.__file__)"
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
-      - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -c "import html; print(html.__file__)"
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: actions/upload-artifact@v2
