@@ -63,7 +63,7 @@
                 <select [(ngModel)]="itemsPerPage"
                         (change)="refreshPagination()"
                         attr.aria-label="Items Per Page">
-                  <option *ngFor="let choice of itemsPerPageCHoice" [value]="choice" >{{ choice }}</option>
+                  <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
                 </select>
               </div>
               <div *ngIf="activeTab === TAB_NAME_TOPICS">
@@ -71,9 +71,9 @@
                 <span class="dashboard-list-pagination-value"
                       *ngFor=" let n of generateNumbersTillRange(currentCount/itemsPerPage); index as idx" (click)="goToPageNumber(idx)">
                   <span *ngIf="pageNumber === idx" class="dashboard-list-pagination-active">
-                    <span>{{ idx + 1 }</span>
+                    <span>{{ idx + 1 }}</span>
                   </span>
-                  <span *ngIf="pageNumber !== idx">{{ idx + 1 }</span>
+                  <span *ngIf="pageNumber !== idx">{{ idx + 1 }}</span>
                 </span>
                 <i class="fa fa-angle-right topic-pagination-arrow" (click)="changePageByOne(MOVE_TO_NEXT_PAGE)"></i>
               </div>
