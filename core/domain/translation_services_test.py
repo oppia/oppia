@@ -44,22 +44,34 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 'en', 'en', 'text to translate')
         )
         self.assertEqual(translated_text, 'text to translate')
-        translation = translation_fetchers.get_machine_translated_text(
+        translation = translation_fetchers.get_machine_translation(
             'en', 'en', 'text to translate')
         self.assertIsNone(translation)
 
-    def test_machine_translation_with_invalid_language_code_raises_exception(
+    def test_machine_translation_with_non_allowlisted_language_returns_none(
             self):
-        with self.assertRaisesRegexp(
-            ValueError, 'Invalid target language code: invalid_language_code'
-        ):
+        translated_text = (
             translation_services.get_and_cache_machine_translation(
-                'en', 'invalid_language_code', 'text to translate')
-        with self.assertRaisesRegexp(
-            ValueError, 'Invalid source language code: invalid_language_code'
-        ):
+                'en', 'hi', 'text to translate')
+        )
+        self.assertIsNone(translated_text)
+        translated_text = (
             translation_services.get_and_cache_machine_translation(
-                'invalid_language_code', 'es', 'text to translate')
+                'hi', 'en', 'text to translate')
+        )
+        self.assertIsNone(translated_text)
+        # Ensure that no translation is cached when returning none (no
+        # translation found).
+        self.assertIsNone(
+            translation_models.MachineTranslationModel.get_machine_translation(
+                'en', 'hi', 'text to translated'
+            )
+        )
+        self.assertIsNone(
+            translation_models.MachineTranslationModel.get_machine_translation(
+                'hi', 'en', 'text to translated'
+            )
+        )
 
     def test_get_machine_translation_checks_datastore_first(self):
         with self.swap_to_always_raise(
@@ -79,7 +91,7 @@ class TranslationServiceTests(test_utils.GenericTestBase):
                 'en', 'fr', 'hello world')
         )
         self.assertEqual(translated_text, 'Bonjour le monde')
-        translation = translation_fetchers.get_machine_translated_text(
+        translation = translation_fetchers.get_machine_translation(
             'en', 'fr', 'hello world')
         self.assertIsNotNone(translation)
         self.assertEqual(translation.translated_text, 'Bonjour le monde')

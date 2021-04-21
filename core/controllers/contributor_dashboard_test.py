@@ -595,13 +595,11 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=200
         )
+
         expected_output = {
             'translated_texts': {
                 'content': 'Por favor continua.',
                 'invalid_content_id': None
-            },
-            'errors': {
-                'invalid_content_id': 'Invalid content_id: invalid_content_id'
             }
         }
         self.assertEqual(output, expected_output)
@@ -629,8 +627,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=200
         )
         expected_output = {
-            'translated_texts': {},
-            'errors': {}
+            'translated_texts': {}
         }
         self.assertEqual(output, expected_output)
 
@@ -670,8 +667,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         )
 
         expected_output = {
-            'translated_texts': {'content': 'Por favor continua.'},
-            'errors': {}
+            'translated_texts': {'content': 'Por favor continua.'}
         }
         self.assertEqual(output, expected_output)
 
