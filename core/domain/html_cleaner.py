@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import html
 print(dir(html))
+print(html.__name__)
 print(html.__path__)
 print(os.listdir(html.__path__[0]))
 
