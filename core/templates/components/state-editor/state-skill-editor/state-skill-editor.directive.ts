@@ -15,6 +15,10 @@
 /**
  * @fileoverview Directive for the Skill editor section in the state editor.
 */
+import { CategorizedSkills } from
+  // eslint-disable-next-line
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
 
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -48,8 +52,8 @@ angular.module('oppia').directive('stateSkillEditor', [
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService) {
           var ctrl = this;
-          var categorizedSkills = null;
-          var untriagedSkillSummaries = null;
+          var categorizedSkills: CategorizedSkills = null;
+          var untriagedSkillSummaries: SkillSummary = null;
           var _init = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
               .then(function(response) {

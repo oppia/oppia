@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
-  // eslint-disable-next-line max-len
+  // eslint-disable-next-line
   'components/state-editor/state-editor-properties-services/state-property.service';
 import { UtilsService } from 'services/utils.service';
 

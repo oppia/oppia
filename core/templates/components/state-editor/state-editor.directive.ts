@@ -63,7 +63,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service');
-require('services/context.service');
+require(
+  'pages/exploration-editor-page/editor-tab/' +
+  'exploration-editor-tab.component.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -91,12 +93,13 @@ angular.module('oppia').directive('stateEditor', [
         onSaveStateContent: '=',
         recomputeGraph: '=',
         refreshWarnings: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
+        explorationIsLinkedToStory: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$http', '$scope', 'ContextService', 'StateContentService',
+        '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService',
         'StateLinkedSkillIdService', 'StateNameService',
@@ -104,7 +107,7 @@ angular.module('oppia').directive('stateEditor', [
         'StateSolicitAnswerDetailsService', 'StateSolutionService',
         'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $http, $scope, ContextService, StateContentService,
+            $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService,
             StateLinkedSkillIdService, StateNameService,
@@ -140,16 +143,6 @@ angular.module('oppia').directive('stateEditor', [
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
-            ctrl.explorationId = ContextService.getExplorationId();
-            ctrl.explorationUrl = UrlInterpolationService.interpolateUrl(
-              '/createhandler/data/<exploration_id>', {
-                exploration_id: ctrl.explorationId
-              });
-            $http.get(ctrl.explorationUrl)
-              .then(function(response) {
-                $scope.explorationIsLinkedToStory = (
-                  response.data.exploration_is_linked_to_story);
-              });
             ctrl.directiveSubscriptions.add(
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {
