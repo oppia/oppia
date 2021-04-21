@@ -109,3 +109,15 @@ angular.module('oppia').directive('createActivityButton', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'create-activity-button'
+})
+export class CreateActivityButtonDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('createActivityButton', elementRef, injector);
+  }
+}

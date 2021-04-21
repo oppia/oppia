@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for navigating the top navigation bar with
+ * @fileoverview Service for navigating the top navigation bar with
  * tab and shift-tab.
  */
 angular.module('oppia').factory('NavigationService', [function() {
