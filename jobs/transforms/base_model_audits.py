@@ -228,7 +228,8 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
             yield audit_errors.ModelDomainObjectValidateError(input_model, e)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
+@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel,
+    base_models.BaseSnapshotMetadataModel)
 class ValidateCommitType(beam.DoFn):
     """DoFn to check whether commit type is valid."""
 
