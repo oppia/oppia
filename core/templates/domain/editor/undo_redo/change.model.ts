@@ -555,6 +555,11 @@ interface TopicAddSubtopicChange {
   'title': string;
 }
 
+interface TopicAddUncategorizedSkillId {
+  'cmd': 'add_uncategorized_skill_id',
+  'new_uncategorized_skill_id': string
+}
+
 interface TopicDeleteSubtopicChange {
   'cmd': 'delete_subtopic';
   'subtopic_id': number;
@@ -612,6 +617,7 @@ export type TopicChange = (
   TopicSubtopicPropertyChange |
   TopicSubtopicPagePropertyChange |
   TopicAddSubtopicChange |
+  TopicAddUncategorizedSkillId |
   TopicDeleteSubtopicChange |
   TopicMoveSkillToSubtopicChange |
   TopicRemoveSkillFromSubtopicChange |

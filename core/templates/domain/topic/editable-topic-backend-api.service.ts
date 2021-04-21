@@ -203,7 +203,7 @@ export class EditableTopicBackendApiService {
 
   private _updateTopic(
       topicId: string,
-      topicVersion: string,
+      topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[],
       successCallback: (value?: UpdateTopicResponse) => void,
@@ -302,7 +302,7 @@ export class EditableTopicBackendApiService {
    */
   updateTopic(
       topicId: string,
-      topicVersion: string,
+      topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[]): Promise<UpdateTopicResponse> {
     return new Promise((resolve, reject) => {
