@@ -72,13 +72,10 @@ describe('Contributor dashboard page', function() {
   }));
 
   it('should set focus on select lang field', function() {
-    var focusSpy = spyOn(focusManagerService, 'setFocus');
-    var windowSpy = spyOn ($window, 'scrollTo');
+    var focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
     ctrl.onTabClick('translateTextTab');
     $timeout.flush();
     expect(focusSpy).toHaveBeenCalled();
-    $timeout.flush();
-    expect(windowSpy).toHaveBeenCalled();
   });
 
   describe('when user is logged in', function() {

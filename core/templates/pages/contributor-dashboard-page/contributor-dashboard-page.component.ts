@@ -51,13 +51,13 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$timeout', '$window', 'FocusManagerService',
+    '$rootScope', '$timeout', 'FocusManagerService',
     'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
-        $rootScope, $timeout, $window, FocusManagerService,
+        $rootScope, $timeout, FocusManagerService,
         LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
@@ -94,21 +94,13 @@ angular.module('oppia').component('contributorDashboardPage', {
 
       ctrl.onTabClick = function(activeTabName) {
         ctrl.activeTabName = activeTabName;
-        // The $timeout is required because at execution time,
-        // the element may not be present in the DOM yet. Thus, it ensures
-        // that the element is visible before focusing.
+        // The $timeout is required to ensure that focus is applied only 
+        // after all the functions in main thread have executed.
         if (ctrl.activeTabName === 'translateTextTab') {
           $timeout(() => {
-            ctrl.addFocusWithoutScroll('selectLangDropDown');
-          }, 0);
+            FocusManagerService.setFocusWithoutScroll('selectLangDropDown');
+          }, 5);
         }
-      };
-
-      ctrl.addFocusWithoutScroll = function(label) {
-        FocusManagerService.setFocus(label);
-        $timeout(function() {
-          $window.scrollTo(0, 0);
-        }, 5);
       };
 
       ctrl.$onInit = function() {

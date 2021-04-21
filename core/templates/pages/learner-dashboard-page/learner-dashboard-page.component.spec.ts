@@ -461,16 +461,11 @@ describe('Learner dashboard page', () => {
       expect(component.explorationPlaylist.length).toBe(10);
     }));
 
-    it('should set focus on browse lesson btn and' +
-      ' scroll back to top of window after focusing', fakeAsync(() => {
-      const focusSpy = spyOn(focusManagerService, 'setFocus');
-      const windowSpy = spyOn(windowRef.nativeWindow, 'scrollTo');
-      component.addFocusWithoutScroll('ourLessonsBtn');
-
+    it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
+      const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      component.ngOnInit();
       flush();
-
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-      expect(windowSpy).toHaveBeenCalled();
     }));
 
     it('should get static image url', () => {
