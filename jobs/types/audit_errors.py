@@ -179,7 +179,14 @@ class ModelExpiringError(BaseAuditError):
         self.message = 'mark model as deleted when older than %s days' % (
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
 
+class ModelIncorrectKeyError(BaseAuditError):
+    """ Error when incorrect key is found in PendingDeletionRequestModel """
 
+    def __init__(self,model):
+        super(ModelIncorrectKeyError,self).__init__(model)
+        self.message = 'Entity id %s: contains keys %s that are not allowed' % (
+                        item.id, incorrect_keys)
+                    
 class ModelRelationshipError(BaseAuditError):
     """Error class for models with invalid relationships."""
 

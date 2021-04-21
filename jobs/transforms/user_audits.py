@@ -52,6 +52,34 @@ class ValidateModelWithUserId(base_model_audits.ValidateBaseModelId):
         self._pattern = feconf.USER_ID_REGEX
 
 
+@audit_decorators.AuditsExisting(user_models.PendingDeletionRequestModel)
+class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
+    """DoFn to check for Validates that pseudonymizable_entity_mappings"""
+
+    def process(self, input_model):
+        """Function that check for incorrect key in model.
+
+        Args:
+            input_model: user_models.PendingDeletionRequestModel. Entity to
+                validate.
+
+        Yields:
+            ModelIncorrectkeyError. An error class for incorrect key.
+        """
+        model = job_utils.clone_model(input_model)
+
+        incorrect_keys = []
+        allowed_keys = [
+            name for name in
+            models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES.__dict__]
+        for key in model.pseudonymizable_entity_mappings.keys():
+            if key not in allowed_keys:
+                incorrect_keys.append(key)
+
+        if incorrect_keys:
+            yield audit_errors.ModelIncorrectKeyError(model)
+
+
 @audit_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateOldModelsMarkedDeleted(beam.DoFn):
     """DoFn to validate old models and mark them for deletion"""
