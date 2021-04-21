@@ -148,12 +148,6 @@ describe('Voiceover upload features', function() {
       await explorationEditorTranslationTab.deleteAudioRecord();
     });
 
-  afterAll(async function() {
-    await explorationEditorPage.saveChanges(
-      'Adds audio file in translation tab.');
-    await workflow.publishExploration();
-  });
-
   afterEach(async function() {
     await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
@@ -161,5 +155,9 @@ describe('Voiceover upload features', function() {
         error: 'Audio files must be under 300 seconds in length.' +
        ' The uploaded file is 301.87 seconds long.'}]);
     await users.logout();
+  });
+
+  afterAll(async function() {
+
   });
 });

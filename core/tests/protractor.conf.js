@@ -167,10 +167,6 @@ var suites = {
 
     wipeout: [
       'protractor_desktop/wipeout.js',
-    ],
-
-    protractorTesting: [
-      'protractor_desktop/exitCodeTest.js',
     ]
   };
 
@@ -417,11 +413,18 @@ exports.config = {
 
   SELENIUM_PROMISE_MANAGER: false,
 
+  // A callback function called once tests are finished. onComplete can
+  // optionally return a promise, which Protractor will wait for before
+  // shutting down webdriver.
+
+  // At this point, tests will be done but global objects will still be
+  // available.
   onComplete: function(success){
     if (!success) {
       exitCode = 1;
     }
   },
+
   // ----- The cleanup step -----
   //
   // A callback function called once the tests have finished running and
