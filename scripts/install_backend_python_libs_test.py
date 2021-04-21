@@ -514,7 +514,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             paths_to_delete.append(
                 path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
 
         def mock_get_mismatches():
@@ -578,7 +578,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ])
 
     def test_correct_metadata_directory_names_do_not_throw_error(self):
-        def mock_find_distributions(paths): # pylint: disable=unused-argument
+        def mock_find_distributions(unused_paths):
             return [
                 Distribution('dependency-1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
@@ -591,41 +591,27 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 }),
             ]
 
-        def mock_list_dir(path): # pylint: disable=unused-argument
+        def mock_list_dir(unused_path):
             return [
                 'dependency-1-1.5.1.dist-info',
-                'dependency_1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
-                'dependency_5-5.0.0.egg-info',
-                'dependency-5-5.0.0-py2.7.egg-info',
-                'dependency_5-5.0.0-py2.7.egg-info',
+                'dependency-5-0.5.3-py2.7.egg-info',
+                'dependency_6-0.5.3-py2.7.egg-info',
             ]
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
+
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)
-        swap_list_dir = self.swap(
-            os, 'listdir', mock_list_dir)
-        swap_is_dir = self.swap(
-            os.path, 'isdir', mock_is_dir
-        )
+        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
 
-        metadata_exception = self.assertRaisesRegexp(
-            Exception,
-            'The python library dependency5 was installed without the correct '
-            'metadata folders which may indicate that the convention for '
-            'naming the metadata folders have changed. Please go to '
-            '`scripts/install_backend_python_libs` and modify our '
-            'assumptions in the '
-            '_get_possible_normalized_metadata_directory_names'
-            ' function for what metadata directory names can be.')
-        with swap_find_distributions, swap_list_dir, metadata_exception:
-            with swap_is_dir:
-                install_backend_python_libs.validate_metadata_directories()
+        with swap_find_distributions, swap_list_dir, swap_is_dir:
+            install_backend_python_libs.validate_metadata_directories()
 
     def test_exception_raised_when_metadata_directory_names_are_missing(self):
-        def mock_find_distributions(paths): # pylint: disable=unused-argument
+        def mock_find_distributions(unused_paths):
             return [
                 Distribution('dependency1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
@@ -638,7 +624,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 }),
             ]
 
-        def mock_list_dir(path): # pylint: disable=unused-argument
+        def mock_list_dir(unused_path):
             return [
                 'dependency1-1.5.1.dist-info',
                 'dependency1',
@@ -648,7 +634,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency5-0.5.3.metadata',
             ]
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)
