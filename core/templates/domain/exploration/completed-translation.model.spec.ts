@@ -17,7 +17,7 @@
  */
 
 import { CompletedTranslation, CompletedTranslationBackendDict } from
-'domain/exploration/completed-translation.model';
+  'domain/exploration/completed-translation.model';
 
 describe('Completed Translation model', () => {
   describe('CompletedTranslationModel', () => {
@@ -27,7 +27,7 @@ describe('Completed Translation model', () => {
       backendDict = {
         translation: 'translation',
         content: 'content',
-        };
+      };
     });
 
     it('should return correct translation', () => {

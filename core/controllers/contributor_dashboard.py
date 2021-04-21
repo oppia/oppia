@@ -290,6 +290,7 @@ class CompletedTranslationsHandler(base.BaseHandler):
         self.values = translated_text_and_content
         self.render_json(self.values)
 
+
 class UserContributionRightsDataHandler(base.BaseHandler):
     """Provides contribution rights of the logged in user in translation,
     voiceover and question category on the contributor dashboard.

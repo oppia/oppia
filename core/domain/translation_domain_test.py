@@ -109,6 +109,7 @@ class MachineTranslatedTextTests(test_utils.GenericTestBase):
             }
         )
 
+
 class CompletedTranslationTest(test_utils.GenericTestBase):
     """Tests for the CompletedTranslation domain object."""
 

@@ -3036,11 +3036,11 @@ class State(python_utils.OBJECT):
 
     def get_translated_text_and_ids(self, language_code):
         """Returns all the html that has been translated in a
-        a given language and their ids corresponding to translations.        
-        
+        a given language and their ids corresponding to translations.
+
         Args:
-            language_code: str. The ISO 639-1 language code of the language.        
-        
+            language_code: str. The ISO 639-1 language code of the language.    
+
         Returns:
             list(tuple(str, str)). A list of tuples with first element
             as content id and second element as the translation content html.
@@ -3058,12 +3058,12 @@ class State(python_utils.OBJECT):
     def get_translated_content_with_content_id(self, content_id, language_code):
         """Returns the translation corresponding to the given content id
         in the language.
-        
+
         Args:
             content_id: str. The content id of the completed translation in the
                 given language.
             language_code: str. The ISO 639-1 language code of the language.
-        
+
         Returns:
             tuple(str, list(str)) A tuple containing two elements. The
             first element is the content id string and the second element

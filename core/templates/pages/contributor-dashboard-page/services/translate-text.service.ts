@@ -187,10 +187,10 @@ export class TranslateTextService {
   loadCompletedTranslationsText(
       expId: string, languageCode: string): void {
     this.translateTextBackedApiService.
-    fetchCompletedTranslationsAndTextAsync(expId, languageCode).
+      fetchCompletedTranslationsAndTextAsync(expId, languageCode).
       then((recievedTranslationsAndTextArray) => {
-      this.completedTranslationsArray = recievedTranslationsAndTextArray;
-    });
+        this.completedTranslationsArray = recievedTranslationsAndTextArray;
+      });
   }
 
   getCompletedTranslationsText(): CompletedTranslation[] {

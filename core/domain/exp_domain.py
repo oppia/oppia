@@ -1416,15 +1416,16 @@ class Exploration(python_utils.OBJECT):
         for state_name, state in self.states.items():
             translations_and_ids = state.get_translated_text_and_ids(
                 language_code)
-            # First appending all the 'content' type translations to the 
+            # First appending all the 'content' type translations to the
             # completed_translations_and_ids.
             for content_id, translated_text in translations_and_ids:
                 if len(translations_and_ids) > 10:
                     break
                 if content_id == 'content':
-                    completed_translation = (translation_domain.
-                        CompletedTranslation(translated_text,
-                        self.get_content_html(state_name, content_id)))
+                    completed_translation = (
+                        translation_domain.CompletedTranslation(
+                            translated_text,
+                            self.get_content_html(state_name, content_id)))
                     completed_translations_and_content.append(
                         completed_translation.to_dict())
 
@@ -1436,11 +1437,13 @@ class Exploration(python_utils.OBJECT):
             for content_id, translated_text in translations_and_ids:
                 if len(translations_and_ids) > 10:
                     break
-                if content_id != 'content':
-                    completedTranslation = translation_domain.CompletedTranslation(
-                        translated_text,self.get_content_html(state_name, content_id))
+                if content_id == 'content':
+                    completed_translation = (
+                        translation_domain.CompletedTranslation(
+                            translated_text,
+                            self.get_content_html(state_name, content_id)))
                     completed_translations_and_content.append(
-                        completedTranslation.to_dict())
+                        completed_translation.to_dict())
         return completed_translations_and_content
         
     def get_trainable_states_dict(self, old_states, exp_versions_diff):

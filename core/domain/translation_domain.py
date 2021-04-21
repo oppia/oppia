@@ -117,6 +117,7 @@ class MachineTranslatedText(python_utils.OBJECT):
             'translated_text': self.translated_text
         }
 
+
 class CompletedTranslation(python_utils.OBJECT):
     """The domain object for Completed Translation."""
 

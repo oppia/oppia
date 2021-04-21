@@ -24,7 +24,6 @@ export interface CompletedTranslationBackendDict {
 export class CompletedTranslation {
   translation: string;
   content: string;
-   
   constructor(
       translation: string, content: string) {
     this.translation = translation;
@@ -36,7 +35,6 @@ export class CompletedTranslation {
     return new CompletedTranslation(
       backendDict.translation, backendDict.content);
   }
-  
   getTranslation(): string {
     return this.translation;
   }
