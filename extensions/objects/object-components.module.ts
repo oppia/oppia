@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
+import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
 import { AlgebraicExpressionEditorComponent } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
@@ -38,6 +39,20 @@ import { HtmlEditorComponent } from './templates/html-editor.component';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
 import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
+import { IntEditorComponent } from './templates/int-editor.component';
+import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { ListOfSetsOfTranslatableHtmlContentIdsEditorComponent } from './templates/list-of-sets-of-translatable-html-content-ids-editor.component';
+import { DirectivesModule } from 'directives/directives.module';
+import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.component';
+import { ListOfUnicodeStringEditorComponent } from './templates/list-of-unicode-string-editor.component';
+import { SetOfUnicodeStringEditorComponent } from './templates/set-of-unicode-string-editor.component';
+import { MathEquationEditorComponent } from './templates/math-equation-editor.component';
+import { LogicErrorCategoryEditorComponent } from './templates/logic-error-category-editor.component';
+import { LogicQuestionEditorComponent } from './templates/logic-question-editor.component';
+import { MathExpressionContentEditorComponent } from './templates/math-expression-content-editor.component';
+import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
+import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
+import { NumberWithUnitsEditorComponent } from './templates/number-with-units-editor.component';
 
 
 @NgModule({
@@ -48,7 +63,10 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
     LeafletModule,
     SharedFormsModule,
     GraphInputInteractionModule,
-    NgbModalModule
+    DynamicContentModule,
+    DirectivesModule,
+    NgbModalModule,
+    NgxTrimDirectiveModule
   ],
   declarations: [
     AlgebraicExpressionEditorComponent,
@@ -62,7 +80,19 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
     GraphEditorComponent,
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
-    ImageWithRegionsResetConfirmationModalComponent
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
+    MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NumberWithUnitsEditorComponent,
+    SetOfUnicodeStringEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -76,7 +106,19 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
     GraphEditorComponent,
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
-    ImageWithRegionsResetConfirmationModalComponent
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
+    MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NumberWithUnitsEditorComponent,
+    SetOfUnicodeStringEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -90,7 +132,19 @@ import { ImageWithRegionsResetConfirmationModalComponent } from './templates/ima
     GraphEditorComponent,
     HtmlEditorComponent,
     ImageWithRegionsEditorComponent,
-    ImageWithRegionsResetConfirmationModalComponent
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
+    MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NumberWithUnitsEditorComponent,
+    SetOfUnicodeStringEditorComponent
   ],
 })
 
