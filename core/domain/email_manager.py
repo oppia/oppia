@@ -399,8 +399,7 @@ def require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        sender_email, bcc_admin=False, sender_name=None, reply_to_id=None,
-        recipient_email=None):
+        sender_email, bcc_admin=False, sender_name=None, recipient_email=None):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -420,8 +419,6 @@ def _send_email(
             email address.
         sender_name: str or None. The name to be shown in the "sender" field of
             the email.
-        reply_to_id: str or None. The unique reply-to id used in reply-to email
-            address sent to recipient.
         recipient_email: str or None. Override for the recipient email.
             This should only be used when the user with user_id equal to
             recipient_id does not exist or is deleted and their email cannot be
@@ -462,8 +459,7 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
-            reply_to_id=reply_to_id)
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
@@ -983,7 +979,7 @@ def send_suggestion_email(
 
 def send_instant_feedback_message_email(
         recipient_id, sender_id, message, email_subject, exploration_title,
-        exploration_id, thread_title, reply_to_id=None):
+        exploration_id, thread_title):
     """Send an email when a new message is posted to a feedback thread, or when
     the thread's status is changed.
 
@@ -995,8 +991,6 @@ def send_instant_feedback_message_email(
         exploration_title: str. The title of the exploration.
         exploration_id: str. ID of the exploration the feedback thread is about.
         thread_title: str. The title of the feedback thread.
-        reply_to_id: str or None. The unique reply-to id used in reply-to email
-            sent to recipient.
     """
 
     email_body_template = (
@@ -1029,7 +1023,7 @@ def send_instant_feedback_message_email(
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
-            email_body, feconf.NOREPLY_EMAIL_ADDRESS, reply_to_id=reply_to_id)
+            email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
 def send_flag_exploration_email(

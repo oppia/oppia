@@ -218,9 +218,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
     prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
