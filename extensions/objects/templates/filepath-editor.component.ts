@@ -229,6 +229,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.userIsDraggingCropArea = false;
       this.userIsResizingCropArea = false;
     }, false);
+    if (this.value) {
+      this.resetComponent(this.value);
+    }
   }
 
   /** Internal functions (not visible in the view) */
@@ -746,6 +749,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     // Update image data.
     this.data.metadata.uploadedFile = newImageFile;
     this.data.metadata.uploadedImageData = newImageData;
+    this.imgData = newImageData;
     this.data.metadata.originalWidth = width;
     this.data.metadata.originalHeight = height;
     // Check point 1 in the note before imports and after fileoverview.
