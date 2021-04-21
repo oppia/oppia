@@ -58,7 +58,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   userCanDeleteSkill: boolean;
 
   TAB_NAME_TOPICS: string = 'topics';
-  activeTab: string = this.TAB_NAME_TOPICS;
+  activeTab: string;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
   TAB_NAME_SKILLS: string = 'skills';
@@ -97,6 +97,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   ) {}
 
   ngOnInit(): void {
+    this.activeTab = this.TAB_NAME_TOPICS;
     this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.filterObject = TopicsAndSkillsDashboardFilter.createDefault();
 
@@ -170,6 +171,7 @@ export class TopicsAndSkillsDashboardPageComponent {
     } else if (this.activeTab === this.TAB_NAME_SKILLS) {
       this.initSkillDashboard();
       this.focusManagerService.setFocus('createSkillBtn');
+      console.log(this.activeTab);
     }
   }
 
@@ -235,6 +237,7 @@ export class TopicsAndSkillsDashboardPageComponent {
             ((this.skillPageNumber + 1) * this.itemsPerPage)) {
       this.goToPageNumber(this.pageNumber + 1);
     }
+    console.log(this.skillSummaries);
   }
 
   navigateSkillPage(direction: string): void {
