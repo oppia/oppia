@@ -116,7 +116,10 @@
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
     "oppia/no-test-blockers": "error",
-    "oppia/disallow-identifier-phrase": "error",
+    "oppia/disallow-identifier-phrase": [
+      error, {
+        disallowedPhrases: ["bypass"]
+      }],
     "angular/di": [
       "error",
       "array"

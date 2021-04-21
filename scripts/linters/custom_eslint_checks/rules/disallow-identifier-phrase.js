@@ -29,22 +29,40 @@ module.exports = {
       recommended: true,
     },
     fixable: null,
-    schema: [],
+    schema: [{
+      type: 'object',
+      properties: {
+        disallowedPhrases: {
+          type: 'array'
+        }
+      },
+      additionalProperties: false
+    }],
     messages: {
-      disallowBypass: (
-        'Please do not use word "bypass"')
+      disallowMessage: (
+        'Please do not use word "{{identifierWord}}"')
     },
   },
 
   create: function(context) {
+    var disallowedPhrases = [];
+    if (context.options[0] && context.options[0].disallowedPhrases) {
+      disallowedPhrases = context.options[0].disallowedPhrases;
+    }
 
     return {
       Identifier: function(node) {
-        if (node.name.toLowerCase().includes('bypass')) {
-          context.report({
-            node: node,
-            messageId: 'disallowBypass'
-          });
+        var identifierName = node.name.toLowerCase();
+        for (var i = 0; i < disallowedPhrases.length; i++) {
+          if (identifierName.includes(disallowedPhrases[i])) {
+            context.report({
+              node: node,
+              messageId: 'disallowMessage',
+              data: {
+                identifierWord: disallowedPhrases[i]
+              }
+            });
+          }
         }
       }
     };

@@ -23,21 +23,31 @@ var rule = require('./disallow-identifier-phrase');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('no-test-blockers', rule, {
+ruleTester.run('disallow-identifier-phrase', rule, {
   valid: [
     {
-      code:
-      `browser.explodre()`,
+      code: (
+        'browser.explodre()'),
+      options: [{
+        disallowedPhrases: ['bypass']
+      }],
+    }, {
+      code: (
+        'browser.explodre()'),
+      options: [],
     }
   ],
 
   invalid: [
     {
       code:
-      `Bypassbrowser.explore()`,
+      'Bypassbrowser.explore()',
       errors: [{
         message: 'Please do not use word "bypass"',
         type: 'Identifier',
+      }],
+      options: [{
+        disallowedPhrases: ['bypass']
       }],
     }
   ]
