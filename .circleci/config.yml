@@ -149,7 +149,7 @@ jobs:
       - run:
           name: Run e2e publication test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="publication" --server_log_level="info" --prod_env
+            python -m scripts.run_e2e_tests --suite="publication" --deparallelize-terser --skip-install --server_log_level="info" --prod_env
       - run:
           name: Run e2e library test
           command: |
