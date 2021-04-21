@@ -36,6 +36,7 @@ class MockChangeDetectorRef {
 }
 
 describe('Translation Modal Component', () => {
+  let contextService: ContextService;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
@@ -64,7 +65,6 @@ describe('Translation Modal Component', () => {
       ],
       providers: [
         NgbActiveModal,
-        ContextService,
         {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef
@@ -72,7 +72,8 @@ describe('Translation Modal Component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    OppiaAngularRootComponent.contextService = TestBed.get(ContextService);
+    OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
+    contextService = OppiaAngularRootComponent.contextService;
   }));
 
   beforeEach(() => {
@@ -147,12 +148,11 @@ describe('Translation Modal Component', () => {
       spyOn(translateTextService, 'init').and.callFake(
         (expId, languageCode, successCallback) => successCallback());
       component.ngOnInit();
-      expect(OppiaAngularRootComponent.contextService.getEntityType()).toBe(
+      expect(contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
-      expect(OppiaAngularRootComponent.contextService.getEntityId()).toBe('1');
-      expect(
-        OppiaAngularRootComponent.contextService.imageSaveDestination
-      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      expect(contextService.getEntityId()).toBe('1');
+      expect(contextService.imageSaveDestination).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
     it('should initialize translateTextService', fakeAsync(() => {
@@ -432,13 +432,11 @@ describe('Translation Modal Component', () => {
 
     it('should not reset the image save destination', () => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
-      expect(
-        OppiaAngularRootComponent.contextService.imageSaveDestination
-      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      expect(contextService.imageSaveDestination).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
       component.suggestTranslatedText();
-      expect(
-        OppiaAngularRootComponent.contextService.imageSaveDestination
-      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      expect(contextService.imageSaveDestination).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     });
 
     it('should reset the image save destination', fakeAsync(() => {
@@ -455,9 +453,8 @@ describe('Translation Modal Component', () => {
       });
       flushMicrotasks();
       component.suggestTranslatedText();
-      expect(
-        OppiaAngularRootComponent.contextService.imageSaveDestination
-      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      expect(contextService.imageSaveDestination).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     }));
   });
 });
