@@ -1437,7 +1437,7 @@ class Exploration(python_utils.OBJECT):
             for content_id, translated_text in translations_and_ids:
                 if len(translations_and_ids) > 10:
                     break
-                if content_id == 'content':
+                if content_id != 'content':
                     completed_translation = (
                         translation_domain.CompletedTranslation(
                             translated_text,
