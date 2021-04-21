@@ -17,47 +17,74 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
+import { LoaderService } from 'services/loader.service';
+import firebase from 'firebase/app';
 
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 @Component({
   selector: 'login-page',
-  template: ''
+  templateUrl: './login-page.component.html'
 })
 export class LoginPageComponent implements OnInit {
+  email = new FormControl('', [Validators.email]);
+  formGroup = new FormGroup({email: this.email});
+
   constructor(
       private alertsService: AlertsService, private authService: AuthService,
-      private windowRef: WindowRef) {}
+      private loaderService: LoaderService, private windowRef: WindowRef) {}
 
-  static get isEnabled(): boolean {
+  get enabled(): boolean {
     return AppConstants.ENABLE_LOGIN_PAGE;
   }
 
+  get emulatorModeIsEnabled(): boolean {
+    return AppConstants.EMULATOR_MODE;
+  }
+
   ngOnInit(): void {
-    if (!LoginPageComponent.isEnabled) {
-      alert('Sign-in is temporarily disabled. Please try again later.');
+    if (!this.enabled) {
+      this.alertsService.addWarning(
+        'Sign-in is temporarily disabled. Please try again later.');
       this.redirectToHomePage();
       return;
     }
+
+    if (this.emulatorModeIsEnabled) {
+      return;
+    }
+
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     this.authService.handleRedirectResultAsync().then(
-      () => this.redirectToSignUp(),
-      rejectionReason => {
-        if (rejectionReason === null) {
-          // Null rejections are used to signal that a user is not logged in.
-          this.authService.signInWithRedirectAsync();
-        } else if (rejectionReason.code === 'auth/user-disabled') {
-          // Disabled Firebase accounts are reserved for users that are pending
-          // account deletion.
-          this.redirectToPendingAccountDeletionPage();
-        } else {
-          this.alertsService.addWarning(rejectionReason.message);
-          setTimeout(() => this.redirectToHomePage(), 2000);
-        }
-      });
+      redirectSucceeded => redirectSucceeded ?
+        this.redirectToSignUp() : this.authService.signInWithRedirectAsync(),
+      error => this.onSignInError(error));
+  }
+
+  async onClickSignInButtonAsync(email: string): Promise<void> {
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
+    await this.authService.signInWithEmail(email).then(
+      () => this.redirectToSignUp(), error => this.onSignInError(error));
+  }
+
+  private onSignInError(error: firebase.auth.Error): void {
+    if (error.code === 'auth/user-disabled') {
+      this.redirectToPendingAccountDeletionPage();
+      return;
+    }
+
+    this.alertsService.addWarning(error.message);
+    this.loaderService.hideLoadingScreen();
+    if (this.emulatorModeIsEnabled) {
+      this.email.setValue('');
+    } else {
+      setTimeout(() => this.redirectToHomePage(), 2000);
+    }
   }
 
   private redirectToSignUp(): void {

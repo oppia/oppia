@@ -49,7 +49,6 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -1609,76 +1608,6 @@ class GenericTestBase(AppEngineTestBase):
         'classifier_model_id': None,
     }
 
-    VERSION_21_STATE_DICT = {
-        'END': {
-            'classifier_model_id': None,
-            'content': {
-                'content_id': 'content',
-                'html': 'Congratulations, you have finished!',
-            },
-            'content_ids_to_audio_translations': {'content': {}},
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'recommendedExplorationIds': {'value': []},
-                },
-                'default_outcome': None,
-                'hints': [],
-                'id': 'EndExploration',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
-        'Introduction': {
-            'classifier_model_id': None,
-            'content': {'content_id': 'content', 'html': ''},
-            'content_ids_to_audio_translations': {
-                'content': {},
-                'default_outcome': {},
-                'feedback_1': {},
-            },
-            'interaction': {
-                'answer_groups': [{
-                    'outcome': {
-                        'dest': 'END',
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Correct!</p>',
-                        },
-                        'labelled_as_correct': False,
-                        'missing_prerequisite_skill_id': None,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                    },
-                    'rule_specs': [{
-                        'inputs': {'x': 'InputString'},
-                        'rule_type': 'Equals',
-                    }],
-                    'tagged_misconception_id': None,
-                    'training_data': ['answer1', 'answer2', 'answer3'],
-                }],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'placeholder': {'value': ''},
-                    'rows': {'value': 1},
-                },
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {'content_id': 'default_outcome', 'html': ''},
-                    'labelled_as_correct': False,
-                    'missing_prerequisite_skill_id': None,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                },
-                'hints': [],
-                'id': 'TextInput',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
-    }
-
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
             'outline': (
@@ -1862,61 +1791,6 @@ title: Title
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-    SAMPLE_UNTITLED_YAML_CONTENT = (
-        """author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
@@ -2622,7 +2496,8 @@ tags: []
     def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, state_names, interaction_ids,
             title='A title', category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
@@ -2639,6 +2514,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            correctness_feedback_enabled: bool. Whether the correctness feedback
+                is enabled or not for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -2653,6 +2530,7 @@ tags: []
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
 
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
@@ -2660,60 +2538,15 @@ tags: []
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
+            if correctness_feedback_enabled:
+                from_state.interaction.default_outcome.labelled_as_correct = (
+                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
-
-    def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 0 states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
-        # Create an ExplorationIssues model to match the behavior of creating
-        # new explorations.
-        stats_services.create_exp_issues_for_new_exploration(exp_id, 1)
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):
@@ -2761,52 +2594,6 @@ tags: []
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 21 states
-        dictionary. Version 21 is where training data of exploration is stored
-        with the states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=21,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_21_STATE_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.
 
@@ -2814,7 +2601,7 @@ tags: []
             owner_id: str. The user_id of the owner of the exploration.
             exploration_id: str. The ID of the new exploration.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
@@ -2886,7 +2673,7 @@ tags: []
             owner_id: str. The user_id of the owner of the collection.
             collection_id: str. ID of the collection to be published.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(

@@ -16,47 +16,52 @@
  * @fileoverview Unit test for ImageLocalStorageService.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { AlertsService } from 'services/alerts.service';
+import { TestBed } from '@angular/core/testing';
+import { AlertsService } from './alerts.service';
+import { ImageLocalStorageService } from './image-local-storage.service';
+import { ImageUploadHelperService } from './image-upload-helper.service';
 
 
 describe('ImageLocalStorageService', () => {
-  let alertsService:AlertsService = null;
-  let imageLocalStorageService:ImageLocalStorageService = null;
-  let imageUploadHelperService:ImageUploadHelperService = null;
-  let sampleImageData:string = 'data:image/png;base64,xyz';
-  let imageFilename:string = 'filename';
+  let alertsService: AlertsService = null;
+  let imageLocalStorageService: ImageLocalStorageService = null;
+  let sampleImageData = 'data:image/png;base64,xyz';
+  let imageFilename = 'filename';
+  let imageUploadHelperService: ImageUploadHelperService;
+  class MockImageUploadHelperService {
+    convertImageDataToImageFile(imageData) {
+      return imageData;
+    }
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        AlertsService,
-        ImageLocalStorageService,
-        ImageUploadHelperService
-      ]
-    }).compileComponents();
-    imageLocalStorageService = TestBed.get(ImageLocalStorageService);
-    imageUploadHelperService = TestBed.get(ImageUploadHelperService);
-    alertsService = TestBed.get(AlertsService);
+      providers: [{
+        provide: ImageUploadHelperService,
+        useClass: MockImageUploadHelperService
+      }]
+    });
+  });
+
+  beforeEach(() => {
+    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    alertsService = TestBed.inject(AlertsService);
+    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
   });
 
   it(
     'should call helper service function correctly when getting' +
     ' object url', () => {
-      spyOn(imageUploadHelperService, 'convertImageDataToImageFile');
+      const imageUploaderSpy = spyOn(
+        imageUploadHelperService, 'convertImageDataToImageFile');
       spyOn(URL, 'createObjectURL').and.returnValue('objectUrl');
       imageLocalStorageService.saveImage(imageFilename, sampleImageData);
       expect(
         imageLocalStorageService.getObjectUrlForImage(imageFilename)
       ).toBe('objectUrl');
-      expect(
-        imageUploadHelperService.convertImageDataToImageFile
-      ).toHaveBeenCalledWith(sampleImageData);
+      expect(imageUploaderSpy).toHaveBeenCalledWith(sampleImageData);
     }
   );
 

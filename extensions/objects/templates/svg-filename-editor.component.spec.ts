@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
@@ -48,6 +51,7 @@ var initializeMockDocument = function(svgFilenameCtrl) {
   var $document = angular.element(document);
   $document.find('body').append(mockDocument.outerHTML);
 };
+importAllAngularServices();
 
 describe('SvgFilenameEditor', function() {
   var alertSpy = null;

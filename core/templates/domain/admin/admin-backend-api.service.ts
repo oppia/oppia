@@ -348,13 +348,19 @@ export class AdminBackendApiService {
   async viewContributionReviewersAsync(
       category: string, languageCode: string
   ): Promise<ViewContributionBackendResponse> {
+    let params = {};
+    if (languageCode === null) {
+      params = { category: category };
+    } else {
+      params = {
+        category: category,
+        language_code: languageCode
+      };
+    }
     return new Promise((resolve, reject) => {
       this.http.get<ViewContributionBackendResponse>(
         AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
-          params: {
-            category: category,
-            language_code: languageCode
-          }
+          params
         }
       ).toPromise().then(response => {
         resolve(response);
@@ -489,17 +495,15 @@ export class AdminBackendApiService {
   }
 
   async grantSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http.get<void>(
-      AdminPageConstants.ADMIN_GRANT_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
-        params: {username: username},
-      }
+    return this.http.put<void>(
+      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {username}
     ).toPromise();
   }
 
   async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http.get<void>(
-      AdminPageConstants.ADMIN_REVOKE_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
-        params: {username: username},
+    return this.http['delete']<void>(
+      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
+        params: {username},
       }
     ).toPromise();
   }
@@ -556,6 +560,43 @@ export class AdminBackendApiService {
     };
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
+  }
+
+  // Admin Dev Mode Activities Tab Services.
+  async generateDummyExplorationsAsync(
+      numDummyExpsToGenerate: number,
+      numDummyExpsToPublish: number): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_explorations',
+      num_dummy_exps_to_generate: numDummyExpsToGenerate,
+      num_dummy_exps_to_publish: numDummyExpsToPublish
+    });
+  }
+
+  async reloadExplorationAsync(explorationId: string): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'reload_exploration',
+      exploration_id: String(explorationId)
+    });
+  }
+
+  async generateDummyNewStructuresDataAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_new_structures_data'
+    });
+  }
+
+  async generateDummyNewSkillDataAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_new_skill_data'
+    });
+  }
+
+  async reloadCollectionAsync(collectionId: string): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'reload_collection',
+      collection_id: String(collectionId)
+    });
   }
 }
 

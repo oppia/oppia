@@ -21,25 +21,34 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AlertsService } from 'services/alerts.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+export interface ImagesData {
+  filename: string;
+  imageBlob: Blob;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageLocalStorageService {
+  storedImageFilenames: string[] = [];
+  // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
+  // minimum limit, for all browsers, per hostname, that can be stored in
+  // sessionStorage and 100kB is the max size limit for uploaded images, hence
+  // the limit below.
+  MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
+  thumbnailBgColor: string = null;
+
   constructor(
     private alertsService: AlertsService,
-    private imageUploadHelperService: ImageUploadHelperService
-  ) {}
+    private imageUploadHelperService: ImageUploadHelperService,
+    private windowRef: WindowRef) {}
 
-  private storedImageFilenames: string[] = [];
-  private MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
-  private thumbnailBgColor: string = null;
-
-  getObjectUrlForImage(filename:string): string {
-    const urlCreator = window.URL || window.webkitURL;
+  getObjectUrlForImage(filename: string): string {
+    const urlCreator = URL || webkitURL;
     const imageBlob = this.imageUploadHelperService.convertImageDataToImageFile(
-      window.sessionStorage.getItem(filename));
-
+      this.windowRef.nativeWindow.sessionStorage.getItem(filename));
     return urlCreator.createObjectURL(imageBlob);
   }
 
@@ -48,7 +57,7 @@ export class ImageLocalStorageService {
    * @param {string} filename - Filename of the image.
    * @param {string} rawImage - Raw base64/URLEncoded data of the image.
    */
-  saveImage(filename:string, rawImage:string): void {
+  saveImage(filename: string, rawImage: string): void {
     if (this.storedImageFilenames.length + 1 > this.MAX_IMAGES_STORABLE) {
       // Since the service is going to be used in the create modal for
       // entities, more images can be added after entity creation, when
@@ -58,46 +67,47 @@ export class ImageLocalStorageService {
         'creation.');
       return;
     }
-    window.sessionStorage.setItem(filename, rawImage);
+    this.windowRef.nativeWindow.sessionStorage.setItem(filename, rawImage);
     this.storedImageFilenames.push(filename);
   }
 
-  deleteImage(filename:string): void {
-    window.sessionStorage.removeItem(filename);
+  deleteImage(filename: string): void {
+    this.windowRef.nativeWindow.sessionStorage.removeItem(filename);
     const index = this.storedImageFilenames.indexOf(filename);
     this.storedImageFilenames.splice(index, 1);
   }
 
-  getStoredImagesData():string[] {
+  getStoredImagesData(): ImagesData[] {
     const returnData = [];
-    for (let idx in this.storedImageFilenames) {
+    for (const idx in this.storedImageFilenames) {
       returnData.push({
         filename: this.storedImageFilenames[idx],
         imageBlob: this.imageUploadHelperService.convertImageDataToImageFile(
-          window.sessionStorage.getItem(this.storedImageFilenames[idx]))
+          this.windowRef.nativeWindow.sessionStorage.getItem(
+            this.storedImageFilenames[idx]))
       });
     }
     return returnData;
   }
 
-  isInStorage(filename:string):boolean {
+  isInStorage(filename: string): boolean {
     return this.storedImageFilenames.indexOf(filename) !== -1;
   }
 
-  setThumbnailBgColor(bgColor:string):void {
+  setThumbnailBgColor(bgColor: string): void {
     this.thumbnailBgColor = bgColor;
   }
 
-  getThumbnailBgColor():string {
+  getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
   }
 
-  flushStoredImagesData():void {
-    window.sessionStorage.clear();
+  flushStoredImagesData(): void {
+    this.windowRef.nativeWindow.sessionStorage.clear();
     this.storedImageFilenames.length = 0;
     this.thumbnailBgColor = null;
   }
 }
+
 angular.module('oppia').factory(
-  'ImageLocalStorageService',
-  downgradeInjectable(ImageLocalStorageService));
+  'ImageLocalStorageService', downgradeInjectable(ImageLocalStorageService));

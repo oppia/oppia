@@ -25,6 +25,7 @@
  */
 import 'firebase/auth';
 import 'hammerjs';
+import 'leaflet/dist/leaflet.css';
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.directive.ts');
@@ -135,8 +136,8 @@ angular.module('oppia').config([
       'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
       'ProfilePageBackendApiService', 'QuestionBackendApiService',
       'RatingComputationService',
-      'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
-      'RubricObjectFactory', 'SchemaDefaultValueService',
+      'ReviewTestBackendApiService',
+      'SchemaDefaultValueService',
       'SchemaUndefinedLastElementService', 'SidebarStatusService',
       'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
       'SpeechSynthesisChunkerService',
@@ -146,8 +147,7 @@ angular.module('oppia').config([
       'StateTopAnswersStatsService', 'StatesObjectFactory',
       'StopwatchObjectFactory', 'StoryContentsObjectFactory',
       'StoryObjectFactory', 'StorySummaryObjectFactory',
-      'StoryViewerBackendApiService', 'SubtopicObjectFactory',
-      'SubtopicPageContentsObjectFactory', 'SubtopicPageObjectFactory',
+      'StoryViewerBackendApiService',
       'SubtopicViewerBackendApiService', 'SuggestionThreadObjectFactory',
       'SuggestionsService', 'TextInputRulesService',
       'ThreadStatusDisplayService', 'TopicObjectFactory',

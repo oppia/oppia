@@ -44,7 +44,7 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -80,6 +80,10 @@
 /buf.gen.yaml @oppia/ml
 
 
+# App Feedback Reporting project
+/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
+
+
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep
@@ -104,7 +108,9 @@
 # Contributor Dashboard project.
 /core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
+/core/domain/translation*.py @vojtechjelinek
 /core/domain/voiceover_services*.py @sagangwee
+/core/storage/translation/ @vojtechjelinek
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 
@@ -249,7 +255,9 @@
 /core/templates/components/profile-link-directives/ @srijanreddy98
 /core/templates/components/summary-tile/ @srijanreddy98
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
+/core/templates/directives/directives.module.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/directives/ng-init.directive.ts @srijanreddy98
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
 /core/templates/services/attribution.service*.ts @srijanreddy98
@@ -289,8 +297,9 @@
 /core/domain/expression_parser*.py @iamprayush
 /core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
-/core/domain/obj_services*.py @iamprayush
+/core/domain/object_registry*.py @iamprayush
 /core/domain/rules_registry*.py @aks681
+/core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
@@ -434,10 +443,7 @@
 
 
 # Infrastructure.
-/jobs/__init__.py @brianrodri
-/jobs/base_model_*.py @brianrodri
-/jobs/jobs_utils.py @brianrodri
-/jobs/jobs_utils_test.py @brianrodri
+/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -465,8 +471,10 @@
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
+/core/templates/pages/logout-page/ @brianrodri
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
+/core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
@@ -512,6 +520,7 @@
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
+/core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
@@ -664,7 +673,7 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/linters/pre_commit_linter.py in sync with the modifications.
+# in scripts/linters/codeowner_linter.py in sync with the modifications.
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
 # 8 lines.
 /core/templates/services/svg-sanitizer.service.ts @BenHenning
