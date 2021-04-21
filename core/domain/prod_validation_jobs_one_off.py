@@ -334,15 +334,6 @@ class BulkEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [email_models.BulkEmailModel]
 
 
-class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates GeneralFeedbackEmailReplyToIdModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [email_models.GeneralFeedbackEmailReplyToIdModel]
-
-
 class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates ExplorationModel."""
 
