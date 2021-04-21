@@ -105,7 +105,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
-    MaterialModule,
     ObjectComponentsModule,
     SharedFormsModule,
     TranslateModule,
@@ -152,7 +151,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     UploadActivityModalComponent,
     PromoBarComponent,
     SortByPipe,
-    PromoBarComponent,
     LearnerDashboardIconsComponent
   ],
 
@@ -175,8 +173,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
-    SkillMasteryViewerComponent,
-    SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
@@ -227,9 +223,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
     LoadingDotsComponent,
-    PromoBarComponent,
-    WrapTextWithEllipsisPipe,
-    PromoBarComponent,
     WrapTextWithEllipsisPipe,
     LearnerDashboardIconsComponent
   ],
