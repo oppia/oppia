@@ -1445,7 +1445,7 @@ class Exploration(python_utils.OBJECT):
                     completed_translations_and_content.append(
                         completed_translation.to_dict())
         return completed_translations_and_content
-        
+
     def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.

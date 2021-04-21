@@ -3039,7 +3039,7 @@ class State(python_utils.OBJECT):
         a given language and their ids corresponding to translations.
 
         Args:
-            language_code: str. The ISO 639-1 language code of the language.    
+            language_code: str. The ISO 639-1 language code of the language.
 
         Returns:
             list(tuple(str, str)). A list of tuples with first element
