@@ -45,7 +45,7 @@ angular.module('oppia').directive('topNavigationBar', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/common-layout-directives/navigation-bars/top-navigation' +
-        '-bar.directive.html'),
+        '-bar.component.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$timeout', '$translate', '$window',

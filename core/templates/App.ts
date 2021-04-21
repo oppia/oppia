@@ -41,7 +41,7 @@ require(
   'side-navigation-bar.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'top-navigation-bar.directive.ts');
+  'top-navigation-bar.component.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
