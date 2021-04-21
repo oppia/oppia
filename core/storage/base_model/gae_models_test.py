@@ -89,12 +89,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
 
-    def test_get_lowest_supported_role_is_exploration_editor(self):
-        self.assertEqual(
-            base_models.BaseModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_EXPLORATION_EDITOR
-        )
-
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
 
@@ -378,11 +372,29 @@ class TestSnapshotContentModel(base_models.BaseSnapshotContentModel):
     pass
 
 
+class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Model that inherits the BaseCommitLogEntryModel for testing."""
+
+    @classmethod
+    def get_instance_id(cls, target_entity_id, version):
+        """A function that returns the id of the log in BaseCommitLogEntryModel.
+
+        Args:
+            target_entity_id: str. The id of the mock entity used.
+            version: int. The version of the model after the commit.
+
+        Returns:
+            str. The commit id with the target entity id and version number.
+        """
+        return 'entity-%s-%s' % (target_entity_id, version)
+
+
 class TestVersionedModel(base_models.VersionedModel):
     """Model that inherits the VersionedModel for testing."""
 
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = TestCommitLogEntryModel
 
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
@@ -392,12 +404,17 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
             base_models.BaseCommitLogEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
+    def test_get_model_association_to_user_is_not_corresponding_to_user(self):
+        self.assertEqual(
+            base_models.BaseCommitLogEntryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
     def test_base_class_get_instance_id_raises_not_implemented_error(self):
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _get_instance_id\(\) method is missing from the '
+            r'The get_instance_id\(\) method is missing from the '
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseCommitLogEntryModel.get_commit('id', 1)
 
@@ -492,23 +509,6 @@ class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
         model1.update_timestamps()
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
-
-
-class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Model that inherits the BaseCommitLogEntryModel for testing."""
-
-    @classmethod
-    def _get_instance_id(cls, target_entity_id, version):
-        """A function that returns the id of the log in BaseCommitLogEntryModel.
-
-        Args:
-            target_entity_id: str. The id of the mock entity used.
-            version: int. The version of the model after the commit.
-
-        Returns:
-            str. The commit id with the target entity id and version number.
-        """
-        return 'entity-%s-%s' % (target_entity_id, version)
 
 
 class CommitLogEntryModelTests(test_utils.GenericTestBase):

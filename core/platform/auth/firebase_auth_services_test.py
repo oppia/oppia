@@ -399,8 +399,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_user(self, uid):
         """Asserts that an account with the given id exists.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -412,8 +412,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_not_user(self, uid):
         """Asserts that an account with the given id does not exist.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -425,8 +425,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_super_admin(self, uid):
         """Asserts that the given ID has super admin privileges.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -439,8 +439,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_not_super_admin(self, uid):
         """Asserts that the given ID does not have super admin privileges.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uid: str. The ID of the user to confirm.
@@ -450,11 +450,35 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._test.assertNotEqual(
             custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
+    def assert_is_disabled(self, uid):
+        """Asserts that the given ID is a disabled account.
+
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self.assert_is_user(uid)
+        self._test.assertTrue(self.get_user(uid).disabled)
+
+    def assert_is_not_disabled(self, uid):
+        """Asserts that the given ID is not a disabled account.
+
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
+
+        Args:
+            uid: str. The ID of the user to confirm.
+        """
+        self.assert_is_user(uid)
+        self._test.assertFalse(self.get_user(uid).disabled)
+
     def assert_is_user_multi(self, uids):
         """Asserts that every account with the given ids exist.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uids: list(str). The IDs of the users to confirm.
@@ -467,8 +491,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def assert_is_not_user_multi(self, uids):
         """Asserts that every account with the given ids do not exist.
 
-        NOTE: This method can only be called after the instance has been
-        installed to a test case!
+        NOTE: This method can only be called after the stub has been installed
+        to a test case!
 
         Args:
             uids: list(str). The IDs of the users to confirm.
@@ -1254,15 +1278,19 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        self.assertIsNotNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
-        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.firebase_sdk_stub.assert_is_not_disabled('aid')
 
         firebase_auth_services.mark_user_for_deletion('uid')
 
         self.assertIsNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
-        self.assertTrue(firebase_admin.auth.get_user('aid').disabled)
+            firebase_auth_services.get_user_id_from_auth_id('aid'))
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id(
+                'aid', include_deleted=True),
+            'uid')
+        self.firebase_sdk_stub.assert_is_disabled('aid')
 
     def test_disable_association_warns_when_firebase_fails_to_update_user(self):
         self.firebase_sdk_stub.create_user('aid')
@@ -1273,17 +1301,21 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             error=firebase_exceptions.UnknownError('could not update'))
         log_capturing_context = self.capture_logging()
 
-        self.assertIsNotNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
-        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.firebase_sdk_stub.assert_is_not_disabled('aid')
 
         with update_user_swap, log_capturing_context as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
         self.assert_matches_regexps(logs, ['could not update'])
         self.assertIsNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
-        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
+            firebase_auth_services.get_user_id_from_auth_id('aid'))
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id(
+                'aid', include_deleted=True),
+            'uid')
+        self.firebase_sdk_stub.assert_is_not_disabled('aid')
 
     def test_disable_association_gives_up_when_auth_assocs_do_not_exist(self):
         with self.capture_logging() as logs:
@@ -1343,6 +1375,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
         user_settings = user_services.create_new_user(self.AUTH_ID, self.EMAIL)
         self.user_id = user_settings.user_id
+        firebase_auth_services.mark_user_for_deletion(self.user_id)
 
     def swap_get_user_to_always_fail(self):
         """Swaps the get_user function so that it always fails."""
