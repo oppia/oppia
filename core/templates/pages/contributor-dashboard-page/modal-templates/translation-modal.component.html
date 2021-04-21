@@ -61,12 +61,12 @@
           <div class="oppia-completed-translations-table-heading">Translated Content</div>
         </div>
         <div class="oppia-translations-and-content-row"
-             *ngFor="let content of contentList; let i = index">
+             *ngFor="let completedTranslation of completedTranslationsList">
           <div class="oppia-translations-and-content-column-left">
-            <angular-html-bind-wrapper [htmlData]="content"></angular-html-bind-wrapper>
+            <angular-html-bind-wrapper [htmlData]="completedTranslation.content"></angular-html-bind-wrapper>
           </div>
           <div class="oppia-translations-and-content-column-right">
-            <angular-html-bind-wrapper [htmlData]="translationsList[i]"></angular-html-bind>
+            <angular-html-bind-wrapper [htmlData]="completedTranslation.translation"></angular-html-bind-wrapper>
           </div>
         </div>
         <div *ngIf="noTranslationComplete && !loadingCompletedTranslations">

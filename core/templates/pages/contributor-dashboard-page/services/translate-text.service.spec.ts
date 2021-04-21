@@ -19,8 +19,9 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { CompletedTranslation } from 'domain/exploration/completed-translation.model';
 
-import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service.ts';
+import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 
 describe('TranslateTextService', () => {
   let translateTextService;
@@ -151,4 +152,25 @@ describe('TranslateTextService', () => {
         expect(textAndAvailability).toEqual(textAndPreviousAvailability);
       }));
   });
+
+  describe('getCompletedTranslationsText', () => {
+    it('should return the completed translations correctly', fakeAsync(() => {
+      const completedTranslations = {
+        translation: '<p>Translation 1</p>',
+        content: '<p>Content 1</p>'};
+        translateTextService.loadCompletedTranslationsText('1', 'en');
+        const req = httpTestingController.expectOne(
+          '/getcompletedtranslationshandler?exp_id=1&language_code=en');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          translation: '<p>Translation 1</p>',
+          content: '<p>Content 1</p>'
+        });
+        flushMicrotasks();
+
+        let completedTranslationsList = translateTextService.
+          getCompletedTranslationsText();
+        expect(completedTranslationsList).toEqual(completedTranslations)
+    }))
+  })
 });

@@ -23,6 +23,7 @@ import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import { CompletedTranslation } from 'domain/exploration/completed-translation.model';
 
 /**
  * @fileoverview A service for handling contribution opportunities in different
@@ -82,6 +83,7 @@ export class TranslateTextService {
   activeContentId;
   activeStateName: string;
   activeContentText: string;
+  completedTranslationsArray: CompletedTranslation[] = [];
 
   constructor(
     private translateTextBackedApiService:
@@ -180,6 +182,18 @@ export class TranslateTextService {
       this.stateWiseContents[this.activeStateName][this.activeContentId],
       translationHtml,
       imagesData).then(successCallback);
+  }
+  
+  loadCompletedTranslationsText(expId, languageCode) {
+    this.translateTextBackedApiService.
+      fetchCompletedTranslationsAndTextAsync(expId, languageCode).
+        then((recievedTranslationsAndTextArray) => {
+        this.completedTranslationsArray = recievedTranslationsAndTextArray;
+    });
+  }
+
+  getCompletedTranslationsText(): CompletedTranslation[] {
+    return this.completedTranslationsArray;
   }
 }
 

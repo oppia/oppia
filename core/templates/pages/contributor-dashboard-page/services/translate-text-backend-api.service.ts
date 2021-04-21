@@ -20,8 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from 'services/image-local-storage.service';
-
-
+import { CompletedTranslation } from 'domain/exploration/completed-translation.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -66,6 +65,23 @@ export class TranslateTextBackendApiService {
     imagesData.forEach(obj => body.append(obj.filename, obj.imageBlob));
     return this.http.post(
       '/suggestionhandler/', body).toPromise();
+  }
+
+  async fetchCompletedTranslationsAndTextAsync(
+    expId: string, languageCode: string): 
+      Promise<CompletedTranslation[]> {
+    console.log(languageCode, expId);
+    return this.http.get('/getcompletedtranslationshandler',{
+      params: {
+        exp_id: expId,
+        language_code: languageCode
+      }
+    }).toPromise().then((body) => {
+      console.log(body);
+      return body;
+    }, (errorResponse) => {
+      return errorResponse.error;
+    });
   }
 }
 

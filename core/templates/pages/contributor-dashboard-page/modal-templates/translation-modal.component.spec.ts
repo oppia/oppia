@@ -23,6 +23,7 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CompletedTranslation } from 'domain/exploration/completed-translation.model';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
@@ -119,6 +120,8 @@ describe('Translation Modal Component', () => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
           (expId, languageCode, successCallback) => successCallback());
+        spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+          callFake((expId, languageCode) => {});
         component.ngOnInit();
       }));
 
@@ -133,6 +136,8 @@ describe('Translation Modal Component', () => {
         translationLanguageService.setActiveLanguageCode('es');
         spyOn(translateTextService, 'init').and.callFake(
           (expId, languageCode, successCallback) => successCallback());
+        spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+          callFake((expId, languageCode) => {});
         component.ngOnInit();
       }));
 
@@ -145,6 +150,8 @@ describe('Translation Modal Component', () => {
     it('should set context correctly', fakeAsync(() => {
       spyOn(translateTextService, 'init').and.callFake(
         (expId, languageCode, successCallback) => successCallback());
+      spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+        callFake((expId, languageCode) => {});
       component.ngOnInit();
       expect(contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
@@ -158,7 +165,9 @@ describe('Translation Modal Component', () => {
       spyOn(translateTextService, 'getTextToTranslate').and.callThrough();
       spyOn(translateTextService, 'getPreviousTextToTranslate')
         .and.callThrough();
-      component.ngOnInit();
+      spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+        callFake((expId, languageCode) => {});
+        component.ngOnInit();
       expect(component.loadingData).toBeTrue();
       expect(translateTextService.init).toHaveBeenCalled();
 
@@ -193,6 +202,8 @@ describe('Translation Modal Component', () => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
           (expId, languageCode, successCallback) => successCallback());
+        spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+          callFake((expId, languageCode) => {});
         component.ngOnInit();
         expect(component.getHtmlSchema().ui_config.language)
           .toBe('ar');
@@ -208,7 +219,8 @@ describe('Translation Modal Component', () => {
         (expId, languageCode, successCallback) => successCallback());
       broadcastSpy = spyOn(
         ckEditorCopyContentService, 'broadcastCopy').and.stub();
-
+      spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+        callFake((expId, languageCode) => {});
       component.ngOnInit();
       target = document.createElement('div');
       target.onclick = function(this, ev) {
@@ -244,6 +256,8 @@ describe('Translation Modal Component', () => {
   describe('when skipping the active translation', () => {
     describe('when there is available text', () => {
       beforeEach(fakeAsync(() => {
+        spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+          callFake((expId, languageCode) => {});
         component.ngOnInit();
 
         const sampleStateWiseContentMapping = {
@@ -288,6 +302,8 @@ describe('Translation Modal Component', () => {
           translation_html: 'texto1'
         }
       };
+      spyOn(translateTextService, 'loadCompletedTranslationsText').and.
+          callFake((expId, languageCode) => {});
       component.ngOnInit();
 
       const sampleStateWiseContentMapping = {
@@ -342,7 +358,6 @@ describe('Translation Modal Component', () => {
       it('should not submit the translation', () => {
         component.loadingData = true;
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
-
         component.suggestTranslatedText();
 
         expect(translateTextService.suggestTranslatedText)
@@ -437,4 +452,57 @@ describe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     });
   });
+
+  describe('on clicking the view completed translations button', () => {
+    beforeEach(fakeAsync(() => {
+      
+    }));
+    afterEach(() => {
+      httpTestingController.verify();
+    });
+    it('should open view completed translations modal if closed', fakeAsync(
+      () => {
+        
+        component.viewCompletedTranslationsModalOpen = false;
+        component.toggleViewCompletedTranslationsModal();
+        expect(component.viewCompletedTranslationsModalOpen).toBe(true);
+      }
+    ))
+    it('should close view completed translations modal if open', fakeAsync(
+      () => {
+        component.viewCompletedTranslationsModalOpen = true;
+        component.toggleViewCompletedTranslationsModal();
+        expect(component.viewCompletedTranslationsModalOpen).toBe(false);
+      }
+    ))
+    it('should set the load the completed translations correctly', fakeAsync(
+      () => {
+        spyOn(translateTextService, 'init').and.callFake(
+          (expId, languageCode, successCallback) => successCallback());
+        spyOn(translateTextService, 'getCompletedTranslationsText').
+          and.callThrough();
+        component.ngOnInit();
+        const req = httpTestingController.expectOne(
+          '/getcompletedtranslationshandler?exp_id=1&language_code=es');
+        expect(req.request.method).toEqual('GET');
+        let sampleCompletedTranslations: CompletedTranslation[] = [
+          CompletedTranslation.createFromBackendDict({
+            translation: 'Translation 1',
+            content: 'content 1'
+          }),
+          CompletedTranslation.createFromBackendDict({
+            translation: 'Translation 2',
+            content: 'content 2'
+          }),
+        ];
+        req.flush(sampleCompletedTranslations);
+        flushMicrotasks();
+        component.loadCompletedTranslations();
+        expect(translateTextService.getCompletedTranslationsText).
+          toHaveBeenCalled();
+        expect(component.loadingCompletedTranslations).toBe(false);
+        expect(component.noTranslationComplete).toBe(false);
+        expect(component.completedTranslationsList).toBe(sampleCompletedTranslations);
+      }));
+  })
 });

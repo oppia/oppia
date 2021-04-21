@@ -208,4 +208,40 @@ describe('TranslateTextBackendApiService', () => {
       flushMicrotasks();
     }));
   });
+
+  describe('fetchCompletedTranslationsAndTextAsync', () => {
+    let successHandler, failHandler;
+    it('should correctly request completed translation texts with given' +
+    'id and language code', fakeAsync(() => {
+      successHandler = jasmine.createSpy('success');
+      failHandler = jasmine.createSpy('error');
+      const sampleDataResults = [{
+        translation: '<p>translation</p>',
+        content: '<p>content</p>'
+      }];
+      translateTextBackendApiService.fetchCompletedTranslationsAndTextAsync(
+        '1', 'en').then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/getcompletedtranslationshandler?exp_id=1&language_code=en');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    }));
+
+    it('should call the failHandler on error response', fakeAsync(() => {
+      const errorEvent = new ErrorEvent('error');
+      failHandler = (error: HttpErrorResponse) => {
+        expect(error.error).toBe(errorEvent);
+      };
+      translateTextBackendApiService.fetchCompletedTranslationsAndTextAsync(
+        '1', 'en').then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/getcompletedtranslationshandler?exp_id=1&language_code=en');
+      expect(req.request.method).toEqual('GET');
+      req.error(errorEvent);
+      flushMicrotasks();
+    }));
+  })
 });

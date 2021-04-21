@@ -28,6 +28,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { AppConstants } from 'app.constants';
+import { CompletedTranslation } from 'domain/exploration/CompletedTranslation.model';
 import constants from 'assets/constants';
 
 class UiConfig {
@@ -65,8 +66,8 @@ export class TranslationModalComponent {
   previousTranslationAvailable: boolean = false;
   viewCompletedTranslationsModalOpen: boolean = false;
   loadingCompletedTranslations: boolean = true;
-  translationsList: string[] = [];
-  noTranslationComplete: boolean = false;
+  completedTranslationsList: CompletedTranslation[] = [];
+  noTranslationComplete: boolean = true;
   contentList: string[] = [];
   HTML_SCHEMA: {
     'type': string;
@@ -99,7 +100,7 @@ export class TranslationModalComponent {
     this.contextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription = (
       this.translationLanguageService.getActiveLanguageDescription());
-    this.translateTextService.init(
+      this.translateTextService.init(
       this.opportunity.id,
       this.translationLanguageService.getActiveLanguageCode(),
       () => {
@@ -118,6 +119,9 @@ export class TranslationModalComponent {
           this.translationLanguageService.getActiveLanguageDirection())
       }
     };
+    this.translateTextService.
+      loadCompletedTranslationsText(this.opportunity.id, 
+        this.translationLanguageService.getActiveLanguageCode());
   }
 
   close(): void {
@@ -191,16 +195,11 @@ export class TranslationModalComponent {
   }
 
   loadCompletedTranslations(): void {
-    // Call the service here and make it work.
-    this.translationsList = ['<p> Translation 1 </p>',
-      '<p> Translation 1 </p>'];
-    this.contentList = ['<p> Content 1', '<p>Content 2</p>'];
-    if (this.translationsList.length > 0) {
+    let translationsAndContent = this.translateTextService.
+      getCompletedTranslationsText();
+    this.completedTranslationsList = translationsAndContent;
+    if (this.completedTranslationsList.length > 0) {
       this.noTranslationComplete = false;
-    }
-    if (this.translationsList.length > 10) {
-      this.translationsList.splice(10);
-      this.contentList.splice(10);
     }
     this.loadingCompletedTranslations = false;
   }
