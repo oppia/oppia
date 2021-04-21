@@ -313,10 +313,7 @@ def main(args=None):
             python_utils.PRINT(
                 'Checking whether coverage is installed in %s'
                 % common.OPPIA_TOOLS_DIR)
-            if not os.path.exists(
-                    os.path.join(
-                        common.OPPIA_TOOLS_DIR,
-                        'coverage-%s' % common.COVERAGE_VERSION)):
+            if not os.path.exists(COVERAGE_DIR):
                 raise Exception(
                     'Coverage is not installed, please run the start script.')
 
