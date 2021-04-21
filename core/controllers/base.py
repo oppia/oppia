@@ -164,7 +164,12 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        auth_claims = auth_services.get_auth_claims_from_request(request)
+        try:
+            auth_claims = auth_services.get_auth_claims_from_request(request)
+        except ValueError:
+            auth_services.destroy_auth_session(self.response)
+            auth_claims = None
+
         self.current_user_is_super_admin = (
             auth_claims is not None and auth_claims.role_is_super_admin)
 
@@ -178,9 +183,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
-        if not auth_claims:
-            auth_services.destroy_auth_session(self.response)
-        else:
+        if auth_claims:
             auth_id = auth_claims.auth_id
             user_settings = user_services.get_user_settings_by_auth_id(auth_id)
             if user_settings is None:

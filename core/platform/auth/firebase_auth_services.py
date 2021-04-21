@@ -597,6 +597,9 @@ def _get_auth_claims_from_session_cookie(cookie):
     Returns:
         AuthClaims|None. The claims from the session cookie, if available.
         Otherwise returns None.
+
+    Raises:
+        ValueError. The cookie has an invalid value.
     """
     # It's OK for a session cookie to be None or empty, it just means that the
     # request hasn't been authenticated.
@@ -613,8 +616,9 @@ def _get_auth_claims_from_session_cookie(cookie):
         claims = firebase_auth.verify_session_cookie(cookie, check_revoked=True)
     except expected_session_cookie_errors:
         logging.warn('User session has ended and must be renewed')
-    except firebase_exceptions.FirebaseError:
+    except firebase_exceptions.FirebaseError as error:
         logging.exception('Invalid session cookie')
+        raise ValueError('Invalid session cookie: %s' % error)
     else:
         return _create_auth_claims(claims)
     return None

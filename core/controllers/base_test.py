@@ -597,6 +597,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         response = self.get_html_response('/splash', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
 
+    def test_auth_services_error(self):
+        get_auth_claims_swap = self.swap_to_always_raise(
+            auth_services, 'get_auth_claims_from_request', error=ValueError)
+        destroy_auth_session_swap = self.swap_with_call_counter(
+            auth_services, 'destroy_auth_session')
+
+        with get_auth_claims_swap, destroy_auth_session_swap as call_counter:
+            self.get_html_response('/splash', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 

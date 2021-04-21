@@ -1194,8 +1194,9 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         firebase_auth.delete_user(self.AUTH_ID)
 
         with self.capture_logging() as logs:
-            self.assertIsNone(
-                firebase_auth_services.get_auth_claims_from_request(
+            self.assertRaisesRegexp(
+                ValueError, 'Invalid session cookie',
+                lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
 
         self.assert_matches_regexps(logs, ['Invalid session cookie'])
