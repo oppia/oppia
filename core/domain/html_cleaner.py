@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import html
-print(os.listdir(html.__path__))
+print(os.listdir(html.__path__[0]))
 
 import json
 import logging
