@@ -295,6 +295,26 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
 
 
+class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
+
+    def test_model_domain_object_validate_error(self):
+        model = base_models.BaseModel(
+            id='123',
+            deleted=True,
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_AGO)
+        error_message = 'Invalid validation type for domain object: Invalid'
+
+        error = audit_errors.ModelDomainObjectValidateError(
+            model, error_message)
+
+        msg = (
+            'ModelDomainObjectValidateError in BaseModel(id=\'123\'): Entity'
+            ' fails domain validation with the error: %s' % error_message)
+
+        self.assertEqual(error.message, msg)
+
+
 class ModelExpiringErrorTests(AuditErrorsTestBase):
 
     def test_message(self):

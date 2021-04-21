@@ -34,8 +34,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {
   SubtitledHtml,
-  SubtitledHtmlObjectFactory,
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+} from 'domain/exploration/subtitled-html.model';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService = null;
@@ -51,7 +50,6 @@ describe('Responses Service', () => {
   let stateEditorService: StateEditorService = null;
   let stateInteractionIdService: StateInteractionIdService = null;
   let stateSolutionService: StateSolutionService = null;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
 
   beforeEach(() => {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
@@ -66,11 +64,10 @@ describe('Responses Service', () => {
     stateEditorService = TestBed.get(StateEditorService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateSolutionService = TestBed.get(StateSolutionService);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
 
     savedMemento = {
       ehfs: explorationHtmlFormatterService,
-      shof: subtitledHtmlObjectFactory,
+      shof: SubtitledHtml,
       answerIsExclusive: true,
       correctAnswer: 'This is the correct answer',
       explanation: new SubtitledHtml('', 'tesster'),

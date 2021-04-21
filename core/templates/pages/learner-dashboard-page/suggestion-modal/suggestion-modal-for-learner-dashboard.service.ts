@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,51 +16,54 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
-require(
-  'pages/learner-dashboard-page/suggestion-modal/' +
-  'learner-dashboard-suggestion-modal.controller.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-require('domain/utilities/url-interpolation.service.ts');
+import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
+interface ExtraParams {
+  'newContent': string,
+  'oldContent': string,
+  'description': string
+}
 
-angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
-  '$uibModal', 'UrlInterpolationService',
-  function($uibModal, UrlInterpolationService) {
-    var _showEditStateContentSuggestionModal = function(
-        newContent, oldContent, description) {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner-dashboard-page/suggestion-modal/' +
-          'learner-dashboard-suggestion-modal.directive.html'),
-        backdrop: true,
-        resolve: {
-          newContent: function() {
-            return newContent;
-          },
-          oldContent: function() {
-            return oldContent;
-          },
-          description: function() {
-            return description;
-          }
-        },
-        controller: 'LearnerDashboardSuggestionModalController'
-      }).result.then(() => {}, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class SuggestionModalForLearnerDashboardService {
+  successfullyAdded: boolean;
+  addToLearnerPlaylistUrl: string;
 
-    return {
-      showSuggestionModal: function(suggestionType, extraParams) {
-        if (suggestionType === 'edit_exploration_state_content') {
-          _showEditStateContentSuggestionModal(
-            extraParams.newContent,
-            extraParams.oldContent,
-            extraParams.description
-          );
-        }
-      }
-    };
+  constructor(
+    private ngbModal: NgbModal,
+  ) {}
+
+  private _showEditStateContentSuggestionModal(
+      newContent: string, oldContent: string, description: string): void {
+    const modelRef = this.ngbModal.open(
+      LearnerDashboardSuggestionModalComponent, {backdrop: true});
+    modelRef.componentInstance.newContent = newContent;
+    modelRef.componentInstance.oldContent = oldContent;
+    modelRef.componentInstance.description = description;
+    modelRef.result.then(() => {}, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
-]);
+
+  showSuggestionModal(suggestionType: string, extraParams: ExtraParams): void {
+    if (suggestionType === 'edit_exploration_state_content') {
+      this._showEditStateContentSuggestionModal(
+        extraParams.newContent,
+        extraParams.oldContent,
+        extraParams.description
+      );
+    }
+  }
+}
+
+angular.module('oppia').factory(
+  'SuggestionModalForLearnerDashboardService',
+  downgradeInjectable(SuggestionModalForLearnerDashboardService)
+);
