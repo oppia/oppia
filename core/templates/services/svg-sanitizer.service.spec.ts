@@ -26,6 +26,7 @@ describe('SvgSanitizerService', () => {
   let svgSanitizerService: SvgSanitizerService;
   let domParser: DOMParser = new DOMParser();
   class MockDomSanitizer {
+    // eslint-disable-next-line oppia/disallow-identifier-phrase
     bypassSecurityTrustResourceUrl(str: string): string {
       return str;
     }

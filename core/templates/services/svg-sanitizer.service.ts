@@ -170,6 +170,7 @@ export class SvgSanitizerService {
    */
   getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl | null {
     if (this.isValidBase64Svg(base64ImageData)) {
+      // eslint-disable-next-line oppia/disallow-identifier-phrase
       return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
     }
     return null;
