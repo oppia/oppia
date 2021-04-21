@@ -309,6 +309,7 @@
 /core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @brianrodri
 /extensions/interactions/ @iamprayush @vojtechjelinek
+/extensions/objects/templates/filepath-editor.component.* @kevintab95
 /extensions/objects/ @iamprayush
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @iamprayush
