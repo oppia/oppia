@@ -94,7 +94,7 @@ angular.module('oppia').component('contributorDashboardPage', {
 
       ctrl.onTabClick = function(activeTabName) {
         ctrl.activeTabName = activeTabName;
-        // The $timeout is required to ensure that focus is applied only 
+        // The $timeout is required to ensure that focus is applied only
         // after all the functions in main thread have executed.
         if (ctrl.activeTabName === 'translateTextTab') {
           $timeout(() => {
