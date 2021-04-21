@@ -100,17 +100,10 @@
               </a>
             </div>
             <div class="skill-list-options-container">
-<<<<<<< HEAD:core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.directive.html
-              <p class="fas fa-ellipsis-v skill-edit-box-icon" ng-click="$ctrl.changeEditOptions(skill.id)"></p>
-              <div ng-if="$ctrl.showEditOptions(skill.id)" class="skill-edit-options" ng-mouseleave="$ctrl.changeEditOptions(null)">
-                <div class="assign-skill-box" ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
-                  <span class="skills-list-action-button" ng-click="$ctrl.assignSkillToTopic(skill)">
-=======
               <p class="fas fa-ellipsis-v skill-edit-box-icon" (click)="changeEditOptions(skill.id)"></p>
               <div *ngIf="showEditOptions(skill.id)" class="skill-edit-options" aria-label="Edit Option For Skill <[skill.description]>" (mouseleave)="changeEditOptions(null)">
                 <div class="assign-skill-box" *ngIf="editableTopicSummaries.length > 0 && !isUnpublishedSkill">
                   <span class="skills-list-action-button" (click)="assignSkillToTopic(skill)">
->>>>>>> 507fb6afe185da0743f7119544b209c4e4d28877:core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.html
                     <i class="fa fa-wrench"></i>
                     <span> Assign to Topic </span>
                   </span>
