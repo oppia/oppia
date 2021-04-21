@@ -36,7 +36,6 @@ class MockChangeDetectorRef {
 }
 
 describe('Translation Modal Component', () => {
-  let oppiaAngularRootComponent: OppiaAngularRootComponent;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
   let ckEditorCopyContentService: CkEditorCopyContentService;
@@ -151,8 +150,9 @@ describe('Translation Modal Component', () => {
       expect(OppiaAngularRootComponent.contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
       expect(OppiaAngularRootComponent.contextService.getEntityId()).toBe('1');
-      expect(OppiaAngularRootComponent.contextService.imageSaveDestination).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      expect(
+        OppiaAngularRootComponent.contextService.imageSaveDestination
+      ).toBe(AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
     it('should initialize translateTextService', fakeAsync(() => {
