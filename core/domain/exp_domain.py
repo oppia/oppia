@@ -1008,7 +1008,7 @@ class Exploration(python_utils.OBJECT):
         # any end states, thus the user cannot bypass that state. However, if
         # the unseen states list contains at least one end state, then the state
         # is bypassable.
-
+        excluded_state_is_bypassable = False
         for state_name_to_exclude in non_initial_checkpoint_state_names:
             new_states = copy.deepcopy(self.states)
             new_states.pop(state_name_to_exclude)
@@ -1033,9 +1033,8 @@ class Exploration(python_utils.OBJECT):
                             dest_state = outcome.dest
                             if self.states[dest_state].interaction.id == (
                                     'EndExploration'):
-                                raise utils.ValidationError(
-                                    'Cannot make %s a checkpoint as it is '
-                                    'bypassable' % state_name_to_exclude)
+                                excluded_state_is_bypassable = True
+                                break
                             if (dest_state not in curr_queue and
                                     dest_state not in processed_state_names):
                                 curr_queue.append(dest_state)
@@ -1043,6 +1042,10 @@ class Exploration(python_utils.OBJECT):
                         raise utils.ValidationError(
                             'The state %s is terminal and a terminal state '
                             'cannot be a checkpoint.' % state_name_to_exclude)
+            if excluded_state_is_bypassable:
+                raise utils.ValidationError(
+                    'Cannot make %s a checkpoint as it is bypassable'
+                    % state_name_to_exclude)
 
         if strict:
             warnings_list = []
