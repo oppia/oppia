@@ -16,7 +16,7 @@ avro-python3==1.9.2.1
     # via apache-beam
 backports.functools-lru-cache==1.6.1
     # via -r requirements.in
-beautifulsoup4==4.9.1
+beautifulsoup4==4.9.3
     # via -r requirements.in
 bleach==3.1.5
     # via -r requirements.in

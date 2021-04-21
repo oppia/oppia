@@ -5,7 +5,7 @@
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
 apache-beam[gcp]==2.24.0
 backports.functools-lru-cache==1.6.1
-beautifulSoup4==4.9.1
+beautifulsoup4==4.9.3
 bleach==3.1.5
 callbacks==0.3.0
 contextlib2==0.6.0.post1

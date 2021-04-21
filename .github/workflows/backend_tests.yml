@@ -17,6 +17,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04]
         shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -38,6 +39,9 @@ jobs:
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}
+      - name: Setup python by installing wheel
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -c "import html; print(html.__file__)"
       - name: Upload coverage report
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: actions/upload-artifact@v2
