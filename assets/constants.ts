@@ -4875,6 +4875,10 @@ export default {
     "description": "polszczyzna (Polish)",
     "direction": "ltr"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)",
+    "direction": "rtl"
+  }, {
     "code": "pt",
     "description": "português (Portuguese)",
     "direction": "ltr"
@@ -4918,6 +4922,10 @@ export default {
     "code": "uk",
     "description": "yкраїнська (Ukrainian)",
     "direction": "ltr"
+  }, {
+    "code": "ur",
+    "description": "اُردُو (Urdu)",
+    "direction": "rtl"
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
@@ -5036,7 +5044,7 @@ export default {
     "id": "prs",
     "description": "Dari",
     "relatedLanguages": ["prs"],
-    "direction": "ltr"
+    "direction": "rtl"
   }, {
     "id": "nl",
     "description": "Dutch",
@@ -5212,6 +5220,11 @@ export default {
     "description": "Ukrainian",
     "relatedLanguages": ["uk"],
     "direction": "ltr"
+  }, {
+    "id": "ur",
+    "description": "Urdu",
+    "relatedLanguages": ["ur"],
+    "direction": "rtl"
   }, {
     "id": "vi",
     "description": "Vietnamese",
