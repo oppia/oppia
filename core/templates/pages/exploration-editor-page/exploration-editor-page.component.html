@@ -8,7 +8,7 @@
     </div>
     <div class="navbar-icons">
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
-          class = "nav-item icon nav-list-item position-relative">
+          class="nav-item icon nav-list-item position-relative">
         <a href="#" class="nav-link navbar-tab protractor-test-main-tab" uib-tooltip="Editor" tooltip-placement="<[$ctrl.countWarnings() ? 'left' : 'bottom']>">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
         </a>
@@ -129,7 +129,7 @@
   </div>
 </div>
 
-<on-screen-keyboard></on-screen-keyboard>
+<oppia-on-screen-keyboard></oppia-on-screen-keyboard>
 
 <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
 <svg width="0" height="0">
@@ -180,13 +180,13 @@
     text-align: center;
   }
   exploration-editor-page .navbar-tab-icon {
-    color: #FFFFFF;
+    color: #FFF;
     display: block;
     font-size: 30px;
     width: 100%;
   }
   exploration-editor-page .navbar-tab span {
-    color: #FFFFFF;
+    color: #FFF;
     font-size: 12px;
   }
   exploration-editor-page .oppia-editor-warnings-box {

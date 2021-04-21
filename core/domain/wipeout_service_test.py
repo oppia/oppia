@@ -47,17 +47,18 @@ import feconf
 import python_utils
 
 (
-    auth_models, collection_models, config_models,
-    email_models, exp_models, feedback_models,
-    improvements_models, question_models, skill_models,
-    story_models, subtopic_models, suggestion_models,
-    topic_models, user_models
+    app_feedback_report_models, auth_models, collection_models, config_models,
+    email_models, exp_models, feedback_models, improvements_models,
+    question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.app_feedback_report, models.NAMES.auth,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -589,6 +590,350 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
 
+class WipeoutServiceDeleteAppFeedbackReportModelsTests(
+        test_utils.GenericTestBase):
+    """Tests that the wipeout services properly deletes references in any
+    AppFeedbackReportModels with the deleted user.
+    """
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
+    # The timestamp in sec since epoch for Mar 8 2021 10:7:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615199836)
+    # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+
+    PLATFORM_ANDROID = 'android'
+    REPORT_ID_1 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_1.second,
+        'randomInteger123')
+    REPORT_ID_2 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'randomInteger321')
+    REPORT_ID_3 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'differentInt')
+    TICKET_ID = '%s.%s.%s' % (
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 28
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
+
+    def setUp(self):
+        super(WipeoutServiceDeleteAppFeedbackReportModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_2,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_3,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_user_is_pseudonymized_from_report(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
+
+        # Verify the user is pseudonymized.
+        report_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_1))
+        self.assertEqual(
+            report_model.scrubbed_by, report_mappings[self.REPORT_ID_1])
+        self.assertNotEqual(report_model.scrubbed_by, self.user_1_id)
+
+    def test_same_pseudonym_used_for_same_user(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+        report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
+
+        # Verify the pseudonym is the same for all report instances.
+        report_model_2 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_2))
+        report_model_3 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_3))
+        self.assertEqual(
+            report_model_2.scrubbed_by, report_mappings[self.REPORT_ID_2])
+        self.assertEqual(
+            report_model_3.scrubbed_by, report_mappings[self.REPORT_ID_3])
+        self.assertNotEqual(report_model_2.scrubbed_by, self.user_2_id)
+        self.assertNotEqual(report_model_3.scrubbed_by, self.user_2_id)
+
+        self.assertEqual(
+            report_model_2.scrubbed_by, report_model_3.scrubbed_by)
+
+    def test_different_users_have_different_pseudonyms(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+        user_1_report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
+        user_2_report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report])
+
+        # Verify pseudonyms are different for different users.
+        report_model_1 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_1))
+        report_model_2 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_2))
+        self.assertEqual(
+            report_model_1.scrubbed_by,
+            user_1_report_mappings[self.REPORT_ID_1])
+        self.assertEqual(
+            report_model_2.scrubbed_by,
+            user_2_report_mappings[self.REPORT_ID_2])
+
+        self.assertNotEqual(
+            report_model_1.scrubbed_by, report_model_2.scrubbed_by)
+
+
+class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
+        test_utils.GenericTestBase):
+    """Tests that the wipeout services properly verifies the deleted status of
+    AppFeedbackReportModels with previous references to a deleted user.
+    """
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
+    # The timestamp in sec since epoch for Mar 8 2021 10:7:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615199836)
+    # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+
+    PLATFORM_ANDROID = 'android'
+    REPORT_ID_1 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_1.second,
+        'randomInteger123')
+    REPORT_ID_2 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'randomInteger321')
+    TICKET_ID = '%s.%s.%s' % (
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 28
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
+
+    def setUp(self):
+        super(
+            WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests,
+            self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_2,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_verify_user_delete_when_user_is_deleted_returns_true(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+    def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+
 class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
@@ -943,6 +1288,8 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             collection_mappings[self.COL_1_ID])
 
     def test_one_collection_with_missing_snapshot_is_pseudonymized(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         collection_models.CollectionCommitLogEntryModel(
             id='collection-%s-1' % self.COL_2_ID,
             collection_id=self.COL_2_ID,
@@ -954,8 +1301,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
-            wipeout_service.pre_delete_user(self.user_1_id)
-            self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -968,12 +1313,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
                 '\'CollectionRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
                 'commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
-                '[WIPEOUT] The commit log model '
-                '\'ExplorationCommitLogEntryModel\' and '
-                'snapshot models [\'ExplorationSnapshotMetadataModel\', '
-                '\'ExplorationRightsSnapshotMetadataModel\'] IDs differ. '
-                'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'an_exploration_id\'].'
             ]
         )
 
@@ -1189,7 +1528,9 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
+        self.publish_collection(self.user_1_id, self.COL_1_ID)
         self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
+        self.publish_collection(self.user_1_id, self.COL_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -1568,7 +1909,9 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXP_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -1588,132 +1931,6 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
             commit_message='123',
             commit_type='create',
             commit_cmds={}
-        ).put()
-
-        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-
-class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
-    """Provides testing of the deletion part of wipeout service."""
-
-    USER_1_EMAIL = 'some@email.com'
-    USER_1_USERNAME = 'username1'
-    USER_2_EMAIL = 'some-other@email.com'
-    USER_2_USERNAME = 'username2'
-    THREAD_1_ID = 'thread_1_id'
-    THREAD_2_ID = 'thread_2_id'
-    REPLY_1_ID = 'reply_1_id'
-    REPLY_2_ID = 'reply_2_id'
-
-    def setUp(self):
-        super(WipeoutServiceDeleteEmailModelsTests, self).setUp()
-        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_1_ID,
-            reply_to_id=self.REPLY_1_ID
-        ).put()
-        wipeout_service.pre_delete_user(self.user_1_id)
-        wipeout_service.pre_delete_user(self.user_2_id)
-        self.process_and_flush_pending_tasks()
-
-    def test_one_email_is_deleted(self):
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_1_ID)))
-
-    def test_multiple_emails_are_deleted(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_2_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_2_ID,
-            reply_to_id=self.REPLY_2_ID
-        ).put()
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_1_ID)))
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_2_ID)))
-
-    def test_multiple_emails_from_multiple_users_are_deleted(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_2_id, self.THREAD_2_ID),
-            user_id=self.user_2_id,
-            thread_id=self.THREAD_2_ID,
-            reply_to_id=self.REPLY_2_ID
-        ).put()
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_1_ID)))
-        self.assertIsNotNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_2_id, self.THREAD_2_ID)))
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_2_id, self.THREAD_2_ID)))
-
-
-class WipeoutServiceVerifyDeleteEmailModelsTests(test_utils.GenericTestBase):
-    """Provides testing of the verification part of wipeout service."""
-
-    USER_1_EMAIL = 'some@email.com'
-    USER_1_USERNAME = 'username1'
-    THREAD_1_ID = 'thread_1_id'
-    THREAD_2_ID = 'thread_2_id'
-    REPLY_1_ID = 'reply_1_id'
-    REPLY_2_ID = 'reply_2_id'
-
-    def setUp(self):
-        super(WipeoutServiceVerifyDeleteEmailModelsTests, self).setUp()
-        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_1_ID,
-            reply_to_id=self.REPLY_1_ID
-        ).put()
-        wipeout_service.pre_delete_user(self.user_1_id)
-        self.process_and_flush_pending_tasks()
-
-    def test_verify_user_delete_when_user_is_deleted_returns_true(self):
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-    def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_1_ID,
-            reply_to_id=self.REPLY_1_ID
         ).put()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))

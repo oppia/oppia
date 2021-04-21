@@ -303,7 +303,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         }
         def mock_exists(unused_path):
             return False
-        def mock_pip_install(unused_package, unused_version, unused_path):
+        def mock_pip_install(unused_versioned_package, unused_path):
             check_function_calls['pip_install_is_called'] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)

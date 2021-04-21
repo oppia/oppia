@@ -22,14 +22,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
-import { RubricBackendDict } from 'domain/skill/RubricObjectFactory';
+import { RubricBackendDict } from 'domain/skill/rubric.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
-import { SkillIdToDescriptionMap } from 'domain/topic/SubtopicObjectFactory';
-import { SubtopicPageBackendDict } from 'domain/topic/SubtopicPageObjectFactory';
+import { SkillIdToDescriptionMap } from 'domain/topic/subtopic.model';
+import { SubtopicPageBackendDict } from 'domain/topic/subtopic-page.model';
 import { TopicBackendDict } from 'domain/topic/TopicObjectFactory';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service.ts';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 interface FetchTopicBackendResponse {
   'topic_dict': TopicBackendDict;
@@ -203,7 +203,7 @@ export class EditableTopicBackendApiService {
 
   private _updateTopic(
       topicId: string,
-      topicVersion: string,
+      topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[],
       successCallback: (value?: UpdateTopicResponse) => void,
@@ -302,7 +302,7 @@ export class EditableTopicBackendApiService {
    */
   updateTopic(
       topicId: string,
-      topicVersion: string,
+      topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[]): Promise<UpdateTopicResponse> {
     return new Promise((resolve, reject) => {

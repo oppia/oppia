@@ -87,28 +87,28 @@
           </div>
 
           <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-            <topics-list topic-summaries="$ctrl.displayedTopicSummaries"
-                         page-number="$ctrl.pageNumber"
-                         items-per-page="$ctrl.itemsPerPage"
-                         ng-if="$ctrl.topicSummaries.length > 0"
-                         user-can-delete-topic="$ctrl.userCanDeleteTopic">
-            </topics-list>
+            <oppia-topics-list [topic-summaries]="$ctrl.displayedTopicSummaries"
+                               [page-number]="$ctrl.pageNumber"
+                               [items-per-page]="$ctrl.itemsPerPage"
+                               ng-if="$ctrl.topicSummaries.length > 0"
+                               [user-can-delete-topic]="$ctrl.userCanDeleteTopic">
+            </oppia-topics-list>
             <p class="intro-card-message" ng-if="!$ctrl.topicSummaries.length">
               No topics to display.
             </p>
           </div>
           <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-            <skills-list skill-summaries="$ctrl.displayedSkillSummaries"
-                         ng-if="$ctrl.displayedSkillSummaries.length > 0"
-                         page-number="$ctrl.pageNumber"
-                         items-per-page="$ctrl.itemsPerPage"
-                         editable-topic-summaries="$ctrl.editableTopicSummaries"
-                         mergeable-skill-summaries="$ctrl.mergeableSkillSummaries"
-                         untriaged-skill-summaries="$ctrl.untriagedSkillSummaries"
-                         user-can-create-skill="$ctrl.userCanCreateSkill"
-                         user-can-delete-skill="$ctrl.userCanDeleteSkill"
-                         skills-categorized-by-topics="$ctrl.skillsCategorizedByTopics">
-            </skills-list>
+            <oppia-skills-list [skill-summaries]="$ctrl.displayedSkillSummaries"
+                               ng-if="$ctrl.displayedSkillSummaries.length > 0"
+                               [page-number]="$ctrl.pageNumber"
+                               [items-per-page]="$ctrl.itemsPerPage"
+                               [editable-topic-summaries]="$ctrl.editableTopicSummaries"
+                               [mergeable-skill-summaries]="$ctrl.mergeableSkillSummaries"
+                               [untriaged-skill-summaries]="$ctrl.untriagedSkillSummaries"
+                               [user-can-create-skill]="$ctrl.userCanCreateSkill"
+                               [user-can-delete-skill]="$ctrl.userCanDeleteSkill"
+                               [skills-categorized-by-topics]="$ctrl.skillsCategorizedByTopics">
+            </oppia-skills-list>
             <p class="intro-card-message protractor-test-no-skills-present-message" ng-if="!$ctrl.displayedSkillSummaries.length">
               No skills to display.
             </p>
@@ -293,7 +293,7 @@
     width: 95%;
   }
   .oppia-topics-and-skills-dashboard .dashboard-content-primary {
-    background-color: #ffffff;
+    background-color: #fff;
     border: 2px solid #aaaac1;
     border-radius: 8px;
     display: inline-block;
@@ -319,7 +319,7 @@
   }
   .oppia-topics-and-skills-dashboard .topic-skill-count {
     align-items: center;
-    background-color: #ffffff;
+    background-color: #fff;
     border: 2px solid #aaaac1;
     border-radius: 8px;
     display: flex;
@@ -336,7 +336,7 @@
     width: 33%;
   }
   .oppia-topics-and-skills-dashboard .topic-skill-filter {
-    background-color: #ffffff;
+    background-color: #fff;
     border: 2px solid #aaaac1;
     border-radius: 8px;
     margin-top: 40px;
@@ -443,7 +443,7 @@
     background-color: #00645C;
     border-radius: 50%;
     box-shadow: 0 3px 3px #707070;
-    color: #FFFFFF;
+    color: #FFF;
     cursor: pointer;
     display: inline-block;
     font-size: 16px;
@@ -454,7 +454,7 @@
     width: 23px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active span {
-    color: #FFFFFF;
+    color: #FFF;
     font-size: 16px;
     outline: none;
   }
@@ -486,7 +486,7 @@
     text-align: center;
   }
   .oppia-topics-and-skills-dashboard .intro-card {
-    background: #ffffff;
+    background: #fff;
     border-left: none;
     border-radius: 5px;
     margin: 0 auto;
@@ -495,7 +495,7 @@
     width: 100%;
   }
   .oppia-topics-and-skills-dashboard .intro-card:before {
-    background: #ffffff;
+    background: #fff;
     border-bottom-right-radius: 80px 50px;
     bottom: -1.7em;
     content: "";
@@ -602,7 +602,7 @@
       background-color: #00645C;
       border-bottom: 2px solid #FFF;
       border-radius: 0;
-      color: #FFFFFF;
+      color: #FFF;
     }
     .oppia-topics-and-skills-dashboard .create-buttons,
     .oppia-topics-and-skills-dashboard .topic-skill-count,
@@ -611,7 +611,7 @@
       display: none;
     }
     .oppia-topics-and-skills-dashboard .topic-skill-filter {
-      background-color: #FFFFFF;
+      background-color: #FFF;
       border: 0;
       border-radius: 0;
       height: 100vh;
@@ -666,7 +666,7 @@
       justify-content: space-between;
     }
     .oppia-topics-and-skills-dashboard .dashboard-cross-icon {
-      color: #000000;
+      color: #000;
       display: block;
       font-size: 20px;
     }

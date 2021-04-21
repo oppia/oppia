@@ -10,7 +10,7 @@
     </div>
 
     <div class="float-right">
-      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success float-right oppia-autofocus"
+      <button ng-if="$ctrl.userIsLoggedIn" class="btn btn-success float-right oppia-thread-button oppia-autofocus"
               ng-click="$ctrl.showCreateThreadModal()" focus-on="newThreadButton">
         Start new thread
       </button>
@@ -159,6 +159,9 @@
     margin-top: 10px;
     word-wrap: break-word;
   }
+  feedback-tab .oppia-thread-button {
+    margin-top: 15px;
+  }
   feedback-tab .oppia-thread-text {
     font-size: larger;
   }
@@ -171,7 +174,7 @@
     margin-top: 6px;
   }
   feedback-tab .oppia-icon-container {
-    color: #ff0000;
+    color: #f00;
     margin-top: 7px;
   }
   feedback-tab .oppia-feedback-response-send-btn {
