@@ -990,16 +990,16 @@ class Exploration(python_utils.OBJECT):
                 checkpoint_count = checkpoint_count + 1
         if not 1 <= checkpoint_count <= 8:
             raise utils.ValidationError(
-                'Expected checkpoint count to be atleast 1 and atmax 8 '
+                'Expected checkpoint count to be between 1 and 8 inclusive '
                 'but found it to be %s'
                 % checkpoint_count
             )
 
-        # Check if a state marked as checkpoint is bypassable.
-        end_state_names = []
+        # Check if a state marked as a checkpoint is bypassable.
+        non_initial_checkpoint_state_names = []
         for state_name, state in self.states.items():
-            if state.interaction.id == 'EndExploration':
-                end_state_names.append(state_name)
+            if state_name != self.init_state_name and state.card_is_checkpoint:
+                non_initial_checkpoint_state_names.append(state_name)
 
         # For every state which is marked as a checkpoint and is not the initial
         # state we remove it from the states dict. Then we make a list of
@@ -1008,40 +1008,41 @@ class Exploration(python_utils.OBJECT):
         # any end states, thus the user cannot bypass that state. However, if
         # the unseen states list contains at least one end state, then the state
         # is bypassable.
-        for state_name, state in self.states.items():
-            if state_name == self.init_state_name:
-                continue
-            elif state.card_is_checkpoint:
-                new_states = copy.deepcopy(self.states)
-                new_states.pop(state_name)
-                processed_queue = []
-                curr_queue = [self.init_state_name]
 
-                while curr_queue:
-                    if curr_queue[0] == state_name:
-                        curr_queue.pop(0)
-                        continue
-                    curr_state_name = curr_queue[0]
-                    curr_queue = curr_queue[1:]
-                    if not curr_state_name in processed_queue:
-                        processed_queue.append(curr_state_name)
+        for state_name_to_exclude in non_initial_checkpoint_state_names:
+            new_states = copy.deepcopy(self.states)
+            new_states.pop(state_name_to_exclude)
+            processed_state_names = set()
+            curr_queue = [self.init_state_name]
 
-                        curr_state = new_states[curr_state_name]
+            while curr_queue:
+                if curr_queue[0] == state_name_to_exclude:
+                    curr_queue.pop(0)
+                    continue
+                curr_state_name = curr_queue[0]
+                curr_queue = curr_queue[1:]
+                if not curr_state_name in processed_state_names:
+                    processed_state_names.add(curr_state_name)
 
-                        if not curr_state.interaction.is_terminal:
-                            all_outcomes = (
-                                curr_state.interaction.get_all_outcomes())
-                            for outcome in all_outcomes:
-                                dest_state = outcome.dest
-                                if (dest_state not in curr_queue and
-                                        dest_state not in processed_queue):
-                                    curr_queue.append(dest_state)
-                unseen_states = list(
-                    set(new_states.keys()) - set(processed_queue))
-                if not all(state in unseen_states for state in end_state_names):
-                    raise utils.ValidationError(
-                        'Cannot make %s a checkpoint as it is '
-                        'bypassable' % state_name)
+                    curr_state = new_states[curr_state_name]
+
+                    if not curr_state.interaction.is_terminal:
+                        all_outcomes = (
+                            curr_state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            dest_state = outcome.dest
+                            if self.states[dest_state].interaction.id == (
+                                    'EndExploration'):
+                                raise utils.ValidationError(
+                                    'Cannot make %s a checkpoint as it is '
+                                    'bypassable' % state_name_to_exclude)
+                            if (dest_state not in curr_queue and
+                                    dest_state not in processed_state_names):
+                                curr_queue.append(dest_state)
+                    else:
+                        raise utils.ValidationError(
+                            'The state %s is terminal and a terminal state '
+                            'cannot be a checkpoint.' % state_name_to_exclude)
 
         if strict:
             warnings_list = []

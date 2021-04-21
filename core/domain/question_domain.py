@@ -1065,7 +1065,7 @@ class Question(python_utils.OBJECT):
     def _convert_state_v43_dict_to_v44_dict(cls, question_state_dict):
         """Converts from version 43 to version 44. Version 44 adds
         card_is_checkpoint boolean to the state, which allows creators to
-        mark a state as a checkpoint for the learners
+        mark a state as a checkpoint for the learners.
 
         Args:
             question_state_dict: dict. A dict representation of

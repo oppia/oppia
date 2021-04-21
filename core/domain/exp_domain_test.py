@@ -491,6 +491,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest = exploration.init_state_name
         init_state.update_interaction_default_outcome(default_outcome)
         init_state.update_card_is_checkpoint(True)
+        exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
         # Note: The state must keep its default_outcome, otherwise it will
@@ -945,8 +946,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.add_states(['State%s' % i])
             exploration.states['State%s' % i].card_is_checkpoint = True
         self._assert_validation_error(
-            exploration, 'Expected checkpoint count to be atleast 1 and atmax '
-            '8 but found it to be 9'
+            exploration, 'Expected checkpoint count to be between 1 and 8 '
+            'inclusive but found it to be 9'
         )
         exploration.states = {
             exploration.init_state_name: new_state,
