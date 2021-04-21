@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import html.parser
+import html
 import json
 import logging
 
@@ -162,7 +162,6 @@ def get_rte_components(html_string):
         - id: str. The name of the component, i.e. 'oppia-noninteractive-link'.
         - customization_args: dict. Customization arg specs for the component.
     """
-    parser = html.parser.HTMLParser()
     components = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (
@@ -174,7 +173,7 @@ def get_rte_components(html_string):
             customization_args = {}
             for attr in oppia_custom_tag_attrs[tag_name]:
                 # Unescape special HTML characters such as '&quot;'.
-                attr_val = parser.unescape(component_tag[attr])
+                attr_val = html.unescape(component_tag[attr])
                 customization_args[attr] = json.loads(attr_val)
 
             component['customization_args'] = customization_args
