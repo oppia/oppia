@@ -32,7 +32,7 @@ jobs:
         run: pip install coverage configparser
       - name: Test html
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: "python -c 'import html; print(open(html.__file__).read())'"
+        run: "python -c 'import html; print(os.listdir(html.__path__))'"
       - name: Run backend test shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }}

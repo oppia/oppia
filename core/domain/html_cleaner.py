@@ -19,8 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import html
-print(open(html.__file__).read())
+print(os.listdir(html.__path__))
 
 import json
 import logging
