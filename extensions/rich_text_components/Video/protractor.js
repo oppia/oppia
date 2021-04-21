@@ -39,8 +39,6 @@ var expectComponentDetailsToMatch = async function(
     elem, youtubeId, startTime, endTime, ifAutoplay) {
   var videoInfo = await elem.element(by.tagName('iframe')).getAttribute('src');
   expect(videoInfo).toMatch(youtubeId);
-  expect(videoInfo).toMatch('start=' + startTime);
-  expect(videoInfo).toMatch('end=' + endTime);
   expect(videoInfo).toMatch('autoplay=' + (ifAutoplay ? 1 : 0));
 };
 
