@@ -95,7 +95,7 @@ commands:
           path: /home/circleci/protractor-screenshots/
           destination: protractor-screenshots/
       - store_artifacts:
-          path: /home/circleci/oppia/core/protractor-video/
+          path: /home/circleci/protractor-video/
           destination: protractor-video/
   
   install_ffmpeg:

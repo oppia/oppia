@@ -339,9 +339,8 @@ exports.config = {
       }));
     }
 
-      // Adding a video reporter. For more information see
-      // https://www.npmjs.com/package/protractor-video-reporter
-    var _ADD_VIDEO_REPORTER = true;
+    // Adding a video reporter. For more information see
+    // https://www.npmjs.com/package/protractor-video-reporter
 
     var ffmpegArguments = [
       '-y',
@@ -353,13 +352,13 @@ exports.config = {
       '-vcodec', 'qtrle',
     ]
 
-    if(_ADD_VIDEO_REPORTER) {
-      jasmine.getEnv().addReporter(new VideoReporter({
-        baseDirectory: path.resolve(__dirname, '../protractor-video'),
-        ffmpegArgs: ffmpegArguments
-      }));
-    }
-
+    jasmine.getEnv().addReporter(new VideoReporter({
+      baseDirectory: path.resolve(__dirname, '../../../protractor-video'),
+      singleVideoPath: 'uuid',
+      saveSuccessVideos: true,
+      ffmpegArgs: ffmpegArguments
+    }));
+    
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'pretty',
