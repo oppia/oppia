@@ -124,7 +124,7 @@ describe('Edit Thumbnail Modal Controller', function() {
     // The setTimeout is being used here to not conflict with $timeout.flush
     // for fadeIn Jquery method. This first setTimeout is to wait the default
     // time for fadeOut Jquery method to complete, which is 400 miliseconds.
-    // 800ms is being used instead of 400ms just to be sure that fadeOut callbak
+    // 1000ms is being used instead of 400ms just to be sure that fadeOut callbak
     // is already executed.
     // Ref: https://api.jquery.com/fadeout/
     setTimeout(function() {
@@ -143,7 +143,7 @@ describe('Edit Thumbnail Modal Controller', function() {
       // ---- Save information ----
       $scope.confirm();
       expect($uibModalInstance.close).toHaveBeenCalled();
-    }, 800);
+    }, 1000);
   });
 
   it('should perform fadeIn and fadeOut operations correctly' +
@@ -167,7 +167,7 @@ describe('Edit Thumbnail Modal Controller', function() {
 
     waitForAsync(() => {
       expect(fadeInElementSpy).toHaveBeenCalled();
-    })
+    });
   });
 
   it('should not load file if it is not a svg type', function() {
