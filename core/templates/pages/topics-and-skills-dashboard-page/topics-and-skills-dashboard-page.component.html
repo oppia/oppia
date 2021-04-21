@@ -98,19 +98,19 @@
               No topics to display.
             </p>
           </div>
-          <div *ngIf="activeTab === TAB_NAME_SKILLS">
-            <!-- <skills-list skill-summaries="displayedSkillSummaries"
-                         *ngIf="displayedSkillSummaries.length > 0"
-                         page-number="pageNumber"
-                         items-per-page="itemsPerPage"
-                         editable-topic-summaries="editableTopicSummaries"
-                         mergeable-skill-summaries="mergeableSkillSummaries"
-                         untriaged-skill-summaries="untriagedSkillSummaries"
-                         user-can-create-skill="userCanCreateSkill"
-                         user-can-delete-skill="userCanDeleteSkill"
-                         skills-categorized-by-topics="skillsCategorizedByTopics">
-            </skills-list> -->
-            <p class="intro-card-message protractor-test-no-skills-present-message" *ngIf="!displayedSkillSummaries.length">
+          <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+            <oppia-skills-list [skill-summaries]="$ctrl.displayedSkillSummaries"
+                               ng-if="$ctrl.displayedSkillSummaries.length > 0"
+                               [page-number]="$ctrl.pageNumber"
+                               [items-per-page]="$ctrl.itemsPerPage"
+                               [editable-topic-summaries]="$ctrl.editableTopicSummaries"
+                               [mergeable-skill-summaries]="$ctrl.mergeableSkillSummaries"
+                               [untriaged-skill-summaries]="$ctrl.untriagedSkillSummaries"
+                               [user-can-create-skill]="$ctrl.userCanCreateSkill"
+                               [user-can-delete-skill]="$ctrl.userCanDeleteSkill"
+                               [skills-categorized-by-topics]="$ctrl.skillsCategorizedByTopics">
+            </oppia-skills-list>
+            <p class="intro-card-message protractor-test-no-skills-present-message" ng-if="!$ctrl.displayedSkillSummaries.length">
               No skills to display.
             </p>
           </div>
