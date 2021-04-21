@@ -27,7 +27,6 @@ jobs:
       - name: Priint env
         run: printenv
       - name: Install third party
-      - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
       - name: Install chrome
