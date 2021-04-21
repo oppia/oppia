@@ -447,12 +447,10 @@
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
-/main_mail.py @aks681
 /main.py @DubeySandeep @nithusha21
 /feconf.py @DubeySandeep @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
-/core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/audit_validators*.py @vojtechjelinek
 /core/domain/base_model_validators*.py @vojtechjelinek
