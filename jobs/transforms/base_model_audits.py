@@ -36,6 +36,7 @@ import feconf
 from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
+import utils
 
 import apache_beam as beam
 
@@ -43,6 +44,8 @@ import apache_beam as beam
 
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
+
+VALIDATION_MODES = utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
 
 
 class ValidateDeletedModel(beam.DoFn):
@@ -157,17 +160,83 @@ class ValidateModelTimestamps(beam.DoFn):
             yield audit_errors.ModelMutatedDuringJobError(model)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
-class ValidateCommitType(beam.DoFn):
-    """DoFn to check whether commit type is valid."""
+@audit_decorators.AuditsExisting(base_models.BaseModel)
+class ValidateModelDomainObjectInstances(beam.DoFn):
+    """DoFn to check whether the model instance passes the validation of the
+    domain object for model.
+    """
+
+    def _get_model_domain_object_instance(self, unused_item):
+        """Returns a domain object instance created from the model.
+
+        This method can be overridden by subclasses, if needed.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            *. A domain object to validate.
+        """
+        return None
+
+    def _get_domain_object_validation_type(self, unused_item):
+        """Returns the type of domain object validation to be performed.
+
+        Some of the storage models support a strict/non strict mode depending
+        on whether the model is published or not. Currently the models which
+        provide this feature are collection, exploration and topic models.
+
+        Other models do not support any strict/non strict validation. So,
+        this function returns neutral mode in the base class. It can be
+        overridden by subclasses to enable strict/non strict mode, if needed.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            str. The type of validation mode: neutral, strict or non strict.
+        """
+        return VALIDATION_MODES.neutral
 
     def process(self, input_model):
         """Function that defines how to process each element in a pipeline of
         models.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            input_model: datastore_services.Model. A domain object to validate.
 
+        Yields:
+            ModelDomainObjectValidateError. Error for domain object validation.
+        """
+        try:
+            domain_object = self._get_model_domain_object_instance(input_model)
+            validation_type = self._get_domain_object_validation_type(
+                input_model)
+            if domain_object is None:
+                return
+            if validation_type == VALIDATION_MODES.neutral:
+                domain_object.validate()
+            elif validation_type == VALIDATION_MODES.strict:
+                domain_object.validate(strict=True)
+            elif validation_type == VALIDATION_MODES.non_strict:
+                domain_object.validate(strict=False)
+            else:
+                raise Exception(
+                    'Invalid validation type for domain object: %s' % (
+                        validation_type))
+        except Exception as e:
+            yield audit_errors.ModelDomainObjectValidateError(input_model, e)
+
+
+@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
+class ValidateCommitType(beam.DoFn):
+    """DoFn to check whether commit type is valid."""
+
+    def process(self, input_model):
+        """Function that defines how to process each element in a pipeline of
+        models.
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
         Yields:
             ModelCommitTypeError. Error for commit_type validation.
         """

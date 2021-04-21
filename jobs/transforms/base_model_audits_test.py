@@ -19,14 +19,25 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import exp_fetchers
+from core.domain import state_domain
 from core.platform import models
+import feconf
 from jobs import job_test_utils
 from jobs.transforms import base_model_audits
 from jobs.types import audit_errors
 
 import apache_beam as beam
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.exploration])
+
+
+class MockDomainObject(base_models.BaseModel):
+
+    def validate(self, strict=True):
+        """Mock validate function."""
+        pass
 
 
 class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
@@ -147,6 +158,183 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [
             audit_errors.InvalidCommitStatusError(invalid_commit_status),
+        ])
+
+
+class MockValidateModelDomainObjectInstancesWithNeutral(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+        return MockDomainObject()
+
+    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
+        return base_model_audits.VALIDATION_MODES.neutral
+
+
+class MockValidateModelDomainObjectInstancesWithStrict(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+        return MockDomainObject()
+
+    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
+        return base_model_audits.VALIDATION_MODES.strict
+
+
+class MockValidateModelDomainObjectInstancesWithNonStrict(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+        return MockDomainObject()
+
+    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
+        return base_model_audits.VALIDATION_MODES.non_strict
+
+
+class MockValidateModelDomainObjectInstancesWithInvalid(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
+        return MockDomainObject()
+
+    def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
+        return 'invalid'
+
+
+class MockValidateExplorationModelDomainObjectInstances(
+        base_model_audits.ValidateModelDomainObjectInstances):
+    def _get_model_domain_object_instance(self, item):
+        return exp_fetchers.get_exploration_from_model(item)
+
+
+class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
+
+    def test_validation_type_for_domain_object(
+            self):
+        model = base_models.BaseModel(
+            id='mock-123',
+            deleted=False,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW)
+
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(
+                base_model_audits.ValidateModelDomainObjectInstances())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validation_type_for_domain_object_with_neutral_type(
+            self):
+        model = base_models.BaseModel(
+            id='mock-123',
+            deleted=False,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW)
+
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(
+                MockValidateModelDomainObjectInstancesWithNeutral())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validation_type_for_domain_object_with_strict_type(
+            self):
+        model = base_models.BaseModel(
+            id='mock-123',
+            deleted=False,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW)
+
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(
+                MockValidateModelDomainObjectInstancesWithStrict())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validation_type_for_domain_object_with_non_strict_type(
+            self):
+        model = base_models.BaseModel(
+            id='mock-123',
+            deleted=False,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW)
+
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(
+                MockValidateModelDomainObjectInstancesWithNonStrict())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_error_is_raised_with_invalid_validation_type_for_domain_object(
+            self):
+        model = base_models.BaseModel(
+            id='mock-123',
+            deleted=False,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW)
+
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(MockValidateModelDomainObjectInstancesWithInvalid())
+        )
+        self.assert_pcoll_equal(output, [
+            audit_errors.ModelDomainObjectValidateError(
+                model, 'Invalid validation type for domain object: invalid')
+        ])
+
+    def test_validation_type_for_exploration_domain_object(self):
+        model_instance1 = exp_models.ExplorationModel(
+            id='mock-123',
+            title='title',
+            category='category',
+            language_code='en',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.State.create_default_state(
+                        feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
+                    ).to_dict()),
+            },
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW
+        )
+
+        model_instance2 = exp_models.ExplorationModel(
+            id='mock-123',
+            title='title',
+            category='category',
+            language_code='en',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.State.create_default_state(
+                        'end', is_initial_state=True
+                    ).to_dict()),
+            },
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([model_instance1, model_instance2])
+            | beam.ParDo(MockValidateExplorationModelDomainObjectInstances())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.ModelDomainObjectValidateError(
+                model_instance2, 'The destination end is not a valid state.')
         ])
 
 
