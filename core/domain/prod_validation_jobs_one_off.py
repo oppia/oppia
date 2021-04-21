@@ -108,12 +108,9 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         validator_module_name = '%s_validators' % model_type
         # TODO(#10415): This try catch is required until all the validators are
         # refactored. Remove the try catch block once #10415 is fixed.
-        try:
-            validator_module = importlib.import_module(
-                'core.domain.%s' % validator_module_name)
-        except ImportError:
-            validator_module = importlib.import_module(
-                'core.domain.prod_validators')
+
+        validator_module = importlib.import_module(
+            'core.domain.%s' % validator_module_name)
         validator = getattr(validator_module, validator_cls_name)
         if not model_instance.deleted:
             validator.validate(model_instance)
