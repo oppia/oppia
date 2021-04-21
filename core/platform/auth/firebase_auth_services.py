@@ -614,8 +614,7 @@ def _get_auth_claims_from_session_cookie(cookie):
     except expected_session_cookie_errors:
         logging.warn('User session has ended and must be renewed')
     except firebase_exceptions.FirebaseError:
-        logging.exception(
-            'Failed to verify the session cookie; request will be unauthorized')
+        logging.exception('Invalid session cookie')
     else:
         return _create_auth_claims(claims)
     return None

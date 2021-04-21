@@ -178,7 +178,9 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
-        if auth_claims:
+        if not auth_claims:
+            auth_services.destroy_auth_session(self.response)
+        else:
             auth_id = auth_claims.auth_id
             user_settings = user_services.get_user_settings_by_auth_id(auth_id)
             if user_settings is None:

@@ -1198,9 +1198,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
                 firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
 
-        self.assert_matches_regexps(logs, [
-            'Failed to verify the session cookie; request will be unauthorized',
-        ])
+        self.assert_matches_regexps(logs, ['Invalid session cookie'])
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):
