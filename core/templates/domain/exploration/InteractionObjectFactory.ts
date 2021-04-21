@@ -68,9 +68,7 @@ import {
 import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {
-  SubtitledHtmlObjectFactory, SubtitledHtml
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 
 export interface InteractionBackendDict {
@@ -241,7 +239,6 @@ export class InteractionObjectFactory {
       private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
       private outcomeFactory: OutcomeObjectFactory,
-      private subtitledHtmlFactory: SubtitledHtmlObjectFactory,
       private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory,
   ) {}
 
@@ -266,7 +263,7 @@ export class InteractionObjectFactory {
       choices: {
         value: choices.value.map(
           subtitledHtmlDict =>
-            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -299,7 +296,7 @@ export class InteractionObjectFactory {
       choices: {
         value: choices.value.map(
           subtitledHtmlDict =>
-            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -315,7 +312,7 @@ export class InteractionObjectFactory {
       choices: {
         value: choices.value.map(
           subtitledHtmlDict =>
-            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
