@@ -1094,7 +1094,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.computeGraphService = this.computeGraphService;
     OppiaAngularRootComponent.conceptCardObjectFactory = (
       this.conceptCardObjectFactory);
-    OppiaAngularRootComponent.contextService = this.contextService;
     OppiaAngularRootComponent.continueRulesService = this.continueRulesService;
     OppiaAngularRootComponent.continueValidationService = (
       this.continueValidationService);
