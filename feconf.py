@@ -1148,6 +1148,7 @@ CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+FIREBASE_EMULATOR_PORT = 9099
 
 # TODO(#11462): Delete this after Firebase authentication has been deployed.
 ENABLE_USER_CREATION = True
