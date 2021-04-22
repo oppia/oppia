@@ -348,19 +348,13 @@ export class AdminBackendApiService {
   async viewContributionReviewersAsync(
       category: string, languageCode: string
   ): Promise<ViewContributionBackendResponse> {
-    let params = {};
-    if (languageCode === null) {
-      params = { category: category };
-    } else {
-      params = {
-        category: category,
-        language_code: languageCode
-      };
-    }
     return new Promise((resolve, reject) => {
       this.http.get<ViewContributionBackendResponse>(
         AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
-          params
+          params: {
+            category: category,
+            language_code: languageCode
+          }
         }
       ).toPromise().then(response => {
         resolve(response);

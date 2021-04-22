@@ -23,13 +23,13 @@ import python_utils
 import utils
 
 
-class MachineTranslation(python_utils.OBJECT):
+class MachineTranslatedText(python_utils.OBJECT):
     """Domain object for machine translation of exploration content."""
 
     def __init__(
             self, source_language_code, target_language_code, source_text,
             translated_text):
-        """Initializes a MachineTranslation domain object.
+        """Initializes a MachineTranslatedText domain object.
 
         Args:
             source_language_code: str. The language code for the source text
@@ -47,10 +47,10 @@ class MachineTranslation(python_utils.OBJECT):
         self.translated_text = translated_text
 
     def validate(self):
-        """Validates properties of the MachineTranslation.
+        """Validates properties of the MachineTranslatedText.
 
         Raises:
-            ValidationError. One or more attributes of the MachineTranslation
+            ValidationError. One or more attributes of the MachineTranslatedText
                 are invalid.
         """
         if not isinstance(self.source_language_code, python_utils.BASESTRING):
@@ -83,7 +83,7 @@ class MachineTranslation(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid target language code: %s' % self.target_language_code)
 
-        if self.source_language_code == self.target_language_code:
+        if self.source_language_code is self.target_language_code:
             raise utils.ValidationError(
                 (
                     'Expected source_language_code to be different from '
@@ -103,11 +103,11 @@ class MachineTranslation(python_utils.OBJECT):
             )
 
     def to_dict(self):
-        """Converts the MachineTranslation domain instance into a dictionary
+        """Converts the MachineTranslatedText domain instance into a dictionary
         form with its keys as the attributes of this class.
 
         Returns:
-            dict. A dictionary containing the MachineTranslation class
+            dict. A dictionary containing the MachineTranslatedText class
             information in a dictionary form.
         """
         return {

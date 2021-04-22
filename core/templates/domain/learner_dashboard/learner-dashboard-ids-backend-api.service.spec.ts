@@ -27,7 +27,7 @@ import { LearnerDashboardActivityIds } from
 
 describe('Learner Dashboard Backend API Service', () => {
   var learnerDashboardIdsBackendApiService:
-    LearnerDashboardIdsBackendApiService;
+    LearnerDashboardIdsBackendApiService = null;
   let httpTestingController: HttpTestingController;
 
   var sampleDataResults = {

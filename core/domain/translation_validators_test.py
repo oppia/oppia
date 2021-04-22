@@ -33,14 +33,14 @@ class MachineTranslationModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(MachineTranslationModelValidatorTests, self).setUp()
-        translation_models.MachineTranslationModel.create(
+        translation_models.MachineTranslatedTextModel.create(
             'en', 'es', 'hello world', 'hola mundo')
         self.job_class = (
             prod_validation_jobs_one_off
-            .MachineTranslationModelAuditOneOffJob)
+            .MachineTranslatedTextModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated MachineTranslationModel\', 1]']
+            u'[u\'fully-validated MachineTranslatedTextModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)

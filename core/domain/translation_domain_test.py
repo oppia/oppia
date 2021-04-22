@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for domain objects related to translations."""
+"""Tests for translate domain objects."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -24,19 +24,19 @@ from core.tests import test_utils
 import utils
 
 
-class MachineTranslationTests(test_utils.GenericTestBase):
-    """Tests for the MachineTranslation domain object."""
+class MachineTranslatedTextTests(test_utils.GenericTestBase):
+    """Tests for the MachineTranslatedText domain object."""
 
     translation = None
 
     def setUp(self):
-        """Setup for MachineTranslation domain object tests."""
-        super(MachineTranslationTests, self).setUp()
+        """Setup for MachineTranslatedTexts domain object tests."""
+        super(MachineTranslatedTextTests, self).setUp()
         self._init_translation()
 
     def _init_translation(self):
         """Initialize self.translation with valid default values."""
-        self.translation = translation_domain.MachineTranslation(
+        self.translation = translation_domain.MachineTranslatedText(
             'en', 'es', 'hello world', 'hola mundo')
         self.translation.validate()
 

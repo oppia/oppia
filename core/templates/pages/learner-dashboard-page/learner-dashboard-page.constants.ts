@@ -62,7 +62,7 @@ export const LearnerDashboardPageConstants = {
       i18nId: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
     },
     EXPLORATION: {
-      key: 'explorationTitle',
+      key: 'exploration',
       i18nId: 'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION'
     }
   }

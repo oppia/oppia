@@ -22,9 +22,9 @@ import { RuleObjectFactory, RuleBackendDict, RuleInputs, Rule } from
   'domain/exploration/RuleObjectFactory';
 
 describe('RuleObjectFactory', () => {
-  let ruleObjectFactory: RuleObjectFactory;
-  let ruleBackendDict: RuleBackendDict;
-  let inputBackend: RuleInputs;
+  let ruleObjectFactory: RuleObjectFactory = null;
+  let ruleBackendDict: RuleBackendDict = null;
+  let inputBackend: RuleInputs = null;
 
   beforeEach(() => {
     ruleObjectFactory = TestBed.get(RuleObjectFactory);

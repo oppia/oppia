@@ -149,7 +149,7 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
             self.failed = True
         if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
             error_message = (
-                'scripts/linters/codeowner_linter.py --> Duplicate pattern(s) '
+                'scripts/linters/pre_commit_linter.py --> Duplicate pattern(s) '
                 'found in CODEOWNER_IMPORTANT_PATHS list.')
             self.error_messages.append(error_message)
             self.failed = True
@@ -163,7 +163,7 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
             error_message = (
                 '%s --> Rule %s is not present in the '
                 'CODEOWNER_IMPORTANT_PATHS list in '
-                'scripts/linters/codeowner_linter.py. Please add this rule in '
+                'scripts/linters/pre_commit_linter.py. Please add this rule in '
                 'the mentioned list or remove this rule from the \'Critical '
                 'files\' section.' % (CODEOWNER_FILEPATH, rule))
             self.error_messages.append(error_message)
@@ -174,7 +174,7 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
                 'section. Please place it under the \'Critical files\' '
                 'section since it is an important rule. Alternatively please '
                 'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
-                'scripts/linters/codeowner_linter.py if it is no longer an '
+                'scripts/linters/pre_commit_linter.py if it is no longer an '
                 'important rule.' % (CODEOWNER_FILEPATH, rule))
             self.error_messages.append(error_message)
             self.failed = True

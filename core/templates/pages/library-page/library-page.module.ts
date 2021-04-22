@@ -27,7 +27,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 
 @NgModule({
   imports: [
@@ -36,12 +35,10 @@ import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/moda
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
-    LearnerPlaylistModalComponent
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
-    LearnerPlaylistModalComponent
+    OppiaAngularRootComponent
   ],
   providers: [
     {

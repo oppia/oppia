@@ -19,9 +19,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 export class GuestCollectionProgress {
-  _completedExplorationsMap: {[key: string]: string[]};
+  _completedExplorationsMap: Object;
 
-  constructor(completedExplorationsMap: {[key: string]: string[]}) {
+  constructor(completedExplorationsMap: Object) {
     this._completedExplorationsMap = completedExplorationsMap;
   }
 

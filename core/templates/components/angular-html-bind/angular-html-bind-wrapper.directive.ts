@@ -27,7 +27,7 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
         htmlData: '<'
       },
       template:
-        '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
+      '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
       controllerAs: '$ctrl',
       controller: [
         '$rootScope',
@@ -44,15 +44,8 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
 
 import { Directive, ElementRef, Injector, Input } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
-// Allow $scope to be provided to parent Component.
-export const ScopeProvider = {
-  deps: ['$injector'],
-  provide: '$scope',
-  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
-};
 @Directive({
-  selector: 'angular-html-bind-wrapper',
-  providers: [ScopeProvider],
+  selector: 'angular-html-bind-wrapper'
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;

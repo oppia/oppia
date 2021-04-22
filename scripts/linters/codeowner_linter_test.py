@@ -114,7 +114,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Rule /.github/stale.yml is not present'
             ' in the CODEOWNER_IMPORTANT_PATHS list in scripts/linters/'
-            'codeowner_linter.py. Please add this rule in the '
+            'pre_commit_linter.py. Please add this rule in the '
             'mentioned list or remove this rule from the \'Critical files'
             '\' section.'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
@@ -169,7 +169,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             'section. Please place it under the \'Critical files\' '
             'section since it is an important rule. Alternatively please '
             'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
-            'scripts/linters/codeowner_linter.py if it is no longer an '
+            'scripts/linters/pre_commit_linter.py if it is no longer an '
             'important rule.'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

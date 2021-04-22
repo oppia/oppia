@@ -27,14 +27,9 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SelectTopicsComponent } from './topic-selector/select-topics.component';
-import { SkillsListComponent } from './skills-list/skills-list.component';
-import { DeleteSkillModalComponent } from './modals/delete-skill-modal.component';
-import { UnassignSkillFromTopicsModalComponent } from './modals/unassign-skill-from-topics-modal.component';
 import { TopicsListComponent } from './topics-list/topics-list.component';
 import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
-import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
-import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 
 @NgModule({
   imports: [
@@ -44,25 +39,15 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
   ],
   declarations: [
     OppiaAngularRootComponent,
-    SkillsListComponent,
-    DeleteSkillModalComponent,
-    UnassignSkillFromTopicsModalComponent,
-    SelectTopicsComponent,
-    AssignSkillToTopicModalComponent,
-    MergeSkillModalComponent,
     TopicsListComponent,
     DeleteTopicModalComponent,
+    SelectTopicsComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    SkillsListComponent,
-    DeleteSkillModalComponent,
-    UnassignSkillFromTopicsModalComponent,
-    SelectTopicsComponent,
-    AssignSkillToTopicModalComponent,
-    MergeSkillModalComponent,
     TopicsListComponent,
     DeleteTopicModalComponent,
+    SelectTopicsComponent
   ],
   providers: [
     {

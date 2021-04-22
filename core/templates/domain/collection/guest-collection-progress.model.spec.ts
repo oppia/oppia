@@ -20,10 +20,10 @@ import { GuestCollectionProgress } from
   'domain/collection/guest-collection-progress.model';
 
 describe('Guest collection progress model', () => {
-  var _collectionId0: string;
-  var _collectionId1: string;
-  var _expId0: string;
-  var _expId1: string;
+  var _collectionId0 = null;
+  var _collectionId1 = null;
+  var _expId0 = null;
+  var _expId1 = null;
 
   beforeEach(() => {
     _collectionId0 = 'collection_id0';
@@ -33,7 +33,7 @@ describe('Guest collection progress model', () => {
   });
 
   var _createEmptyProgressObject = () => {
-    return GuestCollectionProgress.createFromJson('');
+    return GuestCollectionProgress.createFromJson(null);
   };
 
   describe('hasCompletionProgress', () => {

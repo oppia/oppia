@@ -89,7 +89,7 @@
                   <li *ngFor="let tab of ADMIN_TAB_URLS | keyvalue">
                     <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab"
                        [href]="tab.value">
-                      {{ tab.key }}
+                      {{tab.key}}
                     </a>
                   </li>
                 </ul>
@@ -103,8 +103,7 @@
                    [href]="ADMIN_TAB_URLS.ACTIVITIES"
                    [ngClass]="{'active': isActivitiesTabOpen()}"
                    ngbTooltip="Activities"
-                   container="body"
-                   placement="bottom">
+                   tooltip-placement="bottom">
                   Activities
                 </a>
               </li>
@@ -113,8 +112,7 @@
                    [href]="ADMIN_TAB_URLS.JOBS"
                    [ngClass]="{'active': isJobsTabOpen()}"
                    ngbTooltip="Jobs"
-                   placement="bottom"
-                   container="body">
+                   tooltip-placement="bottom">
                   Jobs
                 </a>
               </li>
@@ -123,8 +121,7 @@
                    [href]="ADMIN_TAB_URLS.CONFIG"
                    [ngClass]="{'active': isConfigTabOpen()}"
                    ngbTooltip="Config"
-                   placement="bottom"
-                   container="body">
+                   tooltip-placement="bottom">
                   Config
                 </a>
               </li>
@@ -133,8 +130,7 @@
                    [href]="ADMIN_TAB_URLS.FEATURES"
                    [ngClass]="{'active': isFeaturesTabOpen()}"
                    ngbTooltip="Features"
-                   placement="bottom"
-                   container="body">
+                   tooltip-placement="bottom">
                   Features
                 </a>
               </li>
@@ -143,8 +139,7 @@
                    [href]="ADMIN_TAB_URLS.ROLES"
                    [ngClass]="{'active': isRolesTabOpen()}"
                    ngbTooltip="Roles"
-                   placement="bottom"
-                   container="body">
+                   tooltip-placement="bottom">
                   Roles
                 </a>
               </li>
@@ -153,8 +148,7 @@
                    [href]="ADMIN_TAB_URLS.MISC"
                    [ngClass]="{'active': isMiscTabOpen()}"
                    ngbTooltip="Miscellaneous"
-                   placement="bottom"
-                   container="body">
+                   tooltip-placement="bottom">
                   Misc
                 </a>
               </li>
@@ -191,7 +185,7 @@
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        [href]="profileUrl"
                        class="dropdown-item oppia-dropdown-item-text">
-                      <strong>{{ username }}</strong>
+                      <strong>{{username}}</strong>
                     </a>
                   </li>
                   <hr class="oppia-top-right-menu-item-separator">

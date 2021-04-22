@@ -626,26 +626,6 @@ describe('Admin backend api service', () => {
 
     expect(successHandler).toHaveBeenCalledWith(result);
     expect(failHandler).not.toHaveBeenCalled();
-
-    category = 'question';
-    languageCode = null;
-
-    abas.viewContributionReviewersAsync(
-      category, languageCode
-    ).then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=question');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(
-      ['validUsername'],
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
   }
   ));
 
