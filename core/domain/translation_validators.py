@@ -29,7 +29,7 @@ from core.platform.cloud_translate import cloud_translate_services
 ])
 
 
-class MachineTranslationModelValidator(
+class MachineTranslatedTextModelValidator(
         base_model_validators.BaseModelValidator):
     """Validates MachineTranslationModel."""
 

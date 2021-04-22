@@ -22,6 +22,7 @@ import json
 from core import jobs_registry
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import email_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -105,11 +106,18 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         exploration = exp_fetchers.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
+        feedback_thread_reply_info = (
+            email_services.get_feedback_thread_reply_info_by_user_and_thread(
+                user_id, reference_dict['thread_id']))
+        if feedback_thread_reply_info is None:
+            raise self.InvalidInputException(
+                'Feedback thread for current user and thread_id does not exist')
 
         subject = 'New Oppia message in "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, message.text, subject,
-            exploration.title, reference_dict['entity_id'], thread.subject)
+            exploration.title, reference_dict['entity_id'],
+            thread.subject, reply_to_id=feedback_thread_reply_info.reply_to_id)
         self.render_json({})
 
 

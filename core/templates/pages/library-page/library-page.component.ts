@@ -21,16 +21,15 @@ import { OppiaAngularRootComponent } from
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
-require('components/summary-tile/exploration-summary-tile.component.ts');
-require('components/summary-tile/collection-summary-tile.component.ts');
+require('components/summary-tile/exploration-summary-tile.directive.ts');
+require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.component.ts');
 
 require('domain/classroom/classroom-backend-api.service');
 require('domain/learner_dashboard/learner-dashboard-activity-ids.model.ts');
 require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
-require(
-  'domain/learner_dashboard/learner-dashboard-activity-backend-api.service');
+require('domain/learner_dashboard/learner-playlist.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/keyboard-shortcut.service.ts');

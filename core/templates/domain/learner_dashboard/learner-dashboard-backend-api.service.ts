@@ -41,7 +41,6 @@ import {
   CreatorSummaryBackendDict,
   ProfileSummary,
 } from 'domain/user/profile-summary.model';
-import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
@@ -69,16 +68,6 @@ interface LearnerDashboardData {
   completedToIncompleteCollections: string[];
   numberOfNonexistentActivities: NonExistentActivities;
   subscriptionList: ProfileSummary[];
-}
-
-interface AddMessagePayload {
-  'updated_status': boolean,
-  'updated_subject': string,
-  'text': string;
-}
-
-interface MessageSummaryList {
-  'message_summary_list': FeedbackMessageSummaryBackendDict[]
 }
 
 @Injectable({
@@ -133,37 +122,13 @@ export class LearnerDashboardBackendApiService {
                 .createFromCreatorBackendDict(profileSummary)))
         });
       }, errorResponse => {
-        reject(errorResponse.status);
+        reject(errorResponse.error.error);
       });
     });
   }
 
   async fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {
     return this._fetchLearnerDashboardDataAsync();
-  }
-
-  async addNewMessageAsync(
-      url: string, payload: AddMessagePayload): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.post<void>(url, payload).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResonse => {
-          reject(errorResonse.error.error);
-        });
-    });
-  }
-
-  async onClickThreadAsync(
-      threadDataUrl: string): Promise<FeedbackMessageSummaryBackendDict[]> {
-    return new Promise((resolve, reject) => {
-      this.http.get<MessageSummaryList>(
-        threadDataUrl).toPromise().then(response => {
-        resolve(response.message_summary_list);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
   }
 }
 

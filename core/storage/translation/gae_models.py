@@ -28,7 +28,7 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 
 
-class MachineTranslationModel(base_models.BaseModel):
+class MachineTranslatedTextModel(base_models.BaseModel):
     """Model for storing machine generated translations for the purpose of
     preventing duplicate generation. Machine translations are used for reference
     purpose only and therefore are context agnostic. Model instances are mapped
@@ -38,7 +38,7 @@ class MachineTranslationModel(base_models.BaseModel):
 
         [source_language_code].[target_language_code].[hashed_source_text]
 
-    See MachineTranslationModel._generate_id() below for details.
+    See MachineTranslatedTextModel._generate_id() below for details.
     The same origin text, source_language_code, and target_language_code always
     maps to the same key and therefore always returns the same translated_text.
     """
@@ -66,7 +66,7 @@ class MachineTranslationModel(base_models.BaseModel):
     def create(
             cls, source_language_code, target_language_code, source_text,
             translated_text):
-        """Creates a new MachineTranslationModel instance and returns its ID.
+        """Creates a new MachineTranslatedTextModel instance and returns its ID.
 
         Args:
             source_language_code: str. The language code for the source text
@@ -80,7 +80,7 @@ class MachineTranslationModel(base_models.BaseModel):
 
         Returns:
             str|None. The id of the newly created
-            MachineTranslationModel instance, or None if the inputs are
+            MachineTranslatedTextModel instance, or None if the inputs are
             invalid.
         """
         if source_language_code is target_language_code:
@@ -103,7 +103,7 @@ class MachineTranslationModel(base_models.BaseModel):
     @staticmethod
     def _generate_id(
             source_language_code, target_language_code, hashed_source_text):
-        """Generates a valid, deterministic key for a MachineTranslationModel
+        """Generates a valid, deterministic key for a MachineTranslatedTextModel
         instance.
 
         Args:
@@ -127,9 +127,9 @@ class MachineTranslationModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_machine_translation(
+    def get_translation_for_text(
             cls, source_language_code, target_language_code, source_text):
-        """Gets MachineTranslationModel by language codes and source text.
+        """Gets MachineTranslatedTextModel by language codes and source text.
 
         Args:
             source_language_code: str. The language code for the source text
@@ -140,7 +140,7 @@ class MachineTranslationModel(base_models.BaseModel):
             source_text: str. The untranslated source text.
 
         Returns:
-            MachineTranslationModel|None. The MachineTranslationModel
+            MachineTranslatedTextModel|None. The MachineTranslatedTextModel
             instance corresponding to the given inputs, if such a translation
             exists, or None if no translation is found.
         """

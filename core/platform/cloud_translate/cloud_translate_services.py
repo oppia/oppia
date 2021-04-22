@@ -37,9 +37,7 @@ def translate_text(text, source_language, target_language):
         https://www.w3schools.com/tags/ref_language_codes.asp
 
     Args:
-        text: str. The text to be translated. If text contains html tags, Cloud
-            Translate only translates content between tags, leaving the tags
-            themselves untouched.
+        text: str. The text to be translated.
         source_language: str. An allowlisted language code.
         target_language: str. An allowlisted language code.
 

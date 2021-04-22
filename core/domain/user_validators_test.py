@@ -3148,8 +3148,9 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_existing_user_contributions_model_failure(self):
-        user_models.UserContributionsModel(id=self.user_id).put()
+    def test_existing_feedback_email_reply_to_id_model_failure(self):
+        email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='id', user_id=self.user_id, reply_to_id='id').put()
         expected_output = [
             (
                 '[u\'failed validation check for '

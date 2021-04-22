@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Pencil Code Editor Validation Service.
  */
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
+import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { OutcomeObjectFactory } from
@@ -29,11 +29,11 @@ import { RuleObjectFactory, RuleInputs } from
 import { TestBed } from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
-  let pcevs: PencilCodeEditorValidationService;
-  let oof: OutcomeObjectFactory;
-  let rof: RuleObjectFactory;
-  let inputBackend: RuleInputs;
-  let agof: AnswerGroupObjectFactory;
+  let pcevs: PencilCodeEditorValidationService = null;
+  let oof: OutcomeObjectFactory = null;
+  let rof: RuleObjectFactory = null;
+  let inputBackend: RuleInputs = null;
+  let agof: AnswerGroupObjectFactory = null;
 
   beforeEach(() => {
     oof = TestBed.get(OutcomeObjectFactory);
@@ -64,7 +64,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-      var answergroup1: AnswerGroup[] = [];
+      var answergroup1 = [];
       var partialWarningsList = [];
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -86,7 +86,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
 
       // It also returns the error when feedback is not provided.
       expect(pcevs.getAllWarnings(
@@ -110,7 +110,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);
@@ -130,7 +130,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-      var answergroup1: AnswerGroup[] = [];
+      var answergroup1 = [];
 
       spyOn(pcevs, 'getCustomizationArgsWarnings')
         .withArgs(customizationArgs).and.returnValue([]);
@@ -158,7 +158,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);

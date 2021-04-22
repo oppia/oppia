@@ -16,7 +16,7 @@
  * @fileoverview Frontend Model for feedback message summary.
  */
 
-export interface FeedbackMessageSummaryBackendDict {
+interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
   'text': string;
   'updated_status': string;
