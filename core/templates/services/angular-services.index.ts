@@ -339,6 +339,7 @@ import { QuestionValidationService } from './question-validation.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
+import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -513,6 +514,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
   ['MockCsrfTokenService', MockCsrfTokenService],
+  ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
   ['MultipleChoiceInputValidationService',
     MultipleChoiceInputValidationService],
