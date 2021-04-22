@@ -69,14 +69,14 @@ export class StoryContents {
     return this._nodes;
   }
 
-  getNodeIdCorrespondingToTitle(title: string): string {
+  getNodeIdCorrespondingToTitle(title: string): string | null {
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].getTitle() === title) {
         return nodes[i].getId();
       }
     }
-    return '';
+    return null;
   }
 
   rearrangeNodeInStory(fromIndex: number, toIndex: number): void {

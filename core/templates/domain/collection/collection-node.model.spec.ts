@@ -62,10 +62,6 @@ describe('Collection node model', () => {
     let summaryObject: LearnerExplorationSummaryBackendDict =
       collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
-
-    delete summaryObject.category;
-    expect(summaryObject).not.toEqual(
-      collectionNode.getExplorationSummaryObject());
   });
 
   it('should be able to create a new collection node by exploration ID',
