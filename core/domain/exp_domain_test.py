@@ -428,6 +428,152 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             Exception, 'Expected exp_id to be a str, received 0'):
             exp_domain.ExpVersionReference(0, 1)
 
+class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
+    """Test checkpoints validations in an exploration. """
+
+    def setUp(self):
+        super(ExplorationCheckpointsUnitTests, self).setUp()
+        self.exploration = (
+            exp_domain.Exploration.create_default_exploration('eid'))
+        self.new_state = state_domain.State.create_default_state('Introduction',
+            is_initial_state=True)
+        self.set_interaction_for_state(self.new_state, 'TextInput')
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state
+        }
+        self.set_interaction_for_state(
+            self.exploration.states[self.exploration.init_state_name],
+            'TextInput')
+        self.init_state = (
+            self.exploration.states[self.exploration.init_state_name])
+        self.end_state = state_domain.State.create_default_state('End')
+        self.set_interaction_for_state(self.end_state, 'EndExploration')
+
+        self.end_state.update_interaction_default_outcome(None)
+
+    def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
+        self.init_state.update_card_is_checkpoint(False)
+        self._assert_validation_error(
+            self.exploration, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False')
+        self.init_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+    def test_end_state_with_card_is_checkpoint_true_is_invalid(self):
+        default_outcome = self.init_state.interaction.default_outcome
+        default_outcome.dest = self.exploration.init_state_name
+        self.init_state.update_interaction_default_outcome(default_outcome)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        self._assert_validation_error(
+            self.exploration, 'Expected card_is_checkpoint of end state to '
+            'be False but found it to be True')
+        self.end_state.update_card_is_checkpoint(False)
+        self.exploration.validate()
+
+    def test_init_state_checkpoint_with_end_exp_interaction_is_valid(self):
+        self.exploration.init_state_name = 'End'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+        self.end_state.update_card_is_checkpoint(False)
+
+    def test_checkpoint_count_with_count_outside_range_is_invalid(self):
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        for i in python_utils.RANGE(8):
+            self.exploration.add_states(['State%s' % i])
+            self.exploration.states['State%s' % i].card_is_checkpoint = True
+        self._assert_validation_error(
+            self.exploration, 'Expected checkpoint count to be between 1 and 8 '
+            'inclusive but found it to be 9'
+        )
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.exploration.validate()
+
+    def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
+        unreachable_state = state_domain.State.create_default_state(
+            'Unreachable')
+        self.set_interaction_for_state(unreachable_state, 'TextInput')
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state,
+            'Unreachable': unreachable_state
+        }
+        self.exploration.states['Unreachable'].card_is_checkpoint = True
+        answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_1',
+                            'normalizedStrSet': ['Test1']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            },
+            {
+                'outcome': {
+                    'dest': 'Unreachable',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': ['Test2']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        self.init_state.update_interaction_answer_groups(answer_group_dicts)
+        self._assert_validation_error(
+            self.exploration, 'Cannot make Unreachable a checkpoint as it is '
+            'bypassable'
+        )
+        self.init_state.update_interaction_answer_groups([])
+        self.exploration.validate()
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
@@ -882,148 +1028,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'notAParamSpec': param_domain.ParamSpec.from_dict(
                 {'obj_type': 'UnicodeString'})
         }
-        exploration.validate()
-
-        # Test checkpoints.
-        new_state = state_domain.State.create_default_state('Introduction')
-        self.set_interaction_for_state(new_state, 'TextInput')
-        exploration.init_state_name = 'Introduction'
-        exploration.states = {
-            exploration.init_state_name: new_state
-        }
-        self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], 'TextInput')
-
-        init_state = exploration.states[exploration.init_state_name]
-
-        # Test whether a state with init card having card_is_checkpoint as false
-        # is invalid.
-        self._assert_validation_error(
-            exploration, 'Expected card_is_checkpoint of first state to '
-            'be True but found it to be False')
-        init_state.update_card_is_checkpoint(True)
-        exploration.validate()
-
-        # Test if end state having card_is_checkpoint as false is invalid.
-        end_state = state_domain.State.create_default_state('End')
-        self.set_interaction_for_state(end_state, 'EndExploration')
-
-        end_state.update_interaction_default_outcome(None)
-        default_outcome = init_state.interaction.default_outcome
-        default_outcome.dest = exploration.init_state_name
-        init_state.update_interaction_default_outcome(default_outcome)
-
-        exploration.states = {
-            exploration.init_state_name: new_state,
-            'End': end_state
-        }
-        end_state.update_card_is_checkpoint(True)
-        self._assert_validation_error(
-            exploration, 'Expected card_is_checkpoint of end state to '
-            'be False but found it to be True')
-        end_state.update_card_is_checkpoint(False)
-        exploration.validate()
-
-        # Test when first state having card_is_checkpoint has EndExploration
-        # interaction.
-        exploration.init_state_name = 'End'
-        exploration.states = {
-            exploration.init_state_name: end_state
-        }
-        end_state.update_card_is_checkpoint(True)
-        exploration.validate()
-        end_state.update_card_is_checkpoint(False)
-
-        # Restore exploration.
-        exploration.init_state_name = 'Introduction'
-        exploration.states = {
-            exploration.init_state_name: new_state,
-            'End': end_state
-        }
-
-        # Test if checkpoint count validation.
-        for i in python_utils.RANGE(8):
-            exploration.add_states(['State%s' % i])
-            exploration.states['State%s' % i].card_is_checkpoint = True
-        self._assert_validation_error(
-            exploration, 'Expected checkpoint count to be between 1 and 8 '
-            'inclusive but found it to be 9'
-        )
-        exploration.states = {
-            exploration.init_state_name: new_state,
-            'End': end_state
-        }
-        exploration.validate()
-
-        # Test if a unreachable state having card_is_checkpoint as True is
-        # invalid.
-        unreachable_state = state_domain.State.create_default_state(
-            'Unreachable')
-        self.set_interaction_for_state(unreachable_state, 'TextInput')
-
-        exploration.states = {
-            exploration.init_state_name: new_state,
-            'End': end_state,
-            'Unreachable': unreachable_state
-        }
-        exploration.states['Unreachable'].card_is_checkpoint = True
-        answer_group_dicts = [
-            {
-                'outcome': {
-                    'dest': 'End',
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
-                },
-                'rule_specs': [{
-                    'inputs': {
-                        'x': {
-                            'contentId': 'rule_input_1',
-                            'normalizedStrSet': ['Test1']
-                        }
-                    },
-                    'rule_type': 'Contains'
-                }],
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            },
-            {
-                'outcome': {
-                    'dest': 'Unreachable',
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
-                },
-                'rule_specs': [{
-                    'inputs': {
-                        'x': {
-                            'contentId': 'rule_input_2',
-                            'normalizedStrSet': ['Test2']
-                        }
-                    },
-                    'rule_type': 'Contains'
-                }],
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
-
-        init_state.update_interaction_answer_groups(answer_group_dicts)
-        self._assert_validation_error(
-            exploration, 'Cannot make Unreachable a checkpoint as it is '
-            'bypassable'
-        )
-        init_state.update_interaction_answer_groups([])
         exploration.validate()
 
     def test_tag_validation(self):
