@@ -24,7 +24,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/exploration-summary-tile.directive.ts');
+require('components/summary-tile/exploration-summary-tile.component.ts');
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');

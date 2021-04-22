@@ -334,15 +334,6 @@ class BulkEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [email_models.BulkEmailModel]
 
 
-class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates GeneralFeedbackEmailReplyToIdModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [email_models.GeneralFeedbackEmailReplyToIdModel]
-
-
 class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates ExplorationModel."""
 
@@ -769,12 +760,12 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
             subtopic_models.SubtopicPageCommitLogEntryModel]
 
 
-class MachineTranslatedTextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates MachineTranslatedTextModel."""
+class MachineTranslationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates MachineTranslationModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [translation_models.MachineTranslatedTextModel]
+        return [translation_models.MachineTranslationModel]
 
 
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
