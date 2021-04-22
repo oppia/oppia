@@ -34,6 +34,26 @@
                                  class="oppia-rte-editor">
       </angular-html-bind-wrapper>
     </div>
+    <div *ngIf="offerMachineTranslation && !loadingData && !uploadingTranslation" class="oppia-machine-translation-container">
+    <div class="machine-translation-header-bar">Computer-Generated Translation
+        <i class="fa fa-chevron-down oppia-toggle-chevron"
+      [hidden]="hideMachineTranslation"
+      aria-hidden="true" (click)="toggleMachineTranslation()">
+      </i>
+      <i class="fa fa-chevron-up oppia-toggle-chevron"
+      [hidden]="!hideMachineTranslation"
+      aria-hidden="true" (click)="toggleMachineTranslation()">
+    </i>
+    </div>
+    <div [hidden]=hideMachineTranslation>
+    <p [hidden]="machineTranslatedText">Loading translation...</p>
+    <angular-html-bind-wrapper  *ngIf="machineTranslatedText" [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                 (click)="onContentClick($event)"
+                                 [htmlData]="machineTranslatedText"
+                                 class="oppia-rte-editor">
+    </angular-html-bind-wrapper>
+    </div>
+    </div>
     <div class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
         <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
@@ -104,9 +124,28 @@
     word-wrap: break-word;
   }
   .oppia-text-to-translate-container {
-    border: 1px solid #ccc;
+    background-color: rgb(233, 247,246);
     margin: 15px 0;
+    margin-bottom: 0;
     padding: 20px;
+  }
+  .oppia-machine-translation-container {
+    background-color: rgba(251, 251, 251);
+    margin: 15px 0;
+    margin-top: 0;
+    padding: 20px;
+  }
+  .oppia-toggle-chevron {
+    float: right;
+    position: absolute;
+    top: 0.25em;
+    right: 0;
+  }
+  .machine-translation-header-bar {
+    color: rgb(4, 47, 152);
+    font-weight: bold;
+    position: relative;
+    padding-bottom: 20px;
   }
   .oppia-translation-tips-container {
     background-color: #EEE;

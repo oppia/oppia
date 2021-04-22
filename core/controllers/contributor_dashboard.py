@@ -335,6 +335,7 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             raise self.PageNotFoundException()
         state_names_to_content_id_mapping = exp.get_translatable_text(
             target_language_code)
+        print(state_names_to_content_id_mapping)
         if state_name not in state_names_to_content_id_mapping:
             raise self.PageNotFoundException()
         content_id_to_text_mapping = (

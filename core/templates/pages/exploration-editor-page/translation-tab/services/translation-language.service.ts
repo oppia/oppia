@@ -64,6 +64,14 @@ export class TranslationLanguageService {
       this.activeLanguageCode);
   }
 
+  isActiveLanguageMachineTranslatable(): boolean {
+    if (!this.activeLanguageCode) {
+      return false;
+    }
+    return this.languageUtilService.languageCodeIsMachineTranslatable(
+      this.activeLanguageCode);
+  }
+
   get onActiveLanguageChanged(): EventEmitter<void> {
     return this._activeLanguageChangedEventEmitter;
   }

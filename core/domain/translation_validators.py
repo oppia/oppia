@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import base_model_validators
 from core.domain import translation_fetchers
 from core.platform import models
@@ -36,7 +37,7 @@ class MachineTranslationModelValidator(
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         language_codes_regex = '(%s)' % '|'.join(
-            cloud_translate_services.LANGUAGE_CODE_ALLOWLIST)
+            constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST)
         # Valid id: [source_language_code]:[target_language_code]:[hashed_text].
         regex_string = '^%s\\.%s\\..+$' % (
             language_codes_regex, language_codes_regex)

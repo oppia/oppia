@@ -73,6 +73,10 @@ export class LanguageUtilService {
       readonly SupportedContentLanguageBackendDict[] {
     return CONSTANTS.SUPPORTED_CONTENT_LANGUAGES;
   }
+  get MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST():
+    readonly string[] {
+    return CONSTANTS.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST;
+  }
 
   constructor(
     private browserChecker: BrowserCheckerService) {}
@@ -180,6 +184,11 @@ export class LanguageUtilService {
   getContentLanguageDescription(contentLanguageCode: string): string {
     const language = this.getSupportedContentLanguages()[contentLanguageCode];
     return language ? language.description : null;
+  }
+
+  languageCodeIsMachineTranslatable(languageCode: string): boolean {
+    return this.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST.includes(
+      languageCode);
   }
 
   // Given a list of audio language codes, returns the complement list, i.e.

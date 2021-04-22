@@ -21,12 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # To use cloud translate in a local dev environment, use
 # cloud_translate_emulator.
+from constants import constants
 from google.cloud import translate_v2 as translate
 
 CLIENT = translate.Client()
-
-# List of languages with adequate Google Translate accuracy.
-LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
 
 
 def translate_text(text, source_language, target_language):
@@ -50,9 +48,11 @@ def translate_text(text, source_language, target_language):
     Returns:
         str. The translated text.
     """
-    if source_language not in LANGUAGE_CODE_ALLOWLIST:
+    if source_language not in (
+        constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST):
         raise ValueError('Invalid source language code: %s' % source_language)
-    if target_language not in LANGUAGE_CODE_ALLOWLIST:
+    if target_language not in (
+        constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST):
         raise ValueError('Invalid target language code: %s' % target_language)
     if source_language == target_language:
         return text

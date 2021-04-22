@@ -23,6 +23,7 @@ import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import { MachineTranslatedTextBackendApiService } from './machine-translated-text-backend-api.service';
 
 /**
  * @fileoverview A service for handling contribution opportunities in different
@@ -85,7 +86,9 @@ export class TranslateTextService {
 
   constructor(
     private translateTextBackedApiService:
-      TranslateTextBackendApiService
+      TranslateTextBackendApiService,
+    private machineTranslatedTextBackendApiService:
+      MachineTranslatedTextBackendApiService
   ) {}
 
   private _getNextText(): string {
@@ -180,6 +183,17 @@ export class TranslateTextService {
       this.stateWiseContents[this.activeStateName][this.activeContentId],
       translationHtml,
       imagesData).then(successCallback);
+  }
+
+  getMachineTranslationAsync(languageCode: string): Promise<string> {
+    return this.machineTranslatedTextBackendApiService
+      .getMachineTranslatedStateTextsAsync(
+        this.activeExpId,
+        this.activeStateName,
+        [this.activeContentId],
+        languageCode).then(contentIdToContentMapping => {
+        return contentIdToContentMapping[this.activeContentId];
+      });
   }
 }
 

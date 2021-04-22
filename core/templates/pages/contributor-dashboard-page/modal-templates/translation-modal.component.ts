@@ -61,6 +61,9 @@ export class TranslationModalComponent {
   loadingData = true;
   moreAvailable = false;
   textToTranslate = '';
+  offerMachineTranslation = false;
+  hideMachineTranslation = true;
+  machineTranslatedText = null;
   languageDescription: string;
   previousTranslationAvailable: boolean = false;
   HTML_SCHEMA: {
@@ -94,6 +97,8 @@ export class TranslationModalComponent {
     this.contextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription = (
       this.translationLanguageService.getActiveLanguageDescription());
+    this.offerMachineTranslation = (
+      this.translationLanguageService.isActiveLanguageMachineTranslatable());
     this.translateTextService.init(
       this.opportunity.id,
       this.translationLanguageService.getActiveLanguageCode(),
@@ -130,6 +135,16 @@ export class TranslationModalComponent {
     this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
   }
 
+  toggleMachineTranslation(): void {
+    this.hideMachineTranslation = !this.hideMachineTranslation;
+    if (!this.hideMachineTranslation) {
+      this.translateTextService.getMachineTranslationAsync(
+        this.activeLanguageCode).then(machineTranslatedText => {
+        this.machineTranslatedText = machineTranslatedText;
+      });
+    }
+  }
+
   isCopyModeActive(): boolean {
     return this.ckEditorCopyContentService.copyModeActive;
   }
@@ -147,6 +162,8 @@ export class TranslationModalComponent {
     this.textToTranslate = textAndAvailability.text;
     this.moreAvailable = textAndAvailability.more;
     this.activeWrittenTranslation.html = '';
+    this.hideMachineTranslation = true;
+    this.machineTranslatedText = null;
   }
 
   returnToPreviousTranslation(): void {

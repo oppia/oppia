@@ -5240,6 +5240,8 @@ export default {
     "speechSynthesisCodeMobile": "en_US"
   }],
 
+  "MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST": ["en", "es", "fr", "zh", "pt"],
+
   "TRANSLATION_TIPS": {
     "zh": [
       // eslint-disable-next-line max-len
