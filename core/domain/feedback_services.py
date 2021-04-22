@@ -1124,28 +1124,6 @@ def _send_feedback_thread_status_change_emails(
                 new_status)
 
 
-def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
-    """Ensures that instance of FeedbackEmailReplyToIdModel exists for each user
-    in user_ids.
-
-    Args:
-        user_ids: list(str). A list of user_ids.
-        thread_id: str. The id of thread used to obtain
-            FeedbackEmailReplyToIdModel for given user.
-    """
-    feedback_email_id_models = (
-        email_models.GeneralFeedbackEmailReplyToIdModel.get_multi_by_user_ids(
-            user_ids, thread_id))
-
-    # Users are added to the thread incrementally. Therefore at any time there
-    # can be at most one user who does not have FeedbackEmailReplyToIdModel
-    # instance.
-    for user_id in user_ids:
-        if feedback_email_id_models[user_id] is None:
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                user_id, thread_id)
-
-
 def _add_message_to_email_buffer(
         author_id, thread_id, message_id, message_length, old_status,
         new_status):
@@ -1167,8 +1145,6 @@ def _add_message_to_email_buffer(
         thread.entity_type, thread.entity_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
-
-    _ensure_each_recipient_has_reply_to_id(other_recipient_ids, thread_id)
 
     if old_status != new_status:
         # Send email for feedback thread status change.

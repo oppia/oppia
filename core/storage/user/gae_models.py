@@ -1867,6 +1867,12 @@ class UserQueryModel(base_models.BaseModel):
     edited_at_least_n_exps = datastore_services.IntegerProperty(default=None)
     # Query option to check if user has edited fewer than n explorations.
     edited_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
+    # Query option to check if user has created collection.
+    created_collection = datastore_services.BooleanProperty(default=False)
+    # Query option to check if user has used LogicProof interaction in any
+    # of the explorations that they created.
+    used_logic_proof_interaction = datastore_services.BooleanProperty(
+        default=False)
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
@@ -1911,6 +1917,9 @@ class UserQueryModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edited_fewer_than_n_exps':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_collection': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'used_logic_proof_interaction':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,

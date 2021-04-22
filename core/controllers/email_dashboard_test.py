@@ -61,7 +61,9 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': 2
+                    'edited_fewer_than_n_exps': 2,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -78,6 +80,8 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(query_model.edited_fewer_than_n_exps, 2)
         self.assertIsNone(query_model.edited_at_least_n_exps)
         self.assertIsNone(query_model.created_fewer_than_n_exps)
+        self.assertFalse(query_model.used_logic_proof_interaction)
+        self.assertFalse(query_model.created_collection)
         self.assertEqual(query_model.submitter_id, self.submitter_id)
 
         # Check that MR job has been enqueued.
@@ -141,18 +145,11 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': 'None',
                     'edited_at_least_n_exps': None,
+                    'created_collection': True,
+                    'used_logic_proof_interaction': False,
                     'fake_key': 2
                 }}, csrf_token=csrf_token, expected_status_int=400)
 
-        self.post_json(
-            '/emaildashboarddatahandler', {
-                'data': {
-                    'has_not_logged_in_for_n_days': 2,
-                    'inactive_in_last_n_days': 5,
-                    'created_at_least_n_exps': 'invalid_value',
-                    'created_fewer_than_n_exps': 'None',
-                    'edited_at_least_n_exps': None
-                }}, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
     def test_email_dashboard_page(self):
@@ -238,14 +235,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         response = self.get_json(
             '/emaildashboarddatahandler',
-            params={'num_queries_to_fetch': '-5'},
-            expected_status_int=400)
-        self.assertEqual(
-            response['error'], '400 Invalid input for query results.')
-
-        response = self.get_json(
-            '/emaildashboarddatahandler',
-            params={'num_queries_to_fetch': 'invalid_data'},
+            params={'invalid_param_key': '2'},
             expected_status_int=400)
         self.assertEqual(
             response['error'], '400 Invalid input for query results.')
@@ -289,7 +279,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -392,7 +384,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         query_models = user_models.UserQueryModel.query().fetch()
 
@@ -467,7 +461,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -516,7 +512,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -560,7 +558,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -622,7 +622,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 

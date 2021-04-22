@@ -62,7 +62,6 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
-import main_mail
 import main_taskqueue
 from proto_files import text_classifier_pb2
 import python_utils
@@ -1309,7 +1308,6 @@ class AppEngineTestBase(TestBase):
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
-        self.mail_testapp = webtest.TestApp(main_mail.app)
 
     def tearDown(self):
         datastore_services.delete_multi(

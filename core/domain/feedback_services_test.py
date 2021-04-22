@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import email_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import feedback_domain
@@ -723,35 +722,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.process_and_flush_pending_tasks()
-
-    def test_that_reply_to_id_is_created(self):
-        with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
-            feedback_services.create_thread(
-                'exploration', self.exploration.id,
-                self.user_id_a, 'a subject', 'A message')
-            threadlist = feedback_services.get_all_threads(
-                'exploration', self.exploration.id, False)
-            thread_id = threadlist[0].id
-
-            feedback_services.create_message(
-                thread_id, self.user_id_b, None, None, 'user b message')
-            # Check that reply_to id is created for user A.
-            queried_object = (
-                email_services
-                .get_feedback_thread_reply_info_by_user_and_thread(
-                    self.user_id_a, thread_id))
-            self.assertEqual(queried_object.user_id, self.user_id_a)
-            self.assertEqual(queried_object.thread_id, thread_id)
-
-            feedback_services.create_message(
-                thread_id, self.user_id_a, None, None, 'user a message')
-            # Check that reply_to id is created for user B.
-            queried_object = (
-                email_services
-                .get_feedback_thread_reply_info_by_user_and_thread(
-                    self.user_id_b, thread_id))
-            self.assertEqual(queried_object.user_id, self.user_id_b)
-            self.assertEqual(queried_object.thread_id, thread_id)
 
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
