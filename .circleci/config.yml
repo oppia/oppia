@@ -21,7 +21,7 @@ workflows:
       - setup_and_typescript_tests
       - e2e_new_structure_tests:
           requires:
-            - setup_and_typescript_tests
+            - e2e_library_and_collections
       - e2e_library_and_collections:
           requires:
             - setup_and_typescript_tests
