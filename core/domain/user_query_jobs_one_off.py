@@ -24,14 +24,20 @@ import datetime
 from constants import constants
 from core import jobs
 from core.domain import email_manager
+from core.domain import exp_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
 
-(user_models, exp_models, job_models) = (
-    models.Registry.import_models(
-        [models.NAMES.user, models.NAMES.exploration, models.NAMES.job]))
+(
+    collection_models, exp_models, job_models,
+    user_models
+) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration, models.NAMES.job,
+    models.NAMES.user
+])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -79,7 +85,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has created atleast n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.created_exploration_ids) >=
             query_model.created_at_least_n_exps)
@@ -89,7 +98,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has created fewer than n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.created_exploration_ids) <
             query_model.created_fewer_than_n_exps)
@@ -99,7 +111,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has edited atleast n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.edited_exploration_ids) >=
             query_model.edited_at_least_n_exps)
@@ -109,10 +124,45 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model, query_model):
         """Determines whether a user has edited atmost n explorations."""
         user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(user_id)
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
         return (
             len(user_contributions.edited_exploration_ids) <
             query_model.edited_fewer_than_n_exps)
+
+    @staticmethod
+    def _is_created_collection_query_satisfied(
+            user_settings_model, _):
+        """Determines whether a user has created collections."""
+        user_id = user_settings_model.id
+        collection = collection_models.CollectionRightsModel.query(
+            collection_models.CollectionRightsModel.owner_ids == user_id
+        ).get()
+        return collection is not None
+
+    @staticmethod
+    def _is_used_logic_proof_interaction_query_satisfied(
+            user_settings_model, _):
+        """Determines whether a user has used logic proof
+        interaction in any of the explorations created by the user.
+        """
+        user_id = user_settings_model.id
+        user_contributions = user_models.UserContributionsModel.get(
+            user_id, strict=False)
+        if user_contributions is None:
+            return False
+        exploration_ids = user_contributions.created_exploration_ids
+        exploration_instances = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [('ExplorationModel', exploration_ids)]))[0]
+        for item in exploration_instances:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+            for _, state in exploration.states.items():
+                if state.interaction.id == 'LogicProof':
+                    return True
+        return False
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -139,7 +189,8 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         for predicate in predicates:
-            if getattr(query_model, predicate['backend_attr']) is not None:
+            value = getattr(query_model, predicate['backend_attr'])
+            if value != predicate['default_value']:
                 query_criteria_satisfied = getattr(
                     job_class,
                     '_is_%s_query_satisfied' % predicate['backend_id'])(
@@ -178,13 +229,9 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_model.put()
 
         query_params = {
-            'inactive_in_last_n_days': query_model.inactive_in_last_n_days,
-            'has_not_logged_in_for_n_days': (
-                query_model.has_not_logged_in_for_n_days),
-            'created_at_least_n_exps': query_model.created_at_least_n_exps,
-            'created_fewer_than_n_exps': query_model.created_fewer_than_n_exps,
-            'edited_at_least_n_exps': query_model.edited_at_least_n_exps,
-            'edited_fewer_than_n_exps': query_model.edited_fewer_than_n_exps
+            predicate['backend_attr']: getattr(
+                query_model, predicate['backend_attr'])
+            for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         }
         email_manager.send_query_failure_email(
             query_model.submitter_id, query_id, query_params)
