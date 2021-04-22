@@ -186,7 +186,7 @@ class ModelIncorrectKeyError(BaseAuditError):
     def __init__(self, model, incorrect_keys):
         super(ModelIncorrectKeyError, self).__init__(model)
         self.message = 'Entity id %s: contains keys %s that are not allowed' % (
-                        model.id, incorrect_keys)
+            model.id, incorrect_keys)
 
 
 class ModelRelationshipError(BaseAuditError):
