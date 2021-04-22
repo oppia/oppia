@@ -41,7 +41,7 @@ CURRENT_PYTHON_BIN = sys.executable
 # Versions of libraries used in devflow.
 COVERAGE_VERSION = '5.3'
 ESPRIMA_VERSION = '4.0.1'
-ISORT_VERSION = '4.3.21'
+ISORT_VERSION = '5.8.0'
 PYCODESTYLE_VERSION = '2.6.0'
 PSUTIL_VERSION = '5.7.3'
 PYLINT_VERSION = '2.7.4'
