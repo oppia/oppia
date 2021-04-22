@@ -127,7 +127,7 @@ export class CreatorDashboardBackendApiService {
     return suggestionThreads;
   }
 
-  _fetchDashboardData(): Promise<CreatorDashboardData> {
+  async _fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this.http.get<CreatorDashboardDataBackendDict>(
       '/creatordashboardhandler/data').toPromise().then(dashboardData => {
       return {
@@ -180,8 +180,8 @@ export class CreatorDashboardBackendApiService {
     });
   }
 
-  fetchDashboardData(): Promise<CreatorDashboardData> {
-    return this._fetchDashboardData();
+  async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
+    return this._fetchDashboardDataAsync();
   }
 }
 

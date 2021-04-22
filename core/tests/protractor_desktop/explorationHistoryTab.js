@@ -54,7 +54,7 @@ describe('Exploration history', function() {
 
     // Creating an exploration creates the first commit. Therefore, there
     // should be a date associated with it.
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     // Switch to the history tab because that is where the commit history
     // is displayed.
@@ -67,7 +67,7 @@ describe('Exploration history', function() {
   it('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     // Check renaming state, editing text, editing interactions and adding
     // state.
@@ -578,7 +578,7 @@ describe('Exploration history', function() {
   it('should revert to old exploration commit', async function() {
     await users.createUser('user2@historyTab.com', 'user2HistoryTab');
     await users.login('user2@historyTab.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
 
     // Make changes for second commit.
     // First card.
@@ -643,7 +643,7 @@ describe('Exploration history', function() {
     await explorationPlayerPage.expectExplorationToBeOver();
 
     // Verify history states between original and reversion.
-    await general.moveToEditor();
+    await general.moveToEditor(false);
     var expectedHistoryStates = [{
       label: 'first',
       color: COLOR_UNCHANGED

@@ -27,7 +27,6 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -49,7 +48,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.NEW_USER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3')
@@ -186,8 +185,8 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
         self.assertEqual(len(json_response['topic_assignment_dicts']), 0)
 
-        topic_id_1 = topic_services.get_new_topic_id()
-        topic_id_2 = topic_services.get_new_topic_id()
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Topic1',
             abbreviated_name='topic-one', url_fragment='topic-one',

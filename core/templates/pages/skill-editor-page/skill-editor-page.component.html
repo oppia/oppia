@@ -77,8 +77,10 @@
     margin-left: 4%;
     width: 35%;
   }
-  .skill-editor-main .oppia-editor-warnings-box-block {
-    display: block;
+
+  .skill-editor-main .oppia-editor-warnings-box {
+    cursor: default;
+    max-width: none;
   }
 
   .skill-editor-main .navbar-tabs {
@@ -95,14 +97,14 @@
   }
 
   .skill-editor-main .navbar-tab-icon {
-    color: #FFFFFF;
+    color: #FFF;
     display: block;
     font-size: 30px;
     width: 100%;
   }
 
   .skill-editor-main .navbar-tab span {
-    color: #FFFFFF;
+    color: #FFF;
     font-size: 12px;
   }
   .skill-editor-main .navbar-tab-active {
@@ -115,7 +117,7 @@
     justify-content: center;
     width: 90px;
   }
-  .skill-editor-main .navbar-icons li:hover {
+  .skill-editor-main .navbar-icons .nav-list-item:hover {
     background-color: #4eb0c0;
   }
   .skill-editor-main .navbar-tab-active-icon {
@@ -125,5 +127,10 @@
     .skill-editor-main .navbar-helper {
       display: none;
     }
+
+    .skill-editor-main .oppia-editor-warnings-box {
+      display: block;
+      width: 200px;
+  }
   }
 </style>

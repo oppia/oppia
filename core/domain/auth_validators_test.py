@@ -37,9 +37,7 @@ datastore_services = models.Registry.import_datastore_services()
 class AuthValidatorTestBase(test_utils.AuditJobsTestBase):
     """Base class with helper methods for testing the auth_validators jobs."""
 
-    def setUp(self):
-        with self.swap_to_always_return(self, 'signup_superadmin_user'):
-            super(AuthValidatorTestBase, self).setUp()
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
 
     def create_user_auth_models(
             self, auth_provider_id, auth_id=None, full_user=True):
@@ -459,5 +457,28 @@ class UserIdByFirebaseAuthIdModelValidatorTests(AuthValidatorTestBase):
              ['Entity id %s: based on field user_auth_details_ids having value '
               '%s, expected model UserAuthDetailsModel with id %s but it '
               'doesn\'t exist' % (self.auth_id, self.user_id, self.user_id)],
+            ],
+        ])
+
+
+class FirebaseSeedModelValidatorTests(AuthValidatorTestBase):
+
+    JOB_CLASS = prod_validation_jobs_one_off.FirebaseSeedModelAuditOneOffJob
+
+    def test_audit_with_valid_id_reports_success(self):
+        auth_models.FirebaseSeedModel(
+            id=auth_models.ONLY_FIREBASE_SEED_MODEL_ID).put()
+
+        self.assertItemsEqual(self.run_job_and_get_output(), [
+            ['fully-validated FirebaseSeedModel', 1],
+        ])
+
+    def test_audit_with_invalid_id_reports_an_error(self):
+        invalid_id = 'abc'
+        auth_models.FirebaseSeedModel(id=invalid_id).put()
+
+        self.assertItemsEqual(self.run_job_and_get_output(), [
+            ['failed validation check for model id check of FirebaseSeedModel',
+             ['Entity id %s: Entity id must be 1' % (invalid_id,)],
             ],
         ])

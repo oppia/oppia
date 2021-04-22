@@ -31,7 +31,7 @@ import { UtilsService } from 'services/utils.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, params: Object | undefined): string {
     return value;
   }
 }

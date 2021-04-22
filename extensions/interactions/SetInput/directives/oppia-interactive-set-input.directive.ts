@@ -102,7 +102,10 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
             }
 
             // Adds an input field by default.
-            ctrl.answer = [''];
+            ctrl.answer = (
+              $attrs.savedSolution !== undefined ?
+              JSON.parse($attrs.savedSolution) : ['']
+            );
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, ctrl.isAnswerValid);

@@ -24,15 +24,18 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'pages/exploration-editor-page/' +
   'services/exploration-language-code.service.ts');
+require('services/context.service.ts');
 
 describe('Exploration Language Code Service', function() {
   let elcs = null;
+  let cs = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
     elcs = $injector.get('ExplorationLanguageCodeService');
+    cs = $injector.get('ContextService');
   }));
 
   it('should test the child object properties', function() {
@@ -45,5 +48,9 @@ describe('Exploration Language Code Service', function() {
     elcs.displayed = 'nl';
     expect(elcs.getCurrentLanguageDescription()).toBe('Nederlands (Dutch)');
     expect(elcs._isValid('en')).toBe(true);
+
+    spyOn(cs, 'isExplorationLinkedToStory').and.returnValue(true);
+    expect(elcs.getSupportedContentLanguages().length).toBe(1);
+    expect(elcs.getSupportedContentLanguages()[0].code).toBe('en');
   });
 });

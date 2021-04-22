@@ -33,15 +33,32 @@ from core.platform import models
 import feconf
 import python_utils
 
-(feedback_models, email_models, suggestion_models) = (
-    models.Registry.import_models(
-        [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+(
+    email_models, expl_models, feedback_models,
+    question_models, skill_models, suggestion_models,
+    topic_models
+) = models.Registry.import_models([
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.suggestion,
+    models.NAMES.topic
+])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
+
+TARGET_TYPE_TO_TARGET_MODEL = {
+    feconf.ENTITY_TYPE_EXPLORATION: (
+        expl_models.ExplorationModel),
+    feconf.ENTITY_TYPE_QUESTION: (
+        question_models.QuestionModel),
+    feconf.ENTITY_TYPE_SKILL: (
+        skill_models.SkillModel),
+    feconf.ENTITY_TYPE_TOPIC: (
+        topic_models.TopicModel)
+}
 
 
 def get_exp_id_from_thread_id(thread_id):
@@ -124,7 +141,7 @@ def create_thread(
 
 def create_message(
         thread_id, author_id, updated_status, updated_subject, text,
-        received_via_email=False):
+        received_via_email=False, should_send_email=True):
     """Creates a new message for the thread and subscribes the author to the
     thread.
 
@@ -140,6 +157,8 @@ def create_message(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether new message is received via email or
             web.
+        should_send_email: bool. Whether the new message(s) need to be added to
+            the email buffer.
 
     Returns:
         FeedbackMessage. The domain object representing the new message added
@@ -150,12 +169,13 @@ def create_message(
     """
     return create_messages(
         [thread_id], author_id, updated_status, updated_subject, text,
-        received_via_email=received_via_email)[0]
+        received_via_email=received_via_email,
+        should_send_email=should_send_email)[0]
 
 
 def create_messages(
         thread_ids, author_id, updated_status, updated_subject, text,
-        received_via_email=False):
+        received_via_email=False, should_send_email=True):
     """Creates a new message for each of the distinct threads in thread_ids and
     for each message, subscribes the author to the thread.
 
@@ -172,6 +192,8 @@ def create_messages(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether the new message(s) are received via
             email or web.
+        should_send_email: bool. Whether the new message(s) need to be added to
+            the email buffer.
 
     Returns:
         list(FeedbackMessage). The domain objects representing the new messages
@@ -315,7 +337,8 @@ def create_messages(
             user_services.is_user_registered(author_id)) and
             # TODO(#12079): Figure out a better way to avoid sending feedback
             # thread emails for contributor dashboard suggestions.
-            (len(text) > 0 or old_statuses[index] != new_statuses[index])):
+            (len(text) > 0 or old_statuses[index] != new_statuses[index]) and
+            should_send_email):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
@@ -1104,28 +1127,6 @@ def _send_feedback_thread_status_change_emails(
                 new_status)
 
 
-def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
-    """Ensures that instance of FeedbackEmailReplyToIdModel exists for each user
-    in user_ids.
-
-    Args:
-        user_ids: list(str). A list of user_ids.
-        thread_id: str. The id of thread used to obtain
-            FeedbackEmailReplyToIdModel for given user.
-    """
-    feedback_email_id_models = (
-        email_models.GeneralFeedbackEmailReplyToIdModel.get_multi_by_user_ids(
-            user_ids, thread_id))
-
-    # Users are added to the thread incrementally. Therefore at any time there
-    # can be at most one user who does not have FeedbackEmailReplyToIdModel
-    # instance.
-    for user_id in user_ids:
-        if feedback_email_id_models[user_id] is None:
-            email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                user_id, thread_id)
-
-
 def _add_message_to_email_buffer(
         author_id, thread_id, message_id, message_length, old_status,
         new_status):
@@ -1147,8 +1148,6 @@ def _add_message_to_email_buffer(
         thread.entity_type, thread.entity_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
-
-    _ensure_each_recipient_has_reply_to_id(other_recipient_ids, thread_id)
 
     if old_status != new_status:
         # Send email for feedback thread status change.

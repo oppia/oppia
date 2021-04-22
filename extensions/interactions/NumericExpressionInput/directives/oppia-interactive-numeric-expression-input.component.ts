@@ -86,11 +86,16 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        const { placeholder } = (
+        const { useFractionForDivision, placeholder } = (
           InteractionAttributesExtractorService.getValuesFromAttributes(
             'NumericExpressionInput', $attrs));
+        GuppyConfigurationService.changeDivSymbol(useFractionForDivision);
         GuppyInitializationService.init(
-          'guppy-div-learner', placeholder.unicode);
+          'guppy-div-learner',
+          placeholder.unicode,
+          $attrs.savedSolution !== undefined ?
+          JSON.parse($attrs.savedSolution) : ''
+        );
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

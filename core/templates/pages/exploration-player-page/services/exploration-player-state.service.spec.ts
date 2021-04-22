@@ -75,7 +75,7 @@ describe('Exploration Player State Service', () => {
       $provide.value('QuestionPlayerEngineService', {});
       $provide.value('QuestionBackendApiService', {});
       $provide.value('PretestQuestionBackendApiService', {
-        fetchPretestQuestions: $.noop
+        fetchPretestQuestionsAsync: $.noop
       });
       $provide.value('PlaythroughService', {
         initSession: $.noop

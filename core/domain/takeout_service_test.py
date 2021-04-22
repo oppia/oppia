@@ -35,17 +35,17 @@ import python_utils
 import utils
 
 (
-    auth_models, base_models, collection_models,
-    config_models, email_models, exploration_models,
-    feedback_models, improvements_models, question_models,
-    skill_models, story_models, subtopic_models,
-    suggestion_models, topic_models, user_models
+    app_feedback_report_models, auth_models, base_models, collection_models,
+    config_models, email_models, exploration_models, feedback_models,
+    improvements_models, question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.base_model, models.NAMES.collection,
-    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.NAMES.app_feedback_report, models.NAMES.auth,
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 
@@ -236,8 +236,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     THREAD_ID_2 = 'thread_id_2'
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
-    USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
-    USER_1_REPLY_TO_ID_2 = 'user_1_reply_to_id_thread_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     USER_1_EMAIL = 'user1@example.com'
@@ -310,6 +308,37 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         {'cmd': 'some_command'},
         {'cmd2': 'another_command'}
     ]
+    PLATFORM_ANDROID = 'android'
+    # Timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615151836)
+    # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+    TICKET_ID = '%s.%s.%s' % (
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    DEVICE_COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 28
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
@@ -330,6 +359,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         15) Populates user settings.
         16) Creates two reply-to ids for feedback.
         17) Creates a task closed by the user.
+        18) Simulates user_1 scrubbing a report.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -560,27 +590,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
-        # Setup for GeneralFeedbackReplyToId.
-        user_two_fake_hash_lambda_one = (
-            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_1)
-        user_two_fake_hash_one = self.swap(
-            utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
-        with user_two_fake_hash_one:
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_1)
-            model.update_timestamps()
-            model.put()
-
-        user_two_deterministic_hash_lambda_two = (
-            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_2)
-        user_two_deterministic_hash_two = self.swap(
-            utils, 'convert_to_hash', user_two_deterministic_hash_lambda_two)
-        with user_two_deterministic_hash_two:
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_2)
-            model.update_timestamps()
-            model.put()
-
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_1_id',
             target_type='exploration',
@@ -716,6 +725,39 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             parent_user_id=self.PROFILE_ID_1
         ).put()
 
+        # Set-up for AppFeedbackReportModel scrubbed by user.
+        report_id = '%s.%s.%s' % (
+            self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
+            'randomInteger123')
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=report_id,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=None,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=(
+                self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        report_entity = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id))
+        report_entity.scrubbed_by = self.USER_ID_1
+        report_entity.update_timestamps()
+        report_entity.put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         user_models.UserSettingsModel(
@@ -743,6 +785,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.set_up_trivial()
         self.maxDiff = None
         # Generate expected output.
+        app_feedback_report = {}
         collection_progress_data = {}
         collection_rights_data = {
             'editable_collection_ids': [],
@@ -759,7 +802,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'voiced_exploration_ids': []
         }
         exploration_data = {}
-        reply_to_data = {}
         general_feedback_message_data = {}
         general_feedback_thread_data = {}
         general_feedback_thread_user_data = {}
@@ -828,6 +870,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_user_email_preferences = {}
 
         expected_user_data = {
+            'app_feedback_report': app_feedback_report,
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
@@ -849,7 +892,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_rights': collection_rights_data,
             'general_suggestion': general_suggestion_data,
             'exploration_rights': exploration_rights_data,
-            'general_feedback_email_reply_to_id': reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
@@ -1256,15 +1298,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
         }
 
-        expected_reply_to_data = {
-            self.THREAD_ID_1: {
-                'reply_to_id': self.USER_1_REPLY_TO_ID_1
-            },
-            self.THREAD_ID_2: {
-                'reply_to_id': self.USER_1_REPLY_TO_ID_2
-            }
-        }
-
         expected_subscriptions_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
@@ -1402,6 +1435,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_user_email_preferences = {}
         expected_user_auth_details = {}
+        expected_app_feedback_report = {
+            '%s.%s.%s' % (
+                self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
+                'randomInteger123'): {
+                    'scrubbed_by': self.USER_ID_1,
+                    'platform': self.PLATFORM_ANDROID,
+                    'ticket_id': self.TICKET_ID,
+                    'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
+                    'report_type': self.REPORT_TYPE_SUGGESTION,
+                    'category': self.CATEGORY_OTHER,
+                    'platform_version': self.PLATFORM_VERSION}}
 
         expected_user_data = {
             'user_stats': expected_stats_data,
@@ -1428,7 +1472,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_collection_rights_data,
             'general_suggestion': expected_general_suggestion_data,
             'exploration_rights': expected_exploration_rights_data,
-            'general_feedback_email_reply_to_id': expected_reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
@@ -1454,7 +1497,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
             'user_email_preferences': expected_user_email_preferences,
-            'user_auth_details': expected_user_auth_details
+            'user_auth_details': expected_user_auth_details,
+            'app_feedback_report': expected_app_feedback_report
         }
 
         user_takeout_object = takeout_service.export_data_for_user(

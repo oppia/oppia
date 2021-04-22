@@ -67,7 +67,7 @@ import { AdminBackendApiService } from
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from
-  'pages/admin-page/services/admin-router.service.ts';
+  'pages/admin-page/services/admin-router.service';
 import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { AlertsService } from 'services/alerts.service';
@@ -79,8 +79,6 @@ import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioTranslationLanguageService } from
@@ -102,7 +100,7 @@ import { BrowserCheckerService } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service.ts';
+  'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
@@ -185,7 +183,7 @@ import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
-import { ExternalSaveService } from 'services/external-save.service.ts';
+import { ExternalSaveService } from 'services/external-save.service';
 import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
@@ -282,7 +280,7 @@ import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
-import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PageTitleService } from 'services/page-title.service';
 import { ParamChangeObjectFactory } from
@@ -328,25 +326,19 @@ import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service.ts';
+  'domain/question/question-backend-api.service';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
-import { ReadOnlySubtopicPageObjectFactory } from
-  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
-  'pages/review-test-page/review-test-engine.service.ts';
-import { RubricObjectFactory } from
-  'domain/skill/RubricObjectFactory';
+  'pages/review-test-page/review-test-engine.service';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
@@ -364,15 +356,13 @@ import { SetInputValidationService } from
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
-  'domain/skill/skill-rights-backend-api.service.ts';
+  'domain/skill/skill-rights-backend-api.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -425,15 +415,8 @@ import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
-import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
-import { SubtopicPageObjectFactory } from
-  'domain/topic/SubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from
   'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -447,13 +430,9 @@ import { TextInputRulesService } from
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
-import { ThreadMessageObjectFactory } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts';
+  'domain/topic/topic-creation-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
@@ -470,8 +449,6 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -505,7 +482,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static angularNameService: AngularNameService;
   static answerClassificationService: AnswerClassificationService;
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
-  static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
   static audioBarStatusService: AudioBarStatusService;
   static audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -684,12 +660,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ratioExpressionInputValidationService:
     RatioExpressionInputValidationService;
   static ratingComputationService: RatingComputationService;
-  static readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory;
   static readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
-  static recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static reviewTestEngineService: ReviewTestEngineService;
-  static rubricObjectFactory: RubricObjectFactory;
   static ruleObjectFactory: RuleObjectFactory;
   static schemaDefaultValueService: SchemaDefaultValueService;
   static schemaFormSubmittedService: SchemaFormSubmittedService;
@@ -699,7 +672,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static searchBackendApiService: SearchBackendApiService;
   static setInputRulesService: SetInputRulesService;
   static setInputValidationService: SetInputValidationService;
-  static shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   static sVMPredictionService: SVMPredictionService;
   static sidebarStatusService: SidebarStatusService;
   static siteAnalyticsService: SiteAnalyticsService;
@@ -743,11 +715,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyObjectFactory: StoryObjectFactory;
   static storyReferenceObjectFactory: StoryReferenceObjectFactory;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
   static subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
-  static subtopicObjectFactory: SubtopicObjectFactory;
-  static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
-  static subtopicPageObjectFactory: SubtopicPageObjectFactory;
   static subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
   static suggestionModalService: SuggestionModalService;
   static suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
@@ -756,8 +724,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static textInputRulesService: TextInputRulesService;
   static textInputTokenizer: TextInputTokenizer;
   static textInputValidationService: TextInputValidationService;
-  static threadMessageObjectFactory: ThreadMessageObjectFactory;
-  static threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
   static threadStatusDisplayService: ThreadStatusDisplayService;
   static topicCreationBackendApiService: TopicCreationBackendApiService;
   static topicObjectFactory: TopicObjectFactory;
@@ -775,7 +741,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static utilsService: UtilsService;
   static validatorsService: ValidatorsService;
   static versionTreeService: VersionTreeService;
-  static voiceoverObjectFactory: VoiceoverObjectFactory;
   static windowDimensionsService: WindowDimensionsService;
   static windowRef: WindowRef;
   static winnowingPreprocessingService: WinnowingPreprocessingService;
@@ -796,7 +761,6 @@ private algebraicExpressionInputValidationService:
 private angularNameService: AngularNameService,
 private answerClassificationService: AnswerClassificationService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
-private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
 private audioBarStatusService: AudioBarStatusService,
 private audioTranslationLanguageService: AudioTranslationLanguageService,
@@ -977,12 +941,9 @@ private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
 private ratioExpressionInputValidationService:
   RatioExpressionInputValidationService,
 private ratingComputationService: RatingComputationService,
-private readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory,
 private readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory,
-private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
 private reviewTestBackendApiService: ReviewTestBackendApiService,
 private reviewTestEngineService: ReviewTestEngineService,
-private rubricObjectFactory: RubricObjectFactory,
 private ruleObjectFactory: RuleObjectFactory,
 private schemaDefaultValueService: SchemaDefaultValueService,
 private schemaFormSubmittedService: SchemaFormSubmittedService,
@@ -992,7 +953,6 @@ private searchExplorationsBackendApiService:
 private searchBackendApiService: SearchBackendApiService,
 private setInputRulesService: SetInputRulesService,
 private setInputValidationService: SetInputValidationService,
-private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
 private sVMPredictionService: SVMPredictionService,
 private sidebarStatusService: SidebarStatusService,
 private siteAnalyticsService: SiteAnalyticsService,
@@ -1036,11 +996,7 @@ private storyEditorNavigationService: StoryEditorNavigationService,
 private storyObjectFactory: StoryObjectFactory,
 private storyReferenceObjectFactory: StoryReferenceObjectFactory,
 private storyViewerBackendApiService: StoryViewerBackendApiService,
-private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
 private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
-private subtopicObjectFactory: SubtopicObjectFactory,
-private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
-private subtopicPageObjectFactory: SubtopicPageObjectFactory,
 private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
 private suggestionModalService: SuggestionModalService,
 private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -1049,8 +1005,6 @@ private textInputPredictionService: TextInputPredictionService,
 private textInputRulesService: TextInputRulesService,
 private textInputTokenizer: TextInputTokenizer,
 private textInputValidationService: TextInputValidationService,
-private threadMessageObjectFactory: ThreadMessageObjectFactory,
-private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory,
 private threadStatusDisplayService: ThreadStatusDisplayService,
 private topicCreationBackendApiService: TopicCreationBackendApiService,
 private topicObjectFactory: TopicObjectFactory,
@@ -1068,7 +1022,6 @@ private userExplorationPermissionsService: UserExplorationPermissionsService,
 private utilsService: UtilsService,
 private validatorsService: ValidatorsService,
 private versionTreeService: VersionTreeService,
-private voiceoverObjectFactory: VoiceoverObjectFactory,
 private windowDimensionsService: WindowDimensionsService,
 private windowRef: WindowRef,
 private winnowingPreprocessingService: WinnowingPreprocessingService,
@@ -1095,8 +1048,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.answerClassificationService);
     OppiaAngularRootComponent.answerGroupObjectFactory = (
       this.answerGroupObjectFactory);
-    OppiaAngularRootComponent.answerStatsObjectFactory = (
-      this.answerStatsObjectFactory);
     OppiaAngularRootComponent.appService = this.appService;
     OppiaAngularRootComponent.audioBarStatusService = (
       this.audioBarStatusService);
@@ -1385,17 +1336,12 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.ratioExpressionInputValidationService);
     OppiaAngularRootComponent.ratingComputationService = (
       this.ratingComputationService);
-    OppiaAngularRootComponent.readOnlySubtopicPageObjectFactory = (
-      this.readOnlySubtopicPageObjectFactory);
     OppiaAngularRootComponent.readOnlyTopicObjectFactory = (
       this.readOnlyTopicObjectFactory);
-    OppiaAngularRootComponent.recordedVoiceoversObjectFactory = (
-      this.recordedVoiceoversObjectFactory);
     OppiaAngularRootComponent.reviewTestBackendApiService = (
       this.reviewTestBackendApiService);
     OppiaAngularRootComponent.reviewTestEngineService = (
       this.reviewTestEngineService);
-    OppiaAngularRootComponent.rubricObjectFactory = this.rubricObjectFactory;
     OppiaAngularRootComponent.ruleObjectFactory = this.ruleObjectFactory;
     OppiaAngularRootComponent.schemaDefaultValueService = (
       this.schemaDefaultValueService);
@@ -1409,8 +1355,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.setInputRulesService);
     OppiaAngularRootComponent.setInputValidationService = (
       this.setInputValidationService);
-    OppiaAngularRootComponent.shortSkillSummaryObjectFactory = (
-      this.shortSkillSummaryObjectFactory);
     OppiaAngularRootComponent.sVMPredictionService = this.sVMPredictionService;
     OppiaAngularRootComponent.sidebarStatusService = this.sidebarStatusService;
     OppiaAngularRootComponent.siteAnalyticsService = this.siteAnalyticsService;
@@ -1481,16 +1425,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.storyReferenceObjectFactory);
     OppiaAngularRootComponent.storyViewerBackendApiService = (
       this.storyViewerBackendApiService);
-    OppiaAngularRootComponent.subtitledHtmlObjectFactory = (
-      this.subtitledHtmlObjectFactory);
     OppiaAngularRootComponent.subtitledUnicodeObjectFactory = (
       this.subtitledUnicodeObjectFactory);
-    OppiaAngularRootComponent.subtopicObjectFactory = (
-      this.subtopicObjectFactory);
-    OppiaAngularRootComponent.subtopicPageContentsObjectFactory = (
-      this.subtopicPageContentsObjectFactory);
-    OppiaAngularRootComponent.subtopicPageObjectFactory = (
-      this.subtopicPageObjectFactory);
     OppiaAngularRootComponent.subtopicViewerBackendApiService = (
       this.subtopicViewerBackendApiService);
     OppiaAngularRootComponent.suggestionModalService = (
@@ -1506,10 +1442,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.textInputTokenizer);
     OppiaAngularRootComponent.textInputValidationService = (
       this.textInputValidationService);
-    OppiaAngularRootComponent.threadMessageObjectFactory = (
-      this.threadMessageObjectFactory);
-    OppiaAngularRootComponent.threadMessageSummaryObjectFactory = (
-      this.threadMessageSummaryObjectFactory);
     OppiaAngularRootComponent.threadStatusDisplayService = (
       this.threadStatusDisplayService);
     OppiaAngularRootComponent.topicCreationBackendApiService = (
@@ -1534,8 +1466,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.utilsService = this.utilsService;
     OppiaAngularRootComponent.validatorsService = this.validatorsService;
     OppiaAngularRootComponent.versionTreeService = this.versionTreeService;
-    OppiaAngularRootComponent.voiceoverObjectFactory = (
-      this.voiceoverObjectFactory);
     OppiaAngularRootComponent.windowDimensionsService = (
       this.windowDimensionsService);
     OppiaAngularRootComponent.windowRef = this.windowRef;

@@ -61,7 +61,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
     def test_library_page(self):
         """Test access to the library page."""
@@ -572,7 +572,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.save_new_valid_exploration(
             self.PRIVATE_EXP_ID_EDITOR, self.editor_id)
