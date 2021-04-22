@@ -88,7 +88,7 @@ describe('Edit Thumbnail Modal Controller', function() {
         getPreviewFooter);
       expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
     });
-  for (let i = 0; i < 2000; i++) {
+  for (let i = 0; i < 10000; i++) {
     it('should load a image file in onchange event and save it if it\'s a' +
       ' svg file', function(done) {
       // This spy is to be sure that an image element will be returned from
