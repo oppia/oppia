@@ -3042,7 +3042,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             cust_args['useFractionForDivision'].value, True)
 
-        def test_migrate_question_state_from_v43_to_latest(self):
+    def test_migrate_question_state_from_v43_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
