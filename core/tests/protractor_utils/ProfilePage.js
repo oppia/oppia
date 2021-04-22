@@ -41,7 +41,9 @@ var ProfilePage = function() {
   };
 
   this.expectCurrUserToHaveProfilePhoto = async function() {
-    expect(await currUserProfilePhoto.isPresent()).toBe(true);
+    await waitFor.visibilityOf(
+      currUserProfilePhoto,
+      'Current user profile photo taking too long to display');
   };
 
   this.expectOtherUserToHaveProfilePhoto = async function() {
@@ -49,6 +51,9 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveBio = async function(expectedText) {
+    await waitFor.visibilityOf(
+      bio,
+      'Bio is taking too long to appear');
     expect(await bio.getText()).toMatch(expectedText);
   };
 
@@ -62,6 +67,9 @@ var ProfilePage = function() {
     expect(numInterests).toEqual(expectedInterests.length);
 
     var interestTexts = await interests.map(async function(interestElem) {
+      await waitFor.visibilityOf(
+        interestElem,
+        'InterestElem is taking too long to appear');
       return await interestElem.getText();
     });
     interestTexts.forEach(function(interestText) {
@@ -70,6 +78,9 @@ var ProfilePage = function() {
   };
 
   this.expectUserToHaveInterestPlaceholder = async function(expectedText) {
+     await waitFor.visibilityOf(
+      interestPlaceholder,
+      'Interest place holder is taking too long to appear');
     expect(await interestPlaceholder.getText()).toMatch(expectedText);
   };
 
@@ -78,17 +89,18 @@ var ProfilePage = function() {
   };
 
   this.expectToHaveExplorationCards = async function() {
-    var explorationCardsCount = await allExplorationCardElements.count();
-    if (explorationCardsCount === 0) {
-      throw new Error('There is no exploration card on this profile');
-    }
-    expect(explorationCardsCount).toBeGreaterThan(0);
+    await waitFor.visibilityOf(
+      allExplorationCardElements.first(),
+      'Exploration cards is not present or taking time to display');
   };
 
   this.expectToHaveExplorationCardByName = async function(explorationName) {
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
         var cardTitle = card.element(cardTitleCss);
+        await waitFor.visibilityOf(
+          cardTitle,
+          'CardTitle is not present or taking too long to display');
         var title = await cardTitle.getText();
         return title === explorationName;
       });
