@@ -226,8 +226,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         models.
 
         Args:
-            input_model: datastore_services.Model. A domain object to
-                validate.
+            input_model: datastore_services.Model. A domain object to validate.
 
         Yields:
             ModelDomainObjectValidateError. Error for domain object validation.
@@ -250,3 +249,25 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                         validation_type))
         except Exception as e:
             yield audit_errors.ModelDomainObjectValidateError(input_model, e)
+
+
+@audit_decorators.AuditsExisting(
+    base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
+class ValidateCommitType(beam.DoFn):
+    """DoFn to check whether commit type is valid."""
+
+    def process(self, input_model):
+        """Function that defines how to process each element in a pipeline of
+        models.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Yields:
+            ModelCommitTypeError. Error for commit_type validation.
+        """
+        model = job_utils.clone_model(input_model)
+
+        if (model.commit_type not in
+                base_models.VersionedModel.COMMIT_TYPE_CHOICES):
+            yield audit_errors.InvalidCommitTypeError(model)

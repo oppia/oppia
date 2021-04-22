@@ -271,7 +271,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'side-navigation-bar.directive.ts',
     'skill-concept-card-editor.directive.ts',
     'skill-creation.service.ts',
-    'skill-description-editor.directive.ts',
+    'skill-description-editor.component.ts',
     'skill-editor-navbar-breadcrumb.component.ts',
     'skill-editor-navbar.directive.ts',
     'skill-editor-state.service.ts',
