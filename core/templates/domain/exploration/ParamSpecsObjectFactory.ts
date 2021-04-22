@@ -105,7 +105,7 @@ export class ParamSpecs {
     this.forEach(
       (
           paramName: string | number,
-          paramSpec: { toBackendDict: () => ParamSpecBackendDict; }
+          paramSpec: ParamSpec
       ) => {
         paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
       });
