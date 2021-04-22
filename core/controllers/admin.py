@@ -847,7 +847,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
 class ContributionRightsHandler(base.BaseHandler):
     """Handles adding and removing contribution rights for contributor
-    dashboard pages."""
+    dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -951,16 +951,14 @@ class ContributionRightsHandler(base.BaseHandler):
                     user_id, language_code)
             elif (category ==
                   constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
-                if not user_services.can_review_question_suggestions(
-                        user_id):
+                if not user_services.can_review_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to review question.' % (
                             username))
                 user_services.remove_question_review_rights(user_id)
             elif (category ==
                   constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
-                if not user_services.can_submit_question_suggestions(
-                        user_id):
+                if not user_services.can_submit_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to submit question.' % (
                             username))

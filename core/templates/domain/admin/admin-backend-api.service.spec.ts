@@ -563,7 +563,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -591,7 +591,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -727,7 +727,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -756,7 +756,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
@@ -790,7 +790,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -819,7 +819,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 

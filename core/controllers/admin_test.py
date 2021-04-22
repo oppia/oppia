@@ -1784,7 +1784,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'invalid',
                 'category': 'translation',
                 'language_code': 'en'
@@ -1802,7 +1802,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'category': 'translation',
                 'language_code': 'hi'
@@ -1816,7 +1816,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'category': 'translation',
                 'language_code': 'invalid'
@@ -1832,7 +1832,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'category': 'translation',
                 'language_code': 'hi'
@@ -1841,7 +1841,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'category': 'translation',
                 'language_code': 'hi'
@@ -1861,7 +1861,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'category': 'voiceover',
                 'language_code': 'hi'
@@ -1878,7 +1878,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'category': 'voiceover',
                 'language_code': 'invalid'
@@ -1898,7 +1898,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'category': 'voiceover',
                 'language_code': 'hi'
@@ -1908,7 +1908,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.voiceover_reviewer_id, language_code='hi'))
 
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'category': 'voiceover',
                 'language_code': 'hi'
@@ -1927,7 +1927,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'category': 'question'
             }, csrf_token=csrf_token)
@@ -1942,7 +1942,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'category': 'question'
             }, csrf_token=csrf_token)
@@ -1950,7 +1950,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'category': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -1967,7 +1967,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'category': 'submit_question'
             }, csrf_token=csrf_token)
@@ -1982,7 +1982,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'category': 'submit_question'
             }, csrf_token=csrf_token)
@@ -1990,7 +1990,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'category': 'submit_question'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -2004,7 +2004,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'category': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -2039,7 +2039,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -2050,7 +2050,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'invalid',
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -2072,7 +2072,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'category': 'translation',
@@ -2087,7 +2087,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'category': 'translation',
@@ -2104,7 +2104,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
                 'category': 'translation',
@@ -2130,7 +2130,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'category': 'voiceover',
@@ -2145,7 +2145,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'category': 'voiceover',
@@ -2162,7 +2162,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'category': 'voiceover',
@@ -2182,7 +2182,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'question'
@@ -2198,7 +2198,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'question'
@@ -2216,7 +2216,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'submit_question'
@@ -2232,7 +2232,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'submit_question'
@@ -2246,7 +2246,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'invalid'
@@ -2259,7 +2259,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -2288,7 +2288,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/removecontributionrightshandler', {
+            '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'all'
             }, csrf_token=csrf_token)

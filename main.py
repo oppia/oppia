@@ -230,10 +230,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionrightshandler',
-        admin.ContributionRightsHandler),
-    get_redirect_route(
-        r'/removecontributionrightshandler',
+        r'/contributionrightshandler',
         admin.ContributionRightsHandler),
     get_redirect_route(
         r'/getcontributorusershandler',
