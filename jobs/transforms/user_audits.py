@@ -54,7 +54,7 @@ class ValidateModelWithUserId(base_model_audits.ValidateBaseModelId):
 
 @audit_decorators.AuditsExisting(user_models.PendingDeletionRequestModel)
 class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
-    """DoFn to check for Validates that pseudonymizable_entity_mappings"""
+    """DoFn to check for Validates that pseudonymizable_entity_mappings."""
 
     def process(self, input_model):
         """Function that check for incorrect key in model.
