@@ -237,6 +237,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.postSvgToServer = function(dimensions, resampledFile) {
+        ctrl.isLoadingIndicatorShown = true;
         return $q(function(successCallback, errorCallback) {
           let form = new FormData();
           form.append('image', resampledFile);
@@ -389,6 +390,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                   width: dimensions.width + 'px'
                 };
                 $scope.$applyAsync();
+                ctrl.isLoadingIndicatorShown = false;
               };
               img.src = getTrustedResourceUrlForSvgFileName(data.filename);
             }, function(parsedResponse) {
