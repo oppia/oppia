@@ -94,7 +94,8 @@ describe('Exploration Html Formatter Service', () => {
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" [last-answer]="lastAnswer">' +
       '</oppia-interactive-graph-input>';
-    expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null))
+    expect(ehfs.getInteractionHtml(
+      interactionId, custArgs, true, null, undefined))
       .toBe(expectedHtmlTag);
   });
 

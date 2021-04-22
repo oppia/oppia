@@ -69,40 +69,37 @@ export class ExplorationHtmlFormatterService {
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
-      savedSolution: Solution): string {
+      savedSolution: Solution | undefined): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
-<<<<<<< HEAD
-=======
+    let tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+    let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
+    const getLastAnswer = (): string => {
+      let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
+      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+        return '[last-answer]="' + propValue + '" ';
+      } else {
+        return 'last-answer="' + propValue + '" ';
+      }
+    };
     if (savedSolution) {
       // TODO(#12292): Refactor this once all interactions have been migrated to
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
-      element.attr(
-        'saved-solution', JSON.stringify(savedSolution.correctAnswer));
+      directiveOuterHtml += (
+        'saved-solution="' + JSON.stringify(
+          savedSolution.correctAnswer) + '" '
+      );
     }
->>>>>>> upstream/develop
-    if (labelForFocusTarget) {
-      element.attr('label-for-focus-target', labelForFocusTarget);
-    }
-    element.attr(
-      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
-    let val = element.get(0).outerHTML;
-    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-      val = val.replace(
-        'last-answer="null"></oppia-interactive-' + htmlInteractionId + '>',
-        '[last-answer]="null"></oppia-interactive-' + htmlInteractionId + '>');
-      val = val.replace(
-        'last-answer="lastAnswer"></oppia-interactive-' +
-        htmlInteractionId + '>',
-        '[last-answer]="lastAnswer"></oppia-interactive-' +
-        htmlInteractionId + '>');
-    }
-    return val;
+    directiveOuterHtml += (
+      'label-for-focus-target="' + labelForFocusTarget + '" ' +
+      getLastAnswer() +
+      '></oppia-interactive-' + htmlInteractionId + '>');
+    return directiveOuterHtml;
   }
 
   getAnswerHtml(
