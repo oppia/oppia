@@ -18,6 +18,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -29,22 +30,17 @@ import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFact
   selector: 'oppia-save-version-mismatch-modal',
   templateUrl: './save-version-mismatch-modal.component.html'
 })
-export class SaveVersionMismatchModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
-    
+export class SaveVersionMismatchModalComponent implements OnInit {
   MSECS_TO_REFRESH: number = 20;
   hasLostChanges: boolean;
-
   @Input() lostChanges:any;
 
   constructor(
     private windowRef: WindowRef,
-    private ngbActiveModal: NgbActiveModal,
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
     private lostChangeObjectFactory: LostChangeObjectFactory
   ) {
-    super(ngbActiveModal);
   }
 
   ngOnInit(): void {

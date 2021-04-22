@@ -1,6 +1,6 @@
 <div class="oppia-lost-changes">
   <ul>
-    <li *ngFor="lostChange in lostChanges">
+    <li *ngFor="let lostChange of lostChanges">
       <span *ngIf="lostChange.cmd === 'add_state'">
         Added state: {{ lostChange.stateName }}
       </span>
@@ -12,8 +12,8 @@
       </span>
       <div *ngIf="lostChange.cmd === 'edit_state_property'">
         Edits to state: {{ lostChange.stateName }}
-        <ng-content ngSwitch="lostChange.propertyName">
-          <div ngSwitchWhen="content">
+        <ng-container [ngSwitch]="lostChange.propertyName">
+          <div *ngSwitchCase="content">
             <div *ngIf="!lostChange.isNewValueEmpty()" class="state-edit-desc">
               <strong>Edited content: </strong>
               <div class="content" ng-bind-html="lostChange.newValue.html">
@@ -21,7 +21,7 @@
             </div>
           </div>
 
-          <div ngSwitchWhen="widget_id" class="state-edit-desc">
+          <div *ngSwitchCase="widget_id" class="state-edit-desc">
             <span *ngIf="lostChange.isAddingInteraction()">
               <strong>Added Interaction: </strong>
               {{ lostChange.newValue }}
@@ -37,7 +37,7 @@
             </span>
           </div>
 
-          <div ngSwitchWhen="widget_customization_args" class="state-edit-desc">
+          <div *ngSwitchCase="widget_customization_args" class="state-edit-desc">
             <span *ngIf="lostChange.isOldValueEmpty()">
               Added Interaction Customizations
             </span>
@@ -49,7 +49,7 @@
             </span>
           </div>
 
-          <div ngSwitchWhen="answer_groups">
+          <div *ngSwitchCase="answer_groups">
             <div *ngIf="lostChange.getRelativeChangeToGroups() === 'added'" class="state-edit-desc answer-group">
               <strong>Added answer group: </strong>
               <p class="sub-edit">
@@ -66,13 +66,13 @@
               <div class="sub-edit" *ngIf="lostChange.newValue.rules.length > 0">
                 <i>Rules: </i>
                 <ol class="rules-list">
-                  <li *ngFor="rule in lostChange.newValue.rules">
+                  <li *ngFor="let rule of lostChange.newValue.rules">
                     <p>Type: {{ rule.type }}</p>
                     <p>Value:
                       <span> </span>
-                      <ng-content *ngFor="input in rule.inputs">
+                      <ng-container *ngFor="let input of rule.inputs">
                         {{  last ? input : (input + ',') }}
-                      </ng-content>
+                      </ng-container>
                     </p>
                   </li>
                 </ol>
@@ -97,13 +97,13 @@
               <div class="sub-edit" *ngIf="lostChange.isRulesEqual()">
                 <i>Rules: </i>
                 <ol class="rules-list">
-                  <li *ngFor="rule in lostChange.newValue.rules; trackBy: index">
+                  <li *ngFor="let rule of lostChange.newValue.rules; trackBy: index">
                     <p>Type: {{ rule.type }}</p>
                     <p>Value:
                       <span> </span>
-                      <ng-content *ngFor="input in rule.inputs">
+                      <ng-container *ngFor="let input of rule.inputs">
                         {{  last ? input : (input + ',') }}
-                      </ng-content>
+                      </ng-container>
                     </p>
                   </li>
                 </ol>
@@ -115,7 +115,7 @@
             </div>
           </div>
 
-          <div ngSwitchWhen="default_outcome">
+          <div *ngSwitchCase="default_outcome">
             <div *ngIf="lostChange.getRelativeChangeToGroups() === 'added'" class="state-edit-desc default-outcome">
               Added default outcome:
               <p class="sub-edit">
@@ -147,7 +147,7 @@
               Deleted default outcome
             </div>
           </div>
-        </ng-content>
+        </ng-container>
       </div>
     </li>
   </ul>

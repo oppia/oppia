@@ -33,6 +33,8 @@ import { ParamChangesEditorDirective } from './param-changes-editor/param-change
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
+import { changesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 
 @NgModule({
   imports: [
@@ -47,14 +49,18 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    SaveVersionMismatchModalComponent,
+    changesInHumanReadableFormComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    SaveVersionMismatchModalComponent,
+    changesInHumanReadableFormComponent,
   ],
   providers: [
     {
