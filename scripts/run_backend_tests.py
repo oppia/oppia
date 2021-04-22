@@ -331,61 +331,61 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    if parsed_args.test_target:
-        if '_test' in parsed_args.test_target:
-            all_test_targets = [parsed_args.test_target]
+    with common.managed_cloud_datastore_emulator():
+        if parsed_args.test_target:
+            if '_test' in parsed_args.test_target:
+                all_test_targets = [parsed_args.test_target]
+            else:
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '---------------------------------------------------------')
+                python_utils.PRINT(
+                    'WARNING : test_target flag should point to the test file.')
+                python_utils.PRINT(
+                    '---------------------------------------------------------')
+                python_utils.PRINT('')
+                time.sleep(3)
+                python_utils.PRINT('Redirecting to its corresponding test file...')
+                all_test_targets = [parsed_args.test_target + '_test']
+        elif parsed_args.test_shard:
+            validation_error = _check_shards_match_tests(
+                include_load_tests=False)
+            if validation_error:
+                raise Exception(validation_error)
+            all_test_targets = _get_all_test_targets_from_shard(
+                parsed_args.test_shard)
         else:
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                '---------------------------------------------------------')
-            python_utils.PRINT(
-                'WARNING : test_target flag should point to the test file.')
-            python_utils.PRINT(
-                '---------------------------------------------------------')
-            python_utils.PRINT('')
-            time.sleep(3)
-            python_utils.PRINT('Redirecting to its corresponding test file...')
-            all_test_targets = [parsed_args.test_target + '_test']
-    elif parsed_args.test_shard:
-        validation_error = _check_shards_match_tests(
-            include_load_tests=False)
-        if validation_error:
-            raise Exception(validation_error)
-        all_test_targets = _get_all_test_targets_from_shard(
-            parsed_args.test_shard)
-    else:
-        include_load_tests = not parsed_args.exclude_load_tests
-        all_test_targets = _get_all_test_targets_from_path(
-            test_path=parsed_args.test_path,
-            include_load_tests=include_load_tests)
+            include_load_tests = not parsed_args.exclude_load_tests
+            all_test_targets = _get_all_test_targets_from_path(
+                test_path=parsed_args.test_path,
+                include_load_tests=include_load_tests)
 
-    # Prepare tasks.
-    max_concurrent_runs = 25
-    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
-    semaphore = threading.Semaphore(concurrent_count)
+        # Prepare tasks.
+        max_concurrent_runs = 25
+        concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
+        semaphore = threading.Semaphore(concurrent_count)
 
-    task_to_taskspec = {}
-    tasks = []
-    for test_target in all_test_targets:
-        test = TestingTaskSpec(
-            test_target, parsed_args.generate_coverage_report)
-        task = concurrent_task_utils.create_task(
-            test.run, parsed_args.verbose, semaphore, name=test_target,
-            report_enabled=False)
-        task_to_taskspec[task] = test
-        tasks.append(task)
+        task_to_taskspec = {}
+        tasks = []
+        for test_target in all_test_targets:
+            test = TestingTaskSpec(
+                test_target, parsed_args.generate_coverage_report)
+            task = concurrent_task_utils.create_task(
+                test.run, parsed_args.verbose, semaphore, name=test_target,
+                report_enabled=False)
+            task_to_taskspec[task] = test
+            tasks.append(task)
 
-    task_execution_failed = False
-    try:
-        with common.managed_cloud_datastore_emulator():
+        task_execution_failed = False
+        try:
             concurrent_task_utils.execute_tasks(tasks, semaphore)
-    except Exception:
-        task_execution_failed = True
+        except Exception:
+            task_execution_failed = True
 
-    for task in tasks:
-        if task.exception:
-            concurrent_task_utils.log(
-                python_utils.convert_to_bytes(task.exception.args[0]))
+        for task in tasks:
+            if task.exception:
+                concurrent_task_utils.log(
+                    python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
