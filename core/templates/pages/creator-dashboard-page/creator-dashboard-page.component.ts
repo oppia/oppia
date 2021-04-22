@@ -319,8 +319,6 @@ angular.module('oppia').component('creatorDashboardPage', {
 
         ctrl.getAverageRating = RatingComputationService
           .computeAverageRating;
-        ctrl.createNewExploration = (
-          ExplorationCreationService.createNewExploration);
         ctrl.getLocaleAbbreviatedDatetimeString = (
           DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
         ctrl.getHumanReadableStatus = (
@@ -333,6 +331,13 @@ angular.module('oppia').component('creatorDashboardPage', {
         angular.element($window).on('resize', function() {
           ctrl.updatesGivenScreenWidth();
         });
+      };
+
+      ctrl.createNewExploration = function() {
+        ExplorationCreationService.createNewExploration();
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the directive is migrated to angular.
+        $rootScope.$applyAsync();
       };
     }
   ]

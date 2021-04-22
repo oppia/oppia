@@ -191,6 +191,7 @@
 /core/domain/summary_services*.py @aks681
 /core/domain/value_generators_domain*.py @vojtechjelinek
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
+/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
@@ -362,8 +363,8 @@
 
 
 # Navigation bar project.
-/core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
-/core/templates/components/button-directives/create-activity-button.directive.html @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.ts @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.html @nithusha21
 /core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/services/bottom-navbar-status.service*.ts @nithusha21
 /core/templates/services/navigation.service*.ts @nithusha21
