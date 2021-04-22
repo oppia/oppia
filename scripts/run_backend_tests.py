@@ -178,8 +178,7 @@ class TestingTaskSpec(python_utils.OBJECT):
 
         result = run_shell_cmd(exc_list)
 
-        return [concurrent_task_utils.TaskResult(
-            None, None, None, [result])]
+        return [concurrent_task_utils.TaskResult(None, None, None, [result])]
 
 
 def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
@@ -309,25 +308,13 @@ def main(args=None):
 
         common.fix_third_party_imports()
 
-        if parsed_args.generate_coverage_report:
-            python_utils.PRINT(
-                'Checking whether coverage is installed in %s'
-                % common.OPPIA_TOOLS_DIR)
-            if not os.path.exists(COVERAGE_DIR):
-                raise Exception(
-                    'Coverage is not installed, please run the start script.')
-
-            pythonpath_components = [COVERAGE_DIR]
-            if os.environ.get('PYTHONPATH'):
-                pythonpath_components.append(os.environ.get('PYTHONPATH'))
-
-            os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
-
         test_specs_provided = sum([
             1 if argument else 0
             for argument in (
-                parsed_args.test_target, parsed_args.test_path,
-                parsed_args.test_shard)
+                parsed_args.test_target,
+                parsed_args.test_path,
+                parsed_args.test_shard
+            )
         ])
 
         if test_specs_provided > 1:
@@ -485,6 +472,11 @@ def main(args=None):
                 '%s errors, %s failures' % (total_errors, total_failures))
 
         if parsed_args.generate_coverage_report:
+            pythonpath_components = [COVERAGE_DIR]
+            if os.environ.get('PYTHONPATH'):
+                pythonpath_components.append(os.environ.get('PYTHONPATH'))
+            os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
+
             subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
             process = subprocess.Popen(
                 [sys.executable, COVERAGE_MODULE_PATH, 'report',

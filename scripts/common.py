@@ -161,18 +161,14 @@ REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
     PYLINT_PATH,
-
     os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
     PSUTIL_DIR,
     os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR
 ]
