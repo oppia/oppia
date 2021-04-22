@@ -180,9 +180,9 @@ class ModelExpiringError(BaseAuditError):
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
 
 class ModelIncorrectKeyError(BaseAuditError):
-    """ Error when incorrect key is found in PendingDeletionRequestModel """
+    """Error class for incorrect key in PendingDeletionRequestModel."""
 
-    def __init__(self,model):
+    def __init__(self, model):
         super(ModelIncorrectKeyError,self).__init__(model)
         self.message = 'Entity id %s: contains keys %s that are not allowed' % (
                         item.id, incorrect_keys)
