@@ -29,7 +29,7 @@ import {
   EmailDashboardQueryBackendDict,
 } from 'domain/email-dashboard/email-dashboard-query.model';
 
-export type QueryData = Record<string, string | number>;
+export type QueryData = Record<string, boolean | number>;
 
 @Injectable({
   providedIn: 'root'
