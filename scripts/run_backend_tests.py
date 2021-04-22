@@ -308,6 +308,14 @@ def main(args=None):
 
         common.fix_third_party_imports()
 
+        if parsed_args.generate_coverage_report:
+            pythonpath_components = [COVERAGE_DIR]
+            if os.environ.get('PYTHONPATH'):
+                pythonpath_components.append(os.environ.get('PYTHONPATH'))
+            os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
+
+        print(sys.path)
+
         test_specs_provided = sum([
             1 if argument else 0
             for argument in (
@@ -472,11 +480,6 @@ def main(args=None):
                 '%s errors, %s failures' % (total_errors, total_failures))
 
         if parsed_args.generate_coverage_report:
-            pythonpath_components = [COVERAGE_DIR]
-            if os.environ.get('PYTHONPATH'):
-                pythonpath_components.append(os.environ.get('PYTHONPATH'))
-            os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
-
             subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
             process = subprocess.Popen(
                 [sys.executable, COVERAGE_MODULE_PATH, 'report',

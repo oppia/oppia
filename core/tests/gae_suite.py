@@ -72,6 +72,10 @@ def main(args=None):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
 
+    # Remove coverage from path since it causes conflicts with the standard
+    # Python html library.
+    sys.path = [path for path in sys.path if 'coverage' not in path]
+
     # The devappserver function fixes the system path by adding certain google
     # appengine libraries that we need in oppia to the system path. The Google
     # Cloud SDK comes with certain packages preinstalled including webapp2,
