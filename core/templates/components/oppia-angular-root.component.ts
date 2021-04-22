@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -749,6 +749,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static workedExampleObjectFactory: WorkedExampleObjectFactory;
   static writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
   static writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  static ajsValueProvider: (string, unknown) => void;
+  static injector: Injector;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -1033,7 +1035,8 @@ private windowRef: WindowRef,
 private winnowingPreprocessingService: WinnowingPreprocessingService,
 private workedExampleObjectFactory: WorkedExampleObjectFactory,
 private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
-private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
+private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory,
+private injector: Injector
   ) {}
 
   public ngAfterViewInit(): void {
@@ -1483,6 +1486,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.writtenTranslationObjectFactory);
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = (
       this.writtenTranslationsObjectFactory);
+
+    OppiaAngularRootComponent.injector = this.injector;
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();
