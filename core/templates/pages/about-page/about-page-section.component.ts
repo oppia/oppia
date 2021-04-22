@@ -16,16 +16,16 @@
  * @fileoverview Component for the about page.
  */
 
- import { Component, Input, OnInit } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- 
- import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
- 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
  @Component({
    selector: 'oppia-about-page-section',
    templateUrl: './about-page-section.component.html'
  })
- export class AboutPageSectionComponent implements OnInit {
+export class AboutPageSectionComponent implements OnInit {
    @Input() i18nHeading: string;
    @Input() i18nParagraph: string;
    @Input() i18nButtonText: string;
@@ -39,15 +39,17 @@
    @Input() hasBorder: boolean;
    imageFilepath: string;
    imageFilepathwebp: string;
-   
+
    constructor(
     private urlInterpolationService: UrlInterpolationService
    ) { }
    ngOnInit(): void {
-     this.imageFilepath = this.urlInterpolationService.getStaticImageUrl(this.imageFilename);
-     this.imageFilepathwebp = this.urlInterpolationService.getStaticImageUrl(this.imageFilenamewebp); 
+     this.imageFilepath =
+      this.urlInterpolationService.getStaticImageUrl(this.imageFilename);
+     this.imageFilepathwebp =
+      this.urlInterpolationService.getStaticImageUrl(this.imageFilenamewebp);
    }
- }
- angular.module('oppia').directive(
-   'oppiaAboutPageSection', downgradeComponent({component: AboutPageSectionComponent}));
- 
+}
+angular.module('oppia').directive(
+  'oppiaAboutPageSection', downgradeComponent(
+    {component: AboutPageSectionComponent}));

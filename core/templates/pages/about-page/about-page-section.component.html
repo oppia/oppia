@@ -49,7 +49,7 @@
 </div>
 
 <style>
-    .oppia-about-page-section {
+  .oppia-about-page-section {
     clear: both;
     display: flex;
     height: 75vh;
@@ -86,34 +86,32 @@
     padding-left: 4vw;
   }
   .oppia-about-section-left-reverse {
-    width: 45%;
     float: left;
+    width: 45%;
   }
   .oppia-about-page-section .oppia-about-section-left {
     padding-left: 4vw;
+    width: 45vw;
   }
   .oppia-about-page-section .oppia-about-section-title {
     color: #00424A;
     font-family: "Capriola", Arial, sans-serif;
-    font-size: 40px;;
+    font-size: 40px;
     font-weight: normal;
     margin: 0;
     width: 30vw;
   }
-  .oppia-about-section-title-white-desktop {
+  .oppia-about-page-section .oppia-about-section-title-white-desktop {
     color: #fff;
     font-family: "Capriola", Arial, sans-serif;
-    font-size: 40px;;
+    font-size: 40px;
     font-weight: normal;
     margin: 0;
-    width: 35vw;
+    width: 45vw;
   }
   .oppia-about-page-section .oppia-about-section-title-mobile,
   .oppia-about-section-title-mobile-white {
     display: none;
-  }
-  .oppia-about-page-section .oppia-about-section-left {
-    width: 45vw;
   }
   .oppia-about-page-section .oppia-about-section-content {
     color: #333;
@@ -125,7 +123,7 @@
     padding-top: 4vh;
     width: 35vw;
   }
-  .oppia-about-section-content-white-desktop {
+  .oppia-about-page-section .oppia-about-section-content-white-desktop {
     color: #fff;
     font-family: "Roboto", Arial, sans-serif;
     font-size: 20px;
@@ -156,7 +154,8 @@
     margin-right: 2vw;
   }
   @media (max-width: 1280px) {
-    .oppia-about-page-section .oppia-about-section-title {
+    .oppia-about-page-section .oppia-about-section-title,
+    .oppia-about-page-section .oppia-about-section-title-white-desktop {
       font-size: 30px;
       width: 40vw;
     }
@@ -164,7 +163,8 @@
       background-size: 100% 70vh, cover;
       height: 70vh;
     }
-    .oppia-about-page-section .oppia-about-section-content {
+    .oppia-about-page-section .oppia-about-section-content,
+    .oppia-about-page-section .oppia-about-section-content-white-desktop {
       font-size: 18px;
       padding-bottom: 5vh;
       padding-top: 3vh;
@@ -172,8 +172,15 @@
     }
     .oppia-about-page-section .oppia-about-section-right {
     margin-right: 4vw;
+    }
+    .oppia-about-page-section .oppia-about-section-button {
+      padding: 10px;
+    }
   }
-    
+  @media (orientation: landscape) and (max-width: 834px) {
+    .oppia-about-page-section .oppia-about-section-button {
+      padding: 6px;
+    }
   }
   @media (max-width: 640px) {
     .oppia-about-page-section .oppia-about-button-container {
@@ -187,6 +194,7 @@
       z-index: 10;
     }
     .oppia-about-page-section .oppia-about-section-button {
+      font-size: 3.6vw;
       padding: 10px;
     }
     .oppia-about-page-section .oppia-about-section-right {
@@ -198,9 +206,6 @@
     }
     .oppia-about-page-section .oppia-about-section-left {
       padding-left: 0;
-      width: 100%;
-    }
-    .oppia-about-page-section .oppia-about-section, {
       width: 100%;
     }
     .oppia-about-page-section {
@@ -221,24 +226,12 @@
       width: 480px;
     }
     .oppia-about-section-left .oppia-about-section-title,
-    .oppia-about-section-title-white-desktop {
+    .oppia-about-section-title-white-desktop,
+    .oppia-about-page-section .oppia-about-section-title {
       display: none;
     }
-    .oppia-about-page-section .oppia-about-section-title-mobile {
-      color: #333;
-      display: block;
-      font-family: "Capriola", Arial, sans-serif;
-      font-size: 25px;
-      margin: 0;
-      margin-right: 2vw;
-      padding-bottom: 3vh;
-      text-align: left;
-      width: 100%;
-    }
+    .oppia-about-page-section .oppia-about-section-title-mobile,
     .oppia-about-page-section .oppia-about-section-title-mobile-white {
-      color: #fff;
-      display: block;
-      font-family: "Capriola", Arial, sans-serif;
       font-size: 25px;
       margin: 0;
       margin-right: 2vw;
@@ -247,20 +240,21 @@
       width: 100%;
     }
     .oppia-about-page-section .oppia-about-section-content,
-    .oppia-about-section-content-white-desktop {
+    .oppia-about-page-section .oppia-about-section-content-white-desktop,
+    .oppia-about-page-section .oppia-about-section-button-container,
+    .oppia-about-page-section .oppia-about-section-right-reverse,
+    .oppia-about-page-section .oppia-about-section-left-reverse {
       width: 100%;
     }
-    .oppia-about-page-section .oppia-about-section-button-container {
-    width: 100%;
   }
-  .oppia-about-section-title {
-      display: none;
+  @media (orientation: landscape) and (max-width: 640px) {
+    .oppia-about-page-section .oppia-about-section-button {
+      font-size: 16px;
+      padding: 6px;
     }
-    .oppia-about-section-right-reverse {
-    width: 100%;
+    .oppia-about-page-section .oppia-about-section-content,
+    .oppia-about-page-section .oppia-about-section-content-white-desktop {
+      padding-bottom: 8vh;
     }
-  .oppia-about-section-left-reverse {
-    width: 100%;
-  }  
   }
 </style>

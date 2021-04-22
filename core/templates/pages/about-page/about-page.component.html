@@ -37,10 +37,9 @@
   <oppia-about-page-section
   [i18nHeading]="'I18N_ABOUT_PAGE_OUR_OUTCOMES'"
   [i18nParagraph]="'I18N_ABOUT_PAGE_OUR_OUTCOMES_CONTENT'"
-  class="oppia-about-page-section-three"
   [imageFilename]="'/about/graph.svg'"
   [isTextWhite]="true"
-  [isSvg]="true">
+  [isSvg]="true" class="oppia-about-page-section-three">
   </oppia-about-page-section>
 
   <oppia-about-page-section
@@ -51,8 +50,7 @@
   [imageFilename]="'/about/fraction_lesson.png'"
   [onClickButton]="onClickVisitClassroomButton"
   [isButtonPresent]="true"
-  [hasBorder]="true"
-  class="oppia-about-page-section-four">
+  [hasBorder]="true" class="oppia-about-page-section-four">
   </oppia-about-page-section>
 
   <oppia-about-page-section
@@ -64,8 +62,7 @@
   [onClickButton]="onClickBrowseLibraryButton"
   [isButtonPresent]="true"
   [isSvg]="false"
-  [hasBorder]="true"
-  class="oppia-about-page-section-five">
+  [hasBorder]="true" class="oppia-about-page-section-five">
   </oppia-about-page-section>
 
   <oppia-about-page-section
@@ -77,8 +74,7 @@
   [onClickButton]="onClickCreateLessonButton"
   [isButtonPresent]="true"
   [isSectionReversed]="true"
-  [isSvg]="false"
-  class="oppia-about-page-section-six">
+  [isSvg]="false" class="oppia-about-page-section-six">
   </oppia-about-page-section>
   <div class="oppia-about-page-section-seven">
     <h2 class="oppia-get-started-title oppia-about-page-title" [innerHTML]="'I18N_ABOUT_PAGE_SECTION_SEVEN_TITLE' | translate"></h2>
@@ -369,7 +365,7 @@
   }
   @media (max-width: 1110px) {
     .oppia-about-page-section-three {
-      height: 50vh;
+      height: 60vh;
     }
   }
   @media (max-width: 910px) {
@@ -404,12 +400,10 @@
     .oppia-about-page-section-three {
       height: 75vh;
       padding-right: 4vw;
-      padding-top: 10vh;
     }
     .oppia-about-page-section-five {
-      height: 100vh;
+      height: 110vh;
       padding-right: 4vw;
-      padding-top: 10vh;
     }
     .about-page .oppia-about-button {
         padding: 6px;
@@ -424,7 +418,6 @@
       background-size: 100% 130vh, cover;
       height: 130vh;
       padding-right: 4vw;
-      padding-top: 10vh;
     }
     .oppia-about-page-section-one .oppia-about-content,
     .oppia-about-page-section-two .oppia-about-content {
@@ -439,7 +432,6 @@
       background-color: #fff;
       background-size: 100% 80vh, cover;
       height: 80vh;
-      padding-top: 10vh;
     }
     .oppia-about-page-section-seven .oppia-get-started-title,
     .oppia-about-page-section-seven .oppia-about-classroom-button-container-one {
@@ -454,6 +446,9 @@
     }
     .oppia-about-page-section-five {
       height: 120vh;
+    }
+    .oppia-about-page-section-two .oppia-section-two-content {
+      padding-left: 5vw;
     }
   }
 
@@ -493,7 +488,7 @@
       max-height: fit-content;
     }
     .about-page .oppia-about-page-section-five {
-      height: 100vh;
+      height: 120vh;
       max-height: fit-content;
     }
     .about-page .oppia-about-page-section-two {
@@ -638,8 +633,8 @@
         height: 185vh;
       }
       .about-page .oppia-about-page-section-six {
-        background-size: 100% 160vh, cover;
-        height: 160vh;
+        background-size: 100% 170vh, cover;
+        height: 170vh;
       }
       .oppia-about-page-section-seven .oppia-get-started-title {
         padding-bottom: 10vh;

@@ -27,7 +27,6 @@ import { UserService } from 'services/user.service';
 import { WindowRef } from
   'services/contextual/window-ref.service';
 import constants from 'assets/constants';
-import { AboutPageSectionComponent } from './about-page-section.component';
 
 @Component({
   selector: 'about-page',

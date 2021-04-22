@@ -33,7 +33,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'about-page-section',
+    'about-page-section.component.ts',
     'admin-config-tab.directive.ts',
     'admin-misc-tab.directive.ts',
     'admin-page.directive.ts',
