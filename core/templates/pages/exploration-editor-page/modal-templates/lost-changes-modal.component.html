@@ -8,7 +8,7 @@
     draft was overwritten by changes on another machine.
   </p>
 
-  <p ng-show="hasLostChanges">
+  <p *ngIf="hasLostChanges">
     The lost changes are displayed below. You may want to copy and
     paste these changes before discarding them.
   </p>
