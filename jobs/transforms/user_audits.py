@@ -77,7 +77,7 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
                 incorrect_keys.append(key)
 
         if incorrect_keys:
-            yield audit_errors.ModelIncorrectKeyError(model)
+            yield audit_errors.ModelIncorrectKeyError(model, incorrect_keys)
 
 
 @audit_decorators.AuditsExisting(user_models.UserQueryModel)

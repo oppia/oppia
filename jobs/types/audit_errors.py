@@ -183,10 +183,10 @@ class ModelExpiringError(BaseAuditError):
 class ModelIncorrectKeyError(BaseAuditError):
     """Error class for incorrect key in PendingDeletionRequestModel."""
 
-    def __init__(self, model):
+    def __init__(self, model, incorrect_keys):
         super(ModelIncorrectKeyError, self).__init__(model)
         self.message = 'Entity id %s: contains keys %s that are not allowed' % (
-                        item.id, incorrect_keys)
+                        model.id, incorrect_keys)
 
 
 class ModelRelationshipError(BaseAuditError):
