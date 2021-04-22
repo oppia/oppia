@@ -296,208 +296,206 @@ def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    with common.managed_cloud_datastore_emulator():
-        for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-            if not os.path.exists(os.path.dirname(directory)):
-                raise Exception('Directory %s does not exist.' % directory)
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
+        if not os.path.exists(os.path.dirname(directory)):
+            raise Exception('Directory %s does not exist.' % directory)
 
-            # The directories should only be inserted starting at index 1. See
-            # https://stackoverflow.com/a/10095099 and
-            # https://stackoverflow.com/q/10095037 for more details.
-            sys.path.insert(1, directory)
+        # The directories should only be inserted starting at index 1. See
+        # https://stackoverflow.com/a/10095099 and
+        # https://stackoverflow.com/q/10095037 for more details.
+        sys.path.insert(1, directory)
 
-        common.fix_third_party_imports()
+    common.fix_third_party_imports()
 
-        if parsed_args.generate_coverage_report:
-            pythonpath_components = [COVERAGE_DIR]
-            if os.environ.get('PYTHONPATH'):
-                pythonpath_components.append(os.environ.get('PYTHONPATH'))
-            os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
+    if parsed_args.generate_coverage_report:
+        pythonpath_components = [COVERAGE_DIR]
+        if os.environ.get('PYTHONPATH'):
+            pythonpath_components.append(os.environ.get('PYTHONPATH'))
+        os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
-        print(sys.path)
+    test_specs_provided = sum([
+        1 if argument else 0
+        for argument in (
+            parsed_args.test_target,
+            parsed_args.test_path,
+            parsed_args.test_shard
+        )
+    ])
 
-        test_specs_provided = sum([
-            1 if argument else 0
-            for argument in (
-                parsed_args.test_target,
-                parsed_args.test_path,
-                parsed_args.test_shard
-            )
-        ])
+    if test_specs_provided > 1:
+        raise Exception(
+            'At most one of test_path, test_target and test_shard may '
+            'be specified.')
+    if parsed_args.test_path and '.' in parsed_args.test_path:
+        raise Exception('The delimiter in test_path should be a slash (/)')
+    if parsed_args.test_target and '/' in parsed_args.test_target:
+        raise Exception('The delimiter in test_target should be a dot (.)')
 
-        if test_specs_provided > 1:
-            raise Exception(
-                'At most one of test_path, test_target and test_shard may '
-                'be specified.')
-        if parsed_args.test_path and '.' in parsed_args.test_path:
-            raise Exception('The delimiter in test_path should be a slash (/)')
-        if parsed_args.test_target and '/' in parsed_args.test_target:
-            raise Exception('The delimiter in test_target should be a dot (.)')
-
-        if parsed_args.test_target:
-            if '_test' in parsed_args.test_target:
-                all_test_targets = [parsed_args.test_target]
-            else:
-                python_utils.PRINT('')
-                python_utils.PRINT(
-                    '---------------------------------------------------------')
-                python_utils.PRINT(
-                    'WARNING : test_target flag should point to the test file.')
-                python_utils.PRINT(
-                    '---------------------------------------------------------')
-                python_utils.PRINT('')
-                time.sleep(3)
-                python_utils.PRINT('Redirecting to its corresponding test file...')
-                all_test_targets = [parsed_args.test_target + '_test']
-        elif parsed_args.test_shard:
-            validation_error = _check_shards_match_tests(
-                include_load_tests=False)
-            if validation_error:
-                raise Exception(validation_error)
-            all_test_targets = _get_all_test_targets_from_shard(
-                parsed_args.test_shard)
+    if parsed_args.test_target:
+        if '_test' in parsed_args.test_target:
+            all_test_targets = [parsed_args.test_target]
         else:
-            include_load_tests = not parsed_args.exclude_load_tests
-            all_test_targets = _get_all_test_targets_from_path(
-                test_path=parsed_args.test_path,
-                include_load_tests=include_load_tests)
-
-        # Prepare tasks.
-        max_concurrent_runs = 25
-        concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
-        semaphore = threading.Semaphore(concurrent_count)
-
-        task_to_taskspec = {}
-        tasks = []
-        for test_target in all_test_targets:
-            test = TestingTaskSpec(
-                test_target, parsed_args.generate_coverage_report)
-            task = concurrent_task_utils.create_task(
-                test.run, parsed_args.verbose, semaphore, name=test_target,
-                report_enabled=False)
-            task_to_taskspec[task] = test
-            tasks.append(task)
-
-        task_execution_failed = False
-        try:
-            concurrent_task_utils.execute_tasks(tasks, semaphore)
-        except Exception:
-            task_execution_failed = True
-
-        for task in tasks:
-            if task.exception:
-                concurrent_task_utils.log(
-                    python_utils.convert_to_bytes(task.exception.args[0]))
-
-        python_utils.PRINT('')
-        python_utils.PRINT('+------------------+')
-        python_utils.PRINT('| SUMMARY OF TESTS |')
-        python_utils.PRINT('+------------------+')
-        python_utils.PRINT('')
-
-        # Check we ran all tests as expected.
-        total_count = 0
-        total_errors = 0
-        total_failures = 0
-        for task in tasks:
-            spec = task_to_taskspec[task]
-
-            if not task.finished:
-                python_utils.PRINT('CANCELED  %s' % spec.test_target)
-                test_count = 0
-            elif task.exception and 'No tests were run' in task.exception.args[0]:
-                python_utils.PRINT(
-                    'ERROR     %s: No tests found.' % spec.test_target)
-                test_count = 0
-            elif task.exception:
-                exc_str = task.exception.args[0]
-                python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
-
-                tests_failed_regex_match = re.search(
-                    r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
-                    '([0-9]+) failures',
-                    task.exception.args[0]
-                )
-
-                try:
-                    test_count = int(tests_failed_regex_match.group(1))
-                    errors = int(tests_failed_regex_match.group(2))
-                    failures = int(tests_failed_regex_match.group(3))
-                    total_errors += errors
-                    total_failures += failures
-                    python_utils.PRINT('FAILED    %s: %s errors, %s failures' % (
-                        spec.test_target, errors, failures))
-                except AttributeError:
-                    # There was an internal error, and the tests did not run (The
-                    # error message did not match `tests_failed_regex_match`).
-                    test_count = 0
-                    total_errors += 1
-                    python_utils.PRINT('')
-                    python_utils.PRINT(
-                        '------------------------------------------------------')
-                    python_utils.PRINT(
-                        '    WARNING: FAILED TO RUN %s' % spec.test_target)
-                    python_utils.PRINT('')
-                    python_utils.PRINT(
-                        '    This is most likely due to an import error.')
-                    python_utils.PRINT(
-                        '------------------------------------------------------')
-            else:
-                try:
-                    tests_run_regex_match = re.search(
-                        r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
-                        task.task_results[0].get_report()[0])
-                    test_count = int(tests_run_regex_match.group(1))
-                    test_time = float(tests_run_regex_match.group(2))
-                    python_utils.PRINT(
-                        'SUCCESS   %s: %d tests (%.1f secs)' %
-                        (spec.test_target, test_count, test_time))
-                except Exception:
-                    python_utils.PRINT(
-                        'An unexpected error occurred. '
-                        'Task output:\n%s' % task.task_results[0].get_report()[0])
-
-            total_count += test_count
-
-        python_utils.PRINT('')
-        if total_count == 0:
-            raise Exception('WARNING: No tests were run.')
-
-        python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
-            total_count, '' if total_count == 1 else 's',
-            len(tasks), '' if len(tasks) == 1 else 'es'))
-
-        if total_errors or total_failures:
+            python_utils.PRINT('')
             python_utils.PRINT(
-                '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+                '---------------------------------------------------------')
+            python_utils.PRINT(
+                'WARNING : test_target flag should point to the test file.')
+            python_utils.PRINT(
+                '---------------------------------------------------------')
+            python_utils.PRINT('')
+            time.sleep(3)
+            python_utils.PRINT('Redirecting to its corresponding test file...')
+            all_test_targets = [parsed_args.test_target + '_test']
+    elif parsed_args.test_shard:
+        validation_error = _check_shards_match_tests(
+            include_load_tests=False)
+        if validation_error:
+            raise Exception(validation_error)
+        all_test_targets = _get_all_test_targets_from_shard(
+            parsed_args.test_shard)
+    else:
+        include_load_tests = not parsed_args.exclude_load_tests
+        all_test_targets = _get_all_test_targets_from_path(
+            test_path=parsed_args.test_path,
+            include_load_tests=include_load_tests)
+
+    # Prepare tasks.
+    max_concurrent_runs = 25
+    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
+    semaphore = threading.Semaphore(concurrent_count)
+
+    task_to_taskspec = {}
+    tasks = []
+    for test_target in all_test_targets:
+        test = TestingTaskSpec(
+            test_target, parsed_args.generate_coverage_report)
+        task = concurrent_task_utils.create_task(
+            test.run, parsed_args.verbose, semaphore, name=test_target,
+            report_enabled=False)
+        task_to_taskspec[task] = test
+        tasks.append(task)
+
+    task_execution_failed = False
+    try:
+        with common.managed_cloud_datastore_emulator():
+            concurrent_task_utils.execute_tasks(tasks, semaphore)
+    except Exception:
+        task_execution_failed = True
+
+    for task in tasks:
+        if task.exception:
+            concurrent_task_utils.log(
+                python_utils.convert_to_bytes(task.exception.args[0]))
+
+    python_utils.PRINT('')
+    python_utils.PRINT('+------------------+')
+    python_utils.PRINT('| SUMMARY OF TESTS |')
+    python_utils.PRINT('+------------------+')
+    python_utils.PRINT('')
+
+    # Check we ran all tests as expected.
+    total_count = 0
+    total_errors = 0
+    total_failures = 0
+    for task in tasks:
+        spec = task_to_taskspec[task]
+
+        if not task.finished:
+            python_utils.PRINT('CANCELED  %s' % spec.test_target)
+            test_count = 0
+        elif task.exception and 'No tests were run' in task.exception.args[0]:
+            python_utils.PRINT(
+                'ERROR     %s: No tests found.' % spec.test_target)
+            test_count = 0
+        elif task.exception:
+            exc_str = task.exception.args[0]
+            python_utils.PRINT(exc_str[exc_str.find('='): exc_str.rfind('-')])
+
+            tests_failed_regex_match = re.search(
+                r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
+                '([0-9]+) failures',
+                task.exception.args[0]
+            )
+
+            try:
+                test_count = int(tests_failed_regex_match.group(1))
+                errors = int(tests_failed_regex_match.group(2))
+                failures = int(tests_failed_regex_match.group(3))
+                total_errors += errors
+                total_failures += failures
+                python_utils.PRINT('FAILED    %s: %s errors, %s failures' % (
+                    spec.test_target, errors, failures))
+            except AttributeError:
+                # There was an internal error, and the tests did not run (The
+                # error message did not match `tests_failed_regex_match`).
+                test_count = 0
+                total_errors += 1
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '------------------------------------------------------')
+                python_utils.PRINT(
+                    '    WARNING: FAILED TO RUN %s' % spec.test_target)
+                python_utils.PRINT('')
+                python_utils.PRINT(
+                    '    This is most likely due to an import error.')
+                python_utils.PRINT(
+                    '------------------------------------------------------')
         else:
-            python_utils.PRINT('All tests passed.')
+            try:
+                tests_run_regex_match = re.search(
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
+                    task.task_results[0].get_report()[0])
+                test_count = int(tests_run_regex_match.group(1))
+                test_time = float(tests_run_regex_match.group(2))
+                python_utils.PRINT(
+                    'SUCCESS   %s: %d tests (%.1f secs)' %
+                    (spec.test_target, test_count, test_time))
+            except Exception:
+                python_utils.PRINT(
+                    'An unexpected error occurred. '
+                    'Task output:\n%s' % task.task_results[0].get_report()[0])
 
-        if task_execution_failed:
-            raise Exception('Task execution failed.')
-        elif total_errors or total_failures:
-            raise Exception(
-                '%s errors, %s failures' % (total_errors, total_failures))
+        total_count += test_count
 
-        if parsed_args.generate_coverage_report:
-            subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
-            process = subprocess.Popen(
-                [sys.executable, COVERAGE_MODULE_PATH, 'report',
-                 '--omit="%s*","third_party/*","/usr/share/*"'
-                 % common.OPPIA_TOOLS_DIR, '--show-missing'],
-                stdout=subprocess.PIPE)
+    python_utils.PRINT('')
+    if total_count == 0:
+        raise Exception('WARNING: No tests were run.')
 
-            report_stdout, _ = process.communicate()
-            python_utils.PRINT(report_stdout)
+    python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
+        total_count, '' if total_count == 1 else 's',
+        len(tasks), '' if len(tasks) == 1 else 'es'))
 
-            coverage_result = re.search(
-                r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
-            if (coverage_result.group('total') != '100'
-                    and not parsed_args.ignore_coverage):
-                raise Exception('Backend test coverage is not 100%')
+    if total_errors or total_failures:
+        python_utils.PRINT(
+            '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+    else:
+        python_utils.PRINT('All tests passed.')
 
-        python_utils.PRINT('')
-        python_utils.PRINT('Done!')
+    if task_execution_failed:
+        raise Exception('Task execution failed.')
+    elif total_errors or total_failures:
+        raise Exception(
+            '%s errors, %s failures' % (total_errors, total_failures))
+
+    if parsed_args.generate_coverage_report:
+        subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
+        process = subprocess.Popen(
+            [sys.executable, COVERAGE_MODULE_PATH, 'report',
+             '--omit="%s*","third_party/*","/usr/share/*"'
+             % common.OPPIA_TOOLS_DIR, '--show-missing'],
+            stdout=subprocess.PIPE)
+
+        report_stdout, _ = process.communicate()
+        python_utils.PRINT(report_stdout)
+
+        coverage_result = re.search(
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+        if (coverage_result.group('total') != '100'
+                and not parsed_args.ignore_coverage):
+            raise Exception('Backend test coverage is not 100%')
+
+    python_utils.PRINT('')
+    python_utils.PRINT('Done!')
 
 
 if __name__ == '__main__':
