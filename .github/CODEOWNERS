@@ -48,25 +48,23 @@
 
 
 # Angular Migration team
-# TODO(#12350): For the following 17 files,
-# replace @arpit1912 with @darksun27 after 2021-04-10.
-/core/templates/components/shared-component.module.ts @srijanreddy98 @arpit1912
-/core/templates/services/loader.service*.ts @srijanreddy98 @arpit1912
-/core/templates/components/material.module.ts @srijanreddy98 @arpit1912
-/core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @arpit1912
-/core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @arpit1912
-/core/templates/base-components/oppia-root.directive.html @srijanreddy98 @arpit1912
-/core/templates/filters/translate.pipe.ts @srijanreddy98 @arpit1912
-/core/templates/services/angular-services.index.ts @srijanreddy98 @arpit1912
-/core/templates/services/contextual/logger.service.ts @srijanreddy98 @arpit1912
-/core/templates/services/contextual/logger.service.spec.ts @srijanreddy98 @arpit1912
-/core/templates/services/i18n-language-code.service.ts @srijanreddy98 @arpit1912
-/core/templates/services/loader.service*.ts @srijanreddy98 @arpit1912
-/core/templates/services/question-validation.service*.ts @srijanreddy98 @arpit1912
-/core/templates/services/request-interceptor.service*.ts @srijanreddy98 @arpit1912
-/core/templates/services/translate.service.ts @srijanreddy98 @arpit1912
-/core/templates/services/translations-backend-api.service.ts @srijanreddy98 @arpit1912
-/core/templates/services/UpgradedServices.ts @srijanreddy98 @arpit1912
+/core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
+/core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
+/core/templates/components/material.module.ts @srijanreddy98 @darksun27
+/core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @darksun27
+/core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @darksun27
+/core/templates/base-components/oppia-root.directive.html @srijanreddy98 @darksun27
+/core/templates/filters/translate.pipe.ts @srijanreddy98 @darksun27
+/core/templates/services/angular-services.index.ts @srijanreddy98 @darksun27
+/core/templates/services/contextual/logger.service.ts @srijanreddy98 @darksun27
+/core/templates/services/contextual/logger.service.spec.ts @srijanreddy98 @darksun27
+/core/templates/services/i18n-language-code.service.ts @srijanreddy98 @darksun27
+/core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
+/core/templates/services/question-validation.service*.ts @srijanreddy98 @darksun27
+/core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
+/core/templates/services/translate.service.ts @srijanreddy98 @darksun27
+/core/templates/services/translations-backend-api.service.ts @srijanreddy98 @darksun27
+/core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek
 /tsconfig-strict.json @vojtechjelinek
@@ -193,6 +191,7 @@
 /core/domain/summary_services*.py @aks681
 /core/domain/value_generators_domain*.py @vojtechjelinek
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
+/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
@@ -257,7 +256,9 @@
 /core/templates/components/profile-link-directives/ @srijanreddy98
 /core/templates/components/summary-tile/ @srijanreddy98
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
+/core/templates/directives/directives.module.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/directives/ng-init.directive.ts @srijanreddy98
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
 /core/templates/services/attribution.service*.ts @srijanreddy98
@@ -362,8 +363,8 @@
 
 
 # Navigation bar project.
-/core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
-/core/templates/components/button-directives/create-activity-button.directive.html @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.ts @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.html @nithusha21
 /core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/services/bottom-navbar-status.service*.ts @nithusha21
 /core/templates/services/navigation.service*.ts @nithusha21
@@ -379,6 +380,7 @@
 /core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
 /core/domain/rights_domain*.py @aks681
+/core/domain/subtopic_validators*.py @vojtechjelinek
 /core/templates/components/concept-card/ @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
@@ -447,19 +449,16 @@
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
-/main_mail.py @aks681
 /main.py @DubeySandeep @nithusha21
 /feconf.py @DubeySandeep @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
-/core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/audit_validators*.py @vojtechjelinek
 /core/domain/base_model_validators*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
 /core/domain/job_validators*.py @vojtechjelinek
-/core/domain/prod_validators*.py @vojtechjelinek
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
 /core/jobs*.py @brianrodri
@@ -520,6 +519,7 @@
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
+/core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
@@ -672,7 +672,7 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/linters/pre_commit_linter.py in sync with the modifications.
+# in scripts/linters/codeowner_linter.py in sync with the modifications.
 # TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
 # 8 lines.
 /core/templates/services/svg-sanitizer.service.ts @BenHenning

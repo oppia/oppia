@@ -236,8 +236,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     THREAD_ID_2 = 'thread_id_2'
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
-    USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
-    USER_1_REPLY_TO_ID_2 = 'user_1_reply_to_id_thread_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     USER_1_EMAIL = 'user1@example.com'
@@ -593,27 +591,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             display_alias=self.GENERIC_DISPLAY_ALIAS_2
         ).put()
 
-        # Setup for GeneralFeedbackReplyToId.
-        user_two_fake_hash_lambda_one = (
-            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_1)
-        user_two_fake_hash_one = self.swap(
-            utils, 'convert_to_hash', user_two_fake_hash_lambda_one)
-        with user_two_fake_hash_one:
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_1)
-            model.update_timestamps()
-            model.put()
-
-        user_two_deterministic_hash_lambda_two = (
-            lambda rand_int, reply_to_id_length: self.USER_1_REPLY_TO_ID_2)
-        user_two_deterministic_hash_two = self.swap(
-            utils, 'convert_to_hash', user_two_deterministic_hash_lambda_two)
-        with user_two_deterministic_hash_two:
-            model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
-                self.USER_ID_1, self.THREAD_ID_2)
-            model.update_timestamps()
-            model.put()
-
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_1_id',
             target_type='exploration',
@@ -826,7 +803,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'voiced_exploration_ids': []
         }
         exploration_data = {}
-        reply_to_data = {}
         general_feedback_message_data = {}
         general_feedback_thread_data = {}
         general_feedback_thread_user_data = {}
@@ -917,7 +893,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'collection_rights': collection_rights_data,
             'general_suggestion': general_suggestion_data,
             'exploration_rights': exploration_rights_data,
-            'general_feedback_email_reply_to_id': reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,
@@ -1324,15 +1299,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
         }
 
-        expected_reply_to_data = {
-            self.THREAD_ID_1: {
-                'reply_to_id': self.USER_1_REPLY_TO_ID_1
-            },
-            self.THREAD_ID_2: {
-                'reply_to_id': self.USER_1_REPLY_TO_ID_2
-            }
-        }
-
         expected_subscriptions_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
@@ -1507,7 +1473,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_collection_rights_data,
             'general_suggestion': expected_general_suggestion_data,
             'exploration_rights': expected_exploration_rights_data,
-            'general_feedback_email_reply_to_id': expected_reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_proficiency': expected_contrib_proficiency_data,

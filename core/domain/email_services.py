@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
-from core.domain import email_domain
 from core.platform import models
 
 import feconf
@@ -27,67 +26,6 @@ import python_utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 platform_email_services = models.Registry.import_email_services()
-
-
-def get_feedback_thread_reply_info_from_model(model):
-    """Converts GeneralFeedbackEmailReplyToIdModel to a FeedbackThreadReplyInfo.
-
-    Args:
-        model: GeneralFeedbackEmailReplyToIdModel. The model to be converted.
-
-    Returns:
-        FeedbackThreadReplyInfo. The resulting domain object.
-    """
-    return email_domain.FeedbackThreadReplyInfo(
-        model.id, model.reply_to_id)
-
-
-def get_feedback_thread_reply_info_by_reply_to_id(reply_to_id):
-    """Gets the domain object corresponding to the model which is fetched by
-    reply-to-id field.
-
-    Args:
-        reply_to_id: str. The reply_to_id to search for.
-
-    Returns:
-        FeedbackThreadReplyInfo or None. The corresponding domain object.
-    """
-    model = email_models.GeneralFeedbackEmailReplyToIdModel.get_by_reply_to_id(
-        reply_to_id)
-    if model is None:
-        return None
-    return get_feedback_thread_reply_info_from_model(model)
-
-
-def get_feedback_thread_reply_info_by_user_and_thread(user_id, thread_id):
-    """Gets the domain object corresponding to the model which is fetched by
-    user_id and thread_id.
-
-    Args:
-        user_id: str. The ID of the user.
-        thread_id: str. The ID of the thread.
-
-    Returns:
-        FeedbackThreadReplyInfo or None. The corresponding domain object.
-    """
-    model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
-        user_id, thread_id, strict=False)
-    if model is None:
-        return None
-    return get_feedback_thread_reply_info_from_model(model)
-
-
-def _get_incoming_email_address(reply_to_id):
-    """Gets the incoming email address. The client is responsible for recording
-    any audit logs.
-
-    Args:
-        reply_to_id: str. The unique id of the sender.
-
-    Returns:
-        str. The email address of the sender.
-    """
-    return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 
 
 def _is_email_valid(email_address):
@@ -135,7 +73,7 @@ def _is_sender_email_valid(sender_email):
 
 def send_mail(
         sender_email, recipient_email, subject, plaintext_body,
-        html_body, bcc_admin=False, reply_to_id=None):
+        html_body, bcc_admin=False):
     """Sends an email.
 
     In general this function should only be called from
@@ -153,8 +91,6 @@ def send_mail(
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
         bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
-        reply_to_id: str|None. The unique id of the sender. Format must be
-            utf-8.
 
     Raises:
         Exception. The configuration in feconf.py forbids emails from being
@@ -176,13 +112,10 @@ def send_mail(
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
     bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
-    reply_to = (
-        _get_incoming_email_address(reply_to_id)
-        if reply_to_id else '')
     response = platform_email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject.encode(encoding='utf-8'),
         plaintext_body.encode(encoding='utf-8'),
-        html_body.encode(encoding='utf-8'), bcc, reply_to, None)
+        html_body.encode(encoding='utf-8'), bcc, '', None)
     if not response:
         raise Exception((
             'Email to %s failed to send. Please try again later or '
