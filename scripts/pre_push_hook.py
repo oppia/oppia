@@ -120,16 +120,20 @@ def get_remote_name():
     task = subprocess.Popen(
         get_remotes_name_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
+    print(out)
     remotes = python_utils.UNICODE(out)[:-1].split('\n')
+    print(remotes)
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (
                 'git config --get remote.%s.url' % remote).split()
+            print(get_remotes_url_cmd)
             task = subprocess.Popen(
                 get_remotes_url_cmd, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
+                print(remote_url)
                 if remote_url.endswith(b'oppia/oppia.git\n'):
                     remote_num += 1
                     remote_name = remote
