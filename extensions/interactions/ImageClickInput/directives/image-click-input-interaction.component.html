@@ -55,11 +55,11 @@
     <div *ngIf="highlightRegionsOnHover">
       <div *ngFor="let region of allRegions; let idx = index"
            class="oppia-click-region position-absolute"
-           [style.height] = "getRegionDimensions(idx).height + 'px'"
-           [style.width] = "getRegionDimensions(idx).width + 'px'"
-           [style.left] = "getRegionDimensions(idx).left + 'px'"
-           [style.top] = "getRegionDimensions(idx).top + 'px'"
-           [style.display] = "getRegionDisplay(region.label)">
+           [style.height]="getRegionDimensions(idx).height + 'px'"
+           [style.width]="getRegionDimensions(idx).width + 'px'"
+           [style.left]="getRegionDimensions(idx).left + 'px'"
+           [style.top]="getRegionDimensions(idx).top + 'px'"
+           [style.display]="getRegionDisplay(region.label)">
       </div>
     </div>
     <div *ngIf="!highlightRegionsOnHover && !interactionIsActive"
