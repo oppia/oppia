@@ -22,18 +22,22 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { GraphVizComponent } from './directives/graph-viz.component';
 import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
 import { ResponseGraphInput } from './directives/oppia-response-graph-input.component';
 import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
+import { TranslateModule } from 'filters/translate.module';
+import { MaterialModule } from 'components/material.module';
+import { DirectivesModule } from 'directives/directives.module';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     FormsModule,
-    SharedComponentsModule
+    MaterialModule,
+    DirectivesModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveGraphInput,
