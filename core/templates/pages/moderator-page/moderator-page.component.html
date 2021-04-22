@@ -53,7 +53,7 @@
                 <td>{{ getDatetimeAsString(message.createdOnMsecs) }}</td>
                 <td>
                   <a *ngIf="isMessageFromExploration(message)"
-                    [href]="getExplorationCreateUrl(message.entityId)">
+                     [href]="getExplorationCreateUrl(message.entityId)">
                     {{ message.entityId }}
                   </a>
                 </td>
