@@ -116,7 +116,7 @@ describe('Exploration Html Formatter Service', () => {
       var interactionId = 'TextInput';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-text-input ' +
-        'saved-solution="&quot;This is a correct answer!&quot;" ' +
+        'saved-solution=""This is a correct answer!"" ' +
         'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
         '</oppia-interactive-text-input>';
       expect(

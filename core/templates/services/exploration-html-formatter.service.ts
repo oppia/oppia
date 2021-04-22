@@ -78,25 +78,40 @@ export class ExplorationHtmlFormatterService {
         element, interactionCustomizationArgs));
     let tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
     let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
+    let addSpace = true;
     const getLastAnswer = (): string => {
       let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-        return '[last-answer]="' + propValue + '" ';
+        return '[last-answer]="' + propValue + '"';
       } else {
-        return 'last-answer="' + propValue + '" ';
+        return 'last-answer="' + propValue + '"';
       }
     };
     if (savedSolution) {
       // TODO(#12292): Refactor this once all interactions have been migrated to
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
+      if (addSpace) {
+        directiveOuterHtml += ' ';
+      }
       directiveOuterHtml += (
         'saved-solution="' + JSON.stringify(
           savedSolution.correctAnswer) + '" '
       );
+      addSpace = false;
+    }
+    if (labelForFocusTarget) {
+      if (addSpace) {
+        directiveOuterHtml += ' ';
+      }
+      directiveOuterHtml += (
+        'label-for-focus-target="' + labelForFocusTarget + '" ');
+      addSpace = false;
+    }
+    if (addSpace) {
+      directiveOuterHtml += ' ';
     }
     directiveOuterHtml += (
-      'label-for-focus-target="' + labelForFocusTarget + '" ' +
       getLastAnswer() +
       '></oppia-interactive-' + htmlInteractionId + '>');
     return directiveOuterHtml;
