@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to disallow
- * identifier phrase
+ * @fileoverview Lint check to disallow identifier phrase
  */
 
 'use strict';
@@ -40,7 +39,7 @@ module.exports = {
     }],
     messages: {
       disallowMessage: (
-        'Please do not use word "{{identifierWord}}"')
+        'Please do not use phrase "{{disallowedPhrase}}"')
     },
   },
 
@@ -59,7 +58,7 @@ module.exports = {
               node: node,
               messageId: 'disallowMessage',
               data: {
-                identifierWord: disallowedPhrases[i]
+                disallowedPhrase: disallowedPhrases[i]
               }
             });
           }

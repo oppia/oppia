@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to disallow usage
- * of identifier phrase.
+ * @fileoverview Lint check to disallow identifier phrase
  */
 
 'use strict';
@@ -27,13 +26,13 @@ ruleTester.run('disallow-identifier-phrase', rule, {
   valid: [
     {
       code: (
-        'browser.explodre()'),
+        'SecurityTrustResourceUrl()'),
       options: [{
         disallowedPhrases: ['bypass']
       }],
     }, {
       code: (
-        'browser.explodre()'),
+        'SecurityTrustResourceUrl()'),
       options: [],
     }
   ],
@@ -41,9 +40,31 @@ ruleTester.run('disallow-identifier-phrase', rule, {
   invalid: [
     {
       code:
-      'Bypassbrowser.explore()',
+      'Bypassbrowser.aciveElement()',
       errors: [{
-        message: 'Please do not use word "bypass"',
+        message: 'Please do not use phrase "bypass"',
+        type: 'Identifier',
+      }],
+      options: [{
+        disallowedPhrases: ['bypass']
+      }],
+    },
+    {
+      code:
+      'this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData)',
+      errors: [{
+        message: 'Please do not use phrase "bypass"',
+        type: 'Identifier',
+      }],
+      options: [{
+        disallowedPhrases: ['bypass']
+      }],
+    },
+    {
+      code:
+      'SecurityTrustResourceUrlbypass()',
+      errors: [{
+        message: 'Please do not use phrase "bypass"',
         type: 'Identifier',
       }],
       options: [{

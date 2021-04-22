@@ -32,7 +32,6 @@ CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 # file.
 CODEOWNER_IMPORTANT_PATHS = [
     '/core/templates/services/svg-sanitizer.service.ts',
-    '/scripts/linters/warranted_angular_security_bypasses.py',
     '/core/controllers/acl_decorators*.py',
     '/core/controllers/base*.py',
     '/core/domain/html*.py',
