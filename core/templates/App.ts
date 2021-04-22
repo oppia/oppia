@@ -28,7 +28,7 @@ import 'hammerjs';
 import 'leaflet/dist/leaflet.css';
 require('app.constants.ajs.ts');
 
-require('components/button-directives/create-activity-button.directive.ts');
+require('components/button-directives/create-activity-button.component.ts');
 require('components/button-directives/social-buttons.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +

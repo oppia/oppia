@@ -83,7 +83,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'convert-to-plain-text.pipe.ts',
     'coord-two-dim-editor.component.ts',
     'correctness-footer.directive.ts',
-    'create-activity-button.directive.ts',
+    'create-activity-button.component.ts',
     'csrf-token.service.ts',
     'current-interaction.service.ts',
     'drag-and-drop-positive-int-editor.component.ts',
