@@ -16,7 +16,7 @@
  * @fileoverview Controller for the topic preview tab.
  */
 
-require('components/summary-tile/subtopic-summary-tile.directive.ts');
+require('components/summary-tile/subtopic-summary-tile.component.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 require(

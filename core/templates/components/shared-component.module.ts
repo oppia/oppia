@@ -62,7 +62,7 @@ import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-edito
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
-import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 
 
@@ -133,7 +133,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     WrapTextWithEllipsisPipe,
@@ -197,7 +197,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,

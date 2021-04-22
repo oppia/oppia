@@ -312,7 +312,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtitled-unicode-editor.directive.ts',
     'subtopic-page.model.ts',
     'subtopic-preview-tab.component.ts',
-    'subtopic-summary-tile.directive.ts',
+    'subtopic-summary-tile.component.ts',
     'subtopic.model.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
     'summary-list-header.component.ts',

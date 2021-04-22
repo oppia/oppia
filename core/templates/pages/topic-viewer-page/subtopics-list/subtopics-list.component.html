@@ -9,11 +9,11 @@
       </div>
       <div class="subtopics-container">
         <div *ngFor="let subtopic of subtopicsList">
-          <subtopic-summary-tile [classroomUrlFragment]="classroomUrlFragment"
-                                 [subtopic]="subtopic"
-                                 [topicId]="topicId"
-                                 [topicUrlFragment]="topicUrlFragment">
-          </subtopic-summary-tile>
+          <oppia-subtopic-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+                                       [subtopic]="subtopic"
+                                       [topicId]="topicId"
+                                       [topicUrlFragment]="topicUrlFragment">
+          </oppia-subtopic-summary-tile>
         </div>
       </div>
     </mat-card>
@@ -46,7 +46,7 @@
     margin-left: 20px;
   }
 
-  .subtopics-list subtopic-summary-tile {
+  .subtopics-list oppia-subtopic-summary-tile {
     margin-right: 2vw;
   }
 

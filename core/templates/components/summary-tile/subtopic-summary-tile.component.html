@@ -1,27 +1,27 @@
-<div class="subtopic-card protractor-test-subtopic-tile" ng-click="$ctrl.openSubtopicPage()" ng-class="{'disabled-link': !$ctrl.classroomUrlFragment}">
+<div class="subtopic-card protractor-test-subtopic-tile" (click)="openSubtopicPage()" [ngClass]="{'disabled-link': !classroomUrlFragment}">
   <div class="subtopic-thumbnail"
-       ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
-    <img ng-src="<[$ctrl.thumbnailUrl]>"
+      [ngStyle]="{ 'background-color' : subtopic.getThumbnailBgColor()}">
+    <img [src]="thumbnailUrl"
          class="img-thumbnail"
          alt=""
-         ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
+         [ngStyle]="{ 'background-color': subtopic.getThumbnailBgColor() }">
   </div>
   <div class="subtopic-title">
-    <[$ctrl.subtopic.getTitle()]>
+    {{ subtopic.getTitle() }}
   </div>
 </div>
 <style>
-  subtopic-summary-tile .subtopic-card {
+  .subtopic-card {
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     cursor: pointer;
     width: 170px;
   }
 
-  subtopic-summary-tile .subtopic-card:focus {
+  .subtopic-card:focus {
     outline: 0;
   }
 
-  subtopic-summary-tile .subtopic-thumbnail {
+  .subtopic-thumbnail {
     border: 1px solid #fff;
     border-radius: 0.4em 0.4em 0 0;
     height: 120px;
@@ -30,14 +30,14 @@
     width: 100%;
   }
 
-  subtopic-summary-tile .img-thumbnail {
+  .img-thumbnail {
     border: none;
     border-radius: 0.4em 0.4em 0 0;
     max-height: 100%;
     max-width: 100%;
   }
 
-  subtopic-summary-tile .subtopic-title {
+  .subtopic-title {
     background-color: #BE563C;
     border-radius: 0 0 0.4em 0.4em;
     color: #fff;
@@ -48,9 +48,9 @@
     padding: 8px 12px 16px 12px;
   }
 
-  subtopic-summary-tile .disabled-link,
-  subtopic-summary-tile .disabled-link:hover,
-  subtopic-summary-tile .disabled-link:active {
+  .disabled-link,
+  .disabled-link:hover,
+  .disabled-link:active {
     color: #000;
     cursor: default;
   }
@@ -60,7 +60,7 @@
       width: 150px;
     }
 
-    subtopic-summary-tile .subtopic-title {
+    .subtopic-title {
       font-size: 0.8em;
       height: 85px;
       padding-left: 10px;
@@ -72,7 +72,7 @@
       width: 130px;
     }
 
-    subtopic-summary-tile .subtopic-title {
+    .subtopic-title {
       font-size: 0.8em;
       height: 85px;
     }
@@ -83,11 +83,11 @@
       width: 130px;
     }
 
-    subtopic-summary-tile .subtopic-title {
+    .subtopic-title {
       height: 75px;
     }
 
-    subtopic-summary-tile .subtopic-thumbnail {
+    .subtopic-thumbnail {
       height: 100px;
     }
   }
