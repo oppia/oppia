@@ -23,7 +23,6 @@ from constants import constants
 from core.domain import base_model_validators
 from core.domain import translation_fetchers
 from core.platform import models
-from core.platform.cloud_translate import cloud_translate_services
 
 (base_models,) = models.Registry.import_models([
     models.NAMES.base_model

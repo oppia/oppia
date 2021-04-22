@@ -25,7 +25,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform.cloud_translate import cloud_translate_emulator
-from core.platform.cloud_translate import cloud_translate_services
 
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
@@ -49,10 +48,10 @@ def translate_text(text, source_language, target_language):
         str. The translated text.
     """
     if source_language not in (
-        constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST):
+            constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST):
         raise ValueError('Invalid source language code: %s' % source_language)
     if target_language not in (
-        constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST):
+            constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST):
         raise ValueError('Invalid target language code: %s' % target_language)
     if source_language == target_language:
         return text

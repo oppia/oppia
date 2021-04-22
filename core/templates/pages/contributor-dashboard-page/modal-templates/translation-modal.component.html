@@ -35,24 +35,24 @@
       </angular-html-bind-wrapper>
     </div>
     <div *ngIf="offerMachineTranslation && !loadingData && !uploadingTranslation" class="oppia-machine-translation-container">
-    <div class="machine-translation-header-bar">Computer-Generated Translation
+      <div class="machine-translation-header-bar">Computer-Generated Translation
         <i class="fa fa-chevron-down oppia-toggle-chevron"
-      [hidden]="hideMachineTranslation"
-      aria-hidden="true" (click)="toggleMachineTranslation()">
-      </i>
-      <i class="fa fa-chevron-up oppia-toggle-chevron"
-      [hidden]="!hideMachineTranslation"
-      aria-hidden="true" (click)="toggleMachineTranslation()">
-    </i>
-    </div>
-    <div [hidden]=hideMachineTranslation>
-    <p [hidden]="machineTranslatedText">Loading translation...</p>
-    <angular-html-bind-wrapper  *ngIf="machineTranslatedText" [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                 (click)="onContentClick($event)"
-                                 [htmlData]="machineTranslatedText"
-                                 class="oppia-rte-editor">
-    </angular-html-bind-wrapper>
-    </div>
+           [hidden]="hideMachineTranslation"
+           aria-hidden="true" (click)="toggleMachineTranslation()">
+        </i>
+        <i class="fa fa-chevron-up oppia-toggle-chevron"
+           [hidden]="!hideMachineTranslation"
+           aria-hidden="true" (click)="toggleMachineTranslation()">
+        </i>
+      </div>
+      <div [hidden]="hideMachineTranslation">
+        <p [hidden]="machineTranslatedText">Loading translation...</p>
+        <angular-html-bind-wrapper [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                   (click)="onContentClick($event)"
+                                   [htmlData]="machineTranslatedText"
+                                   class="oppia-rte-editor" *ngIf="machineTranslatedText">
+        </angular-html-bind-wrapper>
+      </div>
     </div>
     <div class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
@@ -131,21 +131,20 @@
   }
   .oppia-machine-translation-container {
     background-color: rgba(251, 251, 251);
-    margin: 15px 0;
-    margin-top: 0;
+    margin: 0 0 15px 0;
     padding: 20px;
   }
   .oppia-toggle-chevron {
     float: right;
     position: absolute;
-    top: 0.25em;
     right: 0;
+    top: 0.25em;
   }
   .machine-translation-header-bar {
     color: rgb(4, 47, 152);
     font-weight: bold;
-    position: relative;
     padding-bottom: 20px;
+    position: relative;
   }
   .oppia-translation-tips-container {
     background-color: #EEE;

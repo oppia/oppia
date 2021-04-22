@@ -341,6 +341,7 @@ import { ExplorationCreationService } from 'components/entity-creation-services/
 import { ImageLocalStorageService } from './image-local-storage.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
+import { MachineTranslatedTextBackendApiService } from 'pages/contributor-dashboard-page/services/machine-translated-text-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -512,6 +513,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['LogicProofRulesService', LogicProofRulesService],
   ['LogicProofValidationService', LogicProofValidationService],
   ['LostChangeObjectFactory', LostChangeObjectFactory],
+  ['MachineTranslatedTextBackendApiService',
+    MachineTranslatedTextBackendApiService],
   ['MathEquationInputRulesService', MathEquationInputRulesService],
   ['MathEquationInputValidationService', MathEquationInputValidationService],
   ['MathInteractionsService', MathInteractionsService],

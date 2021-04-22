@@ -39,7 +39,7 @@ describe('Machine Translated Texts Backend Api Service', () => {
 
   describe('getMachineTranslatedStateTextsAsync', () => {
     const sampleTranslationResponse: MachineTranslatedTextBackendDict = {
-      translated_text: {content1: 'texto para traducir'}
+      translated_texts: {content1: 'texto para traducir'}
     };
 
     it('should return a machine generated translation', fakeAsync(() => {
