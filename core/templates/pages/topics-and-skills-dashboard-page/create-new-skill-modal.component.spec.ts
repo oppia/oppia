@@ -127,6 +127,7 @@ describe('Create new skill modal', () => {
     spyOn(skillCreationService, 'getSkillDescriptionStatus').and
       .returnValue('not_disabled');
     spyOn(skillCreationService, 'markChangeInSkillDescription');
+    componentInstance.newSkillDescription = 'not_empty';
     componentInstance.updateSkillDescriptionAndCheckIfExists();
     componentInstance._skillDescriptionExistsCallback(false);
     expect(componentInstance.rubrics[1].getExplanations()).toEqual([
