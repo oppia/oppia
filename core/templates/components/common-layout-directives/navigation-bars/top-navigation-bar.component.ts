@@ -29,7 +29,7 @@ import { UserService } from 'services/user.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SearchService } from 'services/search.service';
-import { TopNavigationBarService } from 'services/top-navigation-bar.service';
+import { NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
 import { HttpClient } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -100,7 +100,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
      private sidebarStatusService: SidebarStatusService,
      private urlInterpolationService: UrlInterpolationService,
      private debouncerService: DebouncerService,
-     private topNavigationBarService: TopNavigationBarService,
+     private navigationService: NavigationService,
      private siteAnalyticsService: SiteAnalyticsService,
      private userService: UserService,
      private deviceInfoService: DeviceInfoService,
@@ -123,10 +123,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
      if (this.currentUrl === 'learn') {
        this.inClassroomPage = true;
      }
-     this.ACTION_OPEN = this.topNavigationBarService.ACTION_OPEN;
-     this.ACTION_CLOSE = this.topNavigationBarService.ACTION_CLOSE;
+     this.ACTION_OPEN = this.navigationService.ACTION_OPEN;
+     this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
      this.KEYBOARD_EVENT_TO_KEY_CODES =
-       this.topNavigationBarService.KEYBOARD_EVENT_TO_KEY_CODES;
+       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
      this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
      let service = this.classroomBackendApiService;
@@ -175,8 +175,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
          // page title, unless the user is already on the dashboard page.
          this.http.get('/notificationshandler').toPromise().then(
            (response) => {
-             // eslint-disable-next-line no-console
-             console.log(response);
              if (this.windowRef.nativeWindow.location.pathname !== '/') {
                this.numUnseenNotifications =
               response.num_unseen_notifications;
@@ -265,7 +263,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     shiftKey: string;
     currentTarget: string; }, menuName: string): void {
      // Focus on the current target before opening its submenu.
-     this.topNavigationBarService.openSubmenu(evt, menuName);
+     this.navigationService.openSubmenu(evt, menuName);
    }
 
    blurNavigationLinks(evt: Event): void {
@@ -280,7 +278,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     keyCode: string;
     shiftKey: string;
     currentTarget: string; }): void {
-     this.topNavigationBarService.closeSubmenu(evt);
+     this.navigationService.closeSubmenu(evt);
    }
 
    closeSubmenuIfNotMobile(evt: {
@@ -308,9 +306,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     shiftKey: string;
     currentTarget: string; }, menuName: string, eventsTobeHandled: {
        [key: string]: string; }): void {
-     this.topNavigationBarService.onMenuKeypress(
+     this.navigationService.onMenuKeypress(
        evt, menuName, eventsTobeHandled);
-     this.activeMenuName = this.topNavigationBarService.activeMenuName;
+     this.activeMenuName = this.navigationService.activeMenuName;
    }
 
    isSidebarShown(): boolean {

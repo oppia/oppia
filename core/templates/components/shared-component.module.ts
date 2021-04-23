@@ -60,6 +60,9 @@ import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/lea
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -74,9 +77,6 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
-import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
-import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 
 // Services.
