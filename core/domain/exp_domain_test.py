@@ -672,7 +672,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             }
         ]
 
-
         second_state.update_interaction_answer_groups(
             second_state_answer_group_dicts)
 
@@ -968,7 +967,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End 2': new_end_state
         }
 
-        # Answer group dict to connect c_state to d_state and new_end_state,
+        # Answer group dicts to connect c_state to d_state and new_end_state,
         # making d_state bypassable.
         c_state_answer_group_dicts = [
             {
