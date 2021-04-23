@@ -175,7 +175,7 @@ describe('Collection node model', () => {
       let summaryObject = collectionNode.getExplorationSummaryObject();
 
       expect(summaryObject).not.toBeNull();
-      expect(collectionNode.getExplorationTitle()).toBe('');
+      expect(collectionNode.getExplorationTitle()).toBeNull();
       expect(collectionNode.isExplorationPrivate()).toBeFalse();
 
       collectionNode.setExplorationSummaryObject(

@@ -103,10 +103,7 @@ export class ParamSpecs {
   toBackendDict(): ParamSpecsBackendDict {
     var paramSpecsBackendDict: ParamSpecsBackendDict = {};
     this.forEach(
-      (
-          paramName: string,
-          paramSpec: ParamSpec
-      ) => {
+      (paramName: string, paramSpec: ParamSpec) => {
         paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
       });
     return paramSpecsBackendDict;

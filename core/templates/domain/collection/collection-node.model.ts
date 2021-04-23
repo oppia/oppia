@@ -82,23 +82,23 @@ export class CollectionNode {
   // Returns the title of the exploration represented by this collection node.
   // This property is immutable. The value returned by this function is
   // null if doesExplorationExist() returns false.
-  getExplorationTitle(): string {
+  getExplorationTitle(): string | null {
     if (this.doesExplorationExist()) {
       return this._explorationSummaryObject.title;
     } else {
-      return '';
+      return null;
     }
   }
 
   // Returns whether the exploration referenced by this node is known to exist
   // in the backend. This property is immutable.
   doesExplorationExist(): boolean {
-    return this._explorationSummaryObject.category !== '';
+    return this._explorationSummaryObject.title !== '';
   }
 
   // Returns whether the exploration referenced by this node is private and
   // not published. This property is immutable. The value returned by this
-  // function is undefined if doesExplorationExist() returns false.
+  // function is false if doesExplorationExist() returns false.
   isExplorationPrivate(): boolean {
     if (this.doesExplorationExist()) {
       return this._explorationSummaryObject.status === (
