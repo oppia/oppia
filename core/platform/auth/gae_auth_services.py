@@ -74,6 +74,9 @@ def get_auth_claims_from_request(unused_request):
     Returns:
         AuthClaims|None. Claims about the currently signed in user. If no user
         is signed in, then returns None.
+
+    Raises:
+        ValueError. The request contains an invalid session.
     """
     gae_user = users.get_current_user()
     if gae_user is not None:

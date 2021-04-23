@@ -109,6 +109,9 @@ def get_auth_claims_from_request(request):
     Returns:
         AuthClaims|None. Claims about the currently signed in user. If no user
         is signed in, then returns None.
+
+    Raises:
+        ValueError. The request contains an invalid session.
     """
     return platform_auth_services.get_auth_claims_from_request(request)
 

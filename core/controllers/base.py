@@ -164,15 +164,11 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        # NOTE: This try/catch intends to prevent invalid session cookies from
-        # crashing the server. For example, if a developer shuts down the
-        # development server without logging out and destroying their session,
-        # the next time the server starts it'd be flooded by "FirebaseError:
-        # User does not exist" exceptions (which makes sense; the Firebase
-        # server is empty). This code acknowledges that cookies might have such
-        # kinds of invalid values, and destroys them as soon as they're
-        # detected, rather than allow them to persist. Debug information is
-        # always logged by the firebase_auth_services module when this occurs.
+        # NOTE: This function raises a ValueError when the request contains an
+        # invalid session. This is a rare/exceptional situation (a session
+        # must either not exist at all, or exist with a valid state), so in
+        # response we destroy the session immediately and rely on the platform
+        # layer to log debugging information.
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
         except ValueError:
