@@ -38,13 +38,13 @@ module.exports = {
   create: function(context) {
     return {
       CallExpression(node) {
-        if (node.callee.property && 
+        if (node.callee.property &&
           node.callee.property.name === 'forEach') {
-            context.report({
-              node,
-              messageId: 'noForEach'
-            })
-          }
+          context.report({
+            node,
+            messageId: 'noForEach'
+          });
+        }
       }
     };
   }
