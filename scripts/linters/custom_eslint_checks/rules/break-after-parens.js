@@ -44,8 +44,6 @@ module.exports = {
     return {
       Program: function(node) {
         const tokens = sourceCode.tokensAndComments;
-        var obj = {'foo': 'bar' };
-        var obj = { 'foo': 'bar' };
         var parensCount = 0;
         const separators = ['(', '{', '[', ' '];
         var parens = [];
