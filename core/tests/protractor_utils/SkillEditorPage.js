@@ -282,10 +282,10 @@ var SkillEditorPage = function() {
       'Add Worked Example Modal takes too long to appear');
 
     await workedExampleQuestion.click();
-    await browser.switchTo().activeElement().sendKeys(question);
+    await (await browser.switchTo().activeElement()).sendKeys(question);
 
     await workedExampleExplanation.click();
-    await browser.switchTo().activeElement().sendKeys(explanation);
+    await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
     await action.click(
       'Save worked example', saveWorkedExampleButton);
@@ -349,13 +349,13 @@ var SkillEditorPage = function() {
       'Add Misconception Modal takes too long to appear');
 
     await misconceptionNameField.click();
-    await browser.switchTo().activeElement().sendKeys(name);
+    await (await browser.switchTo().activeElement()).sendKeys(name);
 
     await misconceptionNotesField.click();
-    await browser.switchTo().activeElement().sendKeys(notes);
+    await (await browser.switchTo().activeElement()).sendKeys(notes);
 
     await misconceptionFeedbackField.click();
-    await browser.switchTo().activeElement().sendKeys(feedback);
+    await (await browser.switchTo().activeElement()).sendKeys(feedback);
 
     await action.click('Confirm add misconception', confirmAddMisconception);
 

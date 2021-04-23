@@ -532,7 +532,7 @@ var ExplorationEditorMainTab = function() {
       addHintModal, 'Add hint modal takes too long to appear');
     await element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
       .last().click();
-    await browser.switchTo().activeElement().sendKeys(hint);
+    await (await browser.switchTo().activeElement()).sendKeys(hint);
 
     await waitFor.elementToBeClickable(
       saveHintButton,
@@ -556,7 +556,9 @@ var ExplorationEditorMainTab = function() {
       solution.correctAnswer);
     await element(by.css('.protractor-test-explanation-textarea'))
       .all(by.tagName('p')).first().click();
-    await browser.switchTo().activeElement().sendKeys(solution.explanation);
+    await (
+      await browser.switchTo().activeElement()
+    ).sendKeys(solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
     await waitFor.elementToBeClickable(

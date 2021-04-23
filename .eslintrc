@@ -116,6 +116,7 @@
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
     "oppia/no-test-blockers": "error",
+    "oppia/e2e-browser-nested-awaits": "error",
     "angular/di": [
       "error",
       "array"
