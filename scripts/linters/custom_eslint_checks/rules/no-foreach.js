@@ -20,50 +20,32 @@
 'use strict';
 
 module.exports = {
-    meta: {
-      type: 'problem',
-      docs: {
-        description: (
-          'Lint check to ensure that there are no forEach statements'),
-        category: 'Possible Errors',
-        recommended: true
-      },
-      fixable: null,
-      schema: [],
-      messages: {
-        noForEach: 'Do not use forEach statements'
-      }
+  meta: {
+    type: 'problem',
+    docs: {
+      description: (
+        'Lint check to ensure that there are no forEach statements'),
+      category: 'Possible Errors',
+      recommended: true
     },
-  
-    create: function(context) {
-      const sourceCode = context.getSourceCode();
-  
-      // var _checkNotForEach = function(node) {
-        // if (comment.value.includes('.forEach')) {
-        //   context.report({
-        //     comment,
-        //     loc: comment.loc,
-        //     messageId: 'noForEach'
-        //   });
-        // }
-      // };
-  
-      return {
-        // Program() {
-        //   const comments = sourceCode.getAllComments();
-        //   comments.filter(
-        //     token => token.type !== 'Shebang').forEach(
-        //     _checkNotForEach);
-        // }
-        CallExpression(node) {
-          if (node.callee.property && 
-            node.callee.property.name === 'forEach') {
-              context.report({
-                node,
-                messageId: 'noForEach'
-              })
-            }
-        }
-      };
+    fixable: null,
+    schema: [],
+    messages: {
+      noForEach: 'Do not use forEach statements'
     }
-  };
+  },
+
+  create: function(context) {
+    return {
+      CallExpression(node) {
+        if (node.callee.property && 
+          node.callee.property.name === 'forEach') {
+            context.report({
+              node,
+              messageId: 'noForEach'
+            })
+          }
+      }
+    };
+  }
+};
