@@ -26,7 +26,7 @@ require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 
-require('domain/skill/RubricObjectFactory.ts');
+require('domain/skill/rubric.model.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -37,7 +37,7 @@ require(
     'create-new-skill-modal.controller.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
-    'skills-list.directive.ts');
+    'skills-list.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
     'topics-list.component.ts');
