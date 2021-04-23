@@ -390,6 +390,8 @@ def _get_possible_normalized_metadata_directory_names(
     """
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
+    # TODO(#11474): The '-py2.7' suffix might be used in some metadata directory
+    # names, this will need to be changed after the Python 3 migration.
     return {
         normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
@@ -400,6 +402,11 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s.egg-info' % (library_name, version_string)),
         normalize_directory_name(
             '%s-%s.egg-info' % (
+                library_name.replace('-', '_'), version_string)),
+        normalize_directory_name(
+            '%s-%s-py2.7.egg-info' % (library_name, version_string)),
+        normalize_directory_name(
+            '%s-%s-py2.7.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
     }
 
