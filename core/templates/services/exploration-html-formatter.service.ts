@@ -61,24 +61,25 @@ export class ExplorationHtmlFormatterService {
    *   Otherwise, parentHasLastAnswerProperty should be set to false.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
-   * @param {Solution} savedSolution - The saved solution that the interaction
-   * needs to be prefilled with.
+   * @param {string} savedSolution - The name of property needs to be bound
+   *   containing the savedSolution in the scope that. The scope here is the
+   *   scope where the return value of this function is compiled.
    */
   getInteractionHtml(
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
-      savedSolution: string | undefined | null): string {
+      savedSolution: string | null): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
-    let tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
     let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
-    let addSpace = true;
+    let spaceToBeAdded = true;
     const getLastAnswer = (): string => {
       let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
@@ -91,7 +92,7 @@ export class ExplorationHtmlFormatterService {
       // TODO(#12292): Refactor this once all interactions have been migrated to
       // Angular 2+, such that we don't need to parse the string in the
       // interaction directives/components.
-      if (addSpace) {
+      if (spaceToBeAdded) {
         directiveOuterHtml += ' ';
       }
       if (this.migratedInteractions.indexOf(interactionId) >= 0) {
@@ -99,22 +100,20 @@ export class ExplorationHtmlFormatterService {
       } else {
         directiveOuterHtml += 'saved-solution="' + savedSolution + '" ';
       }
-      addSpace = false;
+      spaceToBeAdded = false;
     }
     if (labelForFocusTarget) {
-      if (addSpace) {
+      if (spaceToBeAdded) {
         directiveOuterHtml += ' ';
       }
       directiveOuterHtml += (
         'label-for-focus-target="' + labelForFocusTarget + '" ');
-      addSpace = false;
+      spaceToBeAdded = false;
     }
-    if (addSpace) {
+    if (spaceToBeAdded) {
       directiveOuterHtml += ' ';
     }
-    directiveOuterHtml += (
-      getLastAnswer() +
-      '></oppia-interactive-' + htmlInteractionId + '>');
+    directiveOuterHtml += getLastAnswer() + tagEnd;
     return directiveOuterHtml;
   }
 
