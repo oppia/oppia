@@ -113,7 +113,7 @@ describe('Exploration Html Formatter Service', () => {
       ).toBe(expectedHtmlTag);
       interactionId = 'GraphInput';
       focusLabel = 'sampleLabel';
-      expectedHtmlTag = 'oppia-interactive-graph-input ' +
+      expectedHtmlTag = '<oppia-interactive-graph-input ' +
         '[saved-solution]="solution" ' +
         'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
         '</oppia-interactive-graph-input>';
