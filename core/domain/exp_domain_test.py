@@ -680,7 +680,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         # As second_state is now connected to end_state and third_state has no
         # outcome, second_state has become non-bypassable.
-        second_state.card_is_checkpoint(True)
+        second_state.update_card_is_checkpoint(True)
         self.exploration.validate()
 
         # Reset the exploration.
