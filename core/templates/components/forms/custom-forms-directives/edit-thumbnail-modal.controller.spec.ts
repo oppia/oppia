@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for EditThumbnailModalController.
  */
 
+import { waitForAsync } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-
 describe('Edit Thumbnail Modal Controller', function() {
   let $q = null;
   let $scope = null;
@@ -109,7 +109,6 @@ describe('Edit Thumbnail Modal Controller', function() {
     const element = $(document.createElement('div'));
     spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
       element);
-    const fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
 
     // Spy Image constructor to handle its events.
     const image = document.createElement('img');
@@ -124,8 +123,8 @@ describe('Edit Thumbnail Modal Controller', function() {
     // The setTimeout is being used here to not conflict with $timeout.flush
     // for fadeIn Jquery method. This first setTimeout is to wait the default
     // time for fadeOut Jquery method to complete, which is 400 miliseconds.
-    // 800ms is being used instead of 400ms just to be sure that fadeOut callbak
-    // is already executed.
+    // 1000ms is being used instead of 400ms just to be sure that fadeOut
+    // callback is already executed.
     // Ref: https://api.jquery.com/fadeout/
     setTimeout(function() {
       $timeout.flush();
@@ -133,7 +132,6 @@ describe('Edit Thumbnail Modal Controller', function() {
       // ---- Dispatch on load event ----
       image.dispatchEvent(new Event('load'));
 
-      expect(fadeInElementSpy).toHaveBeenCalled();
       expect($scope.invalidTagsAndAttributes).toEqual({
         tags: ['html', 'body', 'parsererror', 'h3', 'div', 'h3'],
         attrs: []
@@ -144,7 +142,31 @@ describe('Edit Thumbnail Modal Controller', function() {
       // ---- Save information ----
       $scope.confirm();
       expect($uibModalInstance.close).toHaveBeenCalled();
-    }, 800);
+    }, 1000);
+  });
+
+  it('should perform fadeIn and fadeOut operations correctly' +
+    'after uploading thumbnail image', function() {
+    // This is just a mocked base 64 in order to test the FileReader event
+    // and its result property.
+    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
+    const arrayBuffer = Uint8Array.from(
+      window.atob(dataBase64Mock), c => c.charCodeAt(0));
+    const file = new File([arrayBuffer], 'thumbnail.png', {
+      type: 'image/svg+xml'
+    });
+
+    // Mocking JQuery element method.
+    const element = $(document.createElement('div'));
+    spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
+      element);
+    const fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
+
+    $scope.onFileChanged(file);
+
+    waitForAsync(() => {
+      expect(fadeInElementSpy).toHaveBeenCalled();
+    });
   });
 
   it('should not load file if it is not a svg type', function() {
