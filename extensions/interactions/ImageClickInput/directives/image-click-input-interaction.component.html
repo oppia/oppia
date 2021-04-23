@@ -38,10 +38,14 @@
 </style>
 <div class="oppia-interactive-image-click-input">
   <div *ngIf="isLoadingIndicatorShown" class="oppia-image-container" [ngStyle]="imageContainerStyle">
-    <img [src]="loadingIndicatorUrl" class="center-element-horizontally" [ngStyle]="loadingIndicatorStyle" alt="Loading...">
+    <img [src]="loadingIndicatorUrl"
+         class="center-element-horizontally"
+         [ngStyle]="loadingIndicatorStyle" alt="Loading...">
   </div>
   <div *ngIf="isTryAgainShown" class="oppia-image-container" [ngStyle]="imageContainerStyle">
-    <button mat-button (click)="loadImage()" class="oppia-learner-reload-image-button center-element-horizontally">
+    <button mat-button
+            (click)="loadImage()"
+            class="oppia-learner-reload-image-button center-element-horizontally">
       <span>Reload image<i class="material-icons oppia-reload-image-symbol">&#10227;</i></span>
     </button>
   </div>

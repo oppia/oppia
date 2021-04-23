@@ -182,9 +182,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     for (let i = 0; i < this.imageAndRegions.labeledRegions.length; i++) {
       const labeledRegion = this.imageAndRegions.labeledRegions[i];
       const regionArea = labeledRegion.region.area;
-      if (regionArea[0][0] <= this.mouseX &&
+      if (this.mouseX >= regionArea[0][0] &&
           this.mouseX <= regionArea[1][0] &&
-          regionArea[0][1] <= this.mouseY &&
+          this.mouseY >= regionArea[0][1] &&
           this.mouseY <= regionArea[1][1]) {
         this.currentlyHoveredRegions.push(labeledRegion.label);
       }
@@ -236,14 +236,14 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       top: null
     };
     if (this.lastAnswer) {
-      dotLocation.left =
+      dotLocation.left = (
         this.lastAnswer.clickPosition[0] * image.width +
         image.getBoundingClientRect().left -
-        image.parentElement.getBoundingClientRect().left - 5;
-      dotLocation.top =
+        image.parentElement.getBoundingClientRect().left - 5);
+      dotLocation.top = (
         this.lastAnswer.clickPosition[1] * image.height +
         image.getBoundingClientRect().top -
-        image.parentElement.getBoundingClientRect().top - 5;
+        image.parentElement.getBoundingClientRect().top - 5);
     }
     return dotLocation;
   }

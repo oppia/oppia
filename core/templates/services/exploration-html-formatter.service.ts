@@ -61,8 +61,8 @@ export class ExplorationHtmlFormatterService {
    *   Otherwise, parentHasLastAnswerProperty should be set to false.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
-   * @param {string} savedSolution - The name of property needs to be bound
-   *   containing the savedSolution in the scope that. The scope here is the
+   * @param {string} savedSolution - The name of property that needs to be bound
+   *   containing the savedSolution in the scope. The scope here is the
    *   scope where the return value of this function is compiled.
    */
   getInteractionHtml(
