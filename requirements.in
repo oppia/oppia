@@ -35,4 +35,5 @@ google-cloud-tasks==1.5.0
 google-cloud-translate==2.0.1
 googleapis_common_protos==1.52.0
 webapp2==3.0.0b1
+webob==1.8.6
 elasticsearch==7.10.0
