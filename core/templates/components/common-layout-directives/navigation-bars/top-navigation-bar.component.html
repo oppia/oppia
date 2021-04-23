@@ -47,7 +47,7 @@ float
     <li>
       <ul *ngIf="windowIsNarrow && !inClassroomPage"
           class="nav oppia-navbar-tabs-narrow">
-        <li><create-activity-button></create-activity-button></li>
+        <li><oppia-create-activity-button></oppia-create-activity-button></li>
       </ul>
     </li>
     <li>
@@ -58,7 +58,7 @@ float
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
             aria-hidden="false"
-            class="nav-item  oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
+            class="nav-item  dropdown oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle"
@@ -74,7 +74,7 @@ float
                   [innerHTML]="'I18N_TOPNAV_CLASSROOM' | translate"></span>
           </a>
           <ul ngbDropdownMenu
-              class="dropdown-menu oppia-navbar-dropdown"
+              class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
               (mouseover)="openSubmenu($event, 'classroomMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu">
@@ -114,7 +114,7 @@ float
             </span>
           </a>
           <ul ngbDropdownMenu
-              class="dropdown-menu oppia-navbar-dropdown"
+              class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
               (mouseover)="openSubmenu($event, 'aboutMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">
             <li class="nav-item">
@@ -188,9 +188,9 @@ float
           </ul>
         </li>
         <li *ngIf="!inClassroomPage">
-          <create-activity-button (mouseover)="blurNavigationLinks($event)"
-                                  [hidden]="!navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE">
-          </create-activity-button>
+          <oppia-create-activity-button (mouseover)="blurNavigationLinks($event)"
+                                        [hidden]="!navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE">
+          </oppia-create-activity-button>
         </li>
       </ul>
     </li>
@@ -381,6 +381,9 @@ float
   </ul>
 </div>
 <style>
+  li.nav-item.oppia-navbar-clickable-dropdown.dropdown:hover {
+    background-color: #34665C;
+  }
   .dropdown-menu {
     left: 100 !important;
     right: 0 !important;

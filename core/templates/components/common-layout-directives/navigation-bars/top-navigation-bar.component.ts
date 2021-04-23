@@ -112,6 +112,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    ) {}
 
    ngOnInit(): void {
+     this.getProfileImageDataAsync();
      this.currentUrl = window.location.pathname.split('/')[1];
      this.LABEL_FOR_CLEARING_FOCUS = AppConstants.LABEL_FOR_CLEARING_FOCUS;
      this.logoutUrl = AppConstants.LOGOUT_URL;

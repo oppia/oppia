@@ -1042,6 +1042,13 @@ textarea {
   word-wrap: break-word;
 }
 
+.oppia-navbar-nav .dropdown-menu {
+  left: auto;
+  right: 0;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
 .oppia-dropdown-submenu > .uib-dropdown-menu {
   -moz-border-radius: 0 6px 6px;
   -webkit-border-radius: 0 6px 6px 6px;
