@@ -34,17 +34,17 @@ interface EventData {
   templateUrl: './response-header.component.html'
 })
 export class ResponseHeaderComponent {
-  @Input() index: number;
-  @Input() outcome: Outcome;
-  @Input() summary: string;
-  @Input() shortSummary: string;
+  @Input() getIndex: number;
+  @Input() getOutcome: Outcome;
+  @Input() getSummary: string;
+  @Input() getShortSummary: string;
   @Input() isActive: boolean;
-  @Output() onDeleteFn: EventEmitter<EventData> = (new EventEmitter());
-  @Input() numRules: number;
+  @Output() getOnDeleteFn: EventEmitter<EventData> = (new EventEmitter());
+  @Input() getNumRules: number;
   @Input() isResponse: boolean;
   @Input() showWarning: boolean;
   @Input() navigateToState: string;
-  editabilityService: EditabilityService;
+  isEditable: boolean = EditabilityService.isEditable;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -69,28 +69,26 @@ export class ResponseHeaderComponent {
   }
 
   isCorrect(): boolean {
-    return this.outcome && this.outcome.labelledAsCorrect;
+    return this.getOutcome && this.getOutcome.labelledAsCorrect;
   }
 
   isOutcomeLooping(): boolean {
     let activeStateName = this.stateEditorService.getActiveStateName();
-    return this.outcome && (this.outcome.dest === activeStateName);
+    return this.getOutcome && (this.getOutcome.dest === activeStateName);
   }
 
   isCreatingNewState(): boolean {
-    let outcome = this.outcome;
-    return outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST;
+    let getOutcome = this.getOutcome;
+    return getOutcome && getOutcome.dest ===
+     AppConstants.PLACEHOLDER_OUTCOME_DEST;
   }
 
   deleteResponse(evt: Event): void {
     let eventData = {
-      index: this.index,
+      index: this.getIndex,
       event: evt
     };
-    this.onDeleteFn.emit(eventData);
-  }
-  ngOnInit(): void {
-    this.editabilityService = new EditabilityService();
+    this.getOnDeleteFn.emit(eventData);
   }
 }
 

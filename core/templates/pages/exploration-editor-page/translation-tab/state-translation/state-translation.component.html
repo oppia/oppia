@@ -78,11 +78,11 @@
              class="oppia-rule-tab"
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(caContent.content.contentId)">
-            <oppia-response-header [index]="$index"
-                                   (summary)="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
-                                   (short-summary)="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+            <oppia-response-header [get-index]="$index"
+                                   [get-summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
+                                   [get-short-summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
                                    [is-active]="$index === activeCustomizationArgContentIndex"
-                                   (show-warning)="contentIdNeedUpdates(caContent.content.contentId)">
+                                   [show-warning]="contentIdNeedUpdates(caContent.content.contentId)">
             </oppia-response-header>
           </a>
           <div ng-if="activeCustomizationArgContentIndex === $index">
@@ -145,16 +145,16 @@
                ng-click="changeActiveAnswerGroupIndex($index)"
                ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}"
                ng-style="contentIdStatusColorStyle(answerGroup.outcome.feedback.contentId)">
-              <oppia-response-header [index]="$index"
-                                     (summary)="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
-                                     (short-summary)="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
+              <oppia-response-header [get-index]="$index"
+                                     [get-summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
+                                     [get-short-summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
                                      [is-active]="$index === activeAnswerGroupIndex"
-                                     [outcome]="answerGroup.outcome"
+                                     [get-outcome]="answerGroup.outcome"
                                      [num-rules]="answerGroup.rules.length"
                                      [is-response]="true"
-                                     (show-warning)="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
+                                     [show-warning]="contentIdNeedUpdates(answerGroup.outcome.feedback.contentId)"
                                      [navigate-to-state]="navigateToState"
-                                     (correctness-feedback-enabled)="ExplorationCorrectnessFeedbackService.isEnabled()">
+                                     [correctness-feedback-enable]="ExplorationCorrectnessFeedbackService.isEnabled()">
               </oppia-response-header>
             </a>
             <div ng-if="activeAnswerGroupIndex === $index">
@@ -188,11 +188,11 @@
                ng-style="contentIdStatusColorStyle(stateDefaultOutcome.feedback.contentId)">
               <oppia-response-header [index]="$index"
                                      [is-active]="$index === activeAnswerGroupIndex"
-                                     (summary)="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
-                                     (short-summary)="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
+                                     [get-summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
+                                     [get-short-summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, true)"
                                      [outcome]="stateDefaultOutcome"
                                      [is-response]="true"
-                                     (show-warning)="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
+                                     [show-warning]="contentIdNeedUpdates(stateDefaultOutcome.feedback.contentId)"
                                      [navigate-to-state]="navigateToState"
                                      [correctness-feedback-enabled]="ExplorationCorrectnessFeedbackService.isEnabled()">
               </oppia-response-header>
@@ -222,10 +222,10 @@
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
              ng-style="contentIdStatusColorStyle(hint.hintContent.contentId)">
             <oppia-response-header [index]="$index"
-                                   (summary)="getSubtitledContentSummary(hint.hintContent)"
-                                   (short-summary)="getSubtitledContentSummary(hint.hintContent)"
+                                   [get-summary]="getSubtitledContentSummary(hint.hintContent)"
+                                   [get-short-summary]="getSubtitledContentSummary(hint.hintContent)"
                                    [is-active]="$index === activeHintIndex"
-                                   (show-warning)="contentIdNeedUpdates(hint.hintContent.contentId)">
+                                   [show-warning]="contentIdNeedUpdates(hint.hintContent.contentId)">
             </oppia-response-header>
           </a>
           <div ng-if="activeHintIndex === $index">
