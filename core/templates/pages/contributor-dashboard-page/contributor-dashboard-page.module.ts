@@ -27,6 +27,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
@@ -38,6 +39,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   imports: [
     BrowserModule,
     HttpClientModule,
+    InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
