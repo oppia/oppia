@@ -98,9 +98,13 @@ export class CreateNewSkillModalComponent {
   }
   updateSkillDescriptionAndCheckIfExists(): void {
     this.resetErrorMsg();
-    this.skillEditorStateService.updateExistenceOfSkillDescription(
-      this.newSkillDescription, this._skillDescriptionExistsCallback.bind(this)
-    );
+
+    if (this.newSkillDescription !== '') {
+      this.skillEditorStateService.updateExistenceOfSkillDescription(
+        this.newSkillDescription,
+        this._skillDescriptionExistsCallback.bind(this)
+      );
+    }
     if (
       this.skillCreationService.getSkillDescriptionStatus() !==
           TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES

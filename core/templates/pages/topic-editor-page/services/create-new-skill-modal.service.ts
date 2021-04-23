@@ -48,7 +48,7 @@ export class CreateNewSkillModalService {
   createNewSkill(topicsIds: string[]): void {
     const modalRef = this.ngbModal.open(
       CreateNewSkillModalComponent, {
-        size: 'lg',
+        windowClass: 'create-new-skill-modal',
         backdrop: 'static'
       });
     modalRef.result.then((result) => {
@@ -62,6 +62,13 @@ export class CreateNewSkillModalService {
       }
       this.skillCreationInProgress = true;
       this.alertsService.clearWarnings();
+      // The window.open has to be initialized separately since if the 'open
+      // new tab' action does not directly result from a user input
+      // (which is not the case, if we wait for result from the backend
+      // before opening a new tab), some browsers block it as a popup.
+      // Here, the new tab is created as soon as the user clicks the
+      // 'Create' button and filled with URL once the details are
+      // fetched from the backend.
       let newTab = this.windowRef.nativeWindow.open();
       let imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.skillCreationBackendApiService.createSkillAsync(
@@ -82,6 +89,10 @@ export class CreateNewSkillModalService {
       }, (errorMessage) => {
         this.alertsService.addWarning(errorMessage);
       });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
     });
   }
 }
