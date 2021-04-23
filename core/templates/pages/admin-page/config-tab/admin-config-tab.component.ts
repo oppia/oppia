@@ -32,7 +32,7 @@ require('components/forms/schema-based-editors/schema-based-editor.directive.ts'
 })
 export class AdminConfigTabComponent implements OnInit {
   @Input() setStatusMessage: string;
-  configProperties = {};
+  adminPageData: AdminPageData | null;
   
   
   constructor(
@@ -44,7 +44,7 @@ export class AdminConfigTabComponent implements OnInit {
   
   ngOnInit(): void {
     this.reloadConfigProperties();
-    console.log(this.configProperties);
+    //console.log(this.configProperties);
   }
   
   isNonemptyObject(object) {
@@ -53,10 +53,11 @@ export class AdminConfigTabComponent implements OnInit {
   
   reloadConfigProperties() {
     this.adminDataService.getDataAsync().then(function(adminDataObject) {
-      this.configProperties = adminDataObject.configProperties;
+      this.adminPageData = adminDataObject;
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
       //$rootScope.$apply();
+      console.log(this.adminPageData.configProperties);
     });
   }
   
@@ -92,7 +93,7 @@ export class AdminConfigTabComponent implements OnInit {
     this.setStatusMessage = 'Saving...';
 
     this.adminTaskManagerService.startTask();
-    var newConfigPropertyValues = JSON.parse(JSON.stringify(this.configProperties));
+    var newConfigPropertyValues = JSON.parse(JSON.stringify(this.adminPageData.configProperties));
     for (var property in newConfigPropertyValues) {
       newConfigPropertyValues[property] = (
         newConfigPropertyValues[property].value);

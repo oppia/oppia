@@ -1,7 +1,7 @@
 d<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Configuration properties</h3>
   <div class="container ml-0" *ngIf="isNonemptyObject(configProperties)">
-    <div *ngFor="let configPropertyId, configPropertyData of configProperties">
+    <!-- <div *ngFor="let configPropertyId, configPropertyData of configProperties">
       <div class="row protractor-test-config-property oppia-description-text-container">
         <span class="col-lg-2 col-md-2 col-sm-2">
           <em class="protractor-test-config-title"><{{ configPropertyData.description }}></em>
@@ -16,7 +16,7 @@ d<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
           </button>
         </span>
       </div>
-    </div>
+    </div> -->
 
     <button (click)="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
     <button (click)="reloadConfigProperties()">Undo changes</button>
