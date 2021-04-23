@@ -1691,6 +1691,28 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v43_dict_to_v44_dict(cls, states_dict):
+        """Converts from version 43 to 44. Version 44 ensures that
+        all oppia-noninteractive-svgdiagrams tags are converted into
+        oppia-noninteractive-image tag.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key,state_dict in states_dict.items():
+            states_dict[key] = state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.convert_svg_diagram_tags_to_image_tags,
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
