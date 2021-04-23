@@ -507,14 +507,16 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.exploration.validate()
 
     def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
+        # Note: In the graphs below, states  with * symbol are checkpoints.
+
         # Exploration to test a checkpoint state which has no outcome.
         #       ┌────────────────┐
-        #       │  Introduction  │
+        #       │  Introduction* │
         #       └──┬───────────┬─┘
         #          │           │
         #          │           │
         # ┌────────┴──┐      ┌─┴─────────┐
-        # │  (Second) │      │   Third   │
+        # │   Second* │      │   Third   │
         # └───────────┘      └─┬─────────┘
         #                      │
         #        ┌─────────────┴─┐
@@ -632,12 +634,12 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # Exploration to test a checkpoint state when the state in the other
         # path has no outcome.
         #       ┌────────────────┐
-        #       │  Introduction  │
+        #       │  Introduction* │
         #       └──┬───────────┬─┘
         #          │           │
         #          │           │
         # ┌────────┴──┐      ┌─┴─────────┐
-        # │ (Second)  │      │   Third   │
+        # │  Second*  │      │   Third   │
         # └────────┬──┘      └───────────┘
         #          │
         #        ┌─┴─────────────┐
@@ -691,7 +693,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         # Exploration to test a bypassable state.
         #                ┌────────────────┐
-        #                │ Introduction   │
+        #                │ Introduction*  │
         #                └─┬─────┬──────┬─┘
         # ┌───────────┐    │     │      │     ┌────────────┐
         # │    A      ├────┘     │      └─────┤      C     │
@@ -701,7 +703,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #      │            └──┬───────┘            │
         #      └─────────┐     │                    │
         #         ┌──────┴─────┴─┐    ┌─────────────┘
-        #         │      D       │    │
+        #         │      D*      │    │
         #         └─────────────┬┘    │
         #                       │     │
         #                    ┌──┴─────┴──┐
@@ -883,7 +885,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         # Modifying the graph to make D non-bypassable.
         #                ┌────────────────┐
-        #                │ Introduction   │
+        #                │ Introduction*  │
         #                └─┬─────┬──────┬─┘
         # ┌───────────┐    │     │      │     ┌────────────┐
         # │    A      ├────┘     │      └─────┤      C     │
@@ -893,7 +895,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #      │            └────┬─────┘             │
         #      │                 │                   │
         #      │          ┌──────┴───────┐           │
-        #      └──────────┤      D       ├───────────┘
+        #      └──────────┤      D*      ├───────────┘
         #                 └──────┬───────┘
         #                        │
         #                  ┌─────┴─────┐
@@ -936,7 +938,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         # Modifying the graph to add another EndExploration state.
         #                ┌────────────────┐
-        #                │ Introduction   │
+        #                │ Introduction*  │
         #                └─┬─────┬──────┬─┘
         # ┌───────────┐    │     │      │     ┌────────────┐
         # │    A      ├────┘     │      └─────┤      C     │
@@ -946,7 +948,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #      │            └────┬─────┘             │   │
         #      │                 │                   │   │
         #      │          ┌──────┴───────┐           │   │
-        #      └──────────┤      D       ├───────────┘   │
+        #      └──────────┤      D*      ├───────────┘   │
         #                 └──────┬───────┘               │
         #                        │                       │
         #                  ┌─────┴─────┐           ┌─────┴─────┐
