@@ -211,4 +211,4 @@ var ExplorationEditorSettingsTab = function() {
   };
 };
 
-exports.ExplorationEditorSettingsTab = ExplorationEditorSettingsTab; 
+exports.ExplorationEditorSettingsTab = ExplorationEditorSettingsTab;
