@@ -1,6 +1,6 @@
 <div class="modal-header protractor-test-question-suggestion-review-modal-header">
   <div>
-    <h3><[questionHeader]></h3>
+    <h3 class="question-header"><[questionHeader]></h3>
     <h4 class="author-header">Submitted by <[authorName]></h4>
   </div>
   <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
@@ -58,6 +58,14 @@
   .author-header {
     margin-top: -12px;
   }
+  .modal-header .question-header {
+    margin-top: 0;
+  }
+  .oppia-suggestion-review-container {
+    height: 400px;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
   .oppia-question-suggestion-rubric {
     display: flex;
     flex-direction: column;
@@ -76,7 +84,6 @@
     margin-bottom: 0.5em;
   }
   .oppia-suggestion-review-message {
-    margin-left: 10px;
-    margin-top: 20px;
+    margin: 5px 8px;
   }
 </style>

@@ -30,6 +30,8 @@ require(
 require(
   'components/state-editor/state-solution-editor/' +
   'state-solution-editor.directive.ts');
+require(
+  'components/state-editor/state-editor.constants.ajs.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -94,13 +96,15 @@ angular.module('oppia').directive('stateEditor', [
         'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
+        'STICKY_HEADER_SCROLL_TOP',
         function(
             $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,
             StateParamChangesService, StateSolicitAnswerDetailsService,
-            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
+            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS,
+            STICKY_HEADER_SCROLL_TOP) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var updateInteractionVisibility = function(newInteractionId) {
@@ -124,7 +128,7 @@ angular.module('oppia').directive('stateEditor', [
           var questionSuggestionDiv = angular.element(
             document.getElementById('questionSuggestionDiv'));
           questionSuggestionDiv.on('scroll', function() {
-            if (questionSuggestionDiv.scrollTop() > 50) {
+            if (questionSuggestionDiv.scrollTop() > STICKY_HEADER_SCROLL_TOP) {
               $scope.isSticky = true;
             } else {
               $scope.isSticky = false;
