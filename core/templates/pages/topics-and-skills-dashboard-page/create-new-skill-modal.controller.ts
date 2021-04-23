@@ -82,9 +82,11 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
     $scope.updateSkillDescriptionAndCheckIfExists = function() {
       $scope.resetErrorMsg();
-      SkillEditorStateService.updateExistenceOfSkillDescription(
-        $scope.newSkillDescription, $scope._skillDescriptionExistsCallback
-      );
+      if ($scope.newSkillDescription !== '') {
+        SkillEditorStateService.updateExistenceOfSkillDescription(
+          $scope.newSkillDescription, $scope._skillDescriptionExistsCallback
+        );
+      }
       if (
         SkillCreationService.getSkillDescriptionStatus() !==
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
