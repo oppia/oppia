@@ -69,16 +69,6 @@ export class StoryContents {
     return this._nodes;
   }
 
-  getNodeIdCorrespondingToTitle(title: string): string | null {
-    var nodes = this._nodes;
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].getTitle() === title) {
-        return nodes[i].getId();
-      }
-    }
-    return null;
-  }
-
   rearrangeNodeInStory(fromIndex: number, toIndex: number): void {
     const nodeToMove: StoryNode = this._nodes[fromIndex];
     this._nodes.splice(fromIndex, 1);
