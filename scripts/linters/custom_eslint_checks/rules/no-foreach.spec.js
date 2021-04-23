@@ -24,28 +24,29 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester();
 ruleTester.run('no-foreach', rule, {
   valid: [
-    `
-    // eslint-disable-next-line max-len
-    it('should' +
-    'check if eslint-disable-next-line is allowed')`,
-    `
-    /* eslint-disable-next-line max-len */
-    it('should' +
-    'check if eslint-disable-next-line is allowed')`,
-    `
-    /* eslint-disable no-multiline-disable */
-    /* eslint-disable max-len */
-    it('should' +
-    'check if we can disable our new lint check')`
+    `it('should transform all key value pairs to angular constants',
+    function() {
+    for (var constantName in constants) {
+        expect($injector.has(constantName)).toBe(true);
+        expect($injector.get(constantName)).toEqual(constants[constantName]);
+    }
+    });`,
+
   ],
 
   invalid: [
     {
       code:
-      `
-      `,
+        `it('should transform all key value pairs to angular constants',
+        function() {
+        for (var constantName in constants) {
+            expect($injector.has(constantName)).toBe(true);
+            expect($injector.get(constantName)).toEqual(constants[constantName]);
+        }
+        
+        });`,
       errors: [{
-        message: 'Do not use disable statement for multilines',
+        message: 'Do not use forEach statements',
         type: null
       }]
     },
