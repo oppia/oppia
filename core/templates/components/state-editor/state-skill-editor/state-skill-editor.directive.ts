@@ -19,16 +19,18 @@ import { CategorizedSkills } from
   // eslint-disable-next-line
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
-require('components/skill-selector/select-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.component.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').directive('stateSkillEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -42,12 +44,12 @@ angular.module('oppia').directive('stateSkillEditor', [
         '/components/state-editor/state-skill-editor/' +
         'state-skill-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'NgbModal',
         'StateLinkedSkillIdService', 'StoryEditorStateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService,
+            $rootScope, $scope, $uibModal, AlertsService, NgbModal,
             StateLinkedSkillIdService, StoryEditorStateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService) {
@@ -82,21 +84,21 @@ angular.module('oppia').directive('stateSkillEditor', [
               StoryEditorStateService.getSkillSummaries());
             var allowSkillsFromOtherTopics = true;
             var skillsInSameTopicCount = 0;
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                skillsInSameTopicCount: () => skillsInSameTopicCount,
-                sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills: () => categorizedSkills,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
-                untriagedSkillSummaries: () => untriagedSkillSummaries
-              },
-              controller: 'SelectSkillModalController',
-              windowClass: 'skill-select-modal',
-              size: 'xl'
-            }).result.then(function(result) {
+            let modalRef: NgbModalRef = NgbModal.open(
+              SelectSkillModalComponent, {
+                backdrop: 'static',
+                windowClass: 'skill-select-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+            modalRef.componentInstance.skillsInSameTopicCount = (
+              skillsInSameTopicCount);
+            modalRef.componentInstance.categorizedSkills = categorizedSkills;
+            modalRef.componentInstance.allowSkillsFromOtherTopics = (
+              allowSkillsFromOtherTopics);
+            modalRef.componentInstance.untriagedSkillSummaries = (
+              untriagedSkillSummaries);
+            modalRef.result.then(function(result) {
               try {
                 StateLinkedSkillIdService.displayed = result.id;
                 StateLinkedSkillIdService.saveDisplayedValue();

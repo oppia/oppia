@@ -18,7 +18,8 @@
 
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
-require('components/skill-selector/select-skill-modal.controller.ts');
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 require(
   'components/skill-selector/skill-selector.component.ts');
 require(
@@ -36,6 +37,7 @@ require(
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/ngb-modal.service.ts');
 require('services/page-title.service.ts');
 require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
@@ -63,17 +65,17 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
+        '$rootScope', '$scope', '$timeout', '$window',
         'AlertsService',
-        'ExplorationIdValidationService', 'FocusManagerService',
+        'ExplorationIdValidationService', 'FocusManagerService', 'NgbModal',
         'PageTitleService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_CHAPTER_TITLE', function(
-            $rootScope, $scope, $timeout, $uibModal, $window,
+            $rootScope, $scope, $timeout, $window,
             AlertsService,
-            ExplorationIdValidationService, FocusManagerService,
+            ExplorationIdValidationService, FocusManagerService, NgbModal,
             PageTitleService,
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
@@ -264,21 +266,21 @@ angular.module('oppia').directive('storyNodeEditor', [
               StoryEditorStateService.getSkillSummaries());
             var allowSkillsFromOtherTopics = true;
             var skillsInSameTopicCount = 0;
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                skillsInSameTopicCount: () => skillsInSameTopicCount,
-                sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills: () => categorizedSkills,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
-                untriagedSkillSummaries: () => untriagedSkillSummaries
-              },
-              controller: 'SelectSkillModalController',
-              windowClass: 'skill-select-modal',
-              size: 'xl'
-            }).result.then(function(summary) {
+            let modalRef: NgbModalRef = NgbModal.open(
+              SelectSkillModalComponent, {
+                backdrop: 'static',
+                windowClass: 'skill-select-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+            modalRef.componentInstance.skillsInSameTopicCount = (
+              skillsInSameTopicCount);
+            modalRef.componentInstance.categorizedSkills = categorizedSkills;
+            modalRef.componentInstance.allowSkillsFromOtherTopics = (
+              allowSkillsFromOtherTopics);
+            modalRef.componentInstance.untriagedSkillSummaries = (
+              untriagedSkillSummaries);
+            modalRef.result.then(function(summary) {
               try {
                 $scope.skillIdToSummaryMap[summary.id] = summary.description;
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
@@ -302,21 +304,21 @@ angular.module('oppia').directive('storyNodeEditor', [
             var topicName = StoryEditorStateService.getTopicName();
             var categorizedSkillsInTopic = {};
             categorizedSkillsInTopic[topicName] = categorizedSkills[topicName];
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                skillsInSameTopicCount: () => skillsInSameTopicCount,
-                sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills: () => categorizedSkillsInTopic,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
-                untriagedSkillSummaries: () => null
-              },
-              controller: 'SelectSkillModalController',
-              windowClass: 'skill-select-modal',
-              size: 'xl'
-            }).result.then(function(summary) {
+            let modalRef: NgbModalRef = NgbModal.open(
+              SelectSkillModalComponent, {
+                backdrop: 'static',
+                windowClass: 'skill-select-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+            modalRef.componentInstance.skillsInSameTopicCount = (
+              skillsInSameTopicCount);
+            modalRef.componentInstance.categorizedSkills = categorizedSkills;
+            modalRef.componentInstance.allowSkillsFromOtherTopics = (
+              allowSkillsFromOtherTopics);
+            modalRef.componentInstance.untriagedSkillSummaries = (
+              untriagedSkillSummaries);
+            modalRef.result.then(function(summary) {
               try {
                 StoryUpdateService.addAcquiredSkillIdToNode(
                   $scope.story, $scope.getId(), summary.id);

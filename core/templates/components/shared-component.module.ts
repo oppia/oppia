@@ -41,6 +41,7 @@ import { AttributionGuideComponent } from './common-layout-directives/common-ele
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
 import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
+import { SelectSkillModalComponent } from './skill-selector/select-skill-modal.component';
 import { SharingLinksComponent } from './common-layout-directives/common-elements/sharing-links.component';
 import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
 import { SkillSelectorComponent } from './skill-selector/skill-selector.component';
@@ -128,6 +129,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
+    SelectSkillModalComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
@@ -158,6 +160,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
@@ -194,6 +197,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OutcomeFeedbackEditorComponent,
     SchemaBasedEditorDirective,
     SharingLinksComponent,
+    SelectSkillModalComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,

@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controller for the questions list.
  */
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 require('directives/angular-html-bind.directive.ts');
 require(
@@ -58,6 +60,7 @@ require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/ngb-modal.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
@@ -89,7 +92,7 @@ angular.module('oppia').directive('questionsList', [
         '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'ContextService', 'EditableQuestionBackendApiService',
         'FocusManagerService', 'ImageLocalStorageService',
-        'MisconceptionObjectFactory',
+        'MisconceptionObjectFactory', 'NgbModal',
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
         'SkillBackendApiService',
@@ -101,7 +104,7 @@ angular.module('oppia').directive('questionsList', [
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
             FocusManagerService, ImageLocalStorageService,
-            MisconceptionObjectFactory,
+            MisconceptionObjectFactory, NgbModal,
             QuestionObjectFactory, QuestionUndoRedoService,
             QuestionValidationService, QuestionsListService,
             SkillBackendApiService,
@@ -515,23 +518,22 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.getGroupedSkillSummaries().current.concat(
                   ctrl.getGroupedSkillSummaries().others);
             var allowSkillsFromOtherTopics = true;
-            $uibModal.open({
-              templateUrl:
-                  UrlInterpolationService.getDirectiveTemplateUrl(
-                    '/components/skill-selector/' +
-                      'select-skill-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                skillsInSameTopicCount: () => skillsInSameTopicCount,
-                sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills: () => ctrl.getSkillsCategorizedByTopics,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
-                untriagedSkillSummaries: () => ctrl.getUntriagedSkillSummaries
-              },
-              controller: 'SelectSkillModalController',
-              windowClass: 'skill-select-modal',
-              size: 'xl'
-            }).result.then(function(summary) {
+            let modalRef: NgbModalRef = NgbModal.open(
+              SelectSkillModalComponent, {
+                backdrop: 'static',
+                windowClass: 'skill-select-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+            modalRef.componentInstance.skillsInSameTopicCount = (
+              skillsInSameTopicCount);
+            modalRef.componentInstance.categorizedSkills = (
+              ctrl.getSkillsCategorizedByTopics);
+            modalRef.componentInstance.allowSkillsFromOtherTopics = (
+              allowSkillsFromOtherTopics);
+            modalRef.componentInstance.untriagedSkillSummaries = (
+              ctrl.getUntriagedSkillSummaries);
+            modalRef.result.then(function(summary) {
               for (var idx in ctrl.associatedSkillSummaries) {
                 if (
                   ctrl.associatedSkillSummaries[idx].getId() ===
