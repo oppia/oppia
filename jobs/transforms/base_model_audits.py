@@ -277,6 +277,7 @@ class ValidateCommitCmdsSchema(beam.DoFn):
 
     def process(self, input_model):
         """Validates schema of commit commands in commit_cmds dict.
+
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
@@ -302,7 +303,7 @@ class ValidateCommitCmdsSchema(beam.DoFn):
             except Exception as e:
                 cmd_name = commit_cmd_dict.get('cmd')
                 yield audit_errors.CommitCmdsValidateError(
-                    cmd_name, model, commit_cmd_dict, e)        
+                    cmd_name, model, commit_cmd_dict, e)
 
 
 @audit_decorators.AuditsExisting(
