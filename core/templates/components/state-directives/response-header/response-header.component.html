@@ -16,7 +16,7 @@
            *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
         Incorrect
       </div>
-      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" 
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct"
            *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
         Correct
       </div>
@@ -36,7 +36,7 @@
     Correct
   </span>
   <span *ngIf="getOutcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
-        (click)="navigateToState(getOutcome.dest)" 
+        (click)="navigateToState(getOutcome.dest)"
         class="oppia-nested-link">
     {{ getOutcome.dest }}
   </span>
