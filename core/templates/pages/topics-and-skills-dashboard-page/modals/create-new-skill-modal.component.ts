@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
+import { TopicsAndSkillsDashboardPageConstants } from '../topics-and-skills-dashboard-page.constants';
 
 @Component({
   selector: 'oppia-create-new-skill-modal',

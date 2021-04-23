@@ -59,7 +59,7 @@ import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/lea
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
-import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-skill-modal.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 
 

@@ -18,13 +18,13 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardFilter } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import { debounce } from 'lodash';
+import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/create-new-skill-modal.service';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -87,7 +87,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   constructor(
     private alertsService: AlertsService,
     private focusManagerService: FocusManagerService,
-    private skillCreationService: SkillCreationService,
+    private createNewSkillModalService: CreateNewSkillModalService,
     private topicCreationService: TopicCreationService,
     private topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService,
@@ -192,7 +192,7 @@ export class TopicsAndSkillsDashboardPageComponent {
   }
 
   createSkill(): void {
-    this.skillCreationService.createNewSkill();
+    this.createNewSkillModalService.createNewSkill();
   }
 
   /**

@@ -58,6 +58,7 @@ import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashb
     DeleteTopicModalComponent,
     SelectTopicsComponent,
     TopicsAndSkillsDashboardPageComponent,
+    CreateNewTopicModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -71,6 +72,7 @@ import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashb
     DeleteTopicModalComponent,
     SelectTopicsComponent,
     TopicsAndSkillsDashboardPageComponent,
+    CreateNewTopicModalComponent
   ],
   providers: [
     SkillCreationService,
@@ -98,6 +100,7 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
