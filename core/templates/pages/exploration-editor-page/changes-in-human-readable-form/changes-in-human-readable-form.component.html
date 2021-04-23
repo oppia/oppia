@@ -13,15 +13,15 @@
       <div *ngIf="lostChange.cmd === 'edit_state_property'">
         Edits to state: {{ lostChange.stateName }}
         <ng-container [ngSwitch]="lostChange.propertyName">
-          <div *ngSwitchCase="content">
+          <div *ngSwitchCase="'content'">
             <div *ngIf="!lostChange.isNewValueEmpty()" class="state-edit-desc">
               <strong>Edited content: </strong>
-              <div class="content" ng-bind-html="lostChange.newValue.html">
+              <div class="content" [innerHTML]="lostChange.newValue.html">
               </div>
             </div>
           </div>
 
-          <div *ngSwitchCase="widget_id" class="state-edit-desc">
+          <div *ngSwitchCase="'widget_id'" class="state-edit-desc">
             <span *ngIf="lostChange.isAddingInteraction()">
               <strong>Added Interaction: </strong>
               {{ lostChange.newValue }}
@@ -37,7 +37,7 @@
             </span>
           </div>
 
-          <div *ngSwitchCase="widget_customization_args" class="state-edit-desc">
+          <div *ngSwitchCase="'widget_customization_args'" class="state-edit-desc">
             <span *ngIf="lostChange.isOldValueEmpty()">
               Added Interaction Customizations
             </span>
@@ -49,7 +49,7 @@
             </span>
           </div>
 
-          <div *ngSwitchCase="answer_groups">
+          <div *ngSwitchCase="'answer_groups'">
             <div *ngIf="lostChange.getRelativeChangeToGroups() === 'added'" class="state-edit-desc answer-group">
               <strong>Added answer group: </strong>
               <p class="sub-edit">
@@ -115,7 +115,7 @@
             </div>
           </div>
 
-          <div *ngSwitchCase="default_outcome">
+          <div *ngSwitchCase="'default_outcome'">
             <div *ngIf="lostChange.getRelativeChangeToGroups() === 'added'" class="state-edit-desc default-outcome">
               Added default outcome:
               <p class="sub-edit">
