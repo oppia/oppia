@@ -25,6 +25,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { ContentLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/layout-directives/content-language-selector.component';
@@ -37,6 +38,7 @@ import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misc
   imports: [
     BrowserModule,
     HttpClientModule,
+    InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
