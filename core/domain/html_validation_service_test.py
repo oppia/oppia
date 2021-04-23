@@ -1238,7 +1238,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             True)
 
     def test_convert_svg_diagram_tags_to_image_tags(self):
-        test_cases = [{
+        test_case = {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
                 'svg_filename-with-value="&quot;img1.svg&quot;"'
@@ -1252,10 +1252,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
             )
-        }]
+        }
 
-        for test_case in test_cases:
-            self.assertEqual(
-                html_validation_service.convert_svg_diagram_tags_to_image_tags(
-                    test_case['html_content']),
-                test_case['expected_output'])
+        self.assertEqual(
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                test_case['html_content']),
+            test_case['expected_output'])
