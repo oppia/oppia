@@ -35,6 +35,7 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
+from core.domain import html_validation_service
 import feconf
 import python_utils
 import utils
@@ -1704,7 +1705,7 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        for key,state_dict in states_dict.items():
+        for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_svg_diagram_tags_to_image_tags,

@@ -715,17 +715,18 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
     Returns:
         str. The updated html string.
     """
-    soup = bs4.BeautifulSoup(html_string.encode(encoding='utf-8'), 'html.parser')
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
 
     for image in soup.findAll(name='oppia-noninteractive-svgdiagram'):
-        # The 'filepath-with-value' and 'alt-with-value' 
+        # The 'filepath-with-value' and 'alt-with-value'
         # attribute values should be enclosed in
         # double quotes(&amp;quot;).
-        attrValue = escape_html(image['svg_filename-with-value'])
-        altValue = escape_html(image['alt-with-value'])
+        attr_value = escape_html(image['svg_filename-with-value'])
+        alt_value = escape_html(image['alt-with-value'])
         del image['svg_filename-with-value']
         image['filepath-with-value'] = attrValue
         image['caption-with-value'] = ''
-        image ['alt-with-value'] = altValue
+        image['alt-with-value'] = altValue
         image.name = 'oppia-noninteractive-image'
     return python_utils.UNICODE(soup)
