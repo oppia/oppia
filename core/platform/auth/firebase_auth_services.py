@@ -116,6 +116,8 @@ def establish_auth_session(request, response):
     fresh_cookie = firebase_auth.create_session_cookie(
         _get_id_token(request), feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
+    import webapp2
+    response = webapp2.Response()
     response.set_cookie(
         feconf.FIREBASE_SESSION_COOKIE_NAME,
         value=fresh_cookie,
@@ -124,7 +126,7 @@ def establish_auth_session(request, response):
         # Only allow this cookie to persist on Oppia's requests and responses,
         # promoting it to a "first-party cookie" (as opposed to a "third-party
         # cookie", which are untrusted by some browsers).
-        samesite='strict',
+        samesite='lax',
         # Toggles https vs http. The production server uses https, but the local
         # developement server uses http.
         secure=(not constants.EMULATOR_MODE),
