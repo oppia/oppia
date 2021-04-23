@@ -36,7 +36,7 @@ import feconf
 from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
-import utils
+import python_utils
 
 import apache_beam as beam
 
@@ -45,7 +45,7 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
-VALIDATION_MODES = utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
+VALIDATION_MODES = python_utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
 
 
 class ValidateDeletedModel(beam.DoFn):
@@ -226,8 +226,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         models.
 
         Args:
-            input_model: datastore_services.Model. A domain object to
-                validate.
+            input_model: datastore_services.Model. A domain object to validate.
 
         Yields:
             ModelDomainObjectValidateError. Error for domain object validation.
@@ -278,7 +277,6 @@ class ValidateCommitCmdsSchema(beam.DoFn):
 
     def process(self, input_model):
         """Validates schema of commit commands in commit_cmds dict.
-
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
@@ -304,4 +302,26 @@ class ValidateCommitCmdsSchema(beam.DoFn):
             except Exception as e:
                 cmd_name = commit_cmd_dict.get('cmd')
                 yield audit_errors.CommitCmdsValidateError(
-                    cmd_name, model, commit_cmd_dict, e)
+                    cmd_name, model, commit_cmd_dict, e)        
+
+
+@audit_decorators.AuditsExisting(
+    base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
+class ValidateCommitType(beam.DoFn):
+    """DoFn to check whether commit type is valid."""
+
+    def process(self, input_model):
+        """Function that defines how to process each element in a pipeline of
+        models.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Yields:
+            ModelCommitTypeError. Error for commit_type validation.
+        """
+        model = job_utils.clone_model(input_model)
+
+        if (model.commit_type not in
+                base_models.VersionedModel.COMMIT_TYPE_CHOICES):
+            yield audit_errors.InvalidCommitTypeError(model)
