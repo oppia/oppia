@@ -813,7 +813,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   private updateValidationWithLatestDimensions(): void {
     const dimensions = this.calculateTargetImageDimensions();
-    const imageDataURI = <string>this.data.metadata.uploadedImageData;
+    const imageDataURI = <string> this.data.metadata.uploadedImageData;
     const mimeType = (<string>imageDataURI).split(';')[0];
     if (mimeType === 'data:image/gif') {
       let successCb = obj => {
@@ -996,7 +996,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       imageDataURI: string, width: number, height: number,
       processFrameCallback: (dataUrl: string) => void,
       successCallback: (gifshotCallbackObject: GifshotCallbackObject) => void
-      ): void {
+  ): void {
     // Looping through individual gif frames can take a while
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
