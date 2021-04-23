@@ -77,6 +77,10 @@ import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { LimitToPipe } from 'filters/limit-to.pipe';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+
 
 // Services.
 import { AuthService } from 'services/auth.service';
@@ -135,6 +139,8 @@ const toastrConfig = {
     AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
@@ -164,6 +170,8 @@ const toastrConfig = {
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
+    UploadActivityModalComponent,
+    PromoBarComponent,
     SortByPipe,
     LearnerDashboardIconsComponent
   ],
@@ -172,6 +180,8 @@ const toastrConfig = {
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
@@ -188,6 +198,8 @@ const toastrConfig = {
     PromoBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    UploadActivityModalComponent,
+    PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
@@ -208,6 +220,8 @@ const toastrConfig = {
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
@@ -227,6 +241,7 @@ const toastrConfig = {
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
+    UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,
     TruncateAndCapitalizePipe,
     TruncatePipe,
