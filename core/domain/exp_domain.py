@@ -971,7 +971,7 @@ class Exploration(python_utils.OBJECT):
                 % (self.states[self.init_state_name].card_is_checkpoint)
             )
 
-        # Check if terminal states are checkpoint.
+        # Check if terminal states are checkpoints.
         for state_name, state in self.states.items():
             interaction = state.interaction
             if interaction.is_terminal:
@@ -1037,11 +1037,10 @@ class Exploration(python_utils.OBJECT):
                         if (dest_state not in curr_queue and
                                 dest_state not in processed_state_names):
                             curr_queue.append(dest_state)
-
-            if excluded_state_is_bypassable:
-                raise utils.ValidationError(
-                    'Cannot make %s a checkpoint as it is bypassable'
-                    % state_name_to_exclude)
+                if excluded_state_is_bypassable:
+                    raise utils.ValidationError(
+                        'Cannot make %s a checkpoint as it is bypassable'
+                        % state_name_to_exclude)
 
         if strict:
             warnings_list = []

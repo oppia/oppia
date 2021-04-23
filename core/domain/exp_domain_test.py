@@ -507,6 +507,20 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.exploration.validate()
 
     def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
+        # Exploration to test a checkpoint state which has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction  │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │  (Second) │      │   Third   │
+        # └───────────┘      └─┬─────────┘
+        #                      │
+        #        ┌─────────────┴─┐
+        #        │      End      │
+        #        └───────────────┘.
+
         second_state = state_domain.State.create_default_state('Second')
         self.set_interaction_for_state(second_state, 'TextInput')
         third_state = state_domain.State.create_default_state('Third')
@@ -570,33 +584,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             }
         ]
 
-        second_state_answer_group_dicts = [
-            {
-                'outcome': {
-                    'dest': 'End',
-                    'feedback': {
-                        'content_id': 'feedback_0',
-                        'html': '<p>Feedback</p>'
-                    },
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None
-                },
-                'rule_specs': [{
-                    'inputs': {
-                        'x': {
-                            'contentId': 'rule_input_0',
-                            'normalizedStrSet': ['Test0']
-                        }
-                    },
-                    'rule_type': 'Contains'
-                }],
-                'training_data': [],
-                'tagged_skill_misconception_id': None
-            }
-        ]
-
         third_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -626,8 +613,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         self.init_state.update_interaction_answer_groups(
             init_state_answer_group_dicts)
-        second_state.update_interaction_answer_groups(
-            second_state_answer_group_dicts)
         third_state.update_interaction_answer_groups(
             third_state_answer_group_dicts)
 
@@ -639,11 +624,78 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         second_state.card_is_checkpoint = False
         self.exploration.validate()
 
+        # Exploration to test a checkpoint state when the state in the other
+        # path has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction  │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │ (Second)  │      │   Third   │
+        # └────────┬──┘      └───────────┘
+        #          │
+        #        ┌─┴─────────────┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        second_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+        second_state.update_interaction_answer_groups(
+            second_state_answer_group_dicts)
+        third_state.update_interaction_answer_groups([])
+
+        second_state.card_is_checkpoint(True)
+        self.exploration.validate()
+
         # Reset the exploration.
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
             'End': self.end_state
         }
+
+        # Exploration to test a bypassable state.
+        #                ┌────────────────┐
+        #                │ Introduction   │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └─────┬──────┘
+        #      │            ┌────┴─────┐            │
+        #      │            │    B     │            │
+        #      │            └──┬───────┘            │
+        #      └─────────┐     │                    │
+        #         ┌──────┴─────┴─┐    ┌─────────────┘
+        #         │      D       │    │
+        #         └─────────────┬┘    │
+        #                       │     │
+        #                    ┌──┴─────┴──┐
+        #                    │    End    │
+        #                    └───────────┘.
 
         a_state = state_domain.State.create_default_state('A')
         self.set_interaction_for_state(a_state, 'TextInput')
@@ -809,6 +861,25 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         d_state.update_card_is_checkpoint(False)
         self.exploration.validate()
 
+        # Modifying the graph to make D non-bypassable.
+        #                ┌────────────────┐
+        #                │ Introduction   │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬─────┘
+        #      │            ┌────┴─────┐             │
+        #      │            │    B     │             │
+        #      │            └────┬─────┘             │
+        #      │                 │                   │
+        #      │          ┌──────┴───────┐           │
+        #      └──────────┤      D       ├───────────┘
+        #                 └──────┬───────┘
+        #                        │
+        #                  ┌─────┴─────┐
+        #                  │    End    │
+        #                  └───────────┘.
+
         c_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -840,6 +911,25 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         d_state.update_card_is_checkpoint(True)
         self.exploration.validate()
+
+        # Modifying the graph to add another EndExploration state.
+        #                ┌────────────────┐
+        #                │ Introduction   │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬───┬─┘
+        #      │            ┌────┴─────┐             │   │
+        #      │            │    B     │             │   │
+        #      │            └────┬─────┘             │   │
+        #      │                 │                   │   │
+        #      │          ┌──────┴───────┐           │   │
+        #      └──────────┤      D       ├───────────┘   │
+        #                 └──────┬───────┘               │
+        #                        │                       │
+        #                  ┌─────┴─────┐           ┌─────┴─────┐
+        #                  │    End    │           │    End 2  │
+        #                  └───────────┘           └───────────┘.
 
         new_end_state = state_domain.State.create_default_state('End 2')
         self.set_interaction_for_state(new_end_state, 'EndExploration')
