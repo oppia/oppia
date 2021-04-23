@@ -115,11 +115,9 @@ class EmailDashboardDataHandler(base.BaseHandler):
         predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
-        for key, value in data.items():
-            if (key not in possible_keys or not isinstance(value, int) or
-                    value < 0):
-                # Raise exception if key is not one of the allowed keys or
-                # corresponding value is not of type integer.
+        for key, _ in data.items():
+            if key not in possible_keys:
+                # Raise exception if key is not one of the allowed keys.
                 raise self.InvalidInputException('400 Invalid input for query.')
 
 

@@ -36,7 +36,7 @@ import feconf
 from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.types import audit_errors
-import utils
+import python_utils
 
 import apache_beam as beam
 
@@ -45,7 +45,7 @@ import apache_beam as beam
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
 
-VALIDATION_MODES = utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
+VALIDATION_MODES = python_utils.create_enum('neutral', 'strict', 'non_strict') # pylint: disable=invalid-name
 
 
 class ValidateDeletedModel(beam.DoFn):
@@ -110,8 +110,30 @@ class ValidateBaseModelId(beam.DoFn):
 
 
 @audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
+class ValidatePostCommitStatus(beam.DoFn):
+    """DoFn to validate post_commit_status."""
+
+    def process(self, input_model):
+        """Function validates that post_commit_status is either public or
+        private
+
+        Args:
+            input_model: base_models.BaseCommitLogEntryModel.
+                Entity to validate.
+
+        Yields:
+            InvalidCommitStatusError. Error for commit_type validation.
+        """
+        model = job_utils.clone_model(input_model)
+        if model.post_commit_status not in [
+                feconf.POST_COMMIT_STATUS_PUBLIC,
+                feconf.POST_COMMIT_STATUS_PRIVATE]:
+            yield audit_errors.InvalidCommitStatusError(model)
+
+
+@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidatePostCommitIsPrivate(beam.DoFn):
-    """DoFn to check if post_commmit_status is private when
+    """DoFn to check if post_commit_status is private when
     post_commit_is_private is true and vice-versa.
     """
 
@@ -124,14 +146,15 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
                 Entity to validate.
 
         Yields:
-            ModelInvalidCommitStatus. Error for commit_type validation.
+            InvalidPrivateCommitStatusError. Error for private commit_type
+            validation.
         """
         model = job_utils.clone_model(input_model)
 
         expected_post_commit_is_private = (
             model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
         if model.post_commit_is_private != expected_post_commit_is_private:
-            yield audit_errors.InvalidCommitStatusError(model)
+            yield audit_errors.InvalidPrivateCommitStatusError(model)
 
 
 @audit_decorators.AuditsExisting(base_models.BaseModel)
@@ -203,8 +226,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         models.
 
         Args:
-            input_model: datastore_services.Model. A domain object to
-                validate.
+            input_model: datastore_services.Model. A domain object to validate.
 
         Yields:
             ModelDomainObjectValidateError. Error for domain object validation.
@@ -227,3 +249,25 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                         validation_type))
         except Exception as e:
             yield audit_errors.ModelDomainObjectValidateError(input_model, e)
+
+
+@audit_decorators.AuditsExisting(
+    base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
+class ValidateCommitType(beam.DoFn):
+    """DoFn to check whether commit type is valid."""
+
+    def process(self, input_model):
+        """Function that defines how to process each element in a pipeline of
+        models.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Yields:
+            ModelCommitTypeError. Error for commit_type validation.
+        """
+        model = job_utils.clone_model(input_model)
+
+        if (model.commit_type not in
+                base_models.VersionedModel.COMMIT_TYPE_CHOICES):
+            yield audit_errors.InvalidCommitTypeError(model)
