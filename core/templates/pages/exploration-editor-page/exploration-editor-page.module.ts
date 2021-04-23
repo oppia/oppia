@@ -35,7 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/explor
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
 import { changesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
-import { LostChangesModalControllerComponent } from './modal-templates/lost-changes-modal.component';
+import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 
 @NgModule({
   imports: [
@@ -53,7 +53,7 @@ import { LostChangesModalControllerComponent } from './modal-templates/lost-chan
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
     changesInHumanReadableFormComponent,
-    LostChangesModalControllerComponent,
+    LostChangesModalComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -63,7 +63,7 @@ import { LostChangesModalControllerComponent } from './modal-templates/lost-chan
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
     changesInHumanReadableFormComponent,
-    LostChangesModalControllerComponent,
+    LostChangesModalComponent,
   ],
   providers: [
     {

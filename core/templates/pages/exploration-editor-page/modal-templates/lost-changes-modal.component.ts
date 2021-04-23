@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for lost changes modal.
+ * @fileoverview Component for lost changes modal.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -22,10 +22,10 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 
 @Component({
-  selector: 'oppia-lost-changes-modal-controller',
+  selector: 'oppia-lost-changes-modal',
   templateUrl: './lost-changes-modal.component.html'
 })
-export class LostChangesModalControllerComponent implements OnInit {
+export class LostChangesModalComponent implements OnInit {
   @Input() lostChanges:any;
 
   constructor(
@@ -33,7 +33,7 @@ export class LostChangesModalControllerComponent implements OnInit {
     private lostChangeObjectFactory: LostChangeObjectFactory
   ) { }
 
-  ngOnInit (): void {
+  ngOnInit(): void {
     this.lostChanges = this.lostChanges.map(
       this.lostChangeObjectFactory.createNew);
     this.loggerService.error('Lost changes: ' + JSON.stringify(this.lostChanges));

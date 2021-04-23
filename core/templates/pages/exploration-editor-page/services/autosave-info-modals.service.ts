@@ -24,7 +24,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { LocalStorageService } from 'services/local-storage.service';
 import { SaveValidationFailModalComponent } from 'pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component.ts';
 import { SaveVersionMismatchModalComponent } from 'pages/exploration-editor-page/modal-templates/save-version-mismatch-modal.component';
-import { LostChangesModalControllerComponent } from 'pages/exploration-editor-page/modal-templates/lost-changes-modal.component.ts'
+import { LostChangesModalComponent } from 'pages/exploration-editor-page/modal-templates/lost-changes-modal.component.ts'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({
@@ -73,7 +73,7 @@ export class AutosaveInfoModalsService {
 
   showLostChangesModal(lostChanges, explorationId): void {
     const modelRef = this.ngbModal.open(
-      LostChangesModalControllerComponent, {backdrop: true});
+      LostChangesModalComponent, {backdrop: true});
     modelRef.componentInstance.lostChanges = lostChanges;
     modelRef.result.then(function() {
       this._isModalOpen = false;
