@@ -102,7 +102,7 @@ angular.module('oppia').directive('learnerViewInfo', [
                   return expInfo;
                 }
               },
-              controller: 'InformationCardModalController'
+              controller: 'InformationCardModalComponent'
             }).result.then(null, () => {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

@@ -23,6 +23,7 @@ import { AdminDataService } from 'pages/admin-page/services/admin-data.service.t
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service.ts';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
+require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
 @Component({
   selector: 'admin-config-tab',
@@ -43,6 +44,7 @@ export class AdminConfigTabComponent implements OnInit {
   
   ngOnInit(): void {
     this.reloadConfigProperties();
+    console.log(this.configProperties);
   }
   
   isNonemptyObject(object) {

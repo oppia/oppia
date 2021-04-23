@@ -1,7 +1,7 @@
-<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+d<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Configuration properties</h3>
   <div class="container ml-0" *ngIf="isNonemptyObject(configProperties)">
-    <div *ngFor="(configPropertyId, configPropertyData) in configProperties">
+    <div *ngFor="let configPropertyId, configPropertyData of configProperties">
       <div class="row protractor-test-config-property oppia-description-text-container">
         <span class="col-lg-2 col-md-2 col-sm-2">
           <em class="protractor-test-config-title"><{{ configPropertyData.description }}></em>
@@ -25,7 +25,7 @@
   <div *ngIf="!isNonemptyObject(configProperties)">
     No configuration properties are available.
   </div>
-</md-card>
+</mat-card>
 <style>
   admin-config-tab .oppia-long-text-card {
     max-width: 1050px;
