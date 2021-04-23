@@ -44,38 +44,38 @@ module.exports = {
     // `await browser.switchTo().activeElement().sendKeys(<ARGS>)`
     var checkExprNode = function(node) {
       node = node.expression;
-      if (node.type !== "AwaitExpression" ||
-        node.argument.type !== "CallExpression") {
+      if (node.type !== 'AwaitExpression' ||
+        node.argument.type !== 'CallExpression') {
         return false;
       }
 
       node = node.argument.callee;
-      if (node.type !== "MemberExpression" ||
-        node.property.type !== "Identifier" ||
-        node.property.name !== "sendKeys" ||
-        node.object.type != "CallExpression") {
+      if (node.type !== 'MemberExpression' ||
+        node.property.type !== 'Identifier' ||
+        node.property.name !== 'sendKeys' ||
+        node.object.type !== 'CallExpression') {
         return false;
       }
 
       node = node.object.callee;
-      if (node.type !== "MemberExpression" ||
-        node.property.type !== "Identifier" ||
-        node.property.name !== "activeElement" ||
-        node.object.type !== "CallExpression") {
+      if (node.type !== 'MemberExpression' ||
+        node.property.type !== 'Identifier' ||
+        node.property.name !== 'activeElement' ||
+        node.object.type !== 'CallExpression') {
         return false;
       }
 
       node = node.object.callee;
-      if (node.type !== "MemberExpression" ||
-        node.property.type !== "Identifier" ||
-        node.property.name !== "switchTo" ||
-        node.object.type !== "Identifier" ||
-        node.object.name !== "browser") {
+      if (node.type !== 'MemberExpression' ||
+        node.property.type !== 'Identifier' ||
+        node.property.name !== 'switchTo' ||
+        node.object.type !== 'Identifier' ||
+        node.object.name !== 'browser') {
         return false;
       }
 
       return true;
-    }
+    };
 
     return {
       ExpressionStatement: function(node) {
