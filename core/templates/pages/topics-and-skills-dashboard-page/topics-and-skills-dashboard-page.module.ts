@@ -27,6 +27,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list/skills-list.component';
 import { DeleteSkillModalComponent } from './modals/delete-skill-modal.component';
@@ -35,12 +36,15 @@ import { TopicsListComponent } from './topics-list/topics-list.component';
 import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
+    DynamicContentModule,
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -69,6 +73,7 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
     TopicsAndSkillsDashboardPageComponent,
   ],
   providers: [
+    SkillCreationService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
@@ -79,6 +84,10 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: '$scope',
+      useExisting: '$rootScope'
     }
   ]
 })
@@ -89,7 +98,6 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

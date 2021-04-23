@@ -18,7 +18,7 @@
 require('services/stateful/focus-manager.service.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-description-editor/' +
-  'skill-description-editor.directive.ts');
+  'skill-description-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
   'skill-concept-card-editor.directive.ts');
@@ -31,7 +31,7 @@ require(
 require(
   'pages/skill-editor-page/editor-tab/skill-rubrics-editor/' +
   'skill-rubrics-editor.directive.ts');
-require('components/rubrics-editor/rubrics-editor.directive.ts');
+require('components/rubrics-editor/rubrics-editor.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');

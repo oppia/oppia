@@ -212,6 +212,22 @@ class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
 
 class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
 
+    def test_message_for_invalid_post_commit_status(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='invalid',
+            post_commit_is_private=False,
+            commit_cmds=[])
+        error = audit_errors.InvalidCommitStatusError(model)
+        self.assertEqual(
+            error.message,
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id=\'123\'): '
+            'post_commit_status is invalid')
+
     def test_message_for_private_post_commit_status(self):
         model = base_models.BaseCommitLogEntryModel(
             id='123',
@@ -222,12 +238,13 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             post_commit_status='private',
             post_commit_is_private=False,
             commit_cmds=[])
-        error = audit_errors.InvalidCommitStatusError(model)
+        error = audit_errors.InvalidPrivateCommitStatusError(model)
 
         self.assertEqual(
             error.message,
-            'InvalidCommitStatusError in BaseCommitLogEntryModel(id=\'123\'): '
-            'post_commit_status="private" but post_commit_is_private=False')
+            'InvalidPrivateCommitStatusError in '
+            'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="private" '
+            'but post_commit_is_private=False')
 
     def test_message_for_public_post_commit_status(self):
         model = base_models.BaseCommitLogEntryModel(
@@ -239,12 +256,13 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             post_commit_status='public',
             post_commit_is_private=True,
             commit_cmds=[])
-        error = audit_errors.InvalidCommitStatusError(model)
+        error = audit_errors.InvalidPrivateCommitStatusError(model)
 
         self.assertEqual(
             error.message,
-            'InvalidCommitStatusError in BaseCommitLogEntryModel(id=\'123\'): '
-            'post_commit_status="public" but post_commit_is_private=True')
+            'InvalidPrivateCommitStatusError in '
+            'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="public" '
+            'but post_commit_is_private=True')
 
 
 class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
@@ -313,6 +331,25 @@ class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
             ' fails domain validation with the error: %s' % error_message)
 
         self.assertEqual(error.message, msg)
+
+
+class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
+
+    def test_model_invalid_id_error(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[])
+        error = audit_errors.InvalidCommitTypeError(model)
+
+        self.assertEqual(
+            error.message,
+            'InvalidCommitTypeError in BaseCommitLogEntryModel(id=\'123\'): '
+            'Commit type invalid-type is not allowed')
 
 
 class ModelExpiringErrorTests(AuditErrorsTestBase):
