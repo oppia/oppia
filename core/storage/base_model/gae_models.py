@@ -36,7 +36,7 @@ VERSION_DELIMITER = '-'
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
-DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+DELETION_POLICY = python_utils.create_enum(  # pylint: disable=invalid-name
     # Models that should be kept.
     'KEEP',
     # Models that should be deleted.
@@ -53,7 +53,7 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
-EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+EXPORT_POLICY = python_utils.create_enum(  # pylint: disable=invalid-name
     # Indicates that a model's field is to be exported.
     'EXPORTED',
     # Indicates that the value of the field is exported as the key in the
@@ -63,7 +63,7 @@ EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
-MODEL_ASSOCIATION_TO_USER = utils.create_enum(  # pylint: disable=invalid-name
+MODEL_ASSOCIATION_TO_USER = python_utils.create_enum(  # pylint: disable=invalid-name
     # Indicates that a model has a single instance per user.
     'ONE_INSTANCE_PER_USER',
     # Indicates that a model can be shared by multiple users.

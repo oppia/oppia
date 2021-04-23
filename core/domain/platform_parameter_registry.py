@@ -53,12 +53,12 @@ class Registry(python_utils.OBJECT):
         """Creates, registers and returns a platform parameter.
 
         Args:
-            name: str. The name of the platform parameter.
+            name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            data_type: DATA_TYPES. The data type of the platform parameter,
-                must be one of the following: 'bool', 'number', 'string'.
+            data_type: Enum(DATA_TYPES). The data type of the platform
+                parameter, must be one of the following: bool, number, string.
             is_feature: bool. True if the platform parameter is a feature flag.
-            feature_stage: FEATURE_STAGES|None. The stage of the feature,
+            feature_stage: Enum(FEATURE_STAGES)|None. The stage of the feature,
                 required if 'is_feature' is True.
 
         Returns:
@@ -67,20 +67,24 @@ class Registry(python_utils.OBJECT):
         if data_type in cls.DEFAULT_VALUE_BY_TYPE_DICT:
             default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
         else:
+            allowed_data_types = [
+                data_type_enum.value
+                for data_type_enum in cls.DEFAULT_VALUE_BY_TYPE_DICT
+            ]
             raise Exception(
                 'Unsupported data type \'%s\', must be one of'' %s.' % (
-                    data_type, list(cls.DEFAULT_VALUE_BY_TYPE_DICT.keys())))
+                    data_type.value, allowed_data_types))
 
         param_dict = {
-            'name': name,
+            'name': name.value if name else None,
             'description': description,
-            'data_type': data_type,
+            'data_type': data_type.value,
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': default,
             'is_feature': is_feature,
-            'feature_stage': feature_stage,
+            'feature_stage': feature_stage.value if feature_stage else None,
         }
         return cls.init_platform_parameter_from_dict(param_dict)
 
@@ -91,9 +95,9 @@ class Registry(python_utils.OBJECT):
         feature flag.
 
         Args:
-            name: str. The name of the platform parameter.
+            name: Enum(PARAMS). The name of the platform parameter.
             description: str. The description of the platform parameter.
-            stage: str. The stage of the feature.
+            stage: Enum(FEATURE_STAGES). The stage of the feature.
 
         Returns:
             PlatformParameter. The created feature flag.

@@ -34,17 +34,6 @@ import utils
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
 
-    def test_create_enum_method(self):
-        """Test create_enum method."""
-        enum = utils.create_enum('first', 'second', 'third')
-        self.assertEqual(enum.first, 'first')
-        self.assertEqual(enum.second, 'second')
-        self.assertEqual(enum.third, 'third')
-        with self.assertRaisesRegexp(
-            AttributeError,
-            'type object \'Enum\' has no attribute \'fourth\''):
-            enum.fourth  # pylint: disable=pointless-statement
-
     def test_get_comma_sep_string_from_list(self):
         """Test get_comma_sep_string_from_list method."""
         alist = ['a', 'b', 'c', 'd']
