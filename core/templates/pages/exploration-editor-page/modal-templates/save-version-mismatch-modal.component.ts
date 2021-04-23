@@ -17,11 +17,8 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';

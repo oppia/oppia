@@ -17,9 +17,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { LoggerService } from 'services/contextual/logger.service';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 
@@ -27,17 +25,13 @@ import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFact
   selector: 'oppia-lost-changes-modal-controller',
   templateUrl: './lost-changes-modal.component.html'
 })
-export class LostChangesModalControllerComponent
-  extends ConfirmOrCancelModal implements OnInit {
+export class LostChangesModalControllerComponent implements OnInit {
   @Input() lostChanges:any;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
     private loggerService: LoggerService,
     private lostChangeObjectFactory: LostChangeObjectFactory
-  ) {
-    super(ngbActiveModal);
-  }
+  ) { }
 
   ngOnInit (): void {
     this.lostChanges = this.lostChanges.map(
