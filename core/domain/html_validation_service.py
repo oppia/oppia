@@ -704,6 +704,7 @@ def is_parsable_as_xml(xml_string):
     except xml.etree.ElementTree.ParseError:
         return False
 
+
 def convert_svg_diagram_tags_to_image_tags(html_string):
     """Renames all the oppia-noninteractive-svgdiagram on the
        server to oppia-noninteractive-image and changes
@@ -725,8 +726,8 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
         attr_value = escape_html(image['svg_filename-with-value'])
         alt_value = escape_html(image['alt-with-value'])
         del image['svg_filename-with-value']
-        image['filepath-with-value'] = attrValue
+        image['filepath-with-value'] = attr_value
         image['caption-with-value'] = ''
-        image['alt-with-value'] = altValue
+        image['alt-with-value'] = alt_value
         image.name = 'oppia-noninteractive-image'
     return python_utils.UNICODE(soup)
