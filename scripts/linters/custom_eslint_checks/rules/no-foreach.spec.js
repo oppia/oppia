@@ -38,28 +38,17 @@ ruleTester.run('no-foreach', rule, {
     {
       code:
         `it('should transform all key value pairs to angular constants',
-        function() {
-        for (var constantName in constants) {
+        constants.forEach(function(constantName) {
             expect($injector.has(constantName)).toBe(true);
             expect($injector.get(constantName)).toEqual(constants[constantName]);
-        }
+        })
         
-        });`,
+        );`,
+
       errors: [{
         message: 'Do not use forEach statements',
         type: null
       }]
     },
-    {
-      code:
-      `
-      
-      var a = (true ||
-        true);`,
-      errors: [{
-        message: 'Do not use disable statement for multilines',
-        type: null
-      }]
-    }
   ]
 });

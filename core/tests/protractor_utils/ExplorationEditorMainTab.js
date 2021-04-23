@@ -741,9 +741,9 @@ var ExplorationEditorMainTab = function() {
     var angularSelectors = ruleDescription.match(re);
     // Slicing first and last letter.
     if (angularSelectors) {
-      angularSelectors.forEach(function(elem) {
+      for (var elem in angularSelectors) {
         parameterTypes.push(elem.toString().slice(1, -1));
-      });
+      }
     }
     // Expected sample output = Array[NonnegativeInt, NonnegativeInt].
     return parameterTypes;
@@ -801,9 +801,9 @@ var ExplorationEditorMainTab = function() {
     // Return as-is if string does not contain placeholders.
     if (placeholders) {
       // Replacing placeholders in ruleDescription with given text.
-      placeholders.forEach(function(placeholderElement, index) {
+      for (var index = 0; index < placeholders.length; ++index) {
         if (providedText[0] === '...') {
-          ruleDescription = ruleDescription.replace(placeholderElement, '...');
+          ruleDescription = ruleDescription.replace(placeholders[index], '...');
         } else {
           if (providedText.length !== placeholders.length) {
             throw new Error(
@@ -812,9 +812,9 @@ var ExplorationEditorMainTab = function() {
               (placeholders.length) + ')');
           }
           ruleDescription = ruleDescription.replace(
-            placeholderElement, providedText[index].toString());
+            placeholders[index], providedText[index].toString());
         }
-      });
+      }
     }
     return ruleDescription;
   };

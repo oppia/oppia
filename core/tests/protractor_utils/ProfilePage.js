@@ -64,9 +64,9 @@ var ProfilePage = function() {
     var interestTexts = await interests.map(async function(interestElem) {
       return await interestElem.getText();
     });
-    interestTexts.forEach(function(interestText) {
+    for (var interestText in interestTexts) {
       expect(expectedInterests.includes(interestText)).toBe(true);
-    });
+    }
   };
 
   this.expectUserToHaveInterestPlaceholder = async function(expectedText) {

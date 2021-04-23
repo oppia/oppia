@@ -60,7 +60,7 @@ module.exports = {
             node.callee.property.name === 'forEach') {
               context.report({
                 node,
-                message: "expected no forEach"
+                messageId: 'noForEach'
               })
             }
         }
