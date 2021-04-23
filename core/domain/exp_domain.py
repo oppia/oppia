@@ -942,6 +942,7 @@ class Exploration(python_utils.OBJECT):
 
             for group in interaction.answer_groups:
                 # Check group destinations.
+                print(all_state_names)
                 if group.outcome.dest not in all_state_names:
                     raise utils.ValidationError(
                         'The destination %s is not a valid state.'
@@ -971,15 +972,15 @@ class Exploration(python_utils.OBJECT):
                 % (self.states[self.init_state_name].card_is_checkpoint)
             )
 
-        # Check if end states are checkpoint.
+        # Check if terminal states are checkpoint.
         for state_name, state in self.states.items():
             interaction = state.interaction
-            if interaction.id == 'EndExploration':
+            if interaction.is_terminal:
                 if state_name != self.init_state_name:
                     if self.states[state_name].card_is_checkpoint:
                         raise utils.ValidationError(
-                            'Expected card_is_checkpoint of end state to be '
-                            'False but found it to be %s'
+                            'Expected card_is_checkpoint of terminal state to '
+                            'be False but found it to be %s'
                             % self.states[state_name].card_is_checkpoint
                         )
 
@@ -1001,13 +1002,12 @@ class Exploration(python_utils.OBJECT):
             if state_name != self.init_state_name and state.card_is_checkpoint:
                 non_initial_checkpoint_state_names.append(state_name)
 
-        # For every state which is marked as a checkpoint and is not the initial
-        # state we remove it from the states dict. Then we make a list of
-        # unseen states. If all end states are unseen on removing a state,
-        # this means that after removing the state it is impossible to reach
-        # any end states, thus the user cannot bypass that state. However, if
-        # the unseen states list contains at least one end state, then the state
-        # is bypassable.
+        # For every non-initial checkpoint state we remove it from the states
+        # dict. Then we check if we can reach a terminal state after removing
+        # the state with checkpoint. As soon as we find a terminal state, we
+        # break out of the loop and raise a validation error. Since, we reached
+        # a terminal state, this implies that the user was not required to go
+        # through the checkpoint. Hence, the checkpoint is bypassable.
         excluded_state_is_bypassable = False
         for state_name_to_exclude in non_initial_checkpoint_state_names:
             new_states = copy.deepcopy(self.states)
@@ -1023,25 +1023,22 @@ class Exploration(python_utils.OBJECT):
                 curr_queue = curr_queue[1:]
                 if not curr_state_name in processed_state_names:
                     processed_state_names.add(curr_state_name)
-
                     curr_state = new_states[curr_state_name]
 
-                    if not curr_state.interaction.is_terminal:
-                        all_outcomes = (
-                            curr_state.interaction.get_all_outcomes())
-                        for outcome in all_outcomes:
-                            dest_state = outcome.dest
-                            if self.states[dest_state].interaction.id == (
-                                    'EndExploration'):
-                                excluded_state_is_bypassable = True
-                                break
-                            if (dest_state not in curr_queue and
-                                    dest_state not in processed_state_names):
-                                curr_queue.append(dest_state)
-                    else:
-                        raise utils.ValidationError(
-                            'The state %s is terminal and a terminal state '
-                            'cannot be a checkpoint.' % state_name_to_exclude)
+                    # We do not need to check if the current state is terminal
+                    # or not, as we would have already raised a validation
+                    # error if we find a terminal state in an outcome.
+                    all_outcomes = (
+                        curr_state.interaction.get_all_outcomes())
+                    for outcome in all_outcomes:
+                        dest_state = outcome.dest
+                        if self.states[dest_state].interaction.is_terminal:
+                            excluded_state_is_bypassable = True
+                            break
+                        if (dest_state not in curr_queue and
+                                dest_state not in processed_state_names):
+                            curr_queue.append(dest_state)
+
             if excluded_state_is_bypassable:
                 raise utils.ValidationError(
                     'Cannot make %s a checkpoint as it is bypassable'
