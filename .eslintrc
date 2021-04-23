@@ -327,6 +327,12 @@
         "before": false
       }
     ],
+
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    
     "unused-imports/no-unused-imports-ts": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
