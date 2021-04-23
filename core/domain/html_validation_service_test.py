@@ -1173,12 +1173,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'alid_4d123_width_23d122_vertical_2d123.svg')
             }]
 
-        self.assertEqual(
-            sorted(
-                html_validation_service.
-                validate_math_content_attribute_in_html(
-                    html_string_with_filename_having_invalid_format)), sorted(
-                        expected_output))
+        self.assertItemsEqual(
+            html_validation_service.validate_math_content_attribute_in_html(
+                html_string_with_filename_having_invalid_format
+            ),
+            expected_output
+        )
 
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for

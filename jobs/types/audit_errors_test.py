@@ -269,9 +269,7 @@ class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
-            id='123',
-            created_on=self.NOW,
-            last_updated=self.YEAR_LATER)
+            id='123', created_on=self.NOW, last_updated=self.YEAR_LATER)
         error = audit_errors.ModelMutatedDuringJobError(model)
 
         self.assertEqual(

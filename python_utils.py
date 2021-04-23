@@ -434,11 +434,11 @@ def _recursively_convert_to_str(value):
         }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
-    elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
-        temp = str(value.encode('utf-8')) # pylint: disable=disallowed-function-calls
+    elif type(value) == UNICODE:  # pylint: disable=unidiomatic-typecheck
+        temp = str(value.encode('utf-8'))  # pylint: disable=disallowed-function-calls
         # Remove the b'' prefix from the string.
         return temp[2:-1].decode('utf-8')
-    elif type(value) == future.types.newbytes:  # pylint: disable=unidiomatic-typecheck
+    elif type(value) == builtins.bytes:  # pylint: disable=unidiomatic-typecheck
         temp = bytes(value)
         # Remove the b'' prefix from the string.
         return temp[2:-1]

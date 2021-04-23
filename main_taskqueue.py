@@ -49,4 +49,5 @@ URLS = [
         tasks.DeferredTasksHandler),
 ]
 
-app = main.NdbWsgiMiddleware(webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
+app = main.NdbWsgiMiddleware(app_without_context)

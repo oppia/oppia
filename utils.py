@@ -428,7 +428,7 @@ def convert_to_hash(input_string, max_length):
         altchars=b'ab'
     ).replace(b'=', b'c')
 
-    return encoded_string[:max_length]
+    return str(encoded_string[:max_length])
 
 
 def base64_from_int(value):
@@ -440,7 +440,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value]))
+    return base64.b64encode(bytes([value % 256]))
 
 
 def get_time_in_millisecs(datetime_obj):

@@ -811,11 +811,8 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
         fake_urls.append(main.get_redirect_route(r'/fake', self.FakeHandler))
         fake_urls.append(main.URLS[-1])
         with self.swap(main, 'URLS', fake_urls):
-            transaction_services = models.Registry.import_transaction_services()
-            app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+            self.testapp = webtest.TestApp(
                 webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
-            self.testapp = webtest.TestApp(app)
-
             response = self.get_json(
                 '/fake', expected_status_int=500)
             self.assertTrue(isinstance(response, dict))

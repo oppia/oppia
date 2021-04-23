@@ -46,20 +46,3 @@ def run_in_transaction_wrapper(fn):
             return fn(*args, **kwargs)
 
     return wrapper
-
-
-def toplevel_wrapper(*args, **kwargs):
-    """Enables a WSGI application to not exit until all its asynchronous
-    requests have finished.
-
-    For more information, see
-    https://developers.google.com/appengine/docs/python/ndb/async#intro
-
-    Args:
-        *args: list(*). Variable length argument list.
-        **kwargs: *. Arbitrary keyword arguments.
-
-    Returns:
-        app. The entire app toplevel.
-    """
-    return client.toplevel(*args, **kwargs)

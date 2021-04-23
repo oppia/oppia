@@ -4695,8 +4695,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 
         recorded_voiceovers.add_content_id_for_voiceover('feedback_1')
         recorded_voiceovers.add_content_id_for_voiceover('feedback_2')
-        self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), [
-            'feedback_2', 'feedback_1'])
+        self.assertItemsEqual(
+            recorded_voiceovers.get_content_ids_for_voiceovers(),
+            ['feedback_2', 'feedback_1'])
 
     def test_add_content_id_for_voiceovers_adds_content_id(self):
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({

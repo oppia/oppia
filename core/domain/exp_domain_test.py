@@ -3548,4 +3548,4 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         actual_outcome_list = exploration.get_all_html_content_strings()
 
-        self.assertEqual(actual_outcome_list, expected_html_list)
+        self.assertItemsEqual(actual_outcome_list, expected_html_list)

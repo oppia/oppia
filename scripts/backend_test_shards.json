@@ -1,23 +1,5 @@
 {
     "1": [
-        "core.controllers.base_test",
-        "core.controllers.collection_editor_test",
-        "core.controllers.editor_test",
-        "core.controllers.learner_playlist_test",
-        "core.controllers.review_tests_test",
-        "core.controllers.resources_test",
-        "core.controllers.cron_test",
-        "extensions.interactions.base_test",
-        "core.controllers.classroom_test",
-        "extensions.rich_text_components.components_test",
-        "core.controllers.topic_editor_test",
-        "core.controllers.platform_feature_test",
-        "extensions.answer_summarizers.models_test",
-        "core.controllers.question_editor_test",
-        "core.controllers.profile_test",
-        "core.controllers.concept_card_viewer_test",
-        "core.controllers.story_editor_test",
-        "core.controllers.subtopic_viewer_test",
         "python_utils_test",
         "core.controllers.questions_list_test",
         "constants_test",
@@ -112,13 +94,7 @@
         "core.domain.object_registry_test",
         "core.domain.translatable_object_registry_test",
         "core.domain.image_services_test",
-        "core.domain.takeout_service_test"
-    ],
-    "7": [
-        "core.domain.story_services_test",
-        "core.domain.fs_domain_test"
-    ],
-    "8": [
+        "core.domain.takeout_service_test",
         "core.domain.taskqueue_services_test",
         "core.domain.email_services_test",
         "core.domain.wipeout_service_test",
@@ -132,7 +108,13 @@
         "core.domain.caching_services_test",
         "core.domain.email_manager_test",
         "core.domain.classifier_domain_test",
-        "core.domain.wipeout_domain_test",
+        "core.domain.wipeout_domain_test"
+    ],
+    "7": [
+        "core.domain.story_services_test",
+        "core.domain.fs_domain_test"
+    ],
+    "8": [
         "core.domain.learner_playlist_services_test",
         "core.domain.state_domain_test",
         "core.domain.activity_services_test",
@@ -174,6 +156,24 @@
         "jobs.types.model_property_test"
     ],
     "10": [
+        "core.controllers.base_test",
+        "core.controllers.collection_editor_test",
+        "core.controllers.editor_test",
+        "core.controllers.learner_playlist_test",
+        "core.controllers.review_tests_test",
+        "core.controllers.resources_test",
+        "core.controllers.cron_test",
+        "extensions.interactions.base_test",
+        "core.controllers.classroom_test",
+        "extensions.rich_text_components.components_test",
+        "core.controllers.topic_editor_test",
+        "core.controllers.platform_feature_test",
+        "extensions.answer_summarizers.models_test",
+        "core.controllers.question_editor_test",
+        "core.controllers.profile_test",
+        "core.controllers.concept_card_viewer_test",
+        "core.controllers.story_editor_test",
+        "core.controllers.subtopic_viewer_test",
         "core.domain.moderator_services_test",
         "core.domain.image_validation_services_test"
     ],

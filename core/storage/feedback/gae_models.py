@@ -200,8 +200,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         for _ in python_utils.RANGE(_MAX_RETRIES):
             thread_id = (
                 entity_type + '.' + entity_id + '.' +
-                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
-                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
+                utils.base64_from_int(
+                    int(utils.get_current_time_in_millisecs())
+                ) + utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
             if not cls.get_by_id(thread_id):
                 return thread_id
         raise Exception(

@@ -795,7 +795,9 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
             'X-Appengine-TaskName': (
                 # Maps empty strings to None so the output can become 'None'.
-                python_utils.convert_to_bytes(task_name or None)),
+                python_utils.convert_to_bytes(task_name)
+                if task_name else b'None'
+            ),
             'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes(1),
         }
         csrf_token = self._test_base.get_new_csrf_token()
@@ -938,6 +940,26 @@ class TestBase(unittest.TestCase):
 
     # A test unicode string.
     UNICODE_TEST_STRING = 'unicode ¡马!'
+
+    def run(self, result=None):
+        """Run the test, collecting the result into the specified TestResult.
+
+        Reference URL:
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
+
+        GenericTestBase's override of run() wraps super().run() in swap
+        contexts to mock out the cache and taskqueue services.
+
+        Args:
+            result: TestResult | None. Holds onto the results of each test. If
+                None, a temporary result object is created (by calling the
+                defaultTestResult() method) and used instead.
+        """
+        client = ndb.Client(
+            project=feconf.OPPIA_PROJECT_ID, namespace=self.id()[-100:]
+        )
+        with client.context():
+            super(TestBase, self).run(result=result)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
@@ -1229,9 +1251,12 @@ class TestBase(unittest.TestCase):
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        return super(TestBase, self).assertRaisesRegexp(
+        return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
+
+    def assertItemsEqual(self, *args, **kwargs):
+        return super().assertCountEqual(*args, **kwargs)
 
     def assert_matches_regexps(self, items, regexps, full_match=False):
         """Asserts that each item matches the corresponding regexp.
@@ -1307,7 +1332,8 @@ class AppEngineTestBase(TestBase):
         super(AppEngineTestBase, self).setUp()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
-        self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
+        self.taskqueue_testapp = webtest.TestApp(
+            main_taskqueue.app_without_context)
 
     def tearDown(self):
         datastore_services.delete_multi(
@@ -1807,8 +1833,6 @@ title: Title
             stack.enter_context(self.swap(
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
-            client = ndb.Client(project=feconf.OPPIA_PROJECT_ID, namespace=self.id()[-100:])
-            stack.enter_context(client.context())
 
             super(GenericTestBase, self).run(result=result)
 
@@ -1830,7 +1854,6 @@ title: Title
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
-        print('LOGOUT')
         os.environ['USER_ID'] = ''
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_IS_ADMIN'] = '0'

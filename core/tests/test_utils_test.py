@@ -23,7 +23,6 @@ import logging
 import os
 
 from constants import constants
-from core import jobs
 from core.domain import auth_domain
 from core.domain import param_domain
 from core.domain import taskqueue_services
@@ -348,31 +347,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             test_utils.FailingFunction(function, MockError, -1)
 
 
-class FailingMapReduceJobManager(jobs.BaseMapReduceJobManager):
-    """Test job that fails because map is a classmethod."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return []
-
-    @classmethod
-    def map(cls):
-        pass
-
-
 class TestUtilsTests(test_utils.GenericTestBase):
-
-    def test_failing_job(self):
-        self.assertIsNone(FailingMapReduceJobManager.map())
-
-        job_id = FailingMapReduceJobManager.create_new()
-        FailingMapReduceJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(None), 1)
-        self.assertRaisesRegexp(
-            RuntimeError, 'MapReduce task failed: Task<.*>',
-            self.process_and_flush_pending_mapreduce_tasks)
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
