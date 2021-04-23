@@ -315,7 +315,7 @@ class UserSettingsModel(base_models.BaseModel):
                 cls.normalized_username == normalized_username
             ).get() is not None
             or DeletedUsernameModel.get(
-                hashed_normalized_username.decode('utf-8'), strict=False
+                hashed_normalized_username, strict=False
             ) is not None
         )
 

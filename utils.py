@@ -428,7 +428,7 @@ def convert_to_hash(input_string, max_length):
         altchars=b'ab'
     ).replace(b'=', b'c')
 
-    return str(encoded_string[:max_length])
+    return encoded_string[:max_length].decode('utf-8')
 
 
 def base64_from_int(value):
