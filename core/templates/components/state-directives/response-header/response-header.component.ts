@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for the header of the response tiles.
  */
-
 
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -25,28 +23,29 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 interface EventData {
   event: Event;
-  index: string
+  index: number
 }
 @Component({
   selector: 'oppia-response-header',
   templateUrl: './response-header.component.html'
 })
 export class ResponseHeaderComponent {
-  @Input() index: string;
-  @Input() outcome: { labelledAsCorrect: void, dest: string };
-  @Input() sumsummarymary: string;
+  @Input() index: number;
+  @Input() outcome: Outcome;
+  @Input() summary: string;
   @Input() shortSummary: string;
   @Input() isActive: boolean;
-  @Output() onDeleteFn: EventEmitter<EventData> = new EventEmitter();
+  @Output() onDeleteFn: EventEmitter<EventData> = (new EventEmitter());
   @Input() numRules: number;
   @Input() isResponse: boolean;
-  @Input() showWarning: (arg0: string) => boolean;
+  @Input() showWarning: boolean;
   @Input() navigateToState: string;
   editabilityService: EditabilityService;
-  eventData: EventData;
+
   constructor(
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
@@ -65,34 +64,33 @@ export class ResponseHeaderComponent {
   }
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): void {
-    var interactionId = this.getCurrentInteractionId();
+    let interactionId = this.getCurrentInteractionId();
     return interactionId && INTERACTION_SPECS[interactionId].is_linear;
   }
 
-  isCorrect(): void {
+  isCorrect(): boolean {
     return this.outcome && this.outcome.labelledAsCorrect;
   }
 
   isOutcomeLooping(): boolean {
-    var outcome = this.outcome;
-    var activeStateName = this.stateEditorService.getActiveStateName();
-    return outcome && (outcome.dest === activeStateName);
+    let activeStateName = this.stateEditorService.getActiveStateName();
+    return this.outcome && (this.outcome.dest === activeStateName);
   }
 
   isCreatingNewState(): boolean {
-    var outcome = this.outcome;
+    let outcome = this.outcome;
     return outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST;
   }
 
   deleteResponse(evt: Event): void {
-    this.eventData = {
+    let eventData = {
       index: this.index,
       event: evt
     };
-    this.onDeleteFn.emit(this.eventData);
+    this.onDeleteFn.emit(eventData);
   }
   ngOnInit(): void {
-    this.editabilityService = new EditabilityService;
+    this.editabilityService = new EditabilityService();
   }
 }
 
