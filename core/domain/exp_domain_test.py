@@ -533,6 +533,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'Third': third_state,
         }
 
+        # Answer group dicts to connect init_state to second_state and
+        # third_state.
         init_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -584,6 +586,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             }
         ]
 
+        # Answer group dict to connect third_state to end_state.
         third_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -616,6 +619,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         third_state.update_interaction_answer_groups(
             third_state_answer_group_dicts)
 
+        # The exploration can be completed via third_state. Hence, making
+        # second_state a checkpoint raises a validation error.
         second_state.card_is_checkpoint = True
         self._assert_validation_error(
             self.exploration, 'Cannot make Second a checkpoint as it is '
@@ -639,6 +644,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #        │      End      │
         #        └───────────────┘.
 
+        # Answer group dicts to connect second_state to end_state.
         second_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -665,10 +671,16 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': None
             }
         ]
+
+
         second_state.update_interaction_answer_groups(
             second_state_answer_group_dicts)
+
+        # Reset the answer group dicts of third_state.
         third_state.update_interaction_answer_groups([])
 
+        # As second_state is now connected to end_state and third_state has no
+        # outcome, second_state has become non-bypassable.
         second_state.card_is_checkpoint(True)
         self.exploration.validate()
 
@@ -715,6 +727,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
 
+        # Answer group dicts to connect init_state to a_state, b_state and
+        # c_state.
         init_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -789,6 +803,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': None
             }
         ]
+
+        # Answer group dict to connect a_state and b_state to d_state.
         a_and_b_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -815,6 +831,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 'tagged_skill_misconception_id': None
             }
         ]
+
+        # Answer group dict to connect c_state and d_state to end_state.
         c_and_d_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -853,6 +871,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         d_state.update_interaction_answer_groups(
             c_and_d_state_answer_group_dicts)
 
+        # As a user can complete the exploration by going through c_state,
+        # d_state becomes bypassable. Hence, making d_state a checkpoint raises
+        # validation error.
         d_state.update_card_is_checkpoint(True)
         self._assert_validation_error(
             self.exploration, 'Cannot make D a checkpoint as it is '
@@ -880,6 +901,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                  │    End    │
         #                  └───────────┘.
 
+        # Answer group dict to connect c_state to d_state. Hence, making d_state
+        # non-bypassable.
         c_state_answer_group_dicts = [
             {
                 'outcome': {
@@ -945,6 +968,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End 2': new_end_state
         }
 
+        # Answer group dict to connect c_state to d_state and new_end_state,
+        # making d_state bypassable.
         c_state_answer_group_dicts = [
             {
                 'outcome': {
