@@ -106,8 +106,6 @@ BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
     'VersionedModel',
 )
 
-client = ndb.Client(project=feconf.OPPIA_PROJECT_ID)
-
 
 def get_filepath_from_filename(filename, rootdir):
     """Returns filepath using the filename. Different files are present in
@@ -957,7 +955,7 @@ class TestBase(unittest.TestCase):
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
-        with client.context(namespace=self.id()[-100:]):
+        with main.client.context(namespace=self.id()[-100:]):
             super(TestBase, self).run(result=result)
 
     def _get_unicode_test_string(self, suffix):
