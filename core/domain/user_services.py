@@ -1060,6 +1060,11 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
         user_id: str. The unique ID of the user.
         profile_picture_data_url: str. New profile picture url to be set.
     """
+
+    if profile_picture_data_url == '':
+        user_email = get_email_from_user_id(user_id)
+        profile_picture_data_url = fetch_gravatar(user_email)
+
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.profile_picture_data_url = profile_picture_data_url
     _save_user_settings(user_settings)
