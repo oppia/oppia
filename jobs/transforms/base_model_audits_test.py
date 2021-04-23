@@ -360,3 +360,26 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             audit_errors.ModelDomainObjectValidateError(
                 model_instance2, 'The destination end is not a valid state.')
         ])
+
+
+class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
+
+    def test_validate_commit_type(self):
+        invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_type_model])
+            | beam.ParDo(base_model_audits.ValidateCommitType())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.InvalidCommitTypeError(invalid_commit_type_model),
+        ])
