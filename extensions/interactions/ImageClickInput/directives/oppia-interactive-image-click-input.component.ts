@@ -152,10 +152,12 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     this.currentlyHoveredRegions = [];
     this.allRegions = this.imageAndRegions.labeledRegions;
     if (!this.interactionIsActive) {
-      /* The following lines highlight the learner's last answer for
-                this card. This need only be done at the beginning as if he
-                submits an answer, based on newCardAvailable, the image
-                is made inactive, so his last selection would be higlighted.*/
+      /**
+       * The following lines highlight the learner's last answer for
+       * this card. This need only be done at the beginning as if he
+       * submits an answer, based on newCardAvailable, the image
+       * is made inactive, so his last selection would be highlighted.
+       */
       this.mouseX = this.lastAnswer.clickPosition[0];
       this.mouseY = this.lastAnswer.clickPosition[1];
       this.updateCurrentlyHoveredRegions();

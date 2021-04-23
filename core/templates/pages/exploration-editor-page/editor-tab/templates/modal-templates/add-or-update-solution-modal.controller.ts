@@ -63,7 +63,7 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
         StateCustomizationArgsService.savedMemento,
         false,
         $scope.SOLUTION_EDITOR_FOCUS_LABEL,
-        $scope.savedMemento () ? 'savedMemento()' : null));
+        $scope.savedMemento() ? 'savedMemento()' : null));
     $scope.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
