@@ -942,7 +942,6 @@ class Exploration(python_utils.OBJECT):
 
             for group in interaction.answer_groups:
                 # Check group destinations.
-                print(all_state_names)
                 if group.outcome.dest not in all_state_names:
                     raise utils.ValidationError(
                         'The destination %s is not a valid state.'

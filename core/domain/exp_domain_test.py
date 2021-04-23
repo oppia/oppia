@@ -428,6 +428,7 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             Exception, 'Expected exp_id to be a str, received 0'):
             exp_domain.ExpVersionReference(0, 1)
 
+
 class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
     """Test checkpoints validations in an exploration. """
 
@@ -435,8 +436,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         super(ExplorationCheckpointsUnitTests, self).setUp()
         self.exploration = (
             exp_domain.Exploration.create_default_exploration('eid'))
-        self.new_state = state_domain.State.create_default_state('Introduction',
-            is_initial_state=True)
+        self.new_state = state_domain.State.create_default_state(
+            'Introduction', is_initial_state=True)
         self.set_interaction_for_state(self.new_state, 'TextInput')
         self.exploration.init_state_name = 'Introduction'
         self.exploration.states = {
@@ -570,7 +571,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         ]
 
         second_state_answer_group_dicts = [
-             {
+            {
                 'outcome': {
                     'dest': 'End',
                     'feedback': {
@@ -638,7 +639,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         second_state.card_is_checkpoint = False
         self.exploration.validate()
 
-        # Reset the exploration
+        # Reset the exploration.
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
             'End': self.end_state
@@ -839,6 +840,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         d_state.update_card_is_checkpoint(True)
         self.exploration.validate()
+
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
