@@ -65,6 +65,7 @@ describe('Creator dashboard controller', () => {
   var suggestionsService = null;
   var SuggestionThreadObjectFactory = null;
   var UserService = null;
+  var explorationCreationService = null;
   var userInfo = {
     canCreateCollections: () => true
   };
@@ -92,6 +93,7 @@ describe('Creator dashboard controller', () => {
       'SuggestionModalForCreatorDashboardService');
     suggestionsService = $injector.get(
       'SuggestionsService');
+    explorationCreationService = $injector.get('ExplorationCreationService');
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
     UserService = $injector.get('UserService');
@@ -138,6 +140,15 @@ describe('Creator dashboard controller', () => {
     ' relative path', function() {
     expect(ctrl.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(
       '/assets/images/path/to/icon.png');
+  });
+
+  it('should create new exploration when clicked on CREATE' +
+   ' EXPLORATION button', function() {
+    spyOn(
+      explorationCreationService, 'createNewExploration');
+    ctrl.createNewExploration();
+    expect(
+      explorationCreationService.createNewExploration).toHaveBeenCalled();
   });
 
   describe('when fetching dashboard successfully and on explorations tab',
