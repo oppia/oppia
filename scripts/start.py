@@ -164,7 +164,8 @@ def main(args=None):
         stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             python_utils.PRINT('Starting Firebase emulators')
-            stack.enter_context(common.managed_firebase_auth_emulator())
+            stack.enter_context(common.managed_firebase_auth_emulator(
+                recover_users=parsed_args.save_datastore))
         python_utils.PRINT('Starting GAE development server')
         stack.enter_context(managed_dev_appserver)
 
