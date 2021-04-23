@@ -23,8 +23,6 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
@@ -32,22 +30,12 @@ import { SubtitledUnicode } from
 
 describe('Exploration Html Formatter Service', () => {
   let ehfs: ExplorationHtmlFormatterService = null;
-  let sof, solution;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
     ehfs = TestBed.get(ExplorationHtmlFormatterService);
-    sof = TestBed.get(SolutionObjectFactory);
-    solution = sof.createFromBackendDict({
-      answer_is_exclusive: false,
-      correct_answer: 'This is a correct answer!',
-      explanation: {
-        content_id: 'solution',
-        html: 'This is the explanation to the answer'
-      }
-    });
   });
 
   it('should correctly set interaction HTML for TextInput when it is in' +
@@ -116,11 +104,22 @@ describe('Exploration Html Formatter Service', () => {
       var interactionId = 'TextInput';
       var focusLabel = 'sampleLabel';
       var expectedHtmlTag = '<oppia-interactive-text-input ' +
-        'saved-solution=""This is a correct answer!"" ' +
+        'saved-solution="solution" ' +
         'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
         '</oppia-interactive-text-input>';
       expect(
-        ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, solution)
+        ehfs.getInteractionHtml(
+          interactionId, {}, false, focusLabel, 'solution')
+      ).toBe(expectedHtmlTag);
+      interactionId = 'GraphInput';
+      focusLabel = 'sampleLabel';
+      expectedHtmlTag = 'oppia-interactive-graph-input ' +
+        '[saved-solution]="solution" ' +
+        'label-for-focus-target="' + focusLabel + '" [last-answer]="null">' +
+        '</oppia-interactive-graph-input>';
+      expect(
+        ehfs.getInteractionHtml(
+          interactionId, {}, false, focusLabel, 'solution')
       ).toBe(expectedHtmlTag);
     });
 

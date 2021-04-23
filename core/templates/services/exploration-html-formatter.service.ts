@@ -27,7 +27,6 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 
 // A service that provides a number of utility functions useful to both the
@@ -37,6 +36,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 })
 export class ExplorationHtmlFormatterService {
   private readonly migratedInteractions: string[] = [
+    'AlgebraicExpressionInput',
     'Continue',
     'FractionInput',
     'GraphInput',
@@ -69,7 +69,7 @@ export class ExplorationHtmlFormatterService {
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string,
-      savedSolution: Solution | undefined): string {
+      savedSolution: string | undefined | null): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
@@ -94,10 +94,11 @@ export class ExplorationHtmlFormatterService {
       if (addSpace) {
         directiveOuterHtml += ' ';
       }
-      directiveOuterHtml += (
-        'saved-solution="' + JSON.stringify(
-          savedSolution.correctAnswer) + '" '
-      );
+      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+        directiveOuterHtml += '[saved-solution]="' + savedSolution + '" ';
+      } else {
+        directiveOuterHtml += 'saved-solution="' + savedSolution + '" ';
+      }
       addSpace = false;
     }
     if (labelForFocusTarget) {
