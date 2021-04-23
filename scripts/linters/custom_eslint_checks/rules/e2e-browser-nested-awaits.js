@@ -40,8 +40,8 @@ module.exports = {
   },
 
   create: function(context) {
-    // Checks if this expression is syntactically the same as:
-    // `await browser.switchTo().activeElement().sendKeys(<ARGS>)`
+    /* Checks if this expression is syntactically the same as:
+       `await browser.switchTo().activeElement().sendKeys(<ARGS>)` */
     var checkExprNode = function(node) {
       node = node.expression;
       if (node.type !== 'AwaitExpression' ||

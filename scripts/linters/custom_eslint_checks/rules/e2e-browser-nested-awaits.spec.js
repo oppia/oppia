@@ -21,8 +21,8 @@
 var rule = require('./e2e-browser-nested-awaits');
 var RuleTester = require('eslint').RuleTester;
 
-// Note: parser options added in order to parse
-// `async` and `await` in the test code snippets
+/* Note: parser options added in order to parse
+   `async` and `await` in the test code snippets */
 var ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2017
@@ -37,7 +37,9 @@ ruleTester.run('e2e-browser-nested-awaits', rule, {
               await page;
               await getPage().sendKeys(solution.explanation);
               await page.frame().activeElement().sendKeys();
-              await(await browser.switchTo().activeElement()).sendKeys(solution.explanation);
+              await(
+                await browser.switchTo().activeElement()
+              ).sendKeys(solution.explanation);
           }
           `
     }],
@@ -45,27 +47,31 @@ ruleTester.run('e2e-browser-nested-awaits', rule, {
     {
       code: `
           async function def() {
-              await browser.switchTo().activeElement().sendKeys(solution.explanation);
+              await browser.switchTo().activeElement().sendKeys(
+                solution.explanation);
           }
           `,
       errors: [
-      {
-        message: 'should have a nested `await` for `browser.switchTo().activeElement()`'
-      }]
+        {
+          message: 'should have a nested `await` for ' +
+                   '`browser.switchTo().activeElement()`'
+        }]
     },
     {
       code: `
           async function def() {
               await browser.switchTo().activeElement().sendKeys();
-              await browser.switchTo().activeElement().sendKeys(array[0].attr);
+              await browser.switchTo().activeElement().sendKeys(arr[0].attr);
           }
           `,
       errors: [
-      {
-        message: 'should have a nested `await` for `browser.switchTo().activeElement()`'
-      },
-      {
-        message: 'should have a nested `await` for `browser.switchTo().activeElement()`'
-      }]
+        {
+          message: 'should have a nested `await` for ' +
+                   '`browser.switchTo().activeElement()`'
+        },
+        {
+          message: 'should have a nested `await` for ' +
+                   '`browser.switchTo().activeElement()`'
+        }]
     }]
 });
