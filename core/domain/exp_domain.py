@@ -1690,7 +1690,6 @@ class Exploration(python_utils.OBJECT):
 
         return states_dict
 
-
     @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
