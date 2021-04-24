@@ -1755,40 +1755,55 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': 0}),
-                state_domain.RuleSpec('Equals', {'x': 1})], [], None
+                        '</oppia-noninteractive-image>')
+                    ), False, [], None, None), [
+                        state_domain.RuleSpec('Equals', {'x': 0}),
+                        state_domain.RuleSpec('Equals', {'x': 1})
+                    ], [], None
         ), state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state3', state_domain.SubtitledHtml(
                     'feedback_2', '<p>Outcome2 for state2</p>'),
-                    False, [], None,
-                    None), [state_domain.RuleSpec(
-                'Equals', {'x': 0})], [], None
+                False, [], None, None),
+            [
+                state_domain.RuleSpec('Equals', {'x': 0})
+            ],
+            [],
+            None
         )]
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1', state_domain.SubtitledHtml(
                     'feedback_1', '<p>Outcome for state3</p>'),
-                    False, [], None, None), [state_domain.RuleSpec(
-                    'Equals', {'x': [
-                    (
-                        '<p>This is value1 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}),
-                state_domain.RuleSpec('Equals', {'x': [
-                    (
-                        '<p>This is value3 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]})], [], None
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x':
+                        [(
+                            '<p>This is value1 for ItemSelection</p>'
+                            '<oppia-noninteractive-image filepath-with-'
+                            'value='
+                            '"&amp;quot;s3Choice1.png&amp;quot;"'
+                            ' caption-with-value="&amp;quot;&amp;quot;" '
+                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            '</oppia-noninteractive-image>')
+                        ]}),
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x':
+                        [(
+                            '<p>This is value3 for ItemSelection</p>'
+                            '<oppia-noninteractive-image filepath-with-'
+                            'value='
+                            '"&amp;quot;s3Choice3.png&amp;quot;"'
+                            ' caption-with-value="&amp;quot;&amp;quot;" '
+                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            '</oppia-noninteractive-image>')
+                        ]})
+            ],
+            [],
+            None
         )]
 
         state2.update_interaction_answer_groups(state_answer_group_list2)

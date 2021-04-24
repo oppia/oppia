@@ -1888,10 +1888,16 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
-                    False, [], None, None), [state_domain.RuleSpec(
-                    'IsEqualToOrdering', {
-                    'x': [['ca_choices_0']]
-                })], [], None
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['ca_choices_0']]
+                    })
+            ],
+            [],
+            None
         )]
 
         written_translations_dict = {
@@ -2160,10 +2166,16 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
-                    False, [], None, None), [state_domain.RuleSpec(
-                    'IsEqualToOrdering', {
-                    'x': [['ca_choices_0']]
-                })], [], None
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['ca_choices_0']]
+                    })
+            ],
+            [],
+            None
         )]
         written_translations_dict = {
             'translations_mapping': {

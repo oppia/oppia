@@ -500,17 +500,26 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
-        old_state_answer_groups = copy.deepcopy(init_state.interaction.answer_groups)
+        old_state_answer_groups = copy.deepcopy(
+            init_state.interaction.answer_groups)
         old_state_answer_groups.append(state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                })], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
         ))
 
         init_state.update_interaction_answer_groups(old_state_answer_groups)
@@ -763,13 +772,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'), False, [], None,
-                    None), [state_domain.RuleSpec('Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], 1
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            1
         )
         init_state.update_interaction_answer_groups([state_answer_group])
 
@@ -779,13 +796,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'), False, [], None,
-                    None), [state_domain.RuleSpec('Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], 'invalid_tagged_skill_misconception_id'
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            'invalid_tagged_skill_misconception_id'
         )
         init_state.update_interaction_answer_groups([state_answer_group])
 
@@ -1244,13 +1269,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'), False, [], None,
-                    None), [state_domain.RuleSpec('Contains', {
-                    'x': {
-                        'contentId': 'rule_input_5',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], None
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_5',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
         )
         # Adds 1 to content count to exploration (feedback_1).
         init_state.update_interaction_answer_groups([state_answer_group])
@@ -1608,13 +1641,21 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', 'Feedback'), False, param_changes, None,
-                    None), [state_domain.RuleSpec('Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], None
+                    'feedback_1', 'Feedback'),
+                False, param_changes, None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
         )
         exploration.init_state.update_interaction_answer_groups(
             [state_answer_group])
@@ -3383,30 +3424,60 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             state1.interaction.id, solution_dict)
         state1.update_interaction_solution(solution)
 
-        state_answer_group_list2 = [state_domain.AnswerGroup(
-            state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Outcome2 for state2</p>'), False,
-                    [], None, None), [state_domain.RuleSpec('Equals',
-                    {'x': 0}), state_domain.RuleSpec('Equals',
-                    {'x': 1})], [], None
-        ), state_domain.AnswerGroup(
-            state_domain.Outcome(
-                'state3', state_domain.SubtitledHtml(
-                    'feedback_2', '<p>Outcome1 for state2</p>'), False,
-                    [], None, None), [state_domain.RuleSpec('Equals',
-                    {'x': 0})], [], None
-        )]
+        state_answer_group_list2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state1', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Outcome2 for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        }),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 1
+                        })
+                ],
+                [],
+                None),
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state3', state_domain.SubtitledHtml(
+                        'feedback_2', '<p>Outcome1 for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        })
+                ],
+                [],
+                None
+            )]
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1', state_domain.SubtitledHtml(
                     'feedback_1', '<p>Outcome for state3</p>'),
-                    False, [], None, None), [
-                        state_domain.RuleSpec(
-                            'Equals', {
-                        'x': ['ca_choices_0']}), state_domain.RuleSpec(
-                            'Equals', {
-                        'x': ['ca_choices_2']})], [], None
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_0']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_2']
+                    })
+            ],
+            [],
+            None
         )]
         state2.update_interaction_answer_groups(state_answer_group_list2)
         state3.update_interaction_answer_groups(state_answer_group_list3)

@@ -124,10 +124,17 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_group_list1 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback1', '<p>Outcome for state1</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('IsEqualToOrdering',
-                    {'x': [['a'], ['b']]}),
-                ], [], None
+                    'feedback1', '<p>Outcome for state1</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['a'], ['b']]
+                    })
+            ],
+            [],
+            None
         )]
 
         customization_args_dict2 = {
@@ -140,35 +147,61 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             }]},
             'allowMultipleItemsInSamePosition': {'value': True}
         }
-        state_answer_group_list2 = [state_domain.AnswerGroup(
-            state_domain.Outcome(
-                'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-                        'IsEqualToOrderingWithOneItemAtIncorrectPosition', {
-                    'x': []
-                }),
-                state_domain.RuleSpec('IsEqualToOrdering', {'x': [['a']]}),
-                state_domain.RuleSpec('HasElementXBeforeElementY', {
-                    'x': '',
-                    'y': ''
-                }),
-                state_domain.RuleSpec(
-                    'IsEqualToOrdering', {'x': []})], [], None
-        ), state_domain.AnswerGroup(
-            state_domain.Outcome(
-                'Introduction', state_domain.SubtitledHtml(
-                    'feedback2', '<p>Outcome for state1</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-                        'HasElementXAtPositionY', {
-                    'x': '',
-                    'y': 1
-                }),
-                state_domain.RuleSpec('HasElementXAtPositionY', {
-                    'x': 'a',
-                    'y': 2
-                })], [], None
-        )]
+        state_answer_group_list2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'State1', state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                        {
+                            'x': []
+                        }),
+                    state_domain.RuleSpec(
+                        'IsEqualToOrdering',
+                        {
+                            'x': [['a']]
+                        }),
+                    state_domain.RuleSpec(
+                        'HasElementXBeforeElementY',
+                        {
+                            'x': '',
+                            'y': ''
+                        }),
+                    state_domain.RuleSpec(
+                        'IsEqualToOrdering',
+                        {
+                            'x': []
+                        })
+                ],
+                [],
+                None
+            ),
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction', state_domain.SubtitledHtml(
+                        'feedback2', '<p>Outcome for state1</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'HasElementXAtPositionY',
+                        {
+                            'x': '',
+                            'y': 1
+                        }),
+                    state_domain.RuleSpec(
+                        'HasElementXAtPositionY',
+                        {
+                            'x': 'a',
+                            'y': 2
+                        })
+                ],
+                [],
+                None
+            )
+        ]
 
         state1.update_interaction_id('DragAndDropSortInput')
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -264,10 +297,22 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_groups = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('IsEqualToOrdering',
-                    {'x': []}), state_domain.RuleSpec('IsEqualToOrdering',
-                    {'x': []})], [], None
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': []
+                    }),
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': []
+                    })
+            ],
+            [],
+            None
         )]
 
         state1.update_interaction_customization_args(customization_args_dict)
@@ -325,9 +370,14 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_group_list1 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-                        'Equals', {'x': '1'})], [], None
+                    'feedback', '<p>Outcome for state1</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {'x': '1'})
+            ],
+            [],
+            None
         )]
 
         state1.update_interaction_id('MultipleChoiceInput')
@@ -369,12 +419,16 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': '0'}),
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec('Equals', {'x': '0'}),
                 state_domain.RuleSpec(
-                    'Equals', {'x': '9007199254740991'}),], [], None
+                    'Equals', {'x': '9007199254740991'})
+            ],
+            [],
+            None
         )]
-
 
         state2.update_interaction_id('MultipleChoiceInput')
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -427,10 +481,15 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_group_list = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': '0'}),
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec('Equals', {'x': '0'}),
                 state_domain.RuleSpec(
-                    'Equals', {'x': '9007199254740991'})], [], None
+                    'Equals', {'x': '9007199254740991'})
+            ],
+            [],
+            None
         )]
 
         state1.update_interaction_customization_args(customization_args_dict)
@@ -489,12 +548,22 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_group_list1 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}), state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value2 for ItemSelection</p>'
-                ]})], [], None
+                    'feedback', '<p>Outcome for state1</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value2 for ItemSelection</p>']
+                    })
+            ],
+            [],
+            None
         )]
 
         state1.update_interaction_id('ItemSelectionInput')
@@ -531,13 +600,22 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}),
-                state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]})], [], None
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    })
+            ],
+            [],
+            None
         )]
 
         state2.update_interaction_id('ItemSelectionInput')
@@ -591,13 +669,22 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state_answer_group_list = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}),
-                state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]})], [], None
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    })
+            ],
+            [],
+            None
         )]
 
         state1.update_interaction_customization_args(customization_args_dict)
@@ -787,13 +874,22 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state_answer_group_list1 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}),
-                state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value2 for ItemSelection</p>'
-                ]})], [], None
+                    'feedback', '<p>Outcome for state1</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value2 for ItemSelection</p>']
+                    })
+            ],
+            [],
+            None
         )]
 
         solution1 = state_domain.Solution.from_dict('ItemSelectionInput', {
@@ -850,13 +946,22 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}),
-                state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]})], [], None
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    })
+            ],
+            [],
+            None
         )]
 
         solution2 = state_domain.Solution.from_dict('ItemSelectionInput', {
@@ -937,13 +1042,22 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state_answer_group_list1 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('IsEqualToOrdering', {'x': [
-                    ['<p>This is value1 for DragAndDropSort</p>']
-                ]}),
-                state_domain.RuleSpec('IsEqualToOrdering', {'x': [
-                    ['<p>This is value2 for DragAndDropSort</p>']
-                ]})], [], None
+                    'feedback', '<p>Outcome for state1</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>This is value1 for DragAndDropSort</p>']]
+                    }),
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>This is value2 for DragAndDropSort</p>']]
+                    })
+            ],
+            [],
+            None
         )]
 
         solution1 = state_domain.Solution.from_dict('DragAndDropSortInput', {
@@ -999,21 +1113,32 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('IsEqualToOrdering', {'x': [
-                    [
-                        '<p>This is value1 for DragAndDropSort</p>',
-                        '<p>This is value3 for DragAndDropSort</p>'
-                    ]
-                ]}),
-                state_domain.RuleSpec('HasElementXBeforeElementY', {
-                    'x': '<p>This is value3 for DragAndDropSort</p>',
-                    'y': '<p>This is value1 for DragAndDropSort</p>'
-                }),
-                state_domain.RuleSpec('HasElementXAtPositionY', {
-                    'x': '<p>This is value3 for DragAndDropSort</p>',
-                    'y': 2
-                })], [], None
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [[
+                            '<p>This is value1 for DragAndDropSort</p>',
+                            '<p>This is value3 for DragAndDropSort</p>'
+                            ]]
+                    }),
+                state_domain.RuleSpec(
+                    'HasElementXBeforeElementY',
+                    {
+                        'x': '<p>This is value3 for DragAndDropSort</p>',
+                        'y': '<p>This is value1 for DragAndDropSort</p>'
+                    }),
+                state_domain.RuleSpec(
+                    'HasElementXAtPositionY',
+                    {
+                        'x': '<p>This is value3 for DragAndDropSort</p>',
+                        'y': 2
+                    })
+            ],
+            [],
+            None
         )]
 
         solution2 = state_domain.Solution.from_dict('DragAndDropSortInput', {
@@ -1112,13 +1237,22 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state_answer_group_list = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 'State1', state_domain.SubtitledHtml(
-                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}),
-                state_domain.RuleSpec('Equals', {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]})], [], None
+                    'feedback', '<p>Outcome for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    })
+            ],
+            [],
+            None
         )]
 
         state1.update_interaction_customization_args(customization_args_dict)

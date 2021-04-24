@@ -80,20 +80,40 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'Introduction', state_domain.SubtitledHtml(
-                    'feedback_1', '<p>State Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec('IsEqualToOrdering', {
-                'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]}),
-                state_domain.RuleSpec('HasElementXAtPositionY', {
-                'x': '<p>HasElementXAtPositionY rule_spec html</p>', 'y': 2}),
-                state_domain.RuleSpec('HasElementXBeforeElementY', {
-                'x': '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                'y': '<p>y input for HasElementXAtPositionY rule_spec </p>'}),
+                    'feedback_1', '<p>State Feedback</p>'),
+                False, [], None, None),
+            [
                 state_domain.RuleSpec(
-                    'IsEqualToOrderingWithOneItemAtIncorrectPosition', {
-                'x': [[(
-                        '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition r'
-                        'ule_spec htmls</p>')]]
-                })], [], None
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
+                    }),
+                state_domain.RuleSpec(
+                    'HasElementXAtPositionY',
+                    {
+                        'x': '<p>HasElementXAtPositionY rule_spec '
+                             'html</p>',
+                        'y': 2
+                    }),
+                state_domain.RuleSpec(
+                    'HasElementXBeforeElementY',
+                    {
+                        'x': '<p>x input for HasElementXAtPositionY '
+                             'rule_spec </p>',
+                        'y': '<p>y input for HasElementXAtPositionY '
+                             'rule_spec </p>'
+                    }),
+                state_domain.RuleSpec(
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                    {
+                        'x': [[(
+                            '<p>IsEqualToOrderingWithOneItemAtIncorrectPos'
+                            'ition rule_spec htmls</p>')
+                              ]]
+                    })
+            ],
+            [],
+            None
         )
         state_solution_dict = {
             'answer_is_exclusive': True,
@@ -384,13 +404,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = [state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>state outcome html</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-                        'Equals', {
-                            'x': {
-                                'contentId': 'rule_input_Equals',
-                                'normalizedStrSet': ['Test']
-                            }})], [], None
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }})
+            ],
+            [],
+            None
         )]
         state_default_outcome = state_domain.Outcome(
             'State1', state_domain.SubtitledHtml(
@@ -494,20 +519,33 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Equals', {
-                    'x': ['<p>Equals rule_spec html</p>']
-                }), state_domain.RuleSpec(
-            'ContainsAtLeastOneOf', {
-                    'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
-                }), state_domain.RuleSpec(
-            'IsProperSubsetOf', {
-                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
-                }), state_domain.RuleSpec(
-            'DoesNotContainAtLeastOneOf', {
-                    'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
-                })], [], None
+                    'feedback', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>Equals rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'ContainsAtLeastOneOf',
+                    {
+                        'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'IsProperSubsetOf',
+                    {
+                        'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'DoesNotContainAtLeastOneOf',
+                    {
+                        'x': ['<p>DoesNotContainAtLeastOneOf rule_'
+                              'spec html</p>']
+                    })
+            ],
+            [],
+            None
         )
         state_solution_dict = {
             'answer_is_exclusive': True,
@@ -600,20 +638,34 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Equals', {
-                    'x': ['<p>Equals rule_spec html</p>']
-                }), state_domain.RuleSpec(
-            'ContainsAtLeastOneOf', {
-                    'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
-                }), state_domain.RuleSpec(
-            'IsProperSubsetOf',  {
-                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
-                }), state_domain.RuleSpec(
-            'DoesNotContainAtLeastOneOf', {
-                    'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
-                })], [], None
+                    'feedback', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>Equals rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'ContainsAtLeastOneOf',
+                    {
+                        'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+
+                    }),
+                state_domain.RuleSpec(
+                    'IsProperSubsetOf',
+                    {
+                        'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                    }),
+                state_domain.RuleSpec(
+                    'DoesNotContainAtLeastOneOf',
+                    {
+                        'x': ['<p>DoesNotContainAtLeastOneOf rule_'
+                              'spec html</p>']
+                    })
+            ],
+            [],
+            None
         )
 
         state.update_interaction_id('ItemSelectionInput')
@@ -687,11 +739,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback', '<p>state outcome html</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Equals', {
-                    'x': ['<p>init_state customization arg html 1</p>']
-                })], [], None
+                    'feedback', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['<p>init_state customization arg html 1</p>']
+                    })
+            ],
+            [],
+            None
         )
         state_customization_args_dict = {
             'maxAllowableSelectionCount': {
@@ -1046,14 +1104,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         '&amp;gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;'
                         'gt;&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title&amp;'
                         'quot;:&amp;quot;hello&amp;quot;}]\">'
-                        '</oppia-noninteractive-tabs>')), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], None
+                        '</oppia-noninteractive-tabs>')),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
         )
 
         init_state.update_interaction_answer_groups(
@@ -1199,14 +1263,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                })], [], None
+                    'feedback_1', '<p>Feedback</p>'), False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
         )
 
         init_state.update_interaction_answer_groups(
@@ -1290,14 +1359,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', {
-                    'x': {
-                        'contentId': 'rule_input_4',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
         )
 
         init_state.update_interaction_answer_groups(
@@ -3493,14 +3568,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
         )
 
         exploration.init_state.update_interaction_answer_groups(
@@ -3520,20 +3601,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-                }), state_domain.RuleSpec(
-            'Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test1']
-                    }
-            })], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                            }
+                    }),
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test1']
+                            }
+                    })
+            ],
+            [],
+            None
         )
 
         exploration.init_state.update_interaction_answer_groups(
@@ -3872,11 +3961,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', {
-                    'x': 'Test'
-            })], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': 'Test'
+                    })
+            ],
+            [],
+            None
         )
 
         self.assertEqual(
@@ -3906,10 +4001,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', []
-            )], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains', []
+                    )
+            ],
+            [],
+            None
         )
 
         with self.assertRaisesRegexp(
@@ -3939,14 +4039,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains',  {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': [[]]
-                    }
-            })], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': [[]]
+                            }
+                    })
+            ],
+            [],
+            None
         )
 
         with self.assertRaisesRegexp(
@@ -3973,14 +4079,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, state_domain.SubtitledHtml(
-                    'feedback_1', '<p>Feedback</p>'), False, [], None,
-                    None), [state_domain.RuleSpec(
-            'Contains', {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-            })], [], None
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                            }
+                    })
+            ],
+            [],
+            None
         )
         exploration.init_state.update_interaction_answer_groups(
             [state_answer_group])
