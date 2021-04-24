@@ -35,6 +35,7 @@ import { HttpClient } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NavigationBackendApiService } from 'services/navigation-backend-api.service';
 
 @Component({
   selector: 'top-navigation-bar',
@@ -109,6 +110,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
      private http: HttpClient,
      private i18nLanguageCodeService: I18nLanguageCodeService,
      private windowRef: WindowRef,
+     private navigationBackendApiService: NavigationBackendApiService
    ) {}
 
    ngOnInit(): void {
@@ -171,20 +173,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
        }
 
        if (this.userIsLoggedIn) {
-         // Show the number of unseen notifications in the navbar and
-         // page title, unless the user is already on the dashboard page.
-         this.http.get('/notificationshandler').toPromise().then(
-           (response) => {
-             if (this.windowRef.nativeWindow.location.pathname !== '/') {
-               this.numUnseenNotifications =
-              response.num_unseen_notifications;
-               if (this.numUnseenNotifications > 0) {
-                 this.windowRef.nativeWindow.document.title = (
-                   '(' + this.numUnseenNotifications + ') ' +
-                 this.windowRef.nativeWindow.document.title);
-               }
-             }
-           });
+         this.navigationBackendApiService.showUnseenNotifications();
        }
      });
 

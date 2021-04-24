@@ -56,7 +56,6 @@ export class NavigationService {
      currentTarget: string; }, menuName: string): void {
       // Focus on the current target before opening its submenu.
       this.activeMenuName = menuName;
-      angular.element(evt.currentTarget).focus();
     }
 
     closeSubmenu(evt: {
@@ -65,8 +64,6 @@ export class NavigationService {
      currentTarget?: string;
      }): void {
       this.activeMenuName = '';
-      angular.element(evt.currentTarget).closest('li')
-        .find('a').blur();
     }
     /**
      * Handles keydown events on menus.

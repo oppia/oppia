@@ -69,7 +69,8 @@ float
              data-toggle="dropdown"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'classroomMenu')"
-             (mouseleave)="closeSubmenuIfNotMobile($event)">
+             (mouseleave)="closeSubmenuIfNotMobile($event)"
+             autofocus>
             <span class="oppia-navbar-tab-content"
                   [innerHTML]="'I18N_TOPNAV_CLASSROOM' | translate"></span>
           </a>
@@ -77,7 +78,8 @@ float
               class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
               (mouseover)="openSubmenu($event, 'classroomMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
-              role="menu">
+              role="menu"
+              autofocus>
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE})"
                  (click)="navigateToClassroomPage('/learn/math')"
@@ -108,7 +110,8 @@ float
              tabindex="0"
              data-toggle="dropdown"
              (mouseover)="openSubmenu($event, 'aboutMenu')"
-             (mouseleave)="closeSubmenuIfNotMobile($event)">
+             (mouseleave)="closeSubmenuIfNotMobile($event)"
+             autofocus>
             <span class="oppia-navbar-tab-content" 
                   [innerHTML]="'I18N_TOPNAV_ABOUT' | translate">
             </span>
@@ -116,7 +119,8 @@ float
           <ul ngbDropdownMenu
               class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
               (mouseover)="openSubmenu($event, 'aboutMenu')"
-              (mouseleave)="closeSubmenuIfNotMobile($event)">
+              (mouseleave)="closeSubmenuIfNotMobile($event)"
+              autofocus>
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
@@ -153,7 +157,8 @@ float
              data-toggle="dropdown"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
-             (mouseleave)="closeSubmenuIfNotMobile($event)">
+             (mouseleave)="closeSubmenuIfNotMobile($event)"
+             autofocus>
             <span class="oppia-navbar-tab-content"
                  [innerHTML]="'I18N_TOPNAV_GET_INVOLVED' | translate">
             </span>
@@ -207,7 +212,8 @@ float
          aria-label="User Menu"
          tabindex="0"
          (mouseover)="openSubmenu($event, 'profileMenu')"
-         (mouseleave)="closeSubmenuIfNotMobile($event)">
+         (mouseleave)="closeSubmenuIfNotMobile($event)"
+         autofocus>
         <div ngbDropdownToggle
              data-toggle="dropdown"
              class="oppia-navbar-profile-picture-container dropdown-toggle">
@@ -251,7 +257,8 @@ float
       <ul ngbDropdownMenu
           class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
           (mouseover)="openSubmenu($event, 'profileMenu')"
-          (mouseleave)="closeSubmenuIfNotMobile($event)">
+          (mouseleave)="closeSubmenuIfNotMobile($event)"
+          autofocus>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"
