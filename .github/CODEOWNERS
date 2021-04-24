@@ -160,7 +160,6 @@
 /.pylintrc @Hudda @DubeySandeep
 /.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
-/codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
