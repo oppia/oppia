@@ -62,7 +62,7 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-delete-topic-button'));
   var editTopicButton = element(
     by.css('.protractor-test-edit-topic-button'));
-  var unassignSkillButon = element(
+  var unassignSkillButton = element(
     by.css('.protractor-test-unassign-skill-button'));
   var skillNameField = element(
     by.css('.protractor-test-new-skill-description-field')
@@ -172,8 +172,6 @@ var TopicsAndSkillsDashboardPage = function() {
       'Assign skill to topic button', assignSkillToTopicButtons.first());
 
     var topic = element(by.cssContainingText(topicNamesClass, topicName));
-    await waitFor.elementToBeClickable(
-      topic, 'Topic list item taking too long to be clickable');
     await action.click('Topic list item', topic);
     await action.click('Confirm move button', confirmMoveButton);
     await waitFor.invisibilityOf(
@@ -350,10 +348,7 @@ var TopicsAndSkillsDashboardPage = function() {
     expect(await skillEditOptions.count()).toEqual(1);
     var skillEditOptionBox = skillEditOptions.first();
     await action.click('Skill edit option', skillEditOptionBox);
-    await waitFor.elementToBeClickable(
-      unassignSkillButon,
-      'Unassign Skill button takes too long to be clickable');
-    await unassignSkillButon.click();
+    await action.click('Unassign Skill Button', unassignSkillButton);
 
     await waitFor.modalPopupToAppear();
     await waitFor.visibilityOf(
@@ -364,14 +359,8 @@ var TopicsAndSkillsDashboardPage = function() {
       '.protractor-test-unassign-topic-label', topicName));
     var assignedTopicInput = topicListItem.element(
       assignedTopicNameInputClass);
-    await waitFor.elementToBeClickable(
-      assignedTopicInput,
-      'Assigned topic checkbox takes too long to be clickable');
-    await assignedTopicInput.click();
+    await action.click('Assigned Topic Checkbox', assignedTopicInput);
 
-    await waitFor.elementToBeClickable(
-      confirmUnassignSkillButton,
-      'Confirm Unassign skill button takes too long to be clickable');
     await action.click('Confirm Unassign Skill', confirmUnassignSkillButton);
     await waitFor.invisibilityOf(
       confirmUnassignSkillButton,
@@ -428,3 +417,4 @@ var TopicsAndSkillsDashboardPage = function() {
 };
 
 exports.TopicsAndSkillsDashboardPage = TopicsAndSkillsDashboardPage;
+
