@@ -2759,7 +2759,7 @@ class State(python_utils.OBJECT):
 
         Args:
             answer_groups_list: list(AnswerGroup). List of AnswerGroup domain
-            objects.
+                objects.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
