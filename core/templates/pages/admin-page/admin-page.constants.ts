@@ -24,7 +24,6 @@ export const AdminPageConstants = {
 
   ADMIN_JOB_OUTPUT_URL_TEMPLATE: '/adminjoboutput?job_id=<jobId>',
   ADMIN_CONTRIBUTION_RIGHTS_DATA_HANDLER: '/contributionrightsdatahandler',
-  ADMIN_GET_CONTRIBUTOR_USERS_HANDLER: '/getcontributorusershandler',
   ADMIN_CONTRIBUTION_RIGHTS_HANDLER: '/contributionrightshandler',
   ADMIN_MEMORY_CACHE_HANDLER_URL: '/memorycacheadminhandler',
   ADMIN_UPDATE_USERNAME_HANDLER_URL: '/updateusernamehandler',

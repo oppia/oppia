@@ -615,7 +615,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
+      '/contributionrightshandler' +
       '?category=voiceover&language_code=en');
     expect(req.request.method).toEqual('GET');
 
@@ -635,7 +635,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
+      '/contributionrightshandler' +
       '?category=question');
     expect(req.request.method).toEqual('GET');
 
@@ -658,7 +658,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
+      '/contributionrightshandler' +
       '?category=InvalidCategory&language_code=en');
     expect(req.request.method).toEqual('GET');
 

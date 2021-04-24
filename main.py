@@ -233,9 +233,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/contributionrightshandler',
         admin.ContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributorusershandler',
-        admin.ContributorUsersListHandler),
-    get_redirect_route(
         r'/contributionrightsdatahandler',
         admin.ContributionRightsDataHandler),
     get_redirect_route(
