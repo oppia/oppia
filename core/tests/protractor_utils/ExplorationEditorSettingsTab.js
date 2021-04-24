@@ -24,8 +24,8 @@ var action = require('./action.js');
 
 var ExplorationEditorSettingsTab = function() {
   /*
-  * Interactive elements
-  */
+   * Interactive elements
+   */
   var explorationCategoryInput = element(
     by.css('.protractor-test-exploration-category-input'));
   var explorationLanguageInput = element(
@@ -47,8 +47,8 @@ var ExplorationEditorSettingsTab = function() {
   var neutralElement = element(by.css('.protractor-test-settings-container'));
 
   /*
-  * Buttons
-  */
+   * Buttons
+   */
   var closePreviewSummaryButton = element(
     by.css('.protractor-test-close-preview-summary-modal'));
   var openPreviewSummaryButton = element(
@@ -61,8 +61,8 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-enable-mark-correctness-feedback'));
 
   /*
-  * Workflows
-  */
+   * Workflows
+   */
   this.deleteExploration = async function() {
     await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
