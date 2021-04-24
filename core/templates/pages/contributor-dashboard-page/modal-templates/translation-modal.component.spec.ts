@@ -28,6 +28,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { MachineTranslatedTextBackendDict } from '../services/machine-translated-text-backend-api.service';
 import { TranslateTextService } from '../services/translate-text.service';
 
 class MockChangeDetectorRef {
@@ -197,6 +198,49 @@ describe('Translation Modal Component', () => {
         expect(component.getHtmlSchema().ui_config.language)
           .toBe('ar');
       }));
+
+    describe('with a machine translatable translation language',
+      () => {
+        beforeEach(fakeAsync(() => {
+          translationLanguageService.setActiveLanguageCode('es');
+          component.ngOnInit();
+          const sampleStateWiseContentMapping = {
+            stateName1: {contentId1: 'Please continue'}
+          };
+
+          const req = httpTestingController.expectOne(
+            '/gettranslatabletexthandler?exp_id=1&language_code=es');
+          expect(req.request.method).toEqual('GET');
+          req.flush({
+            state_names_to_content_id_mapping: sampleStateWiseContentMapping,
+            version: 1
+          });
+          flushMicrotasks();
+        }));
+
+        it('should offer translation', () => {
+          expect(component.offerMachineTranslation).toBeTrue();
+        });
+
+        it('should not retrieve translation until dropdown chevron is clicked',
+          fakeAsync(() => {
+            expect(component.hideMachineTranslation).toBeTrue();
+            component.toggleMachineTranslation();
+            const sampleMachineTranslationResponse:
+            MachineTranslatedTextBackendDict = {
+              translated_texts: {contentId1: 'Por favor continua.'}
+            };
+            const req = httpTestingController.expectOne(
+              '/machine_translated_state_texts_handler?exp_id=1&state_name=' +
+            'stateName1&content_ids=%5B%22contentId1%22%5D&' +
+            'target_language_code=es');
+            expect(req.request.method).toEqual('GET');
+            req.flush(sampleMachineTranslationResponse);
+            flushMicrotasks();
+            expect(component.hideMachineTranslation).toBeFalse();
+            expect(component.machineTranslatedText).toBe('Por favor continua.');
+          }));
+      });
   });
 
   describe('when clicking on the translatable content', () => {
@@ -259,13 +303,19 @@ describe('Translation Modal Component', () => {
           version: 1
         });
         flushMicrotasks();
-        component.skipActiveTranslation();
       }));
 
 
       it('should retrieve remaining text and availability', () => {
+        component.skipActiveTranslation();
         expect(component.textToTranslate).toBe('text2');
         expect(component.moreAvailable).toBeFalse();
+      });
+
+      it('should hide the machine translation', () => {
+        component.hideMachineTranslation = false;
+        component.skipActiveTranslation();
+        expect(component.hideMachineTranslation).toBeTrue();
       });
     });
   });

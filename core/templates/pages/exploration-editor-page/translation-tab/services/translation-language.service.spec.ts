@@ -82,6 +82,8 @@ describe('Translation language service', () => {
       });
 
     it('should show if the active language is machine translatable', () => {
+      expect(translationLanguageService.isActiveLanguageMachineTranslatable())
+        .toBeFalse();
       translationLanguageService.setActiveLanguageCode('es');
       expect(translationLanguageService.isActiveLanguageMachineTranslatable())
         .toBeTrue();
