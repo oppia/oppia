@@ -35,7 +35,7 @@ export class AdminConfigTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = (
     new EventEmitter
   );
-  configProperties: AdminPageData = {};
+  configProperties = {};
   configPropertiesKeys = [];
   
   constructor(
