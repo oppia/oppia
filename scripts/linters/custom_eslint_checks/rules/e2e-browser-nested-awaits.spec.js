@@ -21,57 +21,124 @@
 var rule = require('./e2e-browser-nested-awaits');
 var RuleTester = require('eslint').RuleTester;
 
-/* Note: parser options added in order to parse
-   `async` and `await` in the test code snippets */
+/*  Note: parser options added in order to parse
+ *  `async` and `await` in the test code snippets
+ */
 var ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2017
   }
 });
 
+/*  All error messages are the same --
+ *  it's defined here to reduce code duplication
+ */
+var errorMsg = '`browser.switchTo().activeElement()` ' +
+  'is not wrapped in an `await` statement';
+
 ruleTester.run('e2e-browser-nested-awaits', rule, {
   valid: [
     {
       code: `
-          async function def() {
-              await page;
-              await getPage().sendKeys(solution.explanation);
-              await page.frame().activeElement().sendKeys();
-              await(
-                await browser.switchTo().activeElement()
-              ).sendKeys(solution.explanation);
+          async function func() {
+            await browser.switchTo().activeElement();
+            await browser.switchTo(param).activeElement(param);
+            await browser.switchTo(param).activeElement();
+            await browser.switchTo().activeElement(param);
           }
           `
-    }],
-  invalid: [
-    {
-      code: `
-          async function def() {
-              await browser.switchTo().activeElement().sendKeys(
-                solution.explanation);
-          }
-          `,
-      errors: [
-        {
-          message: 'should have a nested `await` for ' +
-                   '`browser.switchTo().activeElement()`'
-        }]
     },
     {
       code: `
-          async function def() {
-              await browser.switchTo().activeElement().sendKeys();
-              await browser.switchTo().activeElement().sendKeys(arr[0].attr);
+          async function func() {
+            await(
+              await browser.switchTo().activeElement()
+            ).sendKeys(solution.explanation);
+            await(
+              await browser.switchTo().activeElement()
+            ).sendKeys();
+            await(
+              await browser.switchTo().activeElement()
+            ).callback(args).chain()[index];
+            await(await browser.switchTo().activeElement());
+            await(await(await (browser.switchTo().activeElement())));
+            await(await(await (browser.switchTo()).activeElement()));
           }
-          `,
-      errors: [
-        {
-          message: 'should have a nested `await` for ' +
-                   '`browser.switchTo().activeElement()`'
-        },
-        {
-          message: 'should have a nested `await` for ' +
-                   '`browser.switchTo().activeElement()`'
-        }]
+          `
+    },
+    {
+      code: `
+          async function func() {
+            await expression;
+            await getPage().sendKeys(args.attr);
+            await page.switchTo().activeElement();
+            await page.switchTo().activeElement().sendKeys();
+            await page.frame().activeElement().sendKeys();
+          }
+          `
+    },
+    {
+      code: `
+          page.switchTo().activeElement();
+          page.switchTo().activeElement().sendKeys();
+          page.frame().activeElement().sendKeys();
+          browser.activeElement().switchTo();
+          `
+    },
+    {
+      code: `
+          async function func() {
+            await browser.activeElement().switchTo();
+            await (await browser.activeElement().switchTo());
+          }
+          `
+    }
+  ],
+  invalid: [
+    {
+      code: `
+          browser.switchTo().activeElement();
+           `,
+      errors: [{ message: errorMsg }]
+    },
+    {
+      code: `
+          browser.switchTo().activeElement().sendKeys(args);
+           `,
+      errors: [{ message: errorMsg }]
+    },
+    {
+      code: `
+          async function func() {
+              await browser.switchTo().activeElement().sendKeys(args);
+          }
+           `,
+      errors: [{ message: errorMsg }]
+    },
+    {
+      code: `
+          async function func() {
+              await browser.switchTo().activeElement().sendKeys();
+          }
+           `,
+      errors: [{ message: errorMsg }]
+    },
+    {
+      code: `
+          async function func() {
+              await browser.switchTo().activeElement().callback(args).chain();
+          }
+           `,
+      errors: [{ message: errorMsg }]
+    },
+    {
+      code: `
+          async function func() {
+              await(
+                await browser.switchTo().activeElement().sendKeys()
+              ).callback();
+          }
+           `,
+      errors: [{ message: errorMsg }]
     }]
 });

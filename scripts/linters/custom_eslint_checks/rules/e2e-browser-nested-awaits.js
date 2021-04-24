@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint to ensure that e2e tests have nested awaits for
-   `await (await browser.switchTo().activeElement()).sendKeys(explanation)`
+ * @fileoverview Lint to ensure that e2e tests wrap
+   `browser.switchTo().activeElement()` in an `await` expression
  */
 
 'use strict';
@@ -25,39 +25,28 @@ module.exports = {
     docs: {
       description: (
         '`browser.switchTo().activeElement()` ' +
-        'should be wrapped in an `await` ' +
-        'expression before calling `sendKeys()`'),
+        'should be wrapped in an `await` expression'),
       category: 'Possible Errors',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      noNestedAwaits: (
-        'should have a nested `await` for ' +
-        '`browser.switchTo().activeElement()`')
+      noBrowserAwait: (
+        '`browser.switchTo().activeElement()` ' +
+        'is not wrapped in an `await` statement')
     },
   },
 
   create: function(context) {
-    /* Checks if this expression is syntactically the same as:
-       `await browser.switchTo().activeElement().sendKeys(<ARGS>)` */
-    var checkExprNode = function(node) {
-      node = node.expression;
-      if (node.type !== 'AwaitExpression' ||
-        node.argument.type !== 'CallExpression') {
-        return false;
-      }
-
-      node = node.argument.callee;
-      if (node.type !== 'MemberExpression' ||
-        node.property.type !== 'Identifier' ||
-        node.property.name !== 'sendKeys' ||
-        node.object.type !== 'CallExpression') {
-        return false;
-      }
-
-      node = node.object.callee;
+    /*  Checks if CallExpression `expr` contains:
+     *  `browser.switchTo().activeElement()`.
+     *
+     *  If it does, checks to see whether `expr` is wrapped
+     *  in an `await` expression.
+     */
+    var checkExprNode = function(expr) {
+      var node = expr.callee;
       if (node.type !== 'MemberExpression' ||
         node.property.type !== 'Identifier' ||
         node.property.name !== 'activeElement' ||
@@ -74,16 +63,16 @@ module.exports = {
         return false;
       }
 
-      return true;
+      return expr.parent.type !== 'AwaitExpression';
     };
 
     return {
-      ExpressionStatement: function(node) {
+      CallExpression: function(node) {
         if (checkExprNode(node)) {
           context.report({
             node,
             loc: node.loc,
-            messageId: 'noNestedAwaits'
+            messageId: 'noBrowserAwait'
           });
         }
       }
