@@ -1746,56 +1746,32 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': (
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', (
                         '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
-            'outcome': {
-                'dest': 'state3',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Outcome2 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                        '</oppia-noninteractive-image>')), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': 0}),
+                state_domain.RuleSpec('Equals', {'x': 1})], [], None
+        ), state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state3', state_domain.SubtitledHtml(
+                    'feedback_2', '<p>Outcome2 for state2</p>'),
+                    False, [], None,
+                    None), [state_domain.RuleSpec(
+                'Equals', {'x': 0})], [], None
+        )]
+        state_answer_group_list3 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Outcome for state3</p>'),
+                    False, [], None, None), [state_domain.RuleSpec(
+                    'Equals', {'x': [
                     (
                         '<p>This is value1 for ItemSelection</p>'
                         '<oppia-noninteractive-image filepath-with-value='
@@ -1803,10 +1779,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
                         '</oppia-noninteractive-image>')
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                ]}),
+                state_domain.RuleSpec('Equals', {'x': [
                     (
                         '<p>This is value3 for ItemSelection</p>'
                         '<oppia-noninteractive-image filepath-with-value='
@@ -1814,24 +1788,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         ' caption-with-value="&amp;quot;&amp;quot;" '
                         'alt-with-value="&amp;quot;&amp;quot;">'
                         '</oppia-noninteractive-image>')
-                ]}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+                ]})], [], None
+        )]
+
+        state2.update_interaction_answer_groups(state_answer_group_list2)
+        state3.update_interaction_answer_groups(state_answer_group_list3)
 
         filenames = (
             exp_services.get_image_filenames_from_exploration(exploration))

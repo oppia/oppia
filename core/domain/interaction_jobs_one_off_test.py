@@ -121,26 +121,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             }]},
             'allowMultipleItemsInSamePosition': {'value': True}
         }
-
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [['a'], ['b']]}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback1',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group_list1 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback1', '<p>Outcome for state1</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('IsEqualToOrdering',
+                    {'x': [['a'], ['b']]}),
+                ], [], None
+        )]
 
         customization_args_dict2 = {
             'choices': {'value': [{
@@ -152,72 +140,40 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             }]},
             'allowMultipleItemsInSamePosition': {'value': True}
         }
-
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec(
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition', {
                     'x': []
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [['a']]}
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }),
+                state_domain.RuleSpec('IsEqualToOrdering', {'x': [['a']]}),
+                state_domain.RuleSpec('HasElementXBeforeElementY', {
                     'x': '',
                     'y': ''
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+                }),
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering', {'x': []})], [], None
+        ), state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback2', '<p>Outcome for state1</p>'), False, [], None,
+                    None), [state_domain.RuleSpec(
+                        'HasElementXAtPositionY', {
                     'x': '',
                     'y': 1
-                }
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+                }),
+                state_domain.RuleSpec('HasElementXAtPositionY', {
                     'x': 'a',
                     'y': 2
-                }
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback2',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                })], [], None
+        )]
 
         state1.update_interaction_id('DragAndDropSortInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_interaction_answer_groups(state_answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -238,7 +194,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(2)
-        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_answer_groups(state_answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
@@ -305,32 +261,18 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_groups = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('IsEqualToOrdering',
+                    {'x': []}), state_domain.RuleSpec('IsEqualToOrdering',
+                    {'x': []})], [], None
+        )]
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list)
+        state1.update_interaction_answer_groups(state_answer_groups)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -380,31 +322,18 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             }]},
             'showChoicesInShuffledOrder': {'value': True}
         }
-
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '1'}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group_list1 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
+                    None), [state_domain.RuleSpec(
+                        'Equals', {'x': '1'})], [], None
+        )]
 
         state1.update_interaction_id('MultipleChoiceInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_interaction_answer_groups(state_answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
@@ -437,33 +366,20 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             'showChoicesInShuffledOrder': {'value': True}
         }
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '0'}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': '9007199254740991'}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': '0'}),
+                state_domain.RuleSpec(
+                    'Equals', {'x': '9007199254740991'}),], [], None
+        )]
+
 
         state2.update_interaction_id('MultipleChoiceInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(4)
-        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_answer_groups(state_answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -508,32 +424,18 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             'showChoicesInShuffledOrder': {'value': True}
         }
 
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '0'}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': '9007199254740991'}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        state_answer_group_list = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': '0'}),
+                state_domain.RuleSpec(
+                    'Equals', {'x': '9007199254740991'})], [], None
+        )]
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list)
+        state1.update_interaction_answer_groups(state_answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -584,37 +486,21 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'maxAllowableSelectionCount': {'value': 1}
         }
 
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+        state_answer_group_list1 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                ]}), state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value2 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                ]})], [], None
+        )]
 
         state1.update_interaction_id('ItemSelectionInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_interaction_answer_groups(state_answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -642,37 +528,22 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'maxAllowableSelectionCount': {'value': 1}
         }
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                ]}),
+                state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                ]})], [], None
+        )]
 
         state2.update_interaction_id('ItemSelectionInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(2)
-        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_answer_groups(state_answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -717,36 +588,21 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'maxAllowableSelectionCount': {'value': 1}
         }
 
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+        state_answer_group_list = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                ]}),
+                state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                ]})], [], None
+        )]
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list)
+        state1.update_interaction_answer_groups(state_answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -928,32 +784,17 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             'maxAllowableSelectionCount': {'value': 1}
         }
 
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+        state_answer_group_list1 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                ]}),
+                state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value2 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                ]})], [], None
+        )]
 
         solution1 = state_domain.Solution.from_dict('ItemSelectionInput', {
             'answer_is_exclusive': True,
@@ -974,7 +815,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state1.update_interaction_id('ItemSelectionInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_interaction_answer_groups(state_answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
         state1.update_interaction_solution(solution1)
         state1.update_interaction_hints(hint_list1)
@@ -1006,32 +847,17 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             'maxAllowableSelectionCount': {'value': 1}
         }
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                ]}),
+                state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                ]})], [], None
+        )]
 
         solution2 = state_domain.Solution.from_dict('ItemSelectionInput', {
             'answer_is_exclusive': True,
@@ -1052,7 +878,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state2.update_interaction_id('ItemSelectionInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(2)
-        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_answer_groups(state_answer_group_list2)
         state2.update_interaction_solution(solution2)
         state2.update_interaction_hints(hint_list2)
 
@@ -1108,32 +934,17 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [
+        state_answer_group_list1 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state1</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('IsEqualToOrdering', {'x': [
                     ['<p>This is value1 for DragAndDropSort</p>']
-                ]}
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [
+                ]}),
+                state_domain.RuleSpec('IsEqualToOrdering', {'x': [
                     ['<p>This is value2 for DragAndDropSort</p>']
-                ]}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                ]})], [], None
+        )]
 
         solution1 = state_domain.Solution.from_dict('DragAndDropSortInput', {
             'answer_is_exclusive': True,
@@ -1154,7 +965,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state1.update_interaction_id('DragAndDropSortInput')
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_interaction_answer_groups(state_answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
         state1.update_interaction_solution(solution1)
         state1.update_interaction_hints(hint_list1)
@@ -1185,42 +996,25 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('IsEqualToOrdering', {'x': [
                     [
                         '<p>This is value1 for DragAndDropSort</p>',
                         '<p>This is value3 for DragAndDropSort</p>'
                     ]
-                ]}
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                ]}),
+                state_domain.RuleSpec('HasElementXBeforeElementY', {
                     'x': '<p>This is value3 for DragAndDropSort</p>',
                     'y': '<p>This is value1 for DragAndDropSort</p>'
-                }
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+                }),
+                state_domain.RuleSpec('HasElementXAtPositionY', {
                     'x': '<p>This is value3 for DragAndDropSort</p>',
                     'y': 2
-                }
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                })], [], None
+        )]
 
         solution2 = state_domain.Solution.from_dict('DragAndDropSortInput', {
             'answer_is_exclusive': True,
@@ -1241,7 +1035,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(2)
-        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_answer_groups(state_answer_group_list2)
         state2.update_interaction_solution(solution2)
         state2.update_interaction_hints(hint_list2)
 
@@ -1315,36 +1109,21 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             'maxAllowableSelectionCount': {'value': 1}
         }
 
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+        state_answer_group_list = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'State1', state_domain.SubtitledHtml(
+                    'feedback', '<p>Outcome for state2</p>'), False, [], None,
+                    None), [state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
+                ]}),
+                state_domain.RuleSpec('Equals', {'x': [
                     '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+                ]})], [], None
+        )]
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_next_content_id_index(2)
-        state1.update_interaction_answer_groups(answer_group_list)
+        state1.update_interaction_answer_groups(state_answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
