@@ -1014,11 +1014,6 @@ class Exploration(python_utils.OBJECT):
             processed_state_names = set()
             curr_queue = [self.init_state_name]
 
-            if excluded_state_is_bypassable:
-                raise utils.ValidationError(
-                    'Cannot make %s a checkpoint as it is bypassable'
-                    % state_name_to_exclude)
-
             while curr_queue:
                 if curr_queue[0] == state_name_to_exclude:
                     curr_queue.pop(0)
@@ -1032,7 +1027,8 @@ class Exploration(python_utils.OBJECT):
                     # We do not need to check if the current state is terminal
                     # or not before getting all outcomes, as when we find a
                     # terminal state in an outcome, we break out of the for loop
-                    # and dest_state is not appended to curr_queue.
+                    # and dest_state is not appended to curr_queue. Hence, a
+                    # terminal state never exists in curr_queue.
                     all_outcomes = (
                         curr_state.interaction.get_all_outcomes())
                     for outcome in all_outcomes:
@@ -1043,6 +1039,10 @@ class Exploration(python_utils.OBJECT):
                         if (dest_state not in curr_queue and
                                 dest_state not in processed_state_names):
                             curr_queue.append(dest_state)
+            if excluded_state_is_bypassable:
+                raise utils.ValidationError(
+                    'Cannot make %s a checkpoint as it is bypassable'
+                    % state_name_to_exclude)
 
         if strict:
             warnings_list = []
