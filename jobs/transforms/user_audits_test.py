@@ -68,15 +68,18 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
 
 
 class ValidateActivityMappingOnlyAllowedKeysTests(
-    job_test_utils.PipelinedTestBase):
+        job_test_utils.PipelinedTestBase):
 
+    USER_ID = 'test_id'
+    INCORRECT_KEY = 'some_id'
+    INCORRECT_KEY_VALUE = 'value'
     def test_process_with_incorrect_keys(self):
 
         test_model = user_models.PendingDeletionRequestModel(
-            id = 'test'
+            id=self.USER_ID
         )
         test_model.pseudonymizable_entity_mappings = {
-            models.NAMES.audit: {'some_id': 'id'}
+            models.NAMES.audit: {self.INCORRECT_KEY: self.INCORRECT_KEY_VALUE}
         }
 
         output = (
@@ -85,8 +88,11 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
             | beam.ParDo(user_audits.ValidateActivityMappingOnlyAllowedKeys())
         )
 
-        self.assert_pcoll_equal(output,[
-            audit_errors.ModelIncorrectKeyError(model,['some_id'])
+        self.assert_pcoll_equal(output, [
+            audit_errors.ModelIncorrectKeyError(
+                test_model,
+                [self.INCORRECT_KEY]
+                )
         ])
 
 
