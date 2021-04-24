@@ -16,7 +16,8 @@
  * @fileoverview Directive for the configuration tab in the admin panel.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Output, OnInit, EventEmitter, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Subscription, Observable, from } from 'rxjs';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service.ts';
@@ -31,11 +32,16 @@ require('components/forms/schema-based-editors/schema-based-editor.directive.ts'
   styleUrls: []
 })
 export class AdminConfigTabComponent implements OnInit {
-  @Input() setStatusMessage: string;
-  adminPageData: AdminPageData | null;
-  
+  @Output() setStatusMessage: EventEmitter<string> = (
+    new EventEmitter
+  );
+  configProperties = {};
+  configPropertiesEntries = [];
+  // configPropertiesObservable: Observable<Object>;
+  // configPropertiesNonEmpty = false;
   
   constructor(
+    private ngZone: NgZone,
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
@@ -52,13 +58,29 @@ export class AdminConfigTabComponent implements OnInit {
   }
   
   reloadConfigProperties() {
-    this.adminDataService.getDataAsync().then(function(adminDataObject) {
-      this.adminPageData = adminDataObject;
-      // TODO(#8521): Remove the use of $rootScope.$apply()
-      // once the directive is migrated to angular.
-      //$rootScope.$apply();
-      console.log(this.adminPageData.configProperties);
-    });
+    // this.configPropertiesNonEmpty = false;
+    // this.adminDataService.getDataAsync().then(adminDataObject => {
+    //   this.configProperties = adminDataObject.configProperties
+    //   this.configPropertiesNonEmpty = true;
+    //   //this.windowRef._window().location.reload();
+    //   //this.configPropertiesNonEmpty = isNonemptyObject(this.configProperties);
+    //   // TODO(#8521): Remove the use of $rootScope.$apply()
+    //   // once the directive is migrated to angular.
+    //   //$rootScope.$apply();
+    //   console.log(this.configProperties);
+    // });
+    
+    
+    from(this.adminDataService.getDataAsync()).subscribe(
+      data => {
+        this.ngZone.run(() => {
+          this.configProperties = data.configProperties;
+          this.configPropertiesEntries = Object.entries(this.configProperties);
+          console.log(this.configPropertiesEntries[3][1].value);
+        });
+        
+      }
+    );
   }
   
   revertToDefaultConfigPropertyValue(configPropertyId) {
@@ -69,13 +91,13 @@ export class AdminConfigTabComponent implements OnInit {
     this.adminBackendApiService.revertConfigPropertyAsync(
       configPropertyId
     ).then(() => {
-      this.setStatusMessage = 'Config property reverted successfully.';
+      this.setStatusMessage.emit('Config property reverted successfully.');
       this.reloadConfigProperties();
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
       //$rootScope.$apply();
     }, errorResponse => {
-      this.setStatusMessage = 'Server error: ' + errorResponse;
+      this.setStatusMessage.emit('Server error: ' + errorResponse);
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
       //$rootScope.$apply();
@@ -90,10 +112,10 @@ export class AdminConfigTabComponent implements OnInit {
       return;
     }
 
-    this.setStatusMessage = 'Saving...';
+    this.setStatusMessage.emit('Saving...');
 
     this.adminTaskManagerService.startTask();
-    var newConfigPropertyValues = JSON.parse(JSON.stringify(this.adminPageData.configProperties));
+    var newConfigPropertyValues = JSON.parse(JSON.stringify(this.configProperties));
     for (var property in newConfigPropertyValues) {
       newConfigPropertyValues[property] = (
         newConfigPropertyValues[property].value);
@@ -102,13 +124,13 @@ export class AdminConfigTabComponent implements OnInit {
     this.adminBackendApiService.saveConfigPropertiesAsync(
       newConfigPropertyValues
     ).then(() => {
-      this.setStatusMessage = 'Data saved successfully.';
+      this.setStatusMessage.emit('Data saved successfully.');
       this.adminTaskManagerService.finishTask();
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
       //$rootScope.$apply();
     }, errorResponse => {
-      this.setStatusMessage = 'Server error: ' + errorResponse;
+      this.setStatusMessage.emit('Server error: ' + errorResponse);
       this.adminTaskManagerService.finishTask();
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
