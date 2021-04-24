@@ -17,7 +17,7 @@
  */
 
 require('third-party-imports/ui-codemirror.import.ts');
-
+import 'components/code-mirror/codemirror.component';
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
@@ -94,6 +94,10 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
           ctrl.getDisplayedValue = function() {
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
+          };
+
+          ctrl.updateLocalValue = function(val) {
+            ctrl.localValue = val;
           };
           ctrl.$onInit = function() {
             if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {

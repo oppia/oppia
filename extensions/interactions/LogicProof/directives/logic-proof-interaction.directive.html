@@ -1,7 +1,11 @@
 <div class="logic-proof-container">
   <span translate="<[$ctrl.questionString]>" translate-values="$ctrl.questionStringData"></span>
   <div class="logic-proof-input-box">
-    <div ui-codemirror="{onLoad: $ctrl.codeEditor, readOnly: !$ctrl.interactionIsActive}">
+    <div>
+      <oppia-codemirror (on-load)="$ctrl.codeEditor($event)"
+                        [read-only]="!$ctrl.interactionIsActive">
+      </oppia-codemirror>
+    </div>
       <textarea ng-trim="false" rows="10"></textarea>
     </div>
   </div>

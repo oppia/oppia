@@ -3,13 +3,12 @@
     <!-- This ng-form is needed for submitting answer on hitting enter. -->
     <form (ngSubmit)="runAndSubmitCode(code)">
       <div class="code-repl-input-box">
-        <ngx-codemirror
-          [options]="editorOptions"
-          [ngModel]="code"
-          [disabled]="!interactionIsActive"
-          [autoFocus]="true"
-          (ngModelChange)="onEditorChange($event)"
-          [ngModelOptions]="{standalone: true}""
+        <ngx-codemirror [options]="editorOptions"
+                        [ngModel]="code"
+                        [disabled]="!interactionIsActive"
+                        [autoFocus]="true"
+                        (ngModelChange)="onEditorChange($event)"
+                        [ngModelOptions]="{standalone: true}""
         ></ngx-codemirror>
       </div>
       <button mat-raised-button type="button" [disabled]="!interactionIsActive || !hasLoaded" (click)="runCode(code)">Test Run</button>

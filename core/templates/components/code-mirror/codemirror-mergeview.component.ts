@@ -45,12 +45,6 @@ export class CodemirrorMergeviewComponent implements OnInit, OnChanges {
         ...this.options
       }
     );
-    if (!this.leftValue) {
-      throw new Error('Left pane value is not defined.');
-    }
-    if (!this.rightValue) {
-      throw new Error('Right pane value is not defined.');
-    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -58,12 +52,18 @@ export class CodemirrorMergeviewComponent implements OnInit, OnChanges {
     if (changes.leftValue &&
       changes.leftValue.currentValue !==
       changes.leftValue.previousValue) {
+      if (this.leftValue === undefined) {
+        throw new Error('Left pane value is not defined.');
+      }
       this.codeMirrorInstance.edit.setValue(changes.leftValue.currentValue);
     }
     // Watch for changes and set value in right pane.
     if (changes.rightValue &&
       changes.rightValue.currentValue !==
       changes.rightValue.previousValue) {
+      if (!this.rightValue === undefined) {
+        throw new Error('Right pane value is not defined.');
+      }
       this.codeMirrorInstance.right.orig.setValue(
         changes.rightValue.currentValue);
     }
