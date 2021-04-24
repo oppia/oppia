@@ -2048,23 +2048,21 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
     def test_add_reviewer_without_username_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'removal_type': 'all'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'invalid',
                 'removal_type': 'all'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid username: invalid')
@@ -2081,14 +2079,13 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()
         self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'translator',
                 'removal_type': 'specific',
                 'category': 'translation',
                 'language_code': 'hi'
-            }, csrf_token=csrf_token)
+            })
 
         self.assertFalse(user_services.can_review_translation_suggestions(
             self.translation_reviewer_id, language_code='hi'))
@@ -2096,14 +2093,13 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
     def test_remove_translation_reviewer_in_invalid_language_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'translator',
                 'removal_type': 'specific',
                 'category': 'translation',
                 'language_code': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid language_code: invalid')
@@ -2113,14 +2109,13 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'translator',
                 'removal_type': 'specific',
                 'category': 'translation',
                 'language_code': 'hi'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -2139,14 +2134,13 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()
         self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'category': 'voiceover',
                 'language_code': 'hi'
-            }, csrf_token=csrf_token)
+            })
 
         self.assertFalse(user_services.can_review_voiceover_applications(
             self.translation_reviewer_id, language_code='hi'))
@@ -2154,14 +2148,13 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
     def test_remove_voiceover_reviewer_in_invalid_language_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'category': 'voiceover',
                 'language_code': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid language_code: invalid')
@@ -2171,14 +2164,13 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_voiceover_applications(
                 self.translation_reviewer_id, language_code='hi'))
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'voiceartist',
                 'removal_type': 'specific',
                 'category': 'voiceover',
                 'language_code': 'hi'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -2191,13 +2183,12 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'question'
-            }, csrf_token=csrf_token)
+            }, )
 
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
@@ -2207,13 +2198,12 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'question'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -2225,13 +2215,12 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'submit_question'
-            }, csrf_token=csrf_token)
+            })
 
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
@@ -2241,13 +2230,12 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'submit_question'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -2255,25 +2243,23 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
     def test_remove_reviewer_for_invalid_category_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'question',
                 'removal_type': 'specific',
                 'category': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid category: invalid')
 
     def test_remove_reviewer_for_invalid_removal_type_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         response = self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'question',
                 'removal_type': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid removal_type: invalid')
@@ -2297,12 +2283,11 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         self.delete_json(
-            '/contributionrightshandler', {
+            '/contributionrightshandler', params={
                 'username': 'translator',
                 'removal_type': 'all'
-            }, csrf_token=csrf_token)
+            })
 
         self.assertFalse(user_services.can_review_question_suggestions(
             self.translation_reviewer_id))
