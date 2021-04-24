@@ -621,7 +621,7 @@ def _get_auth_claims_from_session_cookie(cookie):
         logging.warn('User session has ended and must be renewed')
     except firebase_exceptions.FirebaseError as error:
         logging.exception('Invalid session cookie')
-        raise ValueError('Invalid session cookie: %s' % error)
+        raise auth_domain.AuthSessionError('Invalid session cookie: %s' % error)
     else:
         return _create_auth_claims(claims)
     return None

@@ -36,6 +36,12 @@ AuthIdUserIdPair = (
     collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id']))
 
 
+class AuthSessionError(Exception):
+    """Error type raised by functions that try to establish auth sessions."""
+
+    pass
+
+
 class AuthClaims(python_utils.OBJECT):
     """Domain object for holding onto essential Claims about an authorized user.
 

@@ -27,6 +27,7 @@ import sys
 import time
 import traceback
 
+from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -164,14 +165,9 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        # NOTE: This function raises a ValueError when the request contains an
-        # invalid session. This is a rare/exceptional situation (a session
-        # must either not exist at all, or exist with a valid state), so in
-        # response we destroy the session immediately and rely on the platform
-        # layer to log debugging information.
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
-        except ValueError:
+        except auth_domain.AuthSessionError:
             auth_services.destroy_auth_session(self.response)
             auth_claims = None
 

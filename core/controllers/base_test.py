@@ -32,6 +32,7 @@ import types
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
@@ -599,7 +600,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_auth_services_error(self):
         get_auth_claims_swap = self.swap_to_always_raise(
-            auth_services, 'get_auth_claims_from_request', error=ValueError)
+            auth_services, 'get_auth_claims_from_request',
+            error=auth_domain.AuthSessionError)
         destroy_auth_session_swap = self.swap_with_call_counter(
             auth_services, 'destroy_auth_session')
 
