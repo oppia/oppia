@@ -332,7 +332,7 @@ export class AdminBackendApiService {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
-        AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER, {
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
           category: category,
           username: username,
           language_code: languageCode
@@ -350,7 +350,7 @@ export class AdminBackendApiService {
   ): Promise<ViewContributionBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<ViewContributionBackendResponse>(
-        AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
           params: {
             category: category,
             language_code: languageCode
@@ -368,7 +368,7 @@ export class AdminBackendApiService {
       username: string): Promise<ContributionRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<ContributionRightsBackendResponse>(
-        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_DATA_HANDLER, {
           params: {
             username: username
           }
@@ -387,7 +387,7 @@ export class AdminBackendApiService {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
-        AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
           username: username,
           removal_type: method,
           category: category,

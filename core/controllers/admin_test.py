@@ -2038,7 +2038,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -2049,7 +2049,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'invalid',
                 'removal_type': 'all'
@@ -2071,7 +2071,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        self.delete_json(
             '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
@@ -2086,7 +2086,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
@@ -2103,7 +2103,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
@@ -2129,7 +2129,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        self.delete_json(
             '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
@@ -2144,7 +2144,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
@@ -2161,7 +2161,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
@@ -2181,7 +2181,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        self.delete_json(
             '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
@@ -2197,7 +2197,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
@@ -2215,7 +2215,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        self.delete_json(
             '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
@@ -2231,7 +2231,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
@@ -2245,7 +2245,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
     def test_remove_reviewer_for_invalid_category_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'specific',
@@ -2258,7 +2258,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
     def test_remove_reviewer_for_invalid_removal_type_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
+        response = self.delete_json(
             '/contributionrightshandler', {
                 'username': 'question',
                 'removal_type': 'invalid'
@@ -2287,7 +2287,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        self.delete_json(
             '/contributionrightshandler', {
                 'username': 'translator',
                 'removal_type': 'all'
@@ -2331,7 +2331,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcontributorusershandler', params={
+            '/contributionrightshandler', params={
                 'category': 'translation',
                 'language_code': 'hi'
             })
@@ -2347,7 +2347,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_voiceover_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/getcontributorusershandler', params={
+            '/contributionrightshandler', params={
                 'category': 'voiceover',
                 'language_code': 'hi'
             })
@@ -2361,7 +2361,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/getcontributorusershandler', params={
+            '/contributionrightshandler', params={
                 'category': 'question'
             })
 
@@ -2374,7 +2374,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         user_services.allow_user_to_submit_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/getcontributorusershandler', params={
+            '/contributionrightshandler', params={
                 'category': 'submit_question'
             })
 
@@ -2386,7 +2386,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcontributorusershandler', params={
+            '/contributionrightshandler', params={
                 'category': 'voiceover',
                 'language_code': 'invalid'
             }, expected_status_int=400)
@@ -2398,7 +2398,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/getcontributorusershandler', params={
+            '/contributionrightshandler', params={
                 'category': 'invalid',
                 'language_code': 'hi'
             }, expected_status_int=400)

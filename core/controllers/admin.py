@@ -846,8 +846,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
 
 
 class ContributionRightsHandler(base.BaseHandler):
-    """Handles adding and removing contribution rights for contributor
-    dashboard page."""
+    """Handles contribution rights of a user on contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -910,7 +909,7 @@ class ContributionRightsHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_access_admin_page
-    def put(self):
+    def delete(self):
         username = self.payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
@@ -979,12 +978,6 @@ class ContributionRightsHandler(base.BaseHandler):
                 'Invalid removal_type: %s' % removal_type)
 
         self.render_json({})
-
-
-class ContributorUsersListHandler(base.BaseHandler):
-    """Handler to show users with contribution rights."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
