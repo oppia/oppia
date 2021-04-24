@@ -417,4 +417,3 @@ var TopicsAndSkillsDashboardPage = function() {
 };
 
 exports.TopicsAndSkillsDashboardPage = TopicsAndSkillsDashboardPage;
-
