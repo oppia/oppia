@@ -30,6 +30,7 @@ export class SelectTopicsComponent {
      new EventEmitter());
    topicsSelected: string[] = [];
    topicFilterText: string = '';
+   filteredTopics: { id: string, name: string, isSelected: boolean }[] = [];
 
    selectOrDeselectTopic(topicId: string): void {
      let topic = this.topicSummaries.find(
@@ -52,9 +53,10 @@ export class SelectTopicsComponent {
 
    searchInTopics(searchText: string):
     { id: string, name: string, isSelected: boolean }[] {
-     return this.topicSummaries.filter(
+     this.filteredTopics = this.topicSummaries.filter(
        topic => topic.name.toLowerCase().indexOf(
          searchText.toLowerCase()) !== -1);
+     return this.filteredTopics;
    }
 }
 

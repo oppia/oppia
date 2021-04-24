@@ -80,6 +80,7 @@ describe('Topic Selector Component', () => {
     componentInstance = fixture.componentInstance;
     componentInstance.topicSummaries = topicSummaries;
     componentInstance.selectedTopicIds = [];
+    componentInstance.filteredTopics = [];
     spyOn(componentInstance.selectedTopicIdsChange, 'emit');
   });
 
@@ -98,5 +99,14 @@ describe('Topic Selector Component', () => {
     componentInstance.selectOrDeselectTopic(topicSummaries[0].id);
     expect(componentInstance.selectedTopicIds).toEqual([topicSummaries[1].id]);
     expect(topicSummaries[0].isSelected).toEqual(false);
+  });
+
+  it('should allow filter the topics', () => {
+    componentInstance.searchInTopics(topicSummaries[0].name);
+    expect(componentInstance.filteredTopics[0].name).toEqual(
+      topicSummaries[0].name);
+    componentInstance.searchInTopics(topicSummaries[1].name);
+    expect(componentInstance.filteredTopics[1].name).toEqual(
+      topicSummaries[1].name);
   });
 });
