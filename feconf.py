@@ -247,7 +247,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 42
+CURRENT_STATE_SCHEMA_VERSION = 43
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -398,8 +398,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 }
 
 # An array containing the image formats that can be compressed.
-COMPRESSIBLE_IMAGE_FORMATS = [
-    IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG, IMAGE_FORMAT_GIF]
+COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
@@ -813,6 +812,7 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
+MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -1135,10 +1135,19 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+# Firebase *explicitly* requires IDs to have at most 128 characters, and may
+# contain any valid ASCII character:
+# https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
+#
+# After manually inspecting ~200 of them, however, we've found that they only
+# use alpha-numeric characters, hence the tighter restriction.
+FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
+
 CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+FIREBASE_EMULATOR_PORT = 9099
 
 # TODO(#11462): Delete this after Firebase authentication has been deployed.
 ENABLE_USER_CREATION = True

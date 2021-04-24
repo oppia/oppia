@@ -27,32 +27,50 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
+
+import { OpportunitiesListItemComponent } from './opportunities-list-item/opportunities-list-item.component';
+import { OpportunitiesListComponent } from './opportunities-list/opportunities-list.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { TranslationModalComponent } from './modal-templates/translation-modal.component';
+import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
+
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    InteractionExtensionsModule,
+    SharedComponentsModule,
+    NgbModalModule
   ],
   declarations: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
+    OpportunitiesListItemComponent,
+    OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
+    TranslationOpportunitiesComponent,
+    TranslationModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
+    OpportunitiesListItemComponent,
+    OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
+    TranslationOpportunitiesComponent,
+    TranslationModalComponent
   ],
   providers: [
     {

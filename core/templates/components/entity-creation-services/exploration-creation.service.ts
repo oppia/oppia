@@ -17,106 +17,106 @@
  * modal.
  */
 
-require(
-  'pages/creator-dashboard-page/modal-templates/' +
-  'upload-activity-modal.controller.ts');
+import { Injectable } from '@angular/core';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { AlertsService } from 'services/alerts.service';
+import { LoaderService } from 'services/loader.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationCreationBackendApiService } from './exploration-creation-backend-api.service';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
-require('services/csrf-token.service.ts');
-require('services/site-analytics.service.ts');
+ @Injectable({
+   providedIn: 'root'
+ })
+export class ExplorationCreationService {
+  CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+  explorationCreationInProgress: boolean;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private csrfTokenService: CsrfTokenService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private alertsService: AlertsService,
+    private loaderService: LoaderService,
+    private ngbModal: NgbModal,
+    private windowRef: WindowRef,
+    private explorationCreationBackendApiService:
+     ExplorationCreationBackendApiService
+  ) {}
 
-angular.module('oppia').factory('ExplorationCreationService', [
-  '$http', '$rootScope', '$timeout', '$uibModal', '$window',
-  'AlertsService', 'CsrfTokenService', 'LoaderService',
-  'SiteAnalyticsService', 'UrlInterpolationService',
-  function(
-      $http, $rootScope, $timeout, $uibModal, $window,
-      AlertsService, CsrfTokenService, LoaderService,
-      SiteAnalyticsService, UrlInterpolationService) {
-    var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
+  createNewExploration(): void {
+    if (this.explorationCreationInProgress) {
+      return;
+    }
+    this.explorationCreationInProgress = true;
+    this.alertsService.clearWarnings();
+    this.loaderService.showLoadingScreen('Creating exploration');
 
-    var explorationCreationInProgress = false;
-
-    return {
-      createNewExploration: function() {
-        if (explorationCreationInProgress) {
-          return;
-        }
-
-        explorationCreationInProgress = true;
-        AlertsService.clearWarnings();
-        LoaderService.showLoadingScreen('Creating exploration');
-
-        $http.post('/contributehandler/create_new', {
-        }).then(function(response) {
-          SiteAnalyticsService.registerCreateNewExplorationEvent(
-            response.data.exploration_id);
-          $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: response.data.exploration_id
-              }
-            );
-          }, 150);
-          return false;
-        }, function() {
-          LoaderService.hideLoadingScreen();
-          explorationCreationInProgress = false;
-        });
-      },
-      showUploadExplorationModal: function() {
-        AlertsService.clearWarnings();
-
-        $uibModal.open({
-          backdrop: 'static',
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/creator-dashboard-page/modal-templates/' +
-            'upload-activity-modal.directive.html'),
-          controller: 'UploadActivityModalController'
-        }).result.then(function(result) {
-          var yamlFile = result.yamlFile;
-
-          LoaderService.showLoadingScreen('Creating exploration');
-
-          var form = new FormData();
-          form.append('yaml_file', yamlFile);
-          form.append('payload', JSON.stringify({}));
-          CsrfTokenService.getTokenAsync().then(function(token) {
-            form.append('csrf_token', token);
-            $.ajax({
-              contentType: false,
-              data: form,
-              dataFilter: function(data) {
-                // Remove the XSSI prefix.
-                return JSON.parse(data.substring(5));
-              },
-              dataType: 'text',
-              processData: false,
-              type: 'POST',
-              url: 'contributehandler/upload'
-            }).done(function(data) {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                  exploration_id: data.exploration_id
-                }
-              );
-            }).fail(function(data) {
-              var transformedData = data.responseText.substring(5);
-              var parsedResponse = JSON.parse(transformedData);
-              AlertsService.addWarning(
-                parsedResponse.error || 'Error communicating with server.');
-              LoaderService.hideLoadingScreen();
-              $rootScope.$apply();
-            });
-          });
-        }, function() {
-          AlertsService.clearWarnings();
-          // Note to developers:
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
-        });
-      }
-    };
+    this.explorationCreationBackendApiService.registerNewExplorationAsync()
+      .then((response) => {
+        this.siteAnalyticsService.registerCreateNewExplorationEvent(
+          response.explorationId);
+        setTimeout(() => {
+          this.windowRef.nativeWindow.location.href =
+        this.urlInterpolationService.interpolateUrl(
+          this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+            exploration_id: response.explorationId
+          }
+        );
+        }, 150);
+        return false;
+      }, function() {
+        this.loaderService.hideLoadingScreen();
+        this.explorationCreationInProgress = false;
+      });
   }
-]);
+  showUploadExplorationModal(): void {
+    this.alertsService.clearWarnings();
+    this.ngbModal.open(
+      UploadActivityModalComponent,
+      {backdrop: 'static'}
+    ).result.then((result) => {
+      const yamlFile = result.yamlFile;
+
+      this.loaderService.showLoadingScreen('Creating exploration');
+
+      var form = new FormData();
+      form.append('yaml_file', yamlFile);
+      form.append('payload', JSON.stringify({}));
+      this.csrfTokenService.getTokenAsync().then((token) => {
+        form.append('csrf_token', token);
+        $.ajax({
+          contentType: false,
+          data: form,
+          dataFilter: function(data) {
+            // Remove the XSSI prefix.
+            return JSON.parse(data.substring(5));
+          },
+          dataType: 'text',
+          processData: false,
+          type: 'POST',
+          url: 'contributehandler/upload'
+        }).done(function(data) {
+          this.windowRef.nativeWindow.location.href =
+          this.urlInterpolationService.interpolateUrl(
+            this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+              exploration_id: data.explorationId
+            }
+          );
+        }).fail((data) => {
+          var transformedData = data.responseText.substring(5);
+          var parsedResponse = JSON.parse(transformedData);
+          this.alertsService.addWarning(
+            parsedResponse.error || 'Error communicating with server.');
+          this.loaderService.hideLoadingScreen();
+        });
+      });
+    });
+  }
+}
+angular.module('oppia').factory(
+  'ExplorationCreationService',
+  downgradeInjectable(ExplorationCreationService));

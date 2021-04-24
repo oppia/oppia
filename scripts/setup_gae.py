@@ -61,9 +61,12 @@ def main(args=None):
             'Downloading Google Cloud SDK (this may take a little while)...')
         os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
         try:
+            # If the google cloud version is updated here, the corresponding
+            # lines (GAE_DIR and GCLOUD_PATH) in release_constants.json should
+            # also be updated.
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-304.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-335.0.0-linux-x86_64.tar.gz',
                 filename='gcloud-sdk.tar.gz')
         except Exception:
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
@@ -72,7 +75,7 @@ def main(args=None):
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-335.0.0/'))
         tar.close()
 
         os.remove('gcloud-sdk.tar.gz')
