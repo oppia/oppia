@@ -1035,14 +1035,14 @@ textarea {
   color: #009688;
 }
 
-.oppia-navbar-nav .uib-dropdown-menu {
+.oppia-navbar-nav .dropdown-menu {
   left: auto;
   right: 0;
   white-space: normal;
   word-wrap: break-word;
 }
 
-.oppia-navbar-nav .dropdown-menu {
+.oppia-navbar-nav .uib-dropdown-menu {
   left: auto;
   right: 0;
   white-space: normal;

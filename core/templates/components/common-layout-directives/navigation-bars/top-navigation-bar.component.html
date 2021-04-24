@@ -1,5 +1,5 @@
 <div class="float-left navbar-header protractor-test-navbar-header">
-  <a *ngIf="windowIsNarrow" 
+  <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar()"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button"
      tabindex="0">
@@ -72,7 +72,8 @@ float
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
             <span class="oppia-navbar-tab-content"
-                  [innerHTML]="'I18N_TOPNAV_CLASSROOM' | translate"></span>
+                  [innerHTML]="'I18N_TOPNAV_CLASSROOM' | translate">
+            </span>
           </a>
           <ul ngbDropdownMenu
               class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
@@ -112,7 +113,7 @@ float
              (mouseover)="openSubmenu($event, 'aboutMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
-            <span class="oppia-navbar-tab-content" 
+            <span class="oppia-navbar-tab-content"
                   [innerHTML]="'I18N_TOPNAV_ABOUT' | translate">
             </span>
           </a>
@@ -202,9 +203,9 @@ float
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
     <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
-         ngbDropdown
-         *ngIf="userIsLoggedIn"
-         class="nav-item dropdown protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
+        ngbDropdown
+        *ngIf="userIsLoggedIn"
+        class="nav-item dropdown protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
       <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
          class="nav-link oppia-navbar-dropdown-toggle"
          aria-haspopup="true"
@@ -219,7 +220,7 @@ float
              class="oppia-navbar-profile-picture-container dropdown-toggle">
           <span *ngIf="profilePictureDataUrl">
             <img [src]="profilePictureDataUrl"
-                 class="oppia-navbar-profile-picture rounded-circle" 
+                 class="oppia-navbar-profile-picture rounded-circle"
                  alt="User Avatar">
           </span>
           <span *ngIf="!profilePictureDataUrl">
@@ -321,14 +322,14 @@ float
           <a class="dropdown-item nav-link"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/moderator"
-             target="_blank" 
+             target="_blank"
              rel="noopener">
             <span [innerHTML]="'I18N_TOPNAV_MODERATOR_PAGE' | translate"></span>
           </a>
         </li>
-        <li class="nav-item" 
+        <li class="nav-item"
             *ngIf="isSuperAdmin">
-          <a class="dropdown-item nav-link protractor-test-admin-link" 
+          <a class="dropdown-item nav-link protractor-test-admin-link"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/admin"
              target="_blank"
@@ -338,7 +339,7 @@ float
         </li>
         <hr class="oppia-top-right-menu-item-separator">
         <li class="nav-item">
-          <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()" 
+          <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"
              [href]="logoutUrl"
              class="dropdown-item nav-link protractor-test-logout-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {tab: ACTION_CLOSE})">
@@ -349,7 +350,7 @@ float
     </li>
 
     <li ngbDropdown
-        *ngIf="!userIsLoggedIn && username !== ''" 
+        *ngIf="!userIsLoggedIn && username !== ''"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
         <button ngbDropdownToggle
@@ -367,10 +368,9 @@ float
              class="nav-link oppia-nav-link">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
-                <img [src]="googleSignInIconUrl"
-                      alt="Google signin icon">
+                <img [src]="googleSignInIconUrl" alt="Google signin icon">
               </div>
-              <span class="oppia-signin-text" 
+              <span class="oppia-signin-text"
                     [innerHTML]="'I18N_TOPNAV_SIGN_IN_WITH_GOOGLE' | translate">
               </span>
             </div>
@@ -379,7 +379,7 @@ float
       </ul>
     </li>
 
-    <li ngbDropdown 
+    <li ngbDropdown
         *ngIf="username === ''"
         class="oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container oppia-navbar-button-container-extra-info">

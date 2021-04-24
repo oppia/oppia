@@ -22,6 +22,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { WindowRef } from './contextual/window-ref.service';
 
+interface UnseenNotifications {
+  'num_unseen_notifications': number
+}
  @Injectable({
    providedIn: 'root'
  })
@@ -35,9 +38,7 @@ export class NavigationBackendApiService {
   async showUnseenNotifications(): Promise<void> {
     return new Promise((reject) => {
       this.http.get('/notificationshandler').toPromise().then(
-        (response: {
-            // eslint-disable-next-line camelcase
-            num_unseen_notifications: number}) => {
+        (response: UnseenNotifications) => {
           if (this.windowRef.nativeWindow.location.pathname !== '/') {
             this.numUnseenNotifications =
                response.num_unseen_notifications;
