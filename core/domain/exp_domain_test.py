@@ -507,7 +507,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.exploration.validate()
 
     def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
-        # Note: In the graphs below, states  with * symbol are checkpoints.
+        # Note: In the graphs below, states with the * symbol are checkpoints.
 
         # Exploration to test a checkpoint state which has no outcome.
         #       ┌────────────────┐

@@ -1007,13 +1007,12 @@ class Exploration(python_utils.OBJECT):
         # break out of the loop and raise a validation error. Since, we reached
         # a terminal state, this implies that the user was not required to go
         # through the checkpoint. Hence, the checkpoint is bypassable.
-        excluded_state_is_bypassable = False
         for state_name_to_exclude in non_initial_checkpoint_state_names:
             new_states = copy.deepcopy(self.states)
             new_states.pop(state_name_to_exclude)
             processed_state_names = set()
             curr_queue = [self.init_state_name]
-
+            excluded_state_is_bypassable = False
             while curr_queue:
                 if curr_queue[0] == state_name_to_exclude:
                     curr_queue.pop(0)
@@ -1027,8 +1026,7 @@ class Exploration(python_utils.OBJECT):
                     # We do not need to check if the current state is terminal
                     # or not before getting all outcomes, as when we find a
                     # terminal state in an outcome, we break out of the for loop
-                    # and dest_state is not appended to curr_queue. Hence, a
-                    # terminal state never exists in curr_queue.
+                    # and raise a validation error.
                     all_outcomes = (
                         curr_state.interaction.get_all_outcomes())
                     for outcome in all_outcomes:
@@ -1039,10 +1037,10 @@ class Exploration(python_utils.OBJECT):
                         if (dest_state not in curr_queue and
                                 dest_state not in processed_state_names):
                             curr_queue.append(dest_state)
-            if excluded_state_is_bypassable:
-                raise utils.ValidationError(
-                    'Cannot make %s a checkpoint as it is bypassable'
-                    % state_name_to_exclude)
+                if excluded_state_is_bypassable:
+                    raise utils.ValidationError(
+                        'Cannot make %s a checkpoint as it is bypassable'
+                        % state_name_to_exclude)
 
         if strict:
             warnings_list = []
