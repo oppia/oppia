@@ -67,6 +67,29 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
 
+class ValidateActivityMappingOnlyAllowedKeysTests(
+    job_test_utils.PipelinedTestBase):
+
+    def test_process_with_incorrect_keys(self):
+
+        test_model = user_models.PendingDeletionRequestModel(
+            id = 'test'
+        )
+        test_model.pseudonymizable_entity_mappings = {
+            models.NAMES.audit: {'some_id': 'id'}
+        }
+
+        output = (
+            self.pipeline
+            | beam.Create([test_model])
+            | beam.ParDo(user_audits.ValidateActivityMappingOnlyAllowedKeys())
+        )
+
+        self.assert_pcoll_equal(output,[
+            audit_errors.ModelIncorrectKeyError(model,['some_id'])
+        ])
+
+
 class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()

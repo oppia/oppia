@@ -333,6 +333,23 @@ class ModelExpiringErrorTests(AuditErrorsTestBase):
                 feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
 
 
+class ModelIncorrectKeyErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = user_models.PendingDeletionRequestModel(
+            id = 'test'
+        )
+        incorrect_keys = ['incorrect key']
+
+        error = audit_errors.ModelIncorrectKeyError(model, incorrect_keys)
+
+        self.assertEqual(
+            error.message,
+            'ModelIncorrectKeyError in PendingDeletionRequestModel(id=\'test\'): Entity '
+            'id %s: contains keys %s that are not allowed' % (
+                model.id, incorrect_keys))
+
+
 class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
