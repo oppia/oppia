@@ -30,6 +30,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
@@ -51,6 +52,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (
@@ -63,6 +65,10 @@ import utils
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
+
+
+PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
@@ -723,10 +729,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_feature_flags(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -744,7 +751,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -758,7 +765,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -787,7 +795,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -801,7 +809,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -831,7 +840,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -845,7 +854,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -994,7 +1004,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -1008,7 +1018,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
