@@ -5240,7 +5240,7 @@ export default {
     "speechSynthesisCodeMobile": "en_US"
   }],
 
-  "MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST": ["en", "es", "fr", "zh", "pt"],
+  "ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES": ["en", "es", "fr", "zh", "pt"],
 
   "TRANSLATION_TIPS": {
     "zh": [

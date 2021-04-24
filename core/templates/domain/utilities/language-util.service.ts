@@ -73,9 +73,9 @@ export class LanguageUtilService {
       readonly SupportedContentLanguageBackendDict[] {
     return CONSTANTS.SUPPORTED_CONTENT_LANGUAGES;
   }
-  get MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST():
+  get ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES():
     readonly string[] {
-    return CONSTANTS.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST;
+    return CONSTANTS.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES;
   }
 
   constructor(
@@ -187,7 +187,7 @@ export class LanguageUtilService {
   }
 
   languageCodeIsMachineTranslatable(languageCode: string): boolean {
-    return this.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST.includes(
+    return this.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES.includes(
       languageCode);
   }
 

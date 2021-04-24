@@ -36,7 +36,7 @@ class MachineTranslationModelValidator(
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         language_codes_regex = '(%s)' % '|'.join(
-            constants.MACHINE_TRANSLATION_LANGUAGE_CODE_ALLOWLIST)
+            constants.ALLOWED_MACHINE_TRANSLATION_LANGUAGE_CODES)
         # Valid id: [source_language_code]:[target_language_code]:[hashed_text].
         regex_string = '^%s\\.%s\\..+$' % (
             language_codes_regex, language_codes_regex)

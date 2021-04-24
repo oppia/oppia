@@ -20,6 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { MachineTranslatedTextBackendDict } from './machine-translated-text-backend-api.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service.ts';
 
 describe('TranslateTextService', () => {
@@ -149,6 +150,30 @@ describe('TranslateTextService', () => {
        translateTextService.getPreviousTextToTranslate();
 
         expect(textAndAvailability).toEqual(textAndPreviousAvailability);
+      }));
+  });
+
+  describe('getMachineTranslationAsync', () => {
+    it('should not retrieve translation until dropdown chevron is clicked',
+      fakeAsync(() => {
+        translateTextService.activeExpId = '1';
+        translateTextService.activeStateName = 'stateName1';
+        translateTextService.activeContentId = 'contentId1';
+        translateTextService.getMachineTranslationAsync('es')
+          .then((translatedText) => {
+            expect(translatedText).toBe('Por favor continua.')
+          });
+        const sampleMachineTranslationResponse:
+            MachineTranslatedTextBackendDict = {
+              translated_texts: {contentId1: 'Por favor continua.'}
+            };
+        const req = httpTestingController.expectOne(
+          '/machine_translated_state_texts_handler?exp_id=1&state_name=' +
+            'stateName1&content_ids=%5B%22contentId1%22%5D&' +
+            'target_language_code=es');
+        expect(req.request.method).toEqual('GET');
+        req.flush(sampleMachineTranslationResponse);
+        flushMicrotasks();
       }));
   });
 });
