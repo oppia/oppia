@@ -67,7 +67,13 @@ angular.module('oppia').directive('schemaBasedEditor', [
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [
+        '$rootScope', function($rootScope) {
+          let ctrl = this;
+          ctrl.$onInit = function() {
+            $rootScope.$applyAsync();
+          };
+        }]
     };
   }]);
 
