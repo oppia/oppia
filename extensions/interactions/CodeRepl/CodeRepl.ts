@@ -23,7 +23,7 @@ require('interactions/CodeRepl/code-repl-prediction.service.ts');
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require('interactions/CodeRepl/directives/code-repl-validation.service.ts');
 require(
-  'interactions/CodeRepl/directives/oppia-interactive-code-repl.directive.ts');
+  'interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts');
 require(
   'interactions/CodeRepl/directives/' +
   'oppia-response-code-repl.directive.ts');
