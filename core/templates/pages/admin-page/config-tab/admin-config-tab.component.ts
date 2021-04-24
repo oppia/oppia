@@ -24,7 +24,9 @@ import { AdminDataService } from 'pages/admin-page/services/admin-data.service.t
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service.ts';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { Schema } from 'services/schema-default-value.service';
 require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
+// import { AdminPageData } from '';
 
 @Component({
   selector: 'admin-config-tab',
@@ -35,22 +37,19 @@ export class AdminConfigTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = (
     new EventEmitter
   );
-  configProperties = {};
-  configPropertiesEntries = [];
-  // configPropertiesObservable: Observable<Object>;
-  // configPropertiesNonEmpty = false;
+  configProperties: AdminPageData = {};
+  configPropertiesKeys = [];
   
   constructor(
-    private ngZone: NgZone,
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
   
   ngOnInit(): void {
     this.reloadConfigProperties();
-    //console.log(this.configProperties);
   }
   
   isNonemptyObject(object) {
@@ -58,30 +57,13 @@ export class AdminConfigTabComponent implements OnInit {
   }
   
   reloadConfigProperties() {
-    // this.configPropertiesNonEmpty = false;
-    // this.adminDataService.getDataAsync().then(adminDataObject => {
-    //   this.configProperties = adminDataObject.configProperties
-    //   this.configPropertiesNonEmpty = true;
-    //   //this.windowRef._window().location.reload();
-    //   //this.configPropertiesNonEmpty = isNonemptyObject(this.configProperties);
-    //   // TODO(#8521): Remove the use of $rootScope.$apply()
-    //   // once the directive is migrated to angular.
-    //   //$rootScope.$apply();
-    //   console.log(this.configProperties);
-    // });
-    
-    
-    from(this.adminDataService.getDataAsync()).subscribe(
+    this.adminDataService.getDataAsync().then(
       data => {
-        this.ngZone.run(() => {
-          this.configProperties = data.configProperties;
-          this.configPropertiesEntries = Object.entries(this.configProperties);
-          console.log(this.configPropertiesEntries[3][1].value);
-        });
-        
-      }
-    );
-  }
+        this.configProperties = data.configProperties;
+        this.configPropertiesKeys = Object.keys(this.configProperties);
+        this.changeDetectorRef.detectChanges();
+      });
+    }
   
   revertToDefaultConfigPropertyValue(configPropertyId) {
     if (!this.windowRef.nativeWindow.confirm('This action is irreversible. Are you sure?')) {
@@ -136,6 +118,22 @@ export class AdminConfigTabComponent implements OnInit {
       // once the directive is migrated to angular.
       //$rootScope.$apply();
     });
+  }
+  
+  updateData(newValue, configPropertyKey) {
+    this.configProperties[configPropertyKey].value = newValue;
+  }
+  
+  getDescription(key): string {
+    return this.configProperties[key].description;
+  }
+  
+  getSchema(key): Schema {
+    return this.configProperties[key].schema;
+  }
+  
+  getValue(key) {
+    return this.configProperties[key].value;
   }
 }
 

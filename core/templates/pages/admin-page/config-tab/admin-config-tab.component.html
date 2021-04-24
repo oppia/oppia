@@ -1,17 +1,18 @@
 <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Configuration properties</h3>
-  <div class="container ml-0" *ngIf="configPropertiesEntries.length">
-    <div *ngFor="let configProperty of configPropertiesEntries">
+  <div class="container ml-0" *ngIf="configProperties">
+    <div *ngFor="let configPropertyKey of configPropertiesKeys">
       <div class="row protractor-test-config-property oppia-description-text-container">
         <span class="col-lg-2 col-md-2 col-sm-2">
-          <em class="protractor-test-config-title">{{ configProperty[1].description }}</em>
+          <em class="protractor-test-config-title">{{ getDescription(configPropertyKey) }}</em>
         </span>
         <span class="col-lg-6 col-md-6 col-sm-6">
-          <schema-based-editor [schema]="configProperty[1].schema" [localValue]="configProperty[1].value">
+          <schema-based-editor [schema]="getSchema(configPropertyKey)" [localValue]="getValue(configPropertyKey)"
+          (localValueChange)="updateData($event, configPropertyKey)">
           </schema-based-editor>
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2">
-          <button type="button" class="btn btn-secondary oppia-revert-button" (click)="revertToDefaultConfigPropertyValue(configProperty[0])">
+          <button type="button" class="btn btn-secondary oppia-revert-button" (click)="revertToDefaultConfigPropertyValue(configPropertyKey)">
             Revert to default
           </button>
         </span>
