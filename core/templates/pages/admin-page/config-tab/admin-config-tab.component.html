@@ -4,11 +4,11 @@
     <div *ngFor="let configPropertyKey of configPropertiesKeys">
       <div class="row protractor-test-config-property oppia-description-text-container">
         <span class="col-lg-2 col-md-2 col-sm-2">
-          <em class="protractor-test-config-title">{{ getDescription(configPropertyKey) }}</em>
+          <em class="protractor-test-config-title">{{ configProperties[configPropertyKey].description }}</em>
         </span>
         <span class="col-lg-6 col-md-6 col-sm-6">
-          <schema-based-editor [schema]="getSchema(configPropertyKey)" [localValue]="getValue(configPropertyKey)"
-          (localValueChange)="updateData($event, configPropertyKey)">
+          <schema-based-editor [schema]="configProperties[configPropertyKey].schema" [localValue]="configProperties[configPropertyKey].value"
+          (localValueChange)="configProperties[configPropertyKey].value = $event">
           </schema-based-editor>
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2">

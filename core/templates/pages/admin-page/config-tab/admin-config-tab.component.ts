@@ -22,9 +22,9 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service.ts';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
-import { Schema } from 'services/schema-default-value.service';
-require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
-// import { AdminPageData } from '';
+// Import { Schema } from 'services/schema-default-value.service';
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
 @Component({
   selector: 'admin-config-tab',
@@ -37,7 +37,7 @@ export class AdminConfigTabComponent implements OnInit {
   );
   configProperties = {};
   configPropertiesKeys = [];
-  
+
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
@@ -45,26 +45,27 @@ export class AdminConfigTabComponent implements OnInit {
     private windowRef: WindowRef,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
-  
+
   ngOnInit(): void {
     this.reloadConfigProperties();
   }
-  
-  isNonemptyObject(object) {
+
+  isNonemptyObject(object: Object): boolean {
     return Object.keys(object).length !== 0;
   }
-  
-  reloadConfigProperties() {
+
+  reloadConfigProperties(): void {
     this.adminDataService.getDataAsync().then(
       data => {
         this.configProperties = data.configProperties;
         this.configPropertiesKeys = Object.keys(this.configProperties);
         this.changeDetectorRef.detectChanges();
       });
-    }
-  
-  revertToDefaultConfigPropertyValue(configPropertyId) {
-    if (!this.windowRef.nativeWindow.confirm('This action is irreversible. Are you sure?')) {
+  }
+
+  revertToDefaultConfigPropertyValue(configPropertyId: string): void {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible. Are you sure?')) {
       return;
     }
 
@@ -75,27 +76,29 @@ export class AdminConfigTabComponent implements OnInit {
       this.reloadConfigProperties();
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
-      //$rootScope.$apply();
+      // $rootScope.$apply();
     }, errorResponse => {
       this.setStatusMessage.emit('Server error: ' + errorResponse);
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
-      //$rootScope.$apply();
+      // $rootScope.$apply();
     });
   }
-  
-  saveConfigProperties() {
+
+  saveConfigProperties(): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm('This action is irreversible. Are you sure?')) {
+    if (!this.windowRef.nativeWindow.confirm(
+      'This action is irreversible. Are you sure?')) {
       return;
     }
 
     this.setStatusMessage.emit('Saving...');
 
     this.adminTaskManagerService.startTask();
-    var newConfigPropertyValues = JSON.parse(JSON.stringify(this.configProperties));
+    var newConfigPropertyValues = JSON.parse(
+      JSON.stringify(this.configProperties));
     for (var property in newConfigPropertyValues) {
       newConfigPropertyValues[property] = (
         newConfigPropertyValues[property].value);
@@ -108,34 +111,29 @@ export class AdminConfigTabComponent implements OnInit {
       this.adminTaskManagerService.finishTask();
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
-      //$rootScope.$apply();
+      // $rootScope.$apply();
     }, errorResponse => {
       this.setStatusMessage.emit('Server error: ' + errorResponse);
       this.adminTaskManagerService.finishTask();
       // TODO(#8521): Remove the use of $rootScope.$apply()
       // once the directive is migrated to angular.
-      //$rootScope.$apply();
+      // $rootScope.$apply();
     });
   }
-  
-  updateData(newValue, configPropertyKey) {
-    this.configProperties[configPropertyKey].value = newValue;
-  }
-  
-  getDescription(key): string {
-    return this.configProperties[key].description;
-  }
-  
-  getSchema(key): Schema {
-    return this.configProperties[key].schema;
-  }
-  
-  getValue(key) {
-    return this.configProperties[key].value;
-  }
+  // UpdateData(newValue: any, configPropertyKey: string): void {
+  //   this.configProperties[configPropertyKey].value = newValue;
+  // }
+  // getDescription(key: string): string {
+  //   return this.configProperties[key].description;
+  // }
+  // getSchema(key: string): Schema {
+  //   return this.configProperties[key].schema;
+  // }
+  // getValue(key: string): any {
+  //   return this.configProperties[key].value;
+  // }
 }
 
 angular.module('oppia').directive(
   'adminConfigTab', downgradeComponent(
     {component: AdminConfigTabComponent}));
-  
