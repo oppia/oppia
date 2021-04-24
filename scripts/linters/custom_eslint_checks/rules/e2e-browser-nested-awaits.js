@@ -39,10 +39,10 @@ module.exports = {
   },
 
   create: function(context) {
-    /*  Checks if CallExpression `expr` contains:
+    /*  Checks if CallExpression `expr` is syntactically the same as:
      *  `browser.switchTo().activeElement()`.
      *
-     *  If it does, checks to see whether `expr` is wrapped
+     *  If it is, checks to see whether `expr` is wrapped
      *  in an `await` expression.
      */
     var checkExprNode = function(expr) {
