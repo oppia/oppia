@@ -16,13 +16,11 @@
  * @fileoverview Directive for the configuration tab in the admin panel.
  */
 
-import { Component, Output, OnInit, EventEmitter, ChangeDetectorRef, NgZone } from '@angular/core';
-import { Subscription, Observable, from } from 'rxjs';
+import { Component, Output, OnInit, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service.ts';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service.ts';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 import { Schema } from 'services/schema-default-value.service';
 require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
