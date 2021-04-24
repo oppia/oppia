@@ -21,8 +21,8 @@ import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from
+  'domain/exploration/recorded-voiceovers.model';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -49,7 +49,6 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   var interactionObjectFactory = null;
   var playerPositionService = null;
   var playerTranscriptService = null;
-  var recordedVoiceoversObjectFactory = null;
   var stateCardObjectFactory = null;
   var suggestionModalService = null;
   var writtenTranslationsObjectFactory = null;
@@ -63,14 +62,12 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   }));
 
   beforeEach(function() {
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    playerPositionService = TestBed.inject(PlayerPositionService);
-    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    recordedVoiceoversObjectFactory = TestBed.inject(
-      RecordedVoiceoversObjectFactory);
-    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
-    suggestionModalService = TestBed.inject(SuggestionModalService);
-    writtenTranslationsObjectFactory = TestBed.inject(
+    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
+    playerPositionService = TestBed.get(PlayerPositionService);
+    playerTranscriptService = TestBed.get(PlayerTranscriptService);
+    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
+    suggestionModalService = TestBed.get(SuggestionModalService);
+    writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
     explorationDataService = TestBed.inject(ExplorationDataService);
   });
@@ -94,7 +91,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
       id: null
     });
 
-    var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
+    var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     var writtenTranslations = writtenTranslationsObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,

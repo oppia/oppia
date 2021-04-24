@@ -31,6 +31,7 @@ import utils
 
 import pkg_resources
 
+OPPIA_REQUIRED_PIP_VERSION = '20.3.4'
 GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
@@ -389,6 +390,8 @@ def _get_possible_normalized_metadata_directory_names(
     """
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
+    # TODO(#11474): The '-py2.7' suffix might be used in some metadata directory
+    # names, this will need to be changed after the Python 3 migration.
     return {
         normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
@@ -400,19 +403,23 @@ def _get_possible_normalized_metadata_directory_names(
         normalize_directory_name(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
+        normalize_directory_name(
+            '%s-%s-py2.7.egg-info' % (library_name, version_string)),
+        normalize_directory_name(
+            '%s-%s-py2.7.egg-info' % (
+                library_name.replace('-', '_'), version_string)),
     }
 
 
-def _verify_pip_is_installed():
+def verify_pip_is_installed():
     """Verify that pip is installed.
 
     Raises:
         ImportError. Error importing pip.
     """
+    python_utils.PRINT('Checking if pip is installed on the local machine')
     try:
-        python_utils.PRINT('Checking if pip is installed on the local machine')
-        # Importing pip just to check if its installed.
-        import pip  #pylint: disable=unused-variable
+        import pip
     except ImportError as e:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
@@ -433,6 +440,15 @@ def _verify_pip_is_installed():
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e)
+    else:
+        if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
+            common.print_each_string_after_two_new_lines([
+                'Oppia requires pip==%s, but you have pip==%s installed.' % (
+                    OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
+                'Upgrading pip on your behalf...',
+            ])
+            _run_pip_command(
+                ['install', 'pip==%s' % OPPIA_REQUIRED_PIP_VERSION])
 
 
 def _run_pip_command(cmd_parts):
@@ -445,7 +461,6 @@ def _run_pip_command(cmd_parts):
     Raises:
         Exception. Error installing package.
     """
-    _verify_pip_is_installed()
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
@@ -484,6 +499,7 @@ def pip_install_to_system(package, version):
         package: str. The package name.
         version: str. The package version.
     """
+    verify_pip_is_installed()
     _run_pip_command(
         ['install', _get_pip_versioned_package_string(package, version)])
 
@@ -498,6 +514,8 @@ def pip_install(
         upgrade: bool. Whether to call pip with the --upgrade flag.
         no_dependencies: bool. Whether call the pip with --no-dependencies flag.
     """
+    verify_pip_is_installed()
+
     additional_pip_args = []
     if upgrade:
         additional_pip_args.append('--upgrade')
@@ -516,6 +534,7 @@ def _pip_install_requirements(install_path, requirements_path):
         install_path: str. The installation path for the packages.
         requirements_path: str. The path to the requirements file.
     """
+    verify_pip_is_installed()
     _run_pip_command([
         'install', '--target', install_path, '--no-dependencies',
         '-r', requirements_path, '--upgrade'
@@ -637,6 +656,7 @@ def main():
     mismatches, regenerate the 'requirements.txt' file and correct the
     mismatches.
     """
+    verify_pip_is_installed()
     python_utils.PRINT('Regenerating "requirements.txt" file...')
     # Calls the script to regenerate requirements. The reason we cannot call the
     # regenerate requirements functionality inline is because the python script

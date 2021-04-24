@@ -170,6 +170,24 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
 
+    def test_wrong_pip_version_raises_import_error(self):
+        import pip
+
+        with self.swap_Popen, self.swap(pip, '__version__', '20.2.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [
+            ['pip', 'install', 'pip==20.3.4'],
+        ])
+
+    def test_correct_pip_version_does_nothing(self):
+        import pip
+
+        with self.swap_check_call, self.swap(pip, '__version__', '20.3.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [])
+
     def test_invalid_git_dependency_raises_an_exception(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
@@ -466,13 +484,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 install_backend_python_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
-        self.assertEqual(
-            print_statements,
-            [
-                'Regenerating "requirements.txt" file...',
-                'All third-party Python libraries are already installed '
-                'correctly.'
-            ])
+        self.assertEqual(print_statements, [
+            'Checking if pip is installed on the local machine',
+            'Regenerating "requirements.txt" file...',
+            'All third-party Python libraries are already installed '
+            'correctly.'
+        ])
 
     def test_library_version_change_is_handled_correctly(self):
         directory_names = [
@@ -497,7 +514,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             paths_to_delete.append(
                 path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
 
         def mock_get_mismatches():
@@ -560,8 +577,41 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'google_cloud_datastore-1.13.0.dist-info'
             ])
 
+    def test_correct_metadata_directory_names_do_not_throw_error(self):
+        def mock_find_distributions(unused_paths):
+            return [
+                Distribution('dependency-1', '1.5.1', {}),
+                Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency-5', '0.5.3', {}),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                }),
+            ]
+
+        def mock_list_dir(unused_path):
+            return [
+                'dependency-1-1.5.1.dist-info',
+                'dependency2-5.0.0.egg-info',
+                'dependency-5-0.5.3-py2.7.egg-info',
+                'dependency_6-0.5.3-py2.7.egg-info',
+            ]
+
+        def mock_is_dir(unused_path):
+            return True
+
+        swap_find_distributions = self.swap(
+            pkg_resources, 'find_distributions', mock_find_distributions)
+        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+
+        with swap_find_distributions, swap_list_dir, swap_is_dir:
+            install_backend_python_libs.validate_metadata_directories()
+
     def test_exception_raised_when_metadata_directory_names_are_missing(self):
-        def mock_find_distributions(paths): # pylint: disable=unused-argument
+        def mock_find_distributions(unused_paths):
             return [
                 Distribution('dependency1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
@@ -574,7 +624,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 }),
             ]
 
-        def mock_list_dir(path): # pylint: disable=unused-argument
+        def mock_list_dir(unused_path):
             return [
                 'dependency1-1.5.1.dist-info',
                 'dependency1',
@@ -584,7 +634,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency5-0.5.3.metadata',
             ]
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)

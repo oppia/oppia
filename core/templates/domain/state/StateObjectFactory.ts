@@ -27,14 +27,12 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import {
   RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-  RecordedVoiceoversObjectFactory
-} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+  RecordedVoiceovers
+} from 'domain/exploration/recorded-voiceovers.model';
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml
+} from 'domain/exploration/subtitled-html.model';
 import {
   WrittenTranslationsBackendDict,
   WrittenTranslations,
@@ -136,15 +134,6 @@ export class State {
       allContentIds.delete('default_outcome');
     }
 
-    // TODO(#11581): Add rule translation support for TextInput and SetInput
-    // interactions. Delete below when completed.
-    allContentIds.forEach(contentId => {
-      if (contentId.indexOf(AppConstants.COMPONENT_NAME_RULE_INPUT) === 0) {
-        // eslint-disable-next-line dot-notation
-        allContentIds.delete(contentId);
-      }
-    });
-
     return allContentIds;
   }
 }
@@ -156,8 +145,6 @@ export class StateObjectFactory {
   constructor(
     private interactionObject: InteractionObjectFactory,
     private paramchangesObject: ParamChangesObjectFactory,
-    private recordedVoiceoversObject: RecordedVoiceoversObjectFactory,
-    private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
@@ -185,11 +172,11 @@ export class StateObjectFactory {
     return new State(
       stateName,
       stateDict.classifier_model_id,
-      this.subtitledHtmlObject.createFromBackendDict(stateDict.content),
+      SubtitledHtml.createFromBackendDict(stateDict.content),
       this.interactionObject.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(
         stateDict.param_changes),
-      this.recordedVoiceoversObject.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         stateDict.recorded_voiceovers),
       stateDict.solicit_answer_details,
       this.writtenTranslationsObject.createFromBackendDict(

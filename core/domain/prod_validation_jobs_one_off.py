@@ -26,21 +26,22 @@ from core.platform import models
 import python_utils
 
 (
-    activity_models, audit_models, auth_models,
+    activity_models, app_feedback_report_models, audit_models, auth_models,
     classifier_models, collection_models, config_models,
     email_models, exp_models, feedback_models,
     improvements_models, job_models, opportunity_models,
     question_models, recommendations_models, skill_models,
     stats_models, story_models, subtopic_models,
-    suggestion_models, topic_models, user_models
+    suggestion_models, topic_models, translation_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.activity, models.NAMES.audit, models.NAMES.auth,
-    models.NAMES.classifier, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.job, models.NAMES.opportunity,
-    models.NAMES.question, models.NAMES.recommendations, models.NAMES.skill,
-    models.NAMES.statistics, models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.NAMES.activity, models.NAMES.app_feedback_report, models.NAMES.audit,
+    models.NAMES.auth, models.NAMES.classifier, models.NAMES.collection,
+    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
+    models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.translation, models.NAMES.user
 ])
 
 VALIDATION_STATUS_SUCCESS = 'fully-validated'
@@ -105,14 +106,9 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         model_module_name = model_instance.__module__
         model_type = model_module_name.split('.')[2]
         validator_module_name = '%s_validators' % model_type
-        # TODO(#10415): This try catch is required until all the validators are
-        # refactored. Remove the try catch block once #10415 is fixed.
-        try:
-            validator_module = importlib.import_module(
-                'core.domain.%s' % validator_module_name)
-        except ImportError:
-            validator_module = importlib.import_module(
-                'core.domain.prod_validators')
+
+        validator_module = importlib.import_module(
+            'core.domain.%s' % validator_module_name)
         validator = getattr(validator_module, validator_cls_name)
         if not model_instance.deleted:
             validator.validate(model_instance)
@@ -146,6 +142,30 @@ class ActivityReferencesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [activity_models.ActivityReferencesModel]
+
+
+class AppFeedbackReportModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates AppFeedbackReportModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [app_feedback_report_models.AppFeedbackReportModel]
+
+
+class AppFeedbackReportTicketModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates AppFeedbackReportTicketModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [app_feedback_report_models.AppFeedbackReportTicketModel]
+
+
+class AppFeedbackReportStatsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates AppFeedbackReportStatsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [app_feedback_report_models.AppFeedbackReportStatsModel]
 
 
 class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -307,15 +327,6 @@ class BulkEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [email_models.BulkEmailModel]
-
-
-class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates GeneralFeedbackEmailReplyToIdModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [email_models.GeneralFeedbackEmailReplyToIdModel]
 
 
 class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -744,6 +755,14 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
             subtopic_models.SubtopicPageCommitLogEntryModel]
 
 
+class MachineTranslationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates MachineTranslationModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [translation_models.MachineTranslationModel]
+
+
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates UserSettingsModel."""
 
@@ -999,6 +1018,14 @@ class UserIdByFirebaseAuthIdModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [auth_models.UserIdByFirebaseAuthIdModel]
+
+
+class FirebaseSeedModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates FirebaseSeedModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [auth_models.FirebaseSeedModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):

@@ -18,23 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
-import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
-import { SubtopicPageObjectFactory } from
-  'domain/topic/SubtopicPageObjectFactory';
+import { SubtopicPage } from
+  'domain/topic/subtopic-page.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
@@ -49,7 +37,6 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
-  var subtopicPageObjectFactory = null;
   var topicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
   var fakeTopicRightsBackendApiService = null;
@@ -148,30 +135,7 @@ describe('Topic editor state service', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value(
-      'RubricObjectFactory', new RubricObjectFactory());
-    $provide.value(
-      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value(
-      'SubtopicObjectFactory',
-      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()));
-    $provide.value(
       'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
-    $provide.value(
-      'SubtopicPageContentsObjectFactory',
-      new SubtopicPageContentsObjectFactory(
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'SubtopicPageObjectFactory', new SubtopicPageObjectFactory(
-        new SubtopicPageContentsObjectFactory(
-          new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-          new SubtitledHtmlObjectFactory())));
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
   importAllAngularServices();
 
@@ -195,7 +159,6 @@ describe('Topic editor state service', function() {
     TopicEditorStateService = $injector.get(
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     topicUpdateService = TestBed.get(TopicUpdateService);
     contextService = TestBed.get(ContextService);
     $q = $injector.get('$q');
@@ -378,7 +341,7 @@ describe('Topic editor state service', function() {
       fakeEditableTopicBackendApiService, 'fetchSubtopicPage'
     ).and.callThrough();
 
-    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPage.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
@@ -388,7 +351,7 @@ describe('Topic editor state service', function() {
   });
 
   it('should not add duplicate subtopic pages to the local cache', function() {
-    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPage.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
@@ -402,7 +365,7 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete newly created subtopic pages from the ' +
     'local cache', function() {
-    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPage.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
     subtopicPage.setId('validTopicId-1');
@@ -433,7 +396,7 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete new subtopic pages without changing already ' +
     'existing subtopic pages from the local cache', function() {
-    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPage.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
     subtopicPage.getPageContents().setHtml('<p>Data 1</p>');
@@ -456,7 +419,7 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete already existing subtopic pages without ' +
     'changing newly created subtopic pages from the local cache', function() {
-    var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
+    var subtopicPage = SubtopicPage.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
     subtopicPage.getPageContents().setHtml('<p>Data 1</p>');
