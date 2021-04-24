@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,17 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Wrapper angular component for code mirror.
+ * @fileoverview Module for the CodeRepl interaction components.
  */
-import { Component, OnInit } from '@angular/core';
 
-@Component({
-  selector: 'selector-name',
-  templateUrl: 'name.component.html'
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import 'core-js/es7/reflect';
+import 'zone.js';
+import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
+
+@NgModule({
+  imports: [CommonModule],
+  declarations: [CodemirrorMergeviewComponent],
+  entryComponents: [CodemirrorMergeviewComponent],
+  exports: [CodemirrorMergeviewComponent]
 })
-
-export class NameComponent implements OnInit {
-  constructor() { }
-
-  ngOnInit(): void { }
-}
+export class CodeMirrorModule {}

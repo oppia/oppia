@@ -77,6 +77,7 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { CodeMirrorModule } from './code-mirror/codemirror.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -96,6 +97,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   imports: [
     BrowserModule,
     CommonModule,
+    CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
@@ -173,6 +175,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   exports: [
     // Modules.
+    CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
     FormsModule,
