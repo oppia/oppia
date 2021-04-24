@@ -73,6 +73,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
     USER_ID = 'test_id'
     INCORRECT_KEY = 'some_id'
     INCORRECT_KEY_VALUE = 'value'
+
     def test_process_with_incorrect_keys(self):
 
         test_model = user_models.PendingDeletionRequestModel(

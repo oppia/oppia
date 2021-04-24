@@ -337,7 +337,7 @@ class ModelIncorrectKeyErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
         model = user_models.PendingDeletionRequestModel(
-            id = 'test'
+            id='test'
         )
         incorrect_keys = ['incorrect key']
 
@@ -345,7 +345,8 @@ class ModelIncorrectKeyErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(
             error.message,
-            'ModelIncorrectKeyError in PendingDeletionRequestModel(id=\'test\'): Entity '
+            'ModelIncorrectKeyError in PendingDeletionRequestModel'
+            '(id=\'test\'): Entity '
             'id %s: contains keys %s that are not allowed' % (
                 model.id, incorrect_keys))
 
