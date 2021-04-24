@@ -1195,7 +1195,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
         with self.capture_logging() as logs:
             self.assertRaisesRegexp(
-                ValueError, 'Invalid session cookie',
+                auth_domain.AuthSessionError, 'Invalid session cookie',
                 lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
 

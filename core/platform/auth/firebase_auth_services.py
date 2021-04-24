@@ -150,7 +150,7 @@ def get_auth_claims_from_request(request):
         is signed in, then returns None.
 
     Raises:
-        ValueError. The request contains an invalid session.
+        AuthSessionError. The request contains an invalid session.
     """
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
@@ -602,7 +602,7 @@ def _get_auth_claims_from_session_cookie(cookie):
         Otherwise returns None.
 
     Raises:
-        ValueError. The cookie has an invalid value.
+        AuthSessionError. The cookie has an invalid value.
     """
     # It's OK for a session cookie to be None or empty, it just means that the
     # request hasn't been authenticated.
