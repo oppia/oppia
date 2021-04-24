@@ -42,7 +42,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.

@@ -27,7 +27,7 @@ import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-act
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
-import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
+import { LearnerDashboardPageComponent } from 'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component';
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { MaterialModule } from 'components/material.module';
 import { FormsModule } from '@angular/forms';
@@ -42,10 +42,11 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -110,6 +111,7 @@ describe('Learner dashboard page', () => {
   let windowRef: WindowRef = null;
 
   let explorationDict: ExplorationBackendDict = {
+    auto_tts_enabled: true,
     init_state_name: 'Introduction',
     language_code: 'en',
     states: {},
