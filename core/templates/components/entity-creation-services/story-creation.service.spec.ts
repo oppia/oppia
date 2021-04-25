@@ -33,7 +33,7 @@ import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Collection Creation service', () => {
+describe('story Creation service', () => {
   let AlertsService: AlertsService = null;
   let loaderService: LoaderService = null;
   let window: Window = null;
