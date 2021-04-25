@@ -105,39 +105,39 @@ export class ImageUploaderComponent {
       if (file.size > HUNDRED_KB_IN_BYTES) {
         let width: number = 171;
         let stop: boolean = false;
-          const reader: FileReader = new FileReader();
-          reader.readAsDataURL(file);
+        const reader: FileReader = new FileReader();
+        reader.readAsDataURL(file);
 
-          reader.onload = function (event) {
-            let imgElement: HTMLImageElement = document.createElement("img");
-            imgElement.src = reader.result;
-            imgElement.onload = function (e) {
-              const canvas = document.createElement("canvas");
-              let scale: number = e.target.height / e.target.width;
-              width = Math.sqrt((100 * 1024) / (3.5 * scale));
+        reader.onload = function (event) {
+          let imgElement: HTMLImageElement = document.createElement("img");
+          imgElement.src = reader.result;
+          imgElement.onload = function (e) {
+            const canvas = document.createElement("canvas");
+            let scale: number = e.target.height / e.target.width;
+            width = Math.sqrt((100 * 1024) / (3.5 * scale));
 
-              const MAX_WIDTH = width;
-              if (imgElement.width > imgElement.height) {
-                const scaleSize = MAX_WIDTH / e.target.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = e.target.height * scaleSize;
-              }
-              else {
-                const scaleSize = MAX_WIDTH / e.target.height;
-                canvas.height = MAX_WIDTH;
-                canvas.width = e.target.width * scaleSize;
-              }
-              
-              const ctx = canvas.getContext("2d");
-              ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
-              
-              canvas.toBlob(function (blob) {
-                newFile = new File([blob], file.name, {type: file.type} );
-                fchng.emit(newFile);
-              });
-            };
+            const MAX_WIDTH = width;
+            if (imgElement.width > imgElement.height) {
+              const scaleSize = MAX_WIDTH / e.target.width;
+              canvas.width = MAX_WIDTH;
+              canvas.height = e.target.height * scaleSize;
+            }
+            else {
+              const scaleSize = MAX_WIDTH / e.target.height;
+              canvas.height = MAX_WIDTH;
+              canvas.width = e.target.width * scaleSize;
+            }
 
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(function (blob) {
+              newFile = new File([blob], file.name, { type: file.type });
+              fchng.emit(newFile);
+            });
           };
+
+        };
 
       }
       else {
