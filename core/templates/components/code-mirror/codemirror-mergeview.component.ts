@@ -15,7 +15,8 @@
 /**
  * @fileoverview Wrapper angular component for code mirror.
  */
-import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -23,11 +24,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
   template: ''
 })
 
-export class CodemirrorMergeviewComponent implements OnInit, OnChanges {
+export class CodemirrorMergeviewComponent implements
+  AfterViewInit, OnInit, OnChanges {
   @Input() options = {};
   @Input() leftValue;
   @Input() rightValue;
-  codeMirrorInstance: CodeMirror.MergeView;
+  codeMirrorInstance: CodeMirror.MergeView.MergeViewEditor;
   constructor(private elementRef: ElementRef) { }
 
   ngOnInit(): void {
@@ -35,13 +37,16 @@ export class CodemirrorMergeviewComponent implements OnInit, OnChanges {
     if (window.CodeMirror === undefined) {
       throw new Error('CodeMirror not found.');
     }
+  }
+
+  ngAfterViewInit(): void {
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
-    this.codeMirrorInstance = new window.CodeMirror.MergeView(
+    this.codeMirrorInstance = window.CodeMirror.MergeView(
       this.elementRef.nativeElement,
       {
-        value: ' ',
-        orig: ' ',
+        value: this.leftValue !== undefined ? this.leftValue : ' ',
+        orig: this.rightValue !== undefined ? this.rightValue : ' ',
         ...this.options
       }
     );
@@ -51,20 +56,23 @@ export class CodemirrorMergeviewComponent implements OnInit, OnChanges {
     // Watch for changes and set value in left pane.
     if (changes.leftValue &&
       changes.leftValue.currentValue !==
-      changes.leftValue.previousValue) {
+      changes.leftValue.previousValue &&
+      this.codeMirrorInstance) {
       if (this.leftValue === undefined) {
         throw new Error('Left pane value is not defined.');
       }
-      this.codeMirrorInstance.edit.setValue(changes.leftValue.currentValue);
+      this.codeMirrorInstance.editor().setValue(
+        changes.leftValue.currentValue);
     }
     // Watch for changes and set value in right pane.
     if (changes.rightValue &&
       changes.rightValue.currentValue !==
-      changes.rightValue.previousValue) {
+      changes.rightValue.previousValue &&
+      this.codeMirrorInstance) {
       if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
-      this.codeMirrorInstance.right.orig.setValue(
+      this.codeMirrorInstance.rightOriginal().setValue(
         changes.rightValue.currentValue);
     }
   }

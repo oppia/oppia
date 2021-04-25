@@ -107,7 +107,7 @@ describe('rich-text components', function() {
 });
 
 
-describe('Interactions', function() {
+fdescribe('Interactions', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
@@ -122,7 +122,7 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should pass their own test suites', async function() {
+  fit('should pass their own test suites', async function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
@@ -134,6 +134,8 @@ describe('Interactions', function() {
     var defaultOutcomeSet = false;
 
     for (var interactionId in interactions.INTERACTIONS) {
+      if (interactionId !== 'CodeRepl') continue;
+      debugger;
       var interaction = interactions.INTERACTIONS[interactionId];
 
       for (var i = 0; i < interaction.testSuite.length; i++) {

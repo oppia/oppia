@@ -18,6 +18,7 @@
 
 import { SimpleChanges } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import CodeMirror from 'node_modules/@types/codemirror';
 import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
 
 describe('Oppia CodeMirror Component', () => {
@@ -64,10 +65,15 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
+
     component.codeMirrorInstance = {
-      edit: {setValue: editSetValueSpy},
-      right: {orig: {setValue: rightOrgSetValueSpy}}
-    };
+      editor: () => {
+        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
+      },
+      rightOriginal: () => {
+        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+      }
+    } as unknown as CodeMirror.MergeView.MergeViewEditor;
     let changes: SimpleChanges = {
       leftValue: {
         currentValue: undefined,
@@ -98,9 +104,13 @@ describe('Oppia CodeMirror Component', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     component.codeMirrorInstance = {
-      edit: {setValue: editSetValueSpy},
-      right: {orig: {setValue: rightOrgSetValueSpy}}
-    };
+      editor: () => {
+        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
+      },
+      rightOriginal: () => {
+        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+      }
+    } as unknown as CodeMirror.MergeView.MergeViewEditor;
     const changes: SimpleChanges = {
       leftValue: {
         currentValue: 'A',
