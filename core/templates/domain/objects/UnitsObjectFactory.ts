@@ -168,7 +168,9 @@ export class UnitsObjectFactory {
   }
 
   createCurrencyUnits(): void {
-    var keys = <Array<keyof typeof ObjectsDomainConstants.CURRENCY_UNITS>>Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+    var keys = <Array<keyof typeof ObjectsDomainConstants.CURRENCY_UNITS>>Object.keys(
+      ObjectsDomainConstants.CURRENCY_UNITS
+      );
     for (var i = 0; i < keys.length; i++) {
       if (ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit === null) {
         // Base unit (like: rupees, dollar etc.).
@@ -190,7 +192,9 @@ export class UnitsObjectFactory {
     // Special symbols need to be replaced as math.js doesn't support custom
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
-    var keys = <Array<keyof typeof ObjectsDomainConstants.CURRENCY_UNITS>>Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+    var keys = <Array<keyof typeof ObjectsDomainConstants.CURRENCY_UNITS>>Object.keys(
+      ObjectsDomainConstants.CURRENCY_UNITS
+      );
     for (var i = 0; i < keys.length; i++) {
       for (
         var j = 0;
