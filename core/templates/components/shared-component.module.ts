@@ -74,6 +74,9 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 
 // Services.
@@ -117,6 +120,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
@@ -145,6 +150,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
+    UploadActivityModalComponent,
+    PromoBarComponent,
     SortByPipe,
     LearnerDashboardIconsComponent
   ],
@@ -152,6 +159,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   entryComponents: [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
@@ -169,6 +178,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     PromoBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    UploadActivityModalComponent,
+    PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     LearnerDashboardIconsComponent
@@ -188,6 +199,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
@@ -206,6 +219,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    UploadActivityModalComponent,
+    PromoBarComponent,
+    WrapTextWithEllipsisPipe,
     TruncateAndCapitalizePipe,
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
