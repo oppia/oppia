@@ -31,7 +31,7 @@ ruleTester.run('no-foreach', rule, {
         expect($injector.get(constantName)).toEqual(constants[constantName]);
     }
     });`,
-    `var forEach = 0`,
+    'var forEach = 0',
     `it('should transform all key value pairs to angular constants',
     function() {
     for (var forEach in constants) {
