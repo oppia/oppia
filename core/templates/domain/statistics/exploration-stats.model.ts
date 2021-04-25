@@ -125,10 +125,7 @@ export class ExplorationStats {
   createNewWithStateRenamed(
       oldStateName: string, newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
-    const stateStats = this.stateStatsMapping.get(oldStateName);
-    if (!stateStats) {
-      throw new Error('no stats exist for old state: ' + oldStateName);
-    }
+    const stateStats = this.getStateStats(oldStateName);
     newStateStatsMapping.set(
       newStateName, stateStats);
     // ES2016 Map uses delete as a method name despite it being a reserved word.
