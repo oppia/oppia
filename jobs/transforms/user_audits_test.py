@@ -70,18 +70,24 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
 class ValidateActivityMappingOnlyAllowedKeysTests(
         job_test_utils.PipelinedTestBase):
 
+    NOW = datetime.datetime.utcnow()
     USER_ID = 'test_id'
-    INCORRECT_KEY = 'some_id'
-    INCORRECT_KEY_VALUE = 'value'
+    EMAIL_ID = 'a@a.com'
+    INCORRECT_KEY = 'audit'
+    ROLE = 'ADMIN'
 
     def test_process_with_incorrect_keys(self):
 
         test_model = user_models.PendingDeletionRequestModel(
-            id=self.USER_ID
+            id=self.USER_ID,
+            email=self.EMAIL_ID,
+            created_on=self.NOW,
+            last_updated=self.NOW,
+            role=self.ROLE,
+            pseudonymizable_entity_mappings={
+                models.NAMES.audit: {'key': 'value'}
+            }
         )
-        test_model.pseudonymizable_entity_mappings = {
-            models.NAMES.audit: {self.INCORRECT_KEY: self.INCORRECT_KEY_VALUE}
-        }
 
         output = (
             self.pipeline
@@ -92,8 +98,6 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         self.assert_pcoll_equal(output, [
             audit_errors.ModelIncorrectKeyError(
                 test_model, [self.INCORRECT_KEY])
-                [self.INCORRECT_KEY]
-                )
         ])
 
 
