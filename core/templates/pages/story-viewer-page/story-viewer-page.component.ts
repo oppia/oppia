@@ -29,6 +29,7 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
 @Component({
   selector: 'oppia-story-viewer-page',
@@ -46,6 +47,9 @@ export class StoryViewerPageComponent implements OnInit {
   storyDescription: string;
   pathIconParameters: string[];
   topicName: string;
+  thumbnailFilename: string;
+  thumbnailBgColor: string;
+  storyNodes: ReadOnlyStoryNode[];
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
@@ -70,28 +74,41 @@ export class StoryViewerPageComponent implements OnInit {
   }
 
   generatePathIconParameters(): string[] {
-    let storyNodes = this.storyPlaythroughObject.getStoryNodes();
     let iconParametersArray = [];
-
+    this.thumbnailFilename = this.storyNodes[0].getThumbnailFilename();
+    this.thumbnailBgColor = this.storyNodes[0].getThumbnailBgColor();
+    if (this.thumbnailFilename === null) {
+      this.thumbnailFilename = '';
+    }
+    if (this.thumbnailBgColor === null) {
+      this.thumbnailBgColor = '';
+    }
     iconParametersArray.push({
       thumbnailIconUrl: (
         this.assetsBackendApiService.getThumbnailUrlForPreview(
           AppConstants.ENTITY_TYPE.STORY, this.storyId,
-          storyNodes[0].getThumbnailFilename())),
+          this.thumbnailFilename)),
       left: '225px',
       top: '35px',
-      thumbnailBgColor: storyNodes[0].getThumbnailBgColor()
+      thumbnailBgColor: this.thumbnailBgColor
     });
-
     for (
       let i = 1; i < this.storyPlaythroughObject.getStoryNodeCount();
       i++) {
+      this.thumbnailFilename = this.storyNodes[i].getThumbnailFilename();
+      this.thumbnailBgColor = this.storyNodes[i].getThumbnailBgColor();
+      if (this.thumbnailFilename === null) {
+        this.thumbnailFilename = '';
+      }
+      if (this.thumbnailBgColor === null) {
+        this.thumbnailBgColor = '';
+      }
       iconParametersArray.push({
         thumbnailIconUrl: (
           this.assetsBackendApiService.getThumbnailUrlForPreview(
             AppConstants.ENTITY_TYPE.STORY, this.storyId,
-            storyNodes[i].getThumbnailFilename())),
-        thumbnailBgColor: storyNodes[i].getThumbnailBgColor()
+            this.thumbnailFilename)),
+        thumbnailBgColor: this.thumbnailBgColor
       });
     }
     return iconParametersArray;
@@ -143,6 +160,7 @@ export class StoryViewerPageComponent implements OnInit {
       (storyDataDict) => {
         this.storyIsLoaded = true;
         this.storyPlaythroughObject = storyDataDict;
+        this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
         this.storyId = this.storyPlaythroughObject.getStoryId();
         this.topicName = this.storyPlaythroughObject.topicName;
         this.pageTitleService.setPageTitle(

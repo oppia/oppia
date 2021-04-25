@@ -56,14 +56,14 @@
                         <pattern id="image{{index}}" patternUnits="userSpaceOnUse" height="180" width="320">
                           <rect width="320"
                                 height="180"
-                                [attr.fill]="pathIconParameters[index].thumbnailBgColor">
+                                [attr.fill]="pathIconParameters[index]?.thumbnailBgColor">
                           </rect>
 
                           <image x="0"
                                  y="0"
                                  height="180"
                                  width="320"
-                                 [attr.xlink:href]="pathIconParameters[index].thumbnailIconUrl"
+                                 [attr.xlink:href]="pathIconParameters[index]?.thumbnailIconUrl"
                                  xlink:href="">
                           </image>
                         </pattern>
@@ -95,14 +95,14 @@
                         <pattern id="image2{{index}}" patternUnits="userSpaceOnUse" height="108" width="192">
                           <rect width="192"
                                 height="108"
-                                [attr.fill]="pathIconParameters[index].thumbnailBgColor">
+                                [attr.fill]="pathIconParameters[index]?.thumbnailBgColor">
                           </rect>
 
                           <image x="0"
                                  y="0"
                                  width="192"
                                  height="108"
-                                 [attr.xlink:href]="pathIconParameters[index].thumbnailIconUrl"
+                                 [attr.xlink:href]="pathIconParameters[index]?.thumbnailIconUrl"
                                  xlink:href="">
                           </image>
                         </pattern>
@@ -145,19 +145,19 @@
   </div>
 </div>
 <style>
-  story-viewer-page .oppia-story-viewer-container a {
+  .oppia-story-viewer-container a {
     text-decoration: none;
   }
 
-  story-viewer-page .oppia-story-viewer-container a:hover, a:hover span {
+  .oppia-story-viewer-container a:hover, a:hover span {
     color: #0844aa;
   }
 
-  story-viewer-page .oppia-story-description-text {
+  .oppia-story-description-text {
     font-size: 20px;
   }
 
-  story-viewer-page .oppia-story-viewer-card-description-box {
+  .oppia-story-viewer-card-description-box {
     margin-left: 10px;
   }
 

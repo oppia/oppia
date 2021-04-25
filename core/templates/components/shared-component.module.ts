@@ -73,9 +73,6 @@ import { PromoBarComponent } from './common-layout-directives/common-elements/pr
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
-import { StoryViewerNavbarBreadcrumbComponent } from 'pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
-import { StoryViewerNavbarPreLogoActionComponent } from 'pages/story-viewer-page/navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
-import { StoryViewerPageComponent } from 'pages/story-viewer-page/story-viewer-page.component';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -128,9 +125,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
-    StoryViewerNavbarBreadcrumbComponent,
-    StoryViewerNavbarPreLogoActionComponent,
-    StoryViewerPageComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
@@ -157,9 +151,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     ImageUploaderComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    StoryViewerNavbarBreadcrumbComponent,
-    StoryViewerNavbarPreLogoActionComponent,
-    StoryViewerPageComponent,
     SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
@@ -189,9 +180,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
-    StoryViewerNavbarBreadcrumbComponent,
-    StoryViewerNavbarPreLogoActionComponent,
-    StoryViewerPageComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
