@@ -283,11 +283,12 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': states_schema_version,
             'states': item.states
         }
+        init_state_name = item.init_state_name
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    states_schema_version)
+                    states_schema_version, init_state_name)
                 states_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -866,11 +867,12 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
         }
+        init_state_name = latest_exploration.init_state_name
         while current_state_schema_version < target_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    current_state_schema_version)
+                    current_state_schema_version, init_state_name)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -951,10 +953,12 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
         }
+        init_state_name = latest_exploration.init_state_name
+
         while current_state_schema_version < target_state_schema_version:
             exp_domain.Exploration.update_states_from_model(
                 versioned_exploration_states,
-                current_state_schema_version)
+                current_state_schema_version, init_state_name)
             current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:

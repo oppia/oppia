@@ -95,6 +95,7 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -136,6 +137,7 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {}
@@ -187,6 +189,7 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -285,6 +288,7 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: true,
         written_translations: {
           translations_mapping: {
             content: {},
