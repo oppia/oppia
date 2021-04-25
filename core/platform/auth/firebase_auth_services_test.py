@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import itertools
 import json
 import logging
@@ -898,7 +897,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         cookie = firebase_auth.create_session_cookie(
-            id_token, datetime.timedelta(days=1))
+            id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
         # Should not raise.
         firebase_auth.verify_session_cookie(cookie, check_revoked=True)
@@ -915,7 +914,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         cookie = firebase_auth.create_session_cookie(
-            id_token, datetime.timedelta(days=1))
+            id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
         # Should not raise.
         firebase_auth.verify_session_cookie(cookie, check_revoked=True)
@@ -1151,7 +1150,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
     def test_returns_claims_if_cookie_is_present(self):
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
-            datetime.timedelta(days=1))
+            feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
         self.assertEqual(
             firebase_auth_services.get_auth_claims_from_request(
@@ -1162,7 +1161,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(
                 self.AUTH_ID, email=feconf.ADMIN_EMAIL_ADDRESS),
-            datetime.timedelta(days=1))
+            feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
         self.assertEqual(
             firebase_auth_services.get_auth_claims_from_request(
@@ -1170,33 +1169,50 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             auth_domain.AuthClaims(
                 self.AUTH_ID, feconf.ADMIN_EMAIL_ADDRESS, True))
 
-    def test_returns_none_after_cookie_is_revoked(self):
+    def test_raises_stale_auth_session_error_when_cookie_is_expired(self):
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
-            datetime.timedelta(days=1))
+            feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
-        self.assertEqual(
-            firebase_auth_services.get_auth_claims_from_request(
-                self.create_request(session_cookie=cookie)),
-            auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
+        always_raise_expired_session_cookie_error = self.swap_to_always_raise(
+            firebase_auth, 'verify_session_cookie',
+            error=firebase_auth.ExpiredSessionCookieError('uh-oh', None))
 
-        firebase_auth.revoke_refresh_tokens(self.AUTH_ID)
+        with always_raise_expired_session_cookie_error:
+            self.assertRaisesRegexp(
+                auth_domain.StaleAuthSessionError, 'Session has expired',
+                lambda: firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)))
 
-        self.assertIsNone(
-            firebase_auth_services.get_auth_claims_from_request(
-                self.create_request(session_cookie=cookie)))
-
-    def test_error_logged_when_cookie_is_from_a_deleted_user(self):
+    def test_raises_stale_auth_session_error_when_cookie_is_revoked(self):
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
-            datetime.timedelta(days=1))
+            feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
-        firebase_auth.delete_user(self.AUTH_ID)
+        always_raise_revoked_session_cookie_error = self.swap_to_always_raise(
+            firebase_auth, 'verify_session_cookie',
+            error=firebase_auth.RevokedSessionCookieError('uh-oh'))
 
-        self.assertRaisesRegexp(
-            auth_domain.AuthSessionError, 'Invalid session cookie',
-            lambda: firebase_auth_services.get_auth_claims_from_request(
-                self.create_request(session_cookie=cookie)))
+        with always_raise_revoked_session_cookie_error:
+            self.assertRaisesRegexp(
+                auth_domain.StaleAuthSessionError, 'Session has been revoked',
+                lambda: firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)))
+
+    def test_raises_auth_session_error_when_cookie_is_invalid(self):
+        cookie = firebase_auth.create_session_cookie(
+            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
+
+        always_raise_unknown_error = self.swap_to_always_raise(
+            firebase_auth, 'verify_session_cookie',
+            error=firebase_exceptions.UnknownError('uh-oh'))
+
+        with always_raise_unknown_error:
+            self.assertRaisesRegexp(
+                auth_domain.AuthSessionError, 'uh-oh',
+                lambda: firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)))
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):

@@ -167,6 +167,10 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
+        except auth_domain.StaleAuthSessionError as error:
+            logging.info('User must sign in again: %s' % error)
+            auth_services.destroy_auth_session(self.response)
+            auth_claims = None
         except auth_domain.AuthSessionError as error:
             logging.exception('Request has an invalid session: %s' % error)
             auth_services.destroy_auth_session(self.response)

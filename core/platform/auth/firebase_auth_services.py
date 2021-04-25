@@ -610,14 +610,13 @@ def _get_auth_claims_from_session_cookie(cookie):
         return None
     try:
         claims = firebase_auth.verify_session_cookie(cookie, check_revoked=True)
-    except (firebase_auth.ExpiredSessionCookieError,
-            firebase_auth.RevokedSessionCookieError):
-        logging.info('The session cookie must be renewed')
-    except firebase_exceptions.FirebaseError as error:
+    except firebase_auth.ExpiredSessionCookieError:
+        raise auth_domain.StaleAuthSessionError('Session has expired')
+    except firebase_auth.RevokedSessionCookieError:
+        raise auth_domain.StaleAuthSessionError('Session has been revoked')
+    except (firebase_exceptions.FirebaseError, ValueError) as error:
         raise auth_domain.AuthSessionError('Invalid session cookie: %s' % error)
-    else:
-        return _create_auth_claims(claims)
-    return None
+    return None if claims is None else _create_auth_claims(claims)
 
 
 def _create_auth_claims(firebase_claims):

@@ -37,7 +37,13 @@ AuthIdUserIdPair = (
 
 
 class AuthSessionError(Exception):
-    """Error type raised by functions that try to establish auth sessions."""
+    """Error raised when an invalid auth session is detected."""
+
+    pass
+
+
+class StaleAuthSessionError(Exception):
+    """Error raised when an auth session needs to be refreshed."""
 
     pass
 
