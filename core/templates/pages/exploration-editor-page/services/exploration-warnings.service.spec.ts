@@ -925,6 +925,7 @@ describe('Exploration Warnings Service', function() {
           },
           classifier_model_id: null,
           solicit_answer_details: false,
+          card_is_checkpoint: false,
           next_content_id_index: null,
         },
         State: {
@@ -953,6 +954,7 @@ describe('Exploration Warnings Service', function() {
             hints: []
           },
           solicit_answer_details: false,
+          card_is_checkpoint: false,
           written_translations: {
             translations_mapping: {
               content: {},
