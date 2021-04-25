@@ -47,11 +47,11 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       template: require('./schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$sce', '$timeout', '$translate',
+        '$filter', '$sce', '$scope', '$timeout', '$translate',
         'DeviceInfoService', 'SchemaFormSubmittedService',
         'StateCustomizationArgsService',
         function(
-            $filter, $sce, $timeout, $translate,
+            $filter, $sce, $scope, $timeout, $translate,
             DeviceInfoService, SchemaFormSubmittedService,
             StateCustomizationArgsService) {
           var ctrl = this;
@@ -98,6 +98,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
 
           ctrl.updateLocalValue = function(val) {
             ctrl.localValue = val;
+            $scope.$applyAsync();
           };
           ctrl.$onInit = function() {
             if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {

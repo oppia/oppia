@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
-      changes.refresh &&
+      changes.refresh !== undefined &&
       changes.refresh.previousValue !== changes.refresh.currentValue &&
       this.codemirror) {
       this.codemirror.refresh();

@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 
 export class CodemirrorMergeviewComponent implements OnInit, OnChanges {
-  @Input() options;
+  @Input() options = {};
   @Input() leftValue;
   @Input() rightValue;
   codeMirrorInstance: CodeMirror.MergeView;
@@ -61,7 +61,7 @@ export class CodemirrorMergeviewComponent implements OnInit, OnChanges {
     if (changes.rightValue &&
       changes.rightValue.currentValue !==
       changes.rightValue.previousValue) {
-      if (!this.rightValue === undefined) {
+      if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
       this.codeMirrorInstance.right.orig.setValue(

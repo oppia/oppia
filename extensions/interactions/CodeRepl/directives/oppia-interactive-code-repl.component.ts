@@ -20,31 +20,25 @@
  * followed by the name of the arg.
  */
 
-require('third-party-imports/ui-codemirror.import.ts');
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require(
-  'interactions/interaction-attributes-extractor.service.ts');
-require('pages/exploration-player-page/services/player-position.service.ts');
-
+import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { Subscription } from 'rxjs';
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { CodeReplRulesService } from './code-repl-rules.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+
+import { CodeReplCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { CodeReplCustomizationArgs } from 'interactions/customization-args-defs';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { CodeReplRulesService } from './code-repl-rules.service';
 
 @Component({
   selector: 'oppia-interactive-code-repl',
   templateUrl: './code-repl-interaction.component.html',
   styleUrls: []
 })
-export class InteractiveCodeReplComponent implements OnInit, AfterViewInit {
+export class InteractiveCodeReplComponent implements
+  OnInit, AfterViewInit, OnDestroy {
   @Input() lastAnswer;
   @Input() languageWithValue;
   @Input() placeholderWithValue;
@@ -286,6 +280,10 @@ export class InteractiveCodeReplComponent implements OnInit, AfterViewInit {
       error: (err || '')
     } as unknown as string,
     this.codeReplRulesService as unknown as InteractionRulesService);
+  }
+
+  ngOnDestroy(): void {
+    this.componentSubscriptions.unsubscribe();
   }
 }
 angular.module('oppia').directive(
