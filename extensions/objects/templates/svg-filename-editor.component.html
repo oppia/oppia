@@ -238,7 +238,7 @@
     </div>
   </div>
   <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
-    <button type="button" class="btn btn-success float-right protractor-test-save-diagram" ng-click="$ctrl.saveSvgFile()" ng-disabled="$ctrl.isUserDrawing() or !$ctrl.isLoadingIndicatorShown">
+    <button type="button" class="btn btn-success float-right protractor-test-save-diagram" ng-click="$ctrl.saveSvgFile()" ng-disabled="$ctrl.isUserDrawing() || $ctrl.isLoadingIndicatorShown">
       <span ng-if="!$ctrl.isLoadingIndicatorShown">Use This Image</span>
       <span ng-if="$ctrl.isLoadingIndicatorShown"><md-progress-circular md-diameter="25px" md-mode="indeterminate" class="oppia-diagram-spinning-button"></md-progress-circular></span>
     </button>
@@ -504,5 +504,5 @@
     margin-right: 30px;
   }
 
-  md-progress-circular svg path { stroke: #f8f6e1; }
+  svg-filename-editor  .oppia-diagram-spinning-button svg path { stroke: #f8f6e1; }
 </style>
