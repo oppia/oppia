@@ -106,14 +106,9 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         model_module_name = model_instance.__module__
         model_type = model_module_name.split('.')[2]
         validator_module_name = '%s_validators' % model_type
-        # TODO(#10415): This try catch is required until all the validators are
-        # refactored. Remove the try catch block once #10415 is fixed.
-        try:
-            validator_module = importlib.import_module(
-                'core.domain.%s' % validator_module_name)
-        except ImportError:
-            validator_module = importlib.import_module(
-                'core.domain.prod_validators')
+
+        validator_module = importlib.import_module(
+            'core.domain.%s' % validator_module_name)
         validator = getattr(validator_module, validator_cls_name)
         if not model_instance.deleted:
             validator.validate(model_instance)
@@ -332,15 +327,6 @@ class BulkEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [email_models.BulkEmailModel]
-
-
-class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates GeneralFeedbackEmailReplyToIdModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [email_models.GeneralFeedbackEmailReplyToIdModel]
 
 
 class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -769,12 +755,12 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
             subtopic_models.SubtopicPageCommitLogEntryModel]
 
 
-class MachineTranslatedTextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates MachineTranslatedTextModel."""
+class MachineTranslationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates MachineTranslationModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [translation_models.MachineTranslatedTextModel]
+        return [translation_models.MachineTranslationModel]
 
 
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
