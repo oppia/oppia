@@ -28,12 +28,14 @@ import re
 import sys
 
 import python_utils
+from scripts import common
 
 
 GITHUB_API_PR_ENDPOINT = (
     'https://api.github.com/repos/%s/%s/pulls/%s')
 PR_URL_REGEX = (
     r'^https://github.com/(?P<owner>\w+)/(?P<repo>\w+)/pull/(?P<num>\w+)/?$')
+UPSTREAM_REMOTE = 'upstream'
 
 
 def parse_pr_url(pr_url):
@@ -55,23 +57,60 @@ def parse_pr_url(pr_url):
         return None
 
 
-def load_diff(url):
-    """Download a PR diff from GitHub.
+def load_diff(base_branch):
+    """Load the diff between the head and base.
 
     Args:
-        url: str. URL of the diff on GitHub.
+        base_branch: str. Base branch of PR.
 
     Returns:
-        list(str). List of the right-stripped lines of the diff. This
-        list is empty if the response code from the GitHub API is not
-        200.
+        tuple(list(tuple(str, str)), dict(str, list(str)). Tuple of a
+        list of changed files (each a tuple of before, after) and a
+        dictionary mapping from file names to list of diff lines for
+        each file. In the event of a parsing error, a tuple of an empty
+        list and empty dictionary is returned.
     """
-    response = python_utils.url_request(url, None, None)
-    if response.getcode() != 200:
-        return []
-    lines = [line.rstrip() for line in response]
-    response.close()
-    return lines
+    diff_name_status = common.run_cmd([
+        'git', 'diff', '--name-status',
+        '{}/{}'.format(UPSTREAM_REMOTE, base_branch),
+    ])
+    diff_files = []
+    for line in diff_name_status.split('\n'):
+        if not line:
+            continue
+        split = line.split()
+        if len(split) < 2 or len(split) > 3:
+            python_utils.PRINT(
+                'Failed to parse diff --name-status line "%s"'
+                % line)
+            return [], {}
+        elif len(split) == 2:
+            diff_files.append((split[1], split[1]))
+        elif len(split) == 3:
+            diff_files.append((split[1], split[2]))
+    file_diffs = {}
+    for file_tuple in diff_files:
+        for file in file_tuple:
+            if file in file_diffs:
+                continue
+            file_diff = common.run_cmd([
+                'git', 'diff', '-U0',
+                '{}/{}'.format(UPSTREAM_REMOTE, base_branch),
+                '--', file,
+            ])
+            file_diff_split = file_diff.rstrip().split('\n')
+            i = 0
+            for line in file_diff_split:
+                i += 1
+                if line.startswith('@@'):
+                    break
+            if i > 6 or i == len(file_diff_split):
+                python_utils.PRINT(
+                    'Skipped too many lines when parsing "%s" diff'
+                    % file)
+                return [], {}
+            file_diffs[file] = file_diff_split[i:]
+    return diff_files, file_diffs
 
 
 def lookup_pr(owner, repo, pull_number):
@@ -99,47 +138,6 @@ def lookup_pr(owner, repo, pull_number):
     return pr
 
 
-def parse_diff(diff):
-    """Parse a PR diff into the changes made in each file.
-
-    Args:
-        diff: list(str). List of the right-stripped lines of the diff.
-
-    Returns:
-        dict(tuple(str, str), list(str)). A dictionary that maps from
-        tuples of (old filename, new filename) to lists of the diff
-        lines associated with those files. Context lines before the
-        first changed line and after the last changed line are excluded.
-    """
-    file_diffs = {}
-    old, new = '', ''
-    file_diff_started = False
-    for line in diff:
-        if line.startswith('diff --git '):
-            match = re.match(
-                r'^diff --git a/(?P<old>[\w.]+) b/(?P<new>[\w.]+)$', line)
-            old, new = match.group('old', 'new')
-            file_diffs[old, new] = []
-            file_diff_started = False
-            continue
-        if line.startswith('+++'):
-            file_diff_started = True
-            continue
-        if bool(old) and bool(new) and file_diff_started:
-            file_diffs[old, new].append(line)
-    for old, new in file_diffs:
-        lines = file_diffs[old, new]
-        i_start = -1
-        i_end = -1
-        for i, line in enumerate(lines):
-            if line.startswith(('-', '+')):
-                if i_start < 0:
-                    i_start = i
-                i_end = i
-        file_diffs[old, new] = lines[i_start:i_end + 1]
-    return file_diffs
-
-
 def check_if_pr_is_translation_pr(pr):
     """Check if a PR is low-risk by virtue of being a translation PR.
 
@@ -163,11 +161,11 @@ def check_if_pr_is_translation_pr(pr):
     source_branch = pr['head']['ref']
     if source_branch != 'translatewiki-prs':
         return 'Source branch is not translatewiki-prs'
-    raw_diff = load_diff(pr['diff_url'])
-    if not raw_diff:
-        return 'Failed to load PR diff from GitHub API'
-    diff = parse_diff(raw_diff)
-    for old, new in diff:
+    base_url = pr['base']['repo']['clone_url']
+    diff_files, _ = load_diff(pr['base']['ref'])
+    if not diff_files:
+        return 'Failed to load PR diff'
+    for old, new in diff_files:
         if not old == new:
             return 'File name change: %s -> %s' % (old, new)
         if not re.match('^assets/i18n/[a-z-]+.json$', old):
@@ -175,23 +173,26 @@ def check_if_pr_is_translation_pr(pr):
     return ''
 
 
-def _check_changelog_pr_diff(diff):
+def _check_changelog_pr_diff(diff_files, file_diffs):
     """Check whether a changelog PR diff is valid.
 
     Args:
-        diff: dict(tuple(str, str), list(str)). PR diff.
+        diff_files: list(tuple(str, str)): Changed files, each as a
+            tuple of (old name, new name).
+        file_diffs: dict(str, list(str)): Map from file names to the
+            lines of that file's diff.
 
     Returns:
         str. If the diff is not valid for a low-risk changelog PR, an
         error message explaining why. Otherwise, an empty string.
     """
-    for old, new in diff:
+    for old, new in diff_files:
         if not old == new:
             return 'File name change: %s -> %s' % (old, new)
         if old in ('AUTHORS', 'CONTRIBUTORS', 'CHANGELOG'):
             pass
         elif old == 'package.json':
-            lines = diff[old, new]
+            lines = file_diffs[old]
             if len(lines) != 2:
                 return 'Only 1 line should change in package.json'
             if not (
@@ -205,7 +206,7 @@ def _check_changelog_pr_diff(diff):
                 return 'package.json changes not low-risk'
 
         elif old == 'core/templates/pages/about-page/about-page.constants.ts':
-            for line in diff[old, new]:
+            for line in file_diffs[old]:
                 if not re.match(r'\+    \'[A-Za-z ]+\',', line):
                     return 'about-page.constants.ts changes not low-risk'
         else:
@@ -243,11 +244,10 @@ def check_if_pr_is_changelog_pr(pr):
             '^update-changelog-for-release-v[0-9.]+$',
             source_branch):
         return 'Source branch does not indicate a changelog PR'
-    raw_diff = load_diff(pr['diff_url'])
-    if not raw_diff:
-        return 'Failed to load PR diff from GitHub API'
-    diff = parse_diff(raw_diff)
-    return _check_changelog_pr_diff(diff)
+    diff_files, file_diffs = load_diff(pr['base']['ref'])
+    if not diff_files:
+        return 'Failed to load PR diff'
+    return _check_changelog_pr_diff(diff_files, file_diffs)
 
 
 LOW_RISK_CHECKERS = (
@@ -271,6 +271,10 @@ def main(tokens=None):
     pr = lookup_pr(owner, repo, number)
     if not pr:
         raise RuntimeError('Failed to load PR from GitHub API')
+    base_repo_url = pr['base']['repo']['clone_url']
+    common.run_cmd(
+        ['git', 'remote', 'add', UPSTREAM_REMOTE, base_repo_url])
+    common.run_cmd(['git', 'fetch', UPSTREAM_REMOTE])
     for low_risk_type, low_risk_checker in LOW_RISK_CHECKERS:
         reason_not_low_risk = low_risk_checker(pr)
         if reason_not_low_risk:

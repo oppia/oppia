@@ -21,6 +21,7 @@ from core.tests import test_utils
 import python_utils
 
 from scripts import check_if_pr_is_low_risk
+from scripts import common
 
 # We import StringIO directly instead of using python_utils.string_io
 # because we need to inherit from StringIO, so we need the StringIO
@@ -81,77 +82,225 @@ class LoadDiffTests(test_utils.GenericTestBase):
             '/raw/oppia/oppia/pull/1'
         )
 
-    def test_rstrips_diff(self):
+    def test_parse_multifile_diff(self):
 
-        def mock_url_request(unused_url, unused_body, unused_headers):
-            data = (
-                'diff --git a/foo.py b/bar.py\n'
-                'index 11af605ef2b7..89d00105ca66 100644\n'
-                '--- a/foo.py\n'
-                '+++ b/bar.py\n'
-                '@@ -32,6 +32,7 @@ def hello():\n'
-                '     s = "Hello, "\n'
-                '     s += "World!"\n'
-                '-    print(s)\n'
-                '+    python_utils.PRINT(s)\n'
-                '     return s\n'
-            )
-            return MockResponse(data=data)
+        def mock_run_cmd(tokens):
+            if '--name-status' in tokens:
+                return (
+                    'M       modified\n'
+                    'R099    old      new\n'
+                    'A       added\n'
+                )
+            if tokens[-1] == 'modified':
+                return (
+                    'diff --git a/modififed b/modified\n'
+                    'index 11af605ef2b7..89d00105ca66 100644\n'
+                    '--- a/modified\n'
+                    '+++ b/modified\n'
+                    '@@ -32,6 +32,7 @@ def hello():\n'
+                    '-    print(s)\n'
+                    '+    python_utils.PRINT(s)\n'
+                )
+            if tokens[-1] == 'old':
+                return (
+                    'diff --git a/old b/old\n'
+                    'index 11af605ef2b7..89d00105ca66 100644\n'
+                    '--- a/old\n'
+                    '+++ /dev/null\n'
+                    '@@ -32,6 +32,7 @@ def hello():\n'
+                    '-    print(s)\n'
+                    '-    python_utils.PRINT(s)\n'
+                )
+            if tokens[-1] == 'new':
+                return (
+                    'diff --git a/new b/new\n'
+                    'index 11af605ef2b7..89d00105ca66 100644\n'
+                    '--- /dev/null\n'
+                    '+++ b/new\n'
+                    '@@ -32,6 +32,7 @@ def hello():\n'
+                    '+    print(s)\n'
+                    '+    python_utils.PRINT(s)\n'
+                )
+            if tokens[-1] == 'added':
+                return (
+                    'diff --git a/added b/added\n'
+                    'index 11af605ef2b7..89d00105ca66 100644\n'
+                    '--- /dev/null\n'
+                    '+++ b/added\n'
+                    '@@ -32,6 +32,7 @@ def hello():\n'
+                    '+    print(s)\n'
+                    '+    python_utils.PRINT(s)\n'
+                )
+            raise AssertionError(
+                'Unknown args to mock_run_cmd: %s' % tokens)
 
-        url_request_swap = self.swap_with_checks(
-            python_utils, 'url_request', mock_url_request,
+
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
             expected_args=[
-                (self.url, None, None),
+                ([
+                    'git', 'diff', '--name-status',
+                    'upstream/develop'],),
+                ([
+                    'git', 'diff', '-U0', 'upstream/develop', '--',
+                    'modified'],),
+                ([
+                    'git', 'diff', '-U0', 'upstream/develop', '--',
+                    'old'],),
+                ([
+                    'git', 'diff', '-U0', 'upstream/develop', '--',
+                    'new'],),
+                ([
+                    'git', 'diff', '-U0', 'upstream/develop', '--',
+                    'added'],),
             ])
 
-        with url_request_swap:
-            diff = check_if_pr_is_low_risk.load_diff(self.url)
+        with run_cmd_swap:
+            diff_files, file_diffs = check_if_pr_is_low_risk.load_diff(
+                'develop')
 
-        expected_diff = [
-            'diff --git a/foo.py b/bar.py',
-            'index 11af605ef2b7..89d00105ca66 100644',
-            '--- a/foo.py',
-            '+++ b/bar.py',
-            '@@ -32,6 +32,7 @@ def hello():',
-            '     s = "Hello, "',
-            '     s += "World!"',
-            '-    print(s)',
-            '+    python_utils.PRINT(s)',
-            '     return s',
+        expected_diff_files = [
+            ('modified', 'modified'),
+            ('old', 'new'),
+            ('added', 'added'),
         ]
-        self.assertListEqual(diff, expected_diff)
+        expected_file_diffs = {
+            'modified': [
+                '-    print(s)',
+                '+    python_utils.PRINT(s)',
+            ],
+            'old': [
+                '-    print(s)',
+                '-    python_utils.PRINT(s)',
+            ],
+            'new': [
+                '+    print(s)',
+                '+    python_utils.PRINT(s)',
+            ],
+            'added': [
+                '+    print(s)',
+                '+    python_utils.PRINT(s)',
+            ],
+        }
+        self.assertListEqual(diff_files, expected_diff_files)
+        self.assertDictEqual(file_diffs, expected_file_diffs)
 
-    def test_empty_diff(self):
+    def test_name_status_failure(self):
 
-        def mock_url_request(unused_url, unused_body, unused_headers):
-            return MockResponse()
+        def mock_run_cmd(unused_tokens):
+            return (
+                'A B C D\n'
+            )
 
-        url_request_swap = self.swap_with_checks(
-            python_utils, 'url_request', mock_url_request,
+        def mock_print(unused_str):
+            pass
+
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
             expected_args=[
-                (self.url, None, None),
+                ([
+                    'git', 'diff', '--name-status',
+                    'upstream/develop'],),
+            ])
+        print_swap = self.swap_with_checks(
+            python_utils, 'PRINT', mock_print,
+            expected_args=[
+                ('Failed to parse diff --name-status line "A B C D"',),
             ])
 
-        with url_request_swap:
-            diff = check_if_pr_is_low_risk.load_diff(self.url)
+        with run_cmd_swap, print_swap:
+            diff_files, file_diffs = check_if_pr_is_low_risk.load_diff(
+                'develop')
 
-        self.assertListEqual(diff, [])
+        self.assertListEqual(diff_files, [])
+        self.assertDictEqual(file_diffs, {})
 
-    def test_api_failure(self):
+    def test_parse_diff_failure_no_diff(self):
 
-        def mock_url_request(unused_url, unused_body, unused_headers):
-            return MockResponse(code=404)
+        def mock_run_cmd(tokens):
+            if '--name-status' in tokens:
+                return (
+                    'M       modified\n'
+                )
+            if tokens[-1] == 'modified':
+                return (
+                    'diff --git a/modififed b/modified\n'
+                    'index 11af605ef2b7..89d00105ca66 100644\n'
+                    '--- a/modified\n'
+                    '+++ b/modified\n'
+                )
 
-        url_request_swap = self.swap_with_checks(
-            python_utils, 'url_request', mock_url_request,
+        def mock_print(unused_str):
+            pass
+
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
             expected_args=[
-                (self.url, None, None),
+                ([
+                    'git', 'diff', '--name-status',
+                    'upstream/develop'],),
+                ([
+                    'git', 'diff', '-U0', 'upstream/develop', '--',
+                    'modified'],),
+            ])
+        print_swap = self.swap_with_checks(
+            python_utils, 'PRINT', mock_print,
+            expected_args=[
+                ('Skipped too many lines when parsing "modified" diff',),
             ])
 
-        with url_request_swap:
-            diff = check_if_pr_is_low_risk.load_diff(self.url)
+        with run_cmd_swap, print_swap:
+            diff_files, file_diffs = check_if_pr_is_low_risk.load_diff(
+                'develop')
 
-        self.assertListEqual(diff, [])
+        self.assertListEqual(diff_files, [])
+        self.assertDictEqual(file_diffs, {})
+
+    def test_parse_diff_failure_long_header(self):
+
+        def mock_run_cmd(tokens):
+            if '--name-status' in tokens:
+                return (
+                    'M       modified\n'
+                )
+            if tokens[-1] == 'modified':
+                return (
+                    'diff --git a/modififed b/modified\n'
+                    'index 11af605ef2b7..89d00105ca66 100644\n'
+                    '--- a/modified\n'
+                    '+++ b/modified\n'
+                    'diff --git a/modififed b/modified\n'
+                    'index 11af605ef2b7..89d00105ca66 100644\n'
+                    '--- a/modified\n'
+                    '+++ b/modified\n'
+                    '@@ -32,6 +32,7 @@ def hello():\n'
+                )
+
+        def mock_print(unused_str):
+            pass
+
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
+            expected_args=[
+                ([
+                    'git', 'diff', '--name-status',
+                    'upstream/develop'],),
+                ([
+                    'git', 'diff', '-U0', 'upstream/develop', '--',
+                    'modified'],),
+            ])
+        print_swap = self.swap_with_checks(
+            python_utils, 'PRINT', mock_print,
+            expected_args=[
+                ('Skipped too many lines when parsing "modified" diff',),
+            ])
+
+        with run_cmd_swap, print_swap:
+            diff_files, file_diffs = check_if_pr_is_low_risk.load_diff(
+                'develop')
+
+        self.assertListEqual(diff_files, [])
+        self.assertDictEqual(file_diffs, {})
 
 
 class LookupPrTests(test_utils.GenericTestBase):
@@ -198,68 +347,7 @@ class LookupPrTests(test_utils.GenericTestBase):
         self.assertDictEqual(pr, {})
 
 
-class ParseDiffTests(test_utils.GenericTestBase):
-
-    def test_strip_contxet(self):
-        diff = [
-            'diff --git a/foo.py b/bar.py',
-            'index 11af605ef2b7..89d00105ca66 100644',
-            '--- a/foo.py',
-            '+++ b/bar.py',
-            '@@ -32,6 +32,7 @@ def hello():',
-            '     s = "Hello, "',
-            '     s += "World!"',
-            '-    print(s)',
-            '+    python_utils.PRINT(s)',
-            '     return s',
-        ]
-        parsed = check_if_pr_is_low_risk.parse_diff(diff)
-        expected_parsed = {
-            ('foo.py', 'bar.py'): [
-                '-    print(s)',
-                '+    python_utils.PRINT(s)',
-            ],
-        }
-        self.assertDictEqual(parsed, expected_parsed)
-
-    def test_multiple_files(self):
-        diff = [
-            'diff --git a/foo.py b/foo.py',
-            'index 11af605ef2b7..89d00105ca66 100644',
-            '--- a/foo.py',
-            '+++ b/foo.py',
-            '@@ -32,6 +32,7 @@ def hello():',
-            '     s = "Hello, "',
-            '     s += "World!"',
-            '-    print(s)',
-            '+    python_utils.PRINT(s)',
-            '     return s',
-            'diff --git a/bar.py b/bar2.py',
-            'index 11af605ef2b7..89d00105ca66 100644',
-            '--- a/bar.py',
-            '+++ b/bar2.py',
-            '@@ -32,6 +32,7 @@ def hello():',
-            '     s = "Hello, "',
-            '     s += "World!"',
-            '-    print(s)',
-            '+    print(s.lower())',
-            '     return s',
-        ]
-        parsed = check_if_pr_is_low_risk.parse_diff(diff)
-        expected_parsed = {
-            ('foo.py', 'foo.py'): [
-                '-    print(s)',
-                '+    python_utils.PRINT(s)',
-            ],
-            ('bar.py', 'bar2.py'): [
-                '-    print(s)',
-                '+    print(s.lower())',
-            ],
-        }
-        self.assertEqual(parsed, expected_parsed)
-
-
-def _make_pr(source_repo, source_branch, diff_url):
+def _make_pr(source_repo, source_branch, base_ref, base_url=''):
     """Create a PR JSON object."""
     return {
         'head': {
@@ -268,67 +356,60 @@ def _make_pr(source_repo, source_branch, diff_url):
             },
             'ref': source_branch,
         },
-        'diff_url': diff_url,
+        'base': {
+            'ref': base_ref,
+            'repo': {
+                'clone_url': base_url,
+            },
+        },
     }
 
 
 class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 
     def test_valid_pr_is_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                ('assets/i18n/foo.json', 'assets/i18n/foo.json'): [
+        def mock_load_diff(unused_branch):
+            diff_files = [
+                ('assets/i18n/foo.json', 'assets/i18n/foo.json')]
+            file_diffs = {
+                'assets/i18n/foo.json': [
                     '-    foo',
                     '+    bar',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
                 pr)
             self.assertEqual(msg, '')
 
     def test_fork_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-
         pr = _make_pr(
             'foo/oppia',
             'translatewiki-prs',
-            diff_url)
+            'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
             pr)
         self.assertEqual(msg, 'Source repo is not oppia/oppia')
 
     def test_other_branch_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs ',
-            diff_url)
+            'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
             pr)
@@ -337,20 +418,18 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
             'Source branch is not translatewiki-prs')
 
     def test_no_diff_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return ''
+        def mock_load_diff(unused_branch):
+            return [], {}
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
+                ('develop',),
             ])
 
         with load_diff_swap:
@@ -358,43 +437,36 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
                 pr)
             self.assertEqual(
                 msg,
-                'Failed to load PR diff from GitHub API')
+                'Failed to load PR diff')
 
     def test_filename_change_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         filename_a = 'assets/i18n/foo.json'
         filename_b = 'assets/i18n/bar.json'
 
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                (filename_a, filename_b): [
+        def mock_load_diff(unused_branch):
+            diff_files = [(filename_a, filename_b)]
+            file_diffs = {
+                filename_a: [
                     '-    foo',
+                ],
+                filename_b: [
                     '+    bar',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
                 pr)
             self.assertEqual(
@@ -403,37 +475,29 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
                     filename_a, filename_b))
 
     def test_py_file_change_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                ('assets/i18n/foo.py', 'assets/i18n/foo.py'): [
+        def mock_load_diff(unused_branch):
+            diff_files = [
+                ('assets/i18n/foo.py', 'assets/i18n/foo.py')]
+            file_diffs = {
+                'assets/i18n/foo.py': [
                     '-    foo',
                     '+    bar',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
                 pr)
             self.assertEqual(
@@ -443,78 +507,71 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
 class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
 
     def test_valid_pr_is_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                ('AUTHORS', 'AUTHORS'): [
-                    '-    foo',
-                    '+    bar',
-                ],
-                ('CONTRIBUTORS', 'CONTRIBUTORS'): [
-                    '-    foo',
-                    '+    bar',
-                ],
-                ('CHANGELOG', 'CHANGELOG'): [
-                    '-    foo',
-                    '+    bar',
-                ],
-                ('package.json', 'package.json'): [
-                    '-  "version": "0.3.0",',
-                    '+  "version": "0.3.1",',
-                ],
+        def mock_load_diff(unused_branch):
+            diff_files = [
+                ('AUTHORS', 'AUTHORS'),
+                ('CONTRIBUTORS', 'CONTRIBUTORS'),
+                ('CHANGELOG', 'CHANGELOG'),
+                ('package.json', 'package.json'),
                 (
                     'core/templates/pages/about-page/about-page.constants.ts',
                     'core/templates/pages/about-page/about-page.constants.ts',
-                ): [
+                ),
+            ]
+            file_diffs = {
+                'AUTHORS': [
+                    '-    foo',
+                    '+    bar',
+                ],
+                'CONTRIBUTORS': [
+                    '-    foo',
+                    '+    bar',
+                ],
+                'CHANGELOG': [
+                    '-    foo',
+                    '+    bar',
+                ],
+                'package.json': [
+                    '-  "version": "0.3.0",',
+                    '+  "version": "0.3.1",',
+                ],
+                'core/templates/pages/about-page/about-page.constants.ts': [
                     '+    \'Foo Bar\',',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
                 pr)
             self.assertEqual(msg, '')
 
     def test_fork_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-
         pr = _make_pr(
             'foo/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
             pr)
         self.assertEqual(msg, 'Source repo is not oppia/oppia')
 
     def test_other_branch_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1 ',
-            diff_url)
+            'develop')
 
         msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
             pr)
@@ -522,20 +579,18 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
             msg, 'Source branch does not indicate a changelog PR')
 
     def test_no_diff_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return ''
+        def mock_load_diff(unused_branch):
+            return [], {}
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
+                ('develop',),
             ])
 
         with load_diff_swap:
@@ -543,191 +598,152 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
                 pr)
             self.assertEqual(
                 msg,
-                'Failed to load PR diff from GitHub API')
+                'Failed to load PR diff')
 
     def test_risky_file_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                ('scripts/start.py', 'scripts/start.py'): [
+        def mock_load_diff(unused_branch):
+            diff_files = [
+                ('scripts/start.py', 'scripts/start.py')]
+            file_diffs = {
+                'scripts/start.py': [
                     '-    foo',
                     '+    bar',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
                 pr)
             self.assertEqual(
                 msg, 'File scripts/start.py changed and not low-risk')
 
     def test_rename_file_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                ('AUTHORS', 'scripts/start.py'): [
+        def mock_load_diff(unused_branch):
+            diff_files = [
+                ('AUTHORS', 'scripts/start.py'),
+            ]
+            file_diffs = {
+                'AUTHORS': [
                     '-    foo',
+                ],
+                'scripts/start.py': [
                     '+    bar',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
                 pr)
             self.assertEqual(
                 msg, 'File name change: AUTHORS -> scripts/start.py')
 
     def test_package_json_addition_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                ('package.json', 'package.json'): [
+        def mock_load_diff(unused_branch):
+            diff_files = [
+                ('package.json', 'package.json')]
+            file_diffs = {
+                'package.json': [
                     '-  "version": "0.3.0",',
                     '+  "version": "0.3.1",',
                     '+  "foo": "bar",',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
                 pr)
             self.assertEqual(
                 msg, 'Only 1 line should change in package.json')
 
     def test_risky_package_json_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                ('package.json', 'package.json'): [
+        def mock_load_diff(unused_branch):
+            diff_files = [('package.json', 'package.json')]
+            file_diffs = {
+                'package.json': [
                     '-    foo: 1,',
                     '+    foo: 2,',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
                 pr)
             self.assertEqual(
                 msg, 'package.json changes not low-risk')
 
     def test_risky_constants_pr_is_not_low_risk(self):
-        diff_url = 'https://github.com/oppia/oppia/pull/1.diff'
-        diff_raw = 'Mock Diff'
-
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            diff_url)
+            'develop')
 
-        def mock_load_diff(unused_url):
-            return diff_raw
-
-        def mock_parse_diff(unused_diff):
-            return {
-                (
-                    'core/templates/pages/about-page/about-page.constants.ts',
-                    'core/templates/pages/about-page/about-page.constants.ts',
-                ): [
+        def mock_load_diff(unused_branch):
+            diff_files = [(
+                'core/templates/pages/about-page/about-page.constants.ts',
+                'core/templates/pages/about-page/about-page.constants.ts',
+            )]
+            file_diffs = {
+                'core/templates/pages/about-page/about-page.constants.ts': [
                     '+    \'Foo Bar\': {',
                 ],
             }
+            return diff_files, file_diffs
 
         load_diff_swap = self.swap_with_checks(
             check_if_pr_is_low_risk, 'load_diff', mock_load_diff,
             expected_args=[
-                (diff_url,),
-            ])
-        parse_diff_swap = self.swap_with_checks(
-            check_if_pr_is_low_risk, 'parse_diff', mock_parse_diff,
-            expected_args=[
-                (diff_raw,),
+                ('develop',),
             ])
 
-        with load_diff_swap, parse_diff_swap:
+        with load_diff_swap:
             msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
                 pr)
             self.assertEqual(
@@ -738,10 +754,12 @@ class MainTests(test_utils.GenericTestBase):
 
     def test_low_risk_translation(self):
         url = 'https://github.com/oppia/oppia/pull/1'
+        repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
-            url)
+            'develop',
+            repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'
@@ -760,6 +778,9 @@ class MainTests(test_utils.GenericTestBase):
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
             return 'Source branch does not indicate a changelog PR'
+
+        def mock_run_cmd(unused_tokens):
+            pass
 
         mock_low_risk_checkers = (
             ('changelog', mock_check_if_pr_is_changelog_pr),
@@ -788,18 +809,26 @@ class MainTests(test_utils.GenericTestBase):
                 ),
                 ('PR is low-risk. Skipping some CI checks.',),
             ])
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
+            expected_args=[
+                (['git', 'remote', 'add', 'upstream', repo_url],),
+                (['git', 'fetch', 'upstream'],),
+            ])
 
         with parse_url_swap, lookup_pr_swap, print_swap:
-            with low_risk_checkers_swap:
+            with low_risk_checkers_swap, run_cmd_swap:
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 0)
 
     def test_low_risk_changelog(self):
         url = 'https://github.com/oppia/oppia/pull/1'
+        repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
-            url)
+            'develop',
+            repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'
@@ -818,6 +847,9 @@ class MainTests(test_utils.GenericTestBase):
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
             return ''
+
+        def mock_run_cmd(unused_tokens):
+            pass
 
         mock_low_risk_checkers = (
             ('translatewiki', mock_check_if_pr_is_translation_pr),
@@ -846,18 +878,26 @@ class MainTests(test_utils.GenericTestBase):
                 ),
                 ('PR is low-risk. Skipping some CI checks.',),
             ])
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
+            expected_args=[
+                (['git', 'remote', 'add', 'upstream', repo_url],),
+                (['git', 'fetch', 'upstream'],),
+            ])
 
         with parse_url_swap, lookup_pr_swap, print_swap:
-            with low_risk_checkers_swap:
+            with low_risk_checkers_swap, run_cmd_swap:
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 0)
 
     def test_risky_translation(self):
         url = 'https://github.com/oppia/oppia/pull/1'
+        repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
-            url)
+            'develop',
+            repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'
@@ -876,6 +916,9 @@ class MainTests(test_utils.GenericTestBase):
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
             return 'Source branch does not indicate a changelog PR'
+
+        def mock_run_cmd(unused_tokens):
+            pass
 
         mock_low_risk_checkers = (
             ('translatewiki', mock_check_if_pr_is_translation_pr),
@@ -908,18 +951,26 @@ class MainTests(test_utils.GenericTestBase):
                 ),
                 ('PR is not low-risk. Running all CI checks.',),
             ])
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
+            expected_args=[
+                (['git', 'remote', 'add', 'upstream', repo_url],),
+                (['git', 'fetch', 'upstream'],),
+            ])
 
         with parse_url_swap, lookup_pr_swap, print_swap:
-            with low_risk_checkers_swap:
+            with low_risk_checkers_swap, run_cmd_swap:
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 1)
 
     def test_risky_changelog(self):
         url = 'https://github.com/oppia/oppia/pull/1'
+        repo_url = 'https://github.com/oppia/oppia.git'
         pr = _make_pr(
             'oppia/oppia',
             'translatewiki-prs',
-            url)
+            'develop',
+            repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'
@@ -938,6 +989,9 @@ class MainTests(test_utils.GenericTestBase):
                 raise AssertionError(
                     'Provided PR to checker does not match expected PR.')
             return 'Invalid change foo'
+
+        def mock_run_cmd(unused_tokens):
+            pass
 
         mock_low_risk_checkers = (
             ('translatewiki', mock_check_if_pr_is_translation_pr),
@@ -970,9 +1024,15 @@ class MainTests(test_utils.GenericTestBase):
                 ),
                 ('PR is not low-risk. Running all CI checks.',),
             ])
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd,
+            expected_args=[
+                (['git', 'remote', 'add', 'upstream', repo_url],),
+                (['git', 'fetch', 'upstream'],),
+            ])
 
         with parse_url_swap, lookup_pr_swap, print_swap:
-            with low_risk_checkers_swap:
+            with low_risk_checkers_swap, run_cmd_swap:
                 code = check_if_pr_is_low_risk.main(tokens=[url])
                 self.assertEqual(code, 1)
 
@@ -1018,6 +1078,6 @@ class MainTests(test_utils.GenericTestBase):
         with parse_url_swap, lookup_pr_swap:
             with self.assertRaisesRegexp(
                 RuntimeError,
-                'Failed to load PR from GitHub API',
+                'Failed to load PR',
             ):
                 check_if_pr_is_low_risk.main(tokens=[url])
