@@ -116,8 +116,6 @@
 
 
 # Core documentation
-# TODO(#11811): For the following 5 files, as well as about-page.constants.ts,
-# replace @BenHenning with @seanlip after 2021-02-07.
 /AUTHORS @BenHenning
 /CHANGELOG @BenHenning
 /CONTRIBUTORS @BenHenning
@@ -162,7 +160,6 @@
 /.pylintrc @Hudda @DubeySandeep
 /.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
-/codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
@@ -480,7 +477,6 @@
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
-# TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
 /redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
 /.firebase.json @brianrodri
@@ -673,8 +669,6 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
-# TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
-# 8 lines.
 /core/templates/services/svg-sanitizer.service.ts @BenHenning
 /scripts/linters/warranted_angular_security_bypasses.py @BenHenning
 /core/controllers/acl_decorators*.py @BenHenning
