@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the ExplorationStatsModel.
  */
 
-import {
+ import {
   ExplorationStats,
   ExplorationStatsBackendDict
 } from 'domain/statistics/exploration-stats.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
 
-describe('Exploration stats model', function () {
+describe('Exploration stats model', function() {
   it('should derive values from the backend dict', () => {
     const explorationStatsBackendDict: ExplorationStatsBackendDict = {
       exp_id: 'eid',
@@ -117,26 +117,26 @@ describe('Exploration stats model', function () {
 
     it('should throw an error when trying to calculate bounce rate of an ' +
       'unplayed exploration', () => {
-        explorationStats = ExplorationStats.createFromBackendDict({
-          exp_id: 'eid',
-          exp_version: 0,
-          num_starts: 0,
-          num_actual_starts: 0,
-          num_completions: 0,
-          state_stats_mapping: {
-            Introduction: {
-              total_answers_count: 0,
-              useful_feedback_count: 0,
-              total_hit_count: 0,
-              first_hit_count: 0,
-              num_times_solution_viewed: 0,
-              num_completions: 0,
-            },
+      explorationStats = ExplorationStats.createFromBackendDict({
+        exp_id: 'eid',
+        exp_version: 0,
+        num_starts: 0,
+        num_actual_starts: 0,
+        num_completions: 0,
+        state_stats_mapping: {
+          Introduction: {
+            total_answers_count: 0,
+            useful_feedback_count: 0,
+            total_hit_count: 0,
+            first_hit_count: 0,
+            num_times_solution_viewed: 0,
+            num_completions: 0,
           },
-        });
-        expect(() => explorationStats.getBounceRate('Introduction'))
-          .toThrowError('Can not get bounce rate of an unplayed exploration');
+        },
       });
+      expect(() => explorationStats.getBounceRate('Introduction'))
+        .toThrowError('Can not get bounce rate of an unplayed exploration');
+    });
   });
 
   describe('Deriving new exploration stats', () => {
