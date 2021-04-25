@@ -91,6 +91,15 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     };
   }
 
+  private _isMouseInsideRegion(regionArea): boolean {
+    return (
+      this.mouseX >= regionArea[0][0] &&
+      this.mouseX <= regionArea[1][0] &&
+      this.mouseY >= regionArea[0][1] &&
+      this.mouseY <= regionArea[1][1]
+    );
+  }
+
   ngOnInit(): void {
     const {
       imageAndRegions,
@@ -182,10 +191,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     for (let i = 0; i < this.imageAndRegions.labeledRegions.length; i++) {
       const labeledRegion = this.imageAndRegions.labeledRegions[i];
       const regionArea = labeledRegion.region.area;
-      if (this.mouseX >= regionArea[0][0] &&
-          this.mouseX <= regionArea[1][0] &&
-          this.mouseY >= regionArea[0][1] &&
-          this.mouseY <= regionArea[1][1]) {
+      if (this._isMouseInsideRegion(regionArea)) {
         this.currentlyHoveredRegions.push(labeledRegion.label);
       }
     }
