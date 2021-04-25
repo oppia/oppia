@@ -21,6 +21,7 @@ import { HttpRequest, HttpInterceptor,
   HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
+import { CsrfTokenService } from './csrf-token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -62,7 +63,7 @@ export class MockCsrfTokenService {
   providedIn: 'root'
 })
 export class RequestInterceptor implements HttpInterceptor {
-  constructor(private csrf: MockCsrfTokenService) {}
+  constructor(private csrf: CsrfTokenService) {}
   intercept(
       request: HttpRequest<FormData>, next: HttpHandler
   ): Observable<HttpEvent<FormData>> {
