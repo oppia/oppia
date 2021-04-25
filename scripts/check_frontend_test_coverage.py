@@ -57,7 +57,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'ck-editor-4-widgets.initializer.ts',
     'code-repl-prediction.service.ts',
     'code-string-editor.component.ts',
-    'codemirror-mergeview.directive.ts',
     'collection-details-editor.directive.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
     'collection-editor-navbar.directive.ts',
