@@ -117,7 +117,7 @@ export class UnitsObjectFactory {
         }
       } else if (unitList[ind] === ')' ) {
         var elem = parenthesisStack.pop()
-        var parsed: number = elem? parseInt(<string>elem[1]): 1;
+        var parsed: number = elem ? parseInt(<string>elem[1]) : 1;
         multiplier = parsed * multiplier;
       } else if (this.isunit(unitList[ind])) {
         unitsWithMultiplier.push([unitList[ind], multiplier]);
@@ -175,14 +175,18 @@ export class UnitsObjectFactory {
     var keys = <(keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[]>
     Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
     for (var i = 0; i < keys.length; i++) {
-      let base_unit_value = ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit;
-      if (base_unit_value !== null) {
-         // Sub unit (like: paise, cents etc.).
-         const def = ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit
-         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
-           definition: base_unit_value,
-           aliases: Object.values(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases)});
-      } else {
+      let baseUnitValue = ObjectsDomainConstants
+      .CURRENCY_UNITS[keys[i]].base_unit;
+      if (baseUnitValue !== null) {
+        // Sub unit (like: paise, cents etc.).
+        createUnit(ObjectsDomainConstants
+          .CURRENCY_UNITS[keys[i]].name, {
+          definition: baseUnitValue,
+          aliases: Object.values(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases
+            )});
+      }
+      else {
         // Base unit (like: rupees, dollar etc.).
         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
         aliases: Object.values(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases)});

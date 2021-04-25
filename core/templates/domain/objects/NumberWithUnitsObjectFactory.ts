@@ -39,7 +39,7 @@ import { Unit, NumberWithUnitsAnswer } from
     front_units: A list of all the currency symbols that are added to the front
       (like- $, Rs, ₹). Keep it an empty list if no symbol is needed.
     base_unit: Define the unit in terms of base unit only if the defined custom
-      unit is a sub unit else assign it '' value.*/
+      unit is a sub unit else assign it 'null' value.*/
 export class NumberWithUnits {
   type: string;
   real: number;

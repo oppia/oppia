@@ -73,11 +73,11 @@ export class ExplorationStats {
   }
 
   getStateStats(stateName: string): StateStats {
-    const stateStats = this.stateStatsMapping.get(stateName)
+    const stateStats = this.stateStatsMapping.get(stateName);
     if (!stateStats) {
       throw new Error('no stats exist for state: ' + stateName);
     }
-    return this.stateStatsMapping.get(stateName)!;
+    return stateStats;
   }
 
   /**
@@ -125,7 +125,7 @@ export class ExplorationStats {
   createNewWithStateRenamed(
       oldStateName: string, newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
-    const stateStats = this.stateStatsMapping.get(oldStateName)
+    const stateStats = this.stateStatsMapping.get(oldStateName);
     if (!stateStats) {
       throw new Error('no stats exist for old state: ' + oldStateName);
     }
