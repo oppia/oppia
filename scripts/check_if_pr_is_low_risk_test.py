@@ -134,7 +134,6 @@ class LoadDiffTests(test_utils.GenericTestBase):
             raise AssertionError(
                 'Unknown args to mock_run_cmd: %s' % tokens)
 
-
         run_cmd_swap = self.swap_with_checks(
             common, 'run_cmd', mock_run_cmd,
             expected_args=[
@@ -759,7 +758,7 @@ class MainTests(test_utils.GenericTestBase):
             'oppia/oppia',
             'translatewiki-prs',
             'develop',
-            repo_url)
+            base_url=repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'
@@ -828,7 +827,7 @@ class MainTests(test_utils.GenericTestBase):
             'oppia/oppia',
             'update-changelog-for-release-v0.3.1',
             'develop',
-            repo_url)
+            base_url=repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'
@@ -897,7 +896,7 @@ class MainTests(test_utils.GenericTestBase):
             'oppia/oppia',
             'translatewiki-prs',
             'develop',
-            repo_url)
+            base_url=repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'
@@ -970,7 +969,7 @@ class MainTests(test_utils.GenericTestBase):
             'oppia/oppia',
             'translatewiki-prs',
             'develop',
-            repo_url)
+            base_url=repo_url)
 
         def mock_parse_url(unused_url):
             return 'oppia', 'oppia', '1'

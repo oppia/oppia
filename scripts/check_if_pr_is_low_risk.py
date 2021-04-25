@@ -90,13 +90,13 @@ def load_diff(base_branch):
             diff_files.append((split[1], split[2]))
     file_diffs = {}
     for file_tuple in diff_files:
-        for file in file_tuple:
-            if file in file_diffs:
+        for filename in file_tuple:
+            if filename in file_diffs:
                 continue
             file_diff = common.run_cmd([
                 'git', 'diff', '-U0',
                 '{}/{}'.format(UPSTREAM_REMOTE, base_branch),
-                '--', file,
+                '--', filename,
             ])
             file_diff_split = file_diff.rstrip().split('\n')
             i = 0
@@ -107,9 +107,9 @@ def load_diff(base_branch):
             if i > 6 or i == len(file_diff_split):
                 python_utils.PRINT(
                     'Skipped too many lines when parsing "%s" diff'
-                    % file)
+                    % filename)
                 return [], {}
-            file_diffs[file] = file_diff_split[i:]
+            file_diffs[filename] = file_diff_split[i:]
     return diff_files, file_diffs
 
 
@@ -161,7 +161,6 @@ def check_if_pr_is_translation_pr(pr):
     source_branch = pr['head']['ref']
     if source_branch != 'translatewiki-prs':
         return 'Source branch is not translatewiki-prs'
-    base_url = pr['base']['repo']['clone_url']
     diff_files, _ = load_diff(pr['base']['ref'])
     if not diff_files:
         return 'Failed to load PR diff'
@@ -177,9 +176,9 @@ def _check_changelog_pr_diff(diff_files, file_diffs):
     """Check whether a changelog PR diff is valid.
 
     Args:
-        diff_files: list(tuple(str, str)): Changed files, each as a
+        diff_files: list(tuple(str, str)). Changed files, each as a
             tuple of (old name, new name).
-        file_diffs: dict(str, list(str)): Map from file names to the
+        file_diffs: dict(str, list(str)). Map from file names to the
             lines of that file's diff.
 
     Returns:
