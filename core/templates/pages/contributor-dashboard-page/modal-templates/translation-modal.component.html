@@ -52,6 +52,7 @@
                                    [htmlData]="machineTranslatedText"
                                    class="oppia-rte-editor" *ngIf="machineTranslatedText">
         </angular-html-bind-wrapper>
+        <img [src]="getStaticImageUrl('/google-translate-attribution/translated_by_google.svg')" class="google-translate-attribution-logo">
       </div>
     </div>
     <div class="oppia-translation-editor-section">
@@ -143,8 +144,10 @@
   .machine-translation-header-bar {
     color: rgb(4, 47, 152);
     font-weight: bold;
-    padding-bottom: 20px;
     position: relative;
+  }
+  .google-translate-attribution-logo {
+    padding-top: 20px;
   }
   .oppia-translation-tips-container {
     background-color: #EEE;

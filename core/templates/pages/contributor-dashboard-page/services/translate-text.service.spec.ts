@@ -161,7 +161,7 @@ describe('TranslateTextService', () => {
         translateTextService.activeContentId = 'contentId1';
         translateTextService.getMachineTranslationAsync('es')
           .then((translatedText) => {
-            expect(translatedText).toBe('Por favor continua.')
+            expect(translatedText).toBe('Por favor continua.');
           });
         const sampleMachineTranslationResponse:
             MachineTranslatedTextBackendDict = {

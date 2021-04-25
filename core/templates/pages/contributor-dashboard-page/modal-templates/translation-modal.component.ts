@@ -27,6 +27,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 
@@ -82,7 +83,8 @@ export class TranslationModalComponent {
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
@@ -200,6 +202,10 @@ export class TranslationModalComponent {
     if (!this.moreAvailable) {
       this.close();
     }
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
 
