@@ -23,6 +23,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { TranslatePipe } from './translate.pipe';
+import { TruncateAtFirstLinePipe } from './string-utility-filters/truncate-at-first-line.pipe';
 
 @NgModule({
   imports: [
@@ -31,12 +32,14 @@ import { TranslatePipe } from './translate.pipe';
     FormsModule,
   ],
   declarations: [
-    TranslatePipe
+    TranslatePipe,
+    TruncateAtFirstLinePipe
   ],
   entryComponents: [],
   exports: [
-    TranslatePipe
+    TranslatePipe,
+    TruncateAtFirstLinePipe
   ],
 })
 
-export class TranslateModule { }
+export class SharedPipesModule { }

@@ -26,7 +26,7 @@ require(
   'interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts');
 require(
   'interactions/CodeRepl/directives/' +
-  'oppia-response-code-repl.directive.ts');
+  'oppia-response-code-repl.component.ts');
 require(
   'interactions/CodeRepl/directives/' +
-  'oppia-short-response-code-repl.directive.ts');
+  'oppia-short-response-code-repl.component.ts');

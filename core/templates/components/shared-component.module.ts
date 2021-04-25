@@ -28,7 +28,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { TranslateModule } from 'filters/translate.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
@@ -106,7 +106,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FormsModule,
     ObjectComponentsModule,
     SharedFormsModule,
-    TranslateModule,
+    SharedPipesModule,
     ...firebaseAuthModules,
   ],
 
@@ -184,7 +184,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbModalModule,
     ObjectComponentsModule,
     SharedFormsModule,
-    TranslateModule,
+    SharedPipesModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,

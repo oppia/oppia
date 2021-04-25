@@ -26,6 +26,10 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { InteractiveCodeReplComponent } from './directives/oppia-interactive-code-repl.component';
+import { DirectivesModule } from 'directives/directives.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { ResponseCodeReplComponent } from './directives/oppia-response-code-repl.component';
+import { ShortResponseCodeRepl } from './directives/oppia-short-response-code-repl.component';
 
 
 @NgModule({
@@ -33,17 +37,25 @@ import { InteractiveCodeReplComponent } from './directives/oppia-interactive-cod
     CommonModule,
     BrowserModule,
     CodemirrorModule,
+    DirectivesModule,
     FormsModule,
-    MatButtonModule
+    MatButtonModule,
+    SharedPipesModule
   ],
   declarations: [
-    InteractiveCodeReplComponent
+    InteractiveCodeReplComponent,
+    ResponseCodeReplComponent,
+    ShortResponseCodeRepl
   ],
   entryComponents: [
-    InteractiveCodeReplComponent
+    InteractiveCodeReplComponent,
+    ResponseCodeReplComponent,
+    ShortResponseCodeRepl
   ],
   exports: [
-    InteractiveCodeReplComponent
+    InteractiveCodeReplComponent,
+    ResponseCodeReplComponent,
+    ShortResponseCodeRepl
   ],
 })
 
