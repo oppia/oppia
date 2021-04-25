@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,14 @@ ruleTester.run('no-foreach', rule, {
         expect($injector.get(constantName)).toEqual(constants[constantName]);
     }
     });`,
-
+    `var forEach = 0`,
+    `it('should transform all key value pairs to angular constants',
+    function() {
+    for (var forEach in constants) {
+        expect($injector.has(forEach)).toBe(true);
+        expect($injector.get(forEach)).toEqual(constants[forEach]);
+    }
+    });`
   ],
 
   invalid: [

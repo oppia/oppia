@@ -741,7 +741,7 @@ var ExplorationEditorMainTab = function() {
     var angularSelectors = ruleDescription.match(re);
     // Slicing first and last letter.
     if (angularSelectors) {
-      for (var elem in angularSelectors) {
+      for (var elem of angularSelectors) {
         parameterTypes.push(elem.toString().slice(1, -1));
       }
     }
@@ -801,7 +801,7 @@ var ExplorationEditorMainTab = function() {
     // Return as-is if string does not contain placeholders.
     if (placeholders) {
       // Replacing placeholders in ruleDescription with given text.
-      for (var index = 0; index < placeholders.length; ++index) {
+      for (var index = 0; index < placeholders.length; index++) {
         if (providedText[0] === '...') {
           ruleDescription = ruleDescription.replace(placeholders[index], '...');
         } else {
