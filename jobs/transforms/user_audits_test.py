@@ -91,7 +91,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
 
         self.assert_pcoll_equal(output, [
             audit_errors.ModelIncorrectKeyError(
-                test_model,
+                test_model, [self.INCORRECT_KEY])
                 [self.INCORRECT_KEY]
                 )
         ])
