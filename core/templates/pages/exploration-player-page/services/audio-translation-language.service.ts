@@ -42,10 +42,10 @@ export class AudioTranslationLanguageService {
     private browserCheckerService: BrowserCheckerService,
     private languageUtilService: LanguageUtilService) {}
 
-  _currentAudioLanguageCode: string = null;
-  _allAudioLanguageCodesInExploration: string[] = null;
-  _explorationLanguageCode: string = null;
-  _automaticTextToSpeechEnabled: boolean = null;
+  _currentAudioLanguageCode: string = '';
+  _allAudioLanguageCodesInExploration: string[] = [];
+  _explorationLanguageCode: string = '';
+  _automaticTextToSpeechEnabled: boolean = false;
   _languagesInExploration: ExplorationLanguageInfo[] = [];
 
   attemptToSetAudioLanguageToExplorationLanguage(): void {
@@ -180,7 +180,7 @@ export class AudioTranslationLanguageService {
   }
 
   clearCurrentAudioLanguageCode(): void {
-    this._currentAudioLanguageCode = null;
+    this._currentAudioLanguageCode = '';
   }
 
   /**

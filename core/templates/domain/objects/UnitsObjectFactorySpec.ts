@@ -21,7 +21,7 @@ import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
 
 describe('UnitsObjectFactory', () => {
-  let units: UnitsObjectFactory = null;
+  let units: UnitsObjectFactory;
 
   beforeEach(() => {
     units = TestBed.get(UnitsObjectFactory);
