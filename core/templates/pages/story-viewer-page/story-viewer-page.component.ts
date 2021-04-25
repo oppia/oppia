@@ -49,7 +49,7 @@ export class StoryViewerPageComponent implements OnInit {
   topicName: string;
   thumbnailFilename: string;
   thumbnailBgColor: string;
-  storyNodes: ReadOnlyStoryNode[];
+  storyNodes: ReadOnlyStoryNode | { getThumbnailBgColor: () => string; }[];
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,

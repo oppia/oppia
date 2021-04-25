@@ -30,6 +30,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -357,7 +359,6 @@ describe('Story Viewer Page component', () => {
 
       spyOn(pageTitleService, 'setPageTitle').and.callThrough();
       spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
-
       component.ngOnInit();
 
       flushMicrotasks();
@@ -379,5 +380,31 @@ describe('Story Viewer Page component', () => {
       }, {
         thumbnailIconUrl: 'thumbnail-url',
         thumbnailBgColor: '#bb8b2f' }]);
+    }));
+
+  it('should return empty values if Filename and BgColor are null',
+    fakeAsync(() => {
+      component.storyNodes = new ReadOnlyStoryNode(
+        'id', 'title', 'description', ['d_id'], ['skills'],
+        ['skills'], 'outline', false, 'exp_id',
+        {}, true, null, null
+      );
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('math');
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic');
+      spyOn(
+        urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+        'story');
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(_samplePlaythroughObject));
+      component.thumbnailFilename = null;
+      component.thumbnailBgColor = null;
+      component.ngOnInit();
+      component.generatePathIconParameters();
+      flushMicrotasks();
+      expect(component.thumbnailBgColor === '');
+      expect(component.thumbnailFilename === '');
     }));
 });
