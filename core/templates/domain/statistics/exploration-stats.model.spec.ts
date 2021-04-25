@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the ExplorationStatsModel.
  */
 
- import {
+import {
   ExplorationStats,
   ExplorationStatsBackendDict
 } from 'domain/statistics/exploration-stats.model';
