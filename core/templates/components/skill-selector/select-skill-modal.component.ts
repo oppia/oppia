@@ -31,7 +31,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   skillsInSameTopicCount: number;
   skillSummaries: AugmentedSkillSummary[];
   untriagedSkillSummaries: SkillSummary[];
-  allowSkillsFromOtherTopics: boolean = true;
+  allowSkillsFromOtherTopics: boolean;
   selectedSkillId: string = null;
 
   constructor(

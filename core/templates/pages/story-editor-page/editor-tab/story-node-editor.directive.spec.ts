@@ -15,7 +15,9 @@
 /**
  * @fileoverview Unit tests for the story node editor directive.
  */
-
+import { TestBed } from '@angular/core/testing';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SkillSummaryBackendDict, SkillSummary } from 'domain/skill/skill-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Story node editor directive', function() {
@@ -23,7 +25,8 @@ describe('Story node editor directive', function() {
 
   importAllAngularServices();
 
-  var $uibModal = null;
+  let mockNgbModal: MockNgbModal;
+  let $uibModal = null;
   var $scope = null;
   var ctrl = null;
   var $q = null;
@@ -36,8 +39,50 @@ describe('Story node editor directive', function() {
   var AlertsService = null;
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
+  let skillSummaryBackendDict: SkillSummaryBackendDict = {
+    id: '3',
+    description: 'description3',
+    language_code: 'language_code',
+    version: 1,
+    misconception_count: null,
+    worked_examples_count: null,
+    skill_model_created_on: 2,
+    skill_model_last_updated: 3
+  };
+  let summary: SkillSummary[] = (
+    [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
+
+
+  class MockNgbModal {
+    success: boolean = true;
+    open(content, options) {
+      return {
+        componentInstance: {
+          skillSummaries: null,
+          skillsInSameTopicCount: null,
+          categorizedSkills: null,
+          allowSkillsFromOtherTopics: null,
+          untriagedSkillSummaries: null
+        },
+        result: {
+          then: (
+              successCallback: (result) => void,
+              cancelCallback: () => void
+          ) => {
+            if (this.success) {
+              successCallback(summary);
+            } else {
+              cancelCallback();
+            }
+          }
+        }
+      };
+    }
+  }
 
   beforeEach(angular.mock.inject(function($injector) {
+    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as
+      jasmine.SpyObj<MockNgbModal>;
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -124,6 +169,7 @@ describe('Story node editor directive', function() {
       $scope: $scope,
       TopicsAndSkillsDashboardBackendApiService:
       MockTopicsAndSkillsDashboardBackendApiService,
+      NgbModal: MockNgbModal,
       $uibModal
     });
     ctrl.$onInit();
@@ -224,7 +270,7 @@ describe('Story node editor directive', function() {
   });
 
   it('should open add skill modal for adding prerequisite skill', function() {
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    var modalSpy = spyOn(mockNgbModal, 'open').and.callThrough();
     $scope.addPrerequisiteSkillId();
     expect(modalSpy).toHaveBeenCalled();
   });

@@ -34,7 +34,7 @@ describe('Select Skill Modal', () => {
   let fixture: ComponentFixture<SelectSkillModalComponent>;
   let componentInstance: SelectSkillModalComponent;
   let ngbActiveModal: NgbActiveModal;
-  let allowSkillsFromOtherTopics: boolean = true;
+  let allowSkillsFromOtherTopics: boolean;
   let shortSkillSummaryBackendDict: ShortSkillSummaryBackendDict = {
     skill_id: '1',
     skill_description: 'description1'
