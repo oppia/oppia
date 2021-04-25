@@ -382,7 +382,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.save = function() {
-      console.log('Saved Called');
       const updatedContentIdToContent = $scope.getContentIdToContent(
         StateCustomizationArgsService.displayed);
       const contentIdsWithModifiedContent = [];
