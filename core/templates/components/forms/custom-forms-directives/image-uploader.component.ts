@@ -97,22 +97,22 @@ export class ImageUploaderComponent {
       /(\\|\/)/g).pop();
     this.errorMessage = this.validateUploadedFile(file, filename);
     let fchng = this.fileChanged;
-    let newFile: File = new File(["asd".repeat(34134)], "so.txt", { type: "text/plain" });
+    let newFile: File = new File(["asd".repeat(34134)], 'so.txt', 
+                        { type: 'text/plain' });
     if (!this.errorMessage) {
       // Only fir this event if validation pass.
       const HUNDRED_KB_IN_BYTES: number = 100 * 1024;
 
       if (file.size > HUNDRED_KB_IN_BYTES) {
         let width: number = 171;
-        let stop: boolean = false;
         const reader: FileReader = new FileReader();
         reader.readAsDataURL(file);
 
-        reader.onload = function (event) {
-          let imgElement: HTMLImageElement = document.createElement("img");
+        reader.onload = function(event) {
+          let imgElement: HTMLImageElement = document.createElement('img');
           imgElement.src = reader.result;
-          imgElement.onload = function (e) {
-            const canvas = document.createElement("canvas");
+          imgElement.onload = function(e) {
+            const canvas = document.createElement('canvas');
             let scale: number = e.target.height / e.target.width;
             width = Math.sqrt((100 * 1024) / (3.5 * scale));
 
@@ -121,24 +121,21 @@ export class ImageUploaderComponent {
               const scaleSize = MAX_WIDTH / e.target.width;
               canvas.width = MAX_WIDTH;
               canvas.height = e.target.height * scaleSize;
-            }
-            else {
+            } else {
               const scaleSize = MAX_WIDTH / e.target.height;
               canvas.height = MAX_WIDTH;
               canvas.width = e.target.width * scaleSize;
             }
 
-            const ctx = canvas.getContext("2d");
+            const ctx = canvas.getContext('2d');
             ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob(function (blob) {
+            canvas.toBlob(function(blob) {
               newFile = new File([blob], file.name, { type: file.type });
               fchng.emit(newFile);
             });
           };
-
         };
-
       }
       else {
         this.fileChanged.emit(file);
