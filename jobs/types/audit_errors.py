@@ -130,6 +130,15 @@ class InvalidCommitStatusError(BaseAuditError):
     def __init__(self, model):
         super(InvalidCommitStatusError, self).__init__(model)
         self.message = (
+            'post_commit_status is %s' % model.post_commit_status)
+
+
+class InvalidPrivateCommitStatusError(BaseAuditError):
+    """Error class for commit models with inconsistent private status values."""
+
+    def __init__(self, model):
+        super(InvalidPrivateCommitStatusError, self).__init__(model)
+        self.message = (
             'post_commit_status="%s" but post_commit_is_private=%r' % (
                 model.post_commit_status, model.post_commit_is_private))
 
@@ -152,6 +161,16 @@ class ModelIdRegexError(BaseAuditError):
         self.message = 'id does not match the expected regex=%r' % regex_string
 
 
+class ModelDomainObjectValidateError(BaseAuditError):
+    """Error class for domain object validation errors."""
+
+    def __init__(self, model, error_message):
+        super(ModelDomainObjectValidateError, self).__init__(model)
+        self.message = (
+            'Entity fails domain validation with the '
+            'error: %s' % error_message)
+
+
 class ModelExpiredError(BaseAuditError):
     """Error class for expired models."""
 
@@ -159,6 +178,15 @@ class ModelExpiredError(BaseAuditError):
         super(ModelExpiredError, self).__init__(model)
         self.message = 'deleted=True when older than %s days' % (
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+
+
+class InvalidCommitTypeError(BaseAuditError):
+    """Error class for commit_type validation errors."""
+
+    def __init__(self, model):
+        super(InvalidCommitTypeError, self).__init__(model)
+        self.message = (
+            'Commit type %s is not allowed' % model.commit_type)
 
 
 class ModelExpiringError(BaseAuditError):
