@@ -22,7 +22,7 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service.ts';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
-// Import { Schema } from 'services/schema-default-value.service';
+import { Schema } from 'services/schema-default-value.service';
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
@@ -58,7 +58,6 @@ export class AdminConfigTabComponent implements OnInit {
     this.adminDataService.getDataAsync().then(
       data => {
         this.configProperties = data.configProperties;
-        this.configPropertiesKeys = Object.keys(this.configProperties);
         this.changeDetectorRef.detectChanges();
       });
   }
@@ -120,18 +119,18 @@ export class AdminConfigTabComponent implements OnInit {
       // $rootScope.$apply();
     });
   }
-  // UpdateData(newValue: any, configPropertyKey: string): void {
-  //   this.configProperties[configPropertyKey].value = newValue;
-  // }
-  // getDescription(key: string): string {
-  //   return this.configProperties[key].description;
-  // }
-  // getSchema(key: string): Schema {
-  //   return this.configProperties[key].schema;
-  // }
-  // getValue(key: string): any {
-  //   return this.configProperties[key].value;
-  // }
+  updateData(newValue: unknown, configPropertyKey: string): void {
+    this.configProperties[configPropertyKey].value = newValue;
+  }
+  getDescription(key: string): string {
+    return this.configProperties[key].description;
+  }
+  getSchema(configPropertyKey: string): Schema {
+    return this.configProperties[configPropertyKey].schema;
+  }
+  getValue(configPropertyKey: string): unknown {
+    return this.configProperties[configPropertyKey].value;
+  }
 }
 
 angular.module('oppia').directive(
