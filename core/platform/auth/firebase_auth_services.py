@@ -608,19 +608,12 @@ def _get_auth_claims_from_session_cookie(cookie):
     # request hasn't been authenticated.
     if not cookie:
         return None
-    # NOTE: Session cookies only provide temporary authentication, so they are
-    # expected to become obsolete over time. The following errors are situations
-    # where this will occur.
-    expected_session_cookie_errors = (
-        firebase_auth.ExpiredSessionCookieError,
-        firebase_auth.RevokedSessionCookieError,
-    )
     try:
         claims = firebase_auth.verify_session_cookie(cookie, check_revoked=True)
-    except expected_session_cookie_errors:
-        logging.warn('User session has ended and must be renewed')
+    except (firebase_auth.ExpiredSessionCookieError,
+            firebase_auth.RevokedSessionCookieError):
+        logging.info('The session cookie must be renewed')
     except firebase_exceptions.FirebaseError as error:
-        logging.exception('Invalid session cookie')
         raise auth_domain.AuthSessionError('Invalid session cookie: %s' % error)
     else:
         return _create_auth_claims(claims)
