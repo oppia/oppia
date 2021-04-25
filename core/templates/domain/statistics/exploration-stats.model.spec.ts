@@ -196,5 +196,11 @@ describe('Exploration stats model', function() {
       expect(copy.getStateStats('Prologue'))
         .toEqual(original.getStateStats('Introduction'));
     });
+
+    it('should throw an error if old state stats do not exist', () => {
+      expect(() => original.createNewWithStateRenamed('Prelude', 'newPrelude'))
+        .toThrowError('no stats exist for old state: Prelude');
+    });
+
   });
 });
