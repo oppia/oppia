@@ -162,8 +162,8 @@ def check_if_pr_is_translation_pr(pr, diff_files, unused_file_diffs):
         pr: dict. JSON object of PR from GitHub API.
         diff_files: list(tuple(str, str)). Changed files, each as a
             tuple of (old name, new name).
-        file_diffs: dict(str, list(str)). Map from file names to the
-            lines of that file's diff.
+        unused_file_diffs: dict(str, list(str)). Map from file names to
+            the lines of that file's diff.
 
     Returns:
         str. An empty string if the PR is a translation PR and low-risk,
