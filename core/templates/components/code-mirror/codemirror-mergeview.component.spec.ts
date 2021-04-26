@@ -48,16 +48,14 @@ describe('Oppia CodeMirror Component', () => {
   it('should call merge view', () => {
     const originalCodeMirror = window.CodeMirror;
     let mergeViewCalled = false;
-    const mergeView = class {
-      constructor() {
-        mergeViewCalled = true;
-      }
+    const mergeView = (...args: unknown[]): void => {
+      mergeViewCalled = true;
     };
     window.CodeMirror = (
       {
         MergeView: mergeView
       } as unknown as typeof import('node_modules/@types/codemirror'));
-    component.ngOnInit();
+    component.ngAfterViewInit();
     expect(mergeViewCalled).toBe(true);
     window.CodeMirror = originalCodeMirror;
   });
