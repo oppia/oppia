@@ -36,6 +36,10 @@ GITHUB_API_PR_ENDPOINT = (
 PR_URL_REGEX = (
     r'^https://github.com/(?P<owner>\w+)/(?P<repo>\w+)/pull/(?P<num>\w+)/?$')
 UPSTREAM_REMOTE = 'upstream'
+FILES_THAT_NEED_DIFFS = (
+    'package.json'
+    'core/templates/pages/about-page/about-page.constants.ts',
+)
 
 
 def parse_pr_url(pr_url):
@@ -59,6 +63,10 @@ def parse_pr_url(pr_url):
 
 def load_diff(base_branch):
     """Load the diff between the head and base.
+
+    Only determine the diffs for files in FILES_THAT_NEED_DIFFS. Other
+    files will be listed as having changed, but their diff lines will
+    not be returned.
 
     Args:
         base_branch: str. Base branch of PR.
@@ -92,6 +100,8 @@ def load_diff(base_branch):
     for file_tuple in diff_files:
         for filename in file_tuple:
             if filename in file_diffs:
+                continue
+            if filename not in FILES_THAT_NEED_DIFFS:
                 continue
             file_diff = common.run_cmd([
                 'git', 'diff', '-U0',
@@ -138,7 +148,7 @@ def lookup_pr(owner, repo, pull_number):
     return pr
 
 
-def check_if_pr_is_translation_pr(pr):
+def check_if_pr_is_translation_pr(pr, diff_files, unused_file_diffs):
     """Check if a PR is low-risk by virtue of being a translation PR.
 
     To be a low-risk translation PR, a PR must:
@@ -150,6 +160,10 @@ def check_if_pr_is_translation_pr(pr):
 
     Args:
         pr: dict. JSON object of PR from GitHub API.
+        diff_files: list(tuple(str, str)). Changed files, each as a
+            tuple of (old name, new name).
+        file_diffs: dict(str, list(str)). Map from file names to the
+            lines of that file's diff.
 
     Returns:
         str. An empty string if the PR is a translation PR and low-risk,
@@ -161,9 +175,6 @@ def check_if_pr_is_translation_pr(pr):
     source_branch = pr['head']['ref']
     if source_branch != 'translatewiki-prs':
         return 'Source branch is not translatewiki-prs'
-    diff_files, _ = load_diff(pr['base']['ref'])
-    if not diff_files:
-        return 'Failed to load PR diff'
     for old, new in diff_files:
         if not old == new:
             return 'File name change: %s -> %s' % (old, new)
@@ -213,7 +224,7 @@ def _check_changelog_pr_diff(diff_files, file_diffs):
     return ''
 
 
-def check_if_pr_is_changelog_pr(pr):
+def check_if_pr_is_changelog_pr(pr, diff_files, file_diffs):
     """Check if a PR is low-risk by virtue of being a changelog PR.
 
     To be a low-risk changelog PR, a PR must:
@@ -230,6 +241,10 @@ def check_if_pr_is_changelog_pr(pr):
 
     Args:
         pr: dict. JSON object of PR from GitHub API.
+        diff_files: list(tuple(str, str)). Changed files, each as a
+            tuple of (old name, new name).
+        file_diffs: dict(str, list(str)). Map from file names to the
+            lines of that file's diff.
 
     Returns:
         str. An empty string if the PR is a changelog PR and low-risk,
@@ -243,9 +258,6 @@ def check_if_pr_is_changelog_pr(pr):
             '^update-changelog-for-release-v[0-9.]+$',
             source_branch):
         return 'Source branch does not indicate a changelog PR'
-    diff_files, file_diffs = load_diff(pr['base']['ref'])
-    if not diff_files:
-        return 'Failed to load PR diff'
     return _check_changelog_pr_diff(diff_files, file_diffs)
 
 
@@ -273,9 +285,14 @@ def main(tokens=None):
     base_repo_url = pr['base']['repo']['clone_url']
     common.run_cmd(
         ['git', 'remote', 'add', UPSTREAM_REMOTE, base_repo_url])
-    common.run_cmd(['git', 'fetch', UPSTREAM_REMOTE])
+    base_branch = pr['base']['ref']
+    common.run_cmd(['git', 'fetch', UPSTREAM_REMOTE, base_branch])
+    diff_files, file_diffs = load_diff(pr['base']['ref'])
+    if not diff_files:
+        raise RuntimeError('Failed to load PR diff')
     for low_risk_type, low_risk_checker in LOW_RISK_CHECKERS:
-        reason_not_low_risk = low_risk_checker(pr)
+        reason_not_low_risk = low_risk_checker(
+            pr, diff_files, file_diffs)
         if reason_not_low_risk:
             python_utils.PRINT(
                 'PR is not a low-risk PR of type %s because: %s' %
