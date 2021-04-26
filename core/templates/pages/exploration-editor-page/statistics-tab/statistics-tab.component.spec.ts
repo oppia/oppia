@@ -164,7 +164,7 @@ describe('Statistics Tab Component', function() {
         numActualStarts: 10,
         numCompletions: 5,
       }));
-    spyOn(stateInteractionStatsService, 'computeStats').and.returnValue(
+    spyOn(stateInteractionStatsService, 'computeStatsAsync').and.returnValue(
       $q.resolve({
         visualizationsInfo: {}
       }));

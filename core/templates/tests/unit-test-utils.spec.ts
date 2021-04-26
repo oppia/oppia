@@ -39,7 +39,7 @@ describe('setupAndGetUpgradedComponent function', () => {
       'mockNg2Component',
       [MockNg2Component]
     ).then(
-      textContext => expect(textContext).toBe('Hello Oppia!')
+      async(textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

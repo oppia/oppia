@@ -85,7 +85,7 @@ export const multiTrim = (
  * @param {angular.IModule} ng1Module - The angularjs module to be included
  *  in angular zone.
  */
-export const bootstrap = (
+export const bootstrapAsync = async(
     platform: PlatformRef,
     Ng2Module: Type<{}>,
     element: Element,
@@ -155,7 +155,7 @@ export const setupAndGetUpgradedComponent = (
 
   // Bootstrap.
   const element = html('<mock-comp></mock-comp>');
-  return bootstrap(
+  return bootstrapAsync(
     platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
     () => multiTrim(element.textContent));
 };
