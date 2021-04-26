@@ -167,17 +167,16 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
-        except auth_domain.StaleAuthSessionError as error:
-            logging.info('User must sign in again: %s' % error)
+        except auth_domain.StaleAuthSessionError:
             auth_services.destroy_auth_session(self.response)
-            auth_claims = None
-        except auth_domain.AuthSessionError as error:
-            logging.exception('Request has an invalid session: %s' % error)
+            raise self.UnauthorizedUserException('Please sign in again')
+        except auth_domain.AuthSessionError:
+            logging.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)
-            auth_claims = None
-
-        self.current_user_is_super_admin = (
-            auth_claims is not None and auth_claims.role_is_super_admin)
+            raise self.UnauthorizedUserException('Please sign in again')
+        else:
+            self.current_user_is_super_admin = (
+                auth_claims is not None and auth_claims.role_is_super_admin)
 
         if (feconf.ENABLE_MAINTENANCE_MODE and
                 not self.current_user_is_super_admin):

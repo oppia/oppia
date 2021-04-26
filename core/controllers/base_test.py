@@ -598,16 +598,30 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         response = self.get_html_response('/splash', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
 
-    def test_auth_services_error(self):
-        get_auth_claims_swap = self.swap_to_always_raise(
+    def test_unauthorized_user_exception_raised_when_session_is_stale(self):
+        always_raise_context = self.swap_to_always_raise(
+            auth_services, 'get_auth_claims_from_request',
+            error=auth_domain.StaleAuthSessionError)
+        call_counter_context = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        with always_raise_context, call_counter_context as call_counter:
+            response = self.testapp.get('/', expect_errors=True)
+
+        self.assertEqual(response.status_int, 500)
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
+        always_raise_context = self.swap_to_always_raise(
             auth_services, 'get_auth_claims_from_request',
             error=auth_domain.AuthSessionError)
-        destroy_auth_session_swap = self.swap_with_call_counter(
-            auth_services, 'destroy_auth_session')
+        call_counter_context = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
-        with get_auth_claims_swap, destroy_auth_session_swap as call_counter:
-            self.get_html_response('/splash', expected_status_int=302)
+        with always_raise_context, call_counter_context as call_counter:
+            response = self.testapp.get('/', expect_errors=True)
 
+        self.assertEqual(response.status_int, 500)
         self.assertEqual(call_counter.times_called, 1)
 
 

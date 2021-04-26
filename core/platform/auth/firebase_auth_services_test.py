@@ -958,7 +958,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
             'testadmin@example.com must correspond to exactly 1 user',
             firebase_auth_services.seed_firebase)
 
-    def test_creates_firebase_account_and_models_if_none_exists(self):
+    def test_creates_firebase_account_and_models_when_none_exists(self):
         self.set_up_models(user_id='abc')
 
         self.assertIsNone(
@@ -1010,7 +1010,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_user_id_from_auth_id('abc'), 'abc')
         self.firebase_sdk_stub.assert_is_super_admin('abc')
 
-    def test_creates_firebase_assoc_if_missing(self):
+    def test_creates_firebase_assoc_when_missing(self):
         self.set_up_models(user_id='uid_abc', gae_id='jkl')
 
         self.assertIsNone(
@@ -1029,7 +1029,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
         self.assertIsNone(
             firebase_auth_services.get_user_id_from_auth_id('jkl'))
 
-    def test_reuses_existing_firebase_id_if_association_exists(self):
+    def test_reuses_existing_firebase_id_when_association_exists(self):
         self.set_up_models(user_id='abc', firebase_auth_id='xyz')
 
         self.assertEqual(
@@ -1046,7 +1046,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_user_id_from_auth_id('xyz'), 'abc')
         self.firebase_sdk_stub.assert_is_super_admin('xyz')
 
-    def test_recreates_firebase_account_if_auth_id_is_wrong(self):
+    def test_recreates_firebase_account_when_auth_id_is_wrong(self):
         self.set_up_models(user_id='abc', firebase_auth_id='xyz')
         self.firebase_sdk_stub.create_user(
             'jkl', email=feconf.ADMIN_EMAIL_ADDRESS)
@@ -1059,7 +1059,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.assert_is_not_user('jkl')
         self.firebase_sdk_stub.assert_is_super_admin('xyz')
 
-    def test_grants_super_admin_priviliges_if_firebase_account_exists(self):
+    def test_grants_super_admin_priviliges_when_firebase_account_exists(self):
         self.set_up_models(user_id='abc', firebase_auth_id='xyz')
         self.firebase_sdk_stub.create_user(
             'xyz', email=feconf.ADMIN_EMAIL_ADDRESS)
@@ -1070,7 +1070,7 @@ class SeedFirebaseTests(FirebaseAuthServicesTestBase):
 
         self.firebase_sdk_stub.assert_is_super_admin('xyz')
 
-    def test_updates_user_id_if_assoc_model_is_inconsistent(self):
+    def test_updates_user_id_when_assoc_model_is_inconsistent(self):
         self.set_up_models(user_id='abc', firebase_auth_id='xyz')
         assoc_model = auth_models.UserIdByFirebaseAuthIdModel.get('xyz')
         assoc_model.user_id = 'jkl'
@@ -1102,7 +1102,7 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
         self.assert_matches_regexps(
             res.headers.get_all('Set-Cookie'), ['session=.*;'])
 
-    def test_does_nothing_if_request_has_cookie(self):
+    def test_does_nothing_when_request_has_cookie(self):
         cookie = firebase_auth.create_session_cookie(
             self.id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
         req = self.create_request(session_cookie=cookie)
@@ -1112,7 +1112,7 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
         self.assertEqual(res.headers.get_all('Set-Cookie'), [])
 
-    def test_reports_error_if_request_missing_both_cookie_and_id_token(self):
+    def test_reports_error_when_request_missing_both_cookie_and_id_token(self):
         req = self.create_request()
         res = self.create_response()
 
@@ -1139,7 +1139,7 @@ class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
 
 class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
-    def test_returns_none_if_cookie_is_missing(self):
+    def test_returns_none_when_cookie_is_missing(self):
         id_token = self.firebase_sdk_stub.create_user(self.AUTH_ID)
 
         self.assertIsNone(firebase_auth_services.get_auth_claims_from_request(
@@ -1147,7 +1147,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         self.assertIsNone(firebase_auth_services.get_auth_claims_from_request(
             self.create_request(id_token=id_token)))
 
-    def test_returns_claims_if_cookie_is_present(self):
+    def test_returns_claims_when_cookie_is_present(self):
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
@@ -1157,7 +1157,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
                 self.create_request(session_cookie=cookie)),
             auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
 
-    def test_grants_super_admin_privileges_to_feconf_admin_email_address(self):
+    def test_feconf_admin_email_address_is_super_admin(self):
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(
                 self.AUTH_ID, email=feconf.ADMIN_EMAIL_ADDRESS),
@@ -1180,7 +1180,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
         with always_raise_expired_session_cookie_error:
             self.assertRaisesRegexp(
-                auth_domain.StaleAuthSessionError, 'Session has expired',
+                auth_domain.StaleAuthSessionError, 'expired',
                 lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
 
@@ -1195,7 +1195,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
         with always_raise_revoked_session_cookie_error:
             self.assertRaisesRegexp(
-                auth_domain.StaleAuthSessionError, 'Session has been revoked',
+                auth_domain.StaleAuthSessionError, 'revoked',
                 lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
 
