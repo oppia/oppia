@@ -32,7 +32,8 @@ import { SplashPageComponent } from './splash-page.component';
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    TranslateModule
   ],
   declarations: [
     SplashPageComponent,
@@ -63,6 +64,7 @@ class SplashPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { TranslateModule } from 'filters/translate.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
