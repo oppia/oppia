@@ -18,7 +18,7 @@
 
 import { Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-//import { PassThrough } from 'node:stream';
+// Timport { PassThrough } from 'node:stream';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
@@ -97,7 +97,7 @@ export class ImageUploaderComponent {
       /(\\|\/)/g).pop();
     this.errorMessage = this.validateUploadedFile(file, filename);
     let fchng = this.fileChanged;
-    let newFile: File = new File(["asd"], 'so.txt', { type: 'text/plain' });
+    let newFile: File = new File(['asd'], 'so.txt', { type: 'text/plain' });
     if (!this.errorMessage) {
       // Only fir this event if validation pass.
       const HUNDRED_KB_IN_BYTES: number = 100 * 1024;
