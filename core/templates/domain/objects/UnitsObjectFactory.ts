@@ -178,8 +178,7 @@ export class UnitsObjectFactory {
     var keys = <(keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[]>
       Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
     for (var i = 0; i < keys.length; i++) {
-      var key = keys[i] as keyof typeof ObjectsDomainConstants.CURRENCY_UNITS;
-      if (ObjectsDomainConstants.CURRENCY_UNITS[key].base_unit === null) {
+      if (ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit === null) {
         // Base unit (like: rupees, dollar etc.).
         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
           aliases: <string[]><unknown> ObjectsDomainConstants.CURRENCY_UNITS[
@@ -205,30 +204,29 @@ export class UnitsObjectFactory {
     var keys = <(keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[]>
       Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
     for (var i = 0; i < keys.length; i++) {
-      var key = keys[i] as keyof typeof ObjectsDomainConstants.CURRENCY_UNITS;
       for (
         var j = 0;
-        j < ObjectsDomainConstants.CURRENCY_UNITS[key].front_units.length;
+        j < ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
         j++) {
         if (
           units.includes(
-            ObjectsDomainConstants.CURRENCY_UNITS[key].front_units[j])) {
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j])) {
           units = units.replace(
-            ObjectsDomainConstants.CURRENCY_UNITS[key].front_units[j], '');
-          units = ObjectsDomainConstants.CURRENCY_UNITS[key].name + units;
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j], '');
+          units = ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name + units;
         }
       }
 
       for (
         var j = 0;
-        j < ObjectsDomainConstants.CURRENCY_UNITS[key].aliases.length;
+        j < ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases.length;
         j++) {
         if (
           units.includes(
-            ObjectsDomainConstants.CURRENCY_UNITS[key].aliases[j])) {
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases[j])) {
           units = units.replace(
-            ObjectsDomainConstants.CURRENCY_UNITS[key].aliases[j],
-            ObjectsDomainConstants.CURRENCY_UNITS[key].name);
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases[j],
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name);
         }
       }
     }
