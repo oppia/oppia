@@ -53,6 +53,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
+    auth_jobs_one_off.AuditFirebaseImportReadinessOneOffJob,
     auth_jobs_one_off.PopulateFirebaseAccountsOneOffJob,
     auth_jobs_one_off.SeedFirebaseOneOffJob,
     auth_jobs_one_off.SyncFirebaseAccountsOneOffJob,
@@ -120,6 +121,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
     story_jobs_one_off.DescriptionLengthAuditOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
+    story_jobs_one_off.StoryExplorationsAuditOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.DeleteStoryCommitLogsOneOffJob,
     suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,
@@ -216,9 +218,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
     prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
@@ -228,6 +227,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
+    prod_validation_jobs_one_off.MachineTranslationModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
     prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
     (

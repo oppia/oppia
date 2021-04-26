@@ -26,11 +26,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { MisconceptionBackendDict } from
   'domain/skill/MisconceptionObjectFactory';
 import { RecordedVoiceOverBackendDict } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+  'domain/exploration/recorded-voiceovers.model';
 import { StateBackendDict } from
   'domain/state/StateObjectFactory';
 import { SubtitledHtmlBackendDict } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { WorkedExampleBackendDict } from
   'domain/skill/WorkedExampleObjectFactory';
 import { Collection } from 'domain/collection/collection.model';
@@ -38,7 +38,7 @@ import { Question } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Story } from 'domain/story/StoryObjectFactory';
 import { Topic } from 'domain/topic/TopicObjectFactory';
-import { SubtopicPage } from 'domain/topic/SubtopicPageObjectFactory';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';
@@ -555,6 +555,11 @@ interface TopicAddSubtopicChange {
   'title': string;
 }
 
+interface TopicAddUncategorizedSkillId {
+  'cmd': 'add_uncategorized_skill_id',
+  'new_uncategorized_skill_id': string
+}
+
 interface TopicDeleteSubtopicChange {
   'cmd': 'delete_subtopic';
   'subtopic_id': number;
@@ -612,6 +617,7 @@ export type TopicChange = (
   TopicSubtopicPropertyChange |
   TopicSubtopicPagePropertyChange |
   TopicAddSubtopicChange |
+  TopicAddUncategorizedSkillId |
   TopicDeleteSubtopicChange |
   TopicMoveSkillToSubtopicChange |
   TopicRemoveSkillFromSubtopicChange |

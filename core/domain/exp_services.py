@@ -33,6 +33,7 @@ import os
 import pprint
 import zipfile
 
+import android_validation_constants
 from constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
@@ -433,6 +434,13 @@ def apply_change_list(exploration_id, change_list):
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected card_is_checkpoint to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_card_is_checkpoint(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
@@ -960,6 +968,89 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
             contributor, contribution_time_msec)
 
 
+def validate_exploration_for_story(exp, strict):
+    """Validates an exploration with story validations.
+
+    Args:
+        exp: Exploration. Exploration object to be validated.
+        strict: bool. Whether to raise an Exception when a validation error
+            is encountered. If not, a list of the error messages are
+            returned. strict should be True when this is called before
+            saving the story and False when this function is called from the
+            frontend.
+
+    Returns:
+        list(str). The various validation error messages (if strict is
+        False).
+
+    Raises:
+        ValidationError. Invalid language found for exploration.
+        ValidationError. Expected no exploration to have parameter values in it.
+        ValidationError. Invalid interaction in exploration.
+        ValidationError. RTE content in state of exploration with ID is not
+            supported on mobile.
+    """
+    validation_error_messages = []
+    if (
+            exp.language_code not in
+            android_validation_constants.SUPPORTED_LANGUAGES):
+        error_string = (
+            'Invalid language %s found for exploration '
+            'with ID %s.' % (exp.language_code, exp.id))
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    if exp.param_specs or exp.param_changes:
+        error_string = (
+            'Expected no exploration to have parameter '
+            'values in it. Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    if not exp.correctness_feedback_enabled:
+        error_string = (
+            'Expected all explorations to have correctness feedback '
+            'enabled. Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    for state_name in exp.states:
+        state = exp.states[state_name]
+        if not state.interaction.is_supported_on_android_app():
+            error_string = (
+                'Invalid interaction %s in exploration '
+                'with ID: %s.' % (state.interaction.id, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        if not state.is_rte_content_supported_on_android():
+            error_string = (
+                'RTE content in state %s of exploration '
+                'with ID %s is not supported on mobile.'
+                % (state_name, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        if state.interaction.id == 'EndExploration':
+            recommended_exploration_ids = (
+                state.interaction.customization_args[
+                    'recommendedExplorationIds'].value)
+            if len(recommended_exploration_ids) != 0:
+                error_string = (
+                    'Exploration with ID: %s contains exploration '
+                    'recommendations in its EndExploration interaction.'
+                    % (exp.id))
+                if strict:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+    return validation_error_messages
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
         is_suggestion=False, is_by_voice_artist=False):
@@ -1016,6 +1107,8 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     updated_exploration = apply_change_list(exploration_id, change_list)
+    if get_story_id_linked_to_exploration(exploration_id) is not None:
+        validate_exploration_for_story(updated_exploration, True)
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
