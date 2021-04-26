@@ -91,7 +91,6 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 }
-require('services/guppy-initialization.service.ts');
 
 angular.module('oppia').directive(
   'setOfAlgebraicIdentifierEditor', downgradeComponent({

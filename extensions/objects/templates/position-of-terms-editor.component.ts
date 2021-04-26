@@ -27,6 +27,7 @@ export interface PositionOfTerm {
   readonly name: 'string';
   readonly humanReadableName: 'string';
 }
+
 @Component({
   selector: 'position-of-terms-editor',
   templateUrl: './position-of-terms-editor.component.html',
@@ -54,6 +55,7 @@ export class PositionOfTermsEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
   }
 }
+
 angular.module('oppia').directive('positionOfTermsEditor', downgradeComponent({
   component: PositionOfTermsEditorComponent
 }));

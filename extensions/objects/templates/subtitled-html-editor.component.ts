@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for Subtitled Html editor.
+ * @fileoverview Component for Subtitled Html editor.
  */
 
 import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef } from '@angular/core';
@@ -23,11 +23,11 @@ interface SubtitledHtmlEditorSchema {
   type: string;
   'ui_config': unknown | {}
 }
+
 @Component({
   selector: 'subtitled-html-editor',
   templateUrl: './subtitled-html-editor.component.html'
 })
-
 export class SubtitledHtmlEditorComponent implements OnInit {
   @Input() modalId: symbol;
   @Input() schema;
