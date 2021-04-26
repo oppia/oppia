@@ -416,6 +416,17 @@ class CheckIfPrIsTranslationPrTests(test_utils.GenericTestBase):
             msg,
             'Source branch is not translatewiki-prs')
 
+    def test_non_develop_pr_is_not_low_risk(self):
+        pr = _make_pr(
+            'oppia/oppia',
+            'translatewiki-prs',
+            'foo')
+
+        msg = check_if_pr_is_low_risk.check_if_pr_is_translation_pr(
+            pr, None, None)
+        self.assertEqual(
+            msg, 'Base branch is not develop')
+
     def test_filename_change_pr_is_not_low_risk(self):
         filename_a = 'assets/i18n/foo.json'
         filename_b = 'assets/i18n/bar.json'
@@ -503,6 +514,17 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
             pr, None, None)
         self.assertEqual(
             msg, 'Source branch does not indicate a changelog PR')
+
+    def test_non_develop_pr_is_not_low_risk(self):
+        pr = _make_pr(
+            'oppia/oppia',
+            'update-changelog-for-release-v0.3.1',
+            'foo')
+
+        msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
+            pr, None, None)
+        self.assertEqual(
+            msg, 'Base branch is not develop')
 
     def test_risky_file_pr_is_not_low_risk(self):
         pr = _make_pr(

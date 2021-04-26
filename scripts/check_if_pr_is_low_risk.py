@@ -157,6 +157,7 @@ def check_if_pr_is_translation_pr(pr, diff_files, unused_file_diffs):
     * Be opened from the branch `translatewiki-prs`.
     * Only change JSON files in `assets/i18n`.
     * Not change the names of any files.
+    * Be opened to the branch `develop`
 
     Args:
         pr: dict. JSON object of PR from GitHub API.
@@ -175,6 +176,9 @@ def check_if_pr_is_translation_pr(pr, diff_files, unused_file_diffs):
     source_branch = pr['head']['ref']
     if source_branch != 'translatewiki-prs':
         return 'Source branch is not translatewiki-prs'
+    base_branch = pr['base']['ref']
+    if base_branch != 'develop':
+        return 'Base branch is not develop'
     for old, new in diff_files:
         if not old == new:
             return 'File name change: %s -> %s' % (old, new)
@@ -238,6 +242,7 @@ def check_if_pr_is_changelog_pr(pr, diff_files, file_diffs):
         * CHANGELOG
         * package.json to update the version number
         * about-page.constants.ts to add names to the contributors list
+    * Be opened to the branch `develop`
 
     Args:
         pr: dict. JSON object of PR from GitHub API.
@@ -258,6 +263,9 @@ def check_if_pr_is_changelog_pr(pr, diff_files, file_diffs):
             '^update-changelog-for-release-v[0-9.]+$',
             source_branch):
         return 'Source branch does not indicate a changelog PR'
+    base_branch = pr['base']['ref']
+    if base_branch != 'develop':
+        return 'Base branch is not develop'
     return _check_changelog_pr_diff(diff_files, file_diffs)
 
 
