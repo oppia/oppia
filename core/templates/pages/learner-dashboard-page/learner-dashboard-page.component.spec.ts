@@ -27,7 +27,7 @@ import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-act
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
-import { LearnerDashboardPageComponent } from 'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component';
+import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { MaterialModule } from 'components/material.module';
 import { FormsModule } from '@angular/forms';
