@@ -54,13 +54,16 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
     });
     $scope.directiveSubscriptions = new Subscription();
     $scope.StateSolutionService = StateSolutionService;
+    $scope.savedMemento = () => {
+      return StateSolutionService.savedMemento?.correctAnswer;
+    };
     $scope.correctAnswerEditorHtml = (
       ExplorationHtmlFormatterService.getInteractionHtml(
         StateInteractionIdService.savedMemento,
         StateCustomizationArgsService.savedMemento,
         false,
         $scope.SOLUTION_EDITOR_FOCUS_LABEL,
-        StateSolutionService.savedMemento));
+        $scope.savedMemento() ? 'savedMemento()' : null));
     $scope.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {

@@ -32,7 +32,9 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
@@ -65,8 +67,8 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
           };
           ctrl.$onInit = function() {
             ctrl.answer = (
-              $attrs.savedSolution !== undefined ?
-              JSON.parse($attrs.savedSolution) : ''
+              ctrl.savedSolution !== undefined ?
+              ctrl.savedSolution : ''
             );
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

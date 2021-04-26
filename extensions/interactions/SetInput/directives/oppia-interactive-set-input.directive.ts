@@ -32,7 +32,9 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require('./set-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
@@ -103,8 +105,8 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
 
             // Adds an input field by default.
             ctrl.answer = (
-              $attrs.savedSolution !== undefined ?
-              JSON.parse($attrs.savedSolution) : ['']
+              ctrl.savedSolution !== undefined ?
+              ctrl.savedSolution : ['']
             );
 
             CurrentInteractionService.registerCurrentInteraction(

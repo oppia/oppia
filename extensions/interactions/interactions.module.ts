@@ -26,6 +26,7 @@ import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionI
 import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
+import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import { GraphInputInteractionModule } from './GraphInput/graph-input-interactio
     AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule,
-    GraphInputInteractionModule
+    GraphInputInteractionModule,
+    ImageClickInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
@@ -42,7 +44,8 @@ import { GraphInputInteractionModule } from './GraphInput/graph-input-interactio
     AlgebraicExpressionInputExtensionsModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule,
-    GraphInputInteractionModule
+    GraphInputInteractionModule,
+    ImageClickInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }

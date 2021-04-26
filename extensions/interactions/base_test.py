@@ -51,6 +51,7 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'EndExploration',
     'FractionInput',
     'GraphInput',
+    'ImageClickInput',
     'MathEquationInput',
     'NumericExpressionInput',
     'RatioExpressionInput'

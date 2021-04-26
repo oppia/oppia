@@ -31,7 +31,7 @@ interface ImageCallback {
   rejectMethod: () => void;
 }
 
-interface ImageDimensions {
+export interface ImageDimensions {
   width: number;
   height: number;
   verticalPadding?: number;

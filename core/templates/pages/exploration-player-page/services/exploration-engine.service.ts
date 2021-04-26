@@ -189,7 +189,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         interactionHtml = ExplorationHtmlFormatterService.getInteractionHtml(
           interactionId,
           exploration.getInteractionCustomizationArgs(currentStateName),
-          true, nextFocusLabel);
+          true, nextFocusLabel, null);
       }
 
       var questionHtml = makeQuestion(initialState, [newParams]);
@@ -236,7 +236,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         interactionId,
         exploration.getInteractionCustomizationArgs(nextStateName),
         true,
-        labelForFocusTarget);
+        labelForFocusTarget, null);
     };
 
     var checkAlwaysAskLearnersForAnswerDetails = function() {
