@@ -77,10 +77,6 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    },
-    {
-      provide: '$scope',
-      useExisting: '$rootScope'
     }
   ]
 })
