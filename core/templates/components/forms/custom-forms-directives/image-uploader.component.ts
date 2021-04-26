@@ -107,10 +107,10 @@ export class ImageUploaderComponent {
         const reader: FileReader = new FileReader();
         reader.readAsDataURL(file);
 
-        reader.onload = function (event) {
+        reader.onload = function(event) {
           let imgElement: HTMLImageElement = document.createElement('img');
           imgElement.src = reader.result.toString();
-          imgElement.onload = function (e) {
+          imgElement.onload = function(e) {
             const canvas = document.createElement('canvas');
             let scale: number = imgElement.height / imgElement.width;
             width = Math.sqrt((100 * 1024) / (3.5 * scale));
@@ -129,7 +129,7 @@ export class ImageUploaderComponent {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob(function (blob) {
+            canvas.toBlob(function(blob) {
               newFile = new File([blob], file.name, { type: file.type });
               fchng.emit(newFile);
             });
