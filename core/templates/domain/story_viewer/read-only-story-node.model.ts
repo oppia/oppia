@@ -50,7 +50,7 @@ export class ReadOnlyStoryNode {
   explorationId: string;
   explorationSummary: LearnerExplorationSummary;
   completed: boolean;
-  thumbnailBgColor: string | null;
+  thumbnailBgColor: string;
   thumbnailFilename: string;
 
   constructor(
@@ -132,7 +132,7 @@ export class ReadOnlyStoryNode {
     return this.thumbnailFilename;
   }
 
-  getThumbnailBgColor(): string | null {
+  getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
   }
 }

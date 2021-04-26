@@ -30,8 +30,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -382,13 +380,99 @@ describe('Story Viewer Page component', () => {
         thumbnailBgColor: '#bb8b2f' }]);
     }));
 
-  it('should return empty values if Filename and BgColor are null',
+  it('should place empty values if Filename and BgColor are null',
     fakeAsync(() => {
-      component.storyNodes = new ReadOnlyStoryNode(
-        'id', 'title', 'description', ['d_id'], ['skills'],
-        ['skills'], 'outline', false, 'exp_id',
-        {}, true, null, null
-      );
+      var firstSampleReadOnlyStoryNodeBackendDict = {
+        id: 'node_1',
+        description: 'description',
+        title: 'Title 1',
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: 'exp_id',
+        outline_is_finalized: false,
+        exp_summary_dict: {
+          title: 'Title',
+          status: 'private',
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra'
+        },
+        completed: true,
+        thumbnail_bg_color: null,
+        thumbnail_filename: null
+      };
+      var secondSampleReadOnlyStoryNodeBackendDict = {
+        id: 'node_2',
+        description: 'description',
+        title: 'Title 2',
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: ['node_3'],
+        outline: 'Outline',
+        exploration_id: 'exp_id',
+        outline_is_finalized: false,
+        exp_summary_dict: {
+          title: 'Title',
+          status: 'private',
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra'
+        },
+        completed: false,
+        thumbnail_bg_color: '',
+        thumbnail_filename: '',
+      };
+
+      var storyPlaythroughBackendObject = {
+        story_id: 'qwerty',
+        story_nodes: [
+          firstSampleReadOnlyStoryNodeBackendDict,
+          secondSampleReadOnlyStoryNodeBackendDict
+        ],
+        story_title: 'Story',
+        story_description: 'Description',
+        topic_name: 'Topic 1',
+        meta_tag_content: 'Story meta tag content'
+      };
+      _samplePlaythroughObject =
+      StoryPlaythrough.createFromBackendDict(
+        storyPlaythroughBackendObject);
       spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
         .and.returnValue('math');
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -399,10 +483,7 @@ describe('Story Viewer Page component', () => {
       spyOn(
         storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
         Promise.resolve(_samplePlaythroughObject));
-      component.thumbnailFilename = null;
-      component.thumbnailBgColor = null;
       component.ngOnInit();
-      component.generatePathIconParameters();
       flushMicrotasks();
       expect(component.thumbnailBgColor === '');
       expect(component.thumbnailFilename === '');
