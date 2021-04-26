@@ -52,7 +52,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-player-page/collection-player-page.directive.html'),
+        '/pages/collection-player-page/collection-player-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
         '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
