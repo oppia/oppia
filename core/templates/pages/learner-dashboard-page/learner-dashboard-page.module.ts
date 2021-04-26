@@ -38,12 +38,14 @@ import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal
   declarations: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
-    RemoveActivityModalComponent
+    RemoveActivityModalComponent,
+    LearnerDashboardSuggestionModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
-    RemoveActivityModalComponent
+    RemoveActivityModalComponent,
+    LearnerDashboardSuggestionModalComponent
   ],
   providers: [
     {
@@ -66,6 +68,7 @@ class LearnerDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
