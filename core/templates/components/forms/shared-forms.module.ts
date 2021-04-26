@@ -27,7 +27,7 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { MaterialModule } from 'components/material.module';
 import { TranslateModule } from 'filters/translate.module';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
-import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
+import { SchemaBasedEditorsModule } from './schema-based-editors/schema-based-editors.module';
 
 @NgModule({
   imports: [
@@ -38,17 +38,17 @@ import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    SchemaBasedEditorsModule,
     TranslateModule,
     CustomFormsComponentsModule
   ],
   declarations: [
-    SchemaBasedEditorDirective
   ],
   entryComponents: [
   ],
   exports: [
     CustomFormsComponentsModule,
-    SchemaBasedEditorDirective
+    SchemaBasedEditorsModule
   ],
 })
 

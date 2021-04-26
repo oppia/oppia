@@ -23,6 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { SchemaBasedBoolEditorComponent } from './schema-based-bool-editor.component';
 import { SchemaBasedChoicesEditorComponent } from './schema-based-choices-editor.component';
+import { SchemaBasedEditorDirective } from './schema-based-editor.directive';
 import { SchemaBasedExpressionEditorComponent } from './schema-based-expression-editor.component';
 import { SchemaBasedIntEditorComponent } from './schema-based-int-editor.component';
 
@@ -37,7 +38,8 @@ import { SchemaBasedIntEditorComponent } from './schema-based-int-editor.compone
     SchemaBasedBoolEditorComponent,
     SchemaBasedChoicesEditorComponent,
     SchemaBasedExpressionEditorComponent,
-    SchemaBasedIntEditorComponent
+    SchemaBasedIntEditorComponent,
+    SchemaBasedEditorDirective
   ],
   entryComponents: [
     SchemaBasedBoolEditorComponent,
@@ -49,7 +51,8 @@ import { SchemaBasedIntEditorComponent } from './schema-based-int-editor.compone
     SchemaBasedBoolEditorComponent,
     SchemaBasedChoicesEditorComponent,
     SchemaBasedExpressionEditorComponent,
-    SchemaBasedIntEditorComponent
+    SchemaBasedIntEditorComponent,
+    SchemaBasedEditorDirective
   ]
 })
 export class SchemaBasedEditorsModule {}
