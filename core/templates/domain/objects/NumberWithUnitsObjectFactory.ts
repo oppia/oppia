@@ -153,14 +153,13 @@ export class NumberWithUnitsObjectFactory {
         var keys = <(keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[]>
           Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
         for (var i = 0; i < keys.length; i++) {
-          var key = keys[i] as keyof typeof ObjectsDomainConstants.CURRENCY_UNITS;
           for (var j = 0;
             j < (
               ObjectsDomainConstants.CURRENCY_UNITS[
-                key].front_units.length); j++) {
+                keys[i]].front_units.length); j++) {
             if (units.indexOf(
               ObjectsDomainConstants.CURRENCY_UNITS[
-                key].front_units[j]) !== -1) {
+                keys[i]].front_units[j]) !== -1) {
               throw new Error(
                 // eslint-disable-next-line max-len
                 ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
@@ -172,12 +171,11 @@ export class NumberWithUnitsObjectFactory {
         var keys = <(keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[]>
           Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
         for (var i = 0; i < keys.length; i++) {
-          var key = keys[i] as keyof typeof ObjectsDomainConstants.CURRENCY_UNITS;
           for (var j = 0;
             j < ObjectsDomainConstants.CURRENCY_UNITS[
-              key].front_units.length; j++) {
+              keys[i]].front_units.length; j++) {
             if (rawInput.startsWith(ObjectsDomainConstants.CURRENCY_UNITS[
-              key].front_units[j])) {
+              keys[i]].front_units[j])) {
               startsWithCorrectCurrencyUnit = true;
               break;
             }
@@ -198,12 +196,11 @@ export class NumberWithUnitsObjectFactory {
 
         startsWithCorrectCurrencyUnit = false;
         for (var i = 0; i < keys.length; i++) {
-          var key = keys[i] as keyof typeof ObjectsDomainConstants.CURRENCY_UNITS;
           for (var j = 0;
             j < ObjectsDomainConstants.CURRENCY_UNITS[
-              key].front_units.length; j++) {
+              keys[i]].front_units.length; j++) {
             if (units === ObjectsDomainConstants.CURRENCY_UNITS[
-              key].front_units[j].trim()) {
+              keys[i]].front_units[j].trim()) {
               startsWithCorrectCurrencyUnit = true;
               break;
             }
