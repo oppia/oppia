@@ -69,7 +69,6 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
-import { FocusOnDirective } from '../directives/focus-on.directive';
 
 
 // Pipes.
@@ -234,7 +233,6 @@ const toastrConfig = {
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
-    FocusOnDirective,
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
