@@ -29,8 +29,8 @@ describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {
     var nwuof: NumberWithUnitsObjectFactory;
     var uof: UnitsObjectFactory;
-    var errors:
-      typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
+    var errors: (
+      typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS);
 
     beforeEach(() => {
       nwuof = new NumberWithUnitsObjectFactory(
