@@ -278,7 +278,7 @@ describe('Skills List Directive', function() {
       });
 
       var topicUpdateSpy = (spyOn(
-        editableTopicBackendApiService, 'updateTopic').and.returnValue(
+        editableTopicBackendApiService, 'updateTopicAsync').and.returnValue(
         $q.resolve()));
 
       ctrl.assignSkillToTopic(skill);

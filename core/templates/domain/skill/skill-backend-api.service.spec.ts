@@ -130,7 +130,7 @@ describe('Skill backend API service', () => {
         groupedSkillSummaries: groupedSkillSummaries
       };
 
-      skillBackendApiService.fetchSkill('1').then(response => {
+      skillBackendApiService.fetchSkillAsync('1').then(response => {
         expect(response).toEqual(expectedResponse);
       });
 
@@ -147,7 +147,7 @@ describe('Skill backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      skillBackendApiService.fetchSkill('1').then(successHandler, failHandler);
+      skillBackendApiService.fetchSkillAsync('1').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
@@ -175,7 +175,7 @@ describe('Skill backend API service', () => {
         skill_id: '2'
       } as const;
 
-      skillBackendApiService.updateSkill(
+      skillBackendApiService.updateSkillAsync(
         '1', 1, 'commit message', [changeList]).then(response => {
         expect(response).toEqual(skill);
       });
@@ -247,7 +247,7 @@ describe('Skill backend API service', () => {
         skill_id: '2'
       } as const;
 
-      skillBackendApiService.updateSkill(
+      skillBackendApiService.updateSkillAsync(
         '1', 1, 'commit message', [changeList]).then(
         successHandler, failHandler);
 
@@ -273,7 +273,7 @@ describe('Skill backend API service', () => {
         skills: [skillBackendDict, skillBackendDict]
       };
 
-      skillBackendApiService.fetchMultiSkills(['1', '2']).then(response => {
+      skillBackendApiService.fetchMultiSkillsAsync(['1', '2']).then(response => {
         expect(response).toEqual([skill, skill]);
       });
 
@@ -291,7 +291,7 @@ describe('Skill backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      skillBackendApiService.fetchMultiSkills(['1', '2']).then(
+      skillBackendApiService.fetchMultiSkillsAsync(['1', '2']).then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -313,7 +313,7 @@ describe('Skill backend API service', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    skillBackendApiService.deleteSkill('1').then(
+    skillBackendApiService.deleteSkillAsync('1').then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
@@ -332,7 +332,7 @@ describe('Skill backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      skillBackendApiService.deleteSkill('1').then(
+      skillBackendApiService.deleteSkillAsync('1').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/skill_editor_handler/data/1');

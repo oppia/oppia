@@ -616,7 +616,7 @@ angular.module('oppia').directive('conversationSkin', [
 
           var _recordLeaveForRefresherExp = function(refresherExpId) {
             if (!_editorPreviewMode) {
-              StatsReportingService.recordLeaveForRefresherExp(
+              StatsReportingService.recordLeaveForRefresherExpAsync(
                 PlayerPositionService.getCurrentStateName(),
                 refresherExpId);
             }
@@ -962,10 +962,10 @@ angular.module('oppia').directive('conversationSkin', [
                       oldStateName, nextCard.getStateName(), answer,
                       LearnerParamsService.getAllParams(), isFirstHit);
 
-                    StatsReportingService.recordStateCompleted(oldStateName);
+                    StatsReportingService.recordStateCompletedAsync(oldStateName);
                   }
                   if (nextCard.isTerminal()) {
-                    StatsReportingService.recordStateCompleted(
+                    StatsReportingService.recordStateCompletedAsync(
                       nextCard.getStateName());
                   }
                   if (wasOldStateInitial && !explorationActuallyStarted) {
@@ -1376,7 +1376,7 @@ angular.module('oppia').directive('conversationSkin', [
                   // the end of the exploration.
                   if (
                     !_editorPreviewMode && $scope.nextCard.isTerminal()) {
-                    StatsReportingService.recordExplorationCompleted(
+                    StatsReportingService.recordExplorationCompletedAsync(
                       newStateName, LearnerParamsService.getAllParams());
 
                     // If the user is a guest, has completed this exploration
@@ -1421,7 +1421,7 @@ angular.module('oppia').directive('conversationSkin', [
               if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
                   !$scope.displayedCard.isTerminal() &&
                   !ExplorationPlayerStateService.isInQuestionMode()) {
-                StatsReportingService.recordMaybeLeaveEvent(
+                StatsReportingService.recordMaybeLeaveEventAsync(
                   PlayerTranscriptService.getLastStateName(),
                   LearnerParamsService.getAllParams());
                 var confirmationMessage = (

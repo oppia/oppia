@@ -88,7 +88,7 @@ describe('Editable story backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      editableStoryBackendApiService.fetchStory('storyId').then(
+      editableStoryBackendApiService.fetchStoryAsync('storyId').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId');
@@ -113,7 +113,7 @@ describe('Editable story backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      editableStoryBackendApiService.deleteStory('storyId').then(
+      editableStoryBackendApiService.deleteStoryAsync('storyId').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId');
@@ -130,7 +130,7 @@ describe('Editable story backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      editableStoryBackendApiService.fetchStory('2').then(
+      editableStoryBackendApiService.fetchStoryAsync('2').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/2');
@@ -153,7 +153,7 @@ describe('Editable story backend API service', () => {
       var story = null;
 
       // Loading a story the first time should fetch it from the backend.
-      editableStoryBackendApiService.fetchStory('storyId').then(
+      editableStoryBackendApiService.fetchStoryAsync('storyId').then(
         // eslint-disable-next-line
         (data: any) => {
           story = data.story;
@@ -172,7 +172,7 @@ describe('Editable story backend API service', () => {
       };
 
       // Send a request to update story.
-      editableStoryBackendApiService.updateStory(
+      editableStoryBackendApiService.updateStoryAsync(
         story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne(
@@ -192,7 +192,7 @@ describe('Editable story backend API service', () => {
       const failHandler = jasmine.createSpy('fail');
 
       // Loading a story the first time should fetch it from the backend.
-      editableStoryBackendApiService.updateStory(
+      editableStoryBackendApiService.updateStoryAsync(
         'storyId_1', 1, 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
@@ -216,7 +216,7 @@ describe('Editable story backend API service', () => {
     var failHandler = jasmine.createSpy('fail');
 
     // Send a request to update story.
-    editableStoryBackendApiService.changeStoryPublicationStatus(
+    editableStoryBackendApiService.changeStoryPublicationStatusAsync(
       'storyId', true).then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/story_publish_handler/storyId');
@@ -234,7 +234,7 @@ describe('Editable story backend API service', () => {
       const failHandler = jasmine.createSpy('fail');
 
       // Loading a story the first time should fetch it from the backend.
-      editableStoryBackendApiService.changeStoryPublicationStatus(
+      editableStoryBackendApiService.changeStoryPublicationStatusAsync(
         'storyId', true).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/story_publish_handler/storyId');

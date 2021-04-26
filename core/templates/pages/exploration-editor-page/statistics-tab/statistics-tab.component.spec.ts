@@ -148,7 +148,7 @@ describe('Statistics Tab Component', function() {
     readOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
 
-    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExploration').and
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
       .returnValue($q.resolve({
         exploration: {
           init_state_name: 'State1',

@@ -97,7 +97,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
     if (!_questionPlayerMode && !('skill_editor' === UrlService.getPathname()
       .split('/')[1].replace(/"/g, "'"))) {
       ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId, version)
+        .loadExplorationAsync(_explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
           $rootScope.$applyAsync();
@@ -374,7 +374,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
             AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
               oldStateName, oldState, answer,
               interactionRulesService));
-          StatsReportingService.recordAnswerSubmitted(
+          StatsReportingService.recordAnswerSubmittedAsync(
             oldStateName,
             LearnerParamsService.getAllParams(),
             answer,

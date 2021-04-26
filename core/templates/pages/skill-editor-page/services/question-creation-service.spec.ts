@@ -105,7 +105,7 @@ describe('Question Creation Service', function() {
       });
       var deferred = $q.defer();
       deferred.resolve([skillBackendDict]);
-      spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
+      spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
         deferred.promise);
       spyOn(
         SkillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
@@ -290,7 +290,7 @@ describe('Question Creation Service', function() {
         topicName: 'topic1',
         subtopicName: 'subtopic2',
       });
-      spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
+      spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
         Promise.reject());
       spyOn(
         SkillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
@@ -452,7 +452,7 @@ describe('Question Creation Service', function() {
       deferred.resolve(
         [SkillObjectFactory.createFromBackendDict(skillBackendDict)]
       );
-      spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
+      spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
         deferred.promise);
       spyOn(
         SkillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
@@ -562,7 +562,7 @@ describe('Question Creation Service', function() {
         qcs.populateMisconceptions();
         $rootScope.$apply();
         var questionSpy = (
-          spyOn(EditableQuestionBackendApiService, 'createQuestion'));
+          spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
         expect(questionSpy).not.toHaveBeenCalled();
       });

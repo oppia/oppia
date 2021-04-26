@@ -117,7 +117,7 @@ angular.module('oppia').directive('learnerLocalNav', [
           ctrl.$onInit = function() {
             ctrl.explorationId = ExplorationEngineService.getExplorationId();
             ReadOnlyExplorationBackendApiService
-              .loadExploration(ctrl.explorationId)
+              .loadExplorationAsync(ctrl.explorationId)
               .then(function(exploration) {
                 ctrl.canEdit = exploration.can_edit;
                 $rootScope.$applyAsync();

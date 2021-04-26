@@ -178,7 +178,7 @@ export class ExplorationDataService {
   // Returns a promise supplying the last saved version for the current
   // exploration.
   getLastSavedData(): Promise<ReadOnlyExplorationBackendDict> {
-    return this.readOnlyExplorationBackendApiService.loadLatestExploration(
+    return this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
       this.explorationId).then(response => {
       this.loggerService.info('Retrieved saved exploration data.');
       this.loggerService.info(JSON.stringify(response));

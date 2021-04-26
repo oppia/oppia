@@ -83,7 +83,7 @@ angular.module('oppia').factory('QuestionCreationService', [
     var newQuestionSkillIds = [];
 
     var populateMisconceptions = function() {
-      SkillBackendApiService.fetchMultiSkills(
+      SkillBackendApiService.fetchMultiSkillsAsync(
         newQuestionSkillIds).then(
         function(skills) {
           skills.forEach(function(skill) {

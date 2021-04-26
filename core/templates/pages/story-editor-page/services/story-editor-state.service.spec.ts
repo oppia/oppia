@@ -155,10 +155,10 @@ describe('Story editor state service', () => {
 
   it('should request to load the story from the backend', () => {
     spyOn(
-      fakeEditableStoryBackendApiService, 'fetchStory').and.callThrough();
+      fakeEditableStoryBackendApiService, 'fetchStoryAsync').and.callThrough();
 
     storyEditorStateService.loadStory('storyId_0');
-    expect(fakeEditableStoryBackendApiService.fetchStory).toHaveBeenCalled();
+    expect(fakeEditableStoryBackendApiService.fetchStoryAsync).toHaveBeenCalled();
   });
 
   it(
