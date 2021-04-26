@@ -2302,7 +2302,7 @@ class State(python_utils.OBJECT):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, solicit_answer_details,
+            written_translations, solicit_answer_details, card_is_checkpoint,
             next_content_id_index, classifier_model_id=None):
         """Initializes a State domain object.
 
@@ -2320,6 +2320,8 @@ class State(python_utils.OBJECT):
             solicit_answer_details: bool. Whether the creator wants to ask
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
+            card_is_checkpoint: bool. If the card is marked as a checkpoint by
+                the creator or not.
             next_content_id_index: int. The next content_id index to use for
                 generation of new content_ids.
             classifier_model_id: str or None. The classifier model ID
@@ -2342,6 +2344,7 @@ class State(python_utils.OBJECT):
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
         self.solicit_answer_details = solicit_answer_details
+        self.card_is_checkpoint = card_is_checkpoint
         self.next_content_id_index = next_content_id_index
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
@@ -2456,6 +2459,11 @@ class State(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'The %s interaction does not support soliciting '
                     'answer details from learners.' % (self.interaction.id))
+
+        if not isinstance(self.card_is_checkpoint, bool):
+            raise utils.ValidationError(
+                'Expected card_is_checkpoint to be a boolean, '
+                'received %s' % self.card_is_checkpoint)
 
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
@@ -2963,6 +2971,19 @@ class State(python_utils.OBJECT):
                 % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
 
+    def update_card_is_checkpoint(self, card_is_checkpoint):
+        """Update the card_is_checkpoint field of a state.
+
+        Args:
+            card_is_checkpoint: bool. The new value of
+                card_is_checkpoint for the state.
+        """
+        if not isinstance(card_is_checkpoint, bool):
+            raise Exception(
+                'Expected card_is_checkpoint to be a boolean, received %s'
+                % card_is_checkpoint)
+        self.card_is_checkpoint = card_is_checkpoint
+
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
@@ -3045,6 +3066,7 @@ class State(python_utils.OBJECT):
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
+            'card_is_checkpoint': self.card_is_checkpoint,
             'next_content_id_index': self.next_content_id_index
         }
 
@@ -3068,6 +3090,7 @@ class State(python_utils.OBJECT):
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
+            state_dict['card_is_checkpoint'],
             state_dict['next_content_id_index'],
             state_dict['classifier_model_id'])
 
@@ -3096,7 +3119,7 @@ class State(python_utils.OBJECT):
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
-            False, 0)
+            False, is_initial_state, 0)
 
     @classmethod
     def convert_html_fields_in_state(

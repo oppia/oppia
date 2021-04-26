@@ -957,6 +957,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             },
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'written_translations': {
                 'translations_mapping': {
                     'content': {},
@@ -1592,6 +1593,24 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
 
+    def test_update_card_is_checkpoint(self):
+        """Test update card_is_checkpoint."""
+        state = state_domain.State.create_default_state('state_1')
+        self.assertEqual(state.card_is_checkpoint, False)
+        state.update_card_is_checkpoint(True)
+        self.assertEqual(state.card_is_checkpoint, True)
+
+    def test_update_card_is_checkpoint_with_non_bool_fails(self):
+        """Test updating card_is_checkpoint with non bool value."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.card_is_checkpoint, True)
+        with self.assertRaisesRegexp(Exception, (
+            'Expected card_is_checkpoint to be a boolean, received')):
+            init_state.update_card_is_checkpoint('abc')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.card_is_checkpoint, True)
+
     def test_convert_html_fields_in_state_with_drag_and_drop_interaction(self):
         """Test the method for converting all the HTML in a state having
         DragAndDropSortInput interaction.
@@ -1754,6 +1773,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -1834,6 +1854,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -2007,6 +2028,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2076,6 +2098,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2210,6 +2233,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2268,6 +2292,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2387,6 +2412,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2435,6 +2461,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2596,6 +2623,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -2676,6 +2704,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -2798,6 +2827,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2905,6 +2935,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2988,6 +3019,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -3080,6 +3112,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3121,6 +3154,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3514,6 +3548,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, True)
+
+    def test_validate_state_card_is_checkpoint(self):
+        """Test validation of card_is_checkpoint."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.card_is_checkpoint, True)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected card_is_checkpoint to be ' +
+            'a boolean, received'):
+            with self.swap(init_state, 'card_is_checkpoint', 'abc'):
+                exploration.validate()
+        self.assertEqual(init_state.card_is_checkpoint, True)
 
     def test_validate_solution_answer_is_exclusive(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
