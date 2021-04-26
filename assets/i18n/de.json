@@ -257,7 +257,7 @@
 	"I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION": "Später spielen",
 	"I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE": "Ziehe und ordne die Aktivitäten in der Reihenfolge neu an, in der du sie spielen möchtest!",
 	"I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE_MOBILE": "Tippen und halten, um die Aktivitäten in die Reihenfolge zu bringen, in der du sie spielen möchtest!",
-	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY": "Er du sikker på, at du vil fjerne „<[entityTitle]>“ fra din „<[sectionNameI18nId]>“ liste?",
+	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_BODY": "Bist du sicher, dass du „<[entityTitle]>“ von deiner Liste „<[sectionNameI18nId]>“ entfernen möchtest?",
 	"I18N_LEARNER_DASHBOARD_REMOVE_ACTIVITY_MODAL_HEADER": "Von der Liste „<[sectionNameI18nId]>“ entfernen?",
 	"I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "Entfernen",
 	"I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE": "Zurück zur Liste der Nachrichten",
