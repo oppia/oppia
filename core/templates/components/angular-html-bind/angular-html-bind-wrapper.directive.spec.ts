@@ -32,7 +32,7 @@ describe('Angular Html Bind Wrapper Directive', () => {
         'angularHtmlBindWrapper',
         [AngularHtmlBindWrapperDirective]
       ).then(
-        textContext => expect(textContext).toBe('Hello Oppia!')
+        async (textContext) => expect(textContext).toBe('Hello Oppia!')
       );
     }));
   });
