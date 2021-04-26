@@ -107,29 +107,29 @@ export class ImageUploaderComponent {
         const reader: FileReader = new FileReader();
         reader.readAsDataURL(file);
 
-        reader.onload = function(event) {
+        reader.onload = function (event) {
           let imgElement: HTMLImageElement = document.createElement('img');
-          imgElement.src = reader.result;
-          imgElement.onload = function(e) {
+          imgElement.src = reader.result.toString();
+          imgElement.onload = function (e) {
             const canvas = document.createElement('canvas');
-            let scale: number = e.target.height / e.target.width;
+            let scale: number = imgElement.height / imgElement.width;
             width = Math.sqrt((100 * 1024) / (3.5 * scale));
 
             const MAX_WIDTH = width;
             if (imgElement.width > imgElement.height) {
-              const scaleSize = MAX_WIDTH / e.target.width;
+              const scaleSize = MAX_WIDTH / imgElement.width;
               canvas.width = MAX_WIDTH;
-              canvas.height = e.target.height * scaleSize;
+              canvas.height = imgElement.height * scaleSize;
             } else {
-              const scaleSize = MAX_WIDTH / e.target.height;
+              const scaleSize = MAX_WIDTH / imgElement.height;
               canvas.height = MAX_WIDTH;
-              canvas.width = e.target.width * scaleSize;
+              canvas.width = imgElement.width * scaleSize;
             }
 
             const ctx = canvas.getContext('2d');
             ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob(function(blob) {
+            canvas.toBlob(function (blob) {
               newFile = new File([blob], file.name, { type: file.type });
               fchng.emit(newFile);
             });
