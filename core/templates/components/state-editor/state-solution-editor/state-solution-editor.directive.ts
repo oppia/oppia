@@ -124,7 +124,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
               StateInteractionIdService.savedMemento,
               StateCustomizationArgsService.savedMemento,
               false,
-              $scope.SOLUTION_EDITOR_FOCUS_LABEL));
+              $scope.SOLUTION_EDITOR_FOCUS_LABEL, null));
 
           $scope.toggleInlineSolutionEditorIsActive = function() {
             $scope.inlineSolutionEditorIsActive = (

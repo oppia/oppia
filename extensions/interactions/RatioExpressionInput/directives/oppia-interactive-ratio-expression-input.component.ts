@@ -31,6 +31,9 @@ require('domain/objects/objects-domain.constants.ajs.ts');
 
 angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
   template: require('./ratio-expression-input-interaction.component.html'),
+  bindings: {
+    savedSolution: '<'
+  },
   controller: [
     '$attrs', '$scope', 'CurrentInteractionService',
     'InteractionAttributesExtractorService',
@@ -91,8 +94,8 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
           ctrl.RatioExpressionInputForm.answer.$setValidity(
             FORM_ERROR_TYPE, true);
         });
-        if ($attrs.savedSolution !== undefined) {
-          let savedSolution = JSON.parse($attrs.savedSolution);
+        if (ctrl.savedSolution !== undefined) {
+          let savedSolution = ctrl.savedSolution;
           savedSolution = Ratio.fromList(
             savedSolution).toAnswerString();
           ctrl.answer = savedSolution;
