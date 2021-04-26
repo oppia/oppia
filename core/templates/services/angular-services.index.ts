@@ -343,6 +343,7 @@ import { ExplorationCreationService } from 'components/entity-creation-services/
 import { ImageLocalStorageService } from './image-local-storage.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
+import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -531,6 +532,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
+  ['NotificationsDashboardPageBackendApiService',
+    NotificationsDashboardPageBackendApiService],
   ['NumberAttemptsService', NumberAttemptsService],
   ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],

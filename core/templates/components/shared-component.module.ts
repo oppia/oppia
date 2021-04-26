@@ -61,7 +61,7 @@ import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboa
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
 import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
-
+import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -131,6 +131,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FilterForMatchingSubstringPipe,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    LoadingMessageComponent,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
@@ -169,7 +170,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    LazyLoadingComponent, LoadingMessageComponent,
+    LoadingDotsComponent, SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
@@ -209,6 +211,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
     FocusOnDirective,
+    LoadingMessageComponent,
+    FilterForMatchingSubstringPipe,
     PromoBarComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
