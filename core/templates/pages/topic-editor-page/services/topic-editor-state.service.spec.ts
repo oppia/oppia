@@ -65,7 +65,7 @@ describe('Topic editor state service', function() {
       fetchStories: null
     };
 
-    var _fetchOrUpdateTopic = function() {
+    var _fetchOrUpdateTopicAsync = async function() {
       return new Promise(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.newBackendTopicObject);
@@ -75,7 +75,7 @@ describe('Topic editor state service', function() {
       });
     };
 
-    var _fetchStories = function() {
+    var _fetchStoriesAsync = async function() {
       return new Promise(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.backendStorySummariesObject);
@@ -99,10 +99,10 @@ describe('Topic editor state service', function() {
     self.newBackendTopicObject = {};
     self.backendStorySummariesObject = [];
     self.failure = null;
-    self.fetchTopic = _fetchOrUpdateTopic;
+    self.fetchTopic = _fetchOrUpdateTopicAsync;
     self.fetchSubtopicPage = _fetchSubtopicPage;
-    self.updateTopic = _fetchOrUpdateTopic;
-    self.fetchStories = _fetchStories;
+    self.updateTopic = _fetchOrUpdateTopicAsync;
+    self.fetchStories = _fetchStoriesAsync;
 
     return self;
   };
@@ -114,7 +114,7 @@ describe('Topic editor state service', function() {
       fetchTopicRights: null
     };
 
-    var _fetchTopicRights = function() {
+    var _fetchTopicRightsAsync = async function() {
       return new Promise(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.backendTopicRightsObject);
@@ -126,7 +126,7 @@ describe('Topic editor state service', function() {
 
     self.backendTopicRightsObject = {};
     self.failure = null;
-    self.fetchTopicRights = _fetchTopicRights;
+    self.fetchTopicRights = _fetchTopicRightsAsync;
 
     return self;
   };
@@ -319,7 +319,8 @@ describe('Topic editor state service', function() {
       fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
 
     TopicEditorStateService.loadTopic(5);
-    expect(fakeEditableTopicBackendApiService.fetchTopicAsync).toHaveBeenCalled();
+    expect(
+      fakeEditableTopicBackendApiService.fetchTopicAsync).toHaveBeenCalled();
   });
 
   it('should request to load the subtopic page from the backend', function() {
@@ -452,7 +453,8 @@ describe('Topic editor state service', function() {
     fakeAsync(() => {
       spyOn(
         fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
-      spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
       spyOn(
         fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
       spyOn(
@@ -475,9 +477,12 @@ describe('Topic editor state service', function() {
   );
 
   it('should fire an update event after loading more topics', fakeAsync(() => {
-    spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
     spyOn(
       fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync').and.callThrough();
     // Load initial topic.
@@ -494,9 +499,12 @@ describe('Topic editor state service', function() {
   }));
 
   it('should track whether it is currently loading the topic', fakeAsync(() => {
-    spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
     spyOn(
       fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync').and.callThrough();
     expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
@@ -518,7 +526,8 @@ describe('Topic editor state service', function() {
       spyOn(
         fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
       spyOn(
-        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync').and.callThrough();
+        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+        .and.callThrough();
       expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
       fakeEditableTopicBackendApiService.failure = 'Internal 500 error';
 
@@ -539,7 +548,8 @@ describe('Topic editor state service', function() {
       spyOn(
         fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
       spyOn(
-        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync').and.callThrough();
+        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+        .and.callThrough();
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
       TopicEditorStateService.loadTopic(5);
@@ -676,9 +686,12 @@ describe('Topic editor state service', function() {
   }));
 
   it('should fire an update event after saving the topic', fakeAsync(() => {
-    spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
     spyOn(
       fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync').and.callThrough();
     TopicEditorStateService.loadTopic(5);
@@ -695,9 +708,12 @@ describe('Topic editor state service', function() {
   }));
 
   it('should track whether it is currently saving the topic', fakeAsync(() => {
-    spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
-    spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'updateTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchTopicAsync').and.callThrough();
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchStoriesAsync').and.callThrough();
     spyOn(
       fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync').and.callThrough();
     TopicEditorStateService.loadTopic(5);

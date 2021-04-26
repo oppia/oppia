@@ -74,7 +74,7 @@ angular.module('oppia').directive('learnerViewInfo', [
             if (expInfo) {
               openInformationCardModal();
             } else {
-              LearnerViewInfoBackendApiService.fetchLearnerInfo(
+              LearnerViewInfoBackendApiService.fetchLearnerInfoAsync(
                 stringifiedExpIds,
                 includePrivateExplorations
               ).then(function(response) {

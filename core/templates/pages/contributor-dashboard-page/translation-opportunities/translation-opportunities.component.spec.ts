@@ -131,7 +131,7 @@ describe('Translation opportunities component', () => {
         more: false
       });
 
-    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBeFalse();
     });
@@ -144,7 +144,7 @@ describe('Translation opportunities component', () => {
         opportunities: opportunitiesArray,
         more: true
       });
-    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBeTrue();
     });
@@ -156,7 +156,7 @@ describe('Translation opportunities component', () => {
       more: false
     });
 
-    component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadMoreOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBeFalse();
     });

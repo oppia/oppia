@@ -48,10 +48,11 @@ export class NotificationsDashboardPageBackendApiService {
     private httpClient: HttpClient
   ) {}
 
-  getNotificationData(): Promise<NotificationsDashboardBackendDict> {
-    return this.httpClient.get<NotificationsDashboardBackendDict>
-    ('/notificationsdashboardhandler/data').toPromise();
-  }
+  async getNotificationDataAsync(): Promise<
+    NotificationsDashboardBackendDict> {
+      return this.httpClient.get<NotificationsDashboardBackendDict>
+      ('/notificationsdashboardhandler/data').toPromise();
+    }
 }
 
 angular.module('oppia').factory('NotificationsDashboardPageBackendApiService',

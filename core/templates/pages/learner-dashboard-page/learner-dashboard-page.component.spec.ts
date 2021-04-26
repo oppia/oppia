@@ -69,7 +69,7 @@ class MockTrunctePipe {
 }
 
 class MockLearnerDashboardActivityBackendApiService {
-  removeActivityModal(): Promise<void> {
+  async removeActivityModalAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });
@@ -326,7 +326,7 @@ describe('Learner dashboard page', () => {
       userService = TestBed.inject(UserService);
       windowRef = TestBed.inject(WindowRef);
 
-      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
+      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
       });
       // Generate completed explorations and exploration playlist.
@@ -388,12 +388,12 @@ describe('Learner dashboard page', () => {
       }
 
       spyOn(userService, 'getProfileImageDataUrlAsync').and
-        .callFake(() => {
+        .callFake(async() => {
           return Promise.resolve(profilePictureDataUrl);
         });
 
       spyOn(userService, 'getUserInfoAsync').and
-        .callFake(() => {
+        .callFake(async() => {
           return Promise.resolve(userInfo);
         });
 

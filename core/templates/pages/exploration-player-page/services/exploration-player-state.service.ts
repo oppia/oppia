@@ -84,8 +84,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
       // For some cases, version is set only after
-      // ReadOnlyExplorationBackendApiService.loadExplorationAsync() has completed.
-      // Use returnDict.version for non-null version value.
+      // ReadOnlyExplorationBackendApiService.loadExplorationAsync()
+      // has completed. Use returnDict.version for non-null version value.
       StatsReportingService.initSession(
         explorationId, returnDict.exploration.title, returnDict.version,
         returnDict.session_id, UrlService.getCollectionIdFromExplorationUrl());

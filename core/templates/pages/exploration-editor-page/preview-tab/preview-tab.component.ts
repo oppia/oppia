@@ -175,7 +175,7 @@ angular.module('oppia').component('previewTab', {
           })
         );
         ctrl.isExplorationPopulated = false;
-        ExplorationDataService.getData().then(function() {
+        ExplorationDataService.getDataAsync().then(function() {
           var initStateNameForPreview = StateEditorService
             .getActiveStateName();
 

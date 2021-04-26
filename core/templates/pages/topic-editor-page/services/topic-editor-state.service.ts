@@ -186,8 +186,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
           topicId);
         let storyDataPromise = EditableTopicBackendApiService.fetchStoriesAsync(
           topicId);
-        let topicRightsPromise = TopicRightsBackendApiService.fetchTopicRightsAsync(
-          topicId);
+        let topicRightsPromise = TopicRightsBackendApiService
+          .fetchTopicRightsAsync(topicId);
         Promise.all([
           topicDataPromise,
           storyDataPromise,

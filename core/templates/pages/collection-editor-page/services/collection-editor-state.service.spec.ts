@@ -41,28 +41,29 @@ describe('Collection editor state service', () => {
     newBackendCollectionObject: CollectionBackendDict;
     failure = null;
 
-    private _fetchOrUpdateCollection(): Promise<void | Collection> {
-      return new Promise((resolve, reject) => {
-        if (!this.failure) {
-          resolve(
-            Collection.create(
-              this.newBackendCollectionObject
-            )
-          );
-        } else {
-          reject();
-        }
-      });
+    private async _fetchOrUpdateCollectionAsync(): Promise<
+      void | Collection> {
+        return new Promise((resolve, reject) => {
+          if (!this.failure) {
+            resolve(
+              Collection.create(
+                this.newBackendCollectionObject
+              )
+            );
+          } else {
+            reject();
+          }
+        });
     }
 
 
 
     get fetchCollectionAsync(): () => Promise<void | Collection> {
-      return this._fetchOrUpdateCollection;
+      return this._fetchOrUpdateCollectionAsync;
     }
 
     get updateCollectionAsync(): () => Promise<void | Collection> {
-      return this._fetchOrUpdateCollection;
+      return this._fetchOrUpdateCollectionAsync;
     }
   }
 
@@ -70,20 +71,21 @@ describe('Collection editor state service', () => {
     backendCollectionRightsObject: CollectionRightsBackendDict;
     failure = null;
 
-    private _fetchCollectionRights(): Promise<void | CollectionRights> {
-      return new Promise((resolve, reject) => {
-        if (!this.failure) {
-          resolve(CollectionRights.create(
-            this.backendCollectionRightsObject
-          ));
-        } else {
-          reject();
-        }
-      });
+    private async _fetchCollectionRightsAsync(): Promise<
+      void | CollectionRights> {
+        return new Promise((resolve, reject) => {
+          if (!this.failure) {
+            resolve(CollectionRights.create(
+              this.backendCollectionRightsObject
+            ));
+          } else {
+            reject();
+          }
+        });
     }
 
     get fetchCollectionRightsAsync(): () => Promise<void | CollectionRights> {
-      return this._fetchCollectionRights;
+      return this._fetchCollectionRightsAsync;
     }
   }
 

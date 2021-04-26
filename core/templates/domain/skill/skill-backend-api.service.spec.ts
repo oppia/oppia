@@ -147,7 +147,8 @@ describe('Skill backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      skillBackendApiService.fetchSkillAsync('1').then(successHandler, failHandler);
+      skillBackendApiService.fetchSkillAsync('1').then(
+        successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
@@ -273,8 +274,9 @@ describe('Skill backend API service', () => {
         skills: [skillBackendDict, skillBackendDict]
       };
 
-      skillBackendApiService.fetchMultiSkillsAsync(['1', '2']).then(response => {
-        expect(response).toEqual([skill, skill]);
+      skillBackendApiService.fetchMultiSkillsAsync(['1', '2']).then(
+        response => {
+          expect(response).toEqual([skill, skill]);
       });
 
       let req = httpTestingController.expectOne(

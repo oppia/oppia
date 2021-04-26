@@ -100,7 +100,7 @@ export class TranslationOpportunitiesComponent {
     });
   }
 
-  loadMoreOpportunities(): Promise<{
+  async loadMoreOpportunitiesAsync(): Promise<{
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {
@@ -110,7 +110,7 @@ export class TranslationOpportunitiesComponent {
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
-  loadOpportunities(): Promise<{
+  async loadOpportunitiesAsync(): Promise<{
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   }> {

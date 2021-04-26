@@ -231,7 +231,7 @@ describe('Audio translation bar directive', function() {
       spyOn(voiceoverRecordingService, 'status').and.returnValue({
         isAvailable: true
       });
-      spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
         $q.reject());
 
       $scope.checkAndStartRecording();

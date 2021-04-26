@@ -165,7 +165,7 @@ angular.module('oppia').factory('ChangeListService', [
       discardAllChanges: function() {
         explorationChangeList = [];
         undoneChangeStack = [];
-        return ExplorationDataService.discardDraft();
+        return ExplorationDataService.discardDraftAsync();
       },
       /**
        * Saves a change dict that represents a change to an exploration

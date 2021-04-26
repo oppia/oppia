@@ -20,7 +20,7 @@ import { EditableExplorationBackendApiService } from
   'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { HttpTestingController, HttpClientTestingModule } from
@@ -51,7 +51,7 @@ describe('Editable exploration backend API service', function() {
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
 

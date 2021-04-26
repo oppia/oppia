@@ -43,7 +43,7 @@ describe('Notifications Dasboard Page Component', () => {
   let dateTimeFormatService: DateTimeFormatService;
 
   class MockNotificationsDashboardBackendApiService {
-    getNotificationData() {
+    async getNotificationDataAsync() {
       return {
         then: (
             successCallback: (

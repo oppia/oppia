@@ -329,7 +329,7 @@ describe('Settings Tab Component', () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve()
         });
-        spyOn(editableExplorationBackendApiService, 'deleteExploration').and
+        spyOn(editableExplorationBackendApiService, 'deleteExplorationAsync').and
           .returnValue($q.resolve());
         spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
           location: {

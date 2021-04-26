@@ -637,7 +637,7 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1).then(onSuccess, onFailure);
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalled();
@@ -667,7 +667,7 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1).then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     flushMicrotasks();
@@ -700,7 +700,7 @@ describe('Image preloader service', () => {
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
 
-      imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+      imagePreloaderService.getImageUrlAsync(filename1).then(onSuccess, onFailure);
 
       httpTestingController.expectOne(requestUrl1)
         .flush(imageBlob, {status: 404, statusText: 'Status Text'});
@@ -719,7 +719,7 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1).then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2);
@@ -746,7 +746,7 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1).then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1)
       .flush(imageBlob, {status: 404, statusText: 'Status Text'});

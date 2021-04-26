@@ -180,7 +180,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               };
 
               ctrl.loadImage = function() {
-                ImagePreloaderService.getImageUrl(ctrl.filepath)
+                ImagePreloaderService.getImageUrlAsync(ctrl.filepath)
                   .then(function(objectUrl) {
                     ctrl.isTryAgainShown = false;
                     ctrl.isLoadingIndicatorShown = false;
