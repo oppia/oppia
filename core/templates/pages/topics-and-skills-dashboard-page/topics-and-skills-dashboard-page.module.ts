@@ -42,7 +42,6 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
-    DynamicContentModule,
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -92,7 +91,6 @@ class TopicsAndSkillsDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
