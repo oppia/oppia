@@ -62,6 +62,7 @@ import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboa
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
+import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -148,6 +149,7 @@ const toastrConfig = {
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
+    LoadingMessageComponent,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
@@ -186,7 +188,8 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    LazyLoadingComponent, LoadingMessageComponent,
+    LoadingDotsComponent, SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
@@ -225,6 +228,7 @@ const toastrConfig = {
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
+    LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
     PromoBarComponent,
