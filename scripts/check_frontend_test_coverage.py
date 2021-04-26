@@ -37,7 +37,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'admin-misc-tab.directive.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
-    'alert-message.directive.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
     'answer-group-editor.directive.ts',
@@ -315,6 +314,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtopic-summary-tile.directive.ts',
     'subtopic.model.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
+    'summarize-nonnegative-number.pipe.ts',
     'summary-list-header.component.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
@@ -348,7 +348,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'version-diff-visualization.directive.ts',
     'version-tree.service.ts',
     'voiceover-recording.service.ts',
-    'warnings-and-alerts.directive.ts',
     'worked-example-editor.directive.ts',
 ]
 
