@@ -286,6 +286,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
     get_redirect_route(
+        r'%s' % feconf.MACHINE_TRANSLATION_DATA_URL,
+        contributor_dashboard.MachineTranslationStateTextsHandler),
+    get_redirect_route(
         r'/getcompletedtranslationshandler',
         contributor_dashboard.CompletedTranslationsHandler),
     get_redirect_route(

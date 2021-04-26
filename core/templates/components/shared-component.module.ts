@@ -59,6 +59,7 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -73,6 +74,9 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 
 // Services.
@@ -102,7 +106,6 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
-    MaterialModule,
     ObjectComponentsModule,
     SharedFormsModule,
     TranslateModule,
@@ -117,12 +120,15 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    LoadingMessageComponent,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
@@ -144,19 +150,23 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
-    SortByPipe,
+    UploadActivityModalComponent,
     PromoBarComponent,
+    SortByPipe,
     LearnerDashboardIconsComponent
   ],
 
   entryComponents: [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    LazyLoadingComponent, LoadingMessageComponent,
+    LoadingDotsComponent, SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
@@ -166,10 +176,9 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
-    SkillMasteryViewerComponent,
-    SocialButtonsComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    UploadActivityModalComponent,
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -190,9 +199,12 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    CreateActivityButtonComponent,
+    CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
+    LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     PromoBarComponent,
     OnScreenKeyboardComponent,
@@ -207,14 +219,14 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    UploadActivityModalComponent,
+    PromoBarComponent,
+    WrapTextWithEllipsisPipe,
     TruncateAndCapitalizePipe,
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
     LoadingDotsComponent,
-    PromoBarComponent,
-    WrapTextWithEllipsisPipe,
-    PromoBarComponent,
     WrapTextWithEllipsisPipe,
     LearnerDashboardIconsComponent
   ],
