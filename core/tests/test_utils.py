@@ -1718,6 +1718,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1750,6 +1751,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
