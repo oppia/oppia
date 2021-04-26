@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,4 +20,5 @@ export const CollectionSummaryTileConstants = {
   COLLECTION_VIEWER_URL: '/collection/<collection_id>',
   COLLECTION_EDITOR_URL:
     '/collection_editor/create/<collection_id>',
+  DEFAULT_EMPTY_TITLE: 'Untitled'
 } as const;
