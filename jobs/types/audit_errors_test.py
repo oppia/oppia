@@ -333,6 +333,25 @@ class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
         self.assertEqual(error.message, msg)
 
 
+class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
+
+    def test_model_invalid_id_error(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[])
+        error = audit_errors.InvalidCommitTypeError(model)
+
+        self.assertEqual(
+            error.message,
+            'InvalidCommitTypeError in BaseCommitLogEntryModel(id=\'123\'): '
+            'Commit type invalid-type is not allowed')
+
+
 class ModelExpiringErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
