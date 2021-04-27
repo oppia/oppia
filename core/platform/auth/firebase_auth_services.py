@@ -150,7 +150,7 @@ def get_auth_claims_from_request(request):
         is signed in, then returns None.
 
     Raises:
-        AuthSessionError. The request contains an invalid session.
+        InvalidAuthSessionError. The request contains an invalid session.
     """
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
@@ -602,7 +602,8 @@ def _get_auth_claims_from_session_cookie(cookie):
         Otherwise returns None.
 
     Raises:
-        AuthSessionError. The cookie has an invalid value.
+        InvalidAuthSessionError. The cookie has an invalid value.
+        StaleAuthSessionError. The cookie has lost its authority.
     """
     # It's OK for a session cookie to be None or empty, it just means that the
     # request hasn't been authenticated.
@@ -615,7 +616,7 @@ def _get_auth_claims_from_session_cookie(cookie):
     except firebase_auth.RevokedSessionCookieError:
         raise auth_domain.StaleAuthSessionError('session has been revoked')
     except (firebase_exceptions.FirebaseError, ValueError) as error:
-        raise auth_domain.AuthSessionError('session invalid: %s' % error)
+        raise auth_domain.InvalidAuthSessionError('session invalid: %s' % error)
     else:
         return _create_auth_claims(claims)
 

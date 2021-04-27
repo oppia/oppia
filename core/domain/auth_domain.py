@@ -36,7 +36,7 @@ AuthIdUserIdPair = (
     collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id']))
 
 
-class AuthSessionError(Exception):
+class InvalidAuthSessionError(Exception):
     """Error raised when an invalid auth session is detected."""
 
     pass

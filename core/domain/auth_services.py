@@ -111,7 +111,8 @@ def get_auth_claims_from_request(request):
         is signed in, then returns None.
 
     Raises:
-        AuthSessionError. The request contains an invalid session.
+        InvalidAuthSessionError. The request contains an invalid session.
+        StaleAuthSessionError. The cookie has lost its authority.
     """
     return platform_auth_services.get_auth_claims_from_request(request)
 

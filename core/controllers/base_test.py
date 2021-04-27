@@ -614,7 +614,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
         always_raise_context = self.swap_to_always_raise(
             auth_services, 'get_auth_claims_from_request',
-            error=auth_domain.AuthSessionError)
+            error=auth_domain.InvalidAuthSessionError)
         call_counter_context = (
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 

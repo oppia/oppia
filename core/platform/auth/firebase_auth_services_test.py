@@ -1210,7 +1210,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
         with always_raise_unknown_error:
             self.assertRaisesRegexp(
-                auth_domain.AuthSessionError, 'uh-oh',
+                auth_domain.InvalidAuthSessionError, 'uh-oh',
                 lambda: firebase_auth_services.get_auth_claims_from_request(
                     self.create_request(session_cookie=cookie)))
 

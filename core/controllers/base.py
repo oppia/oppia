@@ -170,7 +170,7 @@ class BaseHandler(webapp2.RequestHandler):
         except auth_domain.StaleAuthSessionError:
             auth_services.destroy_auth_session(self.response)
             raise self.UnauthorizedUserException('Please sign in again')
-        except auth_domain.AuthSessionError:
+        except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)
             raise self.UnauthorizedUserException('Please sign in again')
