@@ -40,7 +40,8 @@ export class CkEditorCopyContentService {
     'oppia-noninteractive-link',
     'oppia-noninteractive-math',
     'oppia-noninteractive-tabs',
-    'oppia-noninteractive-video'
+    'oppia-noninteractive-video',
+    'oppia-noninteractive-skillreview'
   ]);
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
   private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
@@ -70,14 +71,17 @@ export class CkEditorCopyContentService {
         break;
       }
 
-      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME
+      || currentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
       }
 
       currentElement = currentElement.parentElement;
+
     }
 
-    let descendants = Array.from(target.childNodes);
+
+    let descendants = Array.from(currentElement.childNodes);
     while (descendants.length !== 0) {
       let currentDescendant = descendants.shift();
       const currentTagName = currentDescendant.nodeName.toLowerCase();
@@ -90,8 +94,8 @@ export class CkEditorCopyContentService {
         ...descendants,
         ...Array.from(currentDescendant.childNodes)
       ];
-    }
 
+    }
     if (containedWidgetTagName &&
         !this.ALLOWLISTED_WIDGETS.has(containedWidgetTagName)) {
       return {};
