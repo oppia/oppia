@@ -136,8 +136,6 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.get();
       await libraryPage.findExploration('Exploration Player Test');
       await libraryPage.playExploration('Exploration Player Test');
-      await explorationPlayerPage.expectExplorationNameToBe(
-        'Exploration Player Test');
     });
 
   it('should visit the collection player and play the correct collection',

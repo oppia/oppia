@@ -27,7 +27,7 @@ import { FocusOnDirective } from './focus-on.directive';
 import { MathJaxDirective } from './mathjax.directive';
 import { NgInitDirective } from './ng-init.directive';
 import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
-import { TopNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.directive';
+import { TopNavigationBarDirective } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.directive';
 
 @NgModule({
   imports: [
@@ -40,7 +40,7 @@ import { TopNavigationBarComponent } from 'components/common-layout-directives/n
     MathJaxDirective,
     NgInitDirective,
     OppiaFooterDirective,
-    TopNavigationBarComponent
+    TopNavigationBarDirective
   ],
   entryComponents: [],
   exports: [
@@ -48,7 +48,7 @@ import { TopNavigationBarComponent } from 'components/common-layout-directives/n
     MathJaxDirective,
     NgInitDirective,
     OppiaFooterDirective,
-    TopNavigationBarComponent
+    TopNavigationBarDirective
   ],
 })
 

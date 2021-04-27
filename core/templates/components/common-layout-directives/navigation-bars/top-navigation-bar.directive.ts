@@ -374,7 +374,7 @@ import { UpgradeComponent } from '@angular/upgrade/static';
 @Directive({
   selector: 'top-navigation-bar'
 })
-export class TopNavigationBarComponent extends UpgradeComponent {
+export class TopNavigationBarDirective extends UpgradeComponent {
   @Input() headerText: string;
   @Output() headerTextChange: EventEmitter<string> = (
     new EventEmitter());
