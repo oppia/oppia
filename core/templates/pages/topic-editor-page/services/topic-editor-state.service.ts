@@ -258,7 +258,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           _subtopicPageLoadedEventEmitter.emit();
           return;
         }
-        EditableTopicBackendApiService.fetchSubtopicPage(
+        EditableTopicBackendApiService.fetchSubtopicPageAsync(
           topicId, subtopicId).then(
           function(newBackendSubtopicPageObject) {
             _updateSubtopicPage(newBackendSubtopicPageObject);

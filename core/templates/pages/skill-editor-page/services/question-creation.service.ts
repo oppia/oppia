@@ -203,7 +203,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
-      EditableQuestionBackendApiService.createQuestion(
+      EditableQuestionBackendApiService.createQuestionAsync(
         newQuestionSkillIds, newQuestionSkillDifficulties,
         question.toBackendDict(true), imagesData);
     };

@@ -37,7 +37,7 @@ describe('Training Modal Controller', function() {
     $provide.value('ExplorationDataService', {
       explorationId: 0,
       autosaveChangeList: function() {},
-      discardDraft: function() {}
+      discardDraftAsync: function() {}
     });
   }));
 

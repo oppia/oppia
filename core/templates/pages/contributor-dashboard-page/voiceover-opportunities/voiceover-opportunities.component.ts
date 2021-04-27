@@ -84,7 +84,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
         ctrl.opportunitiesAreLoading = true;
         ctrl.moreOpportunitiesAvailable = true;
         ctrl.progressBarRequired = false;
-        ContributionOpportunitiesService.getVoiceoverOpportunities(
+        ContributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
           TranslationLanguageService.getActiveLanguageCode(),
           updateWithNewOpportunities);
       };

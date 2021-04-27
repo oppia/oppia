@@ -98,7 +98,7 @@ describe('Question Creation Service', function() {
         version: 2,
       };
 
-      spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
+      spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue({
         skill: skillBackendDict,
         topicName: 'topic1',
         subtopicName: 'subtopic2',
@@ -232,7 +232,7 @@ describe('Question Creation Service', function() {
         qcs.populateMisconceptions();
 
         var questionSpy = (
-          spyOn(EditableQuestionBackendApiService, 'createQuestion'));
+          spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
         expect(questionSpy).toHaveBeenCalled();
       });
@@ -285,7 +285,7 @@ describe('Question Creation Service', function() {
         version: 2,
       };
 
-      spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
+      spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue({
         skill: skillBackendDict,
         topicName: 'topic1',
         subtopicName: 'subtopic2',
@@ -390,7 +390,7 @@ describe('Question Creation Service', function() {
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
         var questionSpy = (
-          spyOn(EditableQuestionBackendApiService, 'createQuestion'));
+          spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
         expect(questionSpy).not.toHaveBeenCalled();
       });
@@ -443,7 +443,7 @@ describe('Question Creation Service', function() {
         version: 2,
       };
 
-      spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
+      spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue({
         skill: SkillObjectFactory.createFromBackendDict(skillBackendDict),
         topicName: 'topic1',
         subtopicName: 'subtopic2',

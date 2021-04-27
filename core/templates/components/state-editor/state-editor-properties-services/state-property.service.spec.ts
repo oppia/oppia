@@ -57,7 +57,7 @@ describe('Change list service', function() {
       mockExplorationData = {
         explorationId: 0,
         autosaveChangeList: function() {},
-        discardDraft: function() {}
+        discardDraftAsync: function() {}
       };
       angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);

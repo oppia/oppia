@@ -196,7 +196,7 @@ angular.module('oppia').directive('questionsList', [
             if (!ctrl.questionIsBeingUpdated) {
               var imagesData = ImageLocalStorageService.getStoredImagesData();
               ImageLocalStorageService.flushStoredImagesData();
-              EditableQuestionBackendApiService.createQuestion(
+              EditableQuestionBackendApiService.createQuestionAsync(
                 ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
                 ctrl.question.toBackendDict(true), imagesData
               ).then(function(response) {

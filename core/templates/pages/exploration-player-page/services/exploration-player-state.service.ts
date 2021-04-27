@@ -137,7 +137,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
       $q.all([
-        EditableExplorationBackendApiService.fetchApplyDraftExploration(
+        EditableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
           explorationId),
         ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),

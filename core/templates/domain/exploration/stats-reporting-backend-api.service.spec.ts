@@ -222,6 +222,7 @@ describe('Stats reporting backend API Service', () => {
 
     spyOn(contextService, 'getExplorationId').and.callFake(mockGetExpId);
 
+    flushMicrotasks();
     expect(() => {
       statsReportingBackendApiService.postsStatsAsync(
         aggregatedStats, expVersion, expId, currentState, nextExpId,

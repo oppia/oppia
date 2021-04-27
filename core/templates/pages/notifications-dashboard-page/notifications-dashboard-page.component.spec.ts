@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for notificationsDashboardPage.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -102,9 +102,10 @@ describe('Notifications Dasboard Page Component', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should initialize', () => {
+  it('should initialize', fakeAsync(() => {
     spyOn(loaderService, 'hideLoadingScreen');
     componentInstance.ngOnInit();
+    flushMicrotasks();
     expect(componentInstance.recentNotifications)
       .toEqual(responseData.recent_notifications);
     expect(componentInstance.jobQueuedMsec)
@@ -114,7 +115,7 @@ describe('Notifications Dasboard Page Component', () => {
     expect(componentInstance.currentUsername)
       .toEqual(responseData.username);
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  });
+  }));
 
   it('should get item url', () => {
     let activityId: string = 'test_id';

@@ -137,7 +137,7 @@ describe('Settings Tab Component', () => {
       data: {
         param_changes: []
       },
-      getData: () => $q.resolve(),
+      getDataAsync: () => $q.resolve(),
       autosaveChangeList: () => {}
     });
     $provide.value(

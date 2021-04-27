@@ -297,7 +297,7 @@ describe('Story editor state service', () => {
 
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(
-      storyEditorStateService.changeStoryPublicationStatusAsync(true)
+      storyEditorStateService.changeStoryPublicationStatus(true)
     ).toBe(true);
     tick(1000);
 
