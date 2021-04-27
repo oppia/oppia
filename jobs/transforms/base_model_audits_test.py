@@ -392,6 +392,16 @@ class MockValidateCommitCmdsSchemaChangeDomain(
         pass
 
 
+class MockValidateWrongSchema(base_model_audits.ValidateCommitCmdsSchema):
+
+    def _get_change_domain_class(self, item):
+        print('the item received here is \n\n\n', item)
+        if (isinstance(item, base_models.BaseCommitLogEntryModel)):
+            return 'test'
+        else:
+            return change_domain.BaseChange(item) 
+
+
 class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_none_commit(self):
@@ -412,4 +422,30 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
+        ])
+
+    # test failing
+    def test_validate_wrong_commit(self):
+        invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
+            id='invalid',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{'cmd-invalid': 'invalid_test_command'}])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(MockValidateWrongSchema())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                "{u'cmd-invalid': u'invalid_test_command'}",
+                'ValidationError. Missing cmd key in change dict')
+                # 'ValidationError. Missing cmd key in change dict')
+                # 'ValidationError. Command {} is not allowed')
         ])
