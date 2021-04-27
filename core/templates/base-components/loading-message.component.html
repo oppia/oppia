@@ -1,4 +1,4 @@
-<div [hidden]="!message"
+<div *ngIf="message"
      class="oppia-loading-fullpage protractor-test-loading-fullpage">
   <div class="oppia-align-center">
     <span>{{ message | translate }}</span>

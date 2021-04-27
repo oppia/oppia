@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,44 +16,61 @@
  * @fileoverview Component for the user's notifications dashboard.
  */
 
-require('base-components/base-content.component.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { LoaderService } from 'services/loader.service';
+import { NotificationsDashboardPageBackendApiService, Notification } from './notifications-dashboard-page-backend-api.service';
+// require('base-components/base-content.directive.ts');
 
-require('services/date-time-format.service.ts');
-require('services/contextual/window-ref.service.ts');
+@Component({
+  selector: 'oppia-notifications-dashboard-page',
+  templateUrl: './notifications-dashboard-page.component.html'
+})
+export class NotificationsDashboardPageComponent {
+  recentNotifications: Notification[] = [];
+  jobQueuedMsec: number;
+  lastSeenMsec: number;
+  currentUsername: string;
 
-angular.module('oppia').component('notificationsDashboardPage', {
-  template: require('./notifications-dashboard-page.component.html'),
-  controller: [
-    '$http', 'DateTimeFormatService', 'LoaderService', 'WindowRef',
-    function($http, DateTimeFormatService, LoaderService, WindowRef) {
-      var ctrl = this;
-      ctrl.getItemUrl = function(activityId, notificationType) {
-        return (
-          '/create/' + activityId + (
-            notificationType === 'feedback_thread' ? '#/feedback' : ''));
-      };
+  constructor(
+    private notificationsDashboardPageBackendApiService:
+    NotificationsDashboardPageBackendApiService,
+    private dateTimeFormatService: DateTimeFormatService,
+    private loaderService: LoaderService,
+    private windowRef: WindowRef,
+  ) {}
 
-      ctrl.navigateToProfile = function($event, username) {
-        $event.stopPropagation();
-        WindowRef.nativeWindow.location.href = '/profile/' + username;
-      };
+  getItemUrl(activityId: string, notificationType: string): string {
+    return (
+      '/create/' + activityId + (
+        notificationType === 'feedback_thread' ? '#/feedback' : ''));
+  }
 
-      ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-        return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-          millisSinceEpoch);
-      };
-      ctrl.$onInit = function() {
-        LoaderService.showLoadingScreen('Loading');
-        $http.get('/notificationsdashboardhandler/data').then(function(
-            response) {
-          var data = response.data;
-          ctrl.recentNotifications = data.recent_notifications;
-          ctrl.jobQueuedMsec = data.job_queued_msec;
-          ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
-          ctrl.currentUsername = data.username;
-          LoaderService.hideLoadingScreen();
-        });
-      };
-    }
-  ]
-});
+  navigateToProfile($event: Event, username: string): void {
+    $event.stopPropagation();
+    this.windowRef.nativeWindow.location.href = '/profile/' + username;
+  }
+
+  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
+    return this.dateTimeFormatService
+      .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+  }
+
+  ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
+    this.notificationsDashboardPageBackendApiService.getNotificationData()
+      .then((response) => {
+        let data = response;
+        this.recentNotifications = data.recent_notifications;
+        this.jobQueuedMsec = data.job_queued_msec;
+        this.lastSeenMsec = data.last_seen_msec || 0.0;
+        this.currentUsername = data.username;
+        this.loaderService.hideLoadingScreen();
+      });
+  }
+}
+
+angular.module('oppia').directive('oppiaNotificationsDashboardPage',
+  downgradeComponent({ component: NotificationsDashboardPageComponent }));

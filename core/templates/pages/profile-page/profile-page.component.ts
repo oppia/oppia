@@ -23,7 +23,7 @@ require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/exploration-summary-tile.directive.ts');
+require('components/summary-tile/exploration-summary-tile.component.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Contributor Dashboard - Oppia"})
   </head>
@@ -18,6 +18,12 @@
         <page-footer></page-footer>
       </oppia-base-content>
 
+          <content>
+            <contributor-dashboard-page></contributor-dashboard-page>
+          </content>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
     </oppia-root>
     @load('pages/footer_js_libs.html')
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>

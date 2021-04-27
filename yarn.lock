@@ -9250,6 +9250,13 @@ ngx-toastr@^13.2.1:
   dependencies:
     tslib "^2.0.0"
 
+ngx-trim-directive@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ngx-trim-directive/-/ngx-trim-directive-1.1.0.tgz#028f0963486efd19298c39f09805e52e332223ba"
+  integrity sha512-czY8oy4oDPYzz2Umc1cVal3tPYIAduW0yHlTHYABWtqwTSBe3/1apvkkUmQou6Eqm7WJh7qxb0N6K/7Xqel/1g==
+  dependencies:
+    tslib "^1.9.0"
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
