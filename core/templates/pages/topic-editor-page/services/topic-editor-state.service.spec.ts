@@ -59,10 +59,10 @@ describe('Topic editor state service', function() {
       newBackendTopicObject: null,
       backendStorySummariesObject: null,
       failure: null,
-      fetchTopic: null,
-      fetchSubtopicPage: null,
-      updateTopic: null,
-      fetchStories: null
+      fetchTopicAsync: null,
+      fetchSubtopicPageAsync: null,
+      updateTopicAsync: null,
+      fetchStoriesAsync: null
     };
 
     var _fetchOrUpdateTopicAsync = async function() {
@@ -99,10 +99,10 @@ describe('Topic editor state service', function() {
     self.newBackendTopicObject = {};
     self.backendStorySummariesObject = [];
     self.failure = null;
-    self.fetchTopic = _fetchOrUpdateTopicAsync;
-    self.fetchSubtopicPage = _fetchSubtopicPage;
-    self.updateTopic = _fetchOrUpdateTopicAsync;
-    self.fetchStories = _fetchStoriesAsync;
+    self.fetchTopicAsync = _fetchOrUpdateTopicAsync;
+    self.fetchSubtopicPageAsync = _fetchSubtopicPage;
+    self.updateTopicAsync = _fetchOrUpdateTopicAsync;
+    self.fetchStoriesAsync = _fetchStoriesAsync;
 
     return self;
   };
@@ -111,7 +111,7 @@ describe('Topic editor state service', function() {
     var self = {
       backendTopicRightsObject: null,
       failure: null,
-      fetchTopicRights: null
+      fetchTopicRightsAsync: null
     };
 
     var _fetchTopicRightsAsync = async function() {
@@ -126,7 +126,7 @@ describe('Topic editor state service', function() {
 
     self.backendTopicRightsObject = {};
     self.failure = null;
-    self.fetchTopicRights = _fetchTopicRightsAsync;
+    self.fetchTopicRightsAsync = _fetchTopicRightsAsync;
 
     return self;
   };
@@ -441,11 +441,11 @@ describe('Topic editor state service', function() {
 
   it('should request to load the topic rights from the backend',
     function() {
-      spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRights')
+      spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
         .and.callThrough();
 
       TopicEditorStateService.loadTopic(5);
-      expect(fakeTopicRightsBackendApiService.fetchTopicRights)
+      expect(fakeTopicRightsBackendApiService.fetchTopicRightsAsync)
         .toHaveBeenCalled();
     }
   );
@@ -683,7 +683,7 @@ describe('Topic editor state service', function() {
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateTopicSpy = (
-      fakeEditableTopicBackendApiService.updateTopic);
+      fakeEditableTopicBackendApiService.updateTopicAsync);
     expect(updateTopicSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
   }));
