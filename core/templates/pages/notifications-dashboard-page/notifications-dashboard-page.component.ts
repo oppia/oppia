@@ -22,7 +22,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { NotificationsDashboardPageBackendApiService, Notification } from './notifications-dashboard-page-backend-api.service';
-// require('base-components/base-content.directive.ts');
 
 @Component({
   selector: 'oppia-notifications-dashboard-page',
