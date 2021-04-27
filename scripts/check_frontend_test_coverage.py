@@ -235,7 +235,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'refresher-exploration-confirmation-modal.service.ts',
     'remove-duplicates-in-array.pipe.ts',
     'request-interceptor.service.ts',
-    'response-header.directive.ts',
+    'response-header.component.ts',
     'review-material-editor.directive.ts',
     'role-graph.directive.ts',
     'rubrics-editor.directive.ts',
