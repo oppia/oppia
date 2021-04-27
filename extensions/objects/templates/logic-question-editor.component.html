@@ -17,9 +17,7 @@
            id="logicQuestionTarget"
            (keyup)="changeTarget()">
   </p>
-  <p>
-    <div class="logic-proof-mistake-message">{{localValue.errorMessage}}</div>
-  </p>
+  <div class="logic-proof-mistake-message">{{ localValue.errorMessage }}</div>
   Default proof (optional):<br>
   <textarea [trim]="false"
             [(ngModel)]="localValue.proofString"
