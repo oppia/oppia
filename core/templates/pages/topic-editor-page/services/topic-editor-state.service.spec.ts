@@ -452,18 +452,14 @@ describe('Topic editor state service', function() {
 
   it('should fire an init event after loading the first topic',
     fakeAsync(() => {
-      spyOn(
-        fakeEditableTopicBackendApiService, 'updateTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
-          .and.callThrough();
-      spyOn(
-        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
-          .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
+        .and.callThrough();
+      spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+        .and.callThrough();
       TopicEditorStateService.loadTopic(5);
       flushMicrotasks();
       $rootScope.$apply();
@@ -482,18 +478,14 @@ describe('Topic editor state service', function() {
   );
 
   it('should fire an update event after loading more topics', fakeAsync(() => {
-    spyOn(
-      fakeEditableTopicBackendApiService, 'updateTopicAsync')
-        .and.callThrough();
-    spyOn(
-      fakeEditableTopicBackendApiService, 'fetchTopicAsync')
-        .and.callThrough();
-    spyOn(
-      fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
-        .and.callThrough();
-    spyOn(
-      fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
-        .and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync')
+      .and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync')
+      .and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
+      .and.callThrough();
+    spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+      .and.callThrough();
     // Load initial topic.
     TopicEditorStateService.loadTopic(5);
     flushMicrotasks();
@@ -509,18 +501,14 @@ describe('Topic editor state service', function() {
 
   it('should track whether it is currently' +
     'loading the topic', fakeAsync(() => {
-    spyOn(
-      fakeEditableTopicBackendApiService, 'updateTopicAsync')
-        .and.callThrough();
-    spyOn(
-      fakeEditableTopicBackendApiService, 'fetchTopicAsync')
-        .and.callThrough();
-    spyOn(
-      fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
-        .and.callThrough();
-    spyOn(
-      fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
-        .and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync')
+      .and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync')
+      .and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
+      .and.callThrough();
+    spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+      .and.callThrough();
     expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
 
     TopicEditorStateService.loadTopic(5);
@@ -533,17 +521,13 @@ describe('Topic editor state service', function() {
 
   it('should indicate a topic is no longer loading after an error',
     fakeAsync(() => {
-      spyOn(
-        fakeEditableTopicBackendApiService, 'updateTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
-          .and.callThrough();
-      spyOn(
-        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+      spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
+        .and.callThrough();
+      spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
         .and.callThrough();
       expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
       fakeEditableTopicBackendApiService.failure = 'Internal 500 error';
@@ -558,17 +542,13 @@ describe('Topic editor state service', function() {
 
   it('should report that a topic has loaded through loadTopic()',
     fakeAsync(() => {
-      spyOn(
-        fakeEditableTopicBackendApiService, 'updateTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
-          .and.callThrough();
-      spyOn(
-        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+      spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
+        .and.callThrough();
+      spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
         .and.callThrough();
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
@@ -664,18 +644,14 @@ describe('Topic editor state service', function() {
 
   it('should not save the topic if there are no pending changes',
     fakeAsync(() => {
-      spyOn(
-        fakeEditableTopicBackendApiService, 'updateTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchTopicAsync')
-          .and.callThrough();
-      spyOn(
-        fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
-          .and.callThrough();
-      spyOn(
-        fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
-          .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'updateTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchTopicAsync')
+        .and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
+        .and.callThrough();
+      spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
+        .and.callThrough();
       TopicEditorStateService.loadTopic(5);
       flushMicrotasks();
       $rootScope.$apply();
@@ -691,7 +667,7 @@ describe('Topic editor state service', function() {
     spyOn(fakeEditableTopicBackendApiService, 'fetchStoriesAsync')
       .and.callThrough();
     spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRightsAsync')
-        .and.callThrough();
+      .and.callThrough();
 
     TopicEditorStateService.loadTopic(0);
     flushMicrotasks();

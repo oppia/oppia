@@ -149,7 +149,7 @@ describe('Statistics Tab Component', function() {
       'ReadOnlyExplorationBackendApiService');
 
     spyOn(
-    readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
+      readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
       .returnValue($q.resolve({
         exploration: {
           init_state_name: 'State1',

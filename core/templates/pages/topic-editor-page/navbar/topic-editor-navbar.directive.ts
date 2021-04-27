@@ -218,10 +218,10 @@ angular.module('oppia').directive('topicEditorNavbar', [
             }
             TopicRightsBackendApiService.unpublishTopicAsync(
               $scope.topicId).then(function() {
-                $scope.topicRights.markTopicAsUnpublished();
-                TopicEditorStateService.setTopicRights($scope.topicRights);
-                $rootScope.$applyAsync();
-              });
+              $scope.topicRights.markTopicAsUnpublished();
+              TopicEditorStateService.setTopicRights($scope.topicRights);
+              $rootScope.$applyAsync();
+            });
           };
 
           $scope.toggleNavigationOptions = function() {

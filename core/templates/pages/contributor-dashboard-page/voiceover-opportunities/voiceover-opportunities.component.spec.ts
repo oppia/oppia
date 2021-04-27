@@ -86,7 +86,7 @@ describe('Voiceover opportunities component', function() {
       ], true));
     spyOn(
       contributionOpportunitiesService, 'getMoreVoiceoverOpportunitiesAsync')
-        .and.callFake((languageCode, callback) => callback([
+      .and.callFake((languageCode, callback) => callback([
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '3',
           topic_name: 'topic_3',
