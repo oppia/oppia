@@ -98,7 +98,8 @@ export class TranslateService {
       newLanguageCode).then(
       translations => {
         this.translations[newLanguageCode] = translations;
-        if (this.currentLang === newLanguageCode) {
+        if (this.currentLang === newLanguageCode ||
+          this.fallbackLang === newLanguageCode) {
           this.onLangChangeEventEmitter.emit(
             {newLanguageCode: newLanguageCode});
         }
