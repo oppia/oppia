@@ -277,7 +277,7 @@ describe('Skill backend API service', () => {
       skillBackendApiService.fetchMultiSkillsAsync(['1', '2']).then(
         response => {
           expect(response).toEqual([skill, skill]);
-      });
+        });
 
       let req = httpTestingController.expectOne(
         '/skill_data_handler/' + encodeURIComponent('1,2'));

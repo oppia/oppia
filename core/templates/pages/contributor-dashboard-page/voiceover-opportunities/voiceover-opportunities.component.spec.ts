@@ -62,42 +62,42 @@ describe('Voiceover opportunities component', function() {
       .returnValue(activeLanguageChangedEmitter);
     spyOn(
       contributionOpportunitiesService, 'getVoiceoverOpportunitiesAsync').and
-        .callFake((languageCode, callback) => callback([
-          ExplorationOpportunitySummary.createFromBackendDict({
-            id: '1',
-            topic_name: 'topic_1',
-            story_title: 'Story title 1',
-            chapter_title: 'Chapter title 1',
-            content_count: 2,
-            translation_counts: {
-              en: 1
-            }
-          }),
-          ExplorationOpportunitySummary.createFromBackendDict({
-            id: '2',
-            topic_name: 'topic_2',
-            story_title: 'Story title 2',
-            chapter_title: 'Chapter title 2',
-            content_count: 4,
-            translation_counts: {
-              en: 2
-            }
-          }),
-        ], true));
+      .callFake((languageCode, callback) => callback([
+        ExplorationOpportunitySummary.createFromBackendDict({
+          id: '1',
+          topic_name: 'topic_1',
+          story_title: 'Story title 1',
+          chapter_title: 'Chapter title 1',
+          content_count: 2,
+          translation_counts: {
+            en: 1
+          }
+        }),
+        ExplorationOpportunitySummary.createFromBackendDict({
+          id: '2',
+          topic_name: 'topic_2',
+          story_title: 'Story title 2',
+          chapter_title: 'Chapter title 2',
+          content_count: 4,
+          translation_counts: {
+            en: 2
+          }
+        }),
+      ], true));
     spyOn(
-      contributionOpportunitiesService, 'getMoreVoiceoverOpportunitiesAsync').and
-        .callFake((languageCode, callback) => callback([
-          ExplorationOpportunitySummary.createFromBackendDict({
-            id: '3',
-            topic_name: 'topic_3',
-            story_title: 'Story title 3',
-            chapter_title: 'Chapter title 3',
-            content_count: 3,
-            translation_counts: {
-              en: 3
-            }
-          }),
-        ], true));
+      contributionOpportunitiesService, 'getMoreVoiceoverOpportunitiesAsync')
+        .and.callFake((languageCode, callback) => callback([
+        ExplorationOpportunitySummary.createFromBackendDict({
+          id: '3',
+          topic_name: 'topic_3',
+          story_title: 'Story title 3',
+          chapter_title: 'Chapter title 3',
+          content_count: 3,
+          translation_counts: {
+            en: 3
+          }
+        }),
+      ], true));
 
     $scope = $rootScope.$new();
     ctrl = $componentController('voiceoverOpportunities', {

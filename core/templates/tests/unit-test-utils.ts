@@ -127,7 +127,7 @@ export const bootstrapAsync = async(
  * @param {unknown} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
  */
-export const setupAndGetUpgradedComponent = (
+export const setupAndGetUpgradedComponentAsync = async(
     kebabCaseName: string,
     camelCaseName: string,
     upgradedComponentTypes: unknown): Promise<string> => {

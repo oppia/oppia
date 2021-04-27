@@ -142,35 +142,36 @@ export class ExplorationDataService {
       // are discarded, otherwise the exploration-with-draft-changes
       // (which is cached here) will be reused.
       return new Promise((resolve, reject) => {
-        this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
-          this.explorationId).then((response) => {
-          this.loggerService.info('Retrieved exploration data.');
-          this.loggerService.info(JSON.stringify(response));
-          this.draftChangeListId = response.draft_change_list_id;
-          this.data = response;
-          const draft = this.localStorageService.getExplorationDraft(
-            this.explorationId);
-          if (draft) {
-            if (draft.isValid(this.draftChangeListId)) {
-              var changeList = draft.getChanges();
-              this._autosaveChangeListAsync(changeList).then(
-                // A reload is needed so that the changelist just saved is
-                // loaded as opposed to the exploration returned by this
-                // response.
-                () => {
-                  this.windowRef.nativeWindow.location.reload();
-                },
-                // If the request errors out, do nothing.
-                () => {}
-              );
-            } else {
-              if (errorCallback) {
-                errorCallback(this.explorationId, draft.getChanges());
+        this.editableExplorationBackendApiService
+          .fetchApplyDraftExplorationAsync(
+            this.explorationId).then((response) => {
+            this.loggerService.info('Retrieved exploration data.');
+            this.loggerService.info(JSON.stringify(response));
+            this.draftChangeListId = response.draft_change_list_id;
+            this.data = response;
+            const draft = this.localStorageService.getExplorationDraft(
+              this.explorationId);
+            if (draft) {
+              if (draft.isValid(this.draftChangeListId)) {
+                var changeList = draft.getChanges();
+                this._autosaveChangeListAsync(changeList).then(
+                  // A reload is needed so that the changelist just saved is
+                  // loaded as opposed to the exploration returned by this
+                  // response.
+                  () => {
+                    this.windowRef.nativeWindow.location.reload();
+                  },
+                  // If the request errors out, do nothing.
+                  () => {}
+                );
+              } else {
+                if (errorCallback) {
+                  errorCallback(this.explorationId, draft.getChanges());
+                }
               }
             }
-          }
-          resolve(response);
-        });
+            resolve(response);
+          });
       });
     }
   }

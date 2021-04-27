@@ -33,7 +33,6 @@ import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/ex
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { SuggestionsService } from 'services/suggestions.service';
-import { async } from 'q';
 
 type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 
@@ -227,7 +226,8 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  async markThreadAsSeenAsync(thread: SuggestionAndFeedbackThread): Promise<void> {
+  async markThreadAsSeenAsync(
+      thread: SuggestionAndFeedbackThread): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }

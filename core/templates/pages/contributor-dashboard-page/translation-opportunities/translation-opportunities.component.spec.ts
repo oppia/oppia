@@ -156,10 +156,11 @@ describe('Translation opportunities component', () => {
       more: false
     });
 
-    component.loadMoreOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
-      expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBeFalse();
-    });
+    component.loadMoreOpportunitiesAsync()
+      .then(({opportunitiesDicts, more}) => {
+        expect(opportunitiesDicts.length).toBe(2);
+        expect(more).toBeFalse();
+      });
   });
 
   it('should open translation modal when clicking button', fakeAsync(() => {

@@ -107,10 +107,10 @@ export class TopicRightsBackendApiService {
   }
 
   async fetchTopicRightsAsync(
-    topicId: string): Promise<TopicRightsBackendResponse> {
-      return new Promise((resolve, reject) => {
-        this._fetchTopicRights(topicId, resolve, reject);
-      });
+      topicId: string): Promise<TopicRightsBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this._fetchTopicRights(topicId, resolve, reject);
+    });
   }
 
   /**
@@ -123,18 +123,18 @@ export class TopicRightsBackendApiService {
    * requests from the backend in further function calls.
    */
   async loadTopicRightsAsync(
-    topicId: string): Promise<TopicRightsBackendResponse> {
-      return new Promise((resolve, reject) => {
-        if (this._isCached(topicId)) {
+      topicId: string): Promise<TopicRightsBackendResponse> {
+    return new Promise((resolve, reject) => {
+      if (this._isCached(topicId)) {
+        resolve(this.topicRightsCache[topicId]);
+      } else {
+        this._fetchTopicRights(topicId, (topicRights) => {
+          // Save the fetched topic rights to avoid future fetches.
+          this.topicRightsCache[topicId] = topicRights;
           resolve(this.topicRightsCache[topicId]);
-        } else {
-          this._fetchTopicRights(topicId, (topicRights) => {
-            // Save the fetched topic rights to avoid future fetches.
-            this.topicRightsCache[topicId] = topicRights;
-            resolve(this.topicRightsCache[topicId]);
-          }, reject);
-        }
-      });
+        }, reject);
+      }
+    });
   }
 
   /**
@@ -160,27 +160,27 @@ export class TopicRightsBackendApiService {
    * Publishes a topic.
    */
   async publishTopicAsync(
-    topicId: string): Promise<TopicRightsBackendResponse> {
-      return new Promise((resolve, reject) => {
-        this._setTopicStatus(topicId, true, resolve, reject);
-      });
+      topicId: string): Promise<TopicRightsBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this._setTopicStatus(topicId, true, resolve, reject);
+    });
   }
 
   async sendMailAsync(
-    topicId: string, topicName: string): Promise<void> {
-      return new Promise((resolve, reject) => {
-        this._sendMail(topicId, topicName, resolve, reject);
-      });
+      topicId: string, topicName: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._sendMail(topicId, topicName, resolve, reject);
+    });
   }
 
   /**
    * Unpublishes a topic.
    */
   async unpublishTopicAsync(
-    topicId: string): Promise<TopicRightsBackendResponse> {
-      return new Promise((resolve, reject) => {
-        this._setTopicStatus(topicId, false, resolve, reject);
-      });
+      topicId: string): Promise<TopicRightsBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this._setTopicStatus(topicId, false, resolve, reject);
+    });
   }
 }
 angular.module('oppia').factory(

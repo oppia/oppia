@@ -68,30 +68,30 @@ export class ContributionOpportunitiesService {
       });
   }
   private async _getTranslationOpportunitiesAsync(
-    languageCode: string, cursor: string) {
-      return this.contributionOpportunitiesBackendApiService
-        .fetchTranslationOpportunitiesAsync(languageCode, cursor)
-        .then(({ opportunities, nextCursor, more }) => {
-          this._translationOpportunitiesCursor = nextCursor;
-          this._moreTranslationOpportunitiesAvailable = more;
-          return {
-            opportunities: opportunities,
-            more: more
-          };
-        });
+      languageCode: string, cursor: string) {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) => {
+        this._translationOpportunitiesCursor = nextCursor;
+        this._moreTranslationOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
+      });
   }
   private async _getVoiceoverOpportunitiesAsync(
-    languageCode: string, cursor: string) {
-      return this.contributionOpportunitiesBackendApiService
-        .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
-        .then(({ opportunities, nextCursor, more }) => {
-          this._voiceoverOpportunitiesCursor = nextCursor;
-          this._moreVoiceoverOpportunitiesAvailable = more;
-          return {
-            opportunities: opportunities,
-            more: more
-          };
-        });
+      languageCode: string, cursor: string) {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) => {
+        this._voiceoverOpportunitiesCursor = nextCursor;
+        this._moreVoiceoverOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
+      });
   }
   showRequiresLoginModal(): void {
     this.modalService.open(LoginRequiredModalContent);

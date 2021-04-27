@@ -54,9 +54,9 @@ angular.module('oppia').component('profilePage', {
       };
       ctrl.$onInit = function() {
         LoaderService.showLoadingScreen('Loading');
-        let fetchProfileData = () =>
+        let fetchProfileDataAsync = async() =>
           ProfilePageBackendApiService.fetchProfileDataAsync();
-        fetchProfileData().then(function(data) {
+        fetchProfileDataAsync().then(function(data) {
           ctrl.username = {
             title: 'Username',
             value: data.usernameOfViewedProfile,

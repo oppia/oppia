@@ -72,9 +72,9 @@ export class SearchExplorationsBackendApiService {
    * and objective.
    */
   async fetchExplorationsAsync(
-    searchQuery: string): Promise<ExplorationMetadata[]> {
-      return new Promise((resolve, reject) => {
-        this._fetchExplorations(searchQuery, resolve, reject);
+      searchQuery: string): Promise<ExplorationMetadata[]> {
+    return new Promise((resolve, reject) => {
+      this._fetchExplorations(searchQuery, resolve, reject);
     });
   }
 }

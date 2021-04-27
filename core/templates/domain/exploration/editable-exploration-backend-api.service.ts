@@ -89,8 +89,8 @@ export class EditableExplorationBackendApiService {
   }
 
   async fetchExplorationAsync(
-    explorationId: string): Promise<ExplorationBackendDict> {
-      return this._fetchExplorationAsync(explorationId, false);
+      explorationId: string): Promise<ExplorationBackendDict> {
+    return this._fetchExplorationAsync(explorationId, false);
   }
 
   async fetchApplyDraftExplorationAsync(

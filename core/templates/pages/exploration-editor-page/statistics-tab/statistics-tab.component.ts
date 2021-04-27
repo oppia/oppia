@@ -57,7 +57,7 @@ angular.module('oppia').component('statisticsTab', {
       const refreshExplorationStatistics = () => {
         $q.all([
           ReadOnlyExplorationBackendApiService
-          .loadLatestExplorationAsync(expId),
+            .loadLatestExplorationAsync(expId),
           ExplorationStatsService.getExplorationStatsAsync(expId)
         ]).then(responses => {
           const [expResponse, expStats] = responses;

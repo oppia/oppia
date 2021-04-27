@@ -216,8 +216,8 @@ angular.module('oppia').directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               return false;
             }
-            TopicRightsBackendApiService.unpublishTopicAsync($scope.topicId).then(
-              function() {
+            TopicRightsBackendApiService.unpublishTopicAsync(
+              $scope.topicId).then(function() {
                 $scope.topicRights.markTopicAsUnpublished();
                 TopicEditorStateService.setTopicRights($scope.topicRights);
                 $rootScope.$applyAsync();

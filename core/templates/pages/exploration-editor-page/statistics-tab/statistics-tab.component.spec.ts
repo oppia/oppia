@@ -149,15 +149,15 @@ describe('Statistics Tab Component', function() {
       'ReadOnlyExplorationBackendApiService');
 
     spyOn(
-      readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
-        .returnValue($q.resolve({
-          exploration: {
-            init_state_name: 'State1',
-            states: {
-              State1: state
-            }
+    readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
+      .returnValue($q.resolve({
+        exploration: {
+          init_state_name: 'State1',
+          states: {
+            State1: state
           }
-        }));
+        }
+      }));
     spyOn(explorationStatsService, 'getExplorationStatsAsync').and.returnValue(
       $q.resolve({
         numStarts: 20,

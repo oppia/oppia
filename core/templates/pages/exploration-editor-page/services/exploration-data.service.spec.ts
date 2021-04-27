@@ -81,7 +81,7 @@ describe('Exploration data service', function() {
   } as unknown as FetchExplorationBackendResponse;
   class MockEditableExplorationBackendApiService {
     resolve: boolean = true;
-    fetchApplyDraftExplorationAsync() {
+    async fetchApplyDraftExplorationAsync() {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
           resolve(sampleDataResults);
@@ -90,7 +90,7 @@ describe('Exploration data service', function() {
         }
       });
     }
-    updateExplorationAsync() {
+    async updateExplorationAsync() {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
           resolve(sampleDataResults);

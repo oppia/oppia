@@ -33,7 +33,7 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -550,7 +550,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   openRemoveActivityModal(
       sectionNameI18nId: string, subsectionName: string,
       activity: LearnerExplorationSummary | CollectionSummary): void {
-    this.learnerDashboardActivityBackendApiService.removeActivityModal(
+    this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activity.id, activity.title)
       .then(() => {

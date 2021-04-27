@@ -43,17 +43,17 @@ describe('Collection editor state service', () => {
 
     private async _fetchOrUpdateCollectionAsync(): Promise<
       void | Collection> {
-        return new Promise((resolve, reject) => {
-          if (!this.failure) {
-            resolve(
-              Collection.create(
-                this.newBackendCollectionObject
-              )
-            );
-          } else {
-            reject();
-          }
-        });
+      return new Promise((resolve, reject) => {
+        if (!this.failure) {
+          resolve(
+            Collection.create(
+              this.newBackendCollectionObject
+            )
+          );
+        } else {
+          reject();
+        }
+      });
     }
 
 
@@ -73,15 +73,15 @@ describe('Collection editor state service', () => {
 
     private async _fetchCollectionRightsAsync(): Promise<
       void | CollectionRights> {
-        return new Promise((resolve, reject) => {
-          if (!this.failure) {
-            resolve(CollectionRights.create(
-              this.backendCollectionRightsObject
-            ));
-          } else {
-            reject();
-          }
-        });
+      return new Promise((resolve, reject) => {
+        if (!this.failure) {
+          resolve(CollectionRights.create(
+            this.backendCollectionRightsObject
+          ));
+        } else {
+          reject();
+        }
+      });
     }
 
     get fetchCollectionRightsAsync(): () => Promise<void | CollectionRights> {
