@@ -176,8 +176,8 @@ export class UnitsObjectFactory {
       Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
     );
     for (var i = 0; i < keys.length; i++) {
-      let baseUnitValue =
-        ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit;
+      let baseUnitValue = (
+        ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit);
       if (baseUnitValue !== null) {
         // Sub unit (like: paise, cents etc.).
         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
