@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,34 +21,34 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-@Component({
-  selector: 'oppia-side-navigation-bar',
-  templateUrl: './side-navigation-bar.component.html'
-})
+ @Component({
+   selector: 'oppia-side-navigation-bar',
+   templateUrl: './side-navigation-bar.component.html'
+ })
 export class SideNavigationBarComponent {
-  @Input() display: boolean;
-  currentUrl: string;
-  classroomSubmenuIsShown: boolean = false;
+   @Input() display: boolean;
+   currentUrl: string;
+   classroomSubmenuIsShown: boolean = false;
 
-  constructor(
-    private windowRef: WindowRef,
-    private urlInterpolationService: UrlInterpolationService
-  ) {}
+   constructor(
+     private windowRef: WindowRef,
+     private urlInterpolationService: UrlInterpolationService
+   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
+   getStaticImageUrl(imagePath: string): string {
+     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+   }
 
-  ngOnInit(): void {
-    this.currentUrl = this.windowRef.nativeWindow.location.pathname;
-  }
+   ngOnInit(): void {
+     this.currentUrl = this.windowRef.nativeWindow.location.pathname;
+   }
 
-  toggleClassroomSubmenu(): void {
-    this.classroomSubmenuIsShown = !this.classroomSubmenuIsShown;
-  }
+   toggleClassroomSubmenu(): void {
+     this.classroomSubmenuIsShown = !this.classroomSubmenuIsShown;
+   }
 }
 
 angular.module('oppia').directive('oppiaSideNavigationBar',
-  downgradeComponent({
-    component: SideNavigationBarComponent
-  }) as angular.IDirectiveFactory);
+   downgradeComponent({
+     component: SideNavigationBarComponent
+   }) as angular.IDirectiveFactory);
