@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/state-directives/response-header/response-header.directive.ts');
+  'components/state-directives/response-header/response-header.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
@@ -549,7 +549,7 @@ angular.module('oppia').component('stateTranslation', {
           $scope.stateInteractionId ? (
             ExplorationHtmlFormatterService.getInteractionHtml(
               $scope.stateInteractionId,
-              $scope.stateInteractionCustomizationArgs, false)
+              $scope.stateInteractionCustomizationArgs, false, undefined, null)
           ) : '');
         $scope.interactionCustomizationArgTranslatableContent = (
           $scope.getInteractionCustomizationArgTranslatableContents(
