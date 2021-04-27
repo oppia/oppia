@@ -27,7 +27,7 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
-
+import { SharedFormsModule } from './forms/shared-forms.module'
 
 // Components.
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
@@ -52,6 +52,7 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
 
 import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
@@ -102,8 +103,6 @@ import { TranslateModule } from 'filters/translate.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { BaseContentComponent } from '../base-components/base-content.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
-import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
-import { SharedFormsModule } from './forms/shared-forms.module';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
