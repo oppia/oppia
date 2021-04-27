@@ -135,14 +135,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
          this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
        });
 
-     // Close the submenu if focus or click occur = nullwhere outside of
-     // the menu or outside of its parent (which opens submenu on hover).
-     angular.element(document).on('click', (evt) => {
-       if (!angular.element(evt.target).closest('li').length) {
-         this.activeMenuName = '';
-       }
-     });
-
      this.directiveSubscriptions.add(
        this.searchService.onSearchBarLoaded.subscribe(
          () => {
@@ -304,6 +296,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
    toggleSidebar(): void {
      this.sidebarStatusService.toggleSidebar();
+     console.log('top-navigation-response:' +
+      this.sidebarStatusService.sidebarIsShown);
    }
 
    navigateToClassroomPage(classroomUrl: string): void {

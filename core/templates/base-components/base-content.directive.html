@@ -25,6 +25,7 @@
 
     <div class="oppia-base-container"
          ng-class="{'oppia-sidebar-menu-open': $ctrl.isSidebarShown(), 'oppia-sidebar-menu-closed': !$ctrl.isSidebarShown()}"
+         ng-click="$ctrl.isSidebarShown()"
          ng-swipe-left="$ctrl.closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
       <div class="oppia-content-container protractor-test-content-container">
         <div id="wrapper">
