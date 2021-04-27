@@ -227,6 +227,7 @@ const toastrConfig = {
     ObjectComponentsModule,
     TranslateModule,
     // Components, directives, and pipes.
+    AttributionGuideComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,

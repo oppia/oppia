@@ -12,169 +12,173 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 /**
  * @fileoverview Component for the main page of the story viewer.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'attribution-guide.component.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
+import { Component, OnInit } from '@angular/core';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { UserService } from 'services/user.service';
+import { AppConstants } from 'app.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
+import { AlertsService } from 'services/alerts.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
-require(
-  'pages/story-viewer-page/navbar-breadcrumb/' +
-  'story-viewer-navbar-breadcrumb.component.ts');
-require(
-  'pages/story-viewer-page/navbar-pre-logo-action/' +
-  'story-viewer-navbar-pre-logo-action.component.ts');
+interface IconParametersArray {
+  thumbnailIconUrl: string,
+  left: string,
+  top: string,
+  thumbnailBgColor: string,
+}
 
-require('domain/story_viewer/story-viewer-backend-api.service.ts');
-require('services/alerts.service.ts');
-require('services/assets-backend-api.service.ts');
-require('services/contextual/url.service.ts');
-require('services/user.service.ts');
+@Component({
+  selector: 'oppia-story-viewer-page',
+  templateUrl: './story-viewer-page.component.html'
+})
+export class StoryViewerPageComponent implements OnInit {
+  storyPlaythroughObject: StoryPlaythrough;
+  storyId: string;
+  storyIsLoaded: boolean;
+  isLoggedIn: boolean;
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
+  storyUrlFragment: string;
+  storyTitle: string;
+  storyDescription: string;
+  pathIconParameters: IconParametersArray[];
+  topicName: string;
+  thumbnailFilename: string;
+  thumbnailBgColor: string;
+  storyNodes: ReadOnlyStoryNode[];
+  iconUrl: string;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private userService: UserService,
+    private windowRef: WindowRef,
+    private urlService: UrlService,
+    private loaderService: LoaderService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private pageTitleService: PageTitleService,
+    private alertsService: AlertsService
+  ) {}
 
-angular.module('oppia').component('storyViewerPage', {
-  template: require('./story-viewer-page.component.html'),
-  controller: [
-    '$rootScope', '$window', 'AlertsService', 'AssetsBackendApiService',
-    'LoaderService', 'StoryViewerBackendApiService',
-    'UrlInterpolationService', 'UrlService', 'UserService',
-    'ENTITY_TYPE', 'FATAL_ERROR_CODES',
-    function(
-        $rootScope, $window, AlertsService, AssetsBackendApiService,
-        LoaderService, StoryViewerBackendApiService,
-        UrlInterpolationService, UrlService, UserService,
-        ENTITY_TYPE, FATAL_ERROR_CODES) {
-      var ctrl = this;
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-      ctrl.storyViewerBackendApiService = (
-        OppiaAngularRootComponent.storyViewerBackendApiService);
-      ctrl.pageTitleService = OppiaAngularRootComponent.pageTitleService;
-
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-
-      ctrl.showChapters = function() {
-        if (!ctrl.storyPlaythroughObject) {
-          return false;
-        }
-        return ctrl.storyPlaythroughObject.getStoryNodeCount() > 0;
-      };
-
-      ctrl.generatePathIconParameters = function() {
-        var storyNodes = ctrl.storyPlaythroughObject.getStoryNodes();
-        var iconParametersArray = [];
-
-        iconParametersArray.push({
-          thumbnailIconUrl: (
-            AssetsBackendApiService.getThumbnailUrlForPreview(
-              ENTITY_TYPE.STORY, ctrl.storyId,
-              storyNodes[0].getThumbnailFilename())),
-          left: '225px',
-          top: '35px',
-          thumbnailBgColor: storyNodes[0].getThumbnailBgColor()
-        });
-
-        for (
-          var i = 1; i < ctrl.storyPlaythroughObject.getStoryNodeCount();
-          i++) {
-          iconParametersArray.push({
-            thumbnailIconUrl: (
-              AssetsBackendApiService.getThumbnailUrlForPreview(
-                ENTITY_TYPE.STORY, ctrl.storyId,
-                storyNodes[i].getThumbnailFilename())),
-            thumbnailBgColor: storyNodes[i].getThumbnailBgColor()
-          });
-        }
-        return iconParametersArray;
-      };
-
-      ctrl.signIn = function() {
-        UserService.getLoginUrlAsync().then(
-          loginUrl => {
-            loginUrl ? $window.location = loginUrl : (
-              $window.location.reload());
-          });
-      };
-
-      ctrl.getExplorationUrl = function(node) {
-        var result = '/explore/' + node.getExplorationId();
-        result = UrlService.addField(
-          result, 'topic_url_fragment',
-          UrlService.getTopicUrlFragmentFromLearnerUrl());
-        result = UrlService.addField(
-          result, 'classroom_url_fragment',
-          UrlService.getClassroomUrlFragmentFromLearnerUrl());
-        result = UrlService.addField(
-          result, 'story_url_fragment',
-          UrlService.getStoryUrlFragmentFromLearnerUrl());
-        result = UrlService.addField(
-          result, 'node_id', node.getId());
-        return result;
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.storyIsLoaded = false;
-        ctrl.isLoggedIn = false;
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.isLoggedIn = userInfo.isLoggedIn();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-        LoaderService.showLoadingScreen('Loading');
-        var topicUrlFragment = (
-          UrlService.getTopicUrlFragmentFromLearnerUrl());
-        var classroomUrlFragment = (
-          UrlService.getClassroomUrlFragmentFromLearnerUrl());
-        var storyUrlFragment = (
-          UrlService.getStoryUrlFragmentFromLearnerUrl());
-        ctrl.storyViewerBackendApiService.fetchStoryDataAsync(
-          topicUrlFragment,
-          classroomUrlFragment,
-          storyUrlFragment).then(
-          function(storyDataDict) {
-            ctrl.storyIsLoaded = true;
-            ctrl.storyPlaythroughObject = storyDataDict;
-            ctrl.storyId = ctrl.storyPlaythroughObject.getStoryId();
-            var topicName = ctrl.storyPlaythroughObject.topicName;
-            ctrl.pageTitleService.setPageTitle(
-              `Learn ${topicName} | ${storyDataDict.title} | Oppia`);
-            ctrl.pageTitleService.updateMetaTag(
-              storyDataDict.getMetaTagContent());
-            ctrl.storyTitle = storyDataDict.title;
-            ctrl.storyDescription = storyDataDict.description;
-
-            StoryViewerBackendApiService.onSendStoryData.emit({
-              topicName: topicName,
-              storyTitle: ctrl.storyTitle
-            });
-
-            LoaderService.hideLoadingScreen();
-            ctrl.pathIconParameters = ctrl.generatePathIconParameters();
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular.
-            $rootScope.$apply();
-          },
-          function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              AlertsService.addWarning('Failed to get dashboard data');
-            }
-          }
-        );
-
-        // The pathIconParameters is an array containing the co-ordinates,
-        // background color and icon url for the icons generated on the
-        // path.
-        ctrl.pathIconParameters = [];
-      };
+  showChapters(): boolean {
+    if (!this.storyPlaythroughObject) {
+      return false;
     }
-  ]
-});
+    return this.storyPlaythroughObject.getStoryNodeCount() > 0;
+  }
+
+  generatePathIconParameters(): IconParametersArray[] {
+    let iconParametersArray: IconParametersArray[] = [];
+    for (
+      let i = 0; i < this.storyPlaythroughObject.getStoryNodeCount();
+      i++) {
+      this.thumbnailFilename = this.storyNodes[i].getThumbnailFilename();
+      this.thumbnailBgColor = this.storyNodes[i].getThumbnailBgColor();
+      if (this.thumbnailFilename === null) {
+        this.iconUrl = '';
+        this.thumbnailFilename = '';
+      } else {
+        this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.STORY, this.storyId,
+          this.thumbnailFilename);
+      }
+      iconParametersArray.push({
+        thumbnailIconUrl: this.iconUrl,
+        left: '225px',
+        top: '35px',
+        thumbnailBgColor: this.thumbnailBgColor,
+      });
+    }
+    return iconParametersArray;
+  }
+
+  signIn(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) => {
+        loginUrl ? this.windowRef.nativeWindow.location.href = loginUrl : (
+          this.windowRef.nativeWindow.location.reload());
+      });
+  }
+
+  getExplorationUrl(
+      node: { getExplorationId: () => string;
+              getId: () => string; }): string {
+    let result = '/explore/' + node.getExplorationId();
+    result = this.urlService.addField(
+      result, 'topic_url_fragment',
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    result = this.urlService.addField(
+      result, 'classroom_url_fragment',
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    result = this.urlService.addField(
+      result, 'story_url_fragment',
+      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    result = this.urlService.addField(
+      result, 'node_id', node.getId());
+    return result;
+  }
+
+  ngOnInit(): void {
+    this.storyIsLoaded = false;
+    this.isLoggedIn = false;
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.isLoggedIn = userInfo.isLoggedIn();
+    });
+    this.topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    this.classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    this.storyUrlFragment = (
+      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    this.loaderService.showLoadingScreen('Loading');
+    this.storyViewerBackendApiService.fetchStoryDataAsync(
+      this.topicUrlFragment,
+      this.classroomUrlFragment,
+      this.storyUrlFragment).then(
+      (storyDataDict) => {
+        this.storyIsLoaded = true;
+        this.storyPlaythroughObject = storyDataDict;
+        this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
+        this.storyId = this.storyPlaythroughObject.getStoryId();
+        this.topicName = this.storyPlaythroughObject.topicName;
+        this.pageTitleService.setPageTitle(
+          `Learn ${this.topicName} | ${storyDataDict.title} | Oppia`);
+        this.pageTitleService.updateMetaTag(
+          storyDataDict.getMetaTagContent());
+        this.storyTitle = storyDataDict.title;
+        this.storyDescription = storyDataDict.description;
+
+        this.loaderService.hideLoadingScreen();
+        this.pathIconParameters = this.generatePathIconParameters();
+      },
+      (errorResponse) => {
+        let errorCodes = AppConstants.FATAL_ERROR_CODES;
+        if (errorCodes.indexOf(errorResponse.status) !== -1) {
+          this.alertsService.addWarning('Failed to get dashboard data');
+        }
+      }
+    );
+
+    // The pathIconParameters is an array containing the co-ordinates,
+    // background color and icon url for the icons generated on the
+    // path.
+    this.pathIconParameters = [];
+  }
+}
+
+angular.module('oppia').directive('oppiaStoryViewerPage',
+  downgradeComponent({component: StoryViewerPageComponent}));

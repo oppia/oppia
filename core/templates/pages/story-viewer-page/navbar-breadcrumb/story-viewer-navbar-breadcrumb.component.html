@@ -1,8 +1,8 @@
-<div ng-if="$ctrl.storyTitle" class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak oppia-story-viewer-nav-breadcrumb">
+<div *ngIf="storyTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-story-viewer-nav-breadcrumb">
   <div class="oppia-story-viewer-nav-separator"></div>
   <div class="oppia-story-viewer-nav-labels-container">
-    <p class="oppia-story-navbar-title"><[$ctrl.storyTitle]></p>
-    <a class="oppia-story-navbar-topic" ng-href="<[$ctrl.getTopicUrl()]>"><[$ctrl.topicName]></a>
+    <p class="oppia-story-navbar-title">{{ storyTitle }}</p>
+    <a class="oppia-story-navbar-topic" [href]="getTopicUrl()">{{ topicName }}</a>
   </div>
 </div>
 

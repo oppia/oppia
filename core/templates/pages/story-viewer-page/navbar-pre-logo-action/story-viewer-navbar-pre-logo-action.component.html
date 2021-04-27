@@ -1,4 +1,4 @@
-<a ng-if="$ctrl.topicName" ng-href="<[$ctrl.getTopicUrl()]>" class="oppia-story-viewer-back-button">
+<a *ngIf="topicName" [href]="getTopicUrl()" class="oppia-story-viewer-back-button">
   <span class="material-icons oppia-navbar-back-button">
     arrow_back
   </span>

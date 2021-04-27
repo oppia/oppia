@@ -12,5 +12,8 @@
   ],
   "core/templates/tests/unit-test-utils.ts": [
     "element, [failHardModule, ng1Module.name]));"
+  ],
+  "core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts": [
+    "expect(component.pathIconParameters).toEqual([{"
   ]
 }

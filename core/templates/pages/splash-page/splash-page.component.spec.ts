@@ -96,8 +96,6 @@ describe('Splash Page', () => {
     }).compileComponents();
   });
 
-  beforeEach(angular.mock.module('oppia'));
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
