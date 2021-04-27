@@ -342,6 +342,7 @@ import { ImageLocalStorageService } from './image-local-storage.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -664,6 +665,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
