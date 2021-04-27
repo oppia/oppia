@@ -29,8 +29,6 @@ from core.tests import test_utils
 import feconf
 import utils
 
-datastore_services = models.Registry.import_datastore_services()
-
 (app_feedback_report_models,) = models.Registry.import_models([
     models.NAMES.app_feedback_report])
 

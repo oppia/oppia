@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import utils
+import python_utils
 
 
 PLATFORM_CHOICE_ANDROID = 'android'
@@ -42,28 +42,28 @@ TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
-ReportType = utils.create_enum('suggestion', 'issue', 'crash')
-Category = utils.create_enum(
+ReportType = python_utils.create_enum('suggestion', 'issue', 'crash')
+Category = python_utils.create_enum(
     'feature_suggestion', 'language_suggestion', 'other_suggestion',
     'lesson_question_issue', 'language_general_issue', 'language_audio_issue',
     'language_text_issue', 'topics_issue', 'profile_issue', 'other_issue',
     'lesson_player_crash', 'practice_questions_crash', 'options_page_crash',
     'profile_page_crash', 'other_crash')
-EntryPoint = utils.create_enum(
+EntryPoint = python_utils.create_enum(
     'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
-StatsParameterNames = utils.create_enum(
+StatsParameterNames = python_utils.create_enum(
     'platform', 'report_type', 'country_locale_code',
     'entry_point_name', 'text_language_code', 'audio_language_code',
     'android_sdk_version', 'version_name')
-FilterFieldNames = utils.create_enum(
+FilterFieldNames = python_utils.create_enum(
     'platform', 'report_type', 'entry_point', 'submitted_on',
     'android_device_model', 'android_sdk_version', 'text_language_code',
     'audio_language_code', 'platform_version',
     'android_device_country_locale_code')
-AndroidTextSize = utils.create_enum(
+AndroidTextSize = python_utils.create_enum(
     'text_size_unspecified', 'small_text_size', 'medium_text_size',
     'large_text_size', 'extra_large_text_size')
-AndroidNetworkTypes = utils.create_enum('wifi', 'cellular', 'none')
+AndroidNetworkTypes = python_utils.create_enum('wifi', 'cellular', 'none')
 
 ANDROID_ENTRY_POINT = [
     EntryPoint.navigation_drawer, EntryPoint.lesson_player,
