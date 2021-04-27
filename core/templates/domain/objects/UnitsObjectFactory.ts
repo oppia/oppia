@@ -242,7 +242,7 @@ export class UnitsObjectFactory {
   fromRawInputString(units: string): Units {
     try {
       this.createCurrencyUnits();
-    } catch (parsingError) { }
+    } catch (parsingError) {}
 
     var compatibleUnits = this.toMathjsCompatibleString(units);
     if (compatibleUnits !== '') {
