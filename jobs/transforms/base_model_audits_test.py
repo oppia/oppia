@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# from core.domain import change_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.platform import models
@@ -387,7 +386,7 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
 
 
 class MockValidateCommitCmdsSchemaChangeDomain(
-    base_model_audits.ValidateCommitCmdsSchema):
+        base_model_audits.ValidateCommitCmdsSchema):
 
     def _get_change_domain_class(self, item):
         pass

@@ -402,4 +402,3 @@ class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
             'CommitCmdsNoneError in BaseCommitLogEntryModel(id=\'invalid\'): '
             'No commit command domain object '
             'defined for entity with commands: [{}]')
-

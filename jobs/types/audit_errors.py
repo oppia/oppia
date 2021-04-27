@@ -235,4 +235,3 @@ class CommitCmdsNoneError(BaseAuditError):
             'No commit command domain object '
             'defined for entity with commands: %s' % (
                 model.commit_cmds))
-
