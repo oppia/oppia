@@ -27,7 +27,7 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
-import { SharedFormsModule } from './forms/shared-forms.module'
+import { SharedFormsModule } from './forms/shared-forms.module';
 
 // Components.
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
