@@ -258,11 +258,11 @@ const getSkillEditorUrl = async function(browser, page) {
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(10000);
     await page.keyboard.type('Skill Overview here');
 
     await page.waitForSelector(confirmSkillCreationButton, {visible: true});
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(10000);
     await page.click(confirmSkillCreationButton);
     // Doing waitForTimeout(15000) to handle new tab being opened.
     await page.waitForTimeout(15000);
@@ -281,7 +281,7 @@ const main = async function() {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
