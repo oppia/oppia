@@ -23,8 +23,8 @@ import { HighBounceRateTask } from
 import { ExplorationStats } from
   'domain/statistics/exploration-stats.model';
 
-describe('High bounce rate task', function () {
-  describe('High bounce rate task model', function () {
+describe('High bounce rate task', function() {
+  describe('High bounce rate task model', function() {
     let config: ExplorationImprovementsConfig;
     let createFromExplorationStats: (
       expStats: ExplorationStats,
@@ -39,8 +39,8 @@ describe('High bounce rate task', function () {
       config = (
         new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));
       createFromExplorationStats = (
-        expStats: ExplorationStats, stateName: string,
-        numEqPlaythroughs: number) => {
+          expStats: ExplorationStats, stateName: string,
+          numEqPlaythroughs: number) => {
         const task = HighBounceRateTask.createFromBackendDict({
           entity_type: 'exploration',
           entity_id: 'eid',
@@ -242,7 +242,7 @@ describe('High bounce rate task', function () {
         }));
       expect(() => task.refreshStatus(
         statsWithWrongId, 1, config)).toThrowError(
-          'Expected stats for exploration id="eid" v1 but given stats are for ' +
+        'Expected stats for exploration id="eid" v1 but given stats are for ' +
           'exploration id="eid2" v1');
 
       const statsWithWrongVersion = (
@@ -265,7 +265,7 @@ describe('High bounce rate task', function () {
         }));
       expect(() => task.refreshStatus(
         statsWithWrongVersion, 1, config)).toThrowError(
-          'Expected stats for exploration id="eid" v1 but given stats are for ' +
+        'Expected stats for exploration id="eid" v1 but given stats are for ' +
           'exploration id="eid" v2');
     });
 
