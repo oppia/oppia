@@ -34,7 +34,7 @@ describe('High bounce rate task', function() {
     let newExplorationStatsWithBounceRate: (
       numExpStarts: number,
       bounceRate: number
-      ) => ExplorationStats;
+    ) => ExplorationStats;
     beforeEach(() => {
       config = (
         new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));
