@@ -23,7 +23,7 @@ import { LostChangeBackendDict, LostChangeObjectFactory } from 'domain/explorati
 import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
-fdescribe('Changes in Human Readable Form Directive', () => {
+describe('Changes in Human Readable Form Directive', () => {
   let component: ChangesInHumanReadableFormComponent;
   let fixture: ComponentFixture<ChangesInHumanReadableFormComponent>;
   let lostChangeObjectFactory: LostChangeObjectFactory;
