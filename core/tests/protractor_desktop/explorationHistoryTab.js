@@ -92,132 +92,136 @@ describe('Exploration history', function() {
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
-        text: 'classifier_model_id: null',
+        text: 'card_is_checkpoint: true',
         highlighted: false
       },
       2: {
-        text: 'content:',
+        text: 'classifier_model_id: null',
         highlighted: false
       },
       3: {
-        text: '  content_id: content',
+        text: 'content:',
         highlighted: false
       },
       4: {
+        text: '  content_id: content',
+        highlighted: false
+      },
+      5: {
         text: '  html: \'\'',
         highlighted: true
       },
-      5: {
+      6: {
         text: 'interaction:',
         highlighted: false
       },
-      6: {
+      7: {
         text: '  answer_groups: []',
         highlighted: true
       },
-      7: {
+      8: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      8: {
+      9: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      9: {
+      10: {
         text: '  default_outcome:',
         highlighted: false
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      10: {
+      11: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true
       },
-      11: {
+      12: {
         text: '    feedback:',
         highlighted: false
       },
-      12: {
+      13: {
         text: '      content_id: default_outcome',
         highlighted: false
       },
-      13: {
+      14: {
         text: '      html: \'\'',
         highlighted: false
       },
-      14: {
+      15: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      15: {
+      16: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
-      16: {
+      17: {
         text: '    param_changes: []',
         highlighted: false
       },
-      17: {
+      18: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      18: {
+      19: {
         text: '  hints: []',
         highlighted: false
       },
-      19: {
+      20: {
         text: '  id: null',
         highlighted: true
       },
-      20: {
+      21: {
         text: '  solution: null',
         highlighted: false
       },
-      21: {
+      22: {
         text: 'next_content_id_index: 0',
         highlighted: true
       },
-      22: {
+      23: {
         text: 'param_changes: []',
         highlighted: false
       },
-      23: {
+      24: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      24: {
+      25: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      25: {
+      26: {
         text: '    content: {}',
         highlighted: false
       },
-      26: {
+      27: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      27: {
+      28: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      28: {
+      29: {
         text: 'written_translations:',
         highlighted: false
       },
-      29: {
+      30: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      30: {
+      31: {
         text: '    content: {}',
         highlighted: false
       },
-      31: {
+      32: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      32: {
+      33: {
         text: '',
         highlighted: false
       }
@@ -225,204 +229,209 @@ describe('Exploration history', function() {
 
     var VERSION_2_STATE_1_CONTENTS = {
       1: {
-        text: 'classifier_model_id: null',
+        text: 'card_is_checkpoint: true',
         highlighted: false
       },
       2: {
-        text: 'content:',
+        text: 'classifier_model_id: null',
         highlighted: false
       },
       3: {
-        text: '  content_id: content',
+        text: 'content:',
         highlighted: false
       },
       4: {
+        text: '  content_id: content',
+        highlighted: false
+      },
+      5: {
         text: '  html: <p>enter 6 to continue</p>',
         highlighted: true
       },
-      5: {
+      6: {
         text: 'interaction:',
         highlighted: false
       },
-      6: {
+      7: {
         text: '  answer_groups:',
         highlighted: true
       },
-      7: {
+      8: {
         text: '  - outcome:',
         highlighted: true
       },
-      8: {
+      9: {
         text: '      dest: second',
         highlighted: true
       },
-      9: {
+      10: {
         text: '      feedback:',
         highlighted: true
       },
-      10: {
+      11: {
         text: '        content_id: feedback_1',
         highlighted: true
       },
-      11: {
+      12: {
         text: '        html: \'\'',
         highlighted: true
       },
-      12: {
+      13: {
         text: '      labelled_as_correct: false',
         highlighted: true
       },
-      13: {
+      14: {
         text: '      missing_prerequisite_skill_id: null',
         highlighted: true
       },
-      14: {
+      15: {
         text: '      param_changes: []',
         highlighted: true
       },
-      15: {
+      16: {
         text: '      refresher_exploration_id: null',
         highlighted: true
       },
-      16: {
+      17: {
         text: '    rule_specs:',
         highlighted: true
       },
-      17: {
+      18: {
         text: '    - inputs:',
         highlighted: true
       },
-      18: {
+      19: {
         text: '        x: 6',
         highlighted: true
       },
-      19: {
+      20: {
         text: '      rule_type: Equals',
         highlighted: true
       },
-      20: {
+      21: {
         text: '    tagged_skill_misconception_id: null',
         highlighted: true
       },
-      21: {
+      22: {
         text: '    training_data: []',
         highlighted: true
       },
-      22: {
+      23: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      23: {
+      24: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      24: {
+      25: {
         text: '  default_outcome:',
         highlighted: false
       },
-      25: {
+      26: {
         text: '    dest: first',
         highlighted: true
       },
-      26: {
+      27: {
         text: '    feedback:',
         highlighted: false
       },
-      27: {
+      28: {
         text: '      content_id: default_outcome',
         highlighted: false
       },
-      28: {
+      29: {
         text: '      html: \'\'',
         highlighted: false
       },
-      29: {
+      30: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      30: {
+      31: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
-      31: {
+      32: {
         text: '    param_changes: []',
         highlighted: false
       },
-      32: {
+      33: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      33: {
+      34: {
         text: '  hints: []',
         highlighted: false
       },
-      34: {
+      35: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      35: {
+      36: {
         text: '  solution: null',
         highlighted: false
       },
-      36: {
+      37: {
         text: 'next_content_id_index: 2',
         highlighted: true
       },
-      37: {
+      38: {
         text: 'param_changes: []',
         highlighted: false
       },
-      38: {
+      39: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      39: {
+      40: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      40: {
-        text: '    content: {}',
-        highlighted: false
-      },
       41: {
-        text: '    default_outcome: {}',
+        text: '    content: {}',
         highlighted: false
       },
       42: {
+        text: '    default_outcome: {}',
+        highlighted: false
+      },
+      43: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      43: {
+      44: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      44: {
+      45: {
         text: 'written_translations:',
         highlighted: false
       },
-      45: {
+      46: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      46: {
+      47: {
         text: '    content: {}',
         highlighted: false
       },
-      47: {
+      48: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      48: {
+      49: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      49: {
+      50: {
         text: '',
         highlighted: false
       }
     };
 
     var STATE_2_STRING =
+      'card_is_checkpoint: false\n' +
       'classifier_model_id: null\n' +
       'content:\n' +
       '  content_id: content\n' +
