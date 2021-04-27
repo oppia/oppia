@@ -16,18 +16,11 @@
  * @fileoverview Unit tests for ChangesInHumanReadableForm Component.
 */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { CommonModule } from '@angular/common';
-import { HttpClientTestingModule } from '@angular/common/http/testing'
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+
 import { LostChangeBackendDict, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-import { TranslatorProviderForTests } from 'tests/test.extras';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
 describe('Changes in Human Readable Form Directive', () => {

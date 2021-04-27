@@ -237,7 +237,8 @@ describe('AutosaveInfoModalsService', () => {
   }));
 
   it('should return true if a modal is opened', () => {
-    expect(autosaveInfoModalsService.isModalOpen()).toBeUndefined();
+    // Default value of isModalOpen is false.
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
 
     autosaveInfoModalsService._isModalOpen = true;
 
@@ -245,10 +246,10 @@ describe('AutosaveInfoModalsService', () => {
   })
 
   it('should return false if a modal is closed', () => {
-    expect(autosaveInfoModalsService.isModalOpen()).toBeUndefined();
+    autosaveInfoModalsService._isModalOpen = true;
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
 
     autosaveInfoModalsService._isModalOpen = false;
-
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false)
   })
 });
