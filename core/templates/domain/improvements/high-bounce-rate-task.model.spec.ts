@@ -30,7 +30,7 @@ describe('High bounce rate task', function() {
       expStats: ExplorationStats,
       stateName: string,
       numEqPlaythroughs: number
-      ) => HighBounceRateTask;
+    ) => HighBounceRateTask;
     let newExplorationStatsWithBounceRate: (
       numExpStarts: number,
       bounceRate: number
