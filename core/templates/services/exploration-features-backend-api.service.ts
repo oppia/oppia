@@ -46,7 +46,7 @@ export class ExplorationFeaturesBackendApiService {
   async fetchExplorationFeaturesAsync(
       explorationId: string): Promise<ExplorationFeatures> {
     return this.http.get<ExplorationFeaturesBackendDict>(
-      this.urlInterpolationService.interpolateUrl(
+      <string> this.urlInterpolationService.interpolateUrl(
         ServicesConstants.EXPLORATION_FEATURES_URL,
         {exploration_id: explorationId}
       )
