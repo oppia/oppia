@@ -62,9 +62,14 @@ import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboa
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
 import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
+import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -79,9 +84,6 @@ import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { LimitToPipe } from 'filters/limit-to.pipe';
-import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
-import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
-import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 
 // Services.
@@ -160,6 +162,7 @@ const toastrConfig = {
     PromoBarComponent,
     RubricsEditorComponent,
     SharingLinksComponent,
+    SideNavigationBarComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -204,6 +207,7 @@ const toastrConfig = {
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
     RubricsEditorComponent,
+    SideNavigationBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
@@ -222,6 +226,7 @@ const toastrConfig = {
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
+    SharedFormsModule,
     TranslateModule,
     // Components, directives, and pipes.
     AudioFileUploaderComponent,
@@ -241,6 +246,7 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    SideNavigationBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
