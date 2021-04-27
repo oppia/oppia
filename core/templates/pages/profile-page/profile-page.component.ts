@@ -18,7 +18,6 @@
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { UserProfile } from 'domain/user/user-profile.model';
 
 require('base-components/base-content.directive.ts');
 require(
@@ -55,10 +54,8 @@ angular.module('oppia').component('profilePage', {
       };
       ctrl.$onInit = function() {
         LoaderService.showLoadingScreen('Loading');
-        let fetchProfileDataAsync = async function() {
-          return ProfilePageBackendApiService.fetchProfileDataAsync();
-        }
-        fetchProfileDataAsync().then(function(data) {
+        ProfilePageBackendApiService.fetchProfileDataAsync()
+        .then(function(data) {
           ctrl.username = {
             title: 'Username',
             value: data.usernameOfViewedProfile,
