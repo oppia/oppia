@@ -356,7 +356,7 @@ exports.config = {
       baseDirectory: path.resolve(__dirname, '../../../protractor-video'),
       singleVideo: false,
       singleVideoPath: 'uuid',
-      saveSuccessVideos: true,
+      saveSuccessVideos: false,
       ffmpegArgs: ffmpegArguments
     }));
     
