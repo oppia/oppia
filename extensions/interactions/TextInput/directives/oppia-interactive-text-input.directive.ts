@@ -33,7 +33,9 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require('./text-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
@@ -67,8 +69,8 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
             ctrl.placeholder = placeholder.unicode;
             ctrl.rows = rows;
             ctrl.answer = (
-              $attrs.savedSolution !== undefined ?
-              JSON.parse($attrs.savedSolution) : ''
+              ctrl.savedSolution !== undefined ?
+              ctrl.savedSolution : ''
             );
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

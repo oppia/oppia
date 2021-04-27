@@ -9243,6 +9243,20 @@ ng-infinite-scroll@^1.3.0:
   resolved "https://registry.yarnpkg.com/ng-infinite-scroll/-/ng-infinite-scroll-1.3.0.tgz#c2e98d8fd134b0525a4d2cf58c95d9b583755112"
   integrity sha1-wumNj9E0sFJaTSz1jJXZtYN1URI=
 
+ngx-toastr@^13.2.1:
+  version "13.2.1"
+  resolved "https://registry.yarnpkg.com/ngx-toastr/-/ngx-toastr-13.2.1.tgz#531bc7da6a524a861e0409bd2749878b3b3f8a3f"
+  integrity sha512-UAzp7/xWK9IXA2LsOmhpaaIGCqscvJokoQpBNpAMrjEkDeSlFf8PWQAuQY795KW0mJb3qF9UG/s23nsXfMYKmg==
+  dependencies:
+    tslib "^2.0.0"
+
+ngx-trim-directive@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ngx-trim-directive/-/ngx-trim-directive-1.1.0.tgz#028f0963486efd19298c39f09805e52e332223ba"
+  integrity sha512-czY8oy4oDPYzz2Umc1cVal3tPYIAduW0yHlTHYABWtqwTSBe3/1apvkkUmQou6Eqm7WJh7qxb0N6K/7Xqel/1g==
+  dependencies:
+    tslib "^1.9.0"
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"

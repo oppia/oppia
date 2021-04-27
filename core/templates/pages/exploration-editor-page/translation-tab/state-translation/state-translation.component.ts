@@ -57,7 +57,7 @@ require(
 
 import { Subscription } from 'rxjs';
 
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import {
@@ -549,7 +549,7 @@ angular.module('oppia').component('stateTranslation', {
           $scope.stateInteractionId ? (
             ExplorationHtmlFormatterService.getInteractionHtml(
               $scope.stateInteractionId,
-              $scope.stateInteractionCustomizationArgs, false)
+              $scope.stateInteractionCustomizationArgs, false, undefined, null)
           ) : '');
         $scope.interactionCustomizationArgTranslatableContent = (
           $scope.getInteractionCustomizationArgTranslatableContents(

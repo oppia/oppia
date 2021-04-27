@@ -19,19 +19,19 @@
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { SubtitledHtmlBackendDict, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
 
-interface LabeledRegion {
+export interface LabeledRegion {
   region: {
     area: number[][];
   };
   label: string;
 }
 
-interface ImageWithRegions {
+export interface ImageWithRegions {
   labeledRegions: LabeledRegion[];
   imagePath: string;
 }
