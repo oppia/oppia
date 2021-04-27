@@ -244,12 +244,12 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unscrubbed_expiring_reports(cls):
-        """Fetches the reports that are past their 90-days in storage and
-        must be scrubbed.
+        """Fetches the reports that are past their 90-days in storage and must
+        be scrubbed.
 
         Returns:
-        list(AppFeedbackReportModel). A list of IDs corresponding to
-            AppFeedbackReportModel entities that need to be scrubbed
+            list(AppFeedbackReportModel). A list of IDs corresponding to
+            AppFeedbackReportModel entities that need to be scrubbed.
         """
         datetime_now = datetime.datetime.utcnow()
         datetime_before_which_to_scrub = datetime_now - (
@@ -257,7 +257,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             datetime.timedelta(days=1))
         return cls.query(
             cls.created_on < datetime_before_which_to_scrub,
-            cls.scrubbed_by == None).fetch()
+            cls.scrubbed_by is None).fetch()
 
     @classmethod
     def get_filter_options_for_field(cls, filter_name):
@@ -267,28 +267,30 @@ class AppFeedbackReportModel(base_models.BaseModel):
             list(str). The possible values that the field name can have.
         """
         query = cls.query(projection=[filter_name], distinct=True)
+        filter_values = []
         if filter_name == constants.FilterFieldNames.report_type:
-            return [model.report_type for model in query]
+            filter_values = [model.report_type for model in query]
         elif filter_name == constants.FilterFieldNames.platform:
-            return [model.platform for model in query]
+            filter_values = [model.platform for model in query]
         elif filter_name == constants.FilterFieldNames.entry_point:
-            return [model.entry_point for model in query]
+            filter_values = [model.entry_point for model in query]
         elif filter_name == constants.FilterFieldNames.submitted_on:
-            return [model.submitted_on.date() for model in query]
+            filter_values = [model.submitted_on.date() for model in query]
         elif filter_name == constants.FilterFieldNames.android_device_model:
-            return [model.android_device_model for model in query]
+            filter_values = [model.android_device_model for model in query]
         elif filter_name == constants.FilterFieldNames.android_sdk_version:
-            return [model.android_sdk_version for model in query]
+            filter_values = [model.android_sdk_version for model in query]
         elif filter_name == constants.FilterFieldNames.text_language_code:
-            return [model.text_language_code for model in query]
+            filter_values = [model.text_language_code for model in query]
         elif filter_name == constants.FilterFieldNames.audio_language_code:
-            return [model.audio_language_code for model in query]
+            filter_values = [model.audio_language_code for model in query]
         elif filter_name == constants.FilterFieldNames.platform_version:
-            return [model.platform_version for model in query]
+            filter_values = [model.platform_version for model in query]
         elif filter_name == (
-            constants.FilterFieldNames.android_device_country_locale_code):
-            return [model.android_device_country_locale_code for model in query]
-        
+                constants.FilterFieldNames.android_device_country_locale_code):
+            filter_values = [
+                model.android_device_country_locale_code for model in query]
+        return filter_values
 
     @staticmethod
     def get_deletion_policy():
@@ -432,6 +434,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         Args:
             entity_id: str. The ID used for this entity.
             ticket_name: str. The name assigned to the ticket by the moderator.
+            platform: str. The platform that this ticket fixes an issue on,
+                corresponding to one of PLATFORM_CHOICES.
             github_issue_repo_name: str. The name of the Github repo with the
                 associated Github issue for this ticket.
             github_issue_number: int|None. The Github issue number associated

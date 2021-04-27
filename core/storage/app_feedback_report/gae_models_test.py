@@ -362,9 +362,9 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         model_class = (
             app_feedback_report_models.AppFeedbackReportStatsModel)
         entity_id = model_class.calculate_id(
-                'android', self.TICKET_ID, self.STATS_DATE)
+            'android', self.TICKET_ID, self.STATS_DATE)
         entity_id_copy = model_class.calculate_id(
-                'android', self.TICKET_ID, self.STATS_DATE)
+            'android', self.TICKET_ID, self.STATS_DATE)
 
         self.assertEqual(entity_id, entity_id_copy)
 

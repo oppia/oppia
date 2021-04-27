@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.controllers import incoming_app_feedback_report
 from core.tests import test_utils
 from core.platform import models
 
@@ -67,10 +66,11 @@ REPORT_JSON = {
     }
 }
 
-ANDROID_API_KEY_STRING = str(feconf.ANDROID_API_KEY)
-ANDROID_APP_PACKAGE_NAME_STRING = str(feconf.ANDROID_APP_PACKAGE_NAME)
-ANDROID_APP_VERSION_NAME_STRING = str(feconf.ANDROID_APP_VERSION_NAME)
-ANDROID_APP_VERSION_CODE_STRING = str(feconf.ANDROID_APP_VERSION_CODE)
+# Webtest requires explicit str-types rather than UNICODE for headers.
+ANDROID_API_KEY_STRING = str(feconf.ANDROID_API_KEY) # pylint: disable=disallowed-function-calls
+ANDROID_APP_PACKAGE_NAME_STRING = str(feconf.ANDROID_APP_PACKAGE_NAME) # pylint: disable=disallowed-function-calls
+ANDROID_APP_VERSION_NAME_STRING = str(feconf.ANDROID_APP_VERSION_NAME) # pylint: disable=disallowed-function-calls
+ANDROID_APP_VERSION_CODE_STRING = str(feconf.ANDROID_APP_VERSION_CODE) # pylint: disable=disallowed-function-calls
 
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
@@ -94,14 +94,14 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         # parity for the tests correctly check these fields.
         with self.swap(feconf, 'ANDROID_API_KEY', ANDROID_API_KEY_STRING):
             with self.swap(
-                    feconf, 'ANDROID_APP_PACKAGE_NAME',
-                    ANDROID_APP_PACKAGE_NAME_STRING):
+                feconf, 'ANDROID_APP_PACKAGE_NAME',
+                ANDROID_APP_PACKAGE_NAME_STRING):
                 with self.swap(
-                        feconf, 'ANDROID_APP_VERSION_NAME',
-                        ANDROID_APP_VERSION_NAME_STRING):
+                    feconf, 'ANDROID_APP_VERSION_NAME',
+                    ANDROID_APP_VERSION_NAME_STRING):
                     with self.swap(
-                            feconf, 'ANDROID_APP_VERSION_CODE',
-                            ANDROID_APP_VERSION_CODE_STRING):
+                        feconf, 'ANDROID_APP_VERSION_CODE',
+                        ANDROID_APP_VERSION_CODE_STRING):
                         self.post_json(
                             feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
                             self.payload, headers=self.headers,
