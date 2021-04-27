@@ -137,7 +137,7 @@ describe('Save Version Mismatch Modal Component', () => {
 
     loggerService = TestBed.inject(LoggerService);
     logSpy = spyOn(loggerService, 'error').and.callThrough();
-    
+
     fixture.detectChanges();
   });
 

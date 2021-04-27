@@ -221,10 +221,10 @@ describe('Exploration editor page component', function() {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [LostChangesModalComponent]
-        }
-      });
+      set: {
+        entryComponents: [LostChangesModalComponent]
+      }
+    });
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

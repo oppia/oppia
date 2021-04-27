@@ -437,8 +437,8 @@ describe('Changes in Human Readable Form Directive', () => {
       '<div class="sub-edit"><i>Rules: </i>' +
       '<ol class="rules-list">' +
       '<li>' +
-      // eslint-disable-next-line dot-notation
       '<p>Type: ' +
+      // eslint-disable-next-line dot-notation
       component.lostChanges[0].newValue['rules'][0].type +
       '</p>' +
       '<p>Value: <span></span>' +
@@ -522,8 +522,8 @@ describe('Changes in Human Readable Form Directive', () => {
       '<div class="sub-edit"><i>Rules: </i>' +
       '<ol class="rules-list">' +
       '<li>' +
-      // eslint-disable-next-line dot-notation
       '<p>Type: ' +
+      // eslint-disable-next-line dot-notation
       component.lostChanges[0].newValue['rules'][0].type +
       '</p>' +
       '<p>Value: <span></span>' +
