@@ -26,8 +26,8 @@ import { AppConstants } from 'app.constants';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 interface EventData {
-  event: Event;
-  index: number
+  index: number,
+  event: Event
 }
 @Component({
   selector: 'oppia-response-header',
