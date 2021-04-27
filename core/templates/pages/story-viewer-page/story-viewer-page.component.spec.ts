@@ -44,7 +44,7 @@ class MockAssetsBackendApiService {
   }
 }
 
-describe('Story Viewer Page component', () => {
+fdescribe('Story Viewer Page component', () => {
   let httpTestingController = null;
   let component: StoryViewerPageComponent;
   let alertsService = null;
@@ -365,11 +365,6 @@ describe('Story Viewer Page component', () => {
         'Learn Topic 1 | Story | Oppia');
       expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
         'Story meta tag content');
-      // This throws "Type '{ thumbnailIconUrl: string;
-      // left: string; top: string; thumbnailBgColor: string; }' is not
-      // assignable to type 'ExpectedRecursive<string>'."We need to do that
-      // in order to test the component
-      // @ts-ignore
       expect(component.pathIconParameters).toEqual([{
         thumbnailIconUrl: 'thumbnail-url',
         left: '225px',
@@ -377,6 +372,8 @@ describe('Story Viewer Page component', () => {
         thumbnailBgColor: '#bb8b2f'
       }, {
         thumbnailIconUrl: 'thumbnail-url',
+        left: '225px',
+        top: '35px',
         thumbnailBgColor: '#bb8b2f' }]);
     }));
 
@@ -417,7 +414,7 @@ describe('Story Viewer Page component', () => {
           category: 'Algebra'
         },
         completed: true,
-        thumbnail_bg_color: null,
+        thumbnail_bg_color: '#bb8b2f',
         thumbnail_filename: null
       };
       var secondSampleReadOnlyStoryNodeBackendDict = {
@@ -455,8 +452,8 @@ describe('Story Viewer Page component', () => {
           category: 'Algebra'
         },
         completed: false,
-        thumbnail_bg_color: '',
-        thumbnail_filename: '',
+        thumbnail_bg_color: '#bb8b2f',
+        thumbnail_filename: null,
       };
 
       var storyPlaythroughBackendObject = {
@@ -485,7 +482,7 @@ describe('Story Viewer Page component', () => {
         Promise.resolve(_samplePlaythroughObject));
       component.ngOnInit();
       flushMicrotasks();
-      expect(component.thumbnailBgColor === '');
       expect(component.thumbnailFilename === '');
+      expect(component.iconUrl === '');
     }));
 });

@@ -155,10 +155,7 @@ export class AssetsBackendApiService {
   }
 
   getThumbnailUrlForPreview(
-      entityType: string, entityId: string, filename: string): string | null {
-    if (filename === '') {
-      return null;
-    }
+      entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
       entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
   }

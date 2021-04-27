@@ -31,6 +31,13 @@ import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
+interface IconParametersArray {
+  thumbnailIconUrl: string,
+  left: string,
+  top: string,
+  thumbnailBgColor: string,
+}
+
 @Component({
   selector: 'oppia-story-viewer-page',
   templateUrl: './story-viewer-page.component.html'
@@ -45,11 +52,12 @@ export class StoryViewerPageComponent implements OnInit {
   storyUrlFragment: string;
   storyTitle: string;
   storyDescription: string;
-  pathIconParameters: string[];
+  pathIconParameters: IconParametersArray[];
   topicName: string;
   thumbnailFilename: string;
   thumbnailBgColor: string;
-  storyNodes: ReadOnlyStoryNode | { getThumbnailBgColor: () => string; }[];
+  storyNodes: ReadOnlyStoryNode[];
+  iconUrl: string;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
@@ -73,42 +81,26 @@ export class StoryViewerPageComponent implements OnInit {
     return this.storyPlaythroughObject.getStoryNodeCount() > 0;
   }
 
-  generatePathIconParameters(): string[] {
-    let iconParametersArray = [];
-    this.thumbnailFilename = this.storyNodes[0].getThumbnailFilename();
-    this.thumbnailBgColor = this.storyNodes[0].getThumbnailBgColor();
-    if (this.thumbnailFilename === null) {
-      this.thumbnailFilename = '';
-    }
-    if (this.thumbnailBgColor === null) {
-      this.thumbnailBgColor = '';
-    }
-    iconParametersArray.push({
-      thumbnailIconUrl: (
-        this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY, this.storyId,
-          this.thumbnailFilename)),
-      left: '225px',
-      top: '35px',
-      thumbnailBgColor: this.thumbnailBgColor
-    });
+  generatePathIconParameters(): IconParametersArray[] {
+    let iconParametersArray: IconParametersArray[] = [];
     for (
-      let i = 1; i < this.storyPlaythroughObject.getStoryNodeCount();
+      let i = 0; i < this.storyPlaythroughObject.getStoryNodeCount();
       i++) {
       this.thumbnailFilename = this.storyNodes[i].getThumbnailFilename();
       this.thumbnailBgColor = this.storyNodes[i].getThumbnailBgColor();
       if (this.thumbnailFilename === null) {
+        this.iconUrl = '';
         this.thumbnailFilename = '';
-      }
-      if (this.thumbnailBgColor === null) {
-        this.thumbnailBgColor = '';
+      } else {
+        this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.STORY, this.storyId,
+          this.thumbnailFilename);
       }
       iconParametersArray.push({
-        thumbnailIconUrl: (
-          this.assetsBackendApiService.getThumbnailUrlForPreview(
-            AppConstants.ENTITY_TYPE.STORY, this.storyId,
-            this.thumbnailFilename)),
-        thumbnailBgColor: this.thumbnailBgColor
+        thumbnailIconUrl: this.iconUrl,
+        left: '225px',
+        top: '35px',
+        thumbnailBgColor: this.thumbnailBgColor,
       });
     }
     return iconParametersArray;
