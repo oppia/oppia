@@ -114,6 +114,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
+    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
@@ -167,7 +168,11 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationCategoryInput,
       'Exploration category input takes too long to be visible.');
-    expect(await explorationCategoryInput.$('option:checked').getText()).
+    var checkedElement = explorationCategoryInput.$('option:checked');
+    await waitFor.visibilityOf(
+      checkedElement,
+      'Checked Element takes too long to be visible.');
+    expect(await checkedElement.getText()).
       toEqual(category);
   };
 
