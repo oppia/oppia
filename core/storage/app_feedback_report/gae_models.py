@@ -286,9 +286,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
         elif filter_name == constants.FilterFieldNames.platform_version:
             return [model.platform_version for model in query]
         elif filter_name == (
-            constants.FilterFieldNames.android_device_country_locale_code):
+                constants.FilterFieldNames.android_device_country_locale_code):
             return [model.android_device_country_locale_code for model in query]
-        
+
 
     @staticmethod
     def get_deletion_policy():

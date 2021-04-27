@@ -50,7 +50,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
                 report_dict))
         report_obj.validate()
         app_feedback_report_services.save_feedback_report_to_storage(
-            report=report_obj, new_incoming_report=True)
+            report_obj, new_incoming_report=True)
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
         return self.render_json({})
@@ -60,6 +60,10 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
 
         Args:
             headers: list(str). The headers to validate from the request.
+
+        Returns:
+            bool. Whether the request headers are valid and correspond to the
+            expected header values for Android requests.
         """
         api_key = headers.get('api_key')
         app_package_name = headers.get('app_package_name')
