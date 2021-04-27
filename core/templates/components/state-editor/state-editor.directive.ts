@@ -125,19 +125,28 @@ angular.module('oppia').directive('stateEditor', [
             $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
           };
 
-          var questionSuggestionDiv = angular.element(
-            document.getElementById('questionSuggestionDiv'));
-          questionSuggestionDiv.on('scroll', function() {
-            if (questionSuggestionDiv.scrollTop() > STICKY_HEADER_SCROLL_TOP) {
-              $scope.isSticky = true;
+          var questionSuggestionReview = angular.element(
+            document.querySelector('.oppia-question-suggestion-review'));
+          questionSuggestionReview.on('scroll', function() {
+            var tutorialStateContent = document.getElementById(
+              'tutorialStateContent');
+            var cardAvatarOnSticky = document.querySelector(
+              '.oppia-editor-card-avatar');
+            if (questionSuggestionReview.scrollTop() >
+             STICKY_HEADER_SCROLL_TOP) {
+              tutorialStateContent.classList.remove(
+                'state-content-editor-parent-container');
+              cardAvatarOnSticky.classList.add(
+                'oppia-editor-card-avatar-sticky');
             } else {
-              $scope.isSticky = false;
+              tutorialStateContent.classList.add(
+                'state-content-editor-parent-container');
+              cardAvatarOnSticky.classList.remove(
+                'oppia-editor-card-avatar-sticky');
             }
-            $scope.$applyAsync();
           });
 
           ctrl.$onInit = function() {
-            $scope.isSticky = false;
             $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg');
             $scope.currentStateIsTerminal = false;
