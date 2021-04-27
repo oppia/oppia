@@ -44,7 +44,7 @@ class MockAssetsBackendApiService {
   }
 }
 
-fdescribe('Story Viewer Page component', () => {
+describe('Story Viewer Page component', () => {
   let httpTestingController = null;
   let component: StoryViewerPageComponent;
   let alertsService = null;
