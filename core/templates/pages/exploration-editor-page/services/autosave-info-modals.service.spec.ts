@@ -68,17 +68,17 @@ describe('AutosaveInfoModalsService', () => {
         resolve('sample-csrf-token');
       });
     });
-  })
+  });
 
   it('should call ngbModal open when opening non strict validation fail' +
     ' modal', fakeAsync(() => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
-        return <NgbModalRef>(
-          { componentInstance: showNonStrictValidationFailModalRef,
-            result: Promise.resolve('success')
-          });
-      });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: showNonStrictValidationFailModalRef,
+          result: Promise.resolve('success')
+        });
+    });
 
     autosaveInfoModalsService.showNonStrictValidationFailModal();
 
@@ -98,7 +98,7 @@ describe('AutosaveInfoModalsService', () => {
 
       autosaveInfoModalsService.showNonStrictValidationFailModal();
       expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-      
+
       flushMicrotasks();
 
       expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
@@ -118,7 +118,7 @@ describe('AutosaveInfoModalsService', () => {
 
       autosaveInfoModalsService.showNonStrictValidationFailModal();
       expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-      
+
       flushMicrotasks();
 
       expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
@@ -152,7 +152,7 @@ describe('AutosaveInfoModalsService', () => {
 
     autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
     expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-    
+
     flushMicrotasks();
 
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
@@ -206,14 +206,15 @@ describe('AutosaveInfoModalsService', () => {
     });
     autosaveInfoModalsService.showLostChangesModal(lostChanges, explorationId);
     expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-    
+
     flushMicrotasks();
 
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     expect(modalSpy).toHaveBeenCalled();
   }));
 
-  it('should handle reject when dismissing show lost changes modal', fakeAsync(() => {
+  it('should handle reject when dismissing show' +
+    'lost changes modal', fakeAsync(() => {
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
 
     const localStorageSpy = spyOn(localStorageService, 'removeExplorationDraft')
@@ -242,14 +243,14 @@ describe('AutosaveInfoModalsService', () => {
 
     autosaveInfoModalsService._isModalOpen = true;
 
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(true)
-  })
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
+  });
 
   it('should return false if a modal is closed', () => {
     autosaveInfoModalsService._isModalOpen = true;
     expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
 
     autosaveInfoModalsService._isModalOpen = false;
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(false)
-  })
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
+  });
 });

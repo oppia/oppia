@@ -20,7 +20,7 @@ import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { LostChangeObjectFactory } from
+import { LostChange, LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 
 import { LostChangesModalComponent } from './lost-changes-modal.component';
@@ -45,11 +45,8 @@ class MockActiveModal {
 
 
 describe('Lost Changes Modal Component', () => {
-
-
   let component: LostChangesModalComponent;
   let fixture: ComponentFixture<LostChangesModalComponent>;
-  let lostChangeObjectFactory: LostChangeObjectFactory;
   let ngbActiveModal: NgbActiveModal;
   let loggerService: LoggerService;
   let logSpy = null;
@@ -57,13 +54,13 @@ describe('Lost Changes Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
-  }];
+  } as unknown as LostChange];
 
   const lostChangesResponse = [{
     utilsService: {},
     cmd: 'add_state',
     stateName: 'State name',
-  }]
+  }];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -89,7 +86,6 @@ describe('Lost Changes Modal Component', () => {
     component.lostChanges = lostChanges;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    lostChangeObjectFactory = TestBed.inject(LostChangeObjectFactory);
     loggerService = TestBed.inject(LoggerService);
     logSpy = spyOn(loggerService, 'error').and.callThrough();
 
@@ -109,7 +105,6 @@ describe('Lost Changes Modal Component', () => {
     component.cancel();
 
     expect(dismissSpy).toHaveBeenCalledWith();
-
   });
 
   it('should contain correct modal header', () => {
@@ -143,5 +138,4 @@ describe('Lost Changes Modal Component', () => {
       'The lost changes are displayed below. You may want to copy and ' +
       'paste these changes before discarding them.');
   });
-
 });

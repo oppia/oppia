@@ -220,9 +220,8 @@ describe('Exploration editor page component', function() {
         FocusManagerService
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    })
-    .overrideModule(BrowserDynamicTestingModule, {
-       set: {
+    }).overrideModule(BrowserDynamicTestingModule, {
+        set: {
           entryComponents: [LostChangesModalComponent]
         }
       });

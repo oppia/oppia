@@ -28,7 +28,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class SaveValidationFailModalComponent extends ConfirmOrCancelModal {
   MSECS_TO_REFRESH: number = 20;
-  
+
   constructor(
     private windowRef: WindowRef,
     private ngbActiveModal: NgbActiveModal,

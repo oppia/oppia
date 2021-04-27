@@ -21,7 +21,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -33,7 +33,7 @@ export class SaveVersionMismatchModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   MSECS_TO_REFRESH: number = 20;
   hasLostChanges: boolean;
-  @Input() lostChanges:any;
+  @Input() lostChanges: LostChange[];
 
   constructor(
     private windowRef: WindowRef,
@@ -42,7 +42,7 @@ export class SaveVersionMismatchModalComponent
     private lostChangeObjectFactory: LostChangeObjectFactory,
     private ngbActiveModal: NgbActiveModal,
   ) {
-      super(ngbActiveModal);
+    super(ngbActiveModal);
   }
 
   ngOnInit(): void {
@@ -52,7 +52,8 @@ export class SaveVersionMismatchModalComponent
       // properties (such as the exploration title, category, etc.).
       this.lostChanges = this.lostChanges.map(
         this.lostChangeObjectFactory.createNew);
-      this.loggerService.error('Lost changes: ' + JSON.stringify(this.lostChanges));
+      this.loggerService.error(
+        'Lost changes: ' + JSON.stringify(this.lostChanges));
     }
   }
 

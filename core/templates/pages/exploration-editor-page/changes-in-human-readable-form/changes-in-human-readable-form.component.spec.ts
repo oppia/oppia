@@ -23,13 +23,13 @@ import { LostChangeBackendDict, LostChangeObjectFactory } from 'domain/explorati
 import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
-describe('Changes in Human Readable Form Directive', () => {
+fdescribe('Changes in Human Readable Form Directive', () => {
   let component: ChangesInHumanReadableFormComponent;
   let fixture: ComponentFixture<ChangesInHumanReadableFormComponent>;
   let lostChangeObjectFactory: LostChangeObjectFactory;
   let outcomeObjectFactory: OutcomeObjectFactory;
 
-  // This is a helper function to clean the compiled html 
+  // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
   const removeComments = (HTML) => {
     return HTML
@@ -37,10 +37,10 @@ describe('Changes in Human Readable Form Directive', () => {
       // Removes Unecessary white spaces and new lines.
       .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')
       // Removes Comments.
-      .replace(/<\!--.*?-->/g, "")
+      .replace(/<\!--.*?-->/g, '')
       // Removes marker.
-      .replace(/::marker/, "");
-  }
+      .replace(/::marker/, '');
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -58,7 +58,7 @@ describe('Changes in Human Readable Form Directive', () => {
   }));
 
   beforeEach(waitForAsync(() => {
-    lostChangeObjectFactory =  TestBed.inject(LostChangeObjectFactory);
+    lostChangeObjectFactory = TestBed.inject(LostChangeObjectFactory);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
 
     fixture = TestBed.createComponent(ChangesInHumanReadableFormComponent);
@@ -131,7 +131,9 @@ describe('Changes in Human Readable Form Directive', () => {
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<span> Deleted state: ' + component.lostChanges[0].stateName + ' </span>' +
+      '<span> Deleted state: ' +
+      component.lostChanges[0].stateName +
+      ' </span>' +
       '</li>' +
       '</ul>' +
       '</div>'
@@ -167,7 +169,8 @@ describe('Changes in Human Readable Form Directive', () => {
         ' <div>' +
         '<div class="state-edit-desc">' +
         '<strong>Edited content: </strong>' +
-        '<div class="content">' + component.lostChanges[0].newValue.html +
+        // eslint-disable-next-line dot-notation
+        '<div class="content">' + component.lostChanges[0].newValue['html'] +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -234,7 +237,8 @@ describe('Changes in Human Readable Form Directive', () => {
       ' Edits to state: ' + component.lostChanges[0].stateName +
       ' <div class="state-edit-desc">' +
       '<span>' +
-      '<strong>Added Interaction: </strong> ' + component.lostChanges[0].newValue +
+      '<strong>Added Interaction: </strong> ' +
+      component.lostChanges[0].newValue +
       ' </span>' +
       '</div>' +
       '</div>' +
@@ -422,16 +426,21 @@ describe('Changes in Human Readable Form Directive', () => {
       '<div class="state-edit-desc answer-group">' +
       '<strong>Added answer group: </strong>' +
       '<p class="sub-edit"><i>Destination: </i>' +
-      component.lostChanges[0].newValue.outcome.dest + ' </p>' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].dest + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback"> ' +
-      component.lostChanges[0].newValue.outcome.feedback.html +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].feedback.html +
       ' </div>' +
       '</div>' +
       '<div class="sub-edit"><i>Rules: </i>' +
       '<ol class="rules-list">' +
       '<li>' +
-      '<p>Type: ' + component.lostChanges[0].newValue.rules[0].type + '</p>' +
+      // eslint-disable-next-line dot-notation
+      '<p>Type: ' +
+      component.lostChanges[0].newValue['rules'][0].type +
+      '</p>' +
       '<p>Value: <span></span>' +
       ' input1,  input2 ' +
       '</p>' +
@@ -502,16 +511,21 @@ describe('Changes in Human Readable Form Directive', () => {
       '<div class="state-edit-desc answer-group">' +
       '<strong>Edited answer group: </strong>' +
       '<p class="sub-edit"><i>Destination: </i> ' +
-      component.lostChanges[0].newValue.outcome.dest + ' </p>' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].dest + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback"> ' +
-      component.lostChanges[0].newValue.outcome.feedback.html +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].feedback.html +
       ' </div>' +
       '</div>' +
       '<div class="sub-edit"><i>Rules: </i>' +
       '<ol class="rules-list">' +
       '<li>' +
-      '<p>Type: ' + component.lostChanges[0].newValue.rules[0].type + '</p>' +
+      // eslint-disable-next-line dot-notation
+      '<p>Type: ' +
+      component.lostChanges[0].newValue['rules'][0].type +
+      '</p>' +
       '<p>Value: <span></span>' +
       ' input1,  input2 ' +
       '</p>' +
@@ -606,10 +620,12 @@ describe('Changes in Human Readable Form Directive', () => {
       '<div class="state-edit-desc default-outcome">' +
       ' Added default outcome: ' +
       '<p class="sub-edit"><i>Destination: </i>' +
-      component.lostChanges[0].newValue.dest + ' </p>' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['dest'] + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback"> ' +
-      component.lostChanges[0].newValue.feedback.html +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['feedback'].html +
       ' </div>' +
       '</div>' +
       '</div>' +
@@ -658,10 +674,12 @@ describe('Changes in Human Readable Form Directive', () => {
       '<div class="state-edit-desc default-outcome">' +
       ' Edited default outcome: ' +
       '<p class="sub-edit"><i>Destination: </i>' +
-      component.lostChanges[0].newValue.dest + ' </p>' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['dest'] + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
       '<div class="feedback"> ' +
-      component.lostChanges[0].newValue.feedback.html +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['feedback'].html +
       ' </div>' +
       '</div>' +
       '</div>' +
@@ -686,7 +704,7 @@ describe('Changes in Human Readable Form Directive', () => {
             content_id: 'feedback_2',
             html: 'Html'
           },
-         } as unknown as OutcomeBackendDict),
+        } as unknown as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {

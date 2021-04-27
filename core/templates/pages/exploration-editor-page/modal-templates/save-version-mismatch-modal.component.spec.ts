@@ -21,7 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SaveVersionMismatchModalComponent } from './save-version-mismatch-modal.component';
-import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
@@ -87,7 +87,7 @@ describe('Save Version Mismatch Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
-  }];
+  } as unknown as LostChange];
 
   const lostChangesResponse = [{
     utilsService: {},
@@ -98,8 +98,6 @@ describe('Save Version Mismatch Modal Component', () => {
   let component: SaveVersionMismatchModalComponent;
   let fixture: ComponentFixture<SaveVersionMismatchModalComponent>;
   let windowRef: MockWindowRef;
-  let lostChangeObjectFactory: LostChangeObjectFactory;
-  let ngbActiveModal: NgbActiveModal;
   let loggerService: LoggerService;
   let logSpy = null;
   let explorationDataService: MockExplorationDataService;
@@ -125,7 +123,7 @@ describe('Save Version Mismatch Modal Component', () => {
           useClass: MockActiveModal
         },
         { provide: WindowRef,
-          useValue: windowRef 
+          useValue: windowRef
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -137,11 +135,9 @@ describe('Save Version Mismatch Modal Component', () => {
     component = fixture.componentInstance;
     component.lostChanges = lostChanges;
 
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    lostChangeObjectFactory = TestBed.inject(LostChangeObjectFactory);
     loggerService = TestBed.inject(LoggerService);
-
     logSpy = spyOn(loggerService, 'error').and.callThrough();
+    
     fixture.detectChanges();
   });
 
@@ -160,45 +156,45 @@ describe('Save Version Mismatch Modal Component', () => {
           reload: reloadSpy
         }
       });
-    
+
       component.discardChanges();
       fixture.detectChanges();
-      
+
       waitForAsync(() => {
         expect(explorationDataService.discardDraft).toHaveBeenCalled();
         expect(reloadSpy).toHaveBeenCalled();
       });
     });
 
-    it('should contain correct modal header', () => {
-      const modalHeader =
-      fixture.debugElement.nativeElement
-        .querySelector('.modal-header').innerText;
-  
-      expect(modalHeader).toBe('Error Saving Exploration');
-    });
-  
-    it('should contain correct modal body', () => {
-      const modalBody =
-      fixture.debugElement.nativeElement
-        .querySelector('.modal-body').children[0].innerText;
-  
-      expect(modalBody).toBe(
-        'Sorry! Someone else has saved a new version of this exploration, so ' +
-        'your pending changes cannot be saved.');
-    });
-  
-    it('should contain description on lost changes' +
-      'only if they exists in modal body', () => {
-      const modalBody =
-      fixture.debugElement.nativeElement
-        .querySelector('.modal-body').children[1].innerText;
-  
-      component.hasLostChanges = true;
-      fixture.detectChanges();
-  
-      expect(modalBody).toBe(
-        'The lost changes are displayed below. You may want to copy and ' +
-        'paste these changes before discarding them.');
-    });
+  it('should contain correct modal header', () => {
+    const modalHeader =
+    fixture.debugElement.nativeElement
+      .querySelector('.modal-header').innerText;
+
+    expect(modalHeader).toBe('Error Saving Exploration');
+  });
+
+  it('should contain correct modal body', () => {
+    const modalBody =
+    fixture.debugElement.nativeElement
+      .querySelector('.modal-body').children[0].innerText;
+
+    expect(modalBody).toBe(
+      'Sorry! Someone else has saved a new version of this exploration, so ' +
+      'your pending changes cannot be saved.');
+  });
+
+  it('should contain description on lost changes' +
+    'only if they exists in modal body', () => {
+    const modalBody =
+    fixture.debugElement.nativeElement
+      .querySelector('.modal-body').children[1].innerText;
+
+    component.hasLostChanges = true;
+    fixture.detectChanges();
+
+    expect(modalBody).toBe(
+      'The lost changes are displayed below. You may want to copy and ' +
+      'paste these changes before discarding them.');
+  });
 });

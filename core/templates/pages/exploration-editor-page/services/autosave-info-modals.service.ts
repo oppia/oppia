@@ -24,8 +24,9 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { LocalStorageService } from 'services/local-storage.service';
 import { SaveVersionMismatchModalComponent } from '../modal-templates/save-version-mismatch-modal.component';
 import { SaveValidationFailModalComponent } from '../modal-templates/save-validation-fail-modal.component';
-import { LostChangesModalComponent } from '../modal-templates/lost-changes-modal.component'
+import { LostChangesModalComponent } from '../modal-templates/lost-changes-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -55,11 +56,11 @@ export class AutosaveInfoModalsService {
     return this._isModalOpen;
   }
 
-  showVersionMismatchModal(lostChanges): void {
+  showVersionMismatchModal(lostChanges: LostChange[]): void {
     const modelRef = this.ngbModal.open(
       SaveVersionMismatchModalComponent, {
         backdrop: 'static',
-        keyboard  : false
+        keyboard: false
       });
     modelRef.componentInstance.lostChanges = lostChanges;
     modelRef.result.then(() => {
@@ -71,11 +72,12 @@ export class AutosaveInfoModalsService {
     this._isModalOpen = true;
   }
 
-  showLostChangesModal(lostChanges, explorationId): void {
+  showLostChangesModal(
+      lostChanges: LostChange[], explorationId: string): void {
     const modelRef = this.ngbModal.open(
       LostChangesModalComponent, {
         backdrop: 'static',
-        keyboard  : false
+        keyboard: false
       });
     modelRef.componentInstance.lostChanges = lostChanges;
     modelRef.result.then(() => {

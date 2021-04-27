@@ -17,11 +17,12 @@
  */
 
 import { Component, Input } from '@angular/core';
+import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
   templateUrl: './changes-in-human-readable-form.component.html'
 })
 export class ChangesInHumanReadableFormComponent {
-  @Input() lostChanges: any;
+  @Input() lostChanges: LostChange[];
 }

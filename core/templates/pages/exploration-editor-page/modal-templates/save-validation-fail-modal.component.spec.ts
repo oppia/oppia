@@ -17,7 +17,7 @@
  */
 
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SaveValidationFailModalComponent } from './save-validation-fail-modal.component';
@@ -91,7 +91,7 @@ describe('Save Validation Fail Modal Component', () => {
           useClass: MockActiveModal
         },
         { provide: WindowRef,
-          useValue: windowRef 
+          useValue: windowRef
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]

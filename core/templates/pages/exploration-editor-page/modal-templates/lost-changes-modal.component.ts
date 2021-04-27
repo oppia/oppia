@@ -19,7 +19,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { LoggerService } from 'services/contextual/logger.service';
-import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -29,22 +29,23 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class LostChangesModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() lostChanges:any;
+  @Input() lostChanges: LostChange[];
   hasLostChanges: boolean;
 
   constructor(
     private loggerService: LoggerService,
     private lostChangeObjectFactory: LostChangeObjectFactory,
     private ngbActiveModal: NgbActiveModal,
-    ) {
-      super(ngbActiveModal);
+  ) {
+    super(ngbActiveModal);
   }
 
   ngOnInit(): void {
     this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
     this.lostChanges = this.lostChanges.map(
       this.lostChangeObjectFactory.createNew);
-    this.loggerService.error('Lost changes: ' + JSON.stringify(this.lostChanges));
+    this.loggerService.error(
+      'Lost changes: ' + JSON.stringify(this.lostChanges));
   }
 
   cancel(): void {
