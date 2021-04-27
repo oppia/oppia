@@ -55,7 +55,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             // instance, then open the concept card modal. To determine if the
             // RTE is inside a CKEditor instance, check if the offsetParent
             // element contains the data attribute ckeWidgetId.
-            if (document.body.style.cursor == 'copy') {
+            if (document.body.style.cursor === 'copy') {
               return;
             }
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
