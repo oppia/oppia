@@ -125,7 +125,7 @@
     "@angular/router": "^10.2.2",
     "@angular/upgrade": "^10.2.2",
     "@asymmetrik/ngx-leaflet": "^8.1.0",
-    "@ctrl/ngx-codemirror": "^4.1.0",
+    "@ctrl/ngx-codemirror": "^4.1.1",
     "@ng-bootstrap/ng-bootstrap": "^8.0.0",
     "@types/angular-translate": "^2.16.2",
     "angular": "^1.8.2",

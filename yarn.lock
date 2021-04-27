@@ -312,10 +312,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@ctrl/ngx-codemirror@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@ctrl/ngx-codemirror/-/ngx-codemirror-4.1.0.tgz#81a66bc5a7af3534361265b1f5300757ca68bbb4"
-  integrity sha512-dAaXVLK4TbEPt0pkYH7Fobdm3EmY45nsapQcHqL/EP9JaThzSZCN0kvrLw6KdkFHVxFVOOwwLXmnj9RJzz8VWA==
+"@ctrl/ngx-codemirror@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@ctrl/ngx-codemirror/-/ngx-codemirror-4.1.1.tgz#dfeb83835d9ead95f9bfab5219c9cbe297bd5cd2"
+  integrity sha512-zeJiFrXpuYpZGUsFHyQ6tyiadBBfZHcV/10b0tTxVm9IIYqiOBXvX+LmTyZ9bRuu+Y7txNIwBdTY/ana0UFU9g==
   dependencies:
     "@types/codemirror" "^0.0.99"
     tslib "^2.0.0"
