@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import change_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.platform import models
@@ -382,4 +383,34 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [
             audit_errors.InvalidCommitTypeError(invalid_commit_type_model),
+        ])
+
+
+class MockValidateCommitCmdsSchemaChangeDomain(
+    base_model_audits.ValidateCommitCmdsSchema):
+
+    def _get_change_domain_class(self, item):
+        pass
+
+
+class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
+
+    def test_validate_none_commit(self):
+        invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
+            id='invalid',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{}])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(MockValidateCommitCmdsSchemaChangeDomain())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])

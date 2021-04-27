@@ -251,7 +251,8 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
             yield audit_errors.ModelDomainObjectValidateError(input_model, e)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseSnapshotMetadataModel)
+@audit_decorators.AuditsExisting(
+    base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
 class ValidateCommitCmdsSchema(beam.DoFn):
     """DoFn to validate schema of commit commands in commit_cmds dict.
     """
@@ -285,17 +286,16 @@ class ValidateCommitCmdsSchema(beam.DoFn):
             CommitCmdsNoneError. Error for invalid commit cmds id.
             CommitCmdsValidateError. Error for wrong commit cmds.
         """
-        model = job_utils.clone_model(input_model)
-        change_domain_object = self._get_change_domain_class(model)
+        change_domain_object = self._get_change_domain_class(input_model)
         if change_domain_object is None:
             # This is for cases where id of the entity is invalid
             # and no commit command domain object is found for the entity.
             # For example, if a CollectionCommitLogEntryModel does
             # not have id starting with collection/rights, there is
             # no commit command domain object defined for this model.
-            yield audit_errors.CommitCmdsNoneError(model)
+            yield audit_errors.CommitCmdsNoneError(input_model)
             return
-        for commit_cmd_dict in model.commit_cmds:
+        for commit_cmd_dict in input_model.commit_cmds:
             if not commit_cmd_dict:
                 continue
             try:
@@ -303,7 +303,7 @@ class ValidateCommitCmdsSchema(beam.DoFn):
             except Exception as e:
                 cmd_name = commit_cmd_dict.get('cmd')
                 yield audit_errors.CommitCmdsValidateError(
-                    cmd_name, model, commit_cmd_dict, e)
+                    input_model, commit_cmd_dict, e)
 
 
 @audit_decorators.AuditsExisting(

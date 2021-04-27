@@ -382,3 +382,24 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
             'ModelRelationshipError in FooModel(id=\'123\'): '
             'FooModel.bar_id=\'123\' should correspond to the ID of an '
             'existing BarModel, but no such model exists')
+
+
+class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='invalid',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{}])
+        error = audit_errors.CommitCmdsNoneError(model)
+
+        self.assertEqual(
+            error.message,
+            'CommitCmdsNoneError in BaseCommitLogEntryModel(id=\'invalid\'): '
+            'No commit command domain object '
+            'defined for entity with commands: [{}]')
+
