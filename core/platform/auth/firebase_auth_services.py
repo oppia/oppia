@@ -151,6 +151,7 @@ def get_auth_claims_from_request(request):
 
     Raises:
         InvalidAuthSessionError. The request contains an invalid session.
+        StaleAuthSessionError. The cookie has lost its authority.
     """
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
