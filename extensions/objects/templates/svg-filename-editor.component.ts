@@ -237,7 +237,6 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.postSvgToServer = function(dimensions, resampledFile) {
-        ctrl.isLoadingIndicatorShown = true;
         return $q(function(successCallback, errorCallback) {
           let form = new FormData();
           form.append('image', resampledFile);
@@ -377,6 +376,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
             ctrl.saveImageToLocalStorage(dimensions, resampledFile);
           } else {
+            ctrl.loadingIndicatorIsShown = true;
             ctrl.postSvgToServer(
               dimensions, resampledFile).then(function(data) {
               // Pre-load image before marking the image as saved.
@@ -390,10 +390,11 @@ angular.module('oppia').component('svgFilenameEditor', {
                   width: dimensions.width + 'px'
                 };
                 $scope.$applyAsync();
-                ctrl.isLoadingIndicatorShown = false;
+                ctrl.loadingIndicatorIsShown = false;
               };
               img.src = getTrustedResourceUrlForSvgFileName(data.filename);
             }, function(parsedResponse) {
+              ctrl.loadingIndicatorIsShown = false;
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
               $scope.$applyAsync();
