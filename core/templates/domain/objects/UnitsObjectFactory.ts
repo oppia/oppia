@@ -33,6 +33,9 @@ interface UnitsDict {
   [unit: string]: number;
 }
 
+type CurrencyUnitsKeys =
+  (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+
 export class Units {
   units: Unit[];
   constructor(unitsList: Unit[]) {
@@ -140,7 +143,7 @@ export class UnitsObjectFactory {
   }
 
   unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
-    var unitDict: { [key: string]: number } = {};
+    var unitDict: UnitsDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
       var multiplier = unitsWithMultiplier[i][1];
@@ -172,7 +175,7 @@ export class UnitsObjectFactory {
   }
 
   createCurrencyUnits(): void {
-    var keys = <(keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[]>(
+    var keys = <CurrencyUnitsKeys>(
       Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
     );
     for (var i = 0; i < keys.length; i++) {
@@ -204,7 +207,7 @@ export class UnitsObjectFactory {
     // Special symbols need to be replaced as math.js doesn't support custom
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
-    var keys = <(keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[]>
+    var keys = <CurrencyUnitsKeys>
       Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
     for (var i = 0; i < keys.length; i++) {
       for (

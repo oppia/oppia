@@ -126,8 +126,7 @@ export class ExplorationStats {
       oldStateName: string, newStateName: string): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     const stateStats = this.getStateStats(oldStateName);
-    newStateStatsMapping.set(
-      newStateName, stateStats);
+    newStateStatsMapping.set(newStateName, stateStats);
     // ES2016 Map uses delete as a method name despite it being a reserved word.
     // eslint-disable-next-line dot-notation
     newStateStatsMapping.delete(oldStateName);
