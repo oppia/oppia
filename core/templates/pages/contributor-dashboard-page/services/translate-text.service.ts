@@ -173,7 +173,8 @@ export class TranslateTextService {
 
   suggestTranslatedText(
       translationHtml: string, languageCode: string, imagesData:
-      ImagesData[], successCallback: () => void): void {
+      ImagesData[], successCallback: () => void,
+      errorCallback: () => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,
@@ -182,7 +183,7 @@ export class TranslateTextService {
       languageCode,
       this.stateWiseContents[this.activeStateName][this.activeContentId],
       translationHtml,
-      imagesData).then(successCallback);
+      imagesData).then(successCallback, errorCallback);
   }
 
   getMachineTranslationAsync(languageCode: string): Promise<string> {

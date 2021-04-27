@@ -30,6 +30,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -83,9 +84,11 @@ export class TranslationModalComponent {
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
-    private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly urlInterpolationService: UrlInterpolationService
-  ) {}
+    private readonly urlInterpolationService: UrlInterpolationService,
+    private readonly changeDetectorRef: ChangeDetectorRef
+  ) {
+    this.contextService = OppiaAngularRootComponent.contextService;
+  }
 
   ngOnInit(): void {
     this.activeLanguageCode =
@@ -182,7 +185,6 @@ export class TranslationModalComponent {
       this.uploadingTranslation = true;
       const imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.imageLocalStorageService.flushStoredImagesData();
-      this.contextService.resetImageSaveDestination();
       this.translateTextService.suggestTranslatedText(
         this.activeWrittenTranslation.html,
         this.translationLanguageService.getActiveLanguageCode(),
@@ -197,9 +199,13 @@ export class TranslationModalComponent {
           }
           this.activeWrittenTranslation.html = '';
           this.uploadingTranslation = false;
+        }, () => {
+          this.contextService.resetImageSaveDestination();
+          this.close();
         });
     }
     if (!this.moreAvailable) {
+      this.contextService.resetImageSaveDestination();
       this.close();
     }
   }
