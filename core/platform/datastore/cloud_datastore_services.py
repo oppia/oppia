@@ -289,3 +289,4 @@ def mock_datetime_for_datastore(mocked_now):
 
     setattr(datetime, 'datetime', MockDatetime)
     setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
+    yield

@@ -423,7 +423,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value % 256]))
+    return base64.b64encode(bytes([value % 256])).decode('utf-8')
 
 
 def get_time_in_millisecs(datetime_obj):

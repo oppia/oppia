@@ -48,7 +48,7 @@ def generate_signature(secret, message, vm_id):
     Returns:
         str. The signature of the payload data.
     """
-    message = '%s|%s' % (base64.b64encode(message), vm_id)
+    message = '%s|%s' % (base64.b64encode(message.encode('utf-8')), vm_id)
     return hmac.new(
         secret, msg=message, digestmod=hashlib.sha256).hexdigest()
 
