@@ -382,3 +382,21 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
             'ModelRelationshipError in FooModel(id=\'123\'): '
             'FooModel.bar_id=\'123\' should correspond to the ID of an '
             'existing BarModel, but no such model exists')
+
+
+class ArchivedModelNotDeletedErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = user_models.UserQueryModel(
+            id='test',
+            submitter_id='submitter',
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_AGO,
+            query_status=feconf.USER_QUERY_STATUS_ARCHIVED
+        )
+
+        error = audit_errors.ArchivedModelNotDeletedError(model)
+        self.assertEqual(
+            error.message,
+            'ArchivedModelNotDeletedError in UserQueryModel(id=\'test\'): '
+            'Archived model not marked as deleted')

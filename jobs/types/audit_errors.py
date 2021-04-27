@@ -222,3 +222,11 @@ class ModelRelationshipError(BaseAuditError):
             'but no such model exists' % (
                 id_property, python_utils.convert_to_bytes(target_id),
                 target_kind))
+
+
+class ArchivedModelNotDeletedError(BaseAuditError):
+    """Error class for models that are archived but not deleted."""
+
+    def __init__(self, model):
+        super(ArchivedModelNotDeletedError, self).__init__(model)
+        self.message = 'Archived model not marked as deleted'
