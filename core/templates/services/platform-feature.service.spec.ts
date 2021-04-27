@@ -338,7 +338,7 @@ describe('PlatformFeatureService', () => {
     );
   });
 
-  fdescribe('platformFeatureInitFactory', () => {
+  describe('platformFeatureInitFactory', () => {
     let factoryFn = (service: PlatformFeatureService) => {
       return async(): Promise<void> => service.initialize();
     }
