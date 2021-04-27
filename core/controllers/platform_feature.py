@@ -65,7 +65,7 @@ class PlatformFeatureDummyHandler(base.BaseHandler):
         # This handler is gated by the dummy_feature flag, i.e. it's only
         # visible when the dummy_feature is enabled.
         if not platform_feature_services.is_feature_enabled(
-                platform_feature_list.PARAM_NAMES.dummy_feature):
+                platform_feature_list.PARAM_NAMES.dummy_feature.value):
             raise self.PageNotFoundException()
         self.render_json({
             'msg': 'ok'
