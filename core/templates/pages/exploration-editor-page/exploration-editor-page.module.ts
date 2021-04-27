@@ -34,7 +34,7 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
-import { changesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
+import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 
 @NgModule({
@@ -52,7 +52,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
-    changesInHumanReadableFormComponent,
+    ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
   ],
   entryComponents: [
@@ -62,7 +62,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
-    changesInHumanReadableFormComponent,
+    ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
   ],
   providers: [

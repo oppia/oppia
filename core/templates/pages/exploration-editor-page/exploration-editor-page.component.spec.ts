@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -47,6 +49,7 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -192,6 +195,12 @@ describe('Exploration editor page component', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        NgbModule
+      ],
+      declarations: [
+        LostChangesModalComponent
+      ],
       providers: [
         ContextService,
         EditabilityService,
@@ -209,8 +218,14 @@ describe('Exploration editor page component', function() {
         UserExplorationPermissionsService,
         UrlInterpolationService,
         FocusManagerService
-      ]
-    });
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    })
+    .overrideModule(BrowserDynamicTestingModule, {
+       set: {
+          entryComponents: [LostChangesModalComponent]
+        }
+      });
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

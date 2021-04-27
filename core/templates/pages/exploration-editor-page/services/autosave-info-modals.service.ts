@@ -42,9 +42,9 @@ export class AutosaveInfoModalsService {
   showNonStrictValidationFailModal(): void {
     const modelRef = this.ngbModal.open(
       SaveValidationFailModalComponent, {backdrop: true});
-    modelRef.result.then(function() {
+    modelRef.result.then(() => {
       this._isModalOpen = false;
-    }, function() {
+    }, () => {
       this._isModalOpen = false;
     });
 
@@ -62,9 +62,9 @@ export class AutosaveInfoModalsService {
         keyboard  : false
       });
     modelRef.componentInstance.lostChanges = lostChanges;
-    modelRef.result.then(function() {
+    modelRef.result.then(() => {
       this._isModalOpen = false;
-    }, function() {
+    }, () => {
       this._isModalOpen = false;
     });
 
@@ -78,9 +78,9 @@ export class AutosaveInfoModalsService {
         keyboard  : false
       });
     modelRef.componentInstance.lostChanges = lostChanges;
-    modelRef.result.then(function() {
+    modelRef.result.then(() => {
       this._isModalOpen = false;
-    }, function() {
+    }, () => {
       // When the user clicks on discard changes button, signal backend
       // to discard the draft and reload the page thereafter.
       this.localStorageService.removeExplorationDraft(explorationId);

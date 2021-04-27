@@ -22,6 +22,6 @@ import { Component, Input } from '@angular/core';
   selector: 'oppia-changes-in-human-readable-form',
   templateUrl: './changes-in-human-readable-form.component.html'
 })
-export class changesInHumanReadableFormComponent {
+export class ChangesInHumanReadableFormComponent {
   @Input() lostChanges: any;
 }

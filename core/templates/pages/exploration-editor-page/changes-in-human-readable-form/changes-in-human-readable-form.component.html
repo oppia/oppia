@@ -70,8 +70,8 @@
                     <p>Type: {{ rule.type }}</p>
                     <p>Value:
                       <span> </span>
-                      <ng-container *ngFor="let input of rule.inputs">
-                        {{  last ? input : (input + ',') }}
+                      <ng-container *ngFor="let input of rule.inputs | keyvalue; let last = last">
+                        {{ last ? input.value: (input.value + ',') }}
                       </ng-container>
                     </p>
                   </li>
@@ -82,7 +82,7 @@
 
             <div *ngIf="lostChange.getRelativeChangeToGroups() === 'edited'" class="state-edit-desc answer-group">
               <strong>Edited answer group: </strong>
-              <p class="sub-edit" *ngIf="!isOutcomeDestEqual()">
+              <p class="sub-edit" *ngIf="!lostChange.isOutcomeDestEqual()">
                 <i>Destination: </i>
                 {{ lostChange.newValue.outcome.dest }}
               </p>
@@ -101,8 +101,8 @@
                     <p>Type: {{ rule.type }}</p>
                     <p>Value:
                       <span> </span>
-                      <ng-container *ngFor="let input of rule.inputs">
-                        {{  last ? input : (input + ',') }}
+                      <ng-container *ngFor="let input of rule.inputs | keyvalue; let last = last">
+                        {{ last ? input.value: (input.value + ',') }}
                       </ng-container>
                     </p>
                   </li>
@@ -131,7 +131,7 @@
 
             <div *ngIf="lostChange.getRelativeChangeToGroups() === 'edited'" class="state-edit-desc default-outcome">
               Edited default outcome:
-              <p class="sub-edit" *ngIf="!isDestEqual()">
+              <p class="sub-edit" *ngIf="!lostChange.isDestEqual()">
                 <i>Destination: </i>{{ lostChange.newValue.dest }}
               </p>
 
