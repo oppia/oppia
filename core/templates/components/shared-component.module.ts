@@ -67,7 +67,7 @@ import { WarningsAndAlertsComponent } from '../base-components/warnings-and-aler
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // Directives.
-import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
+import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.component';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 
