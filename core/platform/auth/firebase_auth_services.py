@@ -123,7 +123,7 @@ def establish_auth_session(request, response):
         overwrite=True,
         # Only allow this cookie to persist on Oppia's requests and responses,
         # promoting it to a "first-party cookie" (as opposed to a "third-party
-        # cookie", which are untrusted by some browsers).
+        # cookie", which is untrusted by some browsers).
         samesite='strict',
         # Toggles https vs http. The production server uses https, but the local
         # developement server uses http.
