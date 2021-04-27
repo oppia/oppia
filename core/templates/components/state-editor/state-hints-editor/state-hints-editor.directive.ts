@@ -22,7 +22,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
 require(
-  'components/state-directives/response-header/response-header.directive.ts');
+  'components/state-directives/response-header/response-header.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
   'add-hint-modal.controller.ts');
