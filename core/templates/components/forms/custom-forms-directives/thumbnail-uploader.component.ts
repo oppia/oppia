@@ -16,7 +16,8 @@
  * @fileoverview Component for uploading images.
  */
 
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -32,7 +33,7 @@ import { EditThumnailModalComponent } from './edit-thumbnail-modal.component';
   selector: 'oppia-thumbnail-uploader',
   templateUrl: './thumbnail-uploader.component.html'
 })
-export class ThumbnailUploaderComponent implements OnChanges, OnInit {
+export class ThumbnailUploaderComponent implements OnInit {
   @Input() disabled;
   @Input() useLocalStorage;
   @Input() getAllowedBgColors;
@@ -115,17 +116,17 @@ export class ThumbnailUploaderComponent implements OnChanges, OnInit {
       this.editableThumbnailDataUrl = this.placeholderImageDataUrl;
       this.uploadedImage = null;
     }
-    this.thumbnailIsLoading = false;
+    this.thumbnailIsLoading = true;
   }
 
   ngOnInit(): void {
     this.filenameChanges();
   }
 
-  ngOnChanges(): void {
-    this.filenameChanges();
-    this.thumbnailIsLoading = false;
-  }
+  // ngOnChanges(): void {
+  //   this.filenameChanges();
+  //   // This.thumbnailIsLoading = false;
+  // }
 
   saveThumbnailBgColor(newBgColor: string): void {
     if (newBgColor !== this.getBgColor) {
@@ -146,7 +147,6 @@ export class ThumbnailUploaderComponent implements OnChanges, OnInit {
   }
 
   postImageToServer(resampledFile: File, callback: () => void): void {
-    this.csrfTokenService.initializeToken();
     this.assetsBackendApiService.saveMathExpresionImage(
       resampledFile, this.tempImageName,
       this.contextService.getEntityType(),
