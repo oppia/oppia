@@ -1238,7 +1238,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             True)
 
     def test_convert_svg_diagram_tags_to_image_tags(self):
-        test_case = {
+        test_cases = [{
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
                 'svg_filename-with-value="&quot;img1.svg&quot;"'
@@ -1252,9 +1252,61 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
             )
-        }
-
-        self.assertEqual(
-            html_validation_service.convert_svg_diagram_tags_to_image_tags(
-                test_case['html_content']),
-            test_case['expected_output'])
+        },{
+            'html_content': (
+                '<oppia-noninteractive-svgdiagram '
+                'svg_filename-with-value="&quot;img1.svg&quot;"'
+                ' alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiagram '
+                'svg_filename-with-value="&quot;img2.svg&quot;"'
+                ' alt-with-value="&quot;Image123&quot;">'
+                '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiagram '
+                'alt-with-value="&quot;Image12345&quot;"
+                ' svg_filename-with-value="&quot;igage.svg&quot;">'
+                '</oppia-noninteractive-svgdiagram>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-image '
+                'alt-with-value="&amp;quot;Image&amp;quot;" '
+                'caption-with-value="" '
+                'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
+                '</oppia-noninteractive-image><oppia-noninteractive-image '
+                'alt-with-value="&amp;quot;Image123&amp;quot;" '
+                'caption-with-value="" '
+                'filepath-with-value="&amp;quot;img2.svg&amp;quot;">'
+                '</oppia-noninteractive-image><oppia-noninteractive-image '
+                'alt-with-value="&amp;quot;Image12345&amp;quot;" '
+                'caption-with-value="" '
+                'filepath-with-value="&amp;quot;igage.svg&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        },{ 
+            'html_content': (
+                '<oppia-noninteractive-svgdiagram '
+                'svg_filename-with-value="&quot;img1.svg&quot;"'
+                ' alt-with-value="&quot;Image&quot;"><oppia-noninteractive-svgdiagram '
+                'svg_filename-with-value="&quot;img1.svg&quot;"'
+                ' alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-svgdiagram><oppia-noninteractive-image '
+                'alt-with-value="&amp;quot;Image1&amp;quot;" '
+                'caption-with-value="xyz" '
+                'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-image '
+                'alt-with-value="&amp;quot;Image&amp;quot;" '
+                'caption-with-value="" '
+                'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
+                '</oppia-noninteractive-image><oppia-noninteractive-image '
+                'alt-with-value="&amp;quot;Image1&amp;quot;" '
+                'caption-with-value="xyz" '
+                'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )          
+        }]
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                    test_case['html_content']),
+                test_case['expected_output'])
