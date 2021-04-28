@@ -427,7 +427,6 @@ export class ExplorationEngineService {
          classificationResult.classificationCategorization,
          feedbackIsUseful);
 
-       console.log(outcome);
        this.statsReportingService.recordAnswerSubmitAction(
          oldStateName, newStateName, oldState.interaction.id, answer,
          outcome.feedback.html);
