@@ -79,7 +79,6 @@ export class OpportunitiesListComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-<<<<<<< HEAD
         ctrl.loadOpportunities().then(function({ opportunitiesDicts, more }) {
           opportunities = opportunitiesDicts;
           // "more" returned from GAE storage is not always reliable if true.
@@ -136,7 +135,6 @@ export class OpportunitiesListComponent {
   }
 }
 
-<<<<<<< HEAD
       ctrl.gotoPage = function(pageNumber) {
         var startIndex = (pageNumber - 1) * OPPORTUNITIES_PAGE_SIZE;
         var endIndex = pageNumber * OPPORTUNITIES_PAGE_SIZE;
@@ -169,8 +167,6 @@ export class OpportunitiesListComponent {
       };
     }]
 });
-=======
 angular.module('oppia').directive(
   'oppiaOpportunitiesList', downgradeComponent(
     {component: OpportunitiesListComponent}));
->>>>>>> upstream/develop

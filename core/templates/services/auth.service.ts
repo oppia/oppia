@@ -175,7 +175,6 @@ export class AuthService {
     await this.authBackendApiService.beginSessionAsync(idToken);
   }
 
-<<<<<<< HEAD
   /** Assumes that angularFireAuth is not null. */
   private async productionSignInAsync(): Promise<firebase.auth.UserCredential> {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -185,7 +184,6 @@ export class AuthService {
     provider.setCustomParameters({ prompt: 'select_account' });
     await this.angularFireAuth.signInWithRedirect(provider);
     return await this.angularFireAuth.getRedirectResult();
-=======
   async signInWithRedirectAsync(): Promise<void> {
     return this.authServiceImpl.signInWithRedirectAsync();
   }
@@ -193,7 +191,6 @@ export class AuthService {
   async signOutAsync(): Promise<void> {
     await this.authServiceImpl.signOutAsync();
     await this.authBackendApiService.endSessionAsync();
->>>>>>> upstream/develop
   }
 }
 

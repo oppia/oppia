@@ -59,7 +59,6 @@ describe('OnScreenKeyboard', function() {
   });
 
   it('should correctly identify keyboard events', function() {
-<<<<<<< HEAD
     ctrl.lettersAreLowercase = true;
     ctrl.keyDownCallBack({ key: 'Shift' });
     expect(ctrl.lettersAreLowercase).toBeFalse();
@@ -70,7 +69,6 @@ describe('OnScreenKeyboard', function() {
     ctrl.keyDownCallBack({ key: 'Backspace' });
     expect(ctrl.value.length).toBe(0);
     ctrl.keyDownCallBack({ key: 'x' });
-=======
     component.lettersAreLowercase = true;
     component.keyDownCallBack({key: 'Shift'} as unknown as KeyboardEvent);
     expect(component.lettersAreLowercase).toBeFalse();
@@ -91,6 +89,5 @@ describe('OnScreenKeyboard', function() {
     });
     window.dispatchEvent(event);
     fixture.detectChanges();
->>>>>>> upstream/develop
   });
 });

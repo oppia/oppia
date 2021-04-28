@@ -133,7 +133,6 @@ describe('Auth service', function() {
       ).toBeRejectedWithError('AngularFireAuth is not available');
     });
 
-<<<<<<< HEAD
       this.email = 'email@test.com';
       this.password = await md5(this.email);
       this.creds = {
@@ -141,13 +140,11 @@ describe('Auth service', function() {
         credential: null,
         additionalUserInfo: { isNewUser: false, profile: {}, providerId: null },
       };
-=======
   it('should throw if handleRedirectResultAsync is called without angular fire',
     async() => {
       await expectAsync(
         new AuthService(null, authBackendApiService).handleRedirectResultAsync()
       ).toBeRejectedWithError('AngularFireAuth is not available');
->>>>>>> upstream/develop
     });
 
   it('should delegate to signInWithEmailAndPassword', async() => {
@@ -216,12 +213,9 @@ describe('Auth service', function() {
     it('should delegate to AngularFireAuth.signInWithRedirect', async() => {
       angularFireAuth.signInWithRedirect.and.resolveTo();
 
-<<<<<<< HEAD
         const error = { code: 'auth/operation-not-allowed' };
         angularFireAuth.getRedirectResult.and.rejectWith(error);
-=======
       await expectAsync(authService.signInWithRedirectAsync()).toBeResolvedTo();
->>>>>>> upstream/develop
 
       expect(angularFireAuth.signInWithRedirect).toHaveBeenCalled();
     });
@@ -250,15 +244,12 @@ describe('Auth service', function() {
       this.creds.user = null;
       angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
 
-<<<<<<< HEAD
         angularFireAuth.signInWithEmailAndPassword
           .and.rejectWith({ code: 'auth/user-not-found' });
-=======
       await expectAsync(authService.handleRedirectResultAsync())
         .toBeResolvedTo(false);
     });
   });
->>>>>>> upstream/develop
 
   describe('Emulator mode', function() {
     beforeEach(async() => {
@@ -279,13 +270,10 @@ describe('Auth service', function() {
       await expectAsync(authService.handleRedirectResultAsync())
         .toBeResolvedTo(false);
 
-<<<<<<< HEAD
         const error = { code: 'auth/operation-not-allowed' };
         angularFireAuth.signInWithEmailAndPassword.and.rejectWith(error);
-=======
       expect(angularFireAuth.getRedirectResult).not.toHaveBeenCalled();
     });
->>>>>>> upstream/develop
 
     it('should sign out and end session', async() => {
       await expectAsync(authService.signOutAsync()).toBeResolvedTo();

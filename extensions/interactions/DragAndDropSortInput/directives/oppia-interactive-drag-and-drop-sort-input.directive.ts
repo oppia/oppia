@@ -109,11 +109,9 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               ctrl.dataMaxDepth = 1;
             }
 
-<<<<<<< HEAD
             // Make list of dicts from the list of choices.
             for (var i = 0; i < ctrl.choices.length; i++) {
               ctrl.list.push({ title: ctrl.choices[i], items: [] });
-=======
             let savedSolution = (
               ctrl.savedSolution !== undefined ? ctrl.savedSolution : []
             );
@@ -138,7 +136,6 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               for (let choice of ctrl.choices) {
                 ctrl.list.push({title: choice, items: []});
               }
->>>>>>> upstream/develop
             }
 
             ctrl.treeOptions = {

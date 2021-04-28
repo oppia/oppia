@@ -89,11 +89,8 @@ export class EmailDashboardBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.post<EmailDashboardQueryBackendDict>(
         this.QUERY_DATA_URL, {
-<<<<<<< HEAD
           data: postData }).toPromise().then(data => {
-=======
           data: data}).toPromise().then(data => {
->>>>>>> upstream/develop
         let queryObject = EmailDashboardQuery.createFromBackendDict(data);
         resolve(queryObject);
       }, errorResponse => {

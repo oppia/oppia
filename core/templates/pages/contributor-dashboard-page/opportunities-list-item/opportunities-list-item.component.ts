@@ -15,7 +15,6 @@
 /**
  * @fileoverview Component for the item view of an opportunity.
  */
-<<<<<<< HEAD
 require(
   'components/common-layout-directives/common-elements/' +
   'lazy-loading.component.ts');
@@ -56,7 +55,6 @@ angular.module('oppia').component('opportunitiesListItem', {
         } else {
           ctrl.opportunityDataIsLoading = true;
         }
-=======
 
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';

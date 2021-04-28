@@ -85,17 +85,14 @@ const login = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-<<<<<<< HEAD
       ADMIN_URL, { waitUntil: networkIdle });
     await page.waitForSelector('#admin', { visible: true });
     await page.click('#admin');
     await page.click('#submit-login');
-=======
       ADMIN_URL, { waitUntil: networkIdle});
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
->>>>>>> upstream/develop
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, { visible: true });

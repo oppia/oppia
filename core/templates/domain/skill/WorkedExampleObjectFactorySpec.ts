@@ -18,15 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-<<<<<<< HEAD
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { WorkedExampleObjectFactory } from
-=======
 import { SubtitledHtml} from
   'domain/exploration/subtitled-html.model';
 import { WorkedExampleObjectFactory} from
->>>>>>> upstream/develop
   'domain/skill/WorkedExampleObjectFactory';
 
 describe('Worked example object factory', () => {
