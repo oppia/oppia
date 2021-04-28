@@ -529,7 +529,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_base64_from_int(self):
         base64_number = utils.base64_from_int(108)
-        self.assertEqual(base64.b64decode(base64_number), '108')
+        self.assertEqual(base64.b64decode(base64_number), '[108]')
 
     def test_get_supported_audio_language_description_with_invalid_code(self):
         valid_language_code = 'en'

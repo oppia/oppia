@@ -411,7 +411,7 @@ def convert_to_bytes(string_to_convert):
     """
     if isinstance(string_to_convert, UNICODE):
         return string_to_convert.encode('utf-8')
-    return bytes(string_to_convert)
+    return b'[' + bytes(string_to_convert) + b']'
 
 
 def _recursively_convert_to_str(value):
