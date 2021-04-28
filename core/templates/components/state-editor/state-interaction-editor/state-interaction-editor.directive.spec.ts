@@ -47,7 +47,6 @@ require(
 
 describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
-
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
@@ -63,7 +62,7 @@ describe('State Interaction controller', function() {
         ]
       });
     });
-    
+
     beforeEach(function() {
       angular.mock.module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the

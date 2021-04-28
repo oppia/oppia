@@ -49,7 +49,7 @@ describe('Solution Verification Service', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        { 
+        {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState
         },

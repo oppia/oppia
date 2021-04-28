@@ -79,8 +79,9 @@ describe('Change list service', function() {
     beforeEach(() => {
       alertsService = TestBed.inject(AlertsService);
 
-      warningSpy = spyOn(alertsService, 'addWarning')
-      autosaveChangeListSpy = spyOn(explorationDataService, 'autosaveChangeList');
+      warningSpy = spyOn(alertsService, 'addWarning');
+      autosaveChangeListSpy = spyOn(
+        explorationDataService, 'autosaveChangeList');
     });
 
     beforeEach(angular.mock.inject(function($injector) {
@@ -281,7 +282,8 @@ describe('Exploration title service', function() {
         $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
       });
 
-      autosaveChangeListSpy = spyOn(explorationDataService, 'autosaveChangeList');
+      autosaveChangeListSpy = spyOn(
+        explorationDataService, 'autosaveChangeList');
     });
 
     beforeEach(angular.mock.inject(function($injector) {

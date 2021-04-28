@@ -788,7 +788,7 @@ describe('Exploration editor page component', function() {
 
       waitForAsync(() => {
         expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
-      })
+      });
     });
 
     it('should callback interaction-changed method for stats', fakeAsync(() => {

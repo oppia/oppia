@@ -97,7 +97,7 @@ describe('Exploration editor tab component', function() {
         }
       ]
     });
-    
+
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     hintObjectFactory = TestBed.get(HintObjectFactory);
