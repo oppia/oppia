@@ -54,8 +54,10 @@ module.exports = {
         /*
         Content as Pseudocode 
         { list[] = getDeclaredVariables(node)  
+          Variable =  List [0] (individual element of the list.
+ 
          // I assumed that the above function returns me a list of variables 
-          if(list contains private variable && string doesn't contain _ after first whitespace (bool return is false))
+          if(list contains private variable && whitespaceafterscope(Variable))
           {  
             context.report({
                node: node,
