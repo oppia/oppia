@@ -58,6 +58,10 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             if (document.body.style.cursor === 'copy') {
               return;
             }
+            // check if the copy mode is enabled within the copy editor
+            // (CKEditor) or not. If it is, don't show the RTE modal.
+            // The concept card modal should get triggered instead of the
+            // RTE modal while copying stuff within the copy editor.
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             // The catch at the end was needed according to this thread:
             // https://github.com/angular-ui/bootstrap/issues/6501, where in
