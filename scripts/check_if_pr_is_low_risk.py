@@ -100,6 +100,7 @@ def load_diff(base_branch):
     for file_tuple in diff_files:
         for filename in file_tuple:
             if filename in file_diffs:
+                # Don't re-generate a diff we already have.
                 continue
             if filename not in FILES_THAT_NEED_DIFFS:
                 continue
@@ -110,13 +111,18 @@ def load_diff(base_branch):
             ])
             file_diff_split = file_diff.rstrip().split('\n')
             i = 0
+            # Find the end of the diff header. See
+            # https://git-scm.com/docs/diff-format for details on the
+            # git diff format.
             for line in file_diff_split:
                 i += 1
                 if line.startswith('@@'):
                     break
-            if i > 6 or i == len(file_diff_split):
+            if i == len(file_diff_split):
+                # We reached the end of the diff without finding the
+                # header, or the header consumes the entire diff.
                 python_utils.PRINT(
-                    'Skipped too many lines when parsing "%s" diff'
+                    'Failed to find end of header in "%s" diff'
                     % filename)
                 return [], {}
             file_diffs[filename] = file_diff_split[i:]
@@ -209,6 +215,7 @@ def _check_changelog_pr_diff(diff_files, file_diffs):
             lines = file_diffs[old]
             if len(lines) != 2:
                 return 'Only 1 line should change in package.json'
+            # Check that only the version has been updated.
             if not (
                     bool(re.match(
                         r'-  "version": "[0-9]\.[0-9]\.[0-9]",',
@@ -221,6 +228,8 @@ def _check_changelog_pr_diff(diff_files, file_diffs):
 
         elif old == 'core/templates/pages/about-page/about-page.constants.ts':
             for line in file_diffs[old]:
+                # All changes should be additions of strings
+                # (specifically names) to a list.
                 if not re.match(r'\+    \'[A-Za-z ]+\',', line):
                     return 'about-page.constants.ts changes not low-risk'
         else:

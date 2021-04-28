@@ -251,57 +251,7 @@ class LoadDiffTests(test_utils.GenericTestBase):
         print_swap = self.swap_with_checks(
             python_utils, 'PRINT', mock_print,
             expected_args=[
-                ('Skipped too many lines when parsing "modified" diff',),
-            ])
-        files_that_need_diffs_swap = self.swap(
-            check_if_pr_is_low_risk, 'FILES_THAT_NEED_DIFFS',
-            ('modified',),
-        )
-
-        with run_cmd_swap, print_swap, files_that_need_diffs_swap:
-            diff_files, file_diffs = check_if_pr_is_low_risk.load_diff(
-                'develop')
-
-        self.assertListEqual(diff_files, [])
-        self.assertDictEqual(file_diffs, {})
-
-    def test_parse_diff_failure_long_header(self):
-
-        def mock_run_cmd(tokens):
-            if '--name-status' in tokens:
-                return (
-                    'M       modified\n'
-                )
-            if tokens[-1] == 'modified':
-                return (
-                    'diff --git a/modififed b/modified\n'
-                    'index 11af605ef2b7..89d00105ca66 100644\n'
-                    '--- a/modified\n'
-                    '+++ b/modified\n'
-                    'diff --git a/modififed b/modified\n'
-                    'index 11af605ef2b7..89d00105ca66 100644\n'
-                    '--- a/modified\n'
-                    '+++ b/modified\n'
-                    '@@ -32,6 +32,7 @@ def hello():\n'
-                )
-
-        def mock_print(unused_str):
-            pass
-
-        run_cmd_swap = self.swap_with_checks(
-            common, 'run_cmd', mock_run_cmd,
-            expected_args=[
-                ([
-                    'git', 'diff', '--name-status',
-                    'upstream/develop'],),
-                ([
-                    'git', 'diff', '-U0', 'upstream/develop', '--',
-                    'modified'],),
-            ])
-        print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
-            expected_args=[
-                ('Skipped too many lines when parsing "modified" diff',),
+                ('Failed to find end of header in "modified" diff',),
             ])
         files_that_need_diffs_swap = self.swap(
             check_if_pr_is_low_risk, 'FILES_THAT_NEED_DIFFS',
