@@ -728,6 +728,6 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
         image.clear()
         image['filepath-with-value'] = escaped_svg_filepath
         image['caption-with-value'] = ''
-        image['alt-with-value'] =  escaped_svg_alt_value
+        image['alt-with-value'] = escaped_svg_alt_value
         image.name = 'oppia-noninteractive-image'
     return python_utils.UNICODE(soup)

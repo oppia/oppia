@@ -1252,7 +1252,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
             )
-        },{
+        }, {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
                 'svg_filename-with-value="&quot;img1.svg&quot;"'
@@ -1261,7 +1261,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'svg_filename-with-value="&quot;img2.svg&quot;"'
                 ' alt-with-value="&quot;Image123&quot;">'
                 '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiagram '
-                'alt-with-value="&quot;Image12345&quot;"
+                'alt-with-value="&quot;Image12345&quot;"'
                 ' svg_filename-with-value="&quot;igage.svg&quot;">'
                 '</oppia-noninteractive-svgdiagram>'
             ),
@@ -1280,7 +1280,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'filepath-with-value="&amp;quot;igage.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
             )
-        },{ 
+        }, { 
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
                 'svg_filename-with-value="&quot;img1.svg&quot;"'
