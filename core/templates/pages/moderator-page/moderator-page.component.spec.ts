@@ -16,15 +16,20 @@
  * @fileoverview Unit tests for Moderator Page Component.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync }
+  from '@angular/core/testing';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
-import { ThreadMessage, ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.model';
+import { SchemaBasedEditorDirective }
+  from 'components/forms/schema-based-editors/schema-based-editor.directive';
+import { ThreadMessage, ThreadMessageBackendDict }
+  from 'domain/feedback_message/ThreadMessage.model';
 import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { ModeratorPageComponent } from './moderator-page.component';
-import { ActivityIdTypeDict, FeaturedActivityResponse, ModeratorPageBackendApiService, RecentCommitResponse, RecentFeedbackMessages } from './services/moderator-page-backend-api.service';
+import { ActivityIdTypeDict, FeaturedActivityResponse,
+  ModeratorPageBackendApiService, RecentCommitResponse, RecentFeedbackMessages }
+  from './services/moderator-page-backend-api.service';
 
 describe('Moderator Page Component', () => {
   let fixture: ComponentFixture<ModeratorPageComponent>;

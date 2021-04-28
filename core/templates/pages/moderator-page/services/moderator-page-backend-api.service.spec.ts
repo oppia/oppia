@@ -17,9 +17,13 @@
  *  the Oppia moderator page.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
-import { ActivityIdTypeDict, FeaturedActivityResponse, ModeratorPageBackendApiService, RecentCommitResponse, RecentFeedbackMessages } from './moderator-page-backend-api.service';
+import { HttpClientTestingModule, HttpTestingController }
+  from '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed, waitForAsync }
+  from '@angular/core/testing';
+import { ActivityIdTypeDict, FeaturedActivityResponse,
+  ModeratorPageBackendApiService, RecentCommitResponse,
+  RecentFeedbackMessages } from './moderator-page-backend-api.service';
 
 describe('Moderator Page Backend Api Service', () => {
   let moderatorPageBackendApiService: ModeratorPageBackendApiService;
@@ -45,7 +49,7 @@ describe('Moderator Page Backend Api Service', () => {
       type: 'type1'
     }];
     moderatorPageBackendApiService
-      .saveFeaturedActivityReferences(activityReferences)
+      .saveFeaturedActivityReferencesAsync(activityReferences)
       .then((responseData) => {
         expect(responseData).toEqual({});
       });
@@ -64,15 +68,16 @@ describe('Moderator Page Backend Api Service', () => {
       exp_ids_to_exp_data: []
     };
     moderatorPageBackendApiService
-      .getRecentCommits().then((responseData) => {
+      .getRecentCommitsAsync().then((responseData) => {
         expect(responseData).toEqual(expectedResponseData);
       });
 
     let req = httpTestingController.expectOne(
       '/recentcommitshandler/recent_commits' +
       '?query_type=all_non_private_commits');
-    expect(req.request.method).toEqual('GET');
     req.flush(expectedResponseData);
+
+    expect(req.request.method).toEqual('GET');
     flushMicrotasks();
   }));
 
@@ -83,7 +88,7 @@ describe('Moderator Page Backend Api Service', () => {
       more: true
     };
     moderatorPageBackendApiService
-      .getRecentFeedbackMessages().then((responseData) => {
+      .getRecentFeedbackMessagesAsync().then((responseData) => {
         expect(responseData).toEqual(expectedResponseData);
       });
 
@@ -98,7 +103,7 @@ describe('Moderator Page Backend Api Service', () => {
       featured_activity_references: []
     };
     moderatorPageBackendApiService
-      .getFeaturedActivityReferences().then((responseData) => {
+      .getFeaturedActivityReferencesAsync().then((responseData) => {
         expect(responseData).toEqual(expectedResponseData);
       });
 

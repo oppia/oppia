@@ -25,7 +25,9 @@ import { AlertsService } from 'services/alerts.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { Schema } from 'services/schema-default-value.service';
-import { ActivityIdTypeDict, CommitMessage, ExplorationDict, ModeratorPageBackendApiService } from './services/moderator-page-backend-api.service';
+import { ActivityIdTypeDict, CommitMessage,
+  ExplorationDict, ModeratorPageBackendApiService }
+  from './services/moderator-page-backend-api.service';
 
 require('base-components/base-content.directive.ts');
 
@@ -34,7 +36,6 @@ require('base-components/base-content.directive.ts');
   templateUrl: './moderator-page.component.html'
 })
 export class ModeratorPageComponent {
-  activeId: number = 1;
   allCommits: CommitMessage[] = [];
   allFeedbackMessages: ThreadMessage[] = [];
   // Map of exploration ids to objects containing a single key: title.
@@ -81,10 +82,10 @@ export class ModeratorPageComponent {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.moderatorPageBackendApiService.getRecentCommits()
+    this.moderatorPageBackendApiService.getRecentCommitsAsync()
       .then((response) => {
-      // Update the explorationData object with information about newly-
-      // discovered explorations.
+        // Update the explorationData object with information about newly-
+        // discovered explorations.
         let explorationIdsToExplorationData = response.exp_ids_to_exp_data;
         for (let expId in explorationIdsToExplorationData) {
           if (!this.explorationData.hasOwnProperty(expId)) {
@@ -96,13 +97,13 @@ export class ModeratorPageComponent {
         this.loaderService.hideLoadingScreen();
       });
 
-    this.moderatorPageBackendApiService.getRecentFeedbackMessages()
+    this.moderatorPageBackendApiService.getRecentFeedbackMessagesAsync()
       .then((response) => {
         this.allFeedbackMessages = response.results.map(
           d => ThreadMessage.createFromBackendDict(d));
       });
 
-    this.moderatorPageBackendApiService.getFeaturedActivityReferences()
+    this.moderatorPageBackendApiService.getFeaturedActivityReferencesAsync()
       .then((response) => {
         this.displayedFeaturedActivityReferences = response
           .featured_activity_references;
@@ -145,7 +146,8 @@ export class ModeratorPageComponent {
       [...this.displayedFeaturedActivityReferences];
 
     this.moderatorPageBackendApiService
-      .saveFeaturedActivityReferences(activityReferencesToSave).then(() => {
+      .saveFeaturedActivityReferencesAsync(activityReferencesToSave)
+      .then(() => {
         this.lastSavedFeaturedActivityReferences = activityReferencesToSave;
         this.alertsService.addSuccessMessage('Featured activities saved.');
       });

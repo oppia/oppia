@@ -16,9 +16,10 @@
  * @fileoverview Backend Api Service for the Oppia moderator page.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.model';
+import { ThreadMessageBackendDict }
+  from 'domain/feedback_message/ThreadMessage.model';
 
 export interface CommitMessage {
   'commit_message': string,
@@ -67,28 +68,28 @@ export class ModeratorPageBackendApiService {
     private httpClient: HttpClient
   ) {}
 
-  saveFeaturedActivityReferences(
+  async saveFeaturedActivityReferencesAsync(
       activityReferencesToSave: ActivityIdTypeDict[]): Promise<Object> {
     return this.httpClient.post('/moderatorhandler/featured', {
       featured_activity_reference_dicts: activityReferencesToSave
     }, {}).toPromise();
   }
 
-  getRecentCommits(): Promise<RecentCommitResponse> {
-    let RECENT_COMMITS_URL: string = (
-      '/recentcommitshandler/recent_commits' +
-      '?query_type=all_non_private_commits');
+  async getRecentCommitsAsync(): Promise<RecentCommitResponse> {
+    let options = {params: new HttpParams()
+      .set('query_type', 'all_non_private_commits')};
     // TODO(sll): Update this to also support collections.
-    return this.httpClient.get<RecentCommitResponse>(RECENT_COMMITS_URL)
-      .toPromise();
+    return this.httpClient.get<RecentCommitResponse>(
+      '/recentcommitshandler/recent_commits', options).toPromise();
   }
 
-  getRecentFeedbackMessages(): Promise<RecentFeedbackMessages> {
+  async getRecentFeedbackMessagesAsync(): Promise<RecentFeedbackMessages> {
     return this.httpClient
       .get<RecentFeedbackMessages>('/recent_feedback_messages').toPromise();
   }
 
-  getFeaturedActivityReferences(): Promise<FeaturedActivityResponse> {
+  async getFeaturedActivityReferencesAsync():
+  Promise<FeaturedActivityResponse> {
     return this.httpClient
       .get<FeaturedActivityResponse>('/moderatorhandler/featured').toPromise();
   }
