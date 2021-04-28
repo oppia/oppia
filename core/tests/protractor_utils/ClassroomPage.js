@@ -32,7 +32,8 @@ var ClassroomPage = function() {
   };
 
   this.expectNumberOfTopicsToBe = async function(count) {
-    await waitFor.visibilityOf(topNavigationBar, 'Top navigation bar not visible');
+    await waitFor.visibilityOf(
+      topNavigationBar, 'Top navigation bar taking too long to appear');
     expect(await topicSummaryTiles.count()).toEqual(count);
   };
 };
