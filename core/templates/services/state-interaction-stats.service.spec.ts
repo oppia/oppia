@@ -27,7 +27,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { StateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 
@@ -161,6 +161,7 @@ describe('State Interaction Stats Service', () => {
       },
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
       written_translations: {
         translations_mapping: {}
       },

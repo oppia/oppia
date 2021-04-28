@@ -15,50 +15,55 @@
 /**
  * @fileoverview Unit test for ImageLocalStorageService.
  */
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { AlertsService } from './alerts.service';
 import { ImageLocalStorageService } from './image-local-storage.service';
 import { ImageUploadHelperService } from './image-upload-helper.service';
-import { AlertsService } from './alerts.service';
+
 
 describe('ImageLocalStorageService', () => {
-  let alertsService: AlertsService;
-  let imageLocalStorageService: ImageLocalStorageService;
-  let sampleImageData = 'dis:issue is:open ata:image/png;base64,xyz';
+  let alertsService: AlertsService = null;
+  let imageLocalStorageService: ImageLocalStorageService = null;
+  let sampleImageData = 'data:image/png;base64,xyz';
   let imageFilename = 'filename';
   let imageUploadHelperService: ImageUploadHelperService;
+  class MockImageUploadHelperService {
+    convertImageDataToImageFile(imageData) {
+      return imageData;
+    }
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      providers: [
-        ImageUploadHelperService,
-        ImageLocalStorageService,
-        AlertsService
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [{
+        provide: ImageUploadHelperService,
+        useClass: MockImageUploadHelperService
+      }]
     });
-    alertsService = TestBed.inject(AlertsService);
+  });
+
+  beforeEach(() => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    alertsService = TestBed.inject(AlertsService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
   });
 
   it(
     'should call helper service function correctly when getting' +
-      ' object url', () => {
-      spyOn(
-        imageUploadHelperService, 'convertImageDataToImageFile'
-      );
+    ' object url', () => {
+      const imageUploaderSpy = spyOn(
+        imageUploadHelperService, 'convertImageDataToImageFile');
       spyOn(URL, 'createObjectURL').and.returnValue('objectUrl');
       imageLocalStorageService.saveImage(imageFilename, sampleImageData);
       expect(
         imageLocalStorageService.getObjectUrlForImage(imageFilename)
       ).toBe('objectUrl');
-      expect(
-        imageUploadHelperService.convertImageDataToImageFile
-      ).toHaveBeenCalledWith(sampleImageData);
-    });
+      expect(imageUploaderSpy).toHaveBeenCalledWith(sampleImageData);
+    }
+  );
 
   it('should delete images from localStorage correctly', () => {
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
@@ -72,30 +77,28 @@ describe('ImageLocalStorageService', () => {
       imageLocalStorageService.getStoredImagesData().length).toEqual(0);
   });
 
-  it('should return correctly check whether file exist in storage',
-    () => {
-      expect(imageLocalStorageService.isInStorage(imageFilename)).toBeFalse();
-      imageLocalStorageService.saveImage(imageFilename, sampleImageData);
-      expect(imageLocalStorageService.isInStorage(imageFilename)).toBeTrue();
-    });
+  it('should return correctly check whether file exist in storage', () => {
+    expect(imageLocalStorageService.isInStorage(imageFilename)).toBeFalse();
+    imageLocalStorageService.saveImage(imageFilename, sampleImageData);
+    expect(imageLocalStorageService.isInStorage(imageFilename)).toBeTrue();
+  });
 
   it(
     'should show error message if number of stored images crosses ' +
-      'limit', () => {
-      for (let i = 0; i <= 50; i++) {
-        imageLocalStorageService.saveImage(
-          'filename' + i, sampleImageData);
+    'limit', () => {
+      for (var i = 0; i <= 50; i++) {
+        imageLocalStorageService.saveImage('filename' + i, sampleImageData);
       }
       expect(alertsService.messages.length).toEqual(0);
       imageLocalStorageService.saveImage('filename51', sampleImageData);
       expect(alertsService.messages.length).toEqual(1);
-    });
+    }
+  );
 
   it('should set and clear the thumbnail background color', () => {
     expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(null);
     let bgColor = '#e34d43';
     imageLocalStorageService.setThumbnailBgColor(bgColor);
-    expect(
-      imageLocalStorageService.getThumbnailBgColor()).toEqual(bgColor);
+    expect(imageLocalStorageService.getThumbnailBgColor()).toEqual(bgColor);
   });
 });

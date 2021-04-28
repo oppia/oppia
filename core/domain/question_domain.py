@@ -1033,6 +1033,51 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v42_dict_to_v43_dict(cls, question_state_dict):
+        """Converts from version 42 to 43. Version 43 adds a new customization
+        arg to NumericExpressionInput, AlgebraicExpressionInput, and
+        MathEquationInput. The customization arg will allow creators to choose
+        whether to render the division sign (÷) instead of a fraction for the
+        division operation.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] in [
+                'NumericExpressionInput', 'AlgebraicExpressionInput',
+                'MathEquationInput']:
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v43_dict_to_v44_dict(cls, question_state_dict):
+        """Converts from version 43 to version 44. Version 44 adds
+        card_is_checkpoint boolean to the state, which allows creators to
+        mark a state as a checkpoint for the learners.
+
+        Args:
+            question_state_dict: dict. A dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict['card_is_checkpoint'] = False
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

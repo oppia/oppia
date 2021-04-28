@@ -10,7 +10,6 @@
         "extensions.interactions.base_test",
         "core.controllers.classroom_test",
         "extensions.rich_text_components.components_test",
-        "core.controllers.incoming_emails_test",
         "core.controllers.topic_editor_test",
         "core.controllers.platform_feature_test",
         "extensions.answer_summarizers.models_test",
@@ -109,7 +108,7 @@
         "core.domain.exp_services_test"
     ],
     "4": [
-        "core.domain.prod_validators_test",
+        "core.domain.subtopic_validators_test",
         "core.domain.skill_jobs_one_off_test",
         "core.domain.email_validators_test",
         "core.domain.exploration_validators_test"
@@ -118,7 +117,6 @@
         "core.domain.suggestion_validators_test",
         "core.domain.subtopic_page_domain_test",
         "core.domain.subscription_services_test",
-        "core.domain.email_domain_test",
         "core.domain.feedback_jobs_one_off_test",
         "core.domain.draft_upgrade_services_test",
         "core.domain.event_services_test",
@@ -147,6 +145,7 @@
         "core.domain.job_validators_test"
     ],
     "8": [
+        "core.domain.app_feedback_report_validators_test",
         "core.domain.taskqueue_services_test",
         "core.domain.collection_jobs_one_off_test",
         "core.domain.email_services_test",
@@ -195,11 +194,23 @@
         "scripts.install_chrome_for_ci_test"
     ],
     "9": [
-        "core.domain.user_jobs_one_off_test",
         "core.domain.topic_validators_test",
-        "jobs.jobs_utils_test",
-        "jobs.base_model_validator_test",
-        "jobs.base_model_validator_errors_test"
+        "core.storage.app_feedback_report.gae_models_test",
+        "core.domain.user_jobs_one_off_test",
+        "jobs.audit_jobs_test",
+        "jobs.base_jobs_test",
+        "jobs.decorators.audit_decorators_test",
+        "jobs.io.stub_io_test",
+        "jobs.job_options_test",
+        "jobs.job_test_utils_test",
+        "jobs.job_utils_test",
+        "jobs.registry_test",
+        "jobs.transforms.audits_registry_test",
+        "jobs.transforms.auth_audits_test",
+        "jobs.transforms.base_model_audits_test",
+        "jobs.transforms.user_audits_test",
+        "jobs.types.audit_errors_test",
+        "jobs.types.model_property_test"
     ],
     "10": [
         "core.domain.question_jobs_one_off_test",
@@ -211,6 +222,13 @@
     ],
     "11": [
         "core.platform.taskqueue.cloud_taskqueue_services_test",
+        "core.platform.cloud_translate.cloud_translate_services_test",
+        "core.platform.cloud_translate.dev_mode_cloud_translate_services_test",
+        "core.storage.translation.gae_models_test",
+        "core.domain.translation_domain_test",
+        "core.domain.translation_validators_test",
+        "core.domain.translation_fetchers_test",
+        "core.domain.translation_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
         "scripts.regenerate_requirements_test",
@@ -237,6 +255,7 @@
         "core.platform.auth.gae_auth_services_test",
         "core.storage.skill.gae_models_test",
         "core.platform.taskqueue.cloud_tasks_emulator_test",
+        "core.platform.cloud_translate.cloud_translate_emulator_test",
         "core.storage.config.gae_models_test",
         "core.platform.app_identity.gae_app_identity_services_test",
         "core.storage.topic.gae_models_test",

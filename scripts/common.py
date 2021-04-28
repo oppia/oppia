@@ -94,7 +94,7 @@ OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
@@ -121,6 +121,12 @@ REDIS_SERVER_PATH = os.path.join(
 REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
+# Directory for storing/fetching data related to the Cloud Datastore emulator.
+CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
+    os.path.join(CURR_DIR, os.pardir, 'cloud_datastore_emulator_cache'))
+# Directory for storing/fetching data related to the Firebase emulator.
+FIREBASE_EMULATOR_CACHE_DIR = (
+    os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -913,24 +919,31 @@ def managed_dev_appserver(
 
 
 @contextlib.contextmanager
-def managed_firebase_auth_emulator():
+def managed_firebase_auth_emulator(recover_users=False):
     """Returns a context manager to manage the Firebase auth emulator.
+
+    Args:
+        recover_users: bool. Whether to recover users created by the previous
+            instance of the Firebase auth emulator.
 
     Yields:
         psutil.Process. The Firebase emulator process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     emulator_args = [
         FIREBASE_PATH, 'emulators:start', '--only', 'auth',
         '--project', feconf.OPPIA_PROJECT_ID,
         '--config', feconf.FIREBASE_EMULATOR_CONFIG_PATH,
     ]
-    with contextlib2.ExitStack() as stack:
-        # OK to use shell=True here because we are passing string literals and
-        # constants, so no risk of shell-injection attacks.
-        yield stack.enter_context(managed_process(emulator_args, shell=True))
+
+    emulator_args.extend(
+        ['--import', FIREBASE_EMULATOR_CACHE_DIR, '--export-on-exit']
+        if recover_users else ['--export-on-exit', FIREBASE_EMULATOR_CACHE_DIR])
+
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
+    with managed_process(emulator_args, shell=True) as proc:
+        wait_for_port_to_be_in_use(feconf.FIREBASE_EMULATOR_PORT)
+        yield proc
 
 
 @contextlib.contextmanager
@@ -950,4 +963,59 @@ def managed_elasticsearch_dev_server():
     # Override the default path to ElasticSearch config files.
     es_env = {'ES_PATH_CONF': ES_PATH_CONFIG_DIR}
     with managed_process(es_args, env=es_env, shell=True) as proc:
+        yield proc
+
+
+@contextlib.contextmanager
+def managed_cloud_datastore_emulator(clear_datastore=False):
+    """Returns a context manager for the Cloud Datastore emulator.
+
+    Args:
+        clear_datastore: bool. Whether to delete the datastore's config and data
+            before starting the emulator.
+
+    Yields:
+        psutil.Process. The emulator process.
+    """
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
+    emulator_hostport = '%s:%d' % (
+        feconf.CLOUD_DATASTORE_EMULATOR_HOST,
+        feconf.CLOUD_DATASTORE_EMULATOR_PORT)
+    emulator_args = [
+        GCLOUD_PATH, 'beta', 'emulators', 'datastore', 'start',
+        '--project', feconf.OPPIA_PROJECT_ID,
+        '--data-dir', CLOUD_DATASTORE_EMULATOR_DATA_DIR,
+        '--host-port', emulator_hostport,
+        '--no-store-on-disk', '--consistency=1.0', '--quiet',
+    ]
+
+    with contextlib2.ExitStack() as stack:
+        data_dir_exists = os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+        if clear_datastore and data_dir_exists:
+            # Replace it with an empty directory.
+            shutil.rmtree(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+            os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+        elif not data_dir_exists:
+            os.makedirs(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+
+        proc = stack.enter_context(managed_process(emulator_args, shell=True))
+
+        wait_for_port_to_be_in_use(feconf.CLOUD_DATASTORE_EMULATOR_PORT)
+
+        # Environment variables required to communicate with the emulator.
+        stack.enter_context(swap_env(
+            'DATASTORE_DATASET', feconf.OPPIA_PROJECT_ID))
+        stack.enter_context(swap_env(
+            'DATASTORE_EMULATOR_HOST', emulator_hostport))
+        stack.enter_context(swap_env(
+            'DATASTORE_EMULATOR_HOST_PATH', '%s/datastore' % emulator_hostport))
+        stack.enter_context(swap_env(
+            'DATASTORE_HOST', 'http://%s' % emulator_hostport))
+        stack.enter_context(swap_env(
+            'DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID))
+        stack.enter_context(swap_env(
+            'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
+
         yield proc

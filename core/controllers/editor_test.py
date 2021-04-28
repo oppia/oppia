@@ -270,7 +270,8 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
 
     SAMPLE_JSON_CONTENT = {
         'State A': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -311,7 +312,8 @@ written_translations:
     default_outcome: {}
 """),
         'State B': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -352,7 +354,8 @@ written_translations:
     default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
-            """classifier_model_id: null
+            """card_is_checkpoint: true
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -395,7 +398,8 @@ written_translations:
     }
 
     SAMPLE_STATE_STRING = (
-        """classifier_model_id: null
+        """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1429,7 +1433,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_username': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
-
         self.logout()
 
         # Check that viewer can access editor page but cannot edit.
@@ -1524,6 +1527,186 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token, expected_status_int=401)
 
+        self.logout()
+
+        # Check that existing editor can be assigned to any other role.
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_OWNER
+            }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_for_deassign_editor_role(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+        self.logout()
+
+        self.login(self.COLLABORATOR_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        self.delete_json(
+            rights_url, params={
+                'member_role': rights_domain.ROLE_EDITOR,
+                'username': self.COLLABORATOR_USERNAME
+            })
+        self.logout()
+
+        self.login(self.COLLABORATOR_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+    def test_for_deassign_sole_owner_from_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        response = self.delete_json(
+            rights_url, params={
+                'member_role': rights_domain.ROLE_OWNER,
+                'username': self.OWNER_USERNAME
+            }, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, users cannot remove their own roles.')
+        self.logout()
+
+    def test_users_cannot_assign_other_role_to_itself(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.OWNER_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Users are not allowed to assign other roles to themselves')
+        self.logout()
+
+    def test_for_deassign_viewer_role_from_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.VIEWER_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        self.delete_json(
+            rights_url, params={
+                'member_role': rights_domain.ROLE_VIEWER,
+                'username': self.VIEWER_USERNAME
+            })
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+    def test_for_checking_username_is_valid(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        response = self.delete_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
 
     def test_transfering_ownership_to_the_community(self):

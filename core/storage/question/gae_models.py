@@ -48,6 +48,50 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to questions.
+
+    A new instance of this model is created and saved every time a commit to
+    QuestionModel occurs.
+
+    The id for this model is of the form 'question-[question_id]-[version]'.
+    """
+
+    # The id of the question being edited.
+    question_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_instance_id(cls, question_id, question_version):
+        """Returns ID of the question commit log entry model.
+
+        Args:
+            question_id: str. The question id whose states are mapped.
+            question_version: int. The version of the question.
+
+        Returns:
+            str. A string containing question ID and
+            question version.
+        """
+        return 'question-%s-%s' % (question_id, question_version)
+
+
 class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
@@ -56,6 +100,7 @@ class QuestionModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = QuestionCommitLogEntryModel
     ALLOW_REVERT = True
 
     # An object representing the question state data.
@@ -621,50 +666,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 question skill link domain objects to delete from the datastore.
         """
         cls.delete_multi(question_skill_links)
-
-
-class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to questions.
-
-    A new instance of this model is created and saved every time a commit to
-    QuestionModel occurs.
-
-    The id for this model is of the form 'question-[question_id]-[version]'.
-    """
-
-    # The id of the question being edited.
-    question_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @staticmethod
-    def get_model_association_to_user():
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    @classmethod
-    def _get_instance_id(cls, question_id, question_version):
-        """Returns ID of the question commit log entry model.
-
-        Args:
-            question_id: str. The question id whose states are mapped.
-            question_version: int. The version of the question.
-
-        Returns:
-            str. A string containing question ID and
-            question version.
-        """
-        return 'question-%s-%s' % (question_id, question_version)
 
 
 class QuestionSummaryModel(base_models.BaseModel):

@@ -429,6 +429,609 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             exp_domain.ExpVersionReference(0, 1)
 
 
+class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
+    """Test checkpoints validations in an exploration. """
+
+    def setUp(self):
+        super(ExplorationCheckpointsUnitTests, self).setUp()
+        self.exploration = (
+            exp_domain.Exploration.create_default_exploration('eid'))
+        self.new_state = state_domain.State.create_default_state(
+            'Introduction', is_initial_state=True)
+        self.set_interaction_for_state(self.new_state, 'TextInput')
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state
+        }
+        self.set_interaction_for_state(
+            self.exploration.states[self.exploration.init_state_name],
+            'TextInput')
+        self.init_state = (
+            self.exploration.states[self.exploration.init_state_name])
+        self.end_state = state_domain.State.create_default_state('End')
+        self.set_interaction_for_state(self.end_state, 'EndExploration')
+
+        self.end_state.update_interaction_default_outcome(None)
+
+    def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
+        self.init_state.update_card_is_checkpoint(False)
+        self._assert_validation_error(
+            self.exploration, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False')
+        self.init_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+    def test_end_state_with_card_is_checkpoint_true_is_invalid(self):
+        default_outcome = self.init_state.interaction.default_outcome
+        default_outcome.dest = self.exploration.init_state_name
+        self.init_state.update_interaction_default_outcome(default_outcome)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        self._assert_validation_error(
+            self.exploration, 'Expected card_is_checkpoint of terminal state '
+            'to be False but found it to be True')
+        self.end_state.update_card_is_checkpoint(False)
+        self.exploration.validate()
+
+    def test_init_state_checkpoint_with_end_exp_interaction_is_valid(self):
+        self.exploration.init_state_name = 'End'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+        self.end_state.update_card_is_checkpoint(False)
+
+    def test_checkpoint_count_with_count_outside_range_is_invalid(self):
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        for i in python_utils.RANGE(8):
+            self.exploration.add_states(['State%s' % i])
+            self.exploration.states['State%s' % i].card_is_checkpoint = True
+        self._assert_validation_error(
+            self.exploration, 'Expected checkpoint count to be between 1 and 8 '
+            'inclusive but found it to be 9'
+        )
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.exploration.validate()
+
+    def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
+        # Note: In the graphs below, states with the * symbol are checkpoints.
+
+        # Exploration to test a checkpoint state which has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │   Second* │      │   Third   │
+        # └───────────┘      └─┬─────────┘
+        #                      │
+        #        ┌─────────────┴─┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        second_state = state_domain.State.create_default_state('Second')
+        self.set_interaction_for_state(second_state, 'TextInput')
+        third_state = state_domain.State.create_default_state('Third')
+        self.set_interaction_for_state(third_state, 'TextInput')
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state,
+            'Second': second_state,
+            'Third': third_state,
+        }
+
+        # Answer group dicts to connect init_state to second_state and
+        # third_state.
+        init_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'Second',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            },
+            {
+                'outcome': {
+                    'dest': 'Third',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_1',
+                            'normalizedStrSet': ['Test1']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        # Answer group dict to connect third_state to end_state.
+        third_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_group_dicts)
+        third_state.update_interaction_answer_groups(
+            third_state_answer_group_dicts)
+
+        # The exploration can be completed via third_state. Hence, making
+        # second_state a checkpoint raises a validation error.
+        second_state.card_is_checkpoint = True
+        self._assert_validation_error(
+            self.exploration, 'Cannot make Second a checkpoint as it is '
+            'bypassable'
+        )
+        second_state.card_is_checkpoint = False
+        self.exploration.validate()
+
+        # Exploration to test a checkpoint state when the state in the other
+        # path has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │  Second*  │      │   Third   │
+        # └────────┬──┘      └───────────┘
+        #          │
+        #        ┌─┴─────────────┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        # Answer group dicts to connect second_state to end_state.
+        second_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        second_state.update_interaction_answer_groups(
+            second_state_answer_group_dicts)
+
+        # Reset the answer group dicts of third_state.
+        third_state.update_interaction_answer_groups([])
+
+        # As second_state is now connected to end_state and third_state has no
+        # outcome, second_state has become non-bypassable.
+        second_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Reset the exploration.
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        # Exploration to test a bypassable state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └─────┬──────┘
+        #      │            ┌────┴─────┐            │
+        #      │            │    B     │            │
+        #      │            └──┬───────┘            │
+        #      └─────────┐     │                    │
+        #         ┌──────┴─────┴─┐    ┌─────────────┘
+        #         │      D*      │    │
+        #         └─────────────┬┘    │
+        #                       │     │
+        #                    ┌──┴─────┴──┐
+        #                    │    End    │
+        #                    └───────────┘.
+
+        a_state = state_domain.State.create_default_state('A')
+        self.set_interaction_for_state(a_state, 'TextInput')
+        b_state = state_domain.State.create_default_state('B')
+        self.set_interaction_for_state(b_state, 'TextInput')
+        c_state = state_domain.State.create_default_state('C')
+        self.set_interaction_for_state(c_state, 'TextInput')
+        d_state = state_domain.State.create_default_state('D')
+        self.set_interaction_for_state(d_state, 'TextInput')
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state
+        }
+
+        # Answer group dicts to connect init_state to a_state, b_state and
+        # c_state.
+        init_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'A',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            },
+            {
+                'outcome': {
+                    'dest': 'B',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_1',
+                            'normalizedStrSet': ['Test1']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            },
+            {
+                'outcome': {
+                    'dest': 'C',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': ['Test2']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        # Answer group dict to connect a_state and b_state to d_state.
+        a_and_b_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'D',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        # Answer group dict to connect c_state and d_state to end_state.
+        c_and_d_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'End',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_group_dicts)
+        a_state.update_interaction_answer_groups(
+            a_and_b_state_answer_group_dicts)
+        b_state.update_interaction_answer_groups(
+            a_and_b_state_answer_group_dicts)
+        c_state.update_interaction_answer_groups(
+            c_and_d_state_answer_group_dicts)
+        d_state.update_interaction_answer_groups(
+            c_and_d_state_answer_group_dicts)
+
+        # As a user can complete the exploration by going through c_state,
+        # d_state becomes bypassable. Hence, making d_state a checkpoint raises
+        # validation error.
+        d_state.update_card_is_checkpoint(True)
+        self._assert_validation_error(
+            self.exploration, 'Cannot make D a checkpoint as it is '
+            'bypassable'
+        )
+        d_state.update_card_is_checkpoint(False)
+        self.exploration.validate()
+
+        # Modifying the graph to make D non-bypassable.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬─────┘
+        #      │            ┌────┴─────┐             │
+        #      │            │    B     │             │
+        #      │            └────┬─────┘             │
+        #      │                 │                   │
+        #      │          ┌──────┴───────┐           │
+        #      └──────────┤      D*      ├───────────┘
+        #                 └──────┬───────┘
+        #                        │
+        #                  ┌─────┴─────┐
+        #                  │    End    │
+        #                  └───────────┘.
+
+        # Answer group dict to connect c_state to d_state. Hence, making d_state
+        # non-bypassable.
+        c_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'D',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_group_dicts)
+
+        d_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Modifying the graph to add another EndExploration state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬───┬─┘
+        #      │            ┌────┴─────┐             │   │
+        #      │            │    B     │             │   │
+        #      │            └────┬─────┘             │   │
+        #      │                 │                   │   │
+        #      │          ┌──────┴───────┐           │   │
+        #      └──────────┤      D*      ├───────────┘   │
+        #                 └──────┬───────┘               │
+        #                        │                       │
+        #                  ┌─────┴─────┐           ┌─────┴─────┐
+        #                  │    End    │           │    End 2  │
+        #                  └───────────┘           └───────────┘.
+
+        new_end_state = state_domain.State.create_default_state('End 2')
+        self.set_interaction_for_state(new_end_state, 'EndExploration')
+        new_end_state.update_interaction_default_outcome(None)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state,
+            'End 2': new_end_state
+        }
+
+        # Answer group dicts to connect c_state to d_state and new_end_state,
+        # making d_state bypassable.
+        c_state_answer_group_dicts = [
+            {
+                'outcome': {
+                    'dest': 'D',
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_0',
+                            'normalizedStrSet': ['Test0']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            },
+            {
+                'outcome': {
+                    'dest': 'End 2',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': False,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_1',
+                            'normalizedStrSet': ['Test1']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            }
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_group_dicts)
+
+        self._assert_validation_error(
+            self.exploration, 'Cannot make D a checkpoint as it is '
+            'bypassable'
+        )
+        d_state.update_card_is_checkpoint(False)
+        self.exploration.validate()
+
+
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
@@ -490,6 +1093,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
         init_state.update_interaction_default_outcome(default_outcome)
+        init_state.update_card_is_checkpoint(True)
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -853,7 +1457,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.states = {
             exploration.init_state_name: (
                 state_domain.State.create_default_state(
-                    exploration.init_state_name))
+                    exploration.init_state_name, is_initial_state=True))
         }
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name], 'TextInput')
@@ -2586,7 +3190,297 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V47
+    YAML_CONTENT_V48 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 48
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 43
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V49 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 49
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 44
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V49
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -2717,9 +3611,10 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 49
 states:
   (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -2794,6 +3689,7 @@ states:
         feedback_1: {}
         solution: {}
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -2817,7 +3713,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 42
+states_schema_version: 44
 tags: []
 title: Title
 """)
@@ -2964,9 +3860,10 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 49
 states:
   (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -3051,6 +3948,7 @@ states:
         feedback_1: {}
         solution: {}
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3074,7 +3972,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 42
+states_schema_version: 44
 tags: []
 title: Title
 """)
@@ -3094,7 +3992,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'eid', title=exp_title, category='Category')
         exploration.add_states([second_state_name])
 
-        def _get_default_state_dict(content_str, dest_name):
+        def _get_default_state_dict(content_str, dest_name, is_init_state):
             """Gets the default state dict of the exploration."""
             return {
                 'next_content_id_index': 0,
@@ -3110,6 +4008,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 'solicit_answer_details': False,
+                'card_is_checkpoint': is_init_state,
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
@@ -3145,9 +4044,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
                     feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-                    feconf.DEFAULT_INIT_STATE_NAME),
+                    feconf.DEFAULT_INIT_STATE_NAME, True),
                 second_state_name: _get_default_state_dict(
-                    '', second_state_name),
+                    '', second_state_name, False),
             },
             'param_changes': [],
             'param_specs': {},

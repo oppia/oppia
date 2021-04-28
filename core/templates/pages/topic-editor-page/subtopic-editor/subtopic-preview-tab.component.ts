@@ -18,7 +18,6 @@
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 
-require('domain/topic/SubtopicPageObjectFactory.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');

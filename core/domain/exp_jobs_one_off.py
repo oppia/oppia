@@ -283,11 +283,12 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': states_schema_version,
             'states': item.states
         }
+        init_state_name = item.init_state_name
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    states_schema_version)
+                    states_schema_version, init_state_name)
                 states_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -866,11 +867,12 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
         }
+        init_state_name = latest_exploration.init_state_name
         while current_state_schema_version < target_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    current_state_schema_version)
+                    current_state_schema_version, init_state_name)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -951,10 +953,12 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
         }
+        init_state_name = latest_exploration.init_state_name
+
         while current_state_schema_version < target_state_schema_version:
             exp_domain.Exploration.update_states_from_model(
                 versioned_exploration_states,
-                current_state_schema_version)
+                current_state_schema_version, init_state_name)
             current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:
@@ -1010,3 +1014,37 @@ class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class ExpSnapshotsDeletionJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that attempts to delete explorations that have no parent
+    ExplorationModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationSnapshotContentModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotContentModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+        ]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsDeletionJob, cls).enqueue(job_id, shard_count=16)
+
+    @staticmethod
+    def map(model):
+        class_name = model.__class__.__name__
+        exp_id = model.get_unversioned_instance_id()
+        exp_model = exp_models.ExplorationModel.get(exp_id, strict=False)
+        if exp_model is None:
+            model.delete()
+            yield ('SUCCESS_DELETED - %s' % class_name, 1)
+        else:
+            yield ('SUCCESS_PASS - %s' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

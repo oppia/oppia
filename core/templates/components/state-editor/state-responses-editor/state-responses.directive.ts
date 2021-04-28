@@ -24,14 +24,14 @@ require(
   'components/state-directives/answer-group-editor/' +
   'answer-group-editor.directive.ts');
 require(
-  'components/state-directives/response-header/response-header.directive.ts');
+  'components/state-directives/response-header/response-header.component.ts');
 require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-destination-editor.directive.ts');
 require(
   'components/state-directives/outcome-editor/' +
-  'outcome-feedback-editor.directive.ts');
+  'outcome-feedback-editor.component.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
@@ -41,7 +41,6 @@ require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/RuleObjectFactory.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
