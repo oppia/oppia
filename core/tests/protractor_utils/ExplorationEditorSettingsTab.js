@@ -114,8 +114,6 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
-
-
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
