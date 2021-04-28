@@ -92,7 +92,7 @@ export class ExplorationEngineService {
    ) {
      this._explorationId = this.contextService.getExplorationId();
      this.version = this.urlService.getExplorationVersionFromUrl();
-     this._editorPreviewMode = this.contextService.isInExplorationContext();
+     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
      this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
 
      if (!this._questionPlayerMode &&
@@ -175,7 +175,8 @@ export class ExplorationEngineService {
    _loadInitialState(
        successCallback: (stateCard: StateCard, str: string) => void): void {
      let initialState: State = this.exploration.getInitialState();
-     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
+     let oldParams: ExplorationParams = this.learnerParamsService
+       .getAllParams();
      let newParams: ExplorationParams = this.makeParams(
        oldParams, initialState.paramChanges, [oldParams]);
      if (newParams === null) {
@@ -196,10 +197,12 @@ export class ExplorationEngineService {
      let interactionHtml = null;
 
      if (interactionId) {
-       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-         interactionId,
-         this.exploration.getInteractionCustomizationArgs(this.currentStateName),
-         true, nextFocusLabel, null);
+       interactionHtml = this.explorationHtmlFormatterService
+         .getInteractionHtml(
+           interactionId,
+           this.exploration.getInteractionCustomizationArgs(
+             this.currentStateName),
+           true, nextFocusLabel, null);
      }
 
      let questionHtml: string = this.makeQuestion(initialState, [newParams]);
