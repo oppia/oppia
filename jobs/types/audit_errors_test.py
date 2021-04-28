@@ -383,9 +383,8 @@ class ModelIncorrectKeyErrorTests(AuditErrorsTestBase):
         self.assertEqual(
             error.message,
             'ModelIncorrectKeyError in PendingDeletionRequestModel'
-            '(id=\'test\'): Entity '
-            'id %s: contains keys %s that are not allowed' % (
-                model.id, incorrect_keys))
+            '(id=\'test\'): contains keys %s are not allowed' %
+            (incorrect_keys))
 
 
 class ModelRelationshipErrorTests(AuditErrorsTestBase):
