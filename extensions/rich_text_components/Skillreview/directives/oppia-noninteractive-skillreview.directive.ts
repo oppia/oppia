@@ -58,7 +58,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             if (document.body.style.cursor === 'copy') {
               return;
             }
-            // check if the copy mode is enabled within the copy editor
+            // Check if the copy mode is enabled within the copy editor
             // (CKEditor) or not. If it is, don't show the RTE modal.
             // The concept card modal should get triggered instead of the
             // RTE modal while copying stuff within the copy editor.

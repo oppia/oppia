@@ -77,7 +77,7 @@ export class CkEditorCopyContentService {
       if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
         currentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
-        // prevents errors if the element clicked on is itself the
+        // Prevents errors if the element clicked on is itself the
         // OUTPUT_VIEW_TAG_NAME (ie ANGULAR-HTML-BIND).
       }
 
