@@ -22,7 +22,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { Rubric } from 'domain/skill/rubric.model';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StorySummary, StorySummaryBackendDict } from 'domain/story/story-summary.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -31,7 +31,7 @@ import { SkillIdToDescriptionMap } from 'domain/topic/subtopic.model';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicRights, TopicRightsBackendDict } from 'domain/topic/topic-rights.model';
 import { Topic, TopicBackendDict, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
 
 @Injectable({
