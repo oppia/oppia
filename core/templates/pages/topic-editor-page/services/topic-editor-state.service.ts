@@ -22,6 +22,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { Rubric } from 'domain/skill/rubric.model';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StorySummary, StorySummaryBackendDict } from 'domain/story/story-summary.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -80,7 +81,9 @@ export class TopicEditorStateService {
     return topicId.toString() + '-' + subtopicId.toString();
   }
 
-  _updateGroupedSkillSummaries(groupedSkillSummaries): void {
+  _updateGroupedSkillSummaries(
+      groupedSkillSummaries: { [topicName: string]:
+        SkillSummaryBackendDict[] }): void {
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
@@ -139,7 +142,7 @@ export class TopicEditorStateService {
         newBackendTopicDict, skillIdToDescriptionDict));
   }
 
-  _updateSkillIdToRubricsObject(skillIdToRubricsObject): void {
+  _updateSkillIdToRubricsObject(skillIdToRubricsObject: object): void {
     for (let skillId in skillIdToRubricsObject) {
       // Skips deleted skills.
       if (!skillIdToRubricsObject[skillId]) {
@@ -240,11 +243,11 @@ export class TopicEditorStateService {
     });
   }
 
-  getGroupedSkillSummaries() {
+  getGroupedSkillSummaries(): object {
     return {...this._groupedSkillSummaries};
   }
 
-  getSkillQuestionCountDict() {
+  getSkillQuestionCountDict(): object {
     return this._skillQuestionCountDict;
   }
 
@@ -301,7 +304,7 @@ export class TopicEditorStateService {
     return this._topicIsInitialized;
   }
 
-  getSkillIdToRubricsObject() {
+  getSkillIdToRubricsObject(): object {
     return this._skillIdToRubricsObject;
   }
 
