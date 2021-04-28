@@ -72,7 +72,7 @@ describe('Moderator Page Component', () => {
   };
 
   class MockModeratorPageBackendApiService {
-    getRecentCommits() {
+    getRecentCommitsAsync() {
       return {
         then: (
             successCallback: (response: RecentCommitResponse) => void
@@ -82,7 +82,7 @@ describe('Moderator Page Component', () => {
       };
     }
 
-    getRecentFeedbackMessages() {
+    getRecentFeedbackMessagesAsync() {
       return {
         then: (
             successCallback: (response: RecentFeedbackMessages) => void
@@ -92,7 +92,7 @@ describe('Moderator Page Component', () => {
       };
     }
 
-    getFeaturedActivityReferences() {
+    getFeaturedActivityReferencesAsync() {
       return {
         then: (
             successCallback: (response: FeaturedActivityResponse) => void
@@ -102,7 +102,7 @@ describe('Moderator Page Component', () => {
       };
     }
 
-    saveFeaturedActivityReferences(references: ActivityIdTypeDict[]) {
+    saveFeaturedActivityReferencesAsync(references: ActivityIdTypeDict[]) {
       return {
         then: (
             successCallback: () => void
