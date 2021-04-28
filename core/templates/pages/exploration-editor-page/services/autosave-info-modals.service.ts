@@ -20,7 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { SaveVersionMismatchModalComponent } from '../modal-templates/save-version-mismatch-modal.component';
 import { SaveValidationFailModalComponent } from '../modal-templates/save-validation-fail-modal.component';
@@ -35,7 +34,6 @@ export class AutosaveInfoModalsService {
   _isModalOpen: boolean = false;
 
   constructor(
-    private explorationDataService: ExplorationDataService,
     private localStorageService: LocalStorageService,
     private ngbModal: NgbModal,
   ) {}
