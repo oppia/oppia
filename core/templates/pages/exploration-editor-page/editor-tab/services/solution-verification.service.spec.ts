@@ -23,6 +23,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -32,14 +33,9 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
 describe('Solution Verification Service', () => {
   let ess, siis, scas, sof, svs, see;
-  let mockExplorationData, mockInteractionState;
+  let mockInteractionState;
 
   beforeEach(() => {
-    mockExplorationData = {
-      explorationId: 0,
-      autosaveChangeList: () => {}
-    };
-
     mockInteractionState = {
       TextInput: {
         display_mode: 'inline',
@@ -53,7 +49,19 @@ describe('Solution Verification Service', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: INTERACTION_SPECS, useValue: mockInteractionState }
+        { 
+          provide: INTERACTION_SPECS,
+          useValue: mockInteractionState
+        },
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeList() {
+              return;
+            }
+          }
+        }
       ]
     });
 
@@ -70,16 +78,7 @@ describe('Solution Verification Service', () => {
       $provide.value(key, value);
     }
   }));
-  beforeEach(function() {
-    mockExplorationData = {
-      explorationId: 0,
-      autosaveChangeList: function() {}
-    };
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', [mockExplorationData][0]);
-    });
-    spyOn(mockExplorationData, 'autosaveChangeList');
-  });
+
   // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
   // block when ExplorationStateService has been migrated to Angular 8.
   beforeEach(angular.mock.inject(function($injector) {

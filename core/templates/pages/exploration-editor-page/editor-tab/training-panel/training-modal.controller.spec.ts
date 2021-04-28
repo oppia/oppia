@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TrainingModalController.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Modal Controller', function() {
@@ -29,17 +31,25 @@ describe('Training Modal Controller', function() {
   var ResponsesService = null;
   var InteractionObjectFactory = null;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeList() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
-
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.value('ExplorationDataService', {
-      explorationId: 0,
-      autosaveChangeList: function() {},
-      discardDraft: function() {}
-    });
-  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');

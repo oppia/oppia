@@ -44,6 +44,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { TestBed } from '@angular/core/testing';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -124,18 +126,21 @@ describe('Translation status service', function() {
     var FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
     var NO_ASSETS_AVAILABLE_COLOR = '#D14836';
     var statesWithAudioDict = null;
-    var mockExplorationData;
 
-    beforeEach(function() {
-      mockExplorationData = {
-        explorationId: 0,
-        autosaveChangeList: function() {},
-        discardDraft: function() {}
-      };
-      angular.mock.module(function($provide) {
-        $provide.value('ExplorationDataService', [mockExplorationData][0]);
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [
+          {
+            provide: ExplorationDataService,
+            useValue: {
+              explorationId: 0,
+              autosaveChangeList() {
+                return;
+              }
+            }
+          }
+        ]
       });
-      spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(angular.mock.inject(function($injector) {

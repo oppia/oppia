@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -778,18 +778,18 @@ describe('Exploration editor page component', function() {
       expect(onStateDeletedSpy).toHaveBeenCalledWith('Final');
     }));
 
-    it('should callback state-renamed method for stats', fakeAsync(() => {
+    it('should callback state-renamed method for stats', () => {
       let onStateRenamedSpy = spyOn(stass, 'onStateRenamed');
       spyOn(cls, 'renameState');
 
       $scope.$apply();
-      flushMicrotasks();
 
       ess.renameState('Introduction', 'Start');
 
-      flushMicrotasks();
-      expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
-    }));
+      waitForAsync(() => {
+        expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
+      })
+    });
 
     it('should callback interaction-changed method for stats', fakeAsync(() => {
       let onStateInteractionSavedSpy = spyOn(stass, 'onStateInteractionSaved');

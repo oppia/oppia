@@ -113,7 +113,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and play the correct exploration',
+  fit('should visit the exploration player and play the correct exploration',
     async function() {
       await users.createAndLoginAdminUser(
         'expCreator@learnerDashboard.com', 'expCreator');

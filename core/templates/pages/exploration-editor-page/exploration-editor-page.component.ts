@@ -332,6 +332,7 @@ angular.module('oppia').component('explorationEditorPage', {
           if (explorationData.draft_changes !== null) {
             ChangeListService.loadAutosavedChangeList(
               explorationData.draft_changes);
+            $rootScope.$applyAsync();
           }
 
           if (explorationData.is_version_of_draft_valid === false &&
@@ -509,6 +510,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
               setPageTitle();
+              $rootScope.$applyAsync();
             }
           )
         );

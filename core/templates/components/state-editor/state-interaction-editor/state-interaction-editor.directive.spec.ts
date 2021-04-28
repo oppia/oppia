@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-interaction-editor.directive.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -45,6 +47,23 @@ require(
 
 describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [
+          {
+            provide: ExplorationDataService,
+            useValue: {
+              explorationId: 0,
+              autosaveChangeList() {
+                return;
+              }
+            }
+          }
+        ]
+      });
+    });
+    
     beforeEach(function() {
       angular.mock.module('oppia');
       // Set a global value for INTERACTION_SPECS that will be used by all the
@@ -70,22 +89,11 @@ describe('State Interaction controller', function() {
     }));
 
     var scope, ecs, cls, ess, siis, scas, scs, idc, IS;
-    var mockExplorationData;
     var outerScope, directiveScope;
     var $componentController;
     var stateEditorCtrl;
 
     beforeEach(angular.mock.module('directiveTemplates'));
-    beforeEach(function() {
-      mockExplorationData = {
-        explorationId: 0,
-        autosaveChangeList: function() {}
-      };
-      angular.mock.module(function($provide) {
-        $provide.value('ExplorationDataService', [mockExplorationData][0]);
-      });
-      spyOn(mockExplorationData, 'autosaveChangeList');
-    });
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, $compile, $controller, $injector, $rootScope,

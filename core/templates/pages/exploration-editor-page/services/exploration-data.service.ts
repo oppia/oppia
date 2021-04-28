@@ -104,7 +104,7 @@ export class ExplorationDataService {
 
   // Note that the changeList is the full changeList since the last
   // committed version (as opposed to the most recent autosave).
-  autosaveChangeList(
+  autosaveChangeList = function(
       changeList: ExplorationChange[],
       successCallback: (response: DraftAutoSaveResponse) => void,
       errorCallback = () => {}
