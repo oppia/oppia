@@ -23,12 +23,16 @@ var ClassroomPage = function() {
   var topicSummaryTiles = element.all(
     by.css('.protractor-test-topic-summary-tile'));
 
+  var topNavigationBar = element.all(
+      by.css('.protractor-test-top-navigation-bar'));
+  
   this.get = async function(classroomName) {
     await browser.get('/learn/' + classroomName);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectNumberOfTopicsToBe = async function(count) {
+    await waitFor.visibilityOf(topNavigationBar, 'Top navigation bar takes too long to appear');
     expect(await topicSummaryTiles.count()).toEqual(count);
   };
 };
