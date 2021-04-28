@@ -629,6 +629,7 @@ describe('SvgFilenameEditor initialized with value attribute',
       $provide.value('ImagePreloaderService', mockImagePreloaderService);
       $provide.value('ImageUploadHelperService', {});
       $provide.value('SvgSanitizerService', {});
+      $provide.value('ImageLocalStorageService', {});
     }));
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $httpBackend = $injector.get('$httpBackend');

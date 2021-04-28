@@ -1,21 +1,21 @@
 <div class="thumbnail-editor form-group">
   <div>
     <div class="oppia-editable-section float-left" title="Change Thumbnail"
-         ng-style="{background: getBgColor()}">
+         [ngStyle]="{background: getBgColor}">
       <div class="oppia-click-to-start-editing protractor-test-photo-button"
-           ng-click="showEditThumbnailModal()"
+           (click)="showEditThumbnailModal()"
            aria-label="upload or edit thumbnail">
       </div>
       <i class="material-icons oppia-editor-edit-icon oppia-pencil-icon">
         &#xE254;
       </i>
-      <oppia-thumbnail-display ng-show="!thumbnailIsLoading"
-                               [img-src]="editableThumbnailDataUrl"
+      <oppia-thumbnail-display [hidden]="!thumbnailIsLoading"
+                               [imgSrc]="editableThumbnailDataUrl"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-                               [background]="getBgColor()">
+                               [background]="getBgColor">
       </oppia-thumbnail-display>
-      <oppia-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
-                               [img-src]="newThumbnailDataUrl"
+      <oppia-thumbnail-display *ngIf="useLocalStorage && newThumbnailDataUrl"
+                               [imgSrc]="newThumbnailDataUrl"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                                [background]="localStorageBgcolor">
       </oppia-thumbnail-display>
@@ -24,11 +24,11 @@
 </div>
 
 <style>
-  thumbnail-uploader .thumbnail-editor {
-    height: 100px;
+  .thumbnail-editor {
+    height: 100px !important;
   }
 
-  thumbnail-uploader .oppia-editable-section {
+  .oppia-editable-section {
     border-radius: 0.25rem;
     display: table-cell;
     height: 100px;
@@ -37,13 +37,13 @@
     width: 180px;
   }
 
-  thumbnail-uploader .img-thumbnail {
+  .img-thumbnail {
     border: none;
-    max-height: 100%;
-    max-width: 100%;
+    height: 100px !important;
+    width: 180px;
   }
 
-  thumbnail-uploader .oppia-pencil-icon {
+  .oppia-pencil-icon {
     right: 8px;
     top: 8px;
   }

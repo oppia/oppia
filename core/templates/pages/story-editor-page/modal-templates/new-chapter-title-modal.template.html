@@ -41,17 +41,17 @@
       <div class="chapter-input-header">
         <span>Thumbnail Image*</span>
       </div>
-      <thumbnail-uploader filename="editableThumbnailFilename"
-                          update-filename="updateThumbnailFilename"
-                          bg-color="editableThumbnailBgColor"
-                          update-bg-color="updateThumbnailBgColor"
-                          allowed-bg-colors="allowedBgColors"
-                          aspect-ratio="'16:9'"
-                          preview-title="title"
-                          preview-description=""
-                          preview-description-bg-color="'#BE563C'"
-                          preview-footer="">
-      </thumbnail-uploader>
+      <oppia-thumbnail-uploader [get-filename]="editableThumbnailFilename"
+                          [update-filename]="updateThumbnailFilename"
+                          [get-bg-color]="editableThumbnailBgColor"
+                          [update-bg-color]="updateThumbnailBgColor"
+                          [get-allowed-bg-colors]="allowedBgColors"
+                          [get-aspect-ratio]="'16:9'"
+                          [get-preview-title]="title"
+                          [get-preview-description]=""
+                          [get-preview-description-bg-color]="'#BE563C'"
+                          [get-preview-footer]="">
+      </oppia-thumbnail-uploader>
     </div>
   </div>
   <div class="modal-footer">

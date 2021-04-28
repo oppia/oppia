@@ -100,15 +100,15 @@
             <p>
               <strong>Thumbnail Image*</strong>
             </p>
-            <thumbnail-uploader filename="$ctrl.subtopic.getThumbnailFilename()"
-                                update-filename="$ctrl.updateSubtopicThumbnailFilename"
-                                bg-color="$ctrl.subtopic.getThumbnailBgColor()"
-                                update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
-                                allowed-bg-colors="$ctrl.allowedBgColors"
-                                aspect-ratio="'4:3'"
-                                preview-title="$ctrl.editableTitle"
-                                preview-description-bg-color="'#BE563C'">
-            </thumbnail-uploader>
+            <oppia-thumbnail-uploader [get-filename]="$ctrl.subtopic.getThumbnailFilename()"
+                                [update-filename]="$ctrl.updateSubtopicThumbnailFilename"
+                                [get-bg-color]="$ctrl.subtopic.getThumbnailBgColor()"
+                                [update-bg-color]="$ctrl.updateSubtopicThumbnailBgColor"
+                                [get-allowed-bg-colors]="$ctrl.allowedBgColors"
+                                [get-aspect-ratio]="'4:3'"
+                                [get-preview-title]="$ctrl.editableTitle"
+                                [get-preview-description-bg-color]="'#BE563C'">
+            </oppia-thumbnail-uploader>
           </div>
         </div>
         <div ng-if="$ctrl.editableThumbnailFilename && $ctrl.subtopicEditorCardIsShown">

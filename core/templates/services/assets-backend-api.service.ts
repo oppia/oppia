@@ -106,6 +106,22 @@ export class AssetsBackendApiService {
     }
   }
 
+  async saveThumbnailImage(
+      resampledFile: Blob, filename: string, entityType: string,
+      entityId: string): Promise<SaveImageResponse> {
+    const form = new FormData();
+    form.append('image', resampledFile);
+    form.append(
+      'payload', JSON.stringify({filename, filename_prefix: 'image'}));
+    form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
+    try {
+      return await this.http.post<SaveImageResponse>(
+        this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    } catch (reason) {
+      return Promise.reject(reason.error);
+    }
+  }
+
   async saveMathExpresionImage(
       resampledFile: Blob, filename: string, entityType: string,
       entityId: string): Promise<SaveImageResponse> {

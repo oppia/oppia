@@ -72,7 +72,8 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
-
+import { EditThumnailModalComponent } from './forms/custom-forms-directives/edit-thumbnail-modal.component';
+import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thumbnail-uploader.component';
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
   AngularFireModule.initializeApp(AuthService.firebaseConfig),
@@ -107,6 +108,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    EditThumnailModalComponent,
+    ThumbnailUploaderComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
     FilterForMatchingSubstringPipe,
@@ -137,6 +140,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   entryComponents: [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
+    EditThumnailModalComponent,
+    ThumbnailUploaderComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
@@ -168,6 +173,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     AudioFileUploaderComponent,
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    EditThumnailModalComponent,
+    ThumbnailUploaderComponent,
     FilterForMatchingSubstringPipe,
     FocusOnDirective,
     ImageUploaderComponent,

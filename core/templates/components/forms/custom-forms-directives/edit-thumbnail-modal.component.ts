@@ -1,0 +1,145 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for edit thumbnail modal.
+ */
+
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+
+@Component({
+  selector: 'edit-thumbnail-modal',
+  templateUrl: './edit-thumbnail-modal.component.html'
+})
+export class EditThumnailModalComponent {
+  allowedBgColors: string[];
+  dimensions: { height: number; width: number; };
+  uploadedImageMimeType: string;
+  file: Blob;
+  openInUploadMode: boolean;
+  constructor(
+    private svgSanitizerService: SvgSanitizerService,
+    private modalInstance: NgbActiveModal,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+  @Input() bgColor = '#fff';
+  @Input() uploadedImage;
+  @Input() invalidImageWarningIsShown = false;
+  @Input() invalidTagsAndAttributes: {
+    tags: string[];
+    attrs: string[]; };
+  @Input() allowedImageFormats = ['svg'];
+  @Input() aspectRatio;
+  @Input() getPreviewDescription;
+  @Input() getPreviewDescriptionBgColor;
+  @Input() getPreviewFooter;
+  @Input() getPreviewTitle;
+
+  setImageDimensions(height: number, width: number): void {
+    this.dimensions = {
+      height: Math.round(height),
+      width: Math.round(width)
+    };
+  }
+
+  isUploadedImageSvg(): boolean {
+    return this.uploadedImageMimeType === 'image/svg+xml';
+  }
+
+  updateBackgroundColor(color: string): void {
+    this.bgColor = color;
+  }
+
+  onFileChanged(file: File): void {
+    this.uploadedImageMimeType = file.type;
+    this.invalidImageWarningIsShown = false;
+    this.invalidTagsAndAttributes = {
+      tags: [],
+      attrs: []
+    };
+    if (this.isUploadedImageSvg()) {
+      $('.oppia-thumbnail-uploader').fadeOut(() => {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () =>{
+          let imgSrc = reader.result as string;
+          this.updateBackgroundColor('#C6DCDA');
+          let img = new Image();
+          this.changeDetectorRef.detectChanges();
+
+          img.onload = () => {
+          //   Setting a default height of 300px and width of
+          //   150px since most browsers use these dimensions
+          //   for SVG files that do not have an explicit
+          //   height and width defined.
+            this.setImageDimensions(
+              img.naturalHeight || 150,
+              img.naturalWidth || 300);
+          };
+          img.src = imgSrc;
+          this.uploadedImage = imgSrc;
+          this.invalidTagsAndAttributes = (
+            this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+              imgSrc));
+          let tags = this.invalidTagsAndAttributes.tags;
+          let attrs = this.invalidTagsAndAttributes.attrs;
+          if (tags.length > 0 || attrs.length > 0) {
+            this.reset();
+          }
+        };
+        setTimeout(() => {
+          $('.oppia-thumbnail-uploader').fadeIn();
+        }, 100);
+      });
+    } else {
+      this.reset();
+      this.invalidImageWarningIsShown = true;
+    }
+  }
+  tempBgColor(tempBgColor: string): string {
+    throw new Error('Method not implemented.');
+  }
+
+  reset(): void {
+    this.uploadedImage = null;
+    this.openInUploadMode = true;
+  }
+
+  onInvalidImageLoaded(): void {
+    this.uploadedImage = null;
+    this.invalidImageWarningIsShown = true;
+  }
+
+  confirm(): void {
+    this.modalInstance.close({
+      newThumbnailDataUrl: this.uploadedImage,
+      newBgColor: this.tempBgColor,
+      openInUploadMode: this.openInUploadMode,
+      dimensions: this.dimensions
+    });
+    console.log(this.uploadedImage);
+  }
+
+  cancel(): void {
+    this.modalInstance.dismiss();
+  }
+  // If (uploadedImage) {
+  //   $uibModalInstance.rendered.then(() => {
+  //     openInUploadMode = false;
+  //     $scope.updateBackgroundColor(tempBgColor);
+  //   });
+  // }
+}

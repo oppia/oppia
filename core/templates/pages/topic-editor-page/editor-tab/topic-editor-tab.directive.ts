@@ -23,7 +23,7 @@ require(
   'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
   'components/forms/custom-forms-directives/' +
-    'edit-thumbnail-modal.controller.ts');
+    'edit-thumbnail-modal.component.ts');
 require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
