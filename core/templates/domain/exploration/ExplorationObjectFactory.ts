@@ -61,6 +61,7 @@ export interface ExplorationBackendDict {
   'language_code': string;
   'draft_change_list_id'?: number;
   'version'?: string;
+  'auto_tts_enabled'?: boolean
 }
 
 export class Exploration {

@@ -389,7 +389,7 @@ export class ExplorationEngineService {
          wasOldStateInitial: boolean,
          isFirstHit: boolean,
          isFinalQuestion: boolean,
-         focusLabel: boolean
+         focusLabel: string
        ) => void): boolean {
      if (this.answerIsBeingProcessed) {
        return;
@@ -427,9 +427,10 @@ export class ExplorationEngineService {
          classificationResult.classificationCategorization,
          feedbackIsUseful);
 
+       console.log(outcome);
        this.statsReportingService.recordAnswerSubmitAction(
          oldStateName, newStateName, oldState.interaction.id, answer,
-         outcome.feedback);
+         outcome.feedback.html);
      }
 
      let refresherExplorationId = outcome.refresherExplorationId;
