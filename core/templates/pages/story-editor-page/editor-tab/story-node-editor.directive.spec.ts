@@ -16,17 +16,26 @@
  * @fileoverview Unit tests for the story node editor directive.
  */
 import { TestBed } from '@angular/core/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SkillSummaryBackendDict, SkillSummary } from 'domain/skill/skill-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+
+class MockNgbModalRef {
+  componentInstance: {
+    skillSummaries: null,
+    skillsInSameTopicCount: null,
+    categorizedSkills: null,
+    allowSkillsFromOtherTopics: null,
+    untriagedSkillSummaries: null
+  };
+}
 
 describe('Story node editor directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
 
-  let mockNgbModal: MockNgbModal;
-  let $uibModal = null;
+  let ngbModal: NgbModal;
   var $scope = null;
   var ctrl = null;
   var $q = null;
@@ -53,37 +62,8 @@ describe('Story node editor directive', function() {
     [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
 
 
-  class MockNgbModal {
-    success: boolean = true;
-    open(content, options) {
-      return {
-        componentInstance: {
-          skillSummaries: null,
-          skillsInSameTopicCount: null,
-          categorizedSkills: null,
-          allowSkillsFromOtherTopics: null,
-          untriagedSkillSummaries: null
-        },
-        result: {
-          then: (
-              successCallback: (result) => void,
-              cancelCallback: () => void
-          ) => {
-            if (this.success) {
-              successCallback(summary);
-            } else {
-              cancelCallback();
-            }
-          }
-        }
-      };
-    }
-  }
-
   beforeEach(angular.mock.inject(function($injector) {
-    mockNgbModal = (TestBed.inject(NgbModal) as unknown) as
-      jasmine.SpyObj<MockNgbModal>;
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = TestBed.inject(NgbModal);
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     WindowDimensionsService = $injector.get('WindowDimensionsService');
@@ -169,8 +149,7 @@ describe('Story node editor directive', function() {
       $scope: $scope,
       TopicsAndSkillsDashboardBackendApiService:
       MockTopicsAndSkillsDashboardBackendApiService,
-      NgbModal: MockNgbModal,
-      $uibModal
+      NgbModal: ngbModal
     });
     ctrl.$onInit();
     $rootScope.$apply();
@@ -270,82 +249,27 @@ describe('Story node editor directive', function() {
   });
 
   it('should open add skill modal for adding prerequisite skill', function() {
-    var modalSpy = spyOn(mockNgbModal, 'open').and.callThrough();
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success')
+        });
+    });
     $scope.addPrerequisiteSkillId();
     expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should call StoryUpdate service for adding prerequisite skill',
-    function() {
-      var deferred = $q.defer();
-      deferred.resolve({
-        id: 'skill_10'
-      });
-      var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: deferred.promise});
-      var storyUpdateSpy = spyOn(
-        StoryUpdateService, 'addPrerequisiteSkillIdToNode');
-      $scope.addPrerequisiteSkillId();
-      $rootScope.$apply();
-      expect(modalSpy).toHaveBeenCalled();
-      expect(storyUpdateSpy).toHaveBeenCalled();
-    });
-
-  it('should call StoryUpdate service for adding prerequisite skill and' +
-      ' catch if the call fails', function() {
-    var deferred = $q.defer();
-    deferred.resolve({
-      id: 'skill_10'
-    });
-    var alertsSpy = spyOn(AlertsService, 'addInfoMessage');
-    var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
-    var storyUpdateSpy = spyOn(
-      StoryUpdateService, 'addPrerequisiteSkillIdToNode').and.throwError(
-      'Error');
-    $scope.addPrerequisiteSkillId();
-    $rootScope.$apply();
-    expect(modalSpy).toHaveBeenCalled();
-    expect(alertsSpy).toHaveBeenCalled();
-    expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should open add skill modal for adding acquired skill', function() {
-    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
-    $scope.addAcquiredSkillId();
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should call StoryUpdate service for adding acquired skill', function() {
-    var deferred = $q.defer();
-    deferred.resolve({
-      id: 'skill_3'
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>(
+        { componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success')
+        });
     });
-    var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
-    var storyUpdateSpy = spyOn(StoryUpdateService, 'addAcquiredSkillIdToNode');
     $scope.addAcquiredSkillId();
-    $rootScope.$apply();
     expect(modalSpy).toHaveBeenCalled();
-    expect(storyUpdateSpy).toHaveBeenCalled();
-  });
-
-  it('should call StoryUpdate service for adding acquired skill and call' +
-      ' Alerts service if the call fails', function() {
-    var deferred = $q.defer();
-    deferred.resolve({
-      id: 'skill_3'
-    });
-    var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
-    var alertsSpy = spyOn(AlertsService, 'addInfoMessage');
-    var storyUpdateSpy = spyOn(
-      StoryUpdateService, 'addAcquiredSkillIdToNode').and.throwError('Error');
-    $scope.addAcquiredSkillId();
-    $rootScope.$apply();
-    expect(alertsSpy).toHaveBeenCalled();
-    expect(modalSpy).toHaveBeenCalled();
-    expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
   it('should toggle chapter outline', function() {

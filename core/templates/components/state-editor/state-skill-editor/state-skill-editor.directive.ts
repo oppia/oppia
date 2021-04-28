@@ -21,7 +21,8 @@ import { CategorizedSkills } from
 import { SkillSummary } from 'core/templates/domain/skill/skill-summary.model';
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
+import { DeleteStateSkillModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-state-skill-modal.component';
+require('../state-editor-properties-services/state-skill.service');
 require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
@@ -44,12 +45,12 @@ angular.module('oppia').directive('stateSkillEditor', [
         '/components/state-editor/state-skill-editor/' +
         'state-skill-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'NgbModal',
+        '$rootScope', '$scope', 'AlertsService', 'NgbModal',
         'StateLinkedSkillIdService', 'StoryEditorStateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService',
         function(
-            $rootScope, $scope, $uibModal, AlertsService, NgbModal,
+            $rootScope, $scope, AlertsService, NgbModal,
             StateLinkedSkillIdService, StoryEditorStateService,
             TopicsAndSkillsDashboardBackendApiService,
             WindowDimensionsService) {
@@ -59,21 +60,7 @@ angular.module('oppia').directive('stateSkillEditor', [
           var _init = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
               .then(function(response) {
-                /**
-                 * CategorizedSkills: dict. It represents the categorized
-                 *   skills on the topic-and-skill-dashboard page.
-                 *   Contains the following key:
-                 *   topicName: dict. Contains the following keys:
-                 *      uncategorized: list(ShortSkillSummary). List of all the
-                 *        uncategorized skills in the topic.
-                 *      subtopicName: list(ShortSkillSummary). List of all the
-                 *        skills in the subtopic of the topic.
-                 */
                 categorizedSkills = response.categorizedSkillsDict;
-                /**
-                 * UntriagedSkillSummaries: list(SkillSummary). A list of all
-                 *   untriaged skills on the topic-and-skill-dashboard page.
-                */
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
                 $rootScope.$applyAsync();
               });
@@ -115,12 +102,9 @@ angular.module('oppia').directive('stateSkillEditor', [
 
           $scope.deleteSkill = function() {
             AlertsService.clearWarnings();
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
-                'modal-templates/delete-state-skill-modal.template.html'),
+            NgbModal.open(
+              DeleteStateSkillModalComponent, {
               backdrop: true,
-              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               StateLinkedSkillIdService.displayed = null;
               StateLinkedSkillIdService.saveDisplayedValue();
