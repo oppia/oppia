@@ -114,8 +114,8 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
-    await action.click('Neutral element', neutralElement);
-    await action.waitForAutosave();
+
+
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
