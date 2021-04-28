@@ -377,7 +377,20 @@ export class ExplorationEngineService {
 
    submitAnswer(
        answer: string, interactionRulesService: InteractionRulesService,
-       successCallback): boolean {
+       successCallback: (
+         nextCard: StateCard,
+         refreshInteraction: boolean,
+         feedbackHtml: string,
+         feedbackAudioTranslations: BindableVoiceovers,
+         refresherExplorationId: string,
+         missingPrerequisiteSkillId: string,
+         remainOnCurrentCard: boolean,
+         taggedSkillMisconceptionId: string,
+         wasOldStateInitial: boolean,
+         isFirstHit: boolean,
+         isFinalQuestion: boolean,
+         focusLabel: boolean
+       ) => void): boolean {
      if (this.answerIsBeingProcessed) {
        return;
      }
@@ -428,7 +441,8 @@ export class ExplorationEngineService {
        this.visitedStateNames.push(newStateName);
      }
      // Compute the data for the next state.
-     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
+     let oldParams: ExplorationParams = this.learnerParamsService
+       .getAllParams();
      oldParams.answer = answer;
      let feedbackHtml: string =
        this.makeFeedback(outcome.feedback.html, [oldParams]);
