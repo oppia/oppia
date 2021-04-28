@@ -55,4 +55,4 @@ export class SwitchContentLanguageRefreshRequiredModalComponent {
 angular.module('oppia').factory(
   'SwitchContentLanguageRefreshRequiredModalComponent',
   downgradeComponent(
-    {component: SwitchContentLanguageRefreshRequiredModalComponent}));
+    { component: SwitchContentLanguageRefreshRequiredModalComponent }));

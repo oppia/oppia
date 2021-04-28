@@ -24,7 +24,7 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-@Pipe({name: 'normalizeWhitespace'})
+@Pipe({ name: 'normalizeWhitespace' })
 export class NormalizeWhitespacePipe implements PipeTransform {
   constructor(private utilsService: UtilsService) {}
   transform(input: string): string {

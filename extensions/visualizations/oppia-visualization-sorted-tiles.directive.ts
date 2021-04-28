@@ -46,7 +46,7 @@ angular.module('oppia').directive('oppiaVisualizationSortedTiles', () => ({
           template: require(
             'components/common-layout-directives/common-elements/' +
             'answer-content-modal.template.html'),
-          resolve: {answerHtml: () => data[index].answer},
+          resolve: { answerHtml: () => data[index].answer },
           backdrop: false,
         });
 

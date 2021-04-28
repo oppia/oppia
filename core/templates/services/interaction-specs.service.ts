@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class InteractionSpecsService {
   isInteractionTrainable(interactionId: string): boolean {
     const interactionSpecs =

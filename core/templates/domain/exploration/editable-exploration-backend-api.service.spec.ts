@@ -312,8 +312,8 @@ describe('Editable exploration backend API service', function() {
       '/createhandler/data/0');
     expect(req.request.method).toEqual('DELETE');
     req.flush(
-      {error: 'Error deleting exploration 1.'},
-      {status: 500, statusText: 'Internal Server Error'});
+      { error: 'Error deleting exploration 1.' },
+      { status: 500, statusText: 'Internal Server Error' });
 
     flushMicrotasks();
 

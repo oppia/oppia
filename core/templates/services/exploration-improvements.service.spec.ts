@@ -332,8 +332,8 @@ describe('ExplorationImprovementsService', function() {
       const eqPlaythrough = (
         playthroughObjectFactory.createNewEarlyQuitPlaythrough(
           expId, expVersion, {
-            state_name: {value: stateName},
-            time_spent_in_exp_in_msecs: {value: 1000},
+            state_name: { value: stateName },
+            time_spent_in_exp_in_msecs: { value: 1000 },
           }, []));
       this.pibasFetchIssuesSpy.and.returnValue(Promise.resolve(
         [eqPlaythrough]));
@@ -541,7 +541,7 @@ describe('ExplorationImprovementsService', function() {
 
   describe('Registering callbacks for state changes', () => {
     beforeEach(fakeAsync(() => {
-      spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
+      spyOn($uibModal, 'open').and.returnValue({ result: Promise.resolve() });
       spyOn(changeListService, 'addState').and.stub();
       spyOn(changeListService, 'deleteState').and.stub();
       spyOn(changeListService, 'editStateProperty').and.stub();

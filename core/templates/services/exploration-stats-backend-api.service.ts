@@ -28,7 +28,7 @@ import {
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ExplorationStatsBackendApiService {
   constructor(
       private http: HttpClient,

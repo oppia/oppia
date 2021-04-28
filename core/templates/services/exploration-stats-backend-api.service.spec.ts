@@ -34,7 +34,7 @@ describe('Exploration stats backend api service', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
 
     explorationStatsBackendApiService = (
       TestBed.get(ExplorationStatsBackendApiService));

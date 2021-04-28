@@ -20,7 +20,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController
 } from '@angular/common/http/testing';
-import {HTTP_INTERCEPTORS, HttpClient} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 
 import {
   MockCsrfTokenService,
@@ -57,12 +57,12 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should expect request body to be a FormData constructor', () => {
-    httpClient.post('/api', {data: 'test'}).subscribe(
+    httpClient.post('/api', { data: 'test' }).subscribe(
       response => expect(response).toBeTruthy());
 
     let req = httpTestingController.expectOne('/api');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body.constructor.name).toEqual('FormData');
-    req.flush({data: 'test'});
+    req.flush({ data: 'test' });
   });
 });

@@ -58,7 +58,7 @@ describe('Create New Story Modal Controller', function() {
     StoryEditorStateService = $injector.get('StoryEditorStateService');
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
-      [{filename: 'a.png', image: 'faf'}]);
+      [{ filename: 'a.png', image: 'faf' }]);
 
     $scope = $rootScope.$new();
     $controller('CreateNewStoryModalController', {

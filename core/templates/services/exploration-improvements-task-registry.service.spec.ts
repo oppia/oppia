@@ -434,7 +434,7 @@ describe('Exploration improvements task registrar service', () => {
 
   describe('Post-initialization', () => {
     it('should not return a resolved task from the open tasks API', () => {
-      statesBackendDict = {Introduction: stateBackendDict};
+      statesBackendDict = { Introduction: stateBackendDict };
       const resolvedTaskTypesByStateName = (
         new Map<string, ExplorationTaskType[]>([
           ['Introduction', [
@@ -503,7 +503,7 @@ describe('Exploration improvements task registrar service', () => {
 
   describe('Generating new tasks', () => {
     it('should not generate open tasks when they do not exist', () => {
-      statesBackendDict = {Introduction: stateBackendDict};
+      statesBackendDict = { Introduction: stateBackendDict };
       taskRegistryService.initialize(
         config, makeStates(), makeExpStats(), [], new Map(), new Map(), []);
 
@@ -526,7 +526,7 @@ describe('Exploration improvements task registrar service', () => {
       expStatsBackendDict.state_stats_mapping = {
         Introduction: {
           ...stateStatsBackendDict,
-          ...{total_hit_count: 500, num_completions: 350},
+          ...{ total_hit_count: 500, num_completions: 350 },
         },
       };
 
@@ -575,7 +575,7 @@ describe('Exploration improvements task registrar service', () => {
   describe('Discarding open tasks', () => {
     it('should discard an HBR task when bounce rate is too low', () => {
       const task = makeTask<HighBounceRateTask>(
-        {...taskBackendDict, ...{status: 'open'}});
+        { ...taskBackendDict, ...{ status: 'open' } });
       statesBackendDict = {
         Introduction: stateBackendDict,
       };
@@ -583,7 +583,7 @@ describe('Exploration improvements task registrar service', () => {
       expStatsBackendDict.state_stats_mapping = {
         Introduction: {
           ...stateStatsBackendDict,
-          ...{total_hit_count: 500, num_completions: 450},
+          ...{ total_hit_count: 500, num_completions: 450 },
         },
       };
 
@@ -616,7 +616,7 @@ describe('Exploration improvements task registrar service', () => {
 
   describe('Handling state changes', () => {
     it('should create new obsolete tasks for newly created state', () => {
-      statesBackendDict = {Introduction: stateBackendDict};
+      statesBackendDict = { Introduction: stateBackendDict };
       taskRegistryService.initialize(
         config, makeStates(), makeExpStats(), [], new Map(), new Map(), []);
 
@@ -652,7 +652,7 @@ describe('Exploration improvements task registrar service', () => {
       expStatsBackendDict.state_stats_mapping = {
         Introduction: {
           ...stateStatsBackendDict,
-          ...{total_hit_count: 500, num_completions: 350},
+          ...{ total_hit_count: 500, num_completions: 350 },
         },
       };
       const answerStats = makeAnswerStats();
@@ -662,15 +662,17 @@ describe('Exploration improvements task registrar service', () => {
       taskBackendDict.status = 'open';
       let [hbrTask, iflTask, ngrTask, siaTask] = [
         makeTask<HighBounceRateTask>(
-          {...taskBackendDict, ...{task_type: 'high_bounce_rate'}}),
+          { ...taskBackendDict, ...{ task_type: 'high_bounce_rate' } }),
         makeTask<IneffectiveFeedbackLoopTask>(
-          {...taskBackendDict, ...{task_type: 'ineffective_feedback_loop'}}),
+          { ...taskBackendDict,
+            ...{ task_type: 'ineffective_feedback_loop' } }),
         makeTask<NeedsGuidingResponsesTask>(
-          {...taskBackendDict, ...{task_type: 'needs_guiding_responses'}}),
+          { ...taskBackendDict, ...{ task_type: 'needs_guiding_responses' } }),
         makeTask<SuccessiveIncorrectAnswersTask>(
-          {...taskBackendDict, ...{task_type: 'successive_incorrect_answers'}}),
+          { ...taskBackendDict,
+            ...{ task_type: 'successive_incorrect_answers' } }),
       ];
-      statesBackendDict = {Introduction: stateBackendDict};
+      statesBackendDict = { Introduction: stateBackendDict };
 
       taskRegistryService.initialize(
         config, makeStates(), makeExpStats(),
@@ -722,7 +724,7 @@ describe('Exploration improvements task registrar service', () => {
       expStatsBackendDict.state_stats_mapping = {
         Introduction: {
           ...stateStatsBackendDict,
-          ...{total_hit_count: 500, num_completions: 350},
+          ...{ total_hit_count: 500, num_completions: 350 },
         },
       };
       const answerStats = makeAnswerStats();
@@ -732,15 +734,17 @@ describe('Exploration improvements task registrar service', () => {
       taskBackendDict.status = 'open';
       let [hbrTask, iflTask, ngrTask, siaTask] = [
         makeTask<HighBounceRateTask>(
-          {...taskBackendDict, ...{task_type: 'high_bounce_rate'}}),
+          { ...taskBackendDict, ...{ task_type: 'high_bounce_rate' } }),
         makeTask<IneffectiveFeedbackLoopTask>(
-          {...taskBackendDict, ...{task_type: 'ineffective_feedback_loop'}}),
+          { ...taskBackendDict,
+            ...{ task_type: 'ineffective_feedback_loop' } }),
         makeTask<NeedsGuidingResponsesTask>(
-          {...taskBackendDict, ...{task_type: 'needs_guiding_responses'}}),
+          { ...taskBackendDict, ...{ task_type: 'needs_guiding_responses' } }),
         makeTask<SuccessiveIncorrectAnswersTask>(
-          {...taskBackendDict, ...{task_type: 'successive_incorrect_answers'}}),
+          { ...taskBackendDict,
+            ...{ task_type: 'successive_incorrect_answers' } }),
       ];
-      statesBackendDict = {Introduction: stateBackendDict};
+      statesBackendDict = { Introduction: stateBackendDict };
 
       taskRegistryService.initialize(
         config, makeStates(), makeExpStats(),

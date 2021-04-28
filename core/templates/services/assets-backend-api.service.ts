@@ -96,7 +96,7 @@ export class AssetsBackendApiService {
       rawAssetData: Blob): Promise<SaveAudioResponse> {
     const form = new FormData();
     form.append('raw_audio_file', rawAssetData);
-    form.append('payload', JSON.stringify({filename}));
+    form.append('payload', JSON.stringify({ filename }));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
     try {
       return await this.http.post<SaveAudioResponse>(
@@ -112,7 +112,7 @@ export class AssetsBackendApiService {
     const form = new FormData();
     form.append('image', resampledFile);
     form.append(
-      'payload', JSON.stringify({filename, filename_prefix: 'image'}));
+      'payload', JSON.stringify({ filename, filename_prefix: 'image' }));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
     try {
       return await this.http.post<SaveImageResponse>(

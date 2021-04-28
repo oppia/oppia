@@ -44,7 +44,7 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
           question.getLinkedSkillIds());
       }
       questionPlayerState[questionId].usedHints.push(
-        {timestamp: getCurrentTime()});
+        { timestamp: getCurrentTime() });
     };
 
     var _solutionViewed = function(question) {
@@ -55,7 +55,7 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
           question.getLinkedSkillIds());
       }
       questionPlayerState[questionId].viewedSolution = {
-        timestamp: getCurrentTime()};
+        timestamp: getCurrentTime() };
     };
 
     var _answerSubmitted = function(
@@ -72,7 +72,7 @@ angular.module('oppia').factory('QuestionPlayerStateService', [
         return;
       }
       questionPlayerState[questionId].answers.push(
-        {isCorrect: isCorrect,
+        { isCorrect: isCorrect,
           timestamp: getCurrentTime(),
           taggedSkillMisconceptionId: taggedSkillMisconceptionId
         });

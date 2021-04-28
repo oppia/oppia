@@ -33,7 +33,7 @@ export const importAllAngularServices = (): void => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{provide: AngularFireAuth, useValue: null}],
+      providers: [{ provide: AngularFireAuth, useValue: null }],
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -140,10 +140,10 @@ export const setupAndGetUpgradedComponent = (
   // The template in the next line is what is rendered. The text of the rendered
   // component should contain "Hello Oppia!". This text context is return
   // value.
-  const ng1Component = {template: 'Hello Oppia!'};
+  const ng1Component = { template: 'Hello Oppia!' };
   const ng1Module = angular.module('ng1Module', [])
     .component(camelCaseName, ng1Component)
-    .directive('mockComp', downgradeComponent({component: MockComponent}));
+    .directive('mockComp', downgradeComponent({ component: MockComponent }));
   @NgModule({
     declarations: [upgradedComponentTypes[0], MockComponent],
     entryComponents: [MockComponent],

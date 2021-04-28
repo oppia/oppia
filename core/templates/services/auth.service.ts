@@ -109,7 +109,7 @@ export class AuthService {
     // Oppia only needs an email address for account management.
     provider.addScope('email');
     // Always prompt the user to select an account, even when they only own one.
-    provider.setCustomParameters({prompt: 'select_account'});
+    provider.setCustomParameters({ prompt: 'select_account' });
     await this.angularFireAuth.signInWithRedirect(provider);
     return await this.angularFireAuth.getRedirectResult();
   }

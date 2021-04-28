@@ -26,7 +26,7 @@ describe('Auth Backend Api Service', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
     httpTestingController = TestBed.inject(HttpTestingController);
     authBackendApiService = TestBed.inject(AuthBackendApiService);
   });

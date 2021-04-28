@@ -29,4 +29,4 @@ export class CollectionStatisticsTabComponent {
 }
 
 angular.module('oppia').directive('collectionStatisticsTab', downgradeComponent(
-  {component: CollectionStatisticsTabComponent}));
+  { component: CollectionStatisticsTabComponent }));

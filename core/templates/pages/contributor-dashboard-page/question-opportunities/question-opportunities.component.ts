@@ -76,7 +76,7 @@ angular.module('oppia').component('questionOpportunities', {
       let userIsLoggedIn = false;
       let allOpportunities = [];
 
-      var getPresentableOpportunitiesData = function({opportunities, more}) {
+      var getPresentableOpportunitiesData = function({ opportunities, more }) {
         let opportunitiesDicts = [];
         for (let index in opportunities) {
           const opportunity = opportunities[index];
@@ -95,7 +95,7 @@ angular.module('oppia').component('questionOpportunities', {
           allOpportunities[opportunityDict.id] = opportunityDict;
           opportunitiesDicts.push(opportunityDict);
         }
-        return {opportunitiesDicts, more};
+        return { opportunitiesDicts, more };
       };
 
       ctrl.createQuestion = function(skill, skillDifficulty) {

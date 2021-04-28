@@ -90,7 +90,7 @@ export class TranslateService {
     this.currentLang = newLanguageCode;
     if (Object.keys(this.translations).includes(newLanguageCode)) {
       this.onLangChangeEventEmitter.emit(
-        {newLanguageCode: newLanguageCode });
+        { newLanguageCode: newLanguageCode });
       return;
     }
     // Otherwise fetch the translations.
@@ -100,7 +100,7 @@ export class TranslateService {
         this.translations[newLanguageCode] = translations;
         if (this.currentLang === newLanguageCode) {
           this.onLangChangeEventEmitter.emit(
-            {newLanguageCode: newLanguageCode});
+            { newLanguageCode: newLanguageCode });
         }
       }
     );

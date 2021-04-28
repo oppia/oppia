@@ -78,8 +78,8 @@ describe('NumberWithUnitsValidationService', () => {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 0, 1), [{ unit: 'kg', exponent: 1 },
+          { unit: 'm', exponent: -2 }])
       }
     }, 'NumberWithUnits');
 
@@ -87,8 +87,8 @@ describe('NumberWithUnitsValidationService', () => {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2000, createFractionDict(
-          false, 0, 0, 1), [{unit: 'g', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 0, 1), [{ unit: 'g', exponent: 1 },
+          { unit: 'm', exponent: -2 }])
       }
     }, 'NumberWithUnits');
 
@@ -96,8 +96,8 @@ describe('NumberWithUnitsValidationService', () => {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 0, 1), [{ unit: 'kg', exponent: 1 },
+          { unit: 'm', exponent: -2 }])
       }
     }, 'NumberWithUnits');
 
@@ -105,8 +105,8 @@ describe('NumberWithUnitsValidationService', () => {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2, 3), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 2, 3), [{ unit: 'kg', exponent: 1 },
+          { unit: 'm', exponent: -2 }])
       }
     }, 'NumberWithUnits');
 
@@ -114,8 +114,8 @@ describe('NumberWithUnitsValidationService', () => {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2000, 3), [{unit: 'g', exponent: 1},
-          {unit: 'm', exponent: -2}])
+          false, 0, 2000, 3), [{ unit: 'g', exponent: 1 },
+          { unit: 'm', exponent: -2 }])
       }
     }, 'NumberWithUnits');
 

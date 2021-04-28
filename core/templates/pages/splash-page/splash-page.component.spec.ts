@@ -33,7 +33,7 @@ import { UserService } from 'services/user.service';
 import { SplashPageComponent } from './splash-page.component';
 import { of } from 'rxjs';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
     return value;

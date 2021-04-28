@@ -31,7 +31,7 @@ interface PredictionService {
 type AlgorithmIdPredictionServiceMap = (
   Map<string, Map<number, PredictionService>>);
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class PredictionAlgorithmRegistryService {
   private algorithmIdPredictionServiceMapping: AlgorithmIdPredictionServiceMap;
 

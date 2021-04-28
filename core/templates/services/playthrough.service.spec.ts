@@ -93,7 +93,7 @@ describe('PlaythroughService', () => {
   };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
 
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
@@ -113,19 +113,19 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.actions).toEqual([
             learnerActionObjectFactory.createNewExplorationStartAction({
-              state_name: {value: 'A'},
+              state_name: { value: 'A' },
             }),
             learnerActionObjectFactory.createNewAnswerSubmitAction({
-              state_name: {value: 'A'},
-              dest_state_name: {value: 'B'},
-              interaction_id: {value: 'TextInput'},
-              submitted_answer: {value: 'Hello'},
-              feedback: {value: 'Wrong!'},
-              time_spent_state_in_msecs: {value: 30000},
+              state_name: { value: 'A' },
+              dest_state_name: { value: 'B' },
+              interaction_id: { value: 'TextInput' },
+              submitted_answer: { value: 'Hello' },
+              feedback: { value: 'Wrong!' },
+              time_spent_state_in_msecs: { value: 30000 },
             }),
             learnerActionObjectFactory.createNewExplorationQuitAction({
-              state_name: {value: 'B'},
-              time_spent_in_state_in_msecs: {value: 40000},
+              state_name: { value: 'B' },
+              time_spent_in_state_in_msecs: { value: 40000 },
             }),
           ]);
         });
@@ -144,19 +144,19 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.actions).toEqual([
             learnerActionObjectFactory.createNewExplorationStartAction({
-              state_name: {value: 'A'},
+              state_name: { value: 'A' },
             }),
             learnerActionObjectFactory.createNewAnswerSubmitAction({
-              state_name: {value: 'A'},
-              dest_state_name: {value: 'B'},
-              interaction_id: {value: 'TextInput'},
-              submitted_answer: {value: 'Hello'},
-              feedback: {value: 'Wrong!'},
-              time_spent_state_in_msecs: {value: 30000},
+              state_name: { value: 'A' },
+              dest_state_name: { value: 'B' },
+              interaction_id: { value: 'TextInput' },
+              submitted_answer: { value: 'Hello' },
+              feedback: { value: 'Wrong!' },
+              time_spent_state_in_msecs: { value: 30000 },
             }),
             learnerActionObjectFactory.createNewExplorationQuitAction({
-              state_name: {value: 'B'},
-              time_spent_in_state_in_msecs: {value: 40000},
+              state_name: { value: 'B' },
+              time_spent_in_state_in_msecs: { value: 40000 },
             }),
           ]);
         });
@@ -247,7 +247,7 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.issueType).toEqual('CyclicStateTransitions');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['A', 'B', 'C', 'A']},
+            state_names: { value: ['A', 'B', 'C', 'A'] },
           });
         });
 
@@ -264,8 +264,8 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.issueType).toEqual('EarlyQuit');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_name: {value: 'A'},
-            time_spent_in_exp_in_msecs: {value: 60000},
+            state_name: { value: 'A' },
+            time_spent_in_exp_in_msecs: { value: 60000 },
           });
         });
 
@@ -296,7 +296,7 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.issueType).toEqual('CyclicStateTransitions');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['C', 'D', 'E', 'C']},
+            state_names: { value: ['C', 'D', 'E', 'C'] },
           });
         });
 
@@ -321,7 +321,7 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.issueType).toEqual('CyclicStateTransitions');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['A', 'B', 'C', 'A']},
+            state_names: { value: ['A', 'B', 'C', 'A'] },
           });
         });
         playthroughService.recordExplorationStartAction('A');
@@ -337,7 +337,7 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.issueType).toEqual('CyclicStateTransitions');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['C', 'D', 'E', 'C']},
+            state_names: { value: ['C', 'D', 'E', 'C'] },
           });
         });
 
@@ -355,7 +355,7 @@ describe('PlaythroughService', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.issueType).toEqual('CyclicStateTransitions');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['A', 'B', 'C', 'A']},
+            state_names: { value: ['A', 'B', 'C', 'A'] },
           });
         });
 
@@ -374,7 +374,7 @@ describe('PlaythroughService', () => {
           expect(playthrough).not.toBeNull();
           expect(playthrough.issueType).toEqual('CyclicStateTransitions');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['C', 'A']},
+            state_names: { value: ['C', 'A'] },
           });
         });
 
@@ -412,7 +412,7 @@ describe('PlaythroughService', () => {
           expect(playthrough).not.toBeNull();
           expect(playthrough.issueType).toEqual('CyclicStateTransitions');
           expect(playthrough.issueCustomizationArgs).toEqual({
-            state_names: {value: ['S', 'T', 'S']},
+            state_names: { value: ['S', 'T', 'S'] },
           });
         });
 

@@ -60,7 +60,7 @@ describe('Question Validation Service', () => {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: { x: 10 }
             }],
             tagged_skill_misconception_id: null
           }, {
@@ -76,7 +76,7 @@ describe('Question Validation Service', () => {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: { x: 10 }
             }],
             tagged_skill_misconception_id: 'abc-1'
           }],

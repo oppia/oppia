@@ -44,16 +44,16 @@ describe('Playthrough Object Factory', () => {
     })];
     let playthroughObject = pof.createNewEarlyQuitPlaythrough(
       'expId1', 1, {
-        state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000},
+        state_name: { value: 'state' },
+        time_spent_in_exp_in_msecs: { value: 30000 },
       }, actions);
 
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({
-      state_name: {value: 'state'},
-      time_spent_in_exp_in_msecs: {value: 30000}
+      state_name: { value: 'state' },
+      time_spent_in_exp_in_msecs: { value: 30000 }
     });
     expect(playthroughObject.actions).toEqual(actions);
   });
@@ -179,8 +179,8 @@ describe('Playthrough Object Factory', () => {
     })];
     let playthroughObject = pof.createNewEarlyQuitPlaythrough(
       'expId1', 1, {
-        state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000}
+        state_name: { value: 'state' },
+        time_spent_in_exp_in_msecs: { value: 30000 }
       }, actions);
 
     let playthroughDict = playthroughObject.toBackendDict();
@@ -189,8 +189,8 @@ describe('Playthrough Object Factory', () => {
       exp_version: 1,
       issue_type: 'EarlyQuit',
       issue_customization_args: {
-        state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000}
+        state_name: { value: 'state' },
+        time_spent_in_exp_in_msecs: { value: 30000 }
       },
       actions: [{
         action_type: 'AnswerSubmit',
@@ -246,15 +246,15 @@ describe('Playthrough Object Factory', () => {
   it('should identify the problematic state', () => {
     let eqPlaythrough = pof.createNewEarlyQuitPlaythrough(
       'expId1', 1, {
-        state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000},
+        state_name: { value: 'state' },
+        time_spent_in_exp_in_msecs: { value: 30000 },
       }, []);
     expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
 
     var misPlaythrough = pof.createNewMultipleIncorrectSubmissionsPlaythrough(
       'expId1', 1, {
-        state_name: {value: 'state'},
-        num_times_answered_incorrectly: {value: 10},
+        state_name: { value: 'state' },
+        num_times_answered_incorrectly: { value: 10 },
       }, []);
     expect(misPlaythrough.getStateNameWithIssue()).toEqual('state');
 

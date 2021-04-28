@@ -28,9 +28,9 @@ describe('Schema Undefined Last Element Service', () => {
   });
 
   it('should get undefined value by schema', () => {
-    expect(sules.getUndefinedValue({type: 'unicode'})).toBe('');
-    expect(sules.getUndefinedValue({type: 'html'})).toBe('');
-    expect(sules.getUndefinedValue({type: 'whatever'})).toBe(undefined);
+    expect(sules.getUndefinedValue({ type: 'unicode' })).toBe('');
+    expect(sules.getUndefinedValue({ type: 'html' })).toBe('');
+    expect(sules.getUndefinedValue({ type: 'whatever' })).toBe(undefined);
     expect(sules.getUndefinedValue({})).toBe(undefined);
   });
 });

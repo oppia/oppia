@@ -64,4 +64,4 @@ export class LoginRequiredMessageComponent {
 
 angular.module('oppia').directive(
   'loginRequiredMessage', downgradeComponent(
-    {component: LoginRequiredMessageComponent}));
+    { component: LoginRequiredMessageComponent }));

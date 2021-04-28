@@ -56,14 +56,14 @@ describe('OnScreenKeyboard', function() {
 
   it('should correctly identify keyboard events', function() {
     ctrl.lettersAreLowercase = true;
-    ctrl.keyDownCallBack({key: 'Shift'});
+    ctrl.keyDownCallBack({ key: 'Shift' });
     expect(ctrl.lettersAreLowercase).toBeFalse();
-    ctrl.keyUpCallBack({key: 'Shift'});
+    ctrl.keyUpCallBack({ key: 'Shift' });
     expect(ctrl.lettersAreLowercase).toBeTrue();
 
     ctrl.value = ['x'];
-    ctrl.keyDownCallBack({key: 'Backspace'});
+    ctrl.keyDownCallBack({ key: 'Backspace' });
     expect(ctrl.value.length).toBe(0);
-    ctrl.keyDownCallBack({key: 'x'});
+    ctrl.keyDownCallBack({ key: 'x' });
   });
 });

@@ -58,8 +58,8 @@ describe('Oppia sorted tiles visualization', function() {
 
     beforeEach(() => {
       element = newDirective(
-        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
-        {header: 'Pretty Tiles!', use_percentages: false});
+        [{ answer: 'foo', frequency: 3 }, { answer: 'bar', frequency: 1 }],
+        { header: 'Pretty Tiles!', use_percentages: false });
     });
 
     it('should render the provided data and their frequencies', () => {
@@ -76,8 +76,8 @@ describe('Oppia sorted tiles visualization', function() {
 
     beforeEach(() => {
       element = newDirective(
-        [{answer: 'foo', frequency: 3}, {answer: 'bar', frequency: 1}],
-        {header: 'Pretty Tiles!', use_percentages: true});
+        [{ answer: 'foo', frequency: 3 }, { answer: 'bar', frequency: 1 }],
+        { header: 'Pretty Tiles!', use_percentages: true });
     });
 
     it('should render the provided data with percentages', () => {
@@ -127,8 +127,8 @@ describe('Oppia sorted tiles visualization', function() {
       spyOn(utilsService, 'isOverflowing').and.returnValue(true);
 
       element = newDirective(
-        [{answer: veryLongAnswer, frequency: 3}],
-        {header: 'Pretty Tiles!', use_percentages: true});
+        [{ answer: veryLongAnswer, frequency: 3 }],
+        { header: 'Pretty Tiles!', use_percentages: true });
     });
 
     it('should respect that the answer is too long', () => {

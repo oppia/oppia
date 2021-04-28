@@ -28,7 +28,7 @@ describe('Audio preloader service', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -41,7 +41,7 @@ describe('Audio preloader service', () => {
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
 
-  const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
+  const audioBlob = new Blob(['audio data'], { type: 'audiotype' });
 
   let explorationDict: ExplorationBackendDict = {
     draft_change_list_id: 1,
@@ -242,10 +242,10 @@ describe('Audio preloader service', () => {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['1']
-              }}
+              } }
             }],
             outcome: {
               dest: 'State 1',
@@ -263,10 +263,10 @@ describe('Audio preloader service', () => {
           }, {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['2']
-              }}
+              } }
             }],
             outcome: {
               dest: 'State 2',

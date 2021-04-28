@@ -74,8 +74,8 @@ describe('Question Creation Service', function() {
         explanations: ['Medium 1', 'Medium 2']
       };
       var conceptCardDict = {
-        explanation: {content_id: 'content',
-          html: 'html_data'},
+        explanation: { content_id: 'content',
+          html: 'html_data' },
         worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -139,10 +139,10 @@ describe('Question Creation Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: {
+                inputs: { x: {
                   contentId: 'rule_input',
                   normalizedStrSet: ['10']
-                }}
+                } }
               }],
             }],
             confirmed_unclassified_answers: [],
@@ -210,7 +210,7 @@ describe('Question Creation Service', function() {
       var skillDiff = SkillDifficulty.create(
         'skillId1', 'description', 0.3);
       var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: Promise.resolve([skillDiff])});
+        { result: Promise.resolve([skillDiff]) });
       qcs.createQuestion();
       expect(modalSpy).toHaveBeenCalled();
     });
@@ -220,7 +220,7 @@ describe('Question Creation Service', function() {
       qcs.initializeNewQuestionCreation();
 
       var modalSpy = spyOn($uibModal, 'open').and.returnValue({
-        result: Promise.resolve()});
+        result: Promise.resolve() });
       qcs.openQuestionEditor(0.3);
       expect(modalSpy).toHaveBeenCalled();
     });
@@ -261,8 +261,8 @@ describe('Question Creation Service', function() {
         explanations: ['Easy']
       };
       var conceptCardDict = {
-        explanation: {content_id: 'content',
-          html: 'html_data'},
+        explanation: { content_id: 'content',
+          html: 'html_data' },
         worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -419,8 +419,8 @@ describe('Question Creation Service', function() {
         explanations: ['Easy']
       };
       var conceptCardDict = {
-        explanation: {content_id: 'content',
-          html: 'html_data'},
+        explanation: { content_id: 'content',
+          html: 'html_data' },
         worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -487,10 +487,10 @@ describe('Question Creation Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: {
+                inputs: { x: {
                   contentId: 'rule_input',
                   normalizedStrSet: ['10']
-                }}
+                } }
               }],
             }],
             confirmed_unclassified_answers: [],

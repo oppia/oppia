@@ -43,7 +43,7 @@ export interface InteractionRulesService {
     answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class AnswerClassificationService {
   constructor(
       private alertsService: AlertsService,

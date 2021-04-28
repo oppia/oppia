@@ -28,7 +28,7 @@ import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
 // ^^^ This block is to be removed.
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { TopicObjectFactory, TopicBackendDict} from 'domain/topic/TopicObjectFactory';
+import { TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TestBed } from '@angular/core/testing';
 
@@ -672,8 +672,8 @@ describe('Topic update service', function() {
   });
 
   it('should rearrange a subtopic', () => {
-    var subtopicsDict = [{id: 2, title: 'Title2', skill_ids: []},
-      {id: 3, title: 'Title3', skill_ids: []}];
+    var subtopicsDict = [{ id: 2, title: 'Title2', skill_ids: [] },
+      { id: 3, title: 'Title3', skill_ids: [] }];
     sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
 
     _sampleTopic = topicObjectFactory.create(

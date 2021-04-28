@@ -54,7 +54,7 @@ describe('Create new skill modal', function() {
       expect($scope.errorMsg).toEqual('');
       expect($scope.conceptCardExplanationEditorIsShown).toEqual(false);
       expect($scope.bindableDict.displayedConceptCardExplanation).toEqual('');
-      expect($scope.HTML_SCHEMA).toEqual({type: 'html'});
+      expect($scope.HTML_SCHEMA).toEqual({ type: 'html' });
       expect($scope.MAX_CHARS_IN_SKILL_DESCRIPTION).toEqual(100);
       expect($scope.newExplanationObject).toEqual(null);
       expect($scope.rubrics).toEqual(rubrics);

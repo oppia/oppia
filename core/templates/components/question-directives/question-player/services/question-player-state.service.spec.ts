@@ -123,7 +123,7 @@ describe('Question player state service', function() {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: { x: 10 }
             }],
             tagged_skill_misconception_id: 'skill_id_1-0'
           }],

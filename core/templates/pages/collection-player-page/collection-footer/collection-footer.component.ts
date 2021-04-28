@@ -45,4 +45,4 @@ export class CollectionFooterComponent implements OnInit {
 
 angular.module('oppia').directive(
   'collectionFooter', downgradeComponent(
-    {component: CollectionFooterComponent}));
+    { component: CollectionFooterComponent }));

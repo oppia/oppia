@@ -387,10 +387,10 @@ describe('Topics and Skills Dashboard Page', function() {
           var deferred = $q.defer();
           deferred.resolve({
             skillSummaries: [
-              {id: 'id1', description: 'description1'},
-              {id: 'id2', description: 'description2'},
-              {id: 'id3', description: 'description3'},
-              {id: 'id4', description: 'description4'}],
+              { id: 'id1', description: 'description1' },
+              { id: 'id2', description: 'description2' },
+              { id: 'id3', description: 'description3' },
+              { id: 'id4', description: 'description4' }],
             more: true,
             nextCursor: 'kasfmk424'
           });

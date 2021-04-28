@@ -25,7 +25,7 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-@Pipe({name: 'normalizeWhitespacePunctuationAndCase'})
+@Pipe({ name: 'normalizeWhitespacePunctuationAndCase' })
 export class NormalizeWhitespacePunctuationAndCasePipe
 implements PipeTransform {
   transform(input: string): string {

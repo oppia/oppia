@@ -36,8 +36,8 @@ describe('Assets Backend API Service', () => {
     const imageRequestUrl = (
       '/assetsdevhandler/exploration/0/assets/image/myfile.png');
 
-    const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
-    const imageBlob = new Blob(['image data'], {type: 'imagetype'});
+    const audioBlob = new Blob(['audio data'], { type: 'audiotype' });
+    const imageBlob = new Blob(['image data'], { type: 'imagetype' });
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -134,7 +134,7 @@ describe('Assets Backend API Service', () => {
         successHandler, failHandler);
       const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
-      req.flush(audioBlob, {status: 400, statusText: 'Failed'});
+      req.flush(audioBlob, { status: 400, statusText: 'Failed' });
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('myfile.mp3');
@@ -188,7 +188,7 @@ describe('Assets Backend API Service', () => {
 
       httpTestingController.expectOne(
         '/createhandler/imageupload/exploration/expid12345'
-      ).flush(null, {status: 400, statusText: 'Failure'});
+      ).flush(null, { status: 400, statusText: 'Failure' });
       flushMicrotasks();
 
       expect(onSuccess).not.toHaveBeenCalled();
@@ -205,7 +205,7 @@ describe('Assets Backend API Service', () => {
 
       httpTestingController.expectOne(
         '/createhandler/audioupload/0'
-      ).flush(null, {status: 400, statusText: 'Failure'});
+      ).flush(null, { status: 400, statusText: 'Failure' });
       flushMicrotasks();
 
       expect(onSuccess).not.toHaveBeenCalled();
@@ -272,7 +272,7 @@ describe('Assets Backend API Service', () => {
 
         let req = httpTestingController.expectOne(audioRequestUrl);
         expect(req.request.method).toEqual('GET');
-        req.flush(audioBlob, {status: 400, statusText: 'Failure'});
+        req.flush(audioBlob, { status: 400, statusText: 'Failure' });
 
         flushMicrotasks();
         expect(successHandler).not.toHaveBeenCalled();
@@ -290,7 +290,7 @@ describe('Assets Backend API Service', () => {
 
         let req = httpTestingController.expectOne(imageRequestUrl);
         expect(req.request.method).toEqual('GET');
-        req.flush(audioBlob, {status: 400, statusText: 'Failure'});
+        req.flush(audioBlob, { status: 400, statusText: 'Failure' });
 
         flushMicrotasks();
         expect(successHandler).not.toHaveBeenCalled();

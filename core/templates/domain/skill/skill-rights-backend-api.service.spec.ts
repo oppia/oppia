@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from
 
 import { SkillRightsBackendDict, SkillRights } from
   'domain/skill/skill-rights.model';
-import { SkillRightsBackendApiService} from
+import { SkillRightsBackendApiService } from
   'domain/skill/skill-rights-backend-api.service.ts';
 
 describe('Skill rights backend API service', () => {

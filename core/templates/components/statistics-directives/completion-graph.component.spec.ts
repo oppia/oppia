@@ -33,7 +33,7 @@ describe('Completion graph', function() {
   it('should derive style values from the completion rate', () => {
     const completionRate = 0.65;
     const ctrl = (
-      $componentController('completionGraph', null, {completionRate}));
+      $componentController('completionGraph', null, { completionRate }));
     ctrl.$onInit();
 
     expect(ctrl.completionBarStyle['stroke-dasharray']).toBeCloseTo(

@@ -130,7 +130,7 @@ export class UnitsObjectFactory {
   convertUnitDictToList(unitDict: UnitsDict): Unit[] {
     var unitList: Unit[] = [];
     for (var key in unitDict) {
-      unitList.push({unit: key, exponent: unitDict[key]});
+      unitList.push({ unit: key, exponent: unitDict[key] });
     }
     return unitList;
   }
@@ -173,12 +173,12 @@ export class UnitsObjectFactory {
       if (ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit === null) {
         // Base unit (like: rupees, dollar etc.).
         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
-          aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases});
+          aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases });
       } else {
         // Sub unit (like: paise, cents etc.).
         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
           definition: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit,
-          aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases});
+          aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases });
       }
     }
   }

@@ -172,9 +172,9 @@ export class TextInputValidationService {
         } else if (rule.type === 'Equals') {
           if (seenStringsEquals.some(
             (seenString) => textInputRulesService.Equals(
-              seenString, {x: {
+              seenString, { x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              } }))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -183,9 +183,9 @@ export class TextInputValidationService {
             });
           } else if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              seenString, {x: {
+              seenString, { x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              } }))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -197,9 +197,9 @@ export class TextInputValidationService {
         } else if (rule.type === 'FuzzyEquals') {
           if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              seenString, {x: {
+              seenString, { x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              } }))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +

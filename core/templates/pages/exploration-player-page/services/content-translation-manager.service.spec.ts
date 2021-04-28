@@ -198,7 +198,7 @@ describe('Content translation manager service', () => {
           content_id: 'ca_placeholder_0'
         })
       },
-      rows: {value: 1}
+      rows: { value: 1 }
     };
 
     expect(card.contentHtml).toBe('<p>fr content</p>');
@@ -223,7 +223,7 @@ describe('Content translation manager service', () => {
           content_id: 'ca_placeholder_0'
         })
       },
-      rows: {value: 1}
+      rows: { value: 1 }
     };
 
     writtenTranslations.toggleNeedsUpdateAttribute('hint_0', 'fr');
@@ -253,7 +253,7 @@ describe('Content translation manager service', () => {
           content_id: 'ca_placeholder_0'
         })
       },
-      rows: {value: 1}
+      rows: { value: 1 }
     };
 
     expect(card.contentHtml).toBe('<p>en content</p>');
@@ -361,7 +361,7 @@ describe('Content translation manager service', () => {
 
       interaction.id = 'DummyInteraction';
       interaction.customizationArgs = {
-        dummyCustArg: {value: [{
+        dummyCustArg: { value: [{
           content: suof.createFromBackendDict({
             unicode_str: 'first',
             content_id: 'ca_0'
@@ -374,13 +374,13 @@ describe('Content translation manager service', () => {
             content_id: 'ca_1'
           }),
           show: true
-        }]}
+        }] }
       };
 
       ctms.init('en');
       ctms.displayTranslations('fr');
       expect(interaction.customizationArgs).toEqual({
-        dummyCustArg: {value: [{
+        dummyCustArg: { value: [{
           content: suof.createFromBackendDict({
             unicode_str: 'fr 1',
             content_id: 'ca_0'
@@ -393,7 +393,7 @@ describe('Content translation manager service', () => {
             content_id: 'ca_1'
           }),
           show: true
-        }]}
+        }] }
       });
     });
   });

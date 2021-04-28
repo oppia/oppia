@@ -42,7 +42,7 @@ describe('Exploration stats back-end API service', () => {
     ExplorationImprovementsBackendApiService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
     explorationImprovementsBackendApiService = (
       TestBed.get(ExplorationImprovementsBackendApiService));
     httpTestingController = TestBed.get(HttpTestingController);
@@ -75,7 +75,7 @@ describe('Exploration stats back-end API service', () => {
     expect(req.request.method).toEqual('GET');
     req.flush(<ExplorationImprovementsResponseBackendDict>{
       open_tasks: [taskDict],
-      resolved_task_types_by_state_name: {Introduction: ['high_bounce_rate']},
+      resolved_task_types_by_state_name: { Introduction: ['high_bounce_rate'] },
     });
     flushMicrotasks();
 

@@ -34,4 +34,4 @@ export class ProfileLinkTextComponent {
 
 angular.module('oppia').directive(
   'profileLinkText', downgradeComponent(
-    {component: ProfileLinkTextComponent}));
+    { component: ProfileLinkTextComponent }));

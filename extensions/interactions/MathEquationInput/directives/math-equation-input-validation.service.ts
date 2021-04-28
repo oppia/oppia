@@ -115,7 +115,7 @@ export class MathEquationInputValidationService {
           let seenRuleType = <string> seenRule.type;
 
           if (seenRuleType === 'IsEquivalentTo' && (
-            meirs.IsEquivalentTo(seenInput, {x: currentInput}))) {
+            meirs.IsEquivalentTo(seenInput, { x: currentInput }))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -127,7 +127,7 @@ export class MathEquationInputValidationService {
             });
           } else if (currentRuleType === 'MatchesExactlyWith' && (
             meirs.MatchesExactlyWith(
-              seenInput, {x: currentInput, y: currentPositionOfTerms}))) {
+              seenInput, { x: currentInput, y: currentPositionOfTerms }))) {
             // This rule will make the following inputs with MatchesExactlyWith
             // rule obsolete.
             warningsList.push({

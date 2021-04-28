@@ -30,4 +30,4 @@ export class LoginRequiredModalContent {
 
 angular.module('oppia').directive(
   'loginRequiredModalContent', downgradeComponent(
-    {component: LoginRequiredModalContent}));
+    { component: LoginRequiredModalContent }));

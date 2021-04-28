@@ -77,4 +77,4 @@ export class OppiaInteractiveContinue implements OnInit {
 }
 angular.module('oppia').directive(
   'oppiaInteractiveContinue', downgradeComponent(
-    {component: OppiaInteractiveContinue}) as angular.IDirectiveFactory);
+    { component: OppiaInteractiveContinue }) as angular.IDirectiveFactory);

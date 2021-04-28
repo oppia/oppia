@@ -28,4 +28,4 @@ export class OppiaAdminProdModeActivitiesTabComponent {}
 
 angular.module('oppia').directive(
   'oppiaAdminProdModeActivitiesTab', downgradeComponent(
-    {component: OppiaAdminProdModeActivitiesTabComponent}));
+    { component: OppiaAdminProdModeActivitiesTabComponent }));

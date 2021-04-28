@@ -43,7 +43,7 @@ describe('Create new topic modal', function() {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
-      [{filename: 'a', image: 'faf'}]);
+      [{ filename: 'a', image: 'faf' }]);
 
     $controller('CreateNewTopicModalController', {
       $scope: $scope,

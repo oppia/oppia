@@ -517,7 +517,7 @@ describe('Topic editor tab directive', function() {
       var deferred = $q.defer();
       deferred.resolve(1);
       spyOn($uibModalInstance, 'open').and.returnValue(
-        {result: deferred.promise});
+        { result: deferred.promise });
       var moveSkillUpdateSpy = spyOn(
         TopicUpdateService, 'moveSkillToSubtopic');
       $scope.changeSubtopicAssignment(null, skillSummary);
@@ -530,7 +530,7 @@ describe('Topic editor tab directive', function() {
       var deferred = $q.defer();
       deferred.resolve(1);
       spyOn($uibModalInstance, 'open').and.returnValue(
-        {result: deferred.promise});
+        { result: deferred.promise });
       var moveSkillSpy = (
         spyOn(TopicUpdateService, 'moveSkillToSubtopic'));
       $scope.changeSubtopicAssignment(1, skillSummary);

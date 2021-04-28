@@ -54,7 +54,7 @@ var GraphEditor = function(graphInputContainer) {
     await addNodeButton.click();
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
-      graphInputContainer, {x: xOffset, y: yOffset}).perform();
+      graphInputContainer, { x: xOffset, y: yOffset }).perform();
     await browser.actions().click().perform();
   };
 

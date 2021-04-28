@@ -93,4 +93,4 @@ export class AttributionGuideComponent implements OnInit {
 
 angular.module('oppia').directive(
   'attributionGuide', downgradeComponent(
-    {component: AttributionGuideComponent}));
+    { component: AttributionGuideComponent }));

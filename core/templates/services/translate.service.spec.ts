@@ -41,7 +41,7 @@ describe('Translate service', () => {
   it('should fetch translations', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    const translations = {I18n_t_1: 'Hello'};
+    const translations = { I18n_t_1: 'Hello' };
 
     translate.fetchTranslationAsync('en').then(successHandler, failHandler);
     const req = httpTestingController.expectOne('/assets/i18n/en.json');
@@ -56,7 +56,7 @@ describe('Translate service', () => {
   it('should set the new translation', fakeAsync(() => {
     let languageCode = '';
     let translations = {};
-    const enTranslations = {I18n_t_1: 'Hello'};
+    const enTranslations = { I18n_t_1: 'Hello' };
     const subscription = translate.onLangChange.subscribe(
       res => {
         languageCode = res.newLanguageCode;
@@ -110,7 +110,7 @@ describe('Translate service', () => {
     flushMicrotasks();
 
     expect(translate.getInterpolatedString(
-      'I18n_t_2', {val: 'World'})).toBe('Hello World');
+      'I18n_t_2', { val: 'World' })).toBe('Hello World');
 
     translate.use('es');
 
@@ -122,11 +122,11 @@ describe('Translate service', () => {
     expect(translate.getInterpolatedString(
       'I18n_t_1')).toBe('Hola');
     expect(translate.getInterpolatedString(
-      'I18n_t_2', {val: 'World'})).toBe('Hello World');
+      'I18n_t_2', { val: 'World' })).toBe('Hello World');
     expect(translate.getInterpolatedString(
-      'I18n_t_2', {val2: 'World'})).toBe('Hello <[val]>');
+      'I18n_t_2', { val2: 'World' })).toBe('Hello <[val]>');
     expect(translate.getInterpolatedString(
-      'I18n_t_3', {val: 'World'})).toBe('I18n_t_3');
+      'I18n_t_3', { val: 'World' })).toBe('I18n_t_3');
   }));
 
   it('should throw an error if key is not defined', fakeAsync(() => {

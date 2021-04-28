@@ -45,7 +45,7 @@ describe('StateTopAnswersStatsService', () => {
   let statesObjectFactory: StatesObjectFactory;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
 
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateTopAnswersStatsBackendApiService = (
@@ -57,21 +57,21 @@ describe('StateTopAnswersStatsService', () => {
   const expId = '7';
 
   const stateBackendDict: StateBackendDict = {
-    content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
+    content: { content_id: 'content', html: 'Say "hello" in Spanish!' },
     next_content_id_index: 0,
     param_changes: [],
     interaction: {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Contains',
-          inputs: {x: {
+          inputs: { x: {
             contentId: 'rule_input',
             normalizedStrSet: ['hola']
-          }}
+          } }
         }],
         outcome: {
           dest: 'Me Llamo',
-          feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+          feedback: { content_id: 'feedback_1', html: '¡Buen trabajo!' },
           labelled_as_correct: true,
           param_changes: [],
           refresher_exploration_id: null,
@@ -82,7 +82,7 @@ describe('StateTopAnswersStatsService', () => {
       }],
       default_outcome: {
         dest: 'Hola',
-        feedback: {content_id: 'default_outcome', html: 'Try again!'},
+        feedback: { content_id: 'default_outcome', html: 'Try again!' },
         labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null,
@@ -120,7 +120,8 @@ describe('StateTopAnswersStatsService', () => {
     },
   };
 
-  const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {
+  const makeStates = (statesBackendDict = {
+    Hola: stateBackendDict }): States => {
     return statesObjectFactory.createFromBackendDict(statesBackendDict);
   };
 
@@ -131,7 +132,7 @@ describe('StateTopAnswersStatsService', () => {
       a => AnswerStats.createFromBackendDict(a));
     return spyOn(stateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
       .and.returnValue(Promise.resolve(new StateTopAnswersStats(
-        {[stateName]: answersStats}, {[stateName]: 'TextInput'})));
+        { [stateName]: answersStats }, { [stateName]: 'TextInput' })));
   };
 
   it('should not contain any stats before init', () => {
@@ -141,44 +142,44 @@ describe('StateTopAnswersStatsService', () => {
   it('should identify unaddressed issues', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 5},
-      {answer: 'adios', frequency: 3},
-      {answer: 'ciao', frequency: 1},
+      { answer: 'hola', frequency: 5 },
+      { answer: 'adios', frequency: 3 },
+      { answer: 'ciao', frequency: 1 },
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromise();
 
     const stateStats = stateTopAnswersStatsService.getStateStats('Hola');
-    expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
-    expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
-    expect(stateStats).toContain(joC({answer: 'ciao', isAddressed: false}));
+    expect(stateStats).toContain(joC({ answer: 'hola', isAddressed: true }));
+    expect(stateStats).toContain(joC({ answer: 'adios', isAddressed: false }));
+    expect(stateStats).toContain(joC({ answer: 'ciao', isAddressed: false }));
   }));
 
   it('should order results by frequency', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 7},
-      {answer: 'adios', frequency: 4},
-      {answer: 'ciao', frequency: 2},
+      { answer: 'hola', frequency: 7 },
+      { answer: 'adios', frequency: 4 },
+      { answer: 'ciao', frequency: 2 },
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromise();
 
     expect(stateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-      joC({answer: 'hola', frequency: 7}),
-      joC({answer: 'adios', frequency: 4}),
-      joC({answer: 'ciao', frequency: 2}),
+      joC({ answer: 'hola', frequency: 7 }),
+      joC({ answer: 'adios', frequency: 4 }),
+      joC({ answer: 'ciao', frequency: 2 }),
     ]);
   }));
 
   it('should throw when stats for state do not exist', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 7},
-      {answer: 'adios', frequency: 4},
-      {answer: 'ciao', frequency: 2},
+      { answer: 'hola', frequency: 7 },
+      { answer: 'adios', frequency: 4 },
+      { answer: 'ciao', frequency: 2 },
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
@@ -191,7 +192,7 @@ describe('StateTopAnswersStatsService', () => {
   it('should have stats for state provided by backend', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'hola', frequency: 3}]);
+      'Hola', [{ answer: 'hola', frequency: 3 }]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromise();
@@ -283,13 +284,13 @@ describe('StateTopAnswersStatsService', () => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'adios', frequency: 3}]);
+      'Hola', [{ answer: 'adios', frequency: 3 }]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromise();
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-      .toContain(joC({answer: 'adios'}));
+      .toContain(joC({ answer: 'adios' }));
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
@@ -308,20 +309,20 @@ describe('StateTopAnswersStatsService', () => {
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-      .not.toContain(joC({answer: 'adios'}));
+      .not.toContain(joC({ answer: 'adios' }));
   }));
 
   it('should recognize newly unresolved answers', fakeAsync(async() => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'hola', frequency: 3}]);
+      'Hola', [{ answer: 'hola', frequency: 3 }]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromise();
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-      .not.toContain(joC({answer: 'hola'}));
+      .not.toContain(joC({ answer: 'hola' }));
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
@@ -341,6 +342,6 @@ describe('StateTopAnswersStatsService', () => {
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-      .toContain(joC({answer: 'hola'}));
+      .toContain(joC({ answer: 'hola' }));
   }));
 });

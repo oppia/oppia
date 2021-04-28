@@ -175,7 +175,7 @@ export class CkEditorCopyContentService {
       editor: CKEDITOR.editor | Partial<CKEDITOR.editor>
   ): void {
     this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
-      ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
+      ({ rootElement, containedWidgetTagName }: CkEditorCopyEvent) => {
         if (!rootElement) {
           return;
         }

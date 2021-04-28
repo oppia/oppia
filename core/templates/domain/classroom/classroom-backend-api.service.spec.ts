@@ -165,7 +165,7 @@ describe('Classroom backend API service', function() {
       let req = httpTestingController.expectOne(
         '/classroom_promos_status_handler');
       expect(req.request.method).toEqual('GET');
-      req.flush({classroom_promos_are_enabled: false});
+      req.flush({ classroom_promos_are_enabled: false });
 
       flushMicrotasks();
 

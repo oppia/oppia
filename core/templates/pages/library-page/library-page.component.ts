@@ -257,7 +257,7 @@ angular.module('oppia').component('libraryPage', {
             ctrl.libraryGroups =
               response.data.activity_summary_dicts_by_category;
             UserService.getUserInfoAsync().then(function(userInfo) {
-              ctrl.activitiesOwned = {explorations: {}, collections: {}};
+              ctrl.activitiesOwned = { explorations: {}, collections: {} };
               if (userInfo.isLoggedIn()) {
                 $http.get('/creatordashboardhandler/data')
                   .then(function(response) {

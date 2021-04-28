@@ -59,7 +59,7 @@ describe('Create new subtopic modal', function() {
         type: 'html',
         ui_config: {
           rows: 100
-        }});
+        } });
       expect(ctrl.allowedBgColors).toEqual(['#FFFFFF']);
       expect(ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE).toEqual(64);
     });

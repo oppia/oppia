@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
+import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
 describe('Editable question backend API service', function() {
@@ -124,7 +124,7 @@ describe('Editable question backend API service', function() {
     let failHandler = jasmine.createSpy('fail');
 
     let imageBlob = new Blob(
-      ['data:image/png;base64,xyz'], {type: 'image/png'});
+      ['data:image/png;base64,xyz'], { type: 'image/png' });
     let imageData = {
       filename: 'image.png',
       imageBlob: imageBlob
@@ -142,7 +142,7 @@ describe('Editable question backend API service', function() {
     req.flush({ questionId: '0' });
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({questionId: '0'});
+    expect(successHandler).toHaveBeenCalledWith({ questionId: '0' });
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -155,7 +155,7 @@ describe('Editable question backend API service', function() {
       let skillDifficulties = [1, 1, 2];
       let questionObject = sampleDataResultsObjects.questionObject;
       let imageBlob = new Blob(
-        ['data:image/png;base64,xyz'], {type: 'image/png'});
+        ['data:image/png;base64,xyz'], { type: 'image/png' });
       let imageData = {
         filename: 'image.png',
         imageBlob: imageBlob
@@ -169,8 +169,8 @@ describe('Editable question backend API service', function() {
       expect(req.request.method).toEqual('POST');
 
       req.flush({
-        error: 'Error creating a new question.'},
-      { status: 500, statusText: 'Internal Server Error'});
+        error: 'Error creating a new question.' },
+      { status: 500, statusText: 'Internal Server Error' });
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -211,8 +211,8 @@ describe('Editable question backend API service', function() {
         '/question_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush({
-        error: 'Error loading question 1.'},
-      {status: 500, statusText: 'Internal Server Error'});
+        error: 'Error loading question 1.' },
+      { status: 500, statusText: 'Internal Server Error' });
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -272,8 +272,8 @@ describe('Editable question backend API service', function() {
       '/question_editor_handler/data/1');
     expect(req.request.method).toEqual('PUT');
     req.flush({
-      error: 'Question with given id doesn\'t exist.'},
-    {status: 404, statusText: 'Not Found'});
+      error: 'Question with given id doesn\'t exist.' },
+    { status: 404, statusText: 'Not Found' });
     flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
@@ -294,7 +294,7 @@ describe('Editable question backend API service', function() {
     let req = httpTestingController.expectOne(
       '/manage_question_skill_link/' + questionId);
     expect(req.request.method).toEqual('PUT');
-    req.flush({status: 200});
+    req.flush({ status: 200 });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -317,8 +317,8 @@ describe('Editable question backend API service', function() {
       '/manage_question_skill_link/' + questionId);
     expect(req.request.method).toEqual('PUT');
     req.flush({
-      error: 'Error loading question 0.'},
-    {status: 500, statusText: 'Internal Server Error'});
+      error: 'Error loading question 0.' },
+    { status: 500, statusText: 'Internal Server Error' });
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();

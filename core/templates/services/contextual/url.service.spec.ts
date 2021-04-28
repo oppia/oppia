@@ -41,7 +41,7 @@ describe('Url Service', () => {
     urlService = TestBed.get(UrlService);
     windowRef = TestBed.get(WindowRef);
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
-      location: mockLocation}));
+      location: mockLocation }));
   });
 
   it('should return correct query value list for each query field', () => {

@@ -63,7 +63,7 @@ describe('Skill creation backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       let imageBlob = new Blob(
-        ['data:image/png;base64,xyz'], {type: 'image/png'});
+        ['data:image/png;base64,xyz'], { type: 'image/png' });
       let imageData = {
         filename: 'image.png',
         imageBlob: imageBlob

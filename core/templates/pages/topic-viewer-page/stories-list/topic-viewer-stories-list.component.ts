@@ -36,4 +36,4 @@ export class StoriesListComponent {
 }
 angular.module('oppia').directive(
   'storiesList', downgradeComponent(
-    {component: StoriesListComponent}));
+    { component: StoriesListComponent }));

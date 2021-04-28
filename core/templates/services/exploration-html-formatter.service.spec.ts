@@ -42,8 +42,8 @@ describe('Exploration Html Formatter Service', () => {
      ' editor mode', () => {
     var interactionId = 'TextInput';
     let custArgs = {
-      placeholder: {value: new SubtitledUnicode('enter here', '')},
-      rows: {value: 1}
+      placeholder: { value: new SubtitledUnicode('enter here', '') },
+      rows: { value: 1 }
     };
     var expectedHtmlTag = '<oppia-interactive-text-input ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
@@ -58,8 +58,8 @@ describe('Exploration Html Formatter Service', () => {
   ' is in editor mode', () => {
     var interactionId = 'GraphInput';
     let custArgs = {
-      placeholder: {value: new SubtitledUnicode('enter here', '')},
-      rows: {value: 1}
+      placeholder: { value: new SubtitledUnicode('enter here', '') },
+      rows: { value: 1 }
     };
     var expectedHtmlTag = '<oppia-interactive-graph-input ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +

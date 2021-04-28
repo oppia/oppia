@@ -98,7 +98,7 @@ class CyclicStateTransitionsTracker {
 
   generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
     return {
-      state_names: {value: this.cycleOfVisitedStates}
+      state_names: { value: this.cycleOfVisitedStates }
     };
   }
 
@@ -130,8 +130,8 @@ class EarlyQuitTracker {
 
   generateIssueCustomizationArgs(): EarlyQuitCustomizationArgs {
     return {
-      state_name: {value: this.stateName},
-      time_spent_in_exp_in_msecs: {value: this.expDurationInSecs * 1000},
+      state_name: { value: this.stateName },
+      time_spent_in_exp_in_msecs: { value: this.expDurationInSecs * 1000 },
     };
   }
 }
@@ -161,8 +161,8 @@ class MultipleIncorrectAnswersTracker {
   generateIssueCustomizationArgs(
   ): MultipleIncorrectSubmissionsCustomizationArgs {
     return {
-      state_name: {value: this.currStateName},
-      num_times_answered_incorrectly: {value: this.numTries},
+      state_name: { value: this.currStateName },
+      num_times_answered_incorrectly: { value: this.numTries },
     };
   }
 }
@@ -204,7 +204,7 @@ export class PlaythroughService {
 
     this.recordedLearnerActions = [
       this.learnerActionObjectFactory.createNewExplorationStartAction({
-        state_name: {value: initStateName},
+        state_name: { value: initStateName },
       })
     ];
 
@@ -226,12 +226,12 @@ export class PlaythroughService {
 
     this.recordedLearnerActions.push(
       this.learnerActionObjectFactory.createNewAnswerSubmitAction({
-        state_name: {value: stateName},
-        dest_state_name: {value: destStateName},
-        interaction_id: {value: interactionId},
-        submitted_answer: {value: answer},
-        feedback: {value: feedback},
-        time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+        state_name: { value: stateName },
+        dest_state_name: { value: destStateName },
+        interaction_id: { value: interactionId },
+        submitted_answer: { value: answer },
+        feedback: { value: feedback },
+        time_spent_state_in_msecs: { value: 1000 * timeSpentInStateSecs }
       }));
 
     this.misTracker.recordStateTransition(destStateName);
@@ -246,8 +246,8 @@ export class PlaythroughService {
 
     this.recordedLearnerActions.push(
       this.learnerActionObjectFactory.createNewExplorationQuitAction({
-        state_name: {value: stateName},
-        time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
+        state_name: { value: stateName },
+        time_spent_in_state_in_msecs: { value: 1000 * timeSpentInStateSecs }
       }));
 
     this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();

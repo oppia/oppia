@@ -28,7 +28,7 @@ import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
     return value;

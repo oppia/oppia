@@ -120,4 +120,4 @@ export class PracticeTabComponent implements OnInit {
 
 angular.module('oppia').directive(
   'practiceTab', downgradeComponent(
-    {component: PracticeTabComponent}));
+    { component: PracticeTabComponent }));

@@ -41,7 +41,7 @@ describe('Expression syntax tree service', () => {
     it('should return the correct environment if exists', () => {
       const expected = 'bar';
       const actual = <string> expressionSyntaxTreeService.lookupEnvs('foo', [
-        {foo: 'bar'}
+        { foo: 'bar' }
       ]);
 
       expect(expected).toBe(actual);

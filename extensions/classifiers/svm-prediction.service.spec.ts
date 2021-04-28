@@ -56,7 +56,7 @@ describe('SVM prediction functions', () => {
       var svmData = {
         classes: [0, 1],
         kernel_params: {
-          kernel: 'rbf', coef0: 0.0, degree: 3, gamma: 0.5},
+          kernel: 'rbf', coef0: 0.0, degree: 3, gamma: 0.5 },
         intercept: [0.04554340162799716],
         n_support: [80, 66],
         probA: [-4.76812258346006],

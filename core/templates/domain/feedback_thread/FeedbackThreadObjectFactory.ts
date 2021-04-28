@@ -85,7 +85,7 @@ export class FeedbackThread {
   }
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class FeedbackThreadObjectFactory {
   createFromBackendDict(
       feedbackThreadBackendDict: FeedbackThreadBackendDict): FeedbackThread {

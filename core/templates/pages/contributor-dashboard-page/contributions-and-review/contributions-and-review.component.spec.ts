@@ -188,7 +188,7 @@ describe('Contributions and review component', function() {
 
     describe('ctrl.loadContributions', () => {
       it('should load contributions correctly', () => {
-        ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+        ctrl.loadContributions().then(({ opportunitiesDicts, more }) => {
           expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
           expect(opportunitiesDicts).toEqual([{
             id: 'suggestion_1',
@@ -204,7 +204,7 @@ describe('Contributions and review component', function() {
 
       it('should return empty list if tab is not initialized', () => {
         ctrl.activeTabType = null;
-        ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+        ctrl.loadContributions().then(({ opportunitiesDicts, more }) => {
           expect(ctrl.contributions).toEqual({});
           expect(opportunitiesDicts).toEqual([]);
           expect(more).toEqual(false);
@@ -214,7 +214,7 @@ describe('Contributions and review component', function() {
       it('should return empty list if suggestion type is not initialized',
         () => {
           ctrl.activeTabType = null;
-          ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+          ctrl.loadContributions().then(({ opportunitiesDicts, more }) => {
             expect(ctrl.contributions).toEqual({});
             expect(opportunitiesDicts).toEqual([]);
             expect(more).toEqual(false);
@@ -459,7 +459,7 @@ describe('Contributions and review component', function() {
     it('should show correct heading for translation suggestions', function() {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+          ctrl.loadContributions().then(({ opportunitiesDicts, more }) => {
             expect(opportunitiesDicts).toEqual([{
               id: 'suggestion_1',
               heading: 'Tradução',
@@ -489,7 +489,7 @@ describe('Contributions and review component', function() {
       ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
       $scope.$apply();
 
-      ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+      ctrl.loadContributions().then(({ opportunitiesDicts, more }) => {
         expect(opportunitiesDicts).toEqual([{
           id: 'suggestion_1',
           heading: 'Question 1',

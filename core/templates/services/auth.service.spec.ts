@@ -43,8 +43,8 @@ describe('Auth service', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        {provide: AngularFireAuth, useValue: angularFireAuth},
-        {provide: AuthBackendApiService, useValue: authBackendApiService},
+        { provide: AngularFireAuth, useValue: angularFireAuth },
+        { provide: AuthBackendApiService, useValue: authBackendApiService },
       ]
     });
 
@@ -130,7 +130,7 @@ describe('Auth service', () => {
       this.creds = {
         user: jasmine.createSpyObj(['getIdToken']),
         credential: null,
-        additionalUserInfo: {isNewUser: false, profile: {}, providerId: null},
+        additionalUserInfo: { isNewUser: false, profile: {}, providerId: null },
       };
     });
 
@@ -171,7 +171,7 @@ describe('Auth service', () => {
       it('should propogate errors', async() => {
         angularFireAuth.signInWithRedirect.and.resolveTo();
 
-        const error = {code: 'auth/operation-not-allowed'};
+        const error = { code: 'auth/operation-not-allowed' };
         angularFireAuth.getRedirectResult.and.rejectWith(error);
 
         await expectAsync(authService.signInAsync()).toBeRejectedWith(error);
@@ -203,7 +203,7 @@ describe('Auth service', () => {
         spyOn(window, 'prompt').and.returnValue(this.email);
 
         angularFireAuth.signInWithEmailAndPassword
-          .and.rejectWith({code: 'auth/user-not-found'});
+          .and.rejectWith({ code: 'auth/user-not-found' });
 
         this.creds.user.getIdToken.and.resolveTo('TKN');
         this.creds.additionalUserInfo.isNewUser = true;
@@ -221,7 +221,7 @@ describe('Auth service', () => {
       it('should propogate errors', async() => {
         spyOn(window, 'prompt').and.returnValue(this.email);
 
-        const error = {code: 'auth/operation-not-allowed'};
+        const error = { code: 'auth/operation-not-allowed' };
         angularFireAuth.signInWithEmailAndPassword.and.rejectWith(error);
 
         await expectAsync(authService.signInAsync()).toBeRejectedWith(error);

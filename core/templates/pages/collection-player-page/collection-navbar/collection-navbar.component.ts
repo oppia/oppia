@@ -56,4 +56,4 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
   }
 }
 angular.module('oppia').directive('collectionNavbar', downgradeComponent(
-  {component: CollectionNavbarComponent}));
+  { component: CollectionNavbarComponent }));

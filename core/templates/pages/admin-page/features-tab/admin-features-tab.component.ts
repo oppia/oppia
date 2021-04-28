@@ -313,4 +313,4 @@ export class AdminFeaturesTabComponent implements OnInit {
 
 angular.module('oppia').directive(
   'adminFeaturesTab', downgradeComponent(
-    {component: AdminFeaturesTabComponent}));
+    { component: AdminFeaturesTabComponent }));

@@ -54,7 +54,7 @@ describe('Exploration search backend API service', () => {
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/exploration/metadata_search?q=' + query);
-      req.flush({collection_node_metadata_list: []});
+      req.flush({ collection_node_metadata_list: [] });
 
       flushMicrotasks();
 

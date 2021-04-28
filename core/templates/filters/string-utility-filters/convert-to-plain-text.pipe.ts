@@ -18,7 +18,7 @@
 
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({name: 'convertToPlainText'})
+@Pipe({ name: 'convertToPlainText' })
 @Injectable({
   providedIn: 'root'
 })

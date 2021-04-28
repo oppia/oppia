@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA, Pipe }
   from '@angular/core';
 
@@ -29,7 +29,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
     return value;

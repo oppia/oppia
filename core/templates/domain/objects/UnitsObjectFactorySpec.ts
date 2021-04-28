@@ -16,7 +16,7 @@
  * @fileoverview unit tests for the units object factory service.
  */
 
-import {TestBed} from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
 
@@ -156,8 +156,8 @@ describe('UnitsObjectFactory', () => {
       { exponent: 1, unit: 'm' },
       { exponent: -2, unit: 's' }]))
       .toEqual(new Units([
-        {exponent: 1, unit: 'paise'},
-        {exponent: -1, unit: 'kg'},
+        { exponent: 1, unit: 'paise' },
+        { exponent: -1, unit: 'kg' },
         { exponent: 1, unit: 'N' },
         { exponent: 1, unit: 'm' },
         { exponent: -2, unit: 's' }]));

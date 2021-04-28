@@ -132,4 +132,4 @@ export class TopicViewerPageComponent implements OnInit {
 
 angular.module('oppia').directive(
   'topicViewerPage', downgradeComponent(
-    {component: TopicViewerPageComponent}));
+    { component: TopicViewerPageComponent }));

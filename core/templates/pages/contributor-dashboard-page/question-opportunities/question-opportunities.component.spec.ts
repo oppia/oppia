@@ -101,7 +101,7 @@ describe('Question opportunities component', function() {
         more: false
       }));
 
-    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    ctrl.loadOpportunities().then(({ opportunitiesDicts, more }) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBe(false);
     });
@@ -114,7 +114,7 @@ describe('Question opportunities component', function() {
         more: true
       }));
 
-    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    ctrl.loadOpportunities().then(({ opportunitiesDicts, more }) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBe(true);
     });
@@ -126,7 +126,7 @@ describe('Question opportunities component', function() {
         more: false
       }));
 
-    ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+    ctrl.loadMoreOpportunities().then(({ opportunitiesDicts, more }) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBe(false);
     });

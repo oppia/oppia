@@ -128,7 +128,7 @@ describe('User Backend Api Service', () => {
 
     const req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');
-    req2.flush({profile_picture_data_url: 'image data'});
+    req2.flush({ profile_picture_data_url: 'image data' });
 
     flushMicrotasks();
   }));
@@ -143,7 +143,7 @@ describe('User Backend Api Service', () => {
     const req = httpTestingController.expectOne(
       '/url_handler?current_url=' + currentUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush({login_url: loginUrl});
+    req.flush({ login_url: loginUrl });
 
     flushMicrotasks();
   }));

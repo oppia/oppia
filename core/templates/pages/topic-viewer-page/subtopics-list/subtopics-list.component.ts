@@ -37,4 +37,4 @@ export class SubtopicsListComponent {
 
 angular.module('oppia').directive(
   'subtopicsList', downgradeComponent(
-    {component: SubtopicsListComponent}));
+    { component: SubtopicsListComponent }));

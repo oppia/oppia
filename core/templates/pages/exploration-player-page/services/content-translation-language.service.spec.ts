@@ -74,9 +74,9 @@ describe('Content translation language service', () => {
   it('should correctly initialize the dropdown options', () => {
     ctls.init(availableLanguageCodes, [], 'en');
     expect(ctls.getLanguageOptionsForDropdown()).toEqual([
-      {value: 'fr', displayed: 'français (French)'},
-      {value: 'zh', displayed: '中文 (Chinese)'},
-      {value: 'en', displayed: 'English'}
+      { value: 'fr', displayed: 'français (French)' },
+      { value: 'zh', displayed: '中文 (Chinese)' },
+      { value: 'en', displayed: 'English' }
     ]);
   });
 

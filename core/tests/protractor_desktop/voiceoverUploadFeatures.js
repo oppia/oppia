@@ -157,9 +157,9 @@ describe('Voiceover upload features', function() {
   afterEach(async function() {
     await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
-      '(Bad Request)', {status_code: 400,
+      '(Bad Request)', { status_code: 400,
         error: 'Audio files must be under 300 seconds in length.' +
-       ' The uploaded file is 301.87 seconds long.'}]);
+       ' The uploaded file is 301.87 seconds long.' }]);
     await users.logout();
   });
 });

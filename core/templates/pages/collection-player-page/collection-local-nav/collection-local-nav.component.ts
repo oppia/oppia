@@ -61,4 +61,4 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
 }
 angular.module('oppia').directive(
   'collectionLocalNav',
-  downgradeComponent({component: CollectionLocalNavComponent}));
+  downgradeComponent({ component: CollectionLocalNavComponent }));

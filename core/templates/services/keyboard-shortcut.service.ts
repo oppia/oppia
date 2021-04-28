@@ -38,7 +38,7 @@ export class KeyboardShortcutService {
   openQuickReference(): void {
     this.ngbModal.dismissAll();
     this.ngbModal.open(
-      KeyboardShortcutHelpModalComponent, {backdrop: true});
+      KeyboardShortcutHelpModalComponent, { backdrop: true });
     this.appRef.tick();
   }
 

@@ -82,7 +82,7 @@ export class MessengerService {
 
   MESSAGE_VALIDATORS: MessageValidatorsType = {
     heightChange(payload: HeightChangeData): boolean {
-      const {height, scroll} = payload;
+      const { height, scroll } = payload;
       return (
         Number.isInteger(height) && height > 0 && typeof scroll === 'boolean');
     },

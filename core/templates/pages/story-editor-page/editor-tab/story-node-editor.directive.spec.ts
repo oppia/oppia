@@ -92,7 +92,7 @@ describe('Story node editor directive', function() {
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(StoryEditorStateService, 'getSkillSummaries').and.returnValue(
-      [{id: '1', description: 'Skill description'}]);
+      [{ id: '1', description: 'Skill description' }]);
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
     spyOn(StoryEditorStateService, 'getClassroomUrlFragment').and.returnValue(
       'math');
@@ -236,7 +236,7 @@ describe('Story node editor directive', function() {
         id: 'skill_10'
       });
       var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: deferred.promise});
+        { result: deferred.promise });
       var storyUpdateSpy = spyOn(
         StoryUpdateService, 'addPrerequisiteSkillIdToNode');
       $scope.addPrerequisiteSkillId();
@@ -253,7 +253,7 @@ describe('Story node editor directive', function() {
     });
     var alertsSpy = spyOn(AlertsService, 'addInfoMessage');
     var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+      { result: deferred.promise });
     var storyUpdateSpy = spyOn(
       StoryUpdateService, 'addPrerequisiteSkillIdToNode').and.throwError(
       'Error');
@@ -276,7 +276,7 @@ describe('Story node editor directive', function() {
       id: 'skill_3'
     });
     var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+      { result: deferred.promise });
     var storyUpdateSpy = spyOn(StoryUpdateService, 'addAcquiredSkillIdToNode');
     $scope.addAcquiredSkillId();
     $rootScope.$apply();
@@ -291,7 +291,7 @@ describe('Story node editor directive', function() {
       id: 'skill_3'
     });
     var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-      {result: deferred.promise});
+      { result: deferred.promise });
     var alertsSpy = spyOn(AlertsService, 'addInfoMessage');
     var storyUpdateSpy = spyOn(
       StoryUpdateService, 'addAcquiredSkillIdToNode').and.throwError('Error');

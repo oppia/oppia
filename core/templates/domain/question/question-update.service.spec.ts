@@ -126,10 +126,10 @@ describe('Question update service', function() {
         answer_groups: [{
           rule_specs: [{
             rule_type: 'Contains',
-            inputs: {x: {
+            inputs: { x: {
               contentId: 'rule_input',
               normalizedStrSet: ['hola']
-            }}
+            } }
           }],
           outcome: {
             dest: 'Me Llamo',
@@ -187,10 +187,10 @@ describe('Question update service', function() {
         answer_groups: [{
           rule_specs: [{
             rule_type: 'Contains',
-            inputs: {x: {
+            inputs: { x: {
               contentId: 'rule_input',
               normalizedStrSet: ['hola']
-            }}
+            } }
           }],
           outcome: {
             dest: 'Me Llamo',

@@ -131,7 +131,7 @@ describe('App', function() {
     it('should handle object values gracefully', function() {
       // Error constructor will fail to compile without casting the object from
       // unknown to string.
-      let obj: unknown = {a: 'something'};
+      let obj: unknown = { a: 'something' };
       $exceptionHandler(obj);
       const errorFromObject = new Error(<string>obj);
 

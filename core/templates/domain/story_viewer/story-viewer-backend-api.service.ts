@@ -107,7 +107,7 @@ export class StoryViewerBackendApiService {
           expSummary => LearnerExplorationSummary.createFromBackendDict(
             expSummary)),
         nextNodeId: data.next_node_id,
-        readyForReviewTest: data.ready_for_review_test});
+        readyForReviewTest: data.ready_for_review_test });
     }, errorResponse => {
       errorCallback(errorResponse.error.error);
     });

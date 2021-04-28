@@ -35,4 +35,4 @@ export class CollectionNodeListComponent {
 
 angular.module('oppia').directive(
   'collectionNodeList', downgradeComponent(
-    {component: CollectionNodeListComponent}));
+    { component: CollectionNodeListComponent }));

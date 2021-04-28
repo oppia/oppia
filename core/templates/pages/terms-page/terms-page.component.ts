@@ -26,9 +26,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class TermsPageComponent {
   scrollTo(el: HTMLElement): void {
-    el.scrollIntoView({behavior: 'smooth'});
+    el.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
 angular.module('oppia').directive(
-  'termsPage', downgradeComponent({component: TermsPageComponent}));
+  'termsPage', downgradeComponent({ component: TermsPageComponent }));

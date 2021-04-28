@@ -47,4 +47,4 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
 }
 angular.module('oppia').directive(
   'topicViewerNavbarBreadcrumb', downgradeComponent(
-    {component: TopicViewerNavbarBreadcrumbComponent}));
+    { component: TopicViewerNavbarBreadcrumbComponent }));

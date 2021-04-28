@@ -155,7 +155,7 @@ describe('Search bar component', function() {
     $httpBackend.expectGET(
       '/searchhandler/data?q=%22mars%22&' +
       'category=("astronomy")&language_code=("pt")').respond({});
-    getUrlParamsSpy.and.returnValue({q: 'mars'});
+    getUrlParamsSpy.and.returnValue({ q: 'mars' });
     mockWindow.location.pathname = '/search/find';
     mockWindow.location.search = (
       '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
@@ -171,7 +171,7 @@ describe('Search bar component', function() {
     mockWindow.location.pathname = '';
     mockWindow.location.search = (
       '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
-    getUrlParamsSpy.and.returnValue({q: 'sun'});
+    getUrlParamsSpy.and.returnValue({ q: 'sun' });
     preferredLanguageCodesLoadedEmitter.emit([]);
     $scope.$digest();
 
@@ -186,7 +186,7 @@ describe('Search bar component', function() {
     $httpBackend.expectGET(
       '/searchhandler/data?q=%22mars%22&' +
       'category=("astronomy")&language_code=("pt")').respond({});
-    getUrlParamsSpy.and.returnValue({q: 'mars'});
+    getUrlParamsSpy.and.returnValue({ q: 'mars' });
     mockWindow.location.pathname = '/search/find';
     mockWindow.location.search = (
       '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
@@ -202,7 +202,7 @@ describe('Search bar component', function() {
     mockWindow.location.pathname = '';
     mockWindow.location.search = (
       '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
-    getUrlParamsSpy.and.returnValue({q: 'sun'});
+    getUrlParamsSpy.and.returnValue({ q: 'sun' });
     $rootScope.$broadcast('$locationChangeSuccess');
     $scope.$digest();
 
@@ -254,10 +254,10 @@ describe('Search bar component', function() {
     spyOn(navigationService, 'onMenuKeypress');
     var event = new Event('click');
     ctrl.openSubmenu(event, 'menuName');
-    ctrl.onMenuKeypress(event, 'menuName', {enter: 'open'});
+    ctrl.onMenuKeypress(event, 'menuName', { enter: 'open' });
 
     expect(navigationService.onMenuKeypress)
-      .toHaveBeenCalledWith(event, 'menuName', {enter: 'open'});
+      .toHaveBeenCalledWith(event, 'menuName', { enter: 'open' });
     expect(ctrl.activeMenuName).toBe('menuName');
   });
 });

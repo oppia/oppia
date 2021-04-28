@@ -23,7 +23,7 @@ import { HttpClient } from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory} from
+import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';

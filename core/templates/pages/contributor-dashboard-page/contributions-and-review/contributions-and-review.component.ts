@@ -327,7 +327,7 @@ angular.module('oppia').component('contributionsAndReview', {
       ctrl.loadContributions = function() {
         if (!ctrl.activeTabType || !ctrl.activeSuggestionType) {
           return new Promise((resolve, reject) => {
-            resolve({opportunitiesDicts: [], more: false});
+            resolve({ opportunitiesDicts: [], more: false });
           });
         }
         var fetchFunction = tabNameToOpportunityFetchFunction[

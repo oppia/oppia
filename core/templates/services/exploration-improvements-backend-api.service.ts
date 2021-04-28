@@ -60,7 +60,7 @@ export class ExplorationImprovementsHistoryResponse {
       public readonly more: boolean) {}
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ExplorationImprovementsBackendApiService {
   constructor(
       private http: HttpClient,
@@ -109,7 +109,7 @@ export class ExplorationImprovementsBackendApiService {
       params = params.append('cursor', cursor);
     }
     return this.http.get<ExplorationImprovementsHistoryResponseBackendDict>(
-      explorationImprovementsHistoryUrl, {params}
+      explorationImprovementsHistoryUrl, { params }
     ).toPromise().then(
       backendDict => new ExplorationImprovementsHistoryResponse(
         backendDict.results.map(

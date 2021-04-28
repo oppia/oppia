@@ -56,7 +56,7 @@ export interface StateInteractionStats {
   visualizationsInfo: VisualizationInfo[];
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
   statsCache: Map<string, Promise<StateInteractionStats>> = new Map();

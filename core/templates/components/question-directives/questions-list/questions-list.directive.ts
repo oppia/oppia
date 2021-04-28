@@ -421,7 +421,7 @@ angular.module('oppia').directive('questionsList', [
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
               EditableQuestionBackendApiService.editQuestionSkillLinks(
-                questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
+                questionId, [{ id: ctrl.selectedSkillId, task: 'remove' }]
               ).then(function() {
                 QuestionsListService.resetPageNumber();
                 QuestionsListService.getQuestionSummariesAsync(
@@ -433,7 +433,7 @@ angular.module('oppia').directive('questionsList', [
               ctrl.getAllSkillSummaries().forEach(function(summary) {
                 if (summary.getDescription() === skillDescription) {
                   EditableQuestionBackendApiService.editQuestionSkillLinks(
-                    questionId, [{id: summary.getId(), task: 'remove'}]
+                    questionId, [{ id: summary.getId(), task: 'remove' }]
                   ).then(function() {
                     QuestionsListService.resetPageNumber();
                     QuestionsListService.getQuestionSummariesAsync(

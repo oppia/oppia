@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ClassroomDataModel.
  */
 
-import { ClassroomData} from
+import { ClassroomData } from
   'domain/classroom/classroom-data.model';
 import { TopicSummary } from
   'domain/topic/topic-summary.model';

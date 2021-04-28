@@ -82,13 +82,13 @@ const login = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      ADMIN_URL, { waitUntil: networkIdle});
-    await page.waitForSelector('#admin', {visible: true});
+      ADMIN_URL, { waitUntil: networkIdle });
+    await page.waitForSelector('#admin', { visible: true });
     await page.click('#admin');
     await page.click('#submit-login');
     // Checks if the user's account was already made.
     try {
-      await page.waitForSelector(usernameInput, {visible: true});
+      await page.waitForSelector(usernameInput, { visible: true });
       await page.type(usernameInput, 'username1');
       await page.click(agreeToTermsCheckBox);
       await page.waitForSelector(registerUser);
@@ -122,7 +122,7 @@ const setRole = async function(browser, page, role) {
         '"successfully updated to")'
     );
     // eslint-disable-next-line dot-notation
-    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
+    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Changing role to admin failed');
@@ -137,10 +137,10 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.goto(
       CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
 
-    await page.waitForSelector(createButtonSelector, {visible: true});
+    await page.waitForSelector(createButtonSelector, { visible: true });
     await page.click(createButtonSelector);
     await page.waitForSelector(
-      dismissCreateModalSelector, {visible: true});
+      dismissCreateModalSelector, { visible: true });
     explorationEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -155,13 +155,13 @@ const getCollectionEditorUrl = async function(browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
-    await page.waitForSelector(createButtonSelector, {visible: true});
+    await page.waitForSelector(createButtonSelector, { visible: true });
     await page.click(createButtonSelector);
     await page.waitForSelector(
-      createCollectionButtonSelector, {visible: true});
+      createCollectionButtonSelector, { visible: true });
     await page.click(createCollectionButtonSelector);
     await page.waitForSelector(
-      addExplorationInput, {visible: true});
+      addExplorationInput, { visible: true });
     collectionEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -175,23 +175,23 @@ const getTopicEditorUrl = async function(browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
-    await page.waitForSelector(createTopicButtonSelector, {visible: true});
+    await page.waitForSelector(createTopicButtonSelector, { visible: true });
     await page.click(createTopicButtonSelector);
 
-    await page.waitForSelector(topicNameField, {visible: true});
+    await page.waitForSelector(topicNameField, { visible: true });
     await page.type(topicNameField, 'Topic1 TASD');
     await page.type(topicUrlFragmentField, 'topic-tasd-one');
     await page.type(topicDescriptionField, 'Topic 1 description');
     await page.click(topicThumbnailButton);
-    await page.waitForSelector(topicUploadButton, {visible: true});
+    await page.waitForSelector(topicUploadButton, { visible: true });
 
     const elementHandle = await page.$(topicUploadButton);
     await elementHandle.uploadFile('core/tests/data/test_svg.svg');
 
-    await page.waitForSelector(thumbnailContainer, {visible: true});
+    await page.waitForSelector(thumbnailContainer, { visible: true });
     await page.click(topicPhotoSubmit);
 
-    await page.waitForSelector(confirmTopicCreationButton, {visible: true});
+    await page.waitForSelector(confirmTopicCreationButton, { visible: true });
     await page.waitForTimeout(5000);
     await page.click(confirmTopicCreationButton);
     // Doing waitForTimeout(10000) to handle new tab being opened.
@@ -202,7 +202,7 @@ const getTopicEditorUrl = async function(browser, page) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
-    await page.waitForSelector(createdTopicLink, {visible: true});
+    await page.waitForSelector(createdTopicLink, { visible: true });
     await page.click(createdTopicLink);
     await page.waitForSelector(createStoryButtonSelector);
 
@@ -217,23 +217,23 @@ const getStoryEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, { waitUntil: networkIdle });
-    await page.waitForSelector(createStoryButtonSelector, {visible: true});
+    await page.waitForSelector(createStoryButtonSelector, { visible: true });
     await page.click(createStoryButtonSelector);
 
-    await page.waitForSelector(storyNameField, {visible: true});
+    await page.waitForSelector(storyNameField, { visible: true });
     await page.type(storyNameField, 'Story TASD');
     await page.type(storyUrlFragmentField, 'story-url-one');
     await page.type(storyDescriptionField, 'Story 1 description');
     await page.click(storyThumbnailButton);
-    await page.waitForSelector(storyUploadButton, {visible: true});
+    await page.waitForSelector(storyUploadButton, { visible: true });
 
     const elementHandle = await page.$(storyUploadButton);
     await elementHandle.uploadFile('core/tests/data/test_svg.svg');
 
-    await page.waitForSelector(thumbnailContainer, {visible: true});
+    await page.waitForSelector(thumbnailContainer, { visible: true });
     await page.click(storyPhotoSubmit);
 
-    await page.waitForSelector(confirmStoryCreationButton, {visible: true});
+    await page.waitForSelector(confirmStoryCreationButton, { visible: true });
     await page.waitForTimeout(5000);
     await page.click(confirmStoryCreationButton);
     await page.waitForTimeout(15000);
@@ -248,17 +248,17 @@ const getSkillEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, { waitUntil: networkIdle });
-    await page.waitForSelector(createSkillButtonSelector, {visible: true});
+    await page.waitForSelector(createSkillButtonSelector, { visible: true });
     await page.click(createSkillButtonSelector);
 
-    await page.waitForSelector(skillDescriptionField, {visible: true});
+    await page.waitForSelector(skillDescriptionField, { visible: true });
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
-    await page.waitForSelector(skillReviewMaterialInput, {visible: true});
+    await page.waitForSelector(skillReviewMaterialInput, { visible: true });
     await page.waitForTimeout(5000);
     await page.keyboard.type('Skill Overview here');
 
-    await page.waitForSelector(confirmSkillCreationButton, {visible: true});
+    await page.waitForSelector(confirmSkillCreationButton, { visible: true });
     await page.waitForTimeout(5000);
     await page.click(confirmSkillCreationButton);
     // Doing waitForTimeout(15000) to handle new tab being opened.
@@ -276,7 +276,7 @@ const getSkillEditorUrl = async function(browser, page) {
 
 const main = async function() {
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,

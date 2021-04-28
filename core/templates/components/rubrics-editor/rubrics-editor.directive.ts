@@ -151,9 +151,9 @@ angular.module('oppia').directive('rubricsEditor', [
             };
             ctrl.selectedRubricIndex = null;
             ctrl.rubricsOptions = [
-              {id: 0, difficulty: 'Easy'},
-              {id: 1, difficulty: 'Medium'},
-              {id: 2, difficulty: 'Hard'}
+              { id: 0, difficulty: 'Easy' },
+              { id: 1, difficulty: 'Medium' },
+              { id: 2, difficulty: 'Hard' }
             ];
             ctrl.selectedRubricIndex = 1;
             ctrl.rubric = ctrl.getRubrics()[1];

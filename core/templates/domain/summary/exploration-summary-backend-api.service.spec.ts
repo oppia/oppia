@@ -88,8 +88,8 @@ describe('Exploration Summary Backend Api Service', () => {
       const req = httpTestingController.expectOne(requestUrl);
       expect(req.request.method).toEqual('GET');
       req.flush(
-        {error: 'Error Communicating with Server'},
-        {status: 400, statusText: ''}
+        { error: 'Error Communicating with Server' },
+        { status: 400, statusText: '' }
       );
       flushMicrotasks();
 
@@ -199,7 +199,7 @@ describe('Exploration Summary Backend Api Service', () => {
     expect(req.request.method).toEqual('GET');
     req.flush(
       { error: errorMessage },
-      { status: 500, statusText: ''}
+      { status: 500, statusText: '' }
     );
 
     flushMicrotasks();

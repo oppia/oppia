@@ -369,7 +369,7 @@ import { SkillCreationBackendApiService } from
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillRightsBackendApiService} from
+import { SkillRightsBackendApiService } from
   'domain/skill/skill-rights-backend-api.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';

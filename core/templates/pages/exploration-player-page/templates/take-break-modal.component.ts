@@ -46,4 +46,4 @@ export class TakeBreakModalComponent {
 angular.module('oppia').factory(
   'TakeBreakModalComponent',
   downgradeComponent(
-    {component: TakeBreakModalComponent}));
+    { component: TakeBreakModalComponent }));

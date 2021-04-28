@@ -47,7 +47,7 @@ describe('NumericExpressionEditor', function() {
     }
     configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler({focused: MockGuppy.focused});
+      handler({ focused: MockGuppy.focused });
     }
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}

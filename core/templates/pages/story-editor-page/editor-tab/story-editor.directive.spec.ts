@@ -203,7 +203,7 @@ describe('Story editor Directive', function() {
       var deferred = $q.defer();
       deferred.resolve();
       var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: deferred.promise});
+        { result: deferred.promise });
       var storyUpdateSpy = spyOn(StoryUpdateService, 'deleteStoryNode');
       $scope.deleteNode('node_1');
       $rootScope.$apply();
@@ -225,7 +225,7 @@ describe('Story editor Directive', function() {
       deferred.resolve();
       var storySpy = spyOn(StoryUpdateService, 'addDestinationNodeIdToNode');
       var modalSpy = spyOn($uibModal, 'open').and.returnValue(
-        {result: deferred.promise});
+        { result: deferred.promise });
       $scope.createNode();
       $rootScope.$apply();
       expect(modalSpy).toHaveBeenCalled();

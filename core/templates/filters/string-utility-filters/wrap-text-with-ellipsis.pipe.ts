@@ -22,7 +22,7 @@ import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { UtilsService } from 'services/utils.service';
 
-@Pipe({name: 'wrapTextWithEllipsis'})
+@Pipe({ name: 'wrapTextWithEllipsis' })
 export class WrapTextWithEllipsisPipe implements PipeTransform {
   constructor(
     private utilsService: UtilsService,

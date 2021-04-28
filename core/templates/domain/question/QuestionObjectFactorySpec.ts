@@ -144,7 +144,7 @@ describe('Question object factory', function() {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: { x: 10 }
             }],
           }],
           confirmed_unclassified_answers: [],

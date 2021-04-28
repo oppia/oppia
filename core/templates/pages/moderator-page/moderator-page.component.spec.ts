@@ -95,13 +95,13 @@ describe('Moderator Page', function() {
 
   it('should return correct bool for isMessageFromExploration', function() {
     expect(
-      ctrl.isMessageFromExploration({entityType: 'exploration'})
+      ctrl.isMessageFromExploration({ entityType: 'exploration' })
     ).toBeTrue();
     expect(
-      ctrl.isMessageFromExploration({entityType: 'collection'})
+      ctrl.isMessageFromExploration({ entityType: 'collection' })
     ).toBeFalse();
     expect(
-      ctrl.isMessageFromExploration({entityType: 'topic'})
+      ctrl.isMessageFromExploration({ entityType: 'topic' })
     ).toBeFalse();
   });
 

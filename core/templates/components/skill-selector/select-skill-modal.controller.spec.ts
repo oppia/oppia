@@ -26,7 +26,7 @@ describe('Select Skill Modal Controller', function() {
   var allowSkillsFromOtherTopics = true;
   var categorizedSkills = {
     'Dummy Topic': {
-      Subtopic1: [{id: '4'}]
+      Subtopic1: [{ id: '4' }]
     }
   };
   var skillsInSameTopicCount = 3;
@@ -54,8 +54,8 @@ describe('Select Skill Modal Controller', function() {
       categorizedSkills: categorizedSkills,
       skillsInSameTopicCount: skillsInSameTopicCount,
       sortedSkillSummaries: sortedSkillSummaries,
-      skillSummaries: [{id: '9'}],
-      untriagedSkillSummaries: [{id: '10'}]
+      skillSummaries: [{ id: '9' }],
+      untriagedSkillSummaries: [{ id: '10' }]
     });
   }));
 

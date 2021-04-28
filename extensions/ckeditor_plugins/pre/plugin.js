@@ -20,7 +20,7 @@ CKEDITOR.plugins.add('pre', {
   icons: 'pre',
 
   init: function(editor) {
-    var style = new CKEDITOR.style({element: 'pre'}, null);
+    var style = new CKEDITOR.style({ element: 'pre' }, null);
 
     editor.addCommand(
       'pre', new CKEDITOR.styleCommand(style));

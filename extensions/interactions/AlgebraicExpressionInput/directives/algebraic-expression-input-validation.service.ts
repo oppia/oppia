@@ -105,7 +105,7 @@ export class AlgebraicExpressionInputValidationService {
 
           if (seenRuleType === 'IsEquivalentTo' && (
             algebraicRulesService.IsEquivalentTo(
-              seenInput, {x: currentInput}))) {
+              seenInput, { x: currentInput }))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -117,7 +117,7 @@ export class AlgebraicExpressionInputValidationService {
             });
           } else if (currentRuleType === 'MatchesExactlyWith' && (
             algebraicRulesService.MatchesExactlyWith(
-              seenInput, {x: currentInput}))) {
+              seenInput, { x: currentInput }))) {
             // This rule will make the following inputs with MatchesExactlyWith
             // rule obsolete.
             warningsList.push({

@@ -16,7 +16,7 @@
  * @fileoverview Constants for the skills mastery list.
  */
 
-import {SkillMasteryListConstants} from
+import { SkillMasteryListConstants } from
   'components/skills-mastery-list/skills-mastery-list.constants';
 
 angular.module('oppia').constant(

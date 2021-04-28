@@ -75,14 +75,14 @@ describe('State Interaction Stats Service', () => {
           {
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['hola!']
-              }}
+              } }
             }],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              feedback: { content_id: 'feedback_1', html: '¡Buen trabajo!' },
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
@@ -94,14 +94,14 @@ describe('State Interaction Stats Service', () => {
           {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['hola']
-              }}
+              } }
             }],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              feedback: { content_id: 'feedback_1', html: '¡Buen trabajo!' },
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
@@ -113,14 +113,14 @@ describe('State Interaction Stats Service', () => {
           {
             rule_specs: [{
               rule_type: 'FuzzyEquals',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['hola']
-              }}
+              } }
             }],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              feedback: { content_id: 'feedback_1', html: '¡Buen trabajo!' },
               labelled_as_correct: true,
               param_changes: [],
               refresher_exploration_id: null,
@@ -142,7 +142,7 @@ describe('State Interaction Stats Service', () => {
         },
         default_outcome: {
           dest: 'Hola',
-          feedback: {content_id: 'default_outcome', html: ''},
+          feedback: { content_id: 'default_outcome', html: '' },
           labelled_as_correct: true,
           param_changes: [],
           refresher_exploration_id: null,
@@ -192,9 +192,9 @@ describe('State Interaction Stats Service', () => {
       req.flush({
         visualizations_info: [{
           data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
+            { answer: 'Ni Hao', frequency: 5 },
+            { answer: 'Aloha', frequency: 3 },
+            { answer: 'Hola', frequency: 1 }
           ]
         }]
       });
@@ -226,9 +226,9 @@ describe('State Interaction Stats Service', () => {
       holaReq.flush({
         visualizations_info: [{
           data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
+            { answer: 'Ni Hao', frequency: 5 },
+            { answer: 'Aloha', frequency: 3 },
+            { answer: 'Hola', frequency: 1 }
           ]
         }]
       });
@@ -243,9 +243,9 @@ describe('State Interaction Stats Service', () => {
       adiosReq.flush({
         visualizations_info: [{
           data: [
-            {answer: 'Zai Jian', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Adios', frequency: 1}
+            { answer: 'Zai Jian', frequency: 5 },
+            { answer: 'Aloha', frequency: 3 },
+            { answer: 'Adios', frequency: 1 }
           ]
         }]
       });
@@ -269,9 +269,9 @@ describe('State Interaction Stats Service', () => {
       req.flush({
         visualizations_info: [{
           data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
+            { answer: 'Ni Hao', frequency: 5 },
+            { answer: 'Aloha', frequency: 3 },
+            { answer: 'Hola', frequency: 1 }
           ]
         }]
       });
@@ -280,9 +280,9 @@ describe('State Interaction Stats Service', () => {
       expect(onSuccess).toHaveBeenCalledWith(joC({
         visualizationsInfo: [joC({
           data: [
-            joC({answer: 'Ni Hao', frequency: 5}),
-            joC({answer: 'Aloha', frequency: 3}),
-            joC({answer: 'Hola', frequency: 1})
+            joC({ answer: 'Ni Hao', frequency: 5 }),
+            joC({ answer: 'Aloha', frequency: 3 }),
+            joC({ answer: 'Hola', frequency: 1 })
           ]
         })]
       }));
@@ -303,7 +303,8 @@ describe('State Interaction Stats Service', () => {
         expect(req.request.method).toEqual('GET');
         req.flush({
           visualizations_info: [{
-            data: [{answer: 'Ni Hao'}, {answer: 'Aloha'}, {answer: 'Hola'}],
+            data: [{ answer: 'Ni Hao' }, { answer: 'Aloha' },
+              { answer: 'Hola' }],
             addressed_info_is_supported: true
           }]
         });
@@ -312,9 +313,9 @@ describe('State Interaction Stats Service', () => {
         expect(onSuccess).toHaveBeenCalledWith(joC({
           visualizationsInfo: [joC({
             data: [
-              joC({answer: 'Ni Hao', isAddressed: false}),
-              joC({answer: 'Aloha', isAddressed: false}),
-              joC({answer: 'Hola', isAddressed: true})
+              joC({ answer: 'Ni Hao', isAddressed: false }),
+              joC({ answer: 'Aloha', isAddressed: false }),
+              joC({ answer: 'Hola', isAddressed: true })
             ]
           })]
         }));
@@ -343,7 +344,7 @@ describe('State Interaction Stats Service', () => {
       expect(req.request.method).toEqual('GET');
       req.flush({
         visualizations_info: [{
-          data: [{answer: 0, frequency: 3}, {answer: 1, frequency: 5}],
+          data: [{ answer: 0, frequency: 3 }, { answer: 1, frequency: 5 }],
         }]
       });
       flushMicrotasks();
@@ -351,8 +352,8 @@ describe('State Interaction Stats Service', () => {
       expect(onSuccess).toHaveBeenCalledWith(joC({
         visualizationsInfo: [joC({
           data: [
-            joC({answer: '<p>foo</p>'}),
-            joC({answer: '<p>bar</p>'}),
+            joC({ answer: '<p>foo</p>' }),
+            joC({ answer: '<p>bar</p>' }),
           ]
         })]
       }));

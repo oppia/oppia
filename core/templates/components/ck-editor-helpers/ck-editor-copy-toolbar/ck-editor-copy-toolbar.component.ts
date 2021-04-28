@@ -57,4 +57,4 @@ export class CkEditorCopyToolbarComponent {
 
 angular.module('oppia').directive(
   'ckEditorCopyToolbar',
-  downgradeComponent({component: CkEditorCopyToolbarComponent}));
+  downgradeComponent({ component: CkEditorCopyToolbarComponent }));

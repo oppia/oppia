@@ -19,7 +19,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 // Filter that truncates a string at the first '...'.
-@Pipe({name: 'truncateAtFirstEllipsis'})
+@Pipe({ name: 'truncateAtFirstEllipsis' })
 export class TruncateAtFirstEllipsisPipe implements PipeTransform {
     pattern = /\.\.\./g;
     transform(input: string): string {

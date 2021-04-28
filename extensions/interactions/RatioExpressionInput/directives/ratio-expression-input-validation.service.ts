@@ -106,7 +106,7 @@ export class RatioExpressionInputValidationService {
         seenRuleType === 'HasNumberOfTermsEqualTo' &&
         currentRuleType !== 'HasNumberOfTermsEqualTo' &&
         ratioRulesService.HasNumberOfTermsEqualTo(
-          currentInput, {y: seenInput})
+          currentInput, { y: seenInput })
       );
     };
 
@@ -191,7 +191,7 @@ export class RatioExpressionInputValidationService {
             currentRuleType !== 'IsEquivalent' &&
             currentRuleType !== 'HasNumberOfTermsEqualTo' && (
               ratioRulesService.Equals(
-                seenInput, {x: currentInput}))) {
+                seenInput, { x: currentInput }))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -220,7 +220,7 @@ export class RatioExpressionInputValidationService {
             currentRuleType !== 'HasNumberOfTermsEqualTo' &&
             currentRuleType !== 'HasSpecificTermEqualTo' && (
               ratioRulesService.IsEquivalent(
-                seenInput, {x: currentInput}))) {
+                seenInput, { x: currentInput }))) {
             // This rule will make the following inputs with
             // IsEquivalent rule obsolete.
             warningsList.push({

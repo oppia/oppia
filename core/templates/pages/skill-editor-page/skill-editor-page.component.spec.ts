@@ -74,7 +74,7 @@ describe('Skill editor page', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     spyOn(window, 'addEventListener');
     ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
+    ctrl.confirmBeforeLeaving({ returnValue: '' });
     expect(window.addEventListener).toHaveBeenCalledWith(
       'beforeunload', ctrl.confirmBeforeLeaving);
   });

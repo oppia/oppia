@@ -50,7 +50,7 @@ angular.module('oppia').component('opportunitiesListItem', {
           if (ctrl.opportunity.progressPercentage) {
             ctrl.progressPercentage = (
               ctrl.opportunity.progressPercentage + '%');
-            ctrl.progressBarStyle = {width: ctrl.progressPercentage};
+            ctrl.progressBarStyle = { width: ctrl.progressPercentage };
           }
         } else {
           ctrl.opportunityDataIsLoading = true;

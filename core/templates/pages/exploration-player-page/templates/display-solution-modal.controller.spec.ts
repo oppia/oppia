@@ -94,8 +94,9 @@ describe('Display Solution Modal Controller', function() {
       answer_groups: [],
       confirmed_unclassified_answers: [],
       customization_args: {
-        placeholder: {value: {content_id: 'ca_placeholder', unicode_str: ''}},
-        rows: {value: 1}
+        placeholder: { value: { content_id: 'ca_placeholder',
+          unicode_str: '' } },
+        rows: { value: 1 }
       },
       hints: [],
       id: 'TextInput'

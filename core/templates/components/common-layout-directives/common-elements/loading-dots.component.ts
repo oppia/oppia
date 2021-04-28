@@ -29,4 +29,4 @@ export class LoadingDotsComponent {
 }
 angular.module('oppia').directive(
   'loadingDots', downgradeComponent(
-    {component: LoadingDotsComponent}));
+    { component: LoadingDotsComponent }));

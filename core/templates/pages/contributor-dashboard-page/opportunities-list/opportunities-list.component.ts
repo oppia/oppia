@@ -73,7 +73,7 @@ angular.module('oppia').component('opportunitiesList', {
         ctrl.lastPageNumber = 1000;
         ctrl.loadingOpportunityData = true;
 
-        ctrl.loadOpportunities().then(function({opportunitiesDicts, more}) {
+        ctrl.loadOpportunities().then(function({ opportunitiesDicts, more }) {
           opportunities = opportunitiesDicts;
           // "more" returned from GAE storage is not always reliable if true.
           // TODO(#11900): The following may not work if the last fetched
@@ -98,7 +98,7 @@ angular.module('oppia').component('opportunitiesList', {
           ctrl.visibleOpportunities = [];
           ctrl.loadingOpportunityData = true;
           ctrl.loadMoreOpportunities().then(
-            function({opportunitiesDicts, more}) {
+            function({ opportunitiesDicts, more }) {
               opportunities = opportunities.concat(opportunitiesDicts);
               // "more" returned from GAE storage is not always reliable if
               // true.

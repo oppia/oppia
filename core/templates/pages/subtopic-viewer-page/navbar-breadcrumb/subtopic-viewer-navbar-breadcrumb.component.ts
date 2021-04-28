@@ -71,4 +71,4 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
 
 angular.module('oppia').directive(
   'subtopicViewerNavbarBreadcrumb', downgradeComponent(
-    {component: SubtopicViewerNavbarBreadcrumbComponent}));
+    { component: SubtopicViewerNavbarBreadcrumbComponent }));

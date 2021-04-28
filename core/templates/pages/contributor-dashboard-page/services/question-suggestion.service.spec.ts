@@ -145,7 +145,7 @@ describe('Question Suggestion Service', function() {
       $httpBackend.expectPOST('/suggestionhandler/').respond(200);
       var successHandler = jasmine.createSpy('success');
       let imageBlob = new Blob(
-        ['data:image/png;base64,xyz'], {type: 'image/png'});
+        ['data:image/png;base64,xyz'], { type: 'image/png' });
       let imageData = {
         filename: 'image.png',
         imageBlob: imageBlob

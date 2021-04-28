@@ -31,7 +31,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserInfo } from 'domain/user/user-info.model.ts';
 import { UserService } from 'services/user.service';
 import { of } from 'rxjs';
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
     return value;
@@ -78,7 +78,7 @@ describe('Teach Page', () => {
           }
         },
         { provide: TranslateService, useClass: MockTranslateService },
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
         UrlInterpolationService,
         {
           provide: WindowRef,

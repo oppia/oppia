@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class SuggestionsService {
   getThreadIdFromSuggestionBackendDict(
       suggestionBackendDict: SuggestionBackendDict): string {

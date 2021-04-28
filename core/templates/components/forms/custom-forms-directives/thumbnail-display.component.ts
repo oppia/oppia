@@ -66,4 +66,4 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
 
 angular.module('oppia').directive(
   'oppiaThumbnailDisplay', downgradeComponent(
-    {component: ThumbnailDisplayComponent}));
+    { component: ThumbnailDisplayComponent }));

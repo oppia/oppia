@@ -35,7 +35,7 @@ describe('Csrf Token Service', function() {
     // testing purposes.
     // @ts-expect-error
     spyOn($, 'ajax').and.returnValue(Promise.resolve(
-      {token: 'sample-csrf-token'}));
+      { token: 'sample-csrf-token' }));
   });
 
   it('should correctly set the csrf token', (done) => {

@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class AppService {
   isMachineLearningClassificationEnabled(): boolean {
     return AppConstants.ENABLE_ML_CLASSIFIERS;

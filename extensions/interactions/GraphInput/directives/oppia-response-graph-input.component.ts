@@ -67,4 +67,4 @@ export class ResponseGraphInput {
 }
 angular.module('oppia').directive(
   'oppiaResponseGraphInput', downgradeComponent(
-    {component: ResponseGraphInput}) as angular.IDirectiveFactory);
+    { component: ResponseGraphInput }) as angular.IDirectiveFactory);

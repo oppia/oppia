@@ -276,8 +276,8 @@ describe('States Object Factory', () => {
         interaction: {
           id: 'MultipleChoiceInput',
           customization_args: {
-            choices: {value: []},
-            showChoicesInShuffledOrder: {value: false}
+            choices: { value: [] },
+            showChoicesInShuffledOrder: { value: false }
           },
           answer_groups: [{
             outcome: {
@@ -292,7 +292,7 @@ describe('States Object Factory', () => {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: { x: 10 }
             }],
           }],
           default_outcome: {
@@ -332,8 +332,8 @@ describe('States Object Factory', () => {
         interaction: {
           id: 'MultipleChoiceInput',
           customization_args: {
-            choices: {value: []},
-            showChoicesInShuffledOrder: {value: false}
+            choices: { value: [] },
+            showChoicesInShuffledOrder: { value: false }
           },
           answer_groups: [{
             outcome: {
@@ -348,7 +348,7 @@ describe('States Object Factory', () => {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: { x: 10 }
             }],
           }],
           default_outcome: {
@@ -457,7 +457,7 @@ describe('States Object Factory', () => {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 20}
+              inputs: { x: 20 }
             }],
           }],
           confirmed_unclassified_answers: [],
@@ -604,8 +604,8 @@ describe('States Object Factory', () => {
         interaction: {
           id: 'MultipleChoiceInput',
           customization_args: {
-            choices: {value: []},
-            showChoicesInShuffledOrder: {value: false}
+            choices: { value: [] },
+            showChoicesInShuffledOrder: { value: false }
           },
           answer_groups: [{
             outcome: {
@@ -620,7 +620,7 @@ describe('States Object Factory', () => {
             },
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: 10}
+              inputs: { x: 10 }
             }],
           }],
           default_outcome: {

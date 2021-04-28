@@ -105,7 +105,7 @@ export class SuggestionThread {
   }
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class SuggestionThreadObjectFactory {
   private createEditExplorationStateContentSuggestionFromBackendDict(
       suggestionBackendDict: SuggestionBackendDict): Suggestion {

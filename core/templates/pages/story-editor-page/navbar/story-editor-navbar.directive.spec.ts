@@ -83,7 +83,7 @@ describe('Story editor navbar directive', function() {
 
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(StoryEditorStateService, 'getSkillSummaries').and.returnValue(
-      [{id: '1', description: 'Skill description'}]);
+      [{ id: '1', description: 'Skill description' }]);
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
     spyOn(StoryEditorStateService, 'getClassroomUrlFragment').and.returnValue(
       'math');

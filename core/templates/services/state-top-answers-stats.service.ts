@@ -69,7 +69,7 @@ export class StateTopAnswersStatsService {
     if (!this.initializationHasStarted) {
       this.initializationHasStarted = true;
       try {
-        const {answers, interactionIds} = (
+        const { answers, interactionIds } = (
           await this.stateTopAnswersStatsBackendApiService.fetchStatsAsync(
             explorationId));
         for (const stateName of Object.keys(answers)) {

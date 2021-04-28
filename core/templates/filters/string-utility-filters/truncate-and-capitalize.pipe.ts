@@ -19,7 +19,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 // Note that this filter does not truncate at the middle of a word.
-@Pipe({name: 'truncateAndCapitalize'})
+@Pipe({ name: 'truncateAndCapitalize' })
 export class TruncateAndCapitalizePipe implements PipeTransform {
   transform(input: string, maxNumberOfCharacters: number): string {
     if (!input) {

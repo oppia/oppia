@@ -51,7 +51,7 @@ export class PlatformFeatureBackendApiService {
     const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
       PlatformFeatureDomainConstants.PLATFORM_FEATURES_EVALUATION_HANDLER_URL,
       {
-        params: {...context.toBackendDict()}
+        params: { ...context.toBackendDict() }
       }
     ).toPromise();
 

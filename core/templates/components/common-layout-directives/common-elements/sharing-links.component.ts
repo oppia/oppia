@@ -101,7 +101,7 @@ export class SharingLinksComponent implements OnInit {
 
   showEmbedExplorationModal(): void {
     const modelRef = this.nbgModal.open(
-      ExplorationEmbedButtonModalComponent, {backdrop: true});
+      ExplorationEmbedButtonModalComponent, { backdrop: true });
     modelRef.componentInstance.serverName = this.serverName;
     modelRef.componentInstance.explorationId = this.explorationId;
   }
@@ -120,4 +120,4 @@ type ShareType = 'exploration' | 'collection';
 type SharingPlatform = 'facebook' | 'twitter' | 'classroom';
 
 angular.module('oppia').directive('sharingLinks', downgradeComponent(
-  {component: SharingLinksComponent}));
+  { component: SharingLinksComponent }));

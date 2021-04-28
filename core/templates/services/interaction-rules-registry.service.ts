@@ -76,7 +76,7 @@ interface InteractionRulesService {
     answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class InteractionRulesRegistryService {
   private rulesServiceRegistry: Map<string, object>;
 

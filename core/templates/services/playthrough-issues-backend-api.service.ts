@@ -52,7 +52,7 @@ export class PlaythroughIssuesBackendApiService {
     return new Promise((resolve, reject) => {
       this.httpClient.get<FetchIssuesResponseBackendDict>(
         this.getFetchIssuesUrl(explorationId), {
-          params: { exp_version: explorationVersion.toString() }}).toPromise()
+          params: { exp_version: explorationVersion.toString() } }).toPromise()
         .then(response => {
           resolve(this.cachedIssues = response.unresolved_issues.map(
             this.playthroughIssueObjectFactory.createFromBackendDict));

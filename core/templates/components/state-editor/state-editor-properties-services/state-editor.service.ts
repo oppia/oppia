@@ -223,7 +223,7 @@ export class StateEditorService {
           DragAndDropSortInputCustomizationArgs
         > customizationArgs)
         .choices.value.map(val => (
-          { val: val.contentId, label: val.html}
+          { val: val.contentId, label: val.html }
         ));
     } else {
       return null;

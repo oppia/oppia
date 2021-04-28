@@ -29,7 +29,7 @@ import {
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class StateTopAnswersStatsBackendApiService {
   constructor(
       private http: HttpClient,
@@ -40,7 +40,7 @@ export class StateTopAnswersStatsBackendApiService {
   async fetchStatsAsync(expId: string): Promise<StateTopAnswersStats> {
     return this.http.get<StateTopAnswersStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STATE_ANSWER_STATS_URL, {exploration_id: expId}))
+        ServicesConstants.STATE_ANSWER_STATS_URL, { exploration_id: expId }))
       .toPromise().then(
         d => this.stateTopAnswersStatsObjectFactory.createFromBackendDict(d),
         errorResponse => {

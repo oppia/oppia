@@ -163,7 +163,7 @@ export class StateTasks implements Iterable<ExplorationTask> {
  * Provides hooks for keeping the tasks fresh after events which could otherwise
  * invalidate them.
  */
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ExplorationImprovementsTaskRegistryService {
   private config: ExplorationImprovementsConfig;
   private expStats: ExplorationStats;
@@ -260,7 +260,7 @@ export class ExplorationImprovementsTaskRegistryService {
         oldTask.taskType,
         ExplorationTaskModel.createFromBackendDict({
           ...oldTask.toBackendDict(),
-          ...{target_id: newStateName},
+          ...{ target_id: newStateName },
         })
       ])),
       new SupportingStateStats(

@@ -35,4 +35,4 @@ export class ThanksPageComponent {
   }
 }
 angular.module('oppia').directive(
-  'thanksPage', downgradeComponent({component: ThanksPageComponent}));
+  'thanksPage', downgradeComponent({ component: ThanksPageComponent }));

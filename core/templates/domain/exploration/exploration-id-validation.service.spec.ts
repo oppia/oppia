@@ -91,7 +91,7 @@ describe('Exploration id validation service', function() {
     let req = httpTestingController
       .expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush({summaries: []});
+    req.flush({ summaries: [] });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(false);
@@ -104,7 +104,7 @@ describe('Exploration id validation service', function() {
     req = httpTestingController
       .expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush({summaries: [null]});
+    req.flush({ summaries: [null] });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(false);
@@ -117,10 +117,10 @@ describe('Exploration id validation service', function() {
     req = httpTestingController
       .expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush({summaries: [
+    req.flush({ summaries: [
       'exp1',
       'exp2'
-    ]});
+    ] });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(false);

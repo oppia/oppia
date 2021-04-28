@@ -80,4 +80,4 @@ export class SkillMasteryViewerComponent implements OnInit {
 
 angular.module('oppia').directive(
   'skillMasteryViewer', downgradeComponent(
-    {component: SkillMasteryViewerComponent}));
+    { component: SkillMasteryViewerComponent }));

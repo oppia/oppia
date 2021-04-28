@@ -39,4 +39,4 @@ export class ProfilePageNavbarComponent implements OnInit {
 
 angular.module('oppia').directive(
   'profilePageNavbar', downgradeComponent(
-    {component: ProfilePageNavbarComponent}));
+    { component: ProfilePageNavbarComponent }));

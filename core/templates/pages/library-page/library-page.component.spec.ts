@@ -132,8 +132,8 @@ describe('Library controller', function() {
         }]
       });
       $httpBackend.expectGET('/creatordashboardhandler/data').respond({
-        explorations_list: [{id: 'exp2'}, {id: 'exp3'}],
-        collections_list: [{id: 'col2'}, {id: 'col3'}]
+        explorations_list: [{ id: 'exp2' }, { id: 'exp3' }],
+        collections_list: [{ id: 'col2' }, { id: 'col3' }]
       });
 
       $scope = $rootScope.$new();
@@ -186,7 +186,7 @@ describe('Library controller', function() {
             col1: false,
             col2: true,
             col3: true,
-          }});
+          } });
         expect(ctrl.tileDisplayCount).toBe(0);
       });
 

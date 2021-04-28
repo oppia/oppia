@@ -161,10 +161,10 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        language: {value: ''},
-        placeholder: {value: ''},
-        preCode: {value: ''},
-        postCode: {value: ''}
+        language: { value: '' },
+        placeholder: { value: '' },
+        preCode: { value: '' },
+        postCode: { value: '' }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -173,10 +173,10 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      language: {value: ''},
-      placeholder: {value: ''},
-      preCode: {value: ''},
-      postCode: {value: ''}
+      language: { value: '' },
+      placeholder: { value: '' },
+      preCode: { value: '' },
+      postCode: { value: '' }
     });
   });
 
@@ -186,10 +186,10 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        language: {value: ''},
-        placeholder: {value: ''},
-        preCode: {value: ''},
-        postCode: {value: ''}
+        language: { value: '' },
+        placeholder: { value: '' },
+        preCode: { value: '' },
+        postCode: { value: '' }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -198,10 +198,10 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      language: {value: ''},
-      placeholder: {value: ''},
-      preCode: {value: ''},
-      postCode: {value: ''}
+      language: { value: '' },
+      placeholder: { value: '' },
+      preCode: { value: '' },
+      postCode: { value: '' }
     });
   });
 
@@ -211,11 +211,11 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        choices: {value: [{
+        choices: { value: [{
           content_id: 'ca_choices',
           html: '<p>first</p>'
-        }]},
-        allowMultipleItemsInSamePosition: {value: true}
+        }] },
+        allowMultipleItemsInSamePosition: { value: true }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -224,8 +224,8 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      choices: {value: [new SubtitledHtml('<p>first</p>', 'ca_choices')]},
-      allowMultipleItemsInSamePosition: {value: true}
+      choices: { value: [new SubtitledHtml('<p>first</p>', 'ca_choices')] },
+      allowMultipleItemsInSamePosition: { value: true }
     });
   });
 
@@ -235,14 +235,14 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        graph: {value: {}},
-        canAddVertex: {value: true},
-        canDeleteVertex: {value: true},
-        canMoveVertex: {value: true},
-        canEditVertexLabel: {value: true},
-        canAddEdge: {value: true},
-        canDeleteEdge: {value: true},
-        canEditEdgeWeight: {value: true}
+        graph: { value: {} },
+        canAddVertex: { value: true },
+        canDeleteVertex: { value: true },
+        canMoveVertex: { value: true },
+        canEditVertexLabel: { value: true },
+        canAddEdge: { value: true },
+        canDeleteEdge: { value: true },
+        canEditEdgeWeight: { value: true }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -251,14 +251,14 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      graph: {value: {}},
-      canAddVertex: {value: true},
-      canDeleteVertex: {value: true},
-      canMoveVertex: {value: true},
-      canEditVertexLabel: {value: true},
-      canAddEdge: {value: true},
-      canDeleteEdge: {value: true},
-      canEditEdgeWeight: {value: true}
+      graph: { value: {} },
+      canAddVertex: { value: true },
+      canDeleteVertex: { value: true },
+      canMoveVertex: { value: true },
+      canEditVertexLabel: { value: true },
+      canAddEdge: { value: true },
+      canDeleteEdge: { value: true },
+      canEditEdgeWeight: { value: true }
     });
   });
 
@@ -268,9 +268,9 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        latitude: {value: 0.0},
-        longitude: {value: 0.0},
-        zoom: {value: 0.0},
+        latitude: { value: 0.0 },
+        longitude: { value: 0.0 },
+        zoom: { value: 0.0 },
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -279,9 +279,9 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      latitude: {value: 0.0},
-      longitude: {value: 0.0},
-      zoom: {value: 0.0},
+      latitude: { value: 0.0 },
+      longitude: { value: 0.0 },
+      zoom: { value: 0.0 },
     });
   });
 
@@ -306,8 +306,8 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        sequenceToGuess: {value: []},
-        initialSequence: {value: []}
+        sequenceToGuess: { value: [] },
+        initialSequence: { value: [] }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -316,8 +316,8 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      sequenceToGuess: {value: []},
-      initialSequence: {value: []}
+      sequenceToGuess: { value: [] },
+      initialSequence: { value: [] }
     });
   });
 
@@ -384,7 +384,7 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        initialCode: {value: ''}
+        initialCode: { value: '' }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -393,7 +393,7 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      initialCode: {value: ''}
+      initialCode: { value: '' }
     });
   });
 
@@ -403,10 +403,10 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        buttonText: {value: {
+        buttonText: { value: {
           content_id: 'ca_buttonText',
           unicode_str: ''
-        }}
+        } }
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -415,7 +415,7 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      buttonText: {value: new SubtitledUnicode('', 'ca_buttonText')}
+      buttonText: { value: new SubtitledUnicode('', 'ca_buttonText') }
     });
   });
 
@@ -779,7 +779,7 @@ describe('Interaction object factory', () => {
         const caSpecs = INTERACTION_SPECS[
           interactionId].customization_arg_specs;
         caSpecs.forEach(caSpec => {
-          defaultCa[caSpec.name] = {value: caSpec.default_value};
+          defaultCa[caSpec.name] = { value: caSpec.default_value };
         });
 
         iof.createFromBackendDict({

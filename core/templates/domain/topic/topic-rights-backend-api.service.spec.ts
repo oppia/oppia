@@ -62,7 +62,7 @@ describe('Topic rights backend API service', () => {
     const req = httpTestingController.expectOne(
       '/rightshandler/get_topic_rights/' + topicId);
     expect(req.request.method).toEqual('GET');
-    req.flush({}, {status: 200, statusText: ''});
+    req.flush({}, { status: 200, statusText: '' });
 
     flushMicrotasks();
 
@@ -77,7 +77,7 @@ describe('Topic rights backend API service', () => {
     const req = httpTestingController.expectOne(
       '/rightshandler/get_topic_rights/' + topicId);
     expect(req.request.method).toEqual('GET');
-    req.flush({}, {status: 404, statusText: ''});
+    req.flush({}, { status: 404, statusText: '' });
 
     flushMicrotasks();
 
@@ -92,7 +92,7 @@ describe('Topic rights backend API service', () => {
     let req = httpTestingController.expectOne(
       '/rightshandler/change_topic_status/0');
     expect(req.request.method).toEqual('PUT');
-    req.flush({}, {status: 200, statusText: ''});
+    req.flush({}, { status: 200, statusText: '' });
 
     flushMicrotasks();
 
@@ -105,7 +105,7 @@ describe('Topic rights backend API service', () => {
     req = httpTestingController.expectOne(
       '/rightshandler/change_topic_status/0');
     expect(req.request.method).toEqual('PUT');
-    req.flush({}, {status: 200, statusText: ''});
+    req.flush({}, { status: 200, statusText: '' });
 
     flushMicrotasks();
 
@@ -121,8 +121,8 @@ describe('Topic rights backend API service', () => {
       '/rightshandler/change_topic_status/0');
     expect(req.request.method).toEqual('PUT');
     req.flush(
-      {error: 'Topic doesn\'t not exist.'},
-      {status: 404, statusText: ''}
+      { error: 'Topic doesn\'t not exist.' },
+      { status: 404, statusText: '' }
     );
 
     flushMicrotasks();
@@ -148,7 +148,7 @@ describe('Topic rights backend API service', () => {
         topic_id: '0',
         topic_is_published: true,
         manager_ids: ['user_id']
-      }, {status: 200, statusText: ''});
+      }, { status: 200, statusText: '' });
 
       flushMicrotasks();
 
@@ -194,7 +194,7 @@ describe('Topic rights backend API service', () => {
     const req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
     expect(req.request.method).toEqual('PUT');
-    req.flush({}, {status: 200, statusText: ''});
+    req.flush({}, { status: 200, statusText: '' });
 
     flushMicrotasks();
 
@@ -209,7 +209,7 @@ describe('Topic rights backend API service', () => {
     const req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
     expect(req.request.method).toEqual('PUT');
-    req.flush({}, {status: 404, statusText: ''});
+    req.flush({}, { status: 404, statusText: '' });
 
     flushMicrotasks();
 

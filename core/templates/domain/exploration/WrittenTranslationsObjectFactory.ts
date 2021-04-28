@@ -143,7 +143,7 @@ export class WrittenTranslations {
       translationsMappingDict[contentId] = languageToWrittenTranslationDict;
     }
 
-    return {translations_mapping: translationsMappingDict};
+    return { translations_mapping: translationsMappingDict };
   }
 }
 

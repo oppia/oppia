@@ -30,7 +30,7 @@ describe('Exploration stats service', function() {
   let explorationStatsService: ExplorationStatsService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
 
     explorationStatsBackendApiService = (
       TestBed.get(ExplorationStatsBackendApiService));

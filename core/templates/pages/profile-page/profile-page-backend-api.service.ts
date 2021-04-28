@@ -62,7 +62,7 @@ export class ProfilePageBackendApiService {
     return this.http.get<UserProfileBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ProfilePageDomainConstants.PROFILE_DATA_URL,
-        {username: this.urlService.getUsernameFromProfileUrl()}
+        { username: this.urlService.getUsernameFromProfileUrl() }
       )
     ).toPromise().then(
       userProfileDict => UserProfile.createFromBackendDict(

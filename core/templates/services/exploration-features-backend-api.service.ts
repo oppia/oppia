@@ -48,7 +48,7 @@ export class ExplorationFeaturesBackendApiService {
     return this.http.get<ExplorationFeaturesBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.EXPLORATION_FEATURES_URL,
-        {exploration_id: explorationId}
+        { exploration_id: explorationId }
       )
     ).toPromise().then(response => ({
       isExplorationWhitelisted: response.is_exploration_whitelisted,

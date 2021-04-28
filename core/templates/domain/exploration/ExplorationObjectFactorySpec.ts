@@ -153,7 +153,7 @@ describe('Exploration object factory', () => {
       language_code: 'en',
       states: {
         'first state': firstState,
-        'second state': secondState},
+        'second state': secondState },
       param_specs: {},
       param_changes: [],
       draft_changes: [],

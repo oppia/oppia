@@ -136,8 +136,8 @@ describe('Playthrough Issue Object Factory', () => {
     let eqPlaythrough = piof.createFromBackendDict({
       issue_type: 'EarlyQuit',
       issue_customization_args: {
-        state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000},
+        state_name: { value: 'state' },
+        time_spent_in_exp_in_msecs: { value: 30000 },
       },
       playthrough_ids: [],
       schema_version: 1,
@@ -148,7 +148,7 @@ describe('Playthrough Issue Object Factory', () => {
     let cstPlaythrough = piof.createFromBackendDict({
       issue_type: 'CyclicStateTransitions',
       issue_customization_args: {
-        state_names: {value: ['state3', 'state1']}
+        state_names: { value: ['state3', 'state1'] }
       },
       playthrough_ids: [],
       schema_version: 1,
@@ -159,8 +159,8 @@ describe('Playthrough Issue Object Factory', () => {
     let misPlaythrough = piof.createFromBackendDict({
       issue_type: 'MultipleIncorrectSubmissions',
       issue_customization_args: {
-        state_name: {value: 'state'},
-        num_times_answered_incorrectly: {value: 5},
+        state_name: { value: 'state' },
+        num_times_answered_incorrectly: { value: 5 },
       },
       playthrough_ids: [],
       schema_version: 1,

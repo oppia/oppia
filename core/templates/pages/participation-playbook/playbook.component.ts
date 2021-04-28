@@ -55,4 +55,4 @@ export class PlaybookPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive('participationPlaybook',
-  downgradeComponent({component: PlaybookPageComponent}));
+  downgradeComponent({ component: PlaybookPageComponent }));

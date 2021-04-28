@@ -29,4 +29,4 @@ export class LazyLoadingComponent {
 }
 angular.module('oppia').directive(
   'lazyLoading', downgradeComponent(
-    {component: LazyLoadingComponent}));
+    { component: LazyLoadingComponent }));

@@ -216,7 +216,7 @@ describe('Rte Helper Modal Controller', function() {
       }];
       var imageFile = (
         new Blob(
-          [new ArrayBuffer(102 * 1024)], {type: 'application/octet-stream'}));
+          [new ArrayBuffer(102 * 1024)], { type: 'application/octet-stream' }));
       spyOn(
         ImageUploadHelperService,
         'convertImageDataToImageFile').and.returnValue(imageFile);

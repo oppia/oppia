@@ -63,4 +63,4 @@ export class ProfileLinkImageComponent implements OnInit {
 }
 
 angular.module('oppia').directive('profileLinkImage', downgradeComponent(
-  {component: ProfileLinkImageComponent}));
+  { component: ProfileLinkImageComponent }));

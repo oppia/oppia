@@ -147,4 +147,4 @@ export class SplashPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive('splashPage',
-  downgradeComponent({component: SplashPageComponent}));
+  downgradeComponent({ component: SplashPageComponent }));

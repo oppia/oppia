@@ -76,9 +76,9 @@ const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
 
 const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   AngularFireAuth,
-  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+  { provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig },
 ] : [
-  {provide: AngularFireAuth, useValue: null},
+  { provide: AngularFireAuth, useValue: null },
 ];
 
 

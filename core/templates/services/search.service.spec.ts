@@ -344,7 +344,7 @@ describe('Search Service', () => {
           searchService.loadMoreData(() => { }, () => { });
           const moreDataReq = httpTestingController.expectOne(
             SAMPLE_QUERY + '&cursor=notempty');
-          moreDataReq.flush({search_cursor: null});
+          moreDataReq.flush({ search_cursor: null });
           flushMicrotasks();
           searchService.loadMoreData(successHandler, errorHandler);
 

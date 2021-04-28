@@ -38,7 +38,7 @@ angular.module('oppia').controller(
       // The ng-model needs to bind to a property of an object on
       // the scope (the property cannot sit directly on the scope)
       // Reference https://stackoverflow.com/q/12618342
-      $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
+      $scope.suggestionData = { suggestionHtml: $scope.originalHtml };
       $scope.showEditor = false;
       // Rte initially displays content unrendered for a split second.
       $timeout(function() {

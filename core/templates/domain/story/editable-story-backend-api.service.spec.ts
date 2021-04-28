@@ -135,7 +135,7 @@ describe('Editable story backend API service', () => {
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/2');
       expect(req.request.method).toEqual('GET');
-      req.flush({error: 'Error loading story 2.'}, {
+      req.flush({ error: 'Error loading story 2.' }, {
         status: 500,
         statusText: 'Error loading story 2.'
       });
@@ -198,7 +198,7 @@ describe('Editable story backend API service', () => {
       let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId_1');
       expect(req.request.method).toEqual('PUT');
-      req.flush({error: 'Story with given id doesn\'t exist.'}, {
+      req.flush({ error: 'Story with given id doesn\'t exist.' }, {
         status: 404,
         statusText: 'Story with given id doesn\'t exist.'
       });
@@ -239,7 +239,7 @@ describe('Editable story backend API service', () => {
       let req = httpTestingController.expectOne(
         '/story_publish_handler/storyId');
       expect(req.request.method).toEqual('PUT');
-      req.flush({error: 'Story with given id doesn\'t exist.'}, {
+      req.flush({ error: 'Story with given id doesn\'t exist.' }, {
         status: 404,
         statusText: 'Story with given id doesn\'t exist.'
       });

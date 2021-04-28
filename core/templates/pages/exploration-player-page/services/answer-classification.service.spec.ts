@@ -51,7 +51,7 @@ describe('Answer Classification Service', () => {
   let textInputRulesService: InteractionRulesService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
+    TestBed.configureTestingModule({ providers: [CamelCaseToHyphensPipe] });
 
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);

@@ -99,7 +99,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
       const states = ExplorationStatesService.getStates();
       const expStats = (
         await ExplorationStatsService.getExplorationStatsAsync(expId));
-      const {openTasks, resolvedTaskTypesByStateName} = (
+      const { openTasks, resolvedTaskTypesByStateName } = (
         await ExplorationImprovementsBackendApiService.getTasksAsync(expId));
       const topAnswersByStateName = (
         await StateTopAnswersStatsService.getTopAnswersByStateNameAsync());

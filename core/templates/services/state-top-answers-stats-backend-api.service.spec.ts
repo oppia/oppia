@@ -34,12 +34,12 @@ describe('StateTopAnswersStatsBackendApiService', () => {
   var sampleDataResults = {
     answers: {
       Hola: [
-        {answer: 'hola', frequency: 7},
-        {answer: 'adios', frequency: 5},
-        {answer: 'que?', frequency: 2},
+        { answer: 'hola', frequency: 7 },
+        { answer: 'adios', frequency: 5 },
+        { answer: 'que?', frequency: 2 },
       ]
     },
-    interaction_ids: {Hola: 'TextInput'},
+    interaction_ids: { Hola: 'TextInput' },
   };
 
   beforeEach(() => {

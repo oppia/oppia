@@ -18,9 +18,9 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtitledHtmlObjectFactory} from
+import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { WorkedExampleObjectFactory} from
+import { WorkedExampleObjectFactory } from
   'domain/skill/WorkedExampleObjectFactory';
 
 describe('Worked example object factory', () => {

@@ -88,7 +88,7 @@ export class AboutPageComponent implements OnInit {
     for (const letter of letters) {
       const names = this.getCredits(letter);
       if (names.length > 0) {
-        this.allCredits.push({letter, names});
+        this.allCredits.push({ letter, names });
       }
     }
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
@@ -116,4 +116,4 @@ export class AboutPageComponent implements OnInit {
   }
 }
 angular.module('oppia').directive(
-  'aboutPage', downgradeComponent({component: AboutPageComponent}));
+  'aboutPage', downgradeComponent({ component: AboutPageComponent }));

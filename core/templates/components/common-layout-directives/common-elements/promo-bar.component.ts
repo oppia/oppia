@@ -86,4 +86,4 @@ export class PromoBarComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaPromoBar', downgradeComponent(
-    {component: PromoBarComponent}));
+    { component: PromoBarComponent }));

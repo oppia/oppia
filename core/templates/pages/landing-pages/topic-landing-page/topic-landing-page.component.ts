@@ -138,7 +138,7 @@ export class TopicLandingPageComponent implements OnInit {
   getLessonQualityImageSrc(filename: string): string {
     return this.urlInterpolationService.getStaticImageUrl(
       this.urlInterpolationService.interpolateUrl(
-        '/landing/<filename>', {filename: filename}));
+        '/landing/<filename>', { filename: filename }));
   }
 
   onClickGetStartedButton(): void {
@@ -160,4 +160,4 @@ export class TopicLandingPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive('topicLandingPage',
-  downgradeComponent({component: TopicLandingPageComponent}));
+  downgradeComponent({ component: TopicLandingPageComponent }));

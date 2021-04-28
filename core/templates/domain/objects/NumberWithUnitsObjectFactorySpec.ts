@@ -40,31 +40,31 @@ describe('NumberWithUnitsObjectFactory', () => {
 
     it('should convert units to list format', () => {
       expect(uof.fromStringToList('kg / kg^2 K mol / (N m s^2) K s')).toEqual(
-        [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
-          {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
-          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);
+        [{ exponent: -1, unit: 'kg' }, { exponent: 2, unit: 'K' },
+          { exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'N' },
+          { exponent: -1, unit: 'm' }, { exponent: -1, unit: 's' }]);
       expect(uof.fromStringToList('mol/(kg / (N m / s^2)')).toEqual(
-        [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
-          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
-          {exponent: -2, unit: 's'}]);
+        [{ exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'kg' },
+          { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
+          { exponent: -2, unit: 's' }]);
       expect(uof.fromStringToList(
         'kg per kg^2 K mol per (N m s^2) K s'
       )).toEqual(
-        [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
-          {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
-          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);
+        [{ exponent: -1, unit: 'kg' }, { exponent: 2, unit: 'K' },
+          { exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'N' },
+          { exponent: -1, unit: 'm' }, { exponent: -1, unit: 's' }]);
     });
 
     it('should convert units from list to string format', () => {
       expect(new Units(
-        [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
-          {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
-          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]
+        [{ exponent: -1, unit: 'kg' }, { exponent: 2, unit: 'K' },
+          { exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'N' },
+          { exponent: -1, unit: 'm' }, { exponent: -1, unit: 's' }]
       ).toString()).toBe('kg^-1 K^2 mol N^-1 m^-1 s^-1');
       expect(new Units(
-        [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
-          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
-          {exponent: -2, unit: 's'}]).toString()).toBe(
+        [{ exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'kg' },
+          { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
+          { exponent: -2, unit: 's' }]).toString()).toBe(
         'mol kg^-1 N m s^-2');
     });
 

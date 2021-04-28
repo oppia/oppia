@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import {LearnerExplorationSummary} from
+import { LearnerExplorationSummary } from
   'domain/summary/learner-exploration-summary.model';
 import { StoryPlaythrough } from
   'domain/story_viewer/story-playthrough.model';
@@ -148,7 +148,7 @@ describe('Story viewer backend API service', () => {
           expSummary => LearnerExplorationSummary.createFromBackendDict(
             expSummary)),
         nextNodeId: sampleDataResults.next_node_id,
-        readyForReviewTest: sampleDataResults.ready_for_review_test});
+        readyForReviewTest: sampleDataResults.ready_for_review_test });
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

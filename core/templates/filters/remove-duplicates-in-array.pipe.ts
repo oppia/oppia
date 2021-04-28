@@ -18,7 +18,7 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({name: 'removeDuplicatesInArray'})
+@Pipe({ name: 'removeDuplicatesInArray' })
 export class RemoveDuplicatesInArrayPipe implements PipeTransform {
   transform(input: string[]): string[] {
     if (!input.filter) {

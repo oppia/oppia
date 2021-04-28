@@ -29,7 +29,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { PageTitleService } from 'services/page-title.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
     return value;
