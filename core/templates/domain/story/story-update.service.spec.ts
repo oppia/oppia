@@ -324,7 +324,7 @@ describe('Story update service', () => {
     storyUpdateService.deleteStoryNode(_sampleStory, 'node_1');
     // Initial node should not be deleted.
     storyUpdateService.deleteStoryNode(_sampleStory, 'node_2');
-    expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual('');
+    expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual(null);
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(0);
 
     expect(() => {
