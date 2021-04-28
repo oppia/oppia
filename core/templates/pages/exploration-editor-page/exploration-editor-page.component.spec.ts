@@ -402,7 +402,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should show mismatch version modal when draft change exists', () => {
-      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null)
+      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
       $scope.$apply();
 
       expect(aims.showVersionMismatchModal)
