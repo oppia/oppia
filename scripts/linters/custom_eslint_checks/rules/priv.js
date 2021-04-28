@@ -36,7 +36,6 @@ module.exports = {
             'that start with _ are tagged as private'),
             category: "Possible Errors",
             recommended: true,
-            url: "https://eslint.org/docs/rules/no-extra-semi"
         },
         fixable: "code",
         schema: [], 
