@@ -90,7 +90,6 @@ export class OpportunitiesListItemComponent {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {
         'background-color': this.opportunity.labelColor
->>>>>>> upstream/develop
       };
     }
 

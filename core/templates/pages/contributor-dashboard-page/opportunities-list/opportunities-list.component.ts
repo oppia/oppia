@@ -82,7 +82,6 @@ export class OpportunitiesListComponent {
         ctrl.loadOpportunities().then(function({ opportunitiesDicts, more }) {
           opportunities = opportunitiesDicts;
           // "more" returned from GAE storage is not always reliable if true.
-=======
   ngOnInit(): void {
     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
       // This ngZone run closure will not be required after \
@@ -115,7 +114,6 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           // "more" returned from GAE storage is not always reliable if
           // true.
->>>>>>> upstream/develop
           // TODO(#11900): The following may not work if the last fetched
           // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
           // robust solution.

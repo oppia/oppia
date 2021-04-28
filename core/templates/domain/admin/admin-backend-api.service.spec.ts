@@ -641,7 +641,7 @@ describe('Admin backend api service', () => {
 
     req.flush(
       ['validUsername'],
-      { status: 200, statusText: 'Success.'});
+      { status: 200, statusText: 'Success.' });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(result);
@@ -1208,7 +1208,7 @@ describe('Admin backend api service', () => {
     abas.grantSuperAdminPrivilegesAsync('abc')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/adminsuperadminhandler');
-    expect(req.request.body).toEqual({username: 'abc'});
+    expect(req.request.body).toEqual({ username: 'abc' });
     expect(req.request.method).toEqual('PUT');
     req.flush(200);
     flushMicrotasks();
