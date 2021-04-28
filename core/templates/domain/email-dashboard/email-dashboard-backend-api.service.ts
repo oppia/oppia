@@ -16,31 +16,31 @@
  * @fileoverview Backend api service for email dashboard pages.
  */
 
- import { downgradeInjectable } from '@angular/upgrade/static';
- import { HttpClient } from '@angular/common/http';
- import { Injectable } from '@angular/core';
- 
- import {
-   EmailDashboardQueryResults,
-   EmailDashboardQueryResultsBackendDict
- } from 'domain/email-dashboard/email-dashboard-query-results.model';
- import {
-   EmailDashboardQuery,
-   EmailDashboardQueryBackendDict,
- } from 'domain/email-dashboard/email-dashboard-query.model';
- 
- export type QueryData = Record<string, boolean | number>;
- 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import {
+  EmailDashboardQueryResults,
+  EmailDashboardQueryResultsBackendDict
+} from 'domain/email-dashboard/email-dashboard-query-results.model';
+import {
+  EmailDashboardQuery,
+  EmailDashboardQueryBackendDict,
+} from 'domain/email-dashboard/email-dashboard-query.model';
+
+export type QueryData = Record<string, boolean | number>;
+
  @Injectable({
    providedIn: 'root'
  })
- export class EmailDashboardBackendApiService {
+export class EmailDashboardBackendApiService {
    QUERY_DATA_URL: string = '/emaildashboarddatahandler';
    QUERY_STATUS_CHECK_URL: string = '/querystatuscheck';
- 
+
    constructor(
      private http: HttpClient) {}
- 
+
    async fetchQueriesPageAsync(
        pageSize: number, cursor: string): Promise<EmailDashboardQueryResults> {
      // Here 'cursor' property is optional because it is present only if this
@@ -54,7 +54,7 @@
      if (cursor) {
        params.cursor = cursor;
      }
- 
+
      return new Promise((resolve, reject) => {
        this.http.get<EmailDashboardQueryResultsBackendDict>(
          this.QUERY_DATA_URL, {
@@ -68,7 +68,7 @@
        });
      });
    }
- 
+
    async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
      return new Promise((resolve, reject) => {
        this.http.get<EmailDashboardQueryBackendDict>(
@@ -84,12 +84,12 @@
        });
      });
    }
- 
+
    async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery> {
      return new Promise((resolve, reject) => {
        this.http.post<EmailDashboardQueryBackendDict>(
          this.QUERY_DATA_URL, {
-           data: data}).toPromise().then(data => {
+           data: data }).toPromise().then(data => {
          let queryObject = EmailDashboardQuery.createFromBackendDict(data);
          resolve(queryObject);
        }, errorResponse => {
@@ -97,8 +97,8 @@
        });
      });
    }
- }
- 
- angular.module('oppia').factory(
-   'EmailDashboardBackendApiService',
-   downgradeInjectable(EmailDashboardBackendApiService));
+}
+
+angular.module('oppia').factory(
+  'EmailDashboardBackendApiService',
+  downgradeInjectable(EmailDashboardBackendApiService));

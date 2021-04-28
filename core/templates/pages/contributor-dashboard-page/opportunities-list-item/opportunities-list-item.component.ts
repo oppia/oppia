@@ -72,4 +72,3 @@
  angular.module('oppia').directive(
    'oppiaOpportunitiesListItem', downgradeComponent(
      {component: OpportunitiesListItemComponent}));
- 

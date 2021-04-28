@@ -16,47 +16,46 @@
  * @fileoverview Unit tests for WorkedExampleObjectFactory.
  */
 
- import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
- import { SubtitledHtml} from
-   'domain/exploration/subtitled-html.model';
- import { WorkedExampleObjectFactory} from
-   'domain/skill/WorkedExampleObjectFactory';
- 
- describe('Worked example object factory', () => {
-   let workedExampleDict;
-   let workedExampleObjectFactory: WorkedExampleObjectFactory;
- 
-   beforeEach(() => {
-     workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
- 
-     workedExampleDict = {
-       question: {
-         html: 'worked example question 1',
-         content_id: 'worked_example_q_1'
-       },
-       explanation: {
-         html: 'worked example explanation 1',
-         content_id: 'worked_example_e_1'
-       }
-     };
-   });
- 
-   it('should create a new worked example from a backend dictionary', () => {
-     let workedExample =
+import { SubtitledHtml } from
+  'domain/exploration/subtitled-html.model';
+import { WorkedExampleObjectFactory } from
+  'domain/skill/WorkedExampleObjectFactory';
+
+describe('Worked example object factory', () => {
+  let workedExampleDict;
+  let workedExampleObjectFactory: WorkedExampleObjectFactory;
+
+  beforeEach(() => {
+    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+
+    workedExampleDict = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+  });
+
+  it('should create a new worked example from a backend dictionary', () => {
+    let workedExample =
            workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
-     expect(workedExample.getQuestion()).toEqual(
-       SubtitledHtml.createDefault(
-         'worked example question 1', 'worked_example_q_1'));
-     expect(workedExample.getExplanation()).toEqual(
-       SubtitledHtml.createDefault(
-         'worked example explanation 1', 'worked_example_e_1'));
-   });
- 
-   it('should convert to a backend dictionary', () => {
-     let workedExample =
+    expect(workedExample.getQuestion()).toEqual(
+      SubtitledHtml.createDefault(
+        'worked example question 1', 'worked_example_q_1'));
+    expect(workedExample.getExplanation()).toEqual(
+      SubtitledHtml.createDefault(
+        'worked example explanation 1', 'worked_example_e_1'));
+  });
+
+  it('should convert to a backend dictionary', () => {
+    let workedExample =
          workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
-     expect(workedExample.toBackendDict()).toEqual(workedExampleDict);
-   });
- });
- 
+    expect(workedExample.toBackendDict()).toEqual(workedExampleDict);
+  });
+});
