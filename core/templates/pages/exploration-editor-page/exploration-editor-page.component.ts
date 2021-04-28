@@ -235,6 +235,7 @@ angular.module('oppia').component('explorationEditorPage', {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
                 lostChanges, explorationId);
+              $rootScope.$applyAsync();
             }
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
@@ -340,6 +341,7 @@ angular.module('oppia').component('explorationEditorPage', {
             // changes is invalid, and draft_changes is not `null`.
             AutosaveInfoModalsService.showVersionMismatchModal(
               ChangeListService.getChangeList());
+            $rootScope.$applyAsync()
           }
           RouterService.onRefreshStatisticsTab.emit();
 

@@ -102,6 +102,7 @@ angular.module('oppia').factory('ChangeListService', [
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showVersionMismatchModal(
                 explorationChangeList);
+              $rootScope.$applyAsync()
             }
           }
           autosaveInProgressEventEmitter.emit(false);
@@ -114,6 +115,7 @@ angular.module('oppia').factory('ChangeListService', [
             JSON.stringify(explorationChangeList));
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showNonStrictValidationFailModal();
+            $rootScope.$applyAsync()
           }
           autosaveInProgressEventEmitter.emit(false);
           $rootScope.$applyAsync();
