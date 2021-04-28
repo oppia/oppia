@@ -48,13 +48,13 @@ require('services/validators.service.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$rootScope', '$filter', '$injector', '$location', '$q', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
   'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
   'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $rootScope, $filter, $injector, $location, $q, $uibModal,
+      $filter, $injector, $location, $q, $rootScope, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
       SolutionValidityService, StateEditorRefreshService, StateEditorService,
