@@ -30,6 +30,8 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { FractionInputRulesService } from './fraction-input-rules.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { FractionAnswer, InteractionAnswer } from 'interactions/answer-defs';
+
 @Component({
   selector: 'oppia-interactive-fraction-input',
   templateUrl: './fraction-input-interaction.component.html',
@@ -40,8 +42,8 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() allowImproperFractionWithValue: string = '';
   @Input() allowNonzeroIntegerPartWithValue: string = '';
   @Input() customPlaceholderWithValue: string = '';
-  @Input() savedSolution: string;
   @Input() labelForFocusTarget: string;
+  @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
   allowImproperFraction: boolean = true;
@@ -125,9 +127,9 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.allowNonzeroIntegerPart = allowNonzeroIntegerPart.value;
     this.customPlaceholder = customPlaceholder.value.unicode;
     if (this.savedSolution !== undefined) {
-      let savedSolution = JSON.parse(this.savedSolution);
+      let savedSolution = this.savedSolution;
       savedSolution = this.fractionObjectFactory.fromDict(
-        savedSolution).toString();
+        savedSolution as FractionAnswer).toString();
       this.answer = savedSolution;
     }
     const submitAnswerFn = () => this.submitAnswer();

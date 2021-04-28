@@ -28,6 +28,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule } from 'filters/translate.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { DirectivesModule } from 'directives/directives.module';
@@ -59,6 +60,11 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
+
+import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
+import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
+import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -73,6 +79,8 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
+import { LimitToPipe } from 'filters/limit-to.pipe';
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
@@ -94,6 +102,20 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
   {provide: AngularFireAuth, useValue: null},
 ];
 
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
@@ -105,6 +127,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
+    ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
     TranslateModule,
@@ -117,6 +140,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   declarations: [
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     CreateActivityButtonComponent,
@@ -127,13 +151,17 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     FilterForMatchingSubstringPipe,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
+    LimitToPipe,
+    LoadingMessageComponent,
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    ResponseHeaderComponent,
     PromoBarComponent,
     SharingLinksComponent,
+    SideNavigationBarComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -142,6 +170,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     WrapTextWithEllipsisPipe,
+    WarningsAndAlertsComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -156,6 +185,7 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
 
   entryComponents: [
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     BackgroundBannerComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -163,22 +193,26 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     CollectionSummaryTileComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    LazyLoadingComponent, LoadingMessageComponent,
+    LoadingDotsComponent, SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
+    ResponseHeaderComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
+    SideNavigationBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    WarningsAndAlertsComponent,
     LearnerDashboardIconsComponent
   ],
 
@@ -191,22 +225,27 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
-    SharedFormsModule,
     TranslateModule,
     // Components, directives, and pipes.
+    AttributionGuideComponent,
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     BackgroundBannerComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
+    LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
+    LimitToPipe,
     PromoBarComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     SchemaBasedEditorDirective,
+    SideNavigationBarComponent,
     SharingLinksComponent,
+    ResponseHeaderComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
@@ -215,15 +254,14 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    WarningsAndAlertsComponent,
     UploadActivityModalComponent,
-    PromoBarComponent,
     WrapTextWithEllipsisPipe,
     TruncateAndCapitalizePipe,
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
     LoadingDotsComponent,
-    WrapTextWithEllipsisPipe,
     LearnerDashboardIconsComponent
   ],
 })
