@@ -247,7 +247,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 43
+CURRENT_STATE_SCHEMA_VERSION = 44
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -1147,6 +1147,7 @@ CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+FIREBASE_EMULATOR_PORT = 9099
 
 # TODO(#11462): Delete this after Firebase authentication has been deployed.
 ENABLE_USER_CREATION = True
