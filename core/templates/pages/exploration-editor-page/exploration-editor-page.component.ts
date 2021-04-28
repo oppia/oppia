@@ -342,6 +342,7 @@ angular.module('oppia').component('explorationEditorPage', {
             AutosaveInfoModalsService.showVersionMismatchModal(
               ChangeListService.getChangeList());
             $rootScope.$applyAsync();
+            return;
           }
           RouterService.onRefreshStatisticsTab.emit();
 

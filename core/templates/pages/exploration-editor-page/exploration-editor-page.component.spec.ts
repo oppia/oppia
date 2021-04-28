@@ -50,6 +50,7 @@ import { StateTopAnswersStatsBackendApiService } from
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -65,7 +66,7 @@ describe('Exploration editor page component', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
-  var aims = null;
+  let aims: AutosaveInfoModalsService = null;
   var cls = null;
   var cs = null;
   var efbas = null;
@@ -202,6 +203,7 @@ describe('Exploration editor page component', function() {
         LostChangesModalComponent
       ],
       providers: [
+        AutosaveInfoModalsService,
         ContextService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
@@ -225,6 +227,8 @@ describe('Exploration editor page component', function() {
         entryComponents: [LostChangesModalComponent]
       }
     });
+
+    aims = TestBed.inject(AutosaveInfoModalsService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -235,7 +239,6 @@ describe('Exploration editor page component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    aims = $injector.get('AutosaveInfoModalsService');
     cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
@@ -399,7 +402,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should show mismatch version modal when draft change exists', () => {
-      spyOn(aims, 'showVersionMismatchModal').and.callThrough();
+      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null)
       $scope.$apply();
 
       expect(aims.showVersionMismatchModal)
