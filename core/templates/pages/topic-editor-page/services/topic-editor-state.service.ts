@@ -468,6 +468,8 @@ export class TopicEditorStateService {
         this._updateSkillIdToRubricsObject(
           topicBackendObject.skillIdToRubricsDict);
         var changeList = this.undoRedoService.getCommittableChangeList();
+        console.log(changeList);
+        alert(changeList);
         for (var i = 0; i < changeList.length; i++) {
           if (changeList[i].cmd === 'delete_canonical_story' ||
               changeList[i].cmd === 'delete_additional_story') {
