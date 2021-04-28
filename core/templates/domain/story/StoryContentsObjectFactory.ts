@@ -36,7 +36,7 @@ interface NodeTitles {
 }
 
 export class StoryContents {
-  _initialNodeId: string;
+  _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;
   constructor(
@@ -53,7 +53,7 @@ export class StoryContents {
     return StoryEditorPageConstants.NODE_ID_PREFIX + index;
   }
 
-  getInitialNodeId(): string {
+  getInitialNodeId(): string | null {
     return this._initialNodeId;
   }
 
@@ -186,7 +186,7 @@ export class StoryContents {
     }
     if (nodeId === this._initialNodeId) {
       if (this._nodes.length === 1) {
-        this._initialNodeId = '';
+        this._initialNodeId = null;
       } else {
         throw new Error('Cannot delete initial story node');
       }
