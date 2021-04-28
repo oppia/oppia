@@ -348,7 +348,7 @@ describe('PlatformFeatureService', () => {
       platformFeatureService = TestBed.get(PlatformFeatureService);
     });
 
-    it('should return a function that calls initialize', () => {
+    it('should return a function that calls initialize', async() => {
       const mockPromise = Promise.resolve(null);
       const spy = spyOn(platformFeatureService, 'initialize')
         .and.returnValue(mockPromise);
@@ -357,7 +357,7 @@ describe('PlatformFeatureService', () => {
       const returnedPromise = returnedFn();
 
       expect(spy).toHaveBeenCalled();
-      expect(returnedPromise).toEqual(mockPromise);
+      await expectAsync(returnedPromise).toBeResolvedTo(null);
     });
   });
 });
