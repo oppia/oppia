@@ -115,8 +115,8 @@ export class OpportunitiesListComponent {
            // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
            // robust solution.
            more = (
-             more && opportunitiesDicts.length
-             === this.OPPORTUNITIES_PAGE_SIZE);
+             more && opportunitiesDicts.length ===
+             this.OPPORTUNITIES_PAGE_SIZE);
            this.visibleOpportunities = this.opportunities.slice(
              startIndex, endIndex);
            this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
@@ -129,8 +129,8 @@ export class OpportunitiesListComponent {
      }
      this.activePageNumber = pageNumber;
    }
- }
+}
 
- angular.module('oppia').directive(
+angular.module('oppia').directive(
   'oppiaOpportunitiesList', downgradeComponent(
     { component: OpportunitiesListComponent }));

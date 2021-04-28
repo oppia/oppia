@@ -71,4 +71,4 @@ export class OpportunitiesListItemComponent {
 
 angular.module('oppia').directive(
   'oppiaOpportunitiesListItem', downgradeComponent(
-    {component: OpportunitiesListItemComponent}));
+    { component: OpportunitiesListItemComponent }));
