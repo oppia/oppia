@@ -15,100 +15,61 @@
 /**
  * @fileoverview Component for the item view of an opportunity.
  */
-require(
-  'components/common-layout-directives/common-elements/' +
-  'lazy-loading.component.ts');
 
-require(
-  'filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-
-angular.module('oppia').component('opportunitiesListItem', {
-  bindings: {
-    opportunity: '<',
-    onClickActionButton: '<',
-    labelRequired: '<',
-    progressBarRequired: '<',
-    opportunityHeadingTruncationLength: '<'
-  },
-  template: require('./opportunities-list-item.component.html'),
-  controller: [
-    function() {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        ctrl.opportunityDataIsLoading = false;
-        if (ctrl.opportunity && ctrl.labelRequired) {
-          ctrl.labelText = ctrl.opportunity.labelText;
-          ctrl.labelStyle = {
-            'background-color': ctrl.opportunity.labelColor
-          };
-        }
-
-        if (!ctrl.opportunityHeadingTruncationLength) {
-          ctrl.opportunityHeadingTruncationLength = 40;
-        }
-        if (ctrl.opportunity) {
-          if (ctrl.opportunity.progressPercentage) {
-            ctrl.progressPercentage = (
-              ctrl.opportunity.progressPercentage + '%');
-            ctrl.progressBarStyle = { width: ctrl.progressPercentage };
-          }
-        } else {
-          ctrl.opportunityDataIsLoading = true;
-        }
-
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-
-export interface ExplorationOpportunity {
-  id: string;
-  labelText: string;
-  labelColor: string;
-  progressPercentage: number;
-}
-
-@Component({
-  selector: 'oppia-opportunities-list-item',
-  templateUrl: './opportunities-list-item.component.html',
-  styleUrls: []
-})
-export class OpportunitiesListItemComponent {
-  @Input() opportunity: ExplorationOpportunity;
-  @Output() clickActionButton: EventEmitter<string> = (
-    new EventEmitter());
-  @Input() labelRequired: boolean;
-  @Input() progressBarRequired: boolean;
-  @Input() opportunityHeadingTruncationLength: number;
-
-  opportunityDataIsLoading: boolean = true;
-  labelText: string;
-  labelStyle: { 'background-color': string; };
-  progressPercentage: string;
-  progressBarStyle: { width: string; };
-
-  ngOnInit(): void {
-    if (this.opportunity && this.labelRequired) {
-      this.labelText = this.opportunity.labelText;
-      this.labelStyle = {
-        'background-color': this.opportunity.labelColor
-      };
-    }
-
-    if (!this.opportunityHeadingTruncationLength) {
-      this.opportunityHeadingTruncationLength = 40;
-    }
-    if (this.opportunity) {
-      if (this.opportunity.progressPercentage) {
-        this.progressPercentage = (
-          this.opportunity.progressPercentage + '%');
-        this.progressBarStyle = {width: this.progressPercentage};
-      }
-      this.opportunityDataIsLoading = false;
-    } else {
-      this.opportunityDataIsLoading = true;
-    }
-  }
-}
-
-angular.module('oppia').directive(
-  'oppiaOpportunitiesListItem', downgradeComponent(
-    {component: OpportunitiesListItemComponent}));
+ import { Component, Input, Output, EventEmitter } from '@angular/core';
+ import { downgradeComponent } from '@angular/upgrade/static';
+ 
+ export interface ExplorationOpportunity {
+   id: string;
+   labelText: string;
+   labelColor: string;
+   progressPercentage: number;
+ }
+ 
+ @Component({
+   selector: 'oppia-opportunities-list-item',
+   templateUrl: './opportunities-list-item.component.html',
+   styleUrls: []
+ })
+ export class OpportunitiesListItemComponent {
+   @Input() opportunity: ExplorationOpportunity;
+   @Output() clickActionButton: EventEmitter<string> = (
+     new EventEmitter());
+   @Input() labelRequired: boolean;
+   @Input() progressBarRequired: boolean;
+   @Input() opportunityHeadingTruncationLength: number;
+ 
+   opportunityDataIsLoading: boolean = true;
+   labelText: string;
+   labelStyle: { 'background-color': string; };
+   progressPercentage: string;
+   progressBarStyle: { width: string; };
+ 
+   ngOnInit(): void {
+     if (this.opportunity && this.labelRequired) {
+       this.labelText = this.opportunity.labelText;
+       this.labelStyle = {
+         'background-color': this.opportunity.labelColor
+       };
+     }
+ 
+     if (!this.opportunityHeadingTruncationLength) {
+       this.opportunityHeadingTruncationLength = 40;
+     }
+     if (this.opportunity) {
+       if (this.opportunity.progressPercentage) {
+         this.progressPercentage = (
+           this.opportunity.progressPercentage + '%');
+         this.progressBarStyle = {width: this.progressPercentage};
+       }
+       this.opportunityDataIsLoading = false;
+     } else {
+       this.opportunityDataIsLoading = true;
+     }
+   }
+ }
+ 
+ angular.module('oppia').directive(
+   'oppiaOpportunitiesListItem', downgradeComponent(
+     {component: OpportunitiesListItemComponent}));
+ 

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the DragAndDropSortInput interaction.
  */
 
-require(
+ require(
   'interactions/DragAndDropSortInput/directives/' +
   'drag-and-drop-sort-input-rules.service.ts');
 require(
@@ -109,9 +109,6 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               ctrl.dataMaxDepth = 1;
             }
 
-            // Make list of dicts from the list of choices.
-            for (var i = 0; i < ctrl.choices.length; i++) {
-              ctrl.list.push({ title: ctrl.choices[i], items: [] });
             let savedSolution = (
               ctrl.savedSolution !== undefined ? ctrl.savedSolution : []
             );

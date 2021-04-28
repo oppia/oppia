@@ -38,7 +38,7 @@ describe('Skill editor main tab directive', function() {
   var assignedSkillTopicData = { topic1: 'subtopic1', topic2: 'subtopic2' };
   beforeEach(angular.mock.module('oppia'));
   var focusManagerService = null;
-  var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
+  var assignedSkillTopicData = { topic1: 'subtopic1', topic2: 'subtopic2' };
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();

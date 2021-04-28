@@ -68,7 +68,7 @@ describe('AlgebraicExpressionEditor', () => {
       {
         imports: [HttpClientTestingModule],
         declarations: [AlgebraicExpressionEditorComponent],
-        providers: [{provide: windowRef, useClass: MockWindowRef}]
+        providers: [{ provide: windowRef, useClass: MockWindowRef }]
       }
     ).compileComponents();
   }));
