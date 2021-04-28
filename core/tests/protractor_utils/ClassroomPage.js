@@ -24,15 +24,15 @@ var ClassroomPage = function() {
     by.css('.protractor-test-topic-summary-tile'));
 
   var topNavigationBar = element.all(
-      by.css('.protractor-test-top-navigation-bar'));
-  
+    by.css('.protractor-test-top-navigation-bar'));
+
   this.get = async function(classroomName) {
     await browser.get('/learn/' + classroomName);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectNumberOfTopicsToBe = async function(count) {
-    await waitFor.visibilityOf(topNavigationBar, 'Top navigation bar takes too long to appear');
+    await waitFor.visibilityOf(topNavigationBar, 'Top navigation bar not visible');
     expect(await topicSummaryTiles.count()).toEqual(count);
   };
 };
