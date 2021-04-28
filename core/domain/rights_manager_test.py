@@ -130,13 +130,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(
-            rights_manager.check_can_assign_voiceartist_in_activity(
+            rights_manager.check_can_modify_voiceartist_in_activity(
                 self.user_voiceover_admin, exp_rights))
         self.assertFalse(
-            rights_manager.check_can_assign_voiceartist_in_activity(
+            rights_manager.check_can_modify_voiceartist_in_activity(
                 self.user_a, exp_rights))
         self.assertTrue(
-            rights_manager.check_can_assign_voiceartist_in_activity(
+            rights_manager.check_can_modify_voiceartist_in_activity(
                 self.user_admin, exp_rights))
 
     def test_non_splash_page_demo_exploration(self):

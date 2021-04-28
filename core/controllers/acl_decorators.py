@@ -1155,7 +1155,7 @@ def can_assign_voiceartist(handler):
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if rights_manager.check_can_assign_voiceartist_in_activity(
+        if rights_manager.check_can_modify_voiceartist_in_activity(
                 self.user, exploration_rights):
             return handler(self, entity_type, entity_id, **kwargs)
         else:

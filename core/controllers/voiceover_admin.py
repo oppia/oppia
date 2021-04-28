@@ -47,18 +47,25 @@ class VoiceartistAssignmentHandler(base.BaseHandler):
         rights_manager.assign_role_for_exploration(
             self.user, entity_id, voice_artist_id, rights_domain.ROLE_VOICE_ARTIST)
 
-        self.render_json({})
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                entity_id).to_dict()
+        })
 
     @acl_decorators.can_assign_voiceartist
     def delete(self, entity_type, entity_id):
-        exploartion = exp_fetchers.get_exploration_by_id(exploration_id)
 
         voice_artist = self.request.get('voice_artist')
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
+
         if voice_artist_id is None:
             raise self.InvalidInputException(
                 'Invalid voice artist name')
         rights_manager.deassign_role_for_exploration(
-            self.user, exploration_id, voice_artist_id, 'voice artist')
-        self.render_json({})
+            self.user, entity_id, voice_artist_id)
+
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                entity_id).to_dict()
+        })

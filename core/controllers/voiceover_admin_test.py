@@ -60,6 +60,18 @@ class testClass(test_utils.GenericTestBase):
         user_services.update_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
+    def test_owner_cannot_assign_voiceartist(self):
+        self.login(self.OWNER_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voiceartist_management_handler/exploration/%s'
+                % self.published_exp_id_1, params,
+                csrf_token=csrf_token, expected_status_int=401)
+        self.logout
+
     def test_voiceover_admin_can_assign_voiceartist(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
@@ -67,6 +79,17 @@ class testClass(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voiceartist_assignment_handler/exploration/%s'
+            '/voiceartist_management_handler/exploration/%s'
+                % self.published_exp_id_1, params, csrf_token=csrf_token)
+        self.logout
+
+    def test_voiceover_admin_can_deassign_voiceartist(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voiceartist_management_handler/exploration/%s'
                 % self.published_exp_id_1, params, csrf_token=csrf_token)
         self.logout

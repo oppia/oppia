@@ -325,6 +325,35 @@ angular.module('oppia').component('settingsTab', {
         reassignRole(newMemberUsername, newMemberRole, oldRole);
       };
 
+      ctrl.editVoiseArtist = function(newVoiceartistUsername) {
+        ExplorationRightsService.saveVoiceArtist(newVoiceartistUsername);
+        ctrl.closeVoiceoverForm();
+        return;
+      }
+      ctrl.removeVoiceArtist = function(voiceArtistUsername) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'remove-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => voiceArtistUsername,
+            role: () => 'voice artist'
+          },
+          controller: 'RemoveRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.removeVoiceArtistRoleAsync(
+            voiceArtistUsername);
+            ctrl.closeVoiceoverForm();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
+        });
+      };
+
       ctrl.removeRole = function(memberUsername, memberRole) {
         AlertsService.clearWarnings();
 

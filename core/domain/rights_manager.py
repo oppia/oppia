@@ -566,7 +566,7 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
-def check_can_assign_voiceartist_in_activity(user, activity_rights):
+def check_can_modify_voiceartist_in_activity(user, activity_rights):
     """Check whether the user can assign voicearttist to activity.
 
     Args:
@@ -579,8 +579,6 @@ def check_can_assign_voiceartist_in_activity(user, activity_rights):
         bool. Whether the user can assign voiceartist.
     """
 
-    print('\n'*5)
-    print(activity_rights, user.actions)
     if activity_rights is None:
         return False
 
@@ -783,8 +781,8 @@ def _assign_role(
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     role_is_voice_artist = new_role == constants.ROLE_VOICE_ARTIST
-    user_can_assigning_voice_artist = check_can_assign_voiceartist_in_activity(
-        user, activity_rights)
+    user_can_assigning_voice_artist = check_can_modify_voiceartist_in_activity(
+        committer, activity_rights)
 
     user_can_assigning_role = (
         role_is_voice_artist and user_can_assigning_voice_artist) or (
@@ -893,7 +891,7 @@ def _assign_role(
 def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     """Deassigns given user from their current role in the activity.
 
-    Args:
+    Args:ready can edit
         committer: UserActionsInfo. UserActionsInfo object for the user
             who is performing the action.
         removed_user_id: str. ID of the user who is being deassigned from
@@ -910,7 +908,10 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    user_can_modify_activity_roles = check_can_modify_voiceartist_in_activity(
+        committer, activity_rights) or check_can_modify_activity_roles(
+            committer, activity_rights)
+    if not user_can_modify_activity_roles:
         logging.error(
             'User %s tried to remove user %s from an activity %s '
             'but was refused permission.' % (

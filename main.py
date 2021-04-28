@@ -856,7 +856,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
 
     get_redirect_route(
-        r'/voiceartist_assignment_handler/<entity_type>/<entity_id>',
+        r'/voiceartist_management_handler/<entity_type>/<entity_id>',
         voiceover_admin.VoiceartistAssignmentHandler),
 ]
 
