@@ -162,13 +162,13 @@ export class EditableTopicBackendApiService {
   }
 
   private _fetchSubtopicPage(
-      topicId: string,
+      topicId: number,
       subtopicId: number,
       successCallback: (value?: SubtopicPageBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
     let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
-        topic_id: topicId,
+        topic_id: topicId.toString(),
         subtopic_id: subtopicId.toString()
       });
 
@@ -283,7 +283,7 @@ export class EditableTopicBackendApiService {
   }
 
   fetchSubtopicPage(
-      topicId: string,
+      topicId: number,
       subtopicId: number): Promise<SubtopicPageBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicPage(topicId, subtopicId, resolve, reject);

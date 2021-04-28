@@ -402,7 +402,19 @@ interface StoryNodeOutlineStatusChange {
   'new_value': boolean;
 }
 
+interface DeleteCanonicalStoryChange {
+  'cmd': 'delete_canonical_story',
+  'story_id': string
+}
+
+interface DeleteAdditionalStoryChange {
+  'cmd': 'delete_additional_story',
+  'story_id': string
+}
+
 export type StoryChange = (
+  DeleteAdditionalStoryChange |
+  DeleteCanonicalStoryChange |
   StoryPropertyChange |
   StoryContentsChange |
   StoryNodePropertyChange |
