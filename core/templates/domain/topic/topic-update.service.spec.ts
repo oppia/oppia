@@ -18,28 +18,22 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-update.service.ts is upgraded to Angular 8.
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtopicPageObjectFactory } from
-  'domain/topic/SubtopicPageObjectFactory';
+import { ShortSkillSummary } from
+  'domain/skill/short-skill-summary.model';
+import { SubtitledHtml } from
+  'domain/exploration/subtitled-html.model';
 // ^^^ This block is to be removed.
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TestBed } from '@angular/core/testing';
+import { SubtopicPage } from './subtopic-page.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Topic update service', function() {
-  let recordedVoiceoversObjectFactory :RecordedVoiceoversObjectFactory = null;
-  let topicUpdateService :TopicUpdateService;
-  let topicObjectFactory :TopicObjectFactory = null;
-  let skillSummaryObjectFactory :ShortSkillSummaryObjectFactory = null;
-  let subtitledHtmlObjectFactory :SubtitledHtmlObjectFactory = null;
-  let subtopicPageObjectFactory :SubtopicPageObjectFactory = null;
-  let undoRedoService :UndoRedoService = null;
+  let topicUpdateService: TopicUpdateService;
+  let topicObjectFactory: TopicObjectFactory = null;
+  let undoRedoService: UndoRedoService = null;
   let _sampleTopic = null;
   let _firstSkillSummary = null;
   let _secondSkillSummary = null;
@@ -105,23 +99,18 @@ describe('Topic update service', function() {
   };
 
   beforeEach(() => {
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     topicUpdateService = TestBed.get(TopicUpdateService);
     topicObjectFactory = TestBed.get(TopicObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
     undoRedoService = TestBed.get(UndoRedoService);
-    skillSummaryObjectFactory = TestBed.get(ShortSkillSummaryObjectFactory);
 
-    _firstSkillSummary = skillSummaryObjectFactory.create(
+    _firstSkillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
-    _secondSkillSummary = skillSummaryObjectFactory.create(
+    _secondSkillSummary = ShortSkillSummary.create(
       'skill_2', 'Description 2');
-    _thirdSkillSummary = skillSummaryObjectFactory.create(
+    _thirdSkillSummary = ShortSkillSummary.create(
       'skill_3', 'Description 3');
 
-    _sampleSubtopicPage = subtopicPageObjectFactory.createFromBackendDict(
+    _sampleSubtopicPage = SubtopicPage.createFromBackendDict(
       sampleSubtopicPageObject);
     _sampleTopic = topicObjectFactory.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
@@ -1007,7 +996,7 @@ describe('Topic update service', function() {
       content_id: 'content'
     };
     var newSampleSubtitledHtml =
-      subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         newSampleSubtitledHtmlDict);
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
       subtitled_html: {
@@ -1076,7 +1065,7 @@ describe('Topic update service', function() {
       content_id: 'content'
     };
     let newSampleSubtitledHtml =
-      subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         newSampleSubtitledHtmlDict);
     topicUpdateService.setSubtopicPageContentsHtml(
       _sampleSubtopicPage, 1, newSampleSubtitledHtml);
@@ -1106,7 +1095,7 @@ describe('Topic update service', function() {
         }
       }
     };
-    let newVoiceovers = recordedVoiceoversObjectFactory.createFromBackendDict(
+    let newVoiceovers = RecordedVoiceovers.createFromBackendDict(
       newRecordedVoiceoversDict);
 
     expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
@@ -1173,7 +1162,7 @@ describe('Topic update service', function() {
         }
       }
     };
-    var newVoiceovers = recordedVoiceoversObjectFactory.createFromBackendDict(
+    var newVoiceovers = RecordedVoiceovers.createFromBackendDict(
       newRecordedVoiceoversDict);
     topicUpdateService.setSubtopicPageContentsAudio(
       _sampleSubtopicPage, 1, newVoiceovers);

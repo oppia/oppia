@@ -35,6 +35,11 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     SUBMITTER_USERNAME = 'submit'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
+    SAMPLE_QUERY_PARAM = {
+        'inactive_in_last_n_days': 10,
+        'created_at_least_n_exps': 5,
+        'has_not_logged_in_for_n_days': 30
+    }
 
     def setUp(self):
         super(EmailDashboardDataHandlerTests, self).setUp()
@@ -57,7 +62,9 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': 2
+                    'edited_fewer_than_n_exps': 2,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -74,6 +81,8 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(query_model.edited_fewer_than_n_exps, 2)
         self.assertIsNone(query_model.edited_at_least_n_exps)
         self.assertIsNone(query_model.created_fewer_than_n_exps)
+        self.assertFalse(query_model.used_logic_proof_interaction)
+        self.assertFalse(query_model.created_collection)
         self.assertEqual(query_model.submitter_id, self.submitter_id)
 
         # Check that MR job has been enqueued.
@@ -103,9 +112,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         query_data = self.get_json(
             '/querystatuscheck', params={'query_id': user_query_id})['query']
@@ -139,18 +146,11 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': 'None',
                     'edited_at_least_n_exps': None,
+                    'created_collection': True,
+                    'used_logic_proof_interaction': False,
                     'fake_key': 2
                 }}, csrf_token=csrf_token, expected_status_int=400)
 
-        self.post_json(
-            '/emaildashboarddatahandler', {
-                'data': {
-                    'has_not_logged_in_for_n_days': 2,
-                    'inactive_in_last_n_days': 5,
-                    'created_at_least_n_exps': 'invalid_value',
-                    'created_fewer_than_n_exps': 'None',
-                    'edited_at_least_n_exps': None
-                }}, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
     def test_email_dashboard_page(self):
@@ -175,6 +175,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     NEW_SUBMITTER_USERNAME = 'submit2'
     EXP_ID_1 = 'exp_1'
     EXP_ID_2 = 'exp_2'
+    SAMPLE_QUERY_PARAM = {
+        'inactive_in_last_n_days': 10,
+        'created_at_least_n_exps': 5,
+        'has_not_logged_in_for_n_days': 30
+    }
 
     def setUp(self):
         super(EmailDashboardResultTests, self).setUp()
@@ -231,14 +236,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         response = self.get_json(
             '/emaildashboarddatahandler',
-            params={'num_queries_to_fetch': '-5'},
-            expected_status_int=400)
-        self.assertEqual(
-            response['error'], '400 Invalid input for query results.')
-
-        response = self.get_json(
-            '/emaildashboarddatahandler',
-            params={'num_queries_to_fetch': 'invalid_data'},
+            params={'invalid_param_key': '2'},
             expected_status_int=400)
         self.assertEqual(
             response['error'], '400 Invalid input for query results.')
@@ -254,9 +252,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.assertEqual(response['recent_queries'], [])
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         response = self.get_json(
             '/emaildashboarddatahandler',
@@ -277,9 +273,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -311,14 +305,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_1_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         user_query_2_id = user_query_services.save_new_user_query(
-            self.new_submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.new_submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -358,9 +348,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -391,14 +379,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_1_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         user_query_2_id = user_query_services.save_new_user_query(
-            self.new_submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.new_submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -437,9 +421,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -470,14 +452,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.login(self.SUBMITTER_EMAIL)
 
         user_query_1_id = user_query_services.save_new_user_query(
-            self.submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.submitter_id, self.SAMPLE_QUERY_PARAM)
 
         user_query_2_id = user_query_services.save_new_user_query(
-            self.new_submitter_id, inactive_in_last_n_days=10,
-            created_at_least_n_exps=5,
-            has_not_logged_in_for_n_days=30)
+            self.new_submitter_id, self.SAMPLE_QUERY_PARAM)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
@@ -524,7 +502,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -627,7 +607,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         query_models = user_models.UserQueryModel.query().fetch()
 
@@ -702,7 +684,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -751,7 +735,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -795,7 +781,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 
@@ -857,7 +845,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'created_at_least_n_exps': 1,
                     'created_fewer_than_n_exps': None,
                     'edited_at_least_n_exps': None,
-                    'edited_fewer_than_n_exps': None
+                    'edited_fewer_than_n_exps': None,
+                    'used_logic_proof_interaction': False,
+                    'created_collection': False
                 }}, csrf_token=csrf_token)
         self.logout()
 

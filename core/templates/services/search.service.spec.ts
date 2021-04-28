@@ -195,11 +195,11 @@ describe('Search Service', () => {
   describe('getSearchUrlQueryString', () => {
     it('should successfully get search url query string', () => {
       const searchQuery = '["1", "2"]';
-      const categories:SelectionList = {
+      const categories: SelectionList = {
         exploration: true,
         feedback: true
       };
-      const languageCodes:SelectionList = {
+      const languageCodes: SelectionList = {
         en: true,
         hi: true
       };

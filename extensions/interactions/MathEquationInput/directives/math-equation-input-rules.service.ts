@@ -23,7 +23,7 @@ import nerdamer from 'nerdamer';
 
 import { AlgebraicExpressionInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts';
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { MathEquationAnswer } from 'interactions/answer-defs';
 import {
   MathEquationRuleInputsWithSide,

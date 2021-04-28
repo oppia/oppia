@@ -29,7 +29,7 @@ import struct
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import interaction_registry
-from core.domain import obj_services
+from core.domain import object_registry
 from core.tests import test_utils
 from extensions.interactions import base
 import feconf
@@ -48,8 +48,10 @@ TEXT_INPUT_ID = 'TextInput'
 INTERACTIONS_THAT_USE_COMPONENTS = [
     'AlgebraicExpressionInput',
     'Continue',
+    'EndExploration',
     'FractionInput',
     'GraphInput',
+    'ImageClickInput',
     'MathEquationInput',
     'NumericExpressionInput',
     'RatioExpressionInput'
@@ -134,7 +136,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     ca_spec.default_value, ca_spec.schema))
 
             if ca_spec.schema['type'] == 'custom':
-                obj_class = obj_services.Registry.get_object_class_by_type(
+                obj_class = object_registry.Registry.get_object_class_by_type(
                     ca_spec.schema['obj_type'])
                 self.assertEqual(
                     ca_spec.default_value,
@@ -632,7 +634,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 # Check that the answer_type corresponds to a valid object
                 # class.
-                obj_services.Registry.get_object_class_by_type(
+                object_registry.Registry.get_object_class_by_type(
                     interaction.answer_type)
 
             self._validate_customization_arg_specs(
@@ -688,7 +690,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             if interaction.can_have_solution:
                 self.assertFalse(interaction.is_linear)
 
-            default_object_values = obj_services.get_default_object_values()
+            default_object_values = object_registry.get_default_object_values()
 
             # Check that the rules for this interaction have object editor
             # templates and default values.

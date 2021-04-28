@@ -41,7 +41,7 @@ class ExplorationFeaturesTestBase(test_utils.GenericTestBase):
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.save_new_valid_exploration(
             self.EXP_ID, editor_id, title='Explore!', end_state_name='END')
-        editor_actions_info = user_services.UserActionsInfo(editor_id)
+        editor_actions_info = user_services.get_user_actions_info(editor_id)
         rights_manager.publish_exploration(editor_actions_info, self.EXP_ID)
 
 

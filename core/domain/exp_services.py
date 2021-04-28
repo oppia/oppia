@@ -33,6 +33,7 @@ import os
 import pprint
 import zipfile
 
+import android_validation_constants
 from constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
@@ -434,6 +435,13 @@ def apply_change_list(exploration_id, change_list):
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
                 elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected card_is_checkpoint to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_card_is_checkpoint(change.new_value)
+                elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
@@ -795,11 +803,15 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
+    # Remove from activities.
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
-def delete_explorations_from_subscribed_users(exploration_ids):
+def delete_explorations_from_user_models(exploration_ids):
     """Remove explorations from all subscribers' exploration_ids.
 
     Args:
@@ -817,6 +829,69 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     user_models.UserSubscriptionsModel.update_timestamps_multi(
         subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
+
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_all().filter(
+            user_models.ExplorationUserDataModel.exploration_id.IN(
+                exploration_ids
+            )
+        ).fetch()
+    )
+    user_models.ExplorationUserDataModel.delete_multi(exp_user_data_models)
+
+    user_contributions_models = (
+        user_models.UserContributionsModel.get_all().filter(
+            datastore_services.any_of(
+                user_models.UserContributionsModel.created_exploration_ids.IN(
+                    exploration_ids
+                ),
+                user_models.UserContributionsModel.edited_exploration_ids.IN(
+                    exploration_ids
+                )
+            )
+        ).fetch()
+    )
+    for model in user_contributions_models:
+        model.created_exploration_ids = [
+            exp_id for exp_id in model.created_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+        model.edited_exploration_ids = [
+            exp_id for exp_id in model.edited_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+    user_models.UserContributionsModel.update_timestamps_multi(
+        user_contributions_models)
+    user_models.UserContributionsModel.put_multi(user_contributions_models)
+
+
+def delete_explorations_from_activities(exploration_ids):
+    """Remove explorations from exploration_ids field in completed and
+    incomplete activities models.
+
+    Args:
+        exploration_ids: list(str). The ids of the explorations to delete.
+    """
+    if not exploration_ids:
+        return
+
+    model_classes = (
+        user_models.CompletedActivitiesModel,
+        user_models.IncompleteActivitiesModel,
+    )
+    all_entities = []
+    for model_class in model_classes:
+        entities = model_class.query(
+            model_class.exploration_ids.IN(exploration_ids)
+        ).fetch()
+        for model in entities:
+            model.exploration_ids = [
+                id_ for id_ in model.exploration_ids
+                if id_ not in exploration_ids
+            ]
+        all_entities.extend(entities)
+    datastore_services.update_timestamps_multi(all_entities)
+    datastore_services.put_multi(all_entities)
 
 
 # Operations on exploration snapshots.
@@ -893,6 +968,89 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
             contributor, contribution_time_msec)
 
 
+def validate_exploration_for_story(exp, strict):
+    """Validates an exploration with story validations.
+
+    Args:
+        exp: Exploration. Exploration object to be validated.
+        strict: bool. Whether to raise an Exception when a validation error
+            is encountered. If not, a list of the error messages are
+            returned. strict should be True when this is called before
+            saving the story and False when this function is called from the
+            frontend.
+
+    Returns:
+        list(str). The various validation error messages (if strict is
+        False).
+
+    Raises:
+        ValidationError. Invalid language found for exploration.
+        ValidationError. Expected no exploration to have parameter values in it.
+        ValidationError. Invalid interaction in exploration.
+        ValidationError. RTE content in state of exploration with ID is not
+            supported on mobile.
+    """
+    validation_error_messages = []
+    if (
+            exp.language_code not in
+            android_validation_constants.SUPPORTED_LANGUAGES):
+        error_string = (
+            'Invalid language %s found for exploration '
+            'with ID %s.' % (exp.language_code, exp.id))
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    if exp.param_specs or exp.param_changes:
+        error_string = (
+            'Expected no exploration to have parameter '
+            'values in it. Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    if not exp.correctness_feedback_enabled:
+        error_string = (
+            'Expected all explorations to have correctness feedback '
+            'enabled. Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    for state_name in exp.states:
+        state = exp.states[state_name]
+        if not state.interaction.is_supported_on_android_app():
+            error_string = (
+                'Invalid interaction %s in exploration '
+                'with ID: %s.' % (state.interaction.id, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        if not state.is_rte_content_supported_on_android():
+            error_string = (
+                'RTE content in state %s of exploration '
+                'with ID %s is not supported on mobile.'
+                % (state_name, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        if state.interaction.id == 'EndExploration':
+            recommended_exploration_ids = (
+                state.interaction.customization_args[
+                    'recommendedExplorationIds'].value)
+            if len(recommended_exploration_ids) != 0:
+                error_string = (
+                    'Exploration with ID: %s contains exploration '
+                    'recommendations in its EndExploration interaction.'
+                    % (exp.id))
+                if strict:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+    return validation_error_messages
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
         is_suggestion=False, is_by_voice_artist=False):
@@ -949,6 +1107,8 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     updated_exploration = apply_change_list(exploration_id, change_list)
+    if get_story_id_linked_to_exploration(exploration_id) is not None:
+        validate_exploration_for_story(updated_exploration, True)
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
@@ -1255,11 +1415,8 @@ def get_demo_exploration_components(demo_path):
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, exploration_id, assets_list,
         strip_voiceovers=False):
-    """Note that the default title and category will be used if the YAML
-    schema version is less than
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    since in that case the YAML schema will not have a title and category
-    present.
+    """Saves a new exploration given its representation in YAML form and the
+    list of assets associated with it.
 
     Args:
         committer_id: str. The id of the user who made the commit.
@@ -1279,7 +1436,6 @@ def save_new_exploration_from_yaml_and_assets(
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')
-    exp_schema_version = yaml_dict['schema_version']
 
     # The assets are committed before the exploration is created because the
     # migrating to state schema version 25 involves adding dimensions to
@@ -1291,16 +1447,7 @@ def save_new_exploration_from_yaml_and_assets(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(asset_filename, asset_content)
 
-    if (exp_schema_version <=
-            exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
-        # The schema of the YAML file for older explorations did not include
-        # a title and a category; these need to be manually specified.
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
-            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
-    else:
-        exploration = exp_domain.Exploration.from_yaml(
-            exploration_id, yaml_content)
+    exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
     if strip_voiceovers:
@@ -1922,14 +2069,26 @@ def regenerate_missing_stats_for_exploration(exp_id):
 
             try:
                 prev_interaction_id = (
-                    prev_exp.state_interaction_ids_dict[state_name])
+                    prev_exp.state_interaction_ids_dict[prev_state_name]
+                    if prev_state_name in prev_exp.state_interaction_ids_dict
+                    else None)
                 current_interaction_id = (
                     exp.state_interaction_ids_dict[state_name])
-                exp_stats_list[i].state_stats_mapping[state_name] = (
-                    prev_exp_stats.state_stats_mapping[
-                        prev_state_name].clone()
-                    if current_interaction_id == prev_interaction_id else
-                    stats_domain.StateStats.create_default())
+                # In early schema versions of ExplorationModel, the END
+                # card was a persistant, implicit state present in every
+                # exploration. The snapshots of these old explorations have
+                # since been migrated but they do not have corresponding state
+                # stats models for the END state. So for such versions, a
+                # default state stats model should be created.
+                if current_interaction_id != prev_interaction_id or (
+                        current_interaction_id == 'EndExploration' and
+                        prev_state_name == 'END'):
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default())
+                else:
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        prev_exp_stats.state_stats_mapping[
+                            prev_state_name].clone())
                 missing_state_stats.append(
                     'StateStats(exp_id=%r, exp_version=%r, '
                     'state_name=%r)' % (exp_id, exp.version, state_name))

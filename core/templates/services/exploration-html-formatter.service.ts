@@ -36,9 +36,11 @@ import { InteractionCustomizationArgs } from
 })
 export class ExplorationHtmlFormatterService {
   private readonly migratedInteractions: string[] = [
+    'AlgebraicExpressionInput',
     'Continue',
     'FractionInput',
-    'GraphInput'
+    'GraphInput',
+    'ImageClickInput'
   ];
 
   constructor(
@@ -59,35 +61,60 @@ export class ExplorationHtmlFormatterService {
    *   Otherwise, parentHasLastAnswerProperty should be set to false.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
+   * @param {string} savedSolution - The name of property that needs to be bound
+   *   containing the savedSolution in the scope. The scope here is the
+   *   scope where the return value of this function is compiled.
    */
   getInteractionHtml(
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
-      labelForFocusTarget: string): string {
+      labelForFocusTarget: string,
+      savedSolution: string | null): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
+    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+    let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
+    let spaceToBeAdded = true;
+    const getLastAnswer = (): string => {
+      let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
+      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+        return '[last-answer]="' + propValue + '"';
+      } else {
+        return 'last-answer="' + propValue + '"';
+      }
+    };
+    if (savedSolution) {
+      // TODO(#12292): Refactor this once all interactions have been migrated to
+      // Angular 2+, such that we don't need to parse the string in the
+      // interaction directives/components.
+      if (spaceToBeAdded) {
+        directiveOuterHtml += ' ';
+      }
+      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+        directiveOuterHtml += '[saved-solution]="' + savedSolution + '" ';
+      } else {
+        directiveOuterHtml += 'saved-solution="' + savedSolution + '" ';
+      }
+      spaceToBeAdded = false;
+    }
     if (labelForFocusTarget) {
-      element.attr('label-for-focus-target', labelForFocusTarget);
+      if (spaceToBeAdded) {
+        directiveOuterHtml += ' ';
+      }
+      directiveOuterHtml += (
+        'label-for-focus-target="' + labelForFocusTarget + '" ');
+      spaceToBeAdded = false;
     }
-    element.attr(
-      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
-    let val = element.get(0).outerHTML;
-    if (this.migratedInteractions.indexOf(interactionId) >= 0) {
-      val = val.replace(
-        'last-answer="null"></oppia-interactive-' + htmlInteractionId + '>',
-        '[last-answer]="null"></oppia-interactive-' + htmlInteractionId + '>');
-      val = val.replace(
-        'last-answer="lastAnswer"></oppia-interactive-' +
-        htmlInteractionId + '>',
-        '[last-answer]="lastAnswer"></oppia-interactive-' +
-        htmlInteractionId + '>');
+    if (spaceToBeAdded) {
+      directiveOuterHtml += ' ';
     }
-    return val;
+    directiveOuterHtml += getLastAnswer() + tagEnd;
+    return directiveOuterHtml;
   }
 
   getAnswerHtml(
@@ -113,7 +140,7 @@ export class ExplorationHtmlFormatterService {
 
   getShortAnswerHtml(
       answer: InteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;
 
     // TODO(sll): Get rid of this special case for multiple choice.

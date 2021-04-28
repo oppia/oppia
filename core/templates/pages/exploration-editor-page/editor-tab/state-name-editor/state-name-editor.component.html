@@ -3,9 +3,9 @@
     <span ng-if="$ctrl.EditabilityService.isEditable()">
       <span ng-if="!$ctrl.StateNameService.isStateNameEditorShown()" ng-click="$ctrl.openStateNameEditor()" class="oppia-editable-section">
         <strong class="oppia-state-name-text"><[$ctrl.StateEditorService.getActiveStateName()]></strong>
-        <i ng-if="$ctrl.EditabilityService.isEditable()" class="material-icons oppia-editor-edit-icon"
-           title="Edit State Name">&#xE254;
-        </i>
+        <button ng-if="$ctrl.EditabilityService.isEditable()" class="material-icons oppia-editor-edit-icon oppia-autofocus"
+                title="Edit State Name">&#xE254;
+        </button>
       </span>
 
       <span ng-if="$ctrl.StateNameService.isStateNameEditorShown()">
@@ -24,5 +24,10 @@
 <style>
   state-name-editor .oppia-state-name-text {
     font-size: 1.2em;
+  }
+
+  button.oppia-editor-edit-icon {
+    border: 0;
+    padding: 0;
   }
 </style>

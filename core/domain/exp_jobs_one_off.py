@@ -283,12 +283,12 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': states_schema_version,
             'states': item.states
         }
+        init_state_name = item.init_state_name
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    states_schema_version,
-                    item.id)
+                    states_schema_version, init_state_name)
                 states_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -344,8 +344,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
-        if (item.states_schema_version !=
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
+        if item.states_schema_version != feconf.CURRENT_STATE_SCHEMA_VERSION:
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
@@ -856,14 +855,6 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 'INFO - Exploration %s failed non-strict validation' % item.id,
                 e)
 
-        # Some (very) old explorations do not have a states schema version.
-        # These explorations have snapshots that were created before the
-        # states_schema_version system was introduced. We therefore set their
-        # states schema version to 0, since we now expect all snapshots to
-        # explicitly include this field.
-        if 'states_schema_version' not in item.content:
-            item.content['states_schema_version'] = 0
-
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
         current_state_schema_version = item.content['states_schema_version']
         if current_state_schema_version == target_state_schema_version:
@@ -876,12 +867,12 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
         }
+        init_state_name = latest_exploration.init_state_name
         while current_state_schema_version < target_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
                     versioned_exploration_states,
-                    current_state_schema_version,
-                    exp_id)
+                    current_state_schema_version, init_state_name)
                 current_state_schema_version += 1
             except Exception as e:
                 error_message = (
@@ -948,10 +939,6 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 'INFO - Exploration %s failed non-strict validation' % item.id,
                 e)
 
-        # Some old explorations do not have a states schema version.
-        if 'states_schema_version' not in item.content:
-            item.content['states_schema_version'] = 0
-
         # If the snapshot being stored in the datastore does not have the most
         # up-to-date states schema version, then update it.
         target_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
@@ -966,11 +953,12 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             'states_schema_version': current_state_schema_version,
             'states': item.content['states']
         }
+        init_state_name = latest_exploration.init_state_name
+
         while current_state_schema_version < target_state_schema_version:
             exp_domain.Exploration.update_states_from_model(
                 versioned_exploration_states,
-                current_state_schema_version,
-                exp_id)
+                current_state_schema_version, init_state_name)
             current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:
@@ -989,3 +977,74 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class RatioTermsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the number of ratio terms used by each state of an
+    exploration.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            interaction = state.interaction
+            exp_and_state_key = '%s %s' % (
+                item.id, state_name)
+            if interaction.id == 'RatioExpressionInput':
+                number_of_terms = (
+                    interaction.customization_args['numberOfTerms'].value)
+                if number_of_terms > 10:
+                    yield (
+                        python_utils.UNICODE(number_of_terms), exp_and_state_key
+                    )
+
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class ExpSnapshotsDeletionJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that attempts to delete explorations that have no parent
+    ExplorationModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationSnapshotContentModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotContentModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+        ]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExpSnapshotsDeletionJob, cls).enqueue(job_id, shard_count=16)
+
+    @staticmethod
+    def map(model):
+        class_name = model.__class__.__name__
+        exp_id = model.get_unversioned_instance_id()
+        exp_model = exp_models.ExplorationModel.get(exp_id, strict=False)
+        if exp_model is None:
+            model.delete()
+            yield ('SUCCESS_DELETED - %s' % class_name, 1)
+        else:
+            yield ('SUCCESS_PASS - %s' % class_name, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

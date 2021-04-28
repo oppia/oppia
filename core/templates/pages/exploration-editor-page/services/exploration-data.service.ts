@@ -50,7 +50,7 @@ export class ExplorationDataService {
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private explorationDataBackendApiService: ExplorationDataBackendApiService,
-    private localStorageService:LocalStorageService,
+    private localStorageService: LocalStorageService,
     private loggerService: LoggerService,
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,

@@ -556,7 +556,7 @@ def publish_story(topic_id, story_id, committer_id):
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:
         raise Exception('A topic with the given ID doesn\'t exist')
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to publish the story.')
@@ -594,7 +594,7 @@ def unpublish_story(topic_id, story_id, committer_id):
         Exception. The story is already unpublished.
         Exception. The user does not have enough rights to unpublish the story.
     """
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the story.')
@@ -757,6 +757,29 @@ def delete_topic_summary(topic_id):
     topic_models.TopicSummaryModel.get(topic_id).delete()
 
 
+def update_story_and_topic_summary(
+        committer_id, story_id, change_list, commit_message, topic_id):
+    """Updates a story. Commits changes. Then generates a new
+    topic summary.
+
+    Args:
+        committer_id: str. The id of the user who is performing the update
+            action.
+        story_id: str. The story id.
+        change_list: list(StoryChange). These changes are applied in sequence to
+            produce the resulting story.
+        commit_message: str or None. A description of changes made to the
+            story.
+        topic_id: str. The id of the topic to which the story is belongs.
+    """
+    story_services.update_story(
+        committer_id, story_id, change_list, commit_message)
+    # Generate new TopicSummary after a Story has been updated to
+    # make sure the TopicSummaryTile displays the correct number
+    # of chapters on the classroom page.
+    generate_topic_summary(topic_id)
+
+
 def generate_topic_summary(topic_id):
     """Creates and stores a summary of the given topic.
 
@@ -780,14 +803,19 @@ def compute_summary_of_topic(topic):
     """
     canonical_story_count = 0
     additional_story_count = 0
+    published_node_count = 0
     for reference in topic.canonical_story_references:
         if reference.story_is_published:
             canonical_story_count += 1
+            story_summary = story_fetchers.get_story_summary_by_id(
+                reference.story_id)
+            published_node_count += len(story_summary.node_titles)
     for reference in topic.additional_story_references:
         if reference.story_is_published:
             additional_story_count += 1
     topic_model_canonical_story_count = canonical_story_count
     topic_model_additional_story_count = additional_story_count
+    total_model_published_node_count = published_node_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
@@ -800,8 +828,9 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic.thumbnail_filename, topic.thumbnail_bg_color,
-        topic.url_fragment, topic.created_on, topic.last_updated
+        total_skill_count, total_model_published_node_count,
+        topic.thumbnail_filename, topic.thumbnail_bg_color, topic.url_fragment,
+        topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -826,6 +855,8 @@ def save_topic_summary(topic_summary):
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
+        'total_published_node_count':
+            topic_summary.total_published_node_count,
         'thumbnail_filename': topic_summary.thumbnail_filename,
         'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
@@ -863,7 +894,7 @@ def publish_topic(topic_id, committer_id):
         raise Exception('The given topic does not exist')
     topic = topic_fetchers.get_topic_by_id(topic_id)
     topic.validate(strict=True)
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to publish the topic.')
@@ -894,7 +925,7 @@ def unpublish_topic(topic_id, committer_id):
     topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
-    user = user_services.UserActionsInfo(committer_id)
+    user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the topic.')

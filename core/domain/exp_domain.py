@@ -26,27 +26,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
-import functools
 import json
 import re
 import string
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import customization_args_util
-from core.domain import expression_parser
-from core.domain import html_validation_service
-from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
-from extensions import domain
 import feconf
 import python_utils
-import schema_utils
 import utils
-
-from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -59,6 +50,7 @@ from pylatexenc import latex2text
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
+STATE_PROPERTY_CARD_IS_CHECKPOINT = 'card_is_checkpoint'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
@@ -236,6 +228,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+        STATE_PROPERTY_CARD_IS_CHECKPOINT,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
@@ -714,6 +707,8 @@ class Exploration(python_utils.OBJECT):
 
             state.solicit_answer_details = sdict['solicit_answer_details']
 
+            state.card_is_checkpoint = sdict['card_is_checkpoint']
+
             exploration.states[state_name] = state
 
         exploration.param_changes = [
@@ -967,6 +962,85 @@ class Exploration(python_utils.OBJECT):
                             'The parameter %s was used in an answer group, '
                             'but it does not exist in this exploration'
                             % param_change.name)
+
+        # Check if first state is a checkpoint or not.
+        if not self.states[self.init_state_name].card_is_checkpoint:
+            raise utils.ValidationError(
+                'Expected card_is_checkpoint of first state to be True'
+                ' but found it to be %s'
+                % (self.states[self.init_state_name].card_is_checkpoint)
+            )
+
+        # Check if terminal states are checkpoints.
+        for state_name, state in self.states.items():
+            interaction = state.interaction
+            if interaction.is_terminal:
+                if state_name != self.init_state_name:
+                    if self.states[state_name].card_is_checkpoint:
+                        raise utils.ValidationError(
+                            'Expected card_is_checkpoint of terminal state to '
+                            'be False but found it to be %s'
+                            % self.states[state_name].card_is_checkpoint
+                        )
+
+        # Check if checkpoint count is between 1 and 8, inclusive.
+        checkpoint_count = 0
+        for state_name, state in self.states.items():
+            if state.card_is_checkpoint:
+                checkpoint_count = checkpoint_count + 1
+        if not 1 <= checkpoint_count <= 8:
+            raise utils.ValidationError(
+                'Expected checkpoint count to be between 1 and 8 inclusive '
+                'but found it to be %s'
+                % checkpoint_count
+            )
+
+        # Check if a state marked as a checkpoint is bypassable.
+        non_initial_checkpoint_state_names = []
+        for state_name, state in self.states.items():
+            if state_name != self.init_state_name and state.card_is_checkpoint:
+                non_initial_checkpoint_state_names.append(state_name)
+
+        # For every non-initial checkpoint state we remove it from the states
+        # dict. Then we check if we can reach a terminal state after removing
+        # the state with checkpoint. As soon as we find a terminal state, we
+        # break out of the loop and raise a validation error. Since, we reached
+        # a terminal state, this implies that the user was not required to go
+        # through the checkpoint. Hence, the checkpoint is bypassable.
+        for state_name_to_exclude in non_initial_checkpoint_state_names:
+            new_states = copy.deepcopy(self.states)
+            new_states.pop(state_name_to_exclude)
+            processed_state_names = set()
+            curr_queue = [self.init_state_name]
+            excluded_state_is_bypassable = False
+            while curr_queue:
+                if curr_queue[0] == state_name_to_exclude:
+                    curr_queue.pop(0)
+                    continue
+                curr_state_name = curr_queue[0]
+                curr_queue = curr_queue[1:]
+                if not curr_state_name in processed_state_names:
+                    processed_state_names.add(curr_state_name)
+                    curr_state = new_states[curr_state_name]
+
+                    # We do not need to check if the current state is terminal
+                    # or not before getting all outcomes, as when we find a
+                    # terminal state in an outcome, we break out of the for loop
+                    # and raise a validation error.
+                    all_outcomes = (
+                        curr_state.interaction.get_all_outcomes())
+                    for outcome in all_outcomes:
+                        dest_state = outcome.dest
+                        if self.states[dest_state].interaction.is_terminal:
+                            excluded_state_is_bypassable = True
+                            break
+                        if (dest_state not in curr_queue and
+                                dest_state not in processed_state_names):
+                            curr_queue.append(dest_state)
+                if excluded_state_is_bypassable:
+                    raise utils.ValidationError(
+                        'Cannot make %s a checkpoint as it is bypassable'
+                        % state_name_to_exclude)
 
         if strict:
             warnings_list = []
@@ -1275,12 +1349,16 @@ class Exploration(python_utils.OBJECT):
         Args:
             init_state_name: str. The new name of the initial state.
         """
+        old_init_state_name = self.init_state_name
         if init_state_name not in self.states:
             raise Exception(
                 'Invalid new initial state name: %s; '
                 'it is not in the list of states %s for this '
                 'exploration.' % (init_state_name, list(self.states.keys())))
         self.init_state_name = init_state_name
+        if old_init_state_name in self.states:
+            self.states[old_init_state_name].card_is_checkpoint = False
+        self.init_state.card_is_checkpoint = True
 
     def update_auto_tts_enabled(self, auto_tts_enabled):
         """Update whether automatic text-to-speech is enabled.
@@ -1347,7 +1425,6 @@ class Exploration(python_utils.OBJECT):
 
         if self.init_state_name == old_state_name:
             self.update_init_state_name(new_state_name)
-
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
         for other_state_name in self.states:
@@ -1517,1609 +1594,6 @@ class Exploration(python_utils.OBJECT):
         return content_count
 
     @classmethod
-    def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
-        """Converts old states schema to the modern v1 schema. v1 contains the
-        schema version 1 and does not contain any old constructs, such as
-        widgets. This is a complete migration of everything previous to the
-        schema versioning update to the earliest versioned schema.
-        Note that the states_dict being passed in is modified in-place.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        # Ensure widgets are renamed to be interactions.
-        for _, state_defn in states_dict.items():
-            if 'widget' not in state_defn:
-                continue
-            state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
-            state_defn['interaction']['id'] = copy.deepcopy(
-                state_defn['interaction']['widget_id'])
-            del state_defn['interaction']['widget_id']
-            if 'sticky' in state_defn['interaction']:
-                del state_defn['interaction']['sticky']
-            del state_defn['widget']
-        return states_dict
-
-    @classmethod
-    def _convert_states_v1_dict_to_v2_dict(cls, states_dict):
-        """Converts from version 1 to 2. Version 1 assumes the existence of an
-        implicit 'END' state, but version 2 does not. As a result, the
-        conversion process involves introducing a proper ending state for all
-        explorations previously designed under this assumption.
-        Note that the states_dict being passed in is modified in-place.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        # The name of the implicit END state before the migration. Needed here
-        # to migrate old explorations which expect that implicit END state.
-        old_end_dest = 'END'
-
-        # Adds an explicit state called 'END' with an EndExploration to replace
-        # links other states have to an implicit 'END' state. Otherwise, if no
-        # states refer to a state called 'END', no new state will be introduced
-        # since it would be isolated from all other states in the graph and
-        # create additional warnings for the user. If they were not referring
-        # to an 'END' state before, then they would only be receiving warnings
-        # about not being able to complete the exploration. The introduction of
-        # a real END state would produce additional warnings (state cannot be
-        # reached from other states, etc.).
-        targets_end_state = False
-        has_end_state = False
-        for (state_name, sdict) in states_dict.items():
-            if not has_end_state and state_name == old_end_dest:
-                has_end_state = True
-
-            if not targets_end_state:
-                for handler in sdict['interaction']['handlers']:
-                    for rule_spec in handler['rule_specs']:
-                        if rule_spec['dest'] == old_end_dest:
-                            targets_end_state = True
-                            break
-
-        # Ensure any explorations pointing to an END state has a valid END
-        # state to end with (in case it expects an END state).
-        if targets_end_state and not has_end_state:
-            states_dict[old_end_dest] = {
-                'content': [{
-                    'type': 'text',
-                    'value': 'Congratulations, you have finished!'
-                }],
-                'interaction': {
-                    'id': 'EndExploration',
-                    'customization_args': {
-                        'recommendedExplorationIds': {
-                            'value': []
-                        }
-                    },
-                    'handlers': [{
-                        'name': 'submit',
-                        'rule_specs': [{
-                            'definition': {
-                                'rule_type': 'default'
-                            },
-                            'dest': old_end_dest,
-                            'feedback': [],
-                            'param_changes': []
-                        }]
-                    }],
-                },
-                'param_changes': []
-            }
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v2_dict_to_v3_dict(cls, states_dict):
-        """Converts from version 2 to 3. Version 3 introduces a triggers list
-        within interactions.
-        Note that the states_dict being passed in is modified in-place.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        # Ensure all states interactions have a triggers list.
-        for sdict in states_dict.values():
-            interaction = sdict['interaction']
-            if 'triggers' not in interaction:
-                interaction['triggers'] = []
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v3_dict_to_v4_dict(cls, states_dict):
-        """Converts from version 3 to 4. Version 4 introduces a new structure
-        for rules by organizing them into answer groups instead of handlers.
-        This migration involves a 1:1 mapping from rule specs to answer groups
-        containing just that single rule. Default rules have their destination
-        state name and feedback copied to the default_outcome portion of an
-        interaction instance.
-        Note that the states_dict being passed in is modified in-place.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            answer_groups = []
-            default_outcome = None
-            for handler in interaction['handlers']:
-                # Ensure the name is 'submit'.
-                if 'name' in handler and handler['name'] != 'submit':
-                    raise utils.ExplorationConversionError(
-                        'Error: Can only convert rules with a name '
-                        '\'submit\' in states v3 to v4 conversion process. '
-                        'Encountered name: %s' % handler['name'])
-
-                # Each rule spec becomes a new answer group.
-                for rule_spec in handler['rule_specs']:
-                    group = {}
-
-                    # Rules don't have a rule_type key anymore.
-                    is_default_rule = False
-                    if 'rule_type' in rule_spec['definition']:
-                        rule_type = rule_spec['definition']['rule_type']
-                        is_default_rule = (rule_type == 'default')
-
-                        # Ensure the rule type is either default or atomic.
-                        if not is_default_rule and rule_type != 'atomic':
-                            raise utils.ExplorationConversionError(
-                                'Error: Can only convert default and atomic '
-                                'rules in states v3 to v4 conversion process. '
-                                'Encountered rule of type: %s' % rule_type)
-
-                    # Ensure the subject is answer.
-                    if ('subject' in rule_spec['definition'] and
-                            rule_spec['definition']['subject'] != 'answer'):
-                        raise utils.ExplorationConversionError(
-                            'Error: Can only convert rules with an \'answer\' '
-                            'subject in states v3 to v4 conversion process. '
-                            'Encountered subject: %s'
-                            % rule_spec['definition']['subject'])
-
-                    # The rule turns into the group's only rule. Rules do not
-                    # have definitions anymore. Do not copy the inputs and name
-                    # if it is a default rule.
-                    if not is_default_rule:
-                        definition = rule_spec['definition']
-                        group['rule_specs'] = [{
-                            'inputs': copy.deepcopy(definition['inputs']),
-                            'rule_type': copy.deepcopy(definition['name'])
-                        }]
-
-                    # Answer groups now have an outcome.
-                    group['outcome'] = {
-                        'dest': copy.deepcopy(rule_spec['dest']),
-                        'feedback': copy.deepcopy(rule_spec['feedback']),
-                        'param_changes': (
-                            copy.deepcopy(rule_spec['param_changes'])
-                            if 'param_changes' in rule_spec else [])
-                    }
-
-                    if is_default_rule:
-                        default_outcome = group['outcome']
-                    else:
-                        answer_groups.append(group)
-
-            try:
-                is_terminal = (
-                    interaction_registry.Registry.get_interaction_by_id(
-                        interaction['id']
-                    ).is_terminal if interaction['id'] is not None else False)
-            except KeyError:
-                raise utils.ExplorationConversionError(
-                    'Trying to migrate exploration containing non-existent '
-                    'interaction ID: %s' % interaction['id'])
-            if not is_terminal:
-                interaction['answer_groups'] = answer_groups
-                interaction['default_outcome'] = default_outcome
-            else:
-                # Terminal nodes have no answer groups or outcomes.
-                interaction['answer_groups'] = []
-                interaction['default_outcome'] = None
-            del interaction['handlers']
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v4_dict_to_v5_dict(cls, states_dict):
-        """Converts from version 4 to 5. Version 5 removes the triggers list
-        within interactions, and replaces it with a fallbacks list.
-        Note that the states_dict being passed in is modified in-place.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        # Ensure all states interactions have a fallbacks list.
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            if 'triggers' in interaction:
-                del interaction['triggers']
-            if 'fallbacks' not in interaction:
-                interaction['fallbacks'] = []
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v5_dict_to_v6_dict(cls, states_dict):
-        """Converts from version 5 to 6. Version 6 introduces a list of
-        confirmed unclassified answers. Those are answers which are confirmed
-        to be associated with the default outcome during classification.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            if 'confirmed_unclassified_answers' not in interaction:
-                interaction['confirmed_unclassified_answers'] = []
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v6_dict_to_v7_dict(cls, states_dict):
-        """Converts from version 6 to 7. Version 7 forces all CodeRepl
-        interactions to use Python.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            if interaction['id'] == 'CodeRepl':
-                interaction['customization_args']['language']['value'] = (
-                    'python')
-
-        return states_dict
-
-    # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
-    # migration is completed.
-    @classmethod
-    def _convert_states_v7_dict_to_v8_dict(cls, states_dict):
-        """Converts from version 7 to 8. Version 8 contains classifier
-        model id.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            state_dict['classifier_model_id'] = None
-        return states_dict
-
-    @classmethod
-    def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
-        """Converts from version 8 to 9. Version 9 contains 'correct'
-        field in answer groups.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['correct'] = False
-        return states_dict
-
-    @classmethod
-    def _convert_states_v9_dict_to_v10_dict(cls, states_dict):
-        """Converts from version 9 to 10. Version 10 contains hints
-        and solution in each interaction.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            interaction = state_dict['interaction']
-            if 'hints' not in interaction:
-                interaction['hints'] = []
-                for fallback in interaction['fallbacks']:
-                    if fallback['outcome']['feedback']:
-                        interaction['hints'].append({
-                            'hint_text': fallback['outcome']['feedback'][0]
-                        })
-            if 'solution' not in interaction:
-                interaction['solution'] = None
-        return states_dict
-
-    @classmethod
-    def _convert_states_v10_dict_to_v11_dict(cls, states_dict):
-        """Converts from version 10 to 11. Version 11 refactors the content to
-        be an HTML string with audio translations.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            content_html = state_dict['content'][0]['value']
-            state_dict['content'] = {
-                'html': content_html,
-                'audio_translations': []
-            }
-        return states_dict
-
-    @classmethod
-    def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
-        """Converts from version 11 to 12. Version 12 refactors audio
-        translations from a list to a dict keyed by language code.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            old_audio_translations = state_dict['content']['audio_translations']
-            state_dict['content']['audio_translations'] = {
-                old_translation['language_code']: {
-                    'filename': old_translation['filename'],
-                    'file_size_bytes': old_translation['file_size_bytes'],
-                    'needs_update': old_translation['needs_update'],
-                }
-                for old_translation in old_audio_translations
-            }
-        return states_dict
-
-    @classmethod
-    def _convert_states_v12_dict_to_v13_dict(cls, states_dict):
-        """Converts from version 12 to 13. Version 13 sets empty
-        solutions to None and removes fallbacks.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if 'fallbacks' in state_dict['interaction']:
-                del state_dict['interaction']['fallbacks']
-            if not state_dict['interaction']['solution']:
-                state_dict['interaction']['solution'] = None
-        return states_dict
-
-    @classmethod
-    def _convert_states_v13_dict_to_v14_dict(cls, states_dict):
-        """Converts from version 13 to 14. Version 14 adds
-        audio translations to feedback, hints, and solutions.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['default_outcome'] is not None:
-                old_feedback_list = (
-                    state_dict['interaction']['default_outcome']['feedback'])
-                default_feedback_html = (
-                    old_feedback_list[0] if len(old_feedback_list) > 0 else '')
-                state_dict['interaction']['default_outcome']['feedback'] = {
-                    'html': default_feedback_html,
-                    'audio_translations': {}
-                }
-            for answer_group_dict in state_dict['interaction']['answer_groups']:
-                old_answer_group_feedback_list = (
-                    answer_group_dict['outcome']['feedback'])
-                feedback_html = (
-                    old_answer_group_feedback_list[0]
-                    if len(old_answer_group_feedback_list) > 0 else '')
-                answer_group_dict['outcome']['feedback'] = {
-                    'html': feedback_html,
-                    'audio_translations': {}
-                }
-            for hint_dict in state_dict['interaction']['hints']:
-                hint_content_html = hint_dict['hint_text']
-                del hint_dict['hint_text']
-                hint_dict['hint_content'] = {
-                    'html': hint_content_html,
-                    'audio_translations': {}
-                }
-            if state_dict['interaction']['solution']:
-                explanation = (
-                    state_dict['interaction']['solution']['explanation'])
-                state_dict['interaction']['solution']['explanation'] = {
-                    'html': explanation,
-                    'audio_translations': {}
-                }
-        return states_dict
-
-    @classmethod
-    def _convert_states_v14_dict_to_v15_dict(cls, states_dict):
-        """Converts from version 14 to 15. Version 15 renames the "correct"
-        field in answer groups to "labelled_as_correct" and (for safety) resets
-        all "labelled_as_correct" values to False.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['labelled_as_correct'] = False
-                del answer_group['correct']
-        return states_dict
-
-    @classmethod
-    def _convert_states_v15_dict_to_v16_dict(cls, states_dict):
-        """Converts from version 15 to 16. Version 16 adds a
-        refresher_exploration_id field to each outcome.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['outcome']['refresher_exploration_id'] = None
-
-            if state_dict['interaction']['default_outcome'] is not None:
-                default_outcome = state_dict['interaction']['default_outcome']
-                default_outcome['refresher_exploration_id'] = None
-        return states_dict
-
-    @classmethod
-    def _convert_states_v16_dict_to_v17_dict(cls, states_dict):
-        """Converts from version 16 to 17. Version 17 moves the
-        labelled_as_correct field to the outcome dict (so that it also appears
-        for the default outcome) and adds two new customization args to
-        FractionInput interactions.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['outcome']['labelled_as_correct'] = (
-                    answer_group['labelled_as_correct'])
-                del answer_group['labelled_as_correct']
-
-            default_outcome = state_dict['interaction']['default_outcome']
-            if default_outcome is not None:
-                default_outcome['labelled_as_correct'] = False
-
-            if state_dict['interaction']['id'] == 'FractionInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'allowImproperFraction': {
-                        'value': True
-                    },
-                    'allowNonzeroIntegerPart': {
-                        'value': True
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v17_dict_to_v18_dict(cls, states_dict):
-        """Converts from version 17 to 18. Version 18 adds a new
-        customization arg to FractionInput interactions which allows
-        you to add custom placeholders.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'FractionInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'customPlaceholder': {
-                        'value': ''
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v18_dict_to_v19_dict(cls, states_dict):
-        """Converts from version 18 to 19. Version 19 adds training_data
-        parameter to each answer group to store training data of that
-        answer group.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_group_indexes_to_preserve = []
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group_index, answer_group in enumerate(answer_groups):
-                if answer_group['rule_specs']:
-                    training_data = []
-                    classifier_rule_index = None
-                    rule_specs = answer_group['rule_specs']
-
-                    for rule_index, rule in enumerate(rule_specs):
-                        if rule['rule_type'] == 'FuzzyMatches':
-                            training_data = rule['inputs']['training_data']
-                            classifier_rule_index = rule_index
-                            break
-
-                    if classifier_rule_index is not None:
-                        answer_group['rule_specs'].pop(classifier_rule_index)
-
-                    answer_group['training_data'] = training_data
-
-                    if training_data or answer_group['rule_specs']:
-                        answer_group_indexes_to_preserve.append(
-                            answer_group_index)
-
-            preserved_answer_groups = []
-            for answer_group_index in answer_group_indexes_to_preserve:
-                preserved_answer_groups.append(
-                    answer_groups[answer_group_index])
-
-            state_dict['interaction']['answer_groups'] = preserved_answer_groups
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v19_dict_to_v20_dict(cls, states_dict):
-        """Converts from version 19 to 20. Version 20 adds
-        tagged_misconception field to answer groups and
-        missing_prerequisite_skill_id field to outcomes.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['outcome']['missing_prerequisite_skill_id'] = None
-                answer_group['tagged_misconception_id'] = None
-
-            default_outcome = state_dict['interaction']['default_outcome']
-            if default_outcome is not None:
-                default_outcome['missing_prerequisite_skill_id'] = None
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v20_dict_to_v21_dict(cls, states_dict):
-        """Converts from version 20 to 21. Version 21 moves audio_translations
-        from SubtitledHTML to content_ids_to_audio_translations.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            content_ids_to_audio_translations = {}
-            content_id = 'content'
-            content_ids_to_audio_translations[content_id] = (
-                state_dict['content'].pop('audio_translations'))
-            state_dict['content']['content_id'] = content_id
-
-            for index, answer_group in enumerate(
-                    state_dict['interaction']['answer_groups']):
-                content_id = 'feedback_' + python_utils.convert_to_bytes(
-                    index + 1)
-                content_ids_to_audio_translations[content_id] = (
-                    answer_group['outcome']['feedback'].pop(
-                        'audio_translations'))
-                answer_group['outcome']['feedback']['content_id'] = content_id
-
-            if state_dict['interaction']['default_outcome']:
-                default_outcome = state_dict['interaction']['default_outcome']
-                content_id = 'default_outcome'
-                content_ids_to_audio_translations[content_id] = (
-                    default_outcome['feedback'].pop('audio_translations'))
-                default_outcome['feedback']['content_id'] = (content_id)
-
-            for index, hint in enumerate(state_dict['interaction']['hints']):
-                content_id = 'hint_' + python_utils.convert_to_bytes(index + 1)
-                content_ids_to_audio_translations[content_id] = (
-                    hint['hint_content'].pop('audio_translations'))
-                hint['hint_content']['content_id'] = content_id
-
-            if state_dict['interaction']['solution']:
-                solution = state_dict['interaction']['solution']
-                content_id = 'solution'
-                content_ids_to_audio_translations[content_id] = (
-                    solution['explanation'].pop('audio_translations'))
-                solution['explanation']['content_id'] = content_id
-
-            state_dict['content_ids_to_audio_translations'] = (
-                content_ids_to_audio_translations)
-        return states_dict
-
-    @classmethod
-    def _convert_states_v21_dict_to_v22_dict(cls, states_dict):
-        """Converts from version 21 to 22. Version 22 converts all Rich Text
-        Editor content to be compatible with the textAngular format.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for key, state_dict in states_dict.items():
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_to_textangular,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_template_schema=True)
-        return states_dict
-
-    @classmethod
-    def _convert_states_v22_dict_to_v23_dict(cls, states_dict):
-        """Converts from version 22 to 23. Version 23 ensures that all
-        all oppia-noninteractive-image tags have caption attribute.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for key, state_dict in states_dict.items():
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.add_caption_attr_to_image,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_template_schema=True)
-        return states_dict
-
-    @classmethod
-    def _convert_states_v23_dict_to_v24_dict(cls, states_dict):
-        """Converts from version 23 to 24. Version 24 converts all Rich Text
-        Editor content to be compatible with the CKEditor format.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for key, state_dict in states_dict.items():
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_to_ckeditor,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_template_schema=True)
-        return states_dict
-
-    @classmethod
-    def _convert_states_v24_dict_to_v25_dict(cls, exp_id, states_dict):
-        """Converts from version 24 to 25. Version 25 adds the dimensions of
-        images in the oppia-noninteractive-image tags.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for key, state_dict in states_dict.items():
-            add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dimensions_to_image_tags,
-                exp_id)
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                add_dimensions_to_image_tags,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_template_schema=True)
-            if state_dict['interaction']['id'] == 'ImageClickInput':
-                filename = state_dict['interaction']['customization_args'][
-                    'imageAndRegions']['value']['imagePath']
-                state_dict['interaction']['customization_args'][
-                    'imageAndRegions']['value']['imagePath'] = (
-                        html_validation_service.get_filename_with_dimensions(
-                            filename, exp_id))
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v25_dict_to_v26_dict(cls, states_dict):
-        """Converts from version 25 to 26. Version 26 adds a new
-        customization arg to DragAndDropSortInput interaction which allows
-        multiple sort items in the same position.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'allowMultipleItemsInSamePosition': {
-                        'value': False
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v26_dict_to_v27_dict(cls, states_dict):
-        """Converts from version 26 to 27. Version 27 adds written_translations
-        dict to the state, which will allow translators to add translation
-        script for the state contents.
-
-        NOTE: This migration will also filter out the content_id from
-        content_ids_to_audio_translations such that the state passes the new
-        validation check safely. The earlier state validation used to check that
-        the set of all content ids present within the state is subset of the
-        content_ids_to_audio_translations keys, but the new validation will
-        check whether both are equal.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            state_content_id_list = []
-
-            # Add state card's content id into the state_content_id_list.
-            state_content_id_list.append(state_dict['content']['content_id'])
-
-            # Add answer_groups content id into the state_content_id_list.
-            for answer_group in state_dict['interaction']['answer_groups']:
-                answer_feedback = answer_group['outcome']['feedback']
-                state_content_id_list.append(answer_feedback['content_id'])
-
-            # If present, add default_outcome content id into
-            # state_content_id_list.
-            default_outcome = state_dict['interaction']['default_outcome']
-            if default_outcome is not None:
-                state_content_id_list.append(
-                    default_outcome['feedback']['content_id'])
-
-            # Add hints content id into state_content_id_list.
-            for hint in state_dict['interaction']['hints']:
-                state_content_id_list.append(hint['hint_content']['content_id'])
-
-            # If present, add solution content id into state_content_id_list.
-            solution = state_dict['interaction']['solution']
-            if solution:
-                state_content_id_list.append(
-                    solution['explanation']['content_id'])
-
-            # Filter content_ids_to_audio_translations with unwanted content id.
-            # These are the extra content id present within the
-            # content_ids_to_audio_translations dict which is of no use as html
-            # linked to these content_ids are not available in the state.
-            citat = state_dict['content_ids_to_audio_translations']
-            extra_content_ids_in_citat = (
-                set(citat.keys()) - set(state_content_id_list))
-            for content_id in extra_content_ids_in_citat:
-                state_dict['content_ids_to_audio_translations'].pop(content_id)
-
-            # Create written_translations using the state_content_id_list.
-            translations_mapping = {}
-            for content_id in state_content_id_list:
-                translations_mapping[content_id] = {}
-
-            state_dict['written_translations'] = {}
-            state_dict['written_translations']['translations_mapping'] = (
-                translations_mapping)
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v27_dict_to_v28_dict(cls, states_dict):
-        """Converts from version 27 to 28. Version 28 replaces
-        content_ids_to_audio_translations with recorded_voiceovers.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            state_dict['recorded_voiceovers'] = {
-                'voiceovers_mapping': (
-                    state_dict.pop('content_ids_to_audio_translations'))
-            }
-        return states_dict
-
-    @classmethod
-    def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
-        """Converts from version 28 to 29. Version 29 adds
-        solicit_answer_details boolean variable to the state, which
-        allows the creator to ask for answer details from the learner
-        about why they landed on a particular answer.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            state_dict['solicit_answer_details'] = False
-        return states_dict
-
-    @classmethod
-    def _convert_states_v29_dict_to_v30_dict(cls, states_dict):
-        """Converts from version 29 to 30. Version 30 replaces
-        tagged_misconception_id with tagged_skill_misconception_id, which
-        contains the skill id and misconception id of the tagged misconception,
-        connected by '-'.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                answer_group['tagged_skill_misconception_id'] = None
-                del answer_group['tagged_misconception_id']
-        return states_dict
-
-    @classmethod
-    def _convert_states_v30_dict_to_v31_dict(cls, states_dict):
-        """Converts from version 30 to 31. Version 31 updates the
-        Voiceover model to have an initialized duration_secs attribute
-        of 0.0. This will be updated when a new mp3 audio file is uploaded
-        for the exploration.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            # Get the voiceovers_mapping metadata.
-            voiceovers_mapping = (
-                state_dict['recorded_voiceovers']['voiceovers_mapping'])
-            language_codes_to_audio_metadata = voiceovers_mapping.values()
-            for language_codes in language_codes_to_audio_metadata:
-                for audio_metadata in language_codes.values():
-                    # Initialize duration_secs with 0.0 for every voiceover
-                    # recording under Content, Feedback, Hints, and Solutions.
-                    # This is necessary to keep the state functional
-                    # when migrating to v31.
-                    audio_metadata['duration_secs'] = 0.0
-        return states_dict
-
-    @classmethod
-    def _convert_states_v31_dict_to_v32_dict(cls, states_dict):
-        """Converts from version 31 to 32. Version 32 adds a new
-        customization arg to SetInput interaction which allows
-        creators to add custom text to the "Add" button.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'SetInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'buttonText': {
-                        'value': 'Add item'
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v32_dict_to_v33_dict(cls, states_dict):
-        """Converts from version 32 to 33. Version 33 adds a new
-        customization arg to MultipleChoiceInput which allows
-        answer choices to be shuffled.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'MultipleChoiceInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'showChoicesInShuffledOrder': {
-                        'value': False
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v33_dict_to_v34_dict(cls, states_dict):
-        """Converts from version 33 to 34. Version 34 adds a new
-        attribute math components. The new attribute has an additional field
-        for storing SVG filenames.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for key, state_dict in states_dict.items():
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.add_math_content_to_math_rte_components,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_template_schema=True)
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
-        """Converts from version 34 to 35. Version 35 upgrades all explorations
-        that use the MathExpressionInput interaction to use one of
-        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
-        interactions.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        is_valid_algebraic_expression = schema_utils.get_validator(
-            'is_valid_algebraic_expression')
-        is_valid_numeric_expression = schema_utils.get_validator(
-            'is_valid_numeric_expression')
-        is_valid_math_equation = schema_utils.get_validator(
-            'is_valid_math_equation')
-        ltt = latex2text.LatexNodes2Text()
-
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'MathExpressionInput':
-                new_answer_groups = []
-                types_of_inputs = set()
-                for group in state_dict['interaction']['answer_groups']:
-                    new_answer_group = copy.deepcopy(group)
-                    for rule_spec in new_answer_group['rule_specs']:
-                        rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
-
-                        rule_input = clean_math_expression(
-                            rule_input)
-
-                        type_of_input = TYPE_INVALID_EXPRESSION
-                        if is_valid_algebraic_expression(rule_input):
-                            type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        elif is_valid_numeric_expression(rule_input):
-                            type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
-                        elif is_valid_math_equation(rule_input):
-                            type_of_input = TYPE_VALID_MATH_EQUATION
-
-                        types_of_inputs.add(type_of_input)
-
-                        if type_of_input != TYPE_INVALID_EXPRESSION:
-                            rule_spec['inputs']['x'] = rule_input
-                            if type_of_input == TYPE_VALID_MATH_EQUATION:
-                                rule_spec['inputs']['y'] = 'both'
-                            rule_spec['rule_type'] = 'MatchesExactlyWith'
-
-                    new_answer_groups.append(new_answer_group)
-
-                if TYPE_INVALID_EXPRESSION not in types_of_inputs:
-                    # If at least one rule input is an equation, we remove
-                    # all other rule inputs that are expressions.
-                    if TYPE_VALID_MATH_EQUATION in types_of_inputs:
-                        new_interaction_id = TYPE_VALID_MATH_EQUATION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_math_equation(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    # Otherwise, if at least one rule_input is an algebraic
-                    # expression, we remove all other rule inputs that are
-                    # numeric expressions.
-                    elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
-                            types_of_inputs):
-                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_algebraic_expression(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    else:
-                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
-                else:
-                    new_interaction_id = 'TextInput'
-                    for group in new_answer_groups:
-                        new_rule_specs = []
-                        for rule_spec in group['rule_specs']:
-                            rule_spec['rule_type'] = 'Equals'
-                            new_rule_specs.append(rule_spec)
-                        group['rule_specs'] = new_rule_specs
-
-                # Removing answer groups that have no rule specs left after
-                # the filtration done above.
-                new_answer_groups = [
-                    answer_group for answer_group in new_answer_groups if (
-                        len(answer_group['rule_specs']) != 0)]
-
-                # Removing feedback keys, from voiceovers_mapping and
-                # translations_mapping, that correspond to the rules that
-                # got deleted.
-                old_answer_groups_feedback_keys = [
-                    answer_group['outcome'][
-                        'feedback']['content_id'] for answer_group in (
-                            state_dict['interaction']['answer_groups'])]
-                new_answer_groups_feedback_keys = [
-                    answer_group['outcome'][
-                        'feedback']['content_id'] for answer_group in (
-                            new_answer_groups)]
-                content_ids_to_delete = set(
-                    old_answer_groups_feedback_keys) - set(
-                        new_answer_groups_feedback_keys)
-                for content_id in content_ids_to_delete:
-                    if content_id in state_dict['recorded_voiceovers'][
-                            'voiceovers_mapping']:
-                        del state_dict['recorded_voiceovers'][
-                            'voiceovers_mapping'][content_id]
-                    if content_id in state_dict['written_translations'][
-                            'translations_mapping']:
-                        del state_dict['written_translations'][
-                            'translations_mapping'][content_id]
-
-                state_dict['interaction']['id'] = new_interaction_id
-                state_dict['interaction']['answer_groups'] = (
-                    new_answer_groups)
-                if state_dict['interaction']['solution']:
-                    correct_answer = state_dict['interaction'][
-                        'solution']['correct_answer']['ascii']
-                    correct_answer = clean_math_expression(correct_answer)
-                    state_dict['interaction'][
-                        'solution']['correct_answer'] = correct_answer
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v35_dict_to_v36_dict(cls, states_dict):
-        """Converts from version 35 to 36. Version 36 adds translation support
-        for interaction customization arguments. This migration converts
-        customization arguments whose schemas have been changed from unicode to
-        SubtitledUnicode or html to SubtitledHtml. It also populates missing
-        customization argument keys on all interactions, removes extra
-        customization arguments, normalizes customization arguments against
-        its schema, and changes PencilCodeEditor's customization argument
-        name from initial_code to initialCode.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            max_existing_content_id_index = -1
-            translations_mapping = state_dict[
-                'written_translations']['translations_mapping']
-            for content_id in translations_mapping:
-                # Find maximum existing content_id index.
-                content_id_suffix = content_id.split('_')[-1]
-
-                # Possible values of content_id_suffix are a digit, or from
-                # a 'outcome' (from 'default_outcome'). If the content_id_suffix
-                # is not a digit, we disregard it here.
-                if content_id_suffix.isdigit():
-                    max_existing_content_id_index = max(
-                        max_existing_content_id_index,
-                        int(content_id_suffix)
-                    )
-
-                # Move 'html' field to 'translation' field and set 'data_format'
-                # to 'html' for all WrittenTranslations.
-                for lang_code in translations_mapping[content_id]:
-                    translations_mapping[
-                        content_id][lang_code]['data_format'] = 'html'
-                    translations_mapping[
-                        content_id][lang_code]['translation'] = (
-                            translations_mapping[content_id][lang_code]['html'])
-                    del translations_mapping[content_id][lang_code]['html']
-
-            interaction_id = state_dict['interaction']['id']
-            if interaction_id is None:
-                state_dict['next_content_id_index'] = (
-                    max_existing_content_id_index + 1)
-                continue
-
-            class ContentIdCounter(python_utils.OBJECT):
-                """This helper class is used to keep track of
-                next_content_id_index and new_content_ids, and provides a
-                function to generate new content_ids.
-                """
-
-                new_content_ids = []
-
-                def __init__(self, next_content_id_index):
-                    """Initializes a ContentIdCounter object.
-
-                    Args:
-                        next_content_id_index: int. The next content id index.
-                    """
-                    self.next_content_id_index = next_content_id_index
-
-                def generate_content_id(self, content_id_prefix):
-                    """Generate a new content_id from the prefix provided and
-                    the next content id index.
-
-                    Args:
-                        content_id_prefix: str. The prefix of the content_id.
-
-                    Returns:
-                        str. The generated content_id.
-                    """
-                    content_id = '%s%i' % (
-                        content_id_prefix,
-                        self.next_content_id_index)
-                    self.next_content_id_index += 1
-                    self.new_content_ids.append(content_id)
-                    return content_id
-
-            content_id_counter = (
-                ContentIdCounter(max_existing_content_id_index + 1))
-
-            ca_dict = state_dict['interaction']['customization_args']
-            if (interaction_id == 'PencilCodeEditor' and
-                    'initial_code' in ca_dict):
-                ca_dict['initialCode'] = ca_dict['initial_code']
-                del ca_dict['initial_code']
-
-            # Retrieve a cached version (state schema v35) of
-            # interaction_specs.json to ensure that this migration remains
-            # stable even when interaction_specs.json is changed.
-            ca_specs = [
-                domain.CustomizationArgSpec(
-                    ca_spec_dict['name'],
-                    ca_spec_dict['description'],
-                    ca_spec_dict['schema'],
-                    ca_spec_dict['default_value']
-                ) for ca_spec_dict in (
-                    interaction_registry.Registry
-                    .get_all_specs_for_state_schema_version(36)[
-                        interaction_id]['customization_arg_specs']
-                )
-            ]
-
-            all_valid_ca_keys = [ca_spec.name for ca_spec in ca_specs]
-            keys_to_remove = [
-                key for key in ca_dict if key not in all_valid_ca_keys]
-            for key in keys_to_remove:
-                del ca_dict[key]
-
-            for ca_spec in ca_specs:
-                schema = ca_spec.schema
-                ca_name = ca_spec.name
-                content_id_prefix = 'ca_%s_' % ca_name
-
-                # We only have to migrate unicode to SubtitledUnicode or
-                # list of html to list of SubtitledHtml. No interactions
-                # were changed from html to SubtitledHtml.
-                is_subtitled_unicode_spec = (
-                    schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
-                    schema['obj_type'] ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
-                is_subtitled_html_list_spec = (
-                    schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                    schema['items']['type'] ==
-                    schema_utils.SCHEMA_TYPE_CUSTOM and
-                    schema['items']['obj_type'] ==
-                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
-
-                if is_subtitled_unicode_spec:
-                    # Default is a SubtitledHtml dict or SubtitleUnicode dict.
-                    new_value = copy.deepcopy(ca_spec.default_value)
-
-                    # If available, assign value to html or unicode_str.
-                    if ca_name in ca_dict:
-                        new_value['unicode_str'] = ca_dict[ca_name]['value']
-
-                    # Assign content_id.
-                    new_value['content_id'] = (
-                        content_id_counter
-                        .generate_content_id(content_id_prefix)
-                    )
-
-                    ca_dict[ca_name] = {'value': new_value}
-                elif is_subtitled_html_list_spec:
-                    new_value = []
-
-                    if ca_name in ca_dict:
-                        # Assign values to html fields.
-                        for html in ca_dict[ca_name]['value']:
-                            new_value.append({
-                                'html': html, 'content_id': None
-                            })
-                    else:
-                        # Default is a list of SubtitledHtml dict.
-                        new_value.extend(copy.deepcopy(ca_spec.default_value))
-
-                    # Assign content_ids.
-                    for subtitled_html_dict in new_value:
-                        subtitled_html_dict['content_id'] = (
-                            content_id_counter
-                            .generate_content_id(content_id_prefix)
-                        )
-
-                    ca_dict[ca_name] = {'value': new_value}
-                elif ca_name not in ca_dict:
-                    ca_dict[ca_name] = {'value': ca_spec.default_value}
-
-            (
-                customization_args_util
-                .validate_customization_args_and_values(
-                    'interaction',
-                    interaction_id,
-                    ca_dict,
-                    ca_specs)
-            )
-
-            state_dict['next_content_id_index'] = (
-                content_id_counter.next_content_id_index)
-            for new_content_id in content_id_counter.new_content_ids:
-                state_dict[
-                    'written_translations'][
-                        'translations_mapping'][new_content_id] = {}
-                state_dict[
-                    'recorded_voiceovers'][
-                        'voiceovers_mapping'][new_content_id] = {}
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
-        """Converts from version 36 to 37. Version 37 changes all rules with
-        type CaseSensitiveEquals to Equals.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] != 'TextInput':
-                continue
-            answer_group_dicts = state_dict['interaction']['answer_groups']
-            for answer_group_dict in answer_group_dicts:
-                for rule_spec_dict in answer_group_dict['rule_specs']:
-                    if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
-                        rule_spec_dict['rule_type'] = 'Equals'
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v37_dict_to_v38_dict(cls, states_dict):
-        """Converts from version 37 to 38. Version 38 adds a customization arg
-        for the Math interactions that allows creators to specify the letters
-        that would be displayed to the learner.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] in (
-                    'AlgebraicExpressionInput', 'MathEquationInput'):
-                variables = set()
-                for group in state_dict['interaction']['answer_groups']:
-                    for rule_spec in group['rule_specs']:
-                        rule_input = rule_spec['inputs']['x']
-                        for variable in expression_parser.get_variables(
-                                rule_input):
-                            # Replacing greek letter names with greek symbols.
-                            if len(variable) > 1:
-                                variable = (
-                                    constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
-                                        variable])
-                            variables.add(variable)
-
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'customOskLetters': {
-                        'value': sorted(variables)
-                    }
-                })
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v38_dict_to_v39_dict(cls, states_dict):
-        """Converts from version 38 to 39. Version 39 adds a new
-        customization arg to NumericExpressionInput interaction which allows
-        creators to modify the placeholder text.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'NumericExpressionInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': (
-                                'Type an expression here, using only numbers.')
-                        }
-                    }
-                })
-                state_dict['written_translations']['translations_mapping'][
-                    'ca_placeholder_0'] = {}
-                state_dict['recorded_voiceovers']['voiceovers_mapping'][
-                    'ca_placeholder_0'] = {}
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v39_dict_to_v40_dict(cls, states_dict):
-        """Converts from version 39 to 40. Version 40 converts TextInput rule
-        inputs from NormalizedString to SetOfNormalizedString.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] != 'TextInput':
-                continue
-            answer_group_dicts = state_dict['interaction']['answer_groups']
-            for answer_group_dict in answer_group_dicts:
-                rule_type_to_inputs = collections.defaultdict(set)
-                for rule_spec_dict in answer_group_dict['rule_specs']:
-                    rule_type = rule_spec_dict['rule_type']
-                    rule_inputs = rule_spec_dict['inputs']['x']
-                    rule_type_to_inputs[rule_type].add(rule_inputs)
-                answer_group_dict['rule_specs'] = [{
-                    'rule_type': rule_type,
-                    'inputs': {'x': list(rule_type_to_inputs[rule_type])}
-                } for rule_type in rule_type_to_inputs]
-
-        return states_dict
-
-    @classmethod
-    def _convert_states_v40_dict_to_v41_dict(cls, states_dict):
-        """Converts from version 40 to 41. Version 41 adds
-        TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
-        objects to RuleSpec domain objects to allow for translations.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        class ContentIdCounter(python_utils.OBJECT):
-            """This helper class is used to keep track of
-            next_content_id_index and new_content_ids, and provides a
-            function to generate new content_ids.
-            """
-
-            def __init__(self, next_content_id_index):
-                """Initializes a ContentIdCounter object.
-
-                Args:
-                    next_content_id_index: int. The next content id index.
-                """
-                self.new_content_ids = []
-                self.next_content_id_index = next_content_id_index
-
-            def generate_content_id(self, content_id_prefix):
-                """Generate a new content_id from the prefix provided and
-                the next content id index.
-
-                Args:
-                    content_id_prefix: str. The prefix of the content_id.
-
-                Returns:
-                    str. The generated content_id.
-                """
-                content_id = '%s%i' % (
-                    content_id_prefix,
-                    self.next_content_id_index)
-                self.next_content_id_index += 1
-                self.new_content_ids.append(content_id)
-                return content_id
-
-        for state_dict in states_dict.values():
-            # As of Jan 2021, which is when this migration is to be run, only
-            # TextInput and SetInput have translatable rule inputs, and every
-            # rule for these interactions takes exactly one translatable input
-            # named x.
-            interaction_id = state_dict['interaction']['id']
-            if interaction_id not in ['TextInput', 'SetInput']:
-                continue
-
-            content_id_counter = ContentIdCounter(
-                state_dict['next_content_id_index'])
-            answer_group_dicts = state_dict['interaction']['answer_groups']
-            for answer_group_dict in answer_group_dicts:
-                for rule_spec_dict in answer_group_dict['rule_specs']:
-                    content_id = content_id_counter.generate_content_id(
-                        'rule_input_')
-                    if interaction_id == 'TextInput':
-                        # Convert to TranslatableSetOfNormalizedString.
-                        rule_spec_dict['inputs']['x'] = {
-                            'contentId': content_id,
-                            'normalizedStrSet': rule_spec_dict['inputs']['x']
-                        }
-                    elif interaction_id == 'SetInput':
-                        # Convert to TranslatableSetOfUnicodeString.
-                        rule_spec_dict['inputs']['x'] = {
-                            'contentId': content_id,
-                            'unicodeStrSet': rule_spec_dict['inputs']['x']
-                        }
-            state_dict['next_content_id_index'] = (
-                content_id_counter.next_content_id_index)
-            for new_content_id in content_id_counter.new_content_ids:
-                state_dict[
-                    'written_translations'][
-                        'translations_mapping'][new_content_id] = {}
-                state_dict[
-                    'recorded_voiceovers'][
-                        'voiceovers_mapping'][new_content_id] = {}
-
-        return states_dict
-
-    @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
         """Converts from version 41 to 42. Version 42 changes rule input types
         for DragAndDropSortInput and ItemSelectionInput interactions to better
@@ -3271,9 +1745,61 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v42_dict_to_v43_dict(cls, states_dict):
+        """Converts from version 42 to 43. Version 43 adds a new customization
+        arg to NumericExpressionInput, AlgebraicExpressionInput, and
+        MathEquationInput. The customization arg will allow creators to choose
+        whether to render the division sign (÷) instead of a fraction for the
+        division operation.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id not in [
+                    'NumericExpressionInput', 'AlgebraicExpressionInput',
+                    'MathEquationInput']:
+                continue
+
+            customization_args = state_dict['interaction']['customization_args']
+            customization_args.update({
+                'useFractionForDivision': {
+                    'value': True
+                }
+            })
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v43_dict_to_v44_dict(cls, states_dict, init_state_name):
+        """Converts from version 43 to version 44. Version 44 adds
+        card_is_checkpoint boolean to the state, which allows creators to
+        mark a state as a checkpoint for the learners
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+            init_state_name: str. Name of the first state.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for (state_name, state_dict) in states_dict.items():
+            state_dict['card_is_checkpoint'] = bool(
+                state_name == init_state_name)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version,
-            exploration_id):
+            cls, versioned_exploration_states,
+            current_states_schema_version, init_state_name):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -3289,1092 +1815,26 @@ class Exploration(python_utils.OBJECT):
                     dicts used to initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
-            exploration_id: str. ID of the exploration.
+            init_state_name: str. Name of initial state.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
-        if current_states_schema_version == 24:
-            conversion_fn = functools.partial(conversion_fn, exploration_id)
-        versioned_exploration_states['states'] = conversion_fn(
-            versioned_exploration_states['states'])
+        if current_states_schema_version == 43:
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states'], init_state_name)
+        else:
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states'])
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 47
-    LAST_UNTITLED_SCHEMA_VERSION = 9
-
-    @classmethod
-    def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
-        """Converts a v1 exploration dict into a v2 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v1.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v2.
-        """
-        exploration_dict['schema_version'] = 2
-        exploration_dict['init_state_name'] = (
-            exploration_dict['states'][0]['name'])
-
-        states_dict = {}
-        for state in exploration_dict['states']:
-            states_dict[state['name']] = state
-            del states_dict[state['name']]['name']
-        exploration_dict['states'] = states_dict
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v2_dict_to_v3_dict(cls, exploration_dict):
-        """Converts a v2 exploration dict into a v3 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v2.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v3.
-        """
-        exploration_dict['schema_version'] = 3
-
-        exploration_dict['objective'] = ''
-        exploration_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
-        exploration_dict['skill_tags'] = []
-        exploration_dict['blurb'] = ''
-        exploration_dict['author_notes'] = ''
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v3_dict_to_v4_dict(cls, exploration_dict):
-        """Converts a v3 exploration dict into a v4 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v3.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v4.
-        """
-        exploration_dict['schema_version'] = 4
-
-        for _, state_defn in exploration_dict['states'].items():
-            state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
-            state_defn['interaction']['id'] = copy.deepcopy(
-                state_defn['interaction']['widget_id'])
-            del state_defn['interaction']['widget_id']
-            del state_defn['interaction']['sticky']
-            del state_defn['widget']
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v4_dict_to_v5_dict(cls, exploration_dict):
-        """Converts a v4 exploration dict into a v5 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v4.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v5.
-        """
-        exploration_dict['schema_version'] = 5
-
-        # Rename the 'skill_tags' field to 'tags'.
-        exploration_dict['tags'] = exploration_dict['skill_tags']
-        del exploration_dict['skill_tags']
-
-        exploration_dict['skin_customizations'] = {
-            'panels_contents': {
-                'bottom': [],
-                'left': [],
-                'right': []
-            }
-        }
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v5_dict_to_v6_dict(cls, exploration_dict):
-        """Converts a v5 exploration dict into a v6 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v5.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v6.
-        """
-        exploration_dict['schema_version'] = 6
-
-        # Ensure this exploration is up-to-date with states schema v3.
-        exploration_dict['states'] = cls._convert_states_v0_dict_to_v1_dict(
-            exploration_dict['states'])
-        exploration_dict['states'] = cls._convert_states_v1_dict_to_v2_dict(
-            exploration_dict['states'])
-        exploration_dict['states'] = cls._convert_states_v2_dict_to_v3_dict(
-            exploration_dict['states'])
-
-        # Update the states schema version to reflect the above conversions to
-        # the states dict.
-        exploration_dict['states_schema_version'] = 3
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v6_dict_to_v7_dict(cls, exploration_dict):
-        """Converts a v6 exploration dict into a v7 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v6.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v7.
-        """
-        exploration_dict['schema_version'] = 7
-
-        # Ensure this exploration is up-to-date with states schema v4.
-        exploration_dict['states'] = cls._convert_states_v3_dict_to_v4_dict(
-            exploration_dict['states'])
-
-        # Update the states schema version to reflect the above conversions to
-        # the states dict.
-        exploration_dict['states_schema_version'] = 4
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v7_dict_to_v8_dict(cls, exploration_dict):
-        """Converts a v7 exploration dict into a v8 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v7.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v8.
-        """
-        exploration_dict['schema_version'] = 8
-
-        # Ensure this exploration is up-to-date with states schema v5.
-        exploration_dict['states'] = cls._convert_states_v4_dict_to_v5_dict(
-            exploration_dict['states'])
-
-        # Update the states schema version to reflect the above conversions to
-        # the states dict.
-        exploration_dict['states_schema_version'] = 5
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v8_dict_to_v9_dict(cls, exploration_dict):
-        """Converts a v8 exploration dict into a v9 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v8.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v9.
-        """
-        exploration_dict['schema_version'] = 9
-
-        # Ensure this exploration is up-to-date with states schema v6.
-        exploration_dict['states'] = cls._convert_states_v5_dict_to_v6_dict(
-            exploration_dict['states'])
-
-        # Update the states schema version to reflect the above conversions to
-        # the states dict.
-        exploration_dict['states_schema_version'] = 6
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v9_dict_to_v10_dict(cls, exploration_dict, title, category):
-        """Converts a v9 exploration dict into a v10 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v9.
-            title: str. The exploration title.
-            category: str. The exploration category.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v10.
-        """
-
-        exploration_dict['schema_version'] = 10
-
-        # From v10 onwards, the title and schema version are stored in the YAML
-        # file.
-        exploration_dict['title'] = title
-        exploration_dict['category'] = category
-
-        # Remove the 'default_skin' property.
-        del exploration_dict['default_skin']
-
-        # Upgrade all gadget panel customizations to have exactly one empty
-        # bottom panel. This is fine because, for previous schema versions,
-        # gadgets functionality had not been released yet.
-        exploration_dict['skin_customizations'] = {
-            'panels_contents': {
-                'bottom': [],
-            }
-        }
-
-        # Ensure this exploration is up-to-date with states schema v7.
-        exploration_dict['states'] = cls._convert_states_v6_dict_to_v7_dict(
-            exploration_dict['states'])
-
-        # Update the states schema version to reflect the above conversions to
-        # the states dict.
-        exploration_dict['states_schema_version'] = 7
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v10_dict_to_v11_dict(cls, exploration_dict):
-        """Converts a v10 exploration dict into a v11 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v10.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v11.
-        """
-
-        exploration_dict['schema_version'] = 11
-
-        exploration_dict['states'] = cls._convert_states_v7_dict_to_v8_dict(
-            exploration_dict['states'])
-
-        exploration_dict['states_schema_version'] = 8
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v11_dict_to_v12_dict(cls, exploration_dict):
-        """Converts a v11 exploration dict into a v12 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v11.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v12.
-        """
-
-        exploration_dict['schema_version'] = 12
-
-        exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
-            exploration_dict['states'])
-
-        exploration_dict['states_schema_version'] = 9
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v12_dict_to_v13_dict(cls, exploration_dict):
-        """Converts a v12 exploration dict into a v13 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v12.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v13.
-        """
-
-        exploration_dict['schema_version'] = 13
-
-        exploration_dict['states'] = cls._convert_states_v9_dict_to_v10_dict(
-            exploration_dict['states'])
-
-        exploration_dict['states_schema_version'] = 10
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v13_dict_to_v14_dict(cls, exploration_dict):
-        """Converts a v13 exploration dict into a v14 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v13.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v14.
-        """
-
-        exploration_dict['schema_version'] = 14
-
-        exploration_dict['states'] = cls._convert_states_v10_dict_to_v11_dict(
-            exploration_dict['states'])
-
-        exploration_dict['states_schema_version'] = 11
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v14_dict_to_v15_dict(cls, exploration_dict):
-        """Converts a v14 exploration dict into a v15 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v14.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v15.
-        """
-
-        exploration_dict['schema_version'] = 15
-
-        exploration_dict['states'] = cls._convert_states_v11_dict_to_v12_dict(
-            exploration_dict['states'])
-
-        exploration_dict['states_schema_version'] = 12
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v15_dict_to_v16_dict(cls, exploration_dict):
-        """Converts a v15 exploration dict into a v16 exploration dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v15.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v16.
-        """
-
-        exploration_dict['schema_version'] = 16
-
-        exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
-            exploration_dict['states'])
-
-        exploration_dict['states_schema_version'] = 13
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v16_dict_to_v17_dict(cls, exploration_dict):
-        """Converts a v16 exploration dict into a v17 exploration dict.
-
-        Removes gadgets and skins.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v16.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v17.
-        """
-
-        exploration_dict['schema_version'] = 17
-
-        if 'skin_customizations' in exploration_dict:
-            del exploration_dict['skin_customizations']
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
-        """Converts a v17 exploration dict into a v18 exploration dict.
-
-        Adds auto_tts_enabled property.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v17.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v18.
-        """
-
-        exploration_dict['schema_version'] = 18
-
-        if exploration_dict['category'] == 'Languages':
-            exploration_dict['auto_tts_enabled'] = False
-        else:
-            exploration_dict['auto_tts_enabled'] = True
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
-        """Converts a v18 exploration dict into a v19 exploration dict.
-
-        Adds audio translations to feedback, hints, and solutions.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v18.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v19.
-        """
-
-        exploration_dict['schema_version'] = 19
-
-        exploration_dict['states'] = cls._convert_states_v13_dict_to_v14_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 14
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
-        """Converts a v19 exploration dict into a v20 exploration dict.
-
-        Introduces a correctness property at the top level, and changes each
-        answer group's "correct" field to "labelled_as_correct" instead.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v19.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v20.
-        """
-
-        exploration_dict['schema_version'] = 20
-
-        exploration_dict['states'] = cls._convert_states_v14_dict_to_v15_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 15
-
-        exploration_dict['correctness_feedback_enabled'] = False
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
-        """Converts a v20 exploration dict into a v21 exploration dict.
-
-        Adds a refresher_exploration_id field to each answer group outcome, and
-        to the default outcome (if it exists).
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v20.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v21.
-        """
-
-        exploration_dict['schema_version'] = 21
-
-        exploration_dict['states'] = cls._convert_states_v15_dict_to_v16_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 16
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v21_dict_to_v22_dict(cls, exploration_dict):
-        """Converts a v21 exploration dict into a v22 exploration dict.
-
-        Moves the labelled_as_correct field from the answer group level to the
-        outcome level, and adds two extra customization args to the
-        FractionInput interaction.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v21.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v22.
-        """
-
-        exploration_dict['schema_version'] = 22
-
-        exploration_dict['states'] = cls._convert_states_v16_dict_to_v17_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 17
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
-        """Converts a v22 exploration dict into a v23 exploration dict.
-
-        Adds a new customization arg to FractionInput interactions
-        which allows you to add custom placeholders.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v22.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v23.
-        """
-
-        exploration_dict['schema_version'] = 23
-
-        exploration_dict['states'] = cls._convert_states_v17_dict_to_v18_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 18
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
-        """Converts a v23 exploration dict into a v24 exploration dict.
-
-        Adds training_data parameter to each answer group to store training
-        data of corresponding answer group.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v23.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v24.
-        """
-
-        exploration_dict['schema_version'] = 24
-
-        exploration_dict['states'] = cls._convert_states_v18_dict_to_v19_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 19
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
-        """Converts a v24 exploration dict into a v25 exploration dict.
-
-        Adds additional tagged_misconception_id and
-        missing_prerequisite_skill_id fields to answer groups and outcomes
-        respectively.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v24.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v25.
-        """
-
-        exploration_dict['schema_version'] = 25
-
-        exploration_dict['states'] = cls._convert_states_v19_dict_to_v20_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 20
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
-        """Converts a v25 exploration dict into a v26 exploration dict.
-
-        Move audio_translations into a seperate dict.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v25.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v26.
-        """
-
-        exploration_dict['schema_version'] = 26
-
-        exploration_dict['states'] = cls._convert_states_v20_dict_to_v21_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 21
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v26_dict_to_v27_dict(cls, exploration_dict):
-        """Converts a v26 exploration dict into a v27 exploration dict.
-
-        Converts all Rich Text Editor content to be compatible with the
-        textAngular format.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v26.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v27.
-        """
-
-        exploration_dict['schema_version'] = 27
-
-        exploration_dict['states'] = cls._convert_states_v21_dict_to_v22_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 22
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v27_dict_to_v28_dict(cls, exploration_dict):
-        """Converts a v27 exploration dict into a v28 exploration dict.
-
-        Adds caption attribute to all oppia-noninteractive-image tags.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v27.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v28.
-        """
-
-        exploration_dict['schema_version'] = 28
-
-        exploration_dict['states'] = cls._convert_states_v22_dict_to_v23_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 23
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v28_dict_to_v29_dict(cls, exploration_dict):
-        """Converts a v28 exploration dict into a v29 exploration dict.
-
-        Converts all Rich Text Editor content to be compatible with the
-        CKEditor format.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v28.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v29.
-        """
-
-        exploration_dict['schema_version'] = 29
-
-        exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 24
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v29_dict_to_v30_dict(cls, exp_id, exploration_dict):
-        """Converts a v29 exploration dict into a v30 exploration dict.
-
-        Adds dimensions to all oppia-noninteractive-image tags.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v29.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v30.
-        """
-
-        exploration_dict['schema_version'] = 30
-
-        exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
-            exp_id, exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 25
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v30_dict_to_v31_dict(cls, exploration_dict):
-        """Converts a v30 exploration dict into a v31 exploration dict.
-
-        Adds a new customization arg to DragAndDropSortInput interactions
-        which allows multiple sort items in the same position.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v30.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v31.
-        """
-
-        exploration_dict['schema_version'] = 31
-
-        exploration_dict['states'] = cls._convert_states_v25_dict_to_v26_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 26
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v31_dict_to_v32_dict(cls, exploration_dict):
-        """Converts a v31 exploration dict into a v32 exploration dict.
-
-        Adds content_tranlations in state for adding text translation.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v31.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v32.
-        """
-
-        exploration_dict['schema_version'] = 32
-
-        exploration_dict['states'] = cls._convert_states_v26_dict_to_v27_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 27
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v32_dict_to_v33_dict(cls, exploration_dict):
-        """Converts a v32 exploration dict into a v33 exploration dict.
-
-        Replaces content_ids_to_audio_translations with recorded_voiceovers in
-        each state of the exploration.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v32.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v33.
-        """
-
-        exploration_dict['schema_version'] = 33
-
-        exploration_dict['states'] = cls._convert_states_v27_dict_to_v28_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 28
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
-        """Converts a v33 exploration dict into a v34 exploration dict.
-
-        Adds solicit_answer_details in state to ask learners for the
-        answer details.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v33.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v34.
-        """
-        exploration_dict['schema_version'] = 34
-
-        exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 29
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v34_dict_to_v35_dict(cls, exploration_dict):
-        """Converts a v34 exploration dict into a v35 exploration dict.
-        Replaces tagged_misconception_id with tagged_skill_misconception_id,
-        which contains the skill id and misconception id of the tagged
-        misconception, connected by '-'.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v34.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v35.
-        """
-        exploration_dict['schema_version'] = 35
-
-        exploration_dict['states'] = cls._convert_states_v29_dict_to_v30_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 30
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v35_dict_to_v36_dict(cls, exploration_dict):
-        """Converts a v35 exploration dict into a v36 exploration dict.
-        Updates existing explorations to match the Voiceover class to have
-        the duration attribute initalised to 0.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v35.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v36.
-        """
-        exploration_dict['schema_version'] = 36
-
-        exploration_dict['states'] = cls._convert_states_v30_dict_to_v31_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 31
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v36_dict_to_v37_dict(cls, exploration_dict):
-        """Converts a v36 exploration dict into a v37 exploration dict.
-        Adds a new customization arg to SetInput interactions
-        which allows creators to customize the "Add item" button.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v36.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v37.
-        """
-        exploration_dict['schema_version'] = 37
-
-        exploration_dict['states'] = cls._convert_states_v31_dict_to_v32_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 32
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v37_dict_to_v38_dict(cls, exploration_dict):
-        """Converts a v37 exploration dict into a v38 exploration dict.
-        Adds a new customization arg to MultipleChoiceInput which allows
-        answer choices to be shuffled.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v37.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v38.
-        """
-        exploration_dict['schema_version'] = 38
-
-        exploration_dict['states'] = cls._convert_states_v32_dict_to_v33_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 33
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v38_dict_to_v39_dict(cls, exploration_dict):
-        """Converts a v38 exploration dict into a v39 exploration dict.
-        Adds a new attribute math components. The new attribute has an
-        additional field to for storing SVG filenames.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v38.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v39.
-        """
-        exploration_dict['schema_version'] = 39
-
-        exploration_dict['states'] = cls._convert_states_v33_dict_to_v34_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 34
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v39_dict_to_v40_dict(cls, exploration_dict):
-        """Converts a v39 exploration dict into a v40 exploration dict.
-        Upgrades all explorations that use the MathExpressionInput interaction
-        to use one of AlgebraicExpressionInput, NumericExpressionInput, or
-        MathEquationInput interactions.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v39.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v40.
-        """
-        exploration_dict['schema_version'] = 40
-
-        exploration_dict['states'] = cls._convert_states_v34_dict_to_v35_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 35
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v40_dict_to_v41_dict(cls, exploration_dict):
-        """Converts a v40 exploration dict into a v41 exploration dict.
-        Adds translation support to customization args.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v40.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v41.
-        """
-        exploration_dict['schema_version'] = 41
-
-        exploration_dict['states'] = cls._convert_states_v35_dict_to_v36_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 36
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v41_dict_to_v42_dict(cls, exploration_dict):
-        """Converts a v41 exploration dict into a v42 exploration dict.
-        Adds translation support to customization args.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v41.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v42.
-        """
-        exploration_dict['schema_version'] = 42
-
-        exploration_dict['states'] = cls._convert_states_v36_dict_to_v37_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 37
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v42_dict_to_v43_dict(cls, exploration_dict):
-        """Converts a v42 exploration dict into a v43 exploration dict.
-        Adds a customization arg for the Math interactions that allows creators
-        to specify the letters that would be displayed to the learner.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v42.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v43.
-        """
-        exploration_dict['schema_version'] = 43
-
-        exploration_dict['states'] = cls._convert_states_v37_dict_to_v38_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 38
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v43_dict_to_v44_dict(cls, exploration_dict):
-        """Converts a v43 exploration dict into a v44 exploration dict.
-        Adds a new customization arg to NumericExpressionInput interaction
-        which allows creators to modify the placeholder text.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v43.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v44.
-        """
-        exploration_dict['schema_version'] = 44
-
-        exploration_dict['states'] = cls._convert_states_v38_dict_to_v39_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 39
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v44_dict_to_v45_dict(cls, exploration_dict):
-        """Converts a v44 exploration dict into a v45 exploration dict.
-        Converts TextInput rule inputs from NormalizedString to
-        SetOfNormalizedString.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v44.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v45.
-        """
-        exploration_dict['schema_version'] = 45
-
-        exploration_dict['states'] = cls._convert_states_v39_dict_to_v40_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 40
-
-        return exploration_dict
-
-    @classmethod
-    def _convert_v45_dict_to_v46_dict(cls, exploration_dict):
-        """Converts a v45 exploration dict into a v46 exploration dict.
-        Adds TranslatableSetOfUnicodeString and
-        TranslatableSetOfNormalizedString objects to RuleSpec domain objects to
-        allow for translations.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v45.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v46.
-        """
-        exploration_dict['schema_version'] = 46
-
-        exploration_dict['states'] = cls._convert_states_v40_dict_to_v41_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 41
-
-        return exploration_dict
+    CURRENT_EXP_SCHEMA_VERSION = 49
+    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
     def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
@@ -4400,16 +1860,57 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(
-            cls, yaml_content, exp_id, title=None, category=None):
+    def _convert_v47_dict_to_v48_dict(cls, exploration_dict):
+        """Converts a v47 exploration dict into a v48 exploration dict.
+        Adds a new customization arg to NumericExpressionInput,
+        AlgebraicExpressionInput, and MathEquationInput. The customization arg
+        will allow creators to choose whether to render the division sign (÷)
+        instead of a fraction for the division operation.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v47.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v48.
+        """
+        exploration_dict['schema_version'] = 48
+
+        exploration_dict['states'] = cls._convert_states_v42_dict_to_v43_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 43
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v48_dict_to_v49_dict(cls, exploration_dict):
+        """Converts a v48 exploration dict into a v49 exploration dict.
+        Adds card_is_checkpoint to mark a state as a checkpoint for the
+        learners.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v48.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v49.
+        """
+        exploration_dict['schema_version'] = 49
+        exploration_dict['states'] = cls._convert_states_v43_dict_to_v44_dict(
+            exploration_dict['states'], exploration_dict['init_state_name'])
+        exploration_dict['states_schema_version'] = 44
+
+        return exploration_dict
+
+    @classmethod
+    def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:
             yaml_content: str. The YAML representation of the exploration.
-            exp_id: str. ID of the exploration.
-            title: str. The exploration title.
-            category: str. The exploration category.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -4429,247 +1930,32 @@ class Exploration(python_utils.OBJECT):
                 'a zip file. The YAML parser returned the following error: %s'
                 % e)
 
-        exploration_schema_version = exploration_dict.get('schema_version')
-        initial_schema_version = exploration_schema_version
-        if exploration_schema_version is None:
-            raise utils.InvalidInputException(
-                'Invalid YAML file: no schema version specified.')
-        if not (1 <= exploration_schema_version
+        exploration_schema_version = exploration_dict['schema_version']
+        if not (cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION <=
+                exploration_schema_version
                 <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v1 to v%s exploration YAML files '
-                'at present.' % cls.CURRENT_EXP_SCHEMA_VERSION)
-        if exploration_schema_version == 1:
-            exploration_dict = cls._convert_v1_dict_to_v2_dict(
-                exploration_dict)
-            exploration_schema_version = 2
-
-        if exploration_schema_version == 2:
-            exploration_dict = cls._convert_v2_dict_to_v3_dict(
-                exploration_dict)
-            exploration_schema_version = 3
-
-        if exploration_schema_version == 3:
-            exploration_dict = cls._convert_v3_dict_to_v4_dict(
-                exploration_dict)
-            exploration_schema_version = 4
-
-        if exploration_schema_version == 4:
-            exploration_dict = cls._convert_v4_dict_to_v5_dict(
-                exploration_dict)
-            exploration_schema_version = 5
-
-        if exploration_schema_version == 5:
-            exploration_dict = cls._convert_v5_dict_to_v6_dict(
-                exploration_dict)
-            exploration_schema_version = 6
-
-        if exploration_schema_version == 6:
-            exploration_dict = cls._convert_v6_dict_to_v7_dict(
-                exploration_dict)
-            exploration_schema_version = 7
-
-        if exploration_schema_version == 7:
-            exploration_dict = cls._convert_v7_dict_to_v8_dict(
-                exploration_dict)
-            exploration_schema_version = 8
-
-        if exploration_schema_version == 8:
-            exploration_dict = cls._convert_v8_dict_to_v9_dict(
-                exploration_dict)
-            exploration_schema_version = 9
-
-        if exploration_schema_version == 9:
-            exploration_dict = cls._convert_v9_dict_to_v10_dict(
-                exploration_dict, title, category)
-            exploration_schema_version = 10
-
-        if exploration_schema_version == 10:
-            exploration_dict = cls._convert_v10_dict_to_v11_dict(
-                exploration_dict)
-            exploration_schema_version = 11
-
-        if exploration_schema_version == 11:
-            exploration_dict = cls._convert_v11_dict_to_v12_dict(
-                exploration_dict)
-            exploration_schema_version = 12
-
-        if exploration_schema_version == 12:
-            exploration_dict = cls._convert_v12_dict_to_v13_dict(
-                exploration_dict)
-            exploration_schema_version = 13
-
-        if exploration_schema_version == 13:
-            exploration_dict = cls._convert_v13_dict_to_v14_dict(
-                exploration_dict)
-            exploration_schema_version = 14
-
-        if exploration_schema_version == 14:
-            exploration_dict = cls._convert_v14_dict_to_v15_dict(
-                exploration_dict)
-            exploration_schema_version = 15
-
-        if exploration_schema_version == 15:
-            exploration_dict = cls._convert_v15_dict_to_v16_dict(
-                exploration_dict)
-            exploration_schema_version = 16
-
-        if exploration_schema_version == 16:
-            exploration_dict = cls._convert_v16_dict_to_v17_dict(
-                exploration_dict)
-            exploration_schema_version = 17
-
-        if exploration_schema_version == 17:
-            exploration_dict = cls._convert_v17_dict_to_v18_dict(
-                exploration_dict)
-            exploration_schema_version = 18
-
-        if exploration_schema_version == 18:
-            exploration_dict = cls._convert_v18_dict_to_v19_dict(
-                exploration_dict)
-            exploration_schema_version = 19
-
-        if exploration_schema_version == 19:
-            exploration_dict = cls._convert_v19_dict_to_v20_dict(
-                exploration_dict)
-            exploration_schema_version = 20
-
-        if exploration_schema_version == 20:
-            exploration_dict = cls._convert_v20_dict_to_v21_dict(
-                exploration_dict)
-            exploration_schema_version = 21
-
-        if exploration_schema_version == 21:
-            exploration_dict = cls._convert_v21_dict_to_v22_dict(
-                exploration_dict)
-            exploration_schema_version = 22
-
-        if exploration_schema_version == 22:
-            exploration_dict = cls._convert_v22_dict_to_v23_dict(
-                exploration_dict)
-            exploration_schema_version = 23
-
-        if exploration_schema_version == 23:
-            exploration_dict = cls._convert_v23_dict_to_v24_dict(
-                exploration_dict)
-            exploration_schema_version = 24
-
-        if exploration_schema_version == 24:
-            exploration_dict = cls._convert_v24_dict_to_v25_dict(
-                exploration_dict)
-            exploration_schema_version = 25
-
-        if exploration_schema_version == 25:
-            exploration_dict = cls._convert_v25_dict_to_v26_dict(
-                exploration_dict)
-            exploration_schema_version = 26
-
-        if exploration_schema_version == 26:
-            exploration_dict = cls._convert_v26_dict_to_v27_dict(
-                exploration_dict)
-            exploration_schema_version = 27
-
-        if exploration_schema_version == 27:
-            exploration_dict = cls._convert_v27_dict_to_v28_dict(
-                exploration_dict)
-            exploration_schema_version = 28
-
-        if exploration_schema_version == 28:
-            exploration_dict = cls._convert_v28_dict_to_v29_dict(
-                exploration_dict)
-            exploration_schema_version = 29
-
-        if exploration_schema_version == 29:
-            exploration_dict = cls._convert_v29_dict_to_v30_dict(
-                exp_id, exploration_dict)
-            exploration_schema_version = 30
-
-        if exploration_schema_version == 30:
-            exploration_dict = cls._convert_v30_dict_to_v31_dict(
-                exploration_dict)
-            exploration_schema_version = 31
-
-        if exploration_schema_version == 31:
-            exploration_dict = cls._convert_v31_dict_to_v32_dict(
-                exploration_dict)
-            exploration_schema_version = 32
-
-        if exploration_schema_version == 32:
-            exploration_dict = cls._convert_v32_dict_to_v33_dict(
-                exploration_dict)
-            exploration_schema_version = 33
-
-        if exploration_schema_version == 33:
-            exploration_dict = cls._convert_v33_dict_to_v34_dict(
-                exploration_dict)
-            exploration_schema_version = 34
-
-        if exploration_schema_version == 34:
-            exploration_dict = cls._convert_v34_dict_to_v35_dict(
-                exploration_dict)
-            exploration_schema_version = 35
-
-        if exploration_schema_version == 35:
-            exploration_dict = cls._convert_v35_dict_to_v36_dict(
-                exploration_dict)
-            exploration_schema_version = 36
-
-        if exploration_schema_version == 36:
-            exploration_dict = cls._convert_v36_dict_to_v37_dict(
-                exploration_dict)
-            exploration_schema_version = 37
-
-        if exploration_schema_version == 37:
-            exploration_dict = cls._convert_v37_dict_to_v38_dict(
-                exploration_dict)
-            exploration_schema_version = 38
-
-        if exploration_schema_version == 38:
-            exploration_dict = cls._convert_v38_dict_to_v39_dict(
-                exploration_dict)
-            exploration_schema_version = 39
-
-        if exploration_schema_version == 39:
-            exploration_dict = cls._convert_v39_dict_to_v40_dict(
-                exploration_dict)
-            exploration_schema_version = 40
-
-        if exploration_schema_version == 40:
-            exploration_dict = cls._convert_v40_dict_to_v41_dict(
-                exploration_dict)
-            exploration_schema_version = 41
-
-        if exploration_schema_version == 41:
-            exploration_dict = cls._convert_v41_dict_to_v42_dict(
-                exploration_dict)
-            exploration_schema_version = 42
-
-        if exploration_schema_version == 42:
-            exploration_dict = cls._convert_v42_dict_to_v43_dict(
-                exploration_dict)
-            exploration_schema_version = 43
-
-        if exploration_schema_version == 43:
-            exploration_dict = cls._convert_v43_dict_to_v44_dict(
-                exploration_dict)
-            exploration_schema_version = 44
-
-        if exploration_schema_version == 44:
-            exploration_dict = cls._convert_v44_dict_to_v45_dict(
-                exploration_dict)
-            exploration_schema_version = 45
-
-        if exploration_schema_version == 45:
-            exploration_dict = cls._convert_v45_dict_to_v46_dict(
-                exploration_dict)
-            exploration_schema_version = 46
+                'Sorry, we can only process v%s to v%s exploration YAML files '
+                'at present.' % (
+                    cls.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
+                    cls.CURRENT_EXP_SCHEMA_VERSION))
 
         if exploration_schema_version == 46:
             exploration_dict = cls._convert_v46_dict_to_v47_dict(
                 exploration_dict)
             exploration_schema_version = 47
 
-        return (exploration_dict, initial_schema_version)
+        if exploration_schema_version == 47:
+            exploration_dict = cls._convert_v47_dict_to_v48_dict(
+                exploration_dict)
+            exploration_schema_version = 48
+
+        if exploration_schema_version == 48:
+            exploration_dict = cls._convert_v48_dict_to_v49_dict(
+                exploration_dict)
+            exploration_schema_version = 49
+
+        return exploration_dict
 
     @classmethod
     def from_yaml(cls, exploration_id, yaml_content):
@@ -4684,52 +1970,11 @@ class Exploration(python_utils.OBJECT):
             Exploration. The corresponding exploration domain object.
 
         Raises:
-            Exception. The initial schema version of exploration is less than
-                or equal to 9.
+            InvalidInputException. The initial schema version of exploration is
+                outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
+                CURRENT_EXP_SCHEMA_VERSION].
         """
-        migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id)
-        exploration_dict = migration_result[0]
-        initial_schema_version = migration_result[1]
-
-        if (initial_schema_version <=
-                cls.LAST_UNTITLED_SCHEMA_VERSION):
-            raise Exception(
-                'Expected a YAML version >= 10, received: %d' % (
-                    initial_schema_version))
-
-        exploration_dict['id'] = exploration_id
-        return Exploration.from_dict(exploration_dict)
-
-    @classmethod
-    def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
-        """Creates and returns exploration from a YAML text string. This is
-        for importing explorations using YAML schema version 9 or earlier.
-
-        Args:
-            exploration_id: str. The id of the exploration.
-            title: str. The exploration title.
-            category: str. The exploration category.
-            yaml_content: str. The YAML representation of the exploration.
-
-        Returns:
-            Exploration. The corresponding exploration domain object.
-
-        Raises:
-            Exception. The initial schema version of exploration is less than
-                or equal to 9.
-        """
-        migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id, title=title, category=category)
-        exploration_dict = migration_result[0]
-        initial_schema_version = migration_result[1]
-
-        if (initial_schema_version >
-                cls.LAST_UNTITLED_SCHEMA_VERSION):
-            raise Exception(
-                'Expected a YAML version <= 9, received: %d' % (
-                    initial_schema_version))
-
+        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

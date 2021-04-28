@@ -51,11 +51,17 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
   }
 };
 
+var getText = async function(elementName, element) {
+  await waitFor.visibilityOf(
+    element, `${elementName} is not visible for getText()`);
+  return await element.getText();
+};
+
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var optionElement = selectorElement.element(
     by.cssContainingText('option', optionToSelect));
-  await optionElement.click();
+  await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
 var select2 = async function(selectorName, selectorElement, optionToSelect) {
@@ -78,6 +84,7 @@ var sendKeys = async function(
 
 exports.clear = clear;
 exports.click = click;
+exports.getText = getText;
 exports.select = select;
 exports.select2 = select2;
 exports.sendKeys = sendKeys;

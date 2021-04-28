@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
-import functools
 import logging
 import os
 import re
@@ -32,17 +31,13 @@ from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import rules_registry
 from core.domain import state_domain
+from core.domain import translatable_object_registry
 from core.tests import test_utils
 import feconf
 import schema_utils
 import utils
 
 import contextlib2
-
-
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return html_validation_service.regenerate_image_filename_using_dimensions(
-        filename, 490, 120)
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -988,6 +983,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             },
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'written_translations': {
                 'translations_mapping': {
                     'content': {},
@@ -1643,198 +1639,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
 
-    def test_convert_html_fields_in_state(self):
-        """Test conversion of html strings in state."""
-        state_dict = {
-            'content': {
-                'content_id': 'content', 'html': 'Hello!'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': 'hello',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
+    def test_update_card_is_checkpoint(self):
+        """Test update card_is_checkpoint."""
+        state = state_domain.State.create_default_state('state_1')
+        self.assertEqual(state.card_is_checkpoint, False)
+        state.update_card_is_checkpoint(True)
+        self.assertEqual(state.card_is_checkpoint, True)
 
-        state_dict_in_textangular = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': '<p>hello</p>',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
-
-        state_dict_with_image_caption = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            '<p><oppia-noninteractive-image caption-'
-                            'with-value="&amp;quot;&amp;quot;" filepath'
-                            '-with-value="&amp;quot;random.png&amp;'
-                            'quot;"></oppia-noninteractive-image>'
-                            'Hello this is test case to check '
-                            'image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': '<p>hello</p>',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
-
-        state_dict_with_image_dimensions = {
-            'content': {
-                'content_id': 'content', 'html': '<p>Hello!</p>'
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
-                    'param_changes': [], 'feedback': {
-                        'content_id': 'default_outcome', 'html': (
-                            u'<p><oppia-noninteractive-image '
-                            'caption-with-value="&amp;quot;&amp;quot;" '
-                            'filepath-with-value="&amp;quot;'
-                            'random_height_490_width_120.png&amp;'
-                            'quot;"></oppia-noninteractive-image>Hello this '
-                            'is test case to check image tag inside p tag</p>'
-                        )
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [{
-                            'html': '<p>hello</p>',
-                            'content_id': 'ca_choices_0'
-                        }]
-                    },
-                    'showChoicesInShuffledOrder': {'value': True}
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'MultipleChoiceInput',
-                'hints': []
-            }
-        }
-
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.convert_to_textangular),
-            state_dict_in_textangular)
-
-        self.assertEqual(
-            state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                html_validation_service.add_caption_attr_to_image),
-            state_dict_with_image_caption)
-
-        add_dimensions_to_image_tags = functools.partial(
-            html_validation_service.add_dimensions_to_image_tags,
-            'eid')
-
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-
-            self.assertEqual(
-                state_domain.State.convert_html_fields_in_state(
-                    state_dict, add_dimensions_to_image_tags),
-                state_dict_with_image_dimensions)
+    def test_update_card_is_checkpoint_with_non_bool_fails(self):
+        """Test updating card_is_checkpoint with non bool value."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.card_is_checkpoint, True)
+        with self.assertRaisesRegexp(Exception, (
+            'Expected card_is_checkpoint to be a boolean, received')):
+            init_state.update_card_is_checkpoint('abc')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.card_is_checkpoint, True)
 
     def test_convert_html_fields_in_state_with_drag_and_drop_interaction(self):
         """Test the method for converting all the HTML in a state having
@@ -1998,6 +1819,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -2078,6 +1900,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -2251,6 +2074,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2320,6 +2144,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2454,6 +2279,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2512,6 +2338,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2631,6 +2458,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2679,6 +2507,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2840,6 +2669,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -2920,6 +2750,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -3042,6 +2873,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3149,6 +2981,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3232,6 +3065,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -3324,6 +3158,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3365,6 +3200,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3536,7 +3372,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         written_translation.validate()
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid translation'):
+            AssertionError, 'Expected unicode HTML string, received 30'):
             with self.swap(written_translation, 'translation', 30):
                 written_translation.validate()
 
@@ -3758,6 +3594,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, True)
+
+    def test_validate_state_card_is_checkpoint(self):
+        """Test validation of card_is_checkpoint."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.card_is_checkpoint, True)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected card_is_checkpoint to be ' +
+            'a boolean, received'):
+            with self.swap(init_state, 'card_is_checkpoint', 'abc'):
+                exploration.validate()
+        self.assertEqual(init_state.card_is_checkpoint, True)
 
     def test_validate_solution_answer_is_exclusive(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4496,7 +4344,15 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
-    def test_from_and_to_dict_wroks_correctly(self):
+    def test_data_formats_are_correct_and_complete(self):
+        translatable_class_names_in_data_formats = sorted(
+            state_domain.WrittenTranslation.
+            DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
+        self.assertEqual(
+            translatable_class_names_in_data_formats,
+            translatable_object_registry.Registry.get_all_class_names())
+
+    def test_from_and_to_dict_works_correctly(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {
@@ -4509,7 +4365,12 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'data_format': 'html',
                         'translation': 'Hey!',
                         'needs_update': False
-                    }
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
+                        'needs_update': False
+                    },
                 },
                 'feedback_1': {
                     'hi': {
@@ -4520,6 +4381,11 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'data_format': 'html',
                         'translation': 'hello!',
+                        'needs_update': False
+                    },
+                    'fr': {
+                        'data_format': 'set_of_normalized_string',
+                        'translation': ['test1', 'test2'],
                         'needs_update': False
                     }
                 }

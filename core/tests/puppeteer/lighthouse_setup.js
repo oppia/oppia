@@ -16,6 +16,7 @@
  * @fileoverview Puppeteer script to collects dynamic urls for lighthouse tests.
  */
 
+var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
 
@@ -32,6 +33,8 @@ var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
 
+var emailInput = '.protractor-test-sign-in-email-input';
+var signInButton = '.protractor-test-sign-in-button';
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
 var registerUser = '.protractor-test-register-user:not([disabled])';
@@ -82,10 +85,17 @@ const login = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
+<<<<<<< HEAD
       ADMIN_URL, { waitUntil: networkIdle });
     await page.waitForSelector('#admin', { visible: true });
     await page.click('#admin');
     await page.click('#submit-login');
+=======
+      ADMIN_URL, { waitUntil: networkIdle});
+    await page.waitForSelector(emailInput, {visible: true});
+    await page.type(emailInput, 'testadmin@example.com');
+    await page.click(signInButton);
+>>>>>>> upstream/develop
     // Checks if the user's account was already made.
     try {
       await page.waitForSelector(usernameInput, { visible: true });
@@ -275,6 +285,8 @@ const getSkillEditorUrl = async function(browser, page) {
 };
 
 const main = async function() {
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+  FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();

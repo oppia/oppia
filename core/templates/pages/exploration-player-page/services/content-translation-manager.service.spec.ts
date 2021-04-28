@@ -20,9 +20,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { RecordedVoiceovers } from
+  'domain/exploration/recorded-voiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
@@ -44,7 +44,6 @@ describe('Content translation manager service', () => {
   let pts: PlayerTranscriptService;
   let scof: StateCardObjectFactory;
   let suof: SubtitledUnicodeObjectFactory;
-  let rvof: RecordedVoiceoversObjectFactory;
   let wtof: WrittenTranslationsObjectFactory;
 
   let writtenTranslations: WrittenTranslations;
@@ -56,7 +55,6 @@ describe('Content translation manager service', () => {
     pts = TestBed.get(PlayerTranscriptService);
     scof = TestBed.get(StateCardObjectFactory);
     suof = TestBed.get(SubtitledUnicodeObjectFactory);
-    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
     wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
     let defaultOutcomeDict = {
@@ -71,7 +69,15 @@ describe('Content translation manager service', () => {
       missing_prerequisite_skill_id: null
     };
     let answerGroupsDict = [{
-      rule_specs: [],
+      rule_specs: [{
+        inputs: {
+          x: {
+            contentId: 'rule_input_3',
+            normalizedStrSet: ['InputString']
+          }
+        },
+        rule_type: 'Equals'
+      }],
       outcome: {
         dest: 'dest_1',
         feedback: {
@@ -165,6 +171,13 @@ describe('Content translation manager service', () => {
             translation: '<p>fr default outcome</p>',
             needs_update: false
           }
+        },
+        rule_input_3: {
+          fr: {
+            data_format: 'set_of_normalized_string',
+            translation: ['fr rule input 1', 'fr rule input 2'],
+            needs_update: false
+          }
         }
       }
     });
@@ -176,9 +189,9 @@ describe('Content translation manager service', () => {
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
-          interaction.id, interaction.customizationArgs, true, null),
+          interaction.id, interaction.customizationArgs, true, null, null),
         interaction,
-        rvof.createEmpty(),
+        RecordedVoiceovers.createEmpty(),
         writtenTranslations,
         'content'
       )
@@ -207,6 +220,10 @@ describe('Content translation manager service', () => {
     expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>fr feedback</p>');
+    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: 'rule_input_3',
+      normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
+    });
     expect(interaction.defaultOutcome.feedback.html).toBe(
       '<p>fr default outcome</p>');
   });
@@ -235,6 +252,10 @@ describe('Content translation manager service', () => {
     expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>fr feedback</p>');
+    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: 'rule_input_3',
+      normalizedStrSet: ['fr rule input 1', 'fr rule input 2']
+    });
     expect(interaction.defaultOutcome.feedback.html).toBe(
       '<p>fr default outcome</p>');
   });
@@ -262,6 +283,10 @@ describe('Content translation manager service', () => {
     expect(interaction.customizationArgs).toEqual(originalCustomizationArgs);
     expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
       '<p>en feedback</p>');
+    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: 'rule_input_3',
+      normalizedStrSet: ['InputString']
+    });
     expect(interaction.defaultOutcome.feedback.html).toBe(
       '<p>en default outcome</p>');
   });
@@ -293,6 +318,24 @@ describe('Content translation manager service', () => {
     expect(translatedHtml).toEqual('<p>en content</p>');
   });
 
+  it('should return default content HTML if translation is nonexistent', () => {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml('<p>en content</p>', 'content');
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, 'pt', content);
+    expect(translatedHtml).toEqual('<p>en content</p>');
+  });
+
   it('should return valid translated content HTML', () => {
     let writtenTranslations = wtof.createFromBackendDict({
       translations_mapping: {
@@ -309,6 +352,107 @@ describe('Content translation manager service', () => {
     let translatedHtml = ctms.getTranslatedHtml(
       writtenTranslations, 'fr', content);
     expect(translatedHtml).toEqual('<p>fr content</p>');
+  });
+
+  it('should not switch rules if the replacement is empty', () => {
+    // This simulates the invalid case where the "fr" translation for the rule
+    // input is an empty list.
+    let newWrittenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr content</p>',
+            needs_update: false
+          }
+        },
+        ca_placeholder_0: {
+          fr: {
+            data_format: 'html',
+            translation: 'fr placeholder',
+            needs_update: false
+          }
+        },
+        outcome_1: {
+          fr: {
+            data_format: 'html',
+            translation: '<p>fr feedback</p>',
+            needs_update: false
+          }
+        },
+        rule_input_3: {
+          fr: {
+            data_format: 'set_of_normalized_string',
+            translation: [],
+            needs_update: false
+          }
+        }
+      }
+    });
+
+    let newInteractionDict = {
+      answer_groups: [{
+        rule_specs: [{
+          inputs: {
+            x: {
+              contentId: 'rule_input_3',
+              normalizedStrSet: ['InputString']
+            }
+          },
+          rule_type: 'Equals'
+        }],
+        outcome: {
+          dest: 'dest_1',
+          feedback: {
+            content_id: 'outcome_1',
+            html: '<p>en feedback</p>'
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        training_data: [],
+        tagged_skill_misconception_id: null
+      }],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: 'en placeholder'
+          }
+        },
+        rows: { value: 1 }
+      },
+      default_outcome: null,
+      hints: [],
+      id: 'TextInput',
+      solution: null
+    };
+
+    pts.init();
+    const newInteraction = iof.createFromBackendDict(newInteractionDict);
+    pts.addNewCard(
+      scof.createNewCard(
+        'State 1',
+        '<p>en content</p>',
+        ehfs.getInteractionHtml(
+          newInteraction.id, newInteraction.customizationArgs, true, null,
+          null),
+        newInteraction,
+        RecordedVoiceovers.createEmpty(),
+        newWrittenTranslations,
+        'content'
+      )
+    );
+
+    ctms.init('en');
+    ctms.displayTranslations('fr');
+    expect(newInteraction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: 'rule_input_3',
+      normalizedStrSet: ['InputString']
+    });
   });
 
   describe('with custom INTERACTION_SPECS cases', () => {

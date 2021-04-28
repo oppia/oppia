@@ -27,9 +27,9 @@ export interface Warning {
 }
 
 export interface Message {
-    type:string;
-    content:string;
-    timeout:number;
+    type: string;
+    content: string;
+    timeout: number;
 }
 
 @Injectable({
@@ -43,20 +43,29 @@ export class AlertsService {
    *   - content: a string containing the warning or message.
    */
 
-  /**
-   * Array of "warning" messages.
-   */
-  warnings: Warning[] = new Array<Warning>();
-  /**
-   * Array of "success" or "info" messages.
-   */
-  messages: Message[] = new Array<Message>();
+  // TODO(#8472): Remove static when migration is complete.
+  // Until then, we need to use static so that the two instances of the service
+  // created by our hybrid app (one for Angular, the other for AngularJS) can
+  // refer to the same objects.
+  private static warnings: Warning[] = [];
+  get warnings(): Warning[] {
+    return AlertsService.warnings;
+  }
+  private static messages: Message[] = [];
+  get messages(): Message[] {
+    return AlertsService.messages;
+  }
 
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
 
-  constructor(private log: LoggerService) {}
+  constructor(private log: LoggerService) {
+    // Since warnings and messages are static, clearing them in the constructor
+    // retain "instance-like" behavior.
+    this.clearWarnings();
+    this.clearMessages();
+  }
 
   /**
    * Adds a warning message.
@@ -85,24 +94,19 @@ export class AlertsService {
 
   /**
    * Deletes the warning from the warnings list.
-   * @param {Object} warningObject - The warning message to be deleted.
+   * @param {Object} warningToDelete - The warning message to be deleted.
    */
-  deleteWarning(warningObject: Warning): void {
-    var warnings = this.warnings;
-    var newWarnings = [];
-    for (var i = 0; i < warnings.length; i++) {
-      if (warnings[i].content !== warningObject.content) {
-        newWarnings.push(warnings[i]);
-      }
-    }
-    this.warnings = newWarnings;
+  deleteWarning(warningToDelete: Warning): void {
+    const filteredWarnings = (
+      this.warnings.filter(w => w.content !== warningToDelete.content));
+    this.warnings.splice(0, this.warnings.length, ...filteredWarnings);
   }
 
   /**
    * Clears all warnings.
    */
   clearWarnings(): void {
-    this.warnings = [];
+    this.warnings.splice(0, this.warnings.length);
   }
 
   /**
@@ -124,18 +128,13 @@ export class AlertsService {
 
   /**
    * Deletes the message from the messages list.
-   * @param {Object} messageObject - Message to be deleted.
+   * @param {Object} messageToDelete - Message to be deleted.
    */
-  deleteMessage(messageObject: Message): void {
-    var messages = this.messages;
-    var newMessages = [];
-    for (var i = 0; i < messages.length; i++) {
-      if (messages[i].type !== messageObject.type ||
-          messages[i].content !== messageObject.content) {
-        newMessages.push(messages[i]);
-      }
-    }
-    this.messages = newMessages;
+  deleteMessage(messageToDelete: Message): void {
+    const isMessageToKeep = (m: Message) => (
+      m.type !== messageToDelete.type || m.content !== messageToDelete.content);
+    const filteredMessages = this.messages.filter(isMessageToKeep);
+    this.messages.splice(0, this.messages.length, ...filteredMessages);
   }
 
   /**
@@ -166,7 +165,7 @@ export class AlertsService {
    * Clears all messages.
    */
   clearMessages(): void {
-    this.messages = [];
+    this.messages.splice(0, this.messages.length);
   }
 }
 

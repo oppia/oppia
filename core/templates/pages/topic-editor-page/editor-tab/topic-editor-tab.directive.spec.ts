@@ -18,6 +18,8 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -42,10 +44,8 @@ describe('Topic editor tab directive', function() {
   var TopicObjectFactory = null;
   var SkillCreationService = null;
   var EntityCreationService = null;
-  var SkillSummaryObjectFactory = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
-  var SubtopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
@@ -84,9 +84,7 @@ describe('Topic editor tab directive', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
-    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     EntityCreationService = $injector.get('EntityCreationService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     mockTasdReinitializedEventEmitter = new EventEmitter();
@@ -120,9 +118,9 @@ describe('Topic editor tab directive', function() {
       TopicsAndSkillsDashboardBackendApiService:
         MockTopicsAndSkillsDashboardBackendApiService
     });
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
-    skillSummary = SkillSummaryObjectFactory.create(
+    skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
     subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];

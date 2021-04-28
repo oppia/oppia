@@ -1,5 +1,5 @@
 <div class="position-relative">
-  <form class="form-inline protractor-test-rule-details" role="form" name="$ctrl.ruleEditForm.form">
+  <form class="form-justify form-inline protractor-test-rule-details" role="form" name="$ctrl.ruleEditForm.form">
     <div ng-if="$ctrl.rule.type != 'FuzzyMatches'" class="rule-parent">
       <rule-type-selector class="protractor-test-answer-description" local-value="<[$ctrl.rule.type]>" on-selection-change="$ctrl.onSelectNewRuleType">
       </rule-type-selector>
@@ -17,19 +17,19 @@
 
         <div class="oppia-custom-editor-container">
           <span ng-if="item.type == 'checkboxes'" class="text-dark">
-            <object-editor obj-type="SetOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+            <object-editor modal-id="$ctrl.modalId" obj-type="SetOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type == 'dropdown'" class="text-dark">
-            <object-editor obj-type="ListOfSetsOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+            <object-editor modal-id="$ctrl.modalId" obj-type="ListOfSetsOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
-            <object-editor obj-type="TranslatableHtmlContentId" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+            <object-editor modal-id="$ctrl.modalId" obj-type="TranslatableHtmlContentId" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
-            <object-editor obj-type="DragAndDropPositiveInt" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+            <object-editor modal-id="$ctrl.modalId" obj-type="DragAndDropPositiveInt" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-            <object-editor obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" class="text-dark"></object-editor>
+            <object-editor modal-id="$ctrl.modalId" obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" class="text-dark"></object-editor>
           </span>
           <span ng-if="item.type == 'noneditable'">
             <[item.text]>
@@ -42,20 +42,24 @@
   <div class="oppia-rule-save-cancel-buttons" ng-if="$ctrl.isEditingRuleInline()">
     <div class="float-right">
       <button type="button" class="btn btn-default" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
+      <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid || $ctrl.isInvalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
     </div>
 
     <div class="oppia-clear"></div>
   </div>
 </div>
 <style>
+  rule-editor .form-justify {
+    justify-content: center;
+  }
+
   rule-editor .form-group.oppia-rule-editor-span {
     display: inline-block;
     margin-right: 5px;
     width: 100%;
   }
   rule-editor .oppia-rule-description-choice {
-    width: 250px;
+    width: 200px;
   }
   rule-editor .oppia-custom-editor-container {
     max-height: 320px;

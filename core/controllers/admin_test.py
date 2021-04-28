@@ -30,6 +30,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services
+from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
@@ -48,8 +49,10 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (
@@ -62,6 +65,10 @@ import utils
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
+
+
+PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
@@ -86,6 +93,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
         super(AdminIntegrationTest, self).setUp()
+        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -721,10 +729,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_feature_flags(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -742,7 +751,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -756,7 +765,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -785,7 +795,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -799,7 +809,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -829,7 +840,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -843,7 +854,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -992,7 +1004,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
-            'test_feature_1', 'feature for test.', 'dev')
+            PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
         new_rule_dicts = [
             {
                 'filters': [
@@ -1006,7 +1018,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         ]
 
         feature_list_ctx = self.swap(
-            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+            platform_feature_services, 'ALL_FEATURES_LIST',
+            [getattr(PARAM_NAMES, feature.name)])
         feature_set_ctx = self.swap(
             platform_feature_services, 'ALL_FEATURES_NAMES_SET',
             set([feature.name]))
@@ -1032,6 +1045,118 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         platform_parameter_registry.Registry.parameter_registry.pop(
             feature.name)
         self.logout()
+
+    def test_grant_super_admin_privileges(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges')
+
+        with grant_super_admin_privileges_stub as call_counter:
+            response = self.put_json(
+                '/adminsuperadminhandler',
+                {'username': self.ADMIN_USERNAME},
+                csrf_token=self.get_new_csrf_token(),
+                expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertNotIn('error', response)
+
+    def test_grant_super_admin_privileges_requires_system_default_admin(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges')
+
+        with grant_super_admin_privileges_stub as call_counter:
+            response = self.put_json(
+                '/adminsuperadminhandler',
+                {'username': self.ADMIN_USERNAME},
+                csrf_token=self.get_new_csrf_token(),
+                expected_status_int=401)
+
+        self.assertEqual(call_counter.times_called, 0)
+        self.assertEqual(
+            response['error'],
+            'Only the default system admin can manage super admins')
+
+    def test_grant_super_admin_privileges_fails_without_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.put_json(
+            '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
+            expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
+    def test_grant_super_admin_privileges_fails_with_invalid_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.put_json(
+            '/adminsuperadminhandler', {'username': 'fakeusername'},
+            csrf_token=self.get_new_csrf_token(), expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
+
+    def test_revoke_super_admin_privileges(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges')
+
+        with revoke_super_admin_privileges_stub as call_counter:
+            response = self.delete_json(
+                '/adminsuperadminhandler',
+                params={'username': self.ADMIN_USERNAME},
+                expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertNotIn('error', response)
+
+    def test_revoke_super_admin_privileges_requires_system_default_admin(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges')
+
+        with revoke_super_admin_privileges_stub as call_counter:
+            response = self.delete_json(
+                '/adminsuperadminhandler',
+                params={'username': self.ADMIN_USERNAME},
+                expected_status_int=401)
+
+        self.assertEqual(call_counter.times_called, 0)
+        self.assertEqual(
+            response['error'],
+            'Only the default system admin can manage super admins')
+
+    def test_revoke_super_admin_privileges_fails_without_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.delete_json(
+            '/adminsuperadminhandler', params={}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
+    def test_revoke_super_admin_privileges_fails_with_invalid_username(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.delete_json(
+            '/adminsuperadminhandler',
+            params={'username': 'fakeusername'}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
+
+    def test_revoke_super_admin_privileges_fails_for_default_admin(self):
+        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+
+        response = self.delete_json(
+            '/adminsuperadminhandler', params={'username': 'testsuper'},
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Cannot revoke privileges from the default super admin account')
 
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
@@ -2446,9 +2571,10 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         super(DeleteUserHandlerTest, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.admin_user_id = self.get_user_id_from_email(
+            feconf.SYSTEM_EMAIL_ADDRESS)
 
     def test_delete_without_user_id_raises_error(self):
         self.delete_json(

@@ -24,8 +24,7 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from './voiceover.model';
 
 describe('States Object Factory', () => {
   let sof: StateObjectFactory = null;
@@ -36,7 +35,6 @@ describe('States Object Factory', () => {
   let secondState = null;
   let statesWithCyclicOutcomeDict = null;
   let statesWithAudioAndWrittenTranslationsDict = null;
-  let vof = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,7 +42,6 @@ describe('States Object Factory', () => {
     });
     ssof = TestBed.get(StatesObjectFactory);
     sof = TestBed.get(StateObjectFactory);
-    vof = TestBed.get(VoiceoverObjectFactory);
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
@@ -92,8 +89,7 @@ describe('States Object Factory', () => {
           default_outcome: {}
         }
       }
-    }
-    );
+    });
 
     newState = {
       classifier_model_id: null,
@@ -671,18 +667,18 @@ describe('States Object Factory', () => {
       statesWithAudioAndWrittenTranslationsDict);
     expect(statesWithAudioAndWrittenTranslations.getAllVoiceovers('hi-en'))
       .toEqual({
-        'first state': [vof.createFromBackendDict({
+        'first state': [Voiceover.createFromBackendDict({
           filename: 'myfile3.mp3',
           file_size_bytes: 0.8,
           needs_update: false,
           duration_secs: 0.8
-        }), vof.createFromBackendDict({
+        }), Voiceover.createFromBackendDict({
           filename: 'myfile8.mp3',
           file_size_bytes: 1.2,
           needs_update: false,
           duration_secs: 1.2
         })],
-        'second state': [vof.createFromBackendDict({
+        'second state': [Voiceover.createFromBackendDict({
           filename: 'myfile2.mp3',
           file_size_bytes: 0.8,
           needs_update: false,
@@ -692,16 +688,6 @@ describe('States Object Factory', () => {
   });
 
   describe('areWrittenTranslationsDisplayable', () => {
-    // TODO(#11581): Add rule translation support for TextInput and SetInput
-    // interactions. Remove this test case afterwards.
-    it('should return false for states that contains a state with' +
-       'a TextInput interaction', () => {
-      const states = ssof.createFromBackendDict(statesDict);
-      expect(
-        states.areWrittenTranslationsDisplayable('fr')
-      ).toBe(false);
-    });
-
     it('should return true for states that have no missing or update needed ' +
        'translations', () => {
       const states = ssof.createFromBackendDict(statesDict);
@@ -782,6 +768,96 @@ describe('States Object Factory', () => {
       expect(
         states.areWrittenTranslationsDisplayable('fr')
       ).toBe(false);
+    });
+
+    it('should return false for states with missing rule input translations, ' +
+       'even if all other translations are present', () => {
+      let statesDictWithRuleInput = {
+        'first state': {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content',
+            html: ''
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                dest: 'END',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Correct!</p>'
+                },
+                labelled_as_correct: false,
+                missing_prerequisite_skill_id: null,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [{
+                inputs: {
+                  x: {
+                    contentId: 'rule_input_3',
+                    normalizedStrSet: ['InputString']
+                  }
+                },
+                rule_type: 'Equals'
+              }],
+              tagged_skill_misconception_id: null,
+              training_data: []
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: new SubtitledUnicode('Type your answer here.', '')
+              }
+            },
+            default_outcome: {
+              dest: 'new state',
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
+              param_changes: [],
+              labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            hints: [],
+            id: 'TextInput'
+          },
+          next_content_id_index: 0,
+          param_changes: [],
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              rule_input_3: {}
+            }
+          }
+        }
+      };
+
+      const states = ssof.createFromBackendDict(statesDictWithRuleInput);
+      const state = states.getState('first state');
+
+      state.writtenTranslations.addWrittenTranslation(
+        'content', 'fr', 'html', '<p>translation</p>');
+      state.writtenTranslations.addWrittenTranslation(
+        'default_outcome', 'fr', 'html', '<p>translation</p>');
+      expect(states.areWrittenTranslationsDisplayable('fr')).toBe(false);
+
+      state.writtenTranslations.addWrittenTranslation(
+        'rule_input_3', 'fr', 'set_of_normalized_string', ['abc']);
+      expect(states.areWrittenTranslationsDisplayable('fr')).toBe(true);
     });
   });
 });

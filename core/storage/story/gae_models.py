@@ -41,6 +41,50 @@ class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to stories.
+
+    A new instance of this model is created and saved every time a commit to
+    StoryModel occurs.
+
+    The id for this model is of the form 'story-[story_id]-[version]'.
+    """
+
+    # The id of the story being edited.
+    story_id = datastore_services.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def get_instance_id(cls, story_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            story_id: str. The id of the story being edited.
+            version: int. The version number of the story after the commit.
+
+        Returns:
+            str. The commit id with the story id and version number.
+        """
+        return 'story-%s-%s' % (story_id, version)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
 class StoryModel(base_models.VersionedModel):
     """Model for storing stories.
 
@@ -50,6 +94,7 @@ class StoryModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = StorySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = StorySnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = StoryCommitLogEntryModel
     ALLOW_REVERT = False
 
     # The title of the story.
@@ -154,50 +199,6 @@ class StoryModel(base_models.VersionedModel):
         return StoryModel.query().filter(
             cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
-
-
-class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to stories.
-
-    A new instance of this model is created and saved every time a commit to
-    StoryModel occurs.
-
-    The id for this model is of the form 'story-[story_id]-[version]'.
-    """
-
-    # The id of the story being edited.
-    story_id = datastore_services.StringProperty(indexed=True, required=True)
-
-    @classmethod
-    def _get_instance_id(cls, story_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
-
-        Args:
-            story_id: str. The id of the story being edited.
-            version: int. The version number of the story after the commit.
-
-        Returns:
-            str. The commit id with the story id and version number.
-        """
-        return 'story-%s-%s' % (story_id, version)
-
-    @staticmethod
-    def get_model_association_to_user():
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
 
 
 class StorySummaryModel(base_models.BaseModel):

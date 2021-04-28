@@ -98,7 +98,7 @@ class SkillRightsHandler(base.BaseHandler):
         """Returns whether the user can edit the description of a skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
             user_actions_info)
 

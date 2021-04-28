@@ -31,6 +31,7 @@ import { AlgebraicExpressionInputRulesService } from './algebraic-expression-inp
 import constants from 'assets/constants';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-interactive-algebraic-expression-input',
@@ -42,6 +43,8 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   hasBeenTouched = false;
   warningText: string = '';
   @Input() customOskLettersWithValue: string = '';
+  @Input() savedSolution: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue: string;
 
   constructor(
     private algebraicExpressionInputRulesService:
@@ -87,13 +90,17 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   ngOnInit(): void {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
+    this.guppyConfigurationService.changeDivSymbol(
+      JSON.parse(this.useFractionForDivisionWithValue || 'false'));
     this.guppyInitializationService.setCustomOskLetters(
       this.htmlEscaperService.escapedJsonToObj(
         this.customOskLettersWithValue) as string[]
     );
     this.guppyInitializationService.init(
       'guppy-div-learner',
-      constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
+      constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput,
+      this.savedSolution !== undefined ? this.savedSolution as string : ''
+    );
     const eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

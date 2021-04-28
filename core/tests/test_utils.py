@@ -49,7 +49,6 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -63,7 +62,6 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
-import main_mail
 import main_taskqueue
 from proto import text_classifier_pb2
 import python_utils
@@ -72,7 +70,6 @@ import utils
 
 import contextlib2
 import elasticsearch
-from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 import requests_mock
@@ -184,9 +181,8 @@ def get_storage_model_module_names():
     """Get all module names in storage."""
     # As models.NAMES is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.NAMES.__dict__:
-        if '__' not in name:
-            yield name
+    for name in models.NAMES:
+        yield name
 
 
 def get_storage_model_classes():
@@ -1098,6 +1094,39 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
+    def swap_with_call_counter(
+            self, obj, attr, raises=None, returns=None, call_through=False):
+        """Swap obj.attr with a CallCounter instance.
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            raises: Exception|None. The exception raised by the swapped
+                function. If None, then no exception is raised.
+            returns: *. The return value of the swapped function.
+            call_through: bool. Whether to call through to the real function,
+                rather than use a stub implementation. If True, the `raises` and
+                `returns` arguments will be ignored.
+
+        Yields:
+            CallCounter. A CallCounter instance that's installed as obj.attr's
+            implementation while within the context manager returned.
+        """
+        if call_through:
+            impl = obj.attr
+        else:
+            def impl(*_, **__):
+                """Behaves according to the given values."""
+                if raises is not None:
+                    # Pylint thinks we're trying to raise `None` even though
+                    # we've explicitly checked for it above.
+                    raise raises # pylint: disable=raising-bad-type
+                return returns
+        call_counter = CallCounter(impl)
+        with self.swap(obj, attr, call_counter):
+            yield call_counter
+
+    @contextlib.contextmanager
     def swap_with_checks(
             self, obj, attr, new_value, expected_args=None,
             expected_kwargs=None, called=True):
@@ -1306,9 +1335,10 @@ class AppEngineTestBase(TestBase):
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app)
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
-        self.mail_testapp = webtest.TestApp(main_mail.app)
 
     def tearDown(self):
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
         super(AppEngineTestBase, self).tearDown()
 
@@ -1465,7 +1495,7 @@ class GenericTestBase(AppEngineTestBase):
     TODO(#12135): Split this enormous test base into smaller, focused pieces.
     """
 
-    # NOTE: For tests that do not/can not use the default super-admin, authors
+    # NOTE: For tests that do not/can not use the default super admin, authors
     # can override the following class-level constant.
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
 
@@ -1572,76 +1602,6 @@ class GenericTestBase(AppEngineTestBase):
             }],
         },
         'classifier_model_id': None,
-    }
-
-    VERSION_21_STATE_DICT = {
-        'END': {
-            'classifier_model_id': None,
-            'content': {
-                'content_id': 'content',
-                'html': 'Congratulations, you have finished!',
-            },
-            'content_ids_to_audio_translations': {'content': {}},
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'recommendedExplorationIds': {'value': []},
-                },
-                'default_outcome': None,
-                'hints': [],
-                'id': 'EndExploration',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
-        'Introduction': {
-            'classifier_model_id': None,
-            'content': {'content_id': 'content', 'html': ''},
-            'content_ids_to_audio_translations': {
-                'content': {},
-                'default_outcome': {},
-                'feedback_1': {},
-            },
-            'interaction': {
-                'answer_groups': [{
-                    'outcome': {
-                        'dest': 'END',
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Correct!</p>',
-                        },
-                        'labelled_as_correct': False,
-                        'missing_prerequisite_skill_id': None,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                    },
-                    'rule_specs': [{
-                        'inputs': {'x': 'InputString'},
-                        'rule_type': 'Equals',
-                    }],
-                    'tagged_misconception_id': None,
-                    'training_data': ['answer1', 'answer2', 'answer3'],
-                }],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'placeholder': {'value': ''},
-                    'rows': {'value': 1},
-                },
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {'content_id': 'default_outcome', 'html': ''},
-                    'labelled_as_correct': False,
-                    'missing_prerequisite_skill_id': None,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                },
-                'hints': [],
-                'id': 'TextInput',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
     }
 
     VERSION_1_STORY_CONTENTS_DICT = {
@@ -1758,6 +1718,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1790,6 +1751,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1827,61 +1789,6 @@ title: Title
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-    SAMPLE_UNTITLED_YAML_CONTENT = (
-        """author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
@@ -1946,11 +1853,6 @@ tags: []
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
-
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        super(GenericTestBase, self).tearDown()
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -2386,40 +2288,6 @@ tags: []
             url, params=data, headers=headers, status=expected_status_int,
             upload_files=upload_files, expect_errors=expect_errors)
 
-    def post_email(
-            self, recipient_email, sender_email, subject, body, html_body=None,
-            expect_errors=False, expected_status_int=200):
-        """Post an email from the sender to the recipient.
-
-        Args:
-            recipient_email: str. The email of the recipient.
-            sender_email: str. The email of the sender.
-            subject: str. The subject of the email.
-            body: str. The body of the email.
-            html_body: str. The HTML body of the email.
-            expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code of the JSON
-                response.
-
-        Returns:
-            json. A JSON response generated by _send_post_request function.
-        """
-        email = mail.EmailMessage(
-            sender=sender_email, to=recipient_email, subject=subject, body=body)
-        if html_body is not None:
-            email.html = html_body
-
-        mime_email = email.to_mime_message()
-        headers = {
-            'Content-Type': mime_email.get_content_type(),
-        }
-        data = mime_email.as_string()
-        incoming_email_url = '/_ah/mail/%s' % recipient_email
-
-        return self._send_post_request(
-            self.mail_testapp, incoming_email_url, data, expect_errors,
-            headers=headers, expected_status_int=expected_status_int)
-
     def post_task(
             self, url, payload, headers, csrf_token=None, expect_errors=False,
             expected_status_int=200):
@@ -2592,7 +2460,8 @@ tags: []
     def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, state_names, interaction_ids,
             title='A title', category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
@@ -2609,6 +2478,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            correctness_feedback_enabled: bool. Whether the correctness feedback
+                is enabled or not for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -2623,6 +2494,7 @@ tags: []
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
 
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
@@ -2630,60 +2502,15 @@ tags: []
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
+            if correctness_feedback_enabled:
+                from_state.interaction.default_outcome.labelled_as_correct = (
+                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
-
-    def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 0 states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
-        # Create an ExplorationIssues model to match the behavior of creating
-        # new explorations.
-        stats_services.create_exp_issues_for_new_exploration(exp_id, 1)
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):
@@ -2731,52 +2558,6 @@ tags: []
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 21 states
-        dictionary. Version 21 is where training data of exploration is stored
-        with the states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=21,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_21_STATE_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.
 
@@ -2784,7 +2565,7 @@ tags: []
             owner_id: str. The user_id of the owner of the exploration.
             exploration_id: str. The ID of the new exploration.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
@@ -2856,7 +2637,7 @@ tags: []
             owner_id: str. The user_id of the owner of the collection.
             collection_id: str. ID of the collection to be published.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(

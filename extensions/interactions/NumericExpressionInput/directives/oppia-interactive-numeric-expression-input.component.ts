@@ -33,6 +33,9 @@ require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
   template: require('./numeric-expression-input-interaction.component.html'),
+  bindings: {
+    savedSolution: '<'
+  },
   controller: [
     '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
@@ -86,11 +89,16 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        const { placeholder } = (
+        const { useFractionForDivision, placeholder } = (
           InteractionAttributesExtractorService.getValuesFromAttributes(
             'NumericExpressionInput', $attrs));
+        GuppyConfigurationService.changeDivSymbol(useFractionForDivision);
         GuppyInitializationService.init(
-          'guppy-div-learner', placeholder.unicode);
+          'guppy-div-learner',
+          placeholder.unicode,
+          ctrl.savedSolution !== undefined ?
+          ctrl.savedSolution : ''
+        );
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

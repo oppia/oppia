@@ -57,7 +57,7 @@ describe('State interaction stats backend api service', () => {
     let expectedObjects = backendResposne.visualizations_info.map(
       VisualizationInfo.createFromBackendDict);
 
-    sisbas.getStats('expId', 'Intro').then((vizInfo) => {
+    sisbas.getStatsAsync('expId', 'Intro').then((vizInfo) => {
       expect(vizInfo).toEqual(expectedObjects);
     });
 
@@ -74,7 +74,7 @@ describe('State interaction stats backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      sisbas.getStats('expId', 'Intro').then(successHandler, failHandler);
+      sisbas.getStatsAsync('expId', 'Intro').then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expId/Intro');

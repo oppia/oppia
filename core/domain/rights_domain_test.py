@@ -34,10 +34,10 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         super(ActivityRightsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.viewer = user_services.UserActionsInfo(self.viewer_id)
+        self.viewer = user_services.get_user_actions_info(self.viewer_id)
 
         self.exp_id = 'exp_id'
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
@@ -178,6 +178,55 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             observed_log_messages[0],
             'User %s tried to release ownership of exploration %s but was '
             'refused permission.' % (self.viewer_id, self.exp_id))
+
+    def test_activity_should_have_atlest_one_owner(self):
+        self.activity_rights.community_owned = False
+        self.activity_rights.owner_ids = []
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Activity should have atleast one owner.'):
+            self.activity_rights.validate()
+
+    def test_assign_role_replaces_old_role(self):
+        self.activity_rights.owner_ids = ['123456']
+        self.activity_rights.editor_ids = []
+        self.activity_rights.viewer_ids = []
+        self.activity_rights.voice_artist_ids = []
+
+        self.activity_rights.assign_new_role(
+            '123456', rights_domain.ROLE_VOICE_ARTIST)
+        self.assertTrue('123456' not in self.activity_rights.owner_ids)
+        self.assertTrue('123456' in self.activity_rights.voice_artist_ids)
+
+    def test_assign_new_role(self):
+        self.activity_rights.owner_ids = []
+        self.activity_rights.editor_ids = []
+        self.activity_rights.viewer_ids = []
+
+        self.activity_rights.assign_new_role('123456', rights_domain.ROLE_OWNER)
+        self.assertTrue('123456' in self.activity_rights.owner_ids)
+
+    def test_cannot_assign_same_role(self):
+        self.activity_rights.owner_ids = ['123456']
+        self.activity_rights.editor_ids = []
+        self.activity_rights.viewer_ids = []
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user already owns this exploration.'):
+            self.activity_rights.assign_new_role(
+                '123456', rights_domain.ROLE_OWNER)
+
+    def test_cannot_assign_viewer_to_public_exp(self):
+        self.activity_rights.owner_ids = []
+        self.activity_rights.editor_ids = []
+        self.activity_rights.viewer_ids = []
+        self.activity_rights.status = rights_domain.ACTIVITY_STATUS_PUBLIC
+
+        with self.assertRaisesRegexp(
+            Exception, 'Public explorations can be viewed by anyone.'):
+            self.activity_rights.assign_new_role(
+                '123456', rights_domain.ROLE_VIEWER)
 
 
 class ExplorationRightsChangeTests(test_utils.GenericTestBase):

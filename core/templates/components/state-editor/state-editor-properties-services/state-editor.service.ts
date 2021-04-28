@@ -27,7 +27,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
@@ -64,6 +64,7 @@ export class StateEditorService {
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
+  private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -311,6 +312,10 @@ export class StateEditorService {
 
   get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
     return this._handleCustomArgsUpdateEventEmitter;
+  }
+
+  get onObjectFormValidityChange(): EventEmitter<boolean> {
+    return this._objectFormValidityChangeEventEmitter;
   }
 }
 

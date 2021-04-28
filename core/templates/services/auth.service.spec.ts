@@ -24,13 +24,13 @@ import { AppConstants } from 'app.constants';
 import { AuthService } from 'services/auth.service';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
-describe('Auth service', () => {
+describe('Auth service', function() {
   let authService: AuthService;
 
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
 
-  beforeEach(() => {
+  beforeEach(async() => {
     angularFireAuth = jasmine.createSpyObj<AngularFireAuth>([
       'createUserWithEmailAndPassword',
       'getRedirectResult',
@@ -38,8 +38,10 @@ describe('Auth service', () => {
       'signInWithRedirect',
       'signOut',
     ]);
-    authBackendApiService = (
-      jasmine.createSpyObj<AuthBackendApiService>(['beginSessionAsync']));
+    authBackendApiService = jasmine.createSpyObj<AuthBackendApiService>({
+      beginSessionAsync: Promise.resolve(),
+      endSessionAsync: Promise.resolve(),
+    });
 
     TestBed.configureTestingModule({
       providers: [
@@ -49,10 +51,19 @@ describe('Auth service', () => {
     });
 
     authService = TestBed.inject(AuthService);
+
+    this.email = 'a@a.com';
+    this.password = await md5(this.email);
+    this.idToken = 'TKN';
+    this.creds = {
+      user: jasmine.createSpyObj({getIdToken: Promise.resolve(this.idToken)}),
+      credential: null,
+      additionalUserInfo: null,
+    };
   });
 
-  it('should not use firebase auth in unit tests', () => {
-    expect(AuthService.firebaseAuthIsEnabled).toBeFalse();
+  it('should use firebase auth in unit tests', () => {
+    expect(AuthService.firebaseAuthIsEnabled).toBeTrue();
   });
 
   it('should be in emulator mode by default', () => {
@@ -115,16 +126,14 @@ describe('Auth service', () => {
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
-  it('should throw if signInAsync is called without angular fire', async() => {
-    await expectAsync(
-      new AuthService(null, authBackendApiService).signInAsync()
-    ).toBeRejectedWithError('AngularFireAuth is not available');
-  });
+  it('should throw if signInWithRedirectAsync is called without angular fire',
+    async() => {
+      await expectAsync(
+        new AuthService(null, authBackendApiService).signInWithRedirectAsync()
+      ).toBeRejectedWithError('AngularFireAuth is not available');
+    });
 
-  describe('Sign In Behavior', function() {
-    beforeEach(async() => {
-      authBackendApiService.beginSessionAsync.and.resolveTo();
-
+<<<<<<< HEAD
       this.email = 'email@test.com';
       this.password = await md5(this.email);
       this.creds = {
@@ -132,100 +141,157 @@ describe('Auth service', () => {
         credential: null,
         additionalUserInfo: { isNewUser: false, profile: {}, providerId: null },
       };
+=======
+  it('should throw if handleRedirectResultAsync is called without angular fire',
+    async() => {
+      await expectAsync(
+        new AuthService(null, authBackendApiService).handleRedirectResultAsync()
+      ).toBeRejectedWithError('AngularFireAuth is not available');
+>>>>>>> upstream/develop
     });
 
-    describe('Production enabled', () => {
-      beforeEach(() => {
-        spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
-          .and.returnValue(false);
-      });
+  it('should delegate to signInWithEmailAndPassword', async() => {
+    angularFireAuth.signInWithEmailAndPassword
+      .and.rejectWith({code: 'auth/user-not-found'});
+    angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(this.creds);
 
-      it('should sign in using redirect', async() => {
-        angularFireAuth.signInWithRedirect.and.resolveTo();
+    await expectAsync(authService.signInWithEmail(this.email))
+      .toBeResolvedTo();
 
-        this.creds.user.getIdToken.and.resolveTo('TKN');
-        this.creds.additionalUserInfo.isNewUser = false;
-        angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
+    expect(angularFireAuth.signInWithEmailAndPassword)
+      .toHaveBeenCalledWith(this.email, this.password);
+    expect(angularFireAuth.createUserWithEmailAndPassword)
+      .toHaveBeenCalledWith(this.email, this.password);
+    expect(authBackendApiService.beginSessionAsync)
+      .toHaveBeenCalledWith(this.idToken);
+  });
 
-        const signInPromise = authService.signInAsync();
+  it('should propogate signInWithEmailAndPassword errors', async() => {
+    const unknownError = {code: 'auth/unknown-error'};
+    spyOn(window, 'prompt').and.returnValue(this.email);
+    angularFireAuth.signInWithEmailAndPassword.and.rejectWith(unknownError);
 
-        await expectAsync(signInPromise).toBeResolvedTo(false);
+    await expectAsync(authService.signInWithEmail(this.email))
+      .toBeRejectedWith(unknownError);
+  });
 
-        expect(angularFireAuth.signInWithRedirect).toHaveBeenCalled();
-      });
+  it('should propogate createUserWithEmailAndPassword errors', async() => {
+    const unknownError = {code: 'auth/unknown-error'};
+    spyOn(window, 'prompt').and.returnValue(this.email);
+    angularFireAuth.signInWithEmailAndPassword
+      .and.rejectWith({code: 'auth/user-not-found'});
+    angularFireAuth.createUserWithEmailAndPassword
+      .and.rejectWith(unknownError);
 
-      it('should recognize new users', async() => {
-        angularFireAuth.signInWithRedirect.and.resolveTo();
+    await expectAsync(authService.signInWithEmail(this.email))
+      .toBeRejectedWith(unknownError);
+    expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
+  });
 
-        this.creds.user.getIdToken.and.resolveTo('TKN');
-        this.creds.additionalUserInfo.isNewUser = true;
-        angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
+  describe('Production mode', function() {
+    beforeEach(async() => {
+      spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
+        .and.returnValue(false);
 
-        const signInPromise = authService.signInAsync();
+      this.idToken = 'TKN';
+      this.creds = {
+        user: jasmine.createSpyObj({getIdToken: Promise.resolve(this.idToken)}),
+        credential: null,
+        additionalUserInfo: null,
+      };
 
-        await expectAsync(signInPromise).toBeResolvedTo(true);
+      authService = new AuthService(angularFireAuth, authBackendApiService);
+    });
 
-        expect(angularFireAuth.signInWithRedirect).toHaveBeenCalled();
-      });
+    it('should fail to call signInWithEmail', async() => {
+      await expectAsync(authService.signInWithEmail(this.email))
+        .toBeRejectedWithError(
+          'signInWithEmail can only be called in emulator mode');
 
-      it('should propogate errors', async() => {
-        angularFireAuth.signInWithRedirect.and.resolveTo();
+      expect(angularFireAuth.signInWithEmailAndPassword).not.toHaveBeenCalled();
+      expect(angularFireAuth.createUserWithEmailAndPassword)
+        .not.toHaveBeenCalled();
+    });
 
+    it('should delegate to AngularFireAuth.signInWithRedirect', async() => {
+      angularFireAuth.signInWithRedirect.and.resolveTo();
+
+<<<<<<< HEAD
         const error = { code: 'auth/operation-not-allowed' };
         angularFireAuth.getRedirectResult.and.rejectWith(error);
+=======
+      await expectAsync(authService.signInWithRedirectAsync()).toBeResolvedTo();
+>>>>>>> upstream/develop
 
-        await expectAsync(authService.signInAsync()).toBeRejectedWith(error);
-      });
+      expect(angularFireAuth.signInWithRedirect).toHaveBeenCalled();
     });
 
-    describe('Emulator enabled', () => {
-      beforeEach(() => {
-        spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
-          .and.returnValue(true);
-      });
+    it('should delegate to AngularFireAuth.getRedirectResult', async() => {
+      angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
 
-      it('should sign in using prompt', async() => {
-        spyOn(window, 'prompt').and.returnValue(this.email);
+      await expectAsync(authService.handleRedirectResultAsync())
+        .toBeResolvedTo(true);
 
-        this.creds.user.getIdToken.and.resolveTo('TKN');
-        this.creds.additionalUserInfo.isNewUser = false;
-        angularFireAuth.signInWithEmailAndPassword.and.resolveTo(this.creds);
+      expect(angularFireAuth.getRedirectResult).toHaveBeenCalled();
+      expect(authBackendApiService.beginSessionAsync)
+        .toHaveBeenCalledWith(this.idToken);
+    });
 
-        const signInPromise = authService.signInAsync();
+    it('should delegate to AngularFireAuth.signOut', async() => {
+      angularFireAuth.signOut.and.resolveTo();
 
-        await expectAsync(signInPromise).toBeResolvedTo(false);
+      await expectAsync(authService.signOutAsync()).toBeResolvedTo();
 
-        expect(angularFireAuth.signInWithEmailAndPassword.calls.first().args)
-          .toEqual([this.email, this.password]);
-      });
+      expect(angularFireAuth.signOut).toHaveBeenCalled();
+      expect(authBackendApiService.endSessionAsync).toHaveBeenCalled();
+    });
 
-      it('should recognize new users', async() => {
-        spyOn(window, 'prompt').and.returnValue(this.email);
+    it('should resolve to false if user is missing', async() => {
+      this.creds.user = null;
+      angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
 
+<<<<<<< HEAD
         angularFireAuth.signInWithEmailAndPassword
           .and.rejectWith({ code: 'auth/user-not-found' });
+=======
+      await expectAsync(authService.handleRedirectResultAsync())
+        .toBeResolvedTo(false);
+    });
+  });
+>>>>>>> upstream/develop
 
-        this.creds.user.getIdToken.and.resolveTo('TKN');
-        this.creds.additionalUserInfo.isNewUser = true;
-        angularFireAuth.createUserWithEmailAndPassword
-          .and.resolveTo(this.creds);
+  describe('Emulator mode', function() {
+    beforeEach(async() => {
+      spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
+        .and.returnValue(true);
 
-        const signInPromise = authService.signInAsync();
+      authService = new AuthService(angularFireAuth, authBackendApiService);
+    });
 
-        await expectAsync(signInPromise).toBeResolvedTo(true);
+    it('should not delegate to signInWithRedirectAsync', async() => {
+      await expectAsync(authService.signInWithRedirectAsync())
+        .toBeResolvedTo();
 
-        expect(angularFireAuth.signInWithEmailAndPassword.calls.first().args)
-          .toEqual([this.email, this.password]);
-      });
+      expect(angularFireAuth.signInWithRedirect).not.toHaveBeenCalled();
+    });
 
-      it('should propogate errors', async() => {
-        spyOn(window, 'prompt').and.returnValue(this.email);
+    it('should not delegate to handleRedirectResultAsync', async() => {
+      await expectAsync(authService.handleRedirectResultAsync())
+        .toBeResolvedTo(false);
 
+<<<<<<< HEAD
         const error = { code: 'auth/operation-not-allowed' };
         angularFireAuth.signInWithEmailAndPassword.and.rejectWith(error);
+=======
+      expect(angularFireAuth.getRedirectResult).not.toHaveBeenCalled();
+    });
+>>>>>>> upstream/develop
 
-        await expectAsync(authService.signInAsync()).toBeRejectedWith(error);
-      });
+    it('should sign out and end session', async() => {
+      await expectAsync(authService.signOutAsync()).toBeResolvedTo();
+      expect(angularFireAuth.signOut).toHaveBeenCalled();
+      expect(authBackendApiService.endSessionAsync).toHaveBeenCalled();
+      expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
   });
 });

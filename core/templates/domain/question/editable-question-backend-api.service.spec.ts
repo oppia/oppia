@@ -139,7 +139,7 @@ describe('Editable question backend API service', function() {
     var req = httpTestingController.expectOne(
       '/question_editor_handler/create_new');
     expect(req.request.method).toEqual('POST');
-    req.flush({ questionId: '0' });
+    req.flush({ question_id: '0' });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({ questionId: '0' });
@@ -286,10 +286,9 @@ describe('Editable question backend API service', function() {
 
     let questionId = '0';
     let skillIdsTaskArray = ['1', '2', 1];
-    let difficulty = 1;
 
     editableQuestionBackendApiService.editQuestionSkillLinks(
-      questionId, skillIdsTaskArray, difficulty).then(
+      questionId, skillIdsTaskArray).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/manage_question_skill_link/' + questionId);
@@ -308,10 +307,9 @@ describe('Editable question backend API service', function() {
 
     let questionId = '0';
     let skillIdsTaskArray = ['1', '2', 1];
-    let difficulty = 1;
 
     editableQuestionBackendApiService.editQuestionSkillLinks(
-      questionId, skillIdsTaskArray, difficulty).then(
+      questionId, skillIdsTaskArray).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
       '/manage_question_skill_link/' + questionId);

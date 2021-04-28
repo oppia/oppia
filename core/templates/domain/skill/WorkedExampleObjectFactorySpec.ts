@@ -18,18 +18,22 @@
 
 import { TestBed } from '@angular/core/testing';
 
+<<<<<<< HEAD
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { WorkedExampleObjectFactory } from
+=======
+import { SubtitledHtml} from
+  'domain/exploration/subtitled-html.model';
+import { WorkedExampleObjectFactory} from
+>>>>>>> upstream/develop
   'domain/skill/WorkedExampleObjectFactory';
 
 describe('Worked example object factory', () => {
   let workedExampleDict;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
     workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
 
     workedExampleDict = {
@@ -48,10 +52,10 @@ describe('Worked example object factory', () => {
     let workedExample =
           workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
     expect(workedExample.getQuestion()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'worked example question 1', 'worked_example_q_1'));
     expect(workedExample.getExplanation()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'worked example explanation 1', 'worked_example_e_1'));
   });
 
