@@ -42,6 +42,9 @@ jobs:
       - name: Run e2e Contributor Dashboard Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
+      - name: Run e2e Publication Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="publication"  --skip-install --skip-build --server_log_level="info" --prod_env
       - name: Run e2e Feature Gating Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
