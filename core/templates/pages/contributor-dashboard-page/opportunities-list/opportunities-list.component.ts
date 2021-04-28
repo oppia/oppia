@@ -16,21 +16,21 @@
  * @fileoverview Component for the list view of opportunities.
  */
 
- import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- 
- import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
- import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
- import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
- import constants from 'assets/constants';
- import { Subscription } from 'rxjs';
- 
+import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
+import constants from 'assets/constants';
+import { Subscription } from 'rxjs';
+
  @Component({
    selector: 'oppia-opportunities-list',
    templateUrl: './opportunities-list.component.html',
    styleUrls: []
  })
- export class OpportunitiesListComponent {
+export class OpportunitiesListComponent {
    @Input() loadOpportunities: () => Promise<{
      opportunitiesDicts: ExplorationOpportunity[], more: boolean}>;
    @Input() labelRequired: boolean;
@@ -40,7 +40,7 @@
      new EventEmitter()
    );
    @Input() opportunityHeadingTruncationLength: number;
- 
+
    loadingOpportunityData: boolean = true;
    lastPageNumber: number = 1000;
    opportunities: ExplorationOpportunity[] = [];
@@ -48,7 +48,7 @@
    directiveSubscriptions = new Subscription();
    activePageNumber: number = 1;
    OPPORTUNITIES_PAGE_SIZE = constants.OPPORTUNITIES_PAGE_SIZE;
- 
+
    constructor(
      private zone: NgZone,
      private readonly contributionOpportunitiesService:
@@ -57,11 +57,11 @@
      this.directiveSubscriptions.add(
        this.translationLanguageService.onActiveLanguageChanged.subscribe(
          () => this.ngOnInit()));
- 
+
      this.directiveSubscriptions.add(
        this.contributionOpportunitiesService
          .reloadOpportunitiesEventEmitter.subscribe(() => this.ngOnInit()));
- 
+
      this.directiveSubscriptions.add(
        this.contributionOpportunitiesService
          .removeOpportunitiesEventEmitter.subscribe((opportunityIds) => {
@@ -74,13 +74,13 @@
              this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE);
          }));
    }
- 
+
    ngOnDestroy(): void {
      this.directiveSubscriptions.unsubscribe();
    }
- 
+
    ngOnInit(): void {
-     this.loadOpportunities().then(({opportunitiesDicts, more}) => {
+     this.loadOpportunities().then(({ opportunitiesDicts, more }) => {
        // This ngZone run closure will not be required after \
        // migration is complete.
        this.zone.run(() => {
@@ -99,7 +99,7 @@
        });
      });
    }
- 
+
    gotoPage(pageNumber: number): void {
      const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
      const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
@@ -107,7 +107,7 @@
        this.visibleOpportunities = [];
        this.loadingOpportunityData = true;
        this.loadMoreOpportunities().then(
-         ({opportunitiesDicts, more}) => {
+         ({ opportunitiesDicts, more }) => {
            this.opportunities = this.opportunities.concat(opportunitiesDicts);
            // "more" returned from GAE storage is not always reliable if
            // true.
@@ -115,7 +115,8 @@
            // page size == OPPORTUNITIES_PAGE_SIZE. Come up with a more
            // robust solution.
            more = (
-             more && opportunitiesDicts.length === this.OPPORTUNITIES_PAGE_SIZE);
+             more && opportunitiesDicts.length
+             === this.OPPORTUNITIES_PAGE_SIZE);
            this.visibleOpportunities = this.opportunities.slice(
              startIndex, endIndex);
            this.lastPageNumber = more ? this.lastPageNumber : Math.ceil(
@@ -129,7 +130,7 @@
      this.activePageNumber = pageNumber;
    }
  }
- 
+
  angular.module('oppia').directive(
-   'oppiaOpportunitiesList', downgradeComponent(
-     {component: OpportunitiesListComponent}));
+  'oppiaOpportunitiesList', downgradeComponent(
+    { component: OpportunitiesListComponent }));

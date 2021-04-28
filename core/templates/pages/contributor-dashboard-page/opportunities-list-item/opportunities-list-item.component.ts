@@ -16,35 +16,35 @@
  * @fileoverview Component for the item view of an opportunity.
  */
 
- import { Component, Input, Output, EventEmitter } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- 
- export interface ExplorationOpportunity {
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+export interface ExplorationOpportunity {
    id: string;
    labelText: string;
    labelColor: string;
    progressPercentage: number;
  }
- 
+
  @Component({
    selector: 'oppia-opportunities-list-item',
    templateUrl: './opportunities-list-item.component.html',
    styleUrls: []
  })
- export class OpportunitiesListItemComponent {
+export class OpportunitiesListItemComponent {
    @Input() opportunity: ExplorationOpportunity;
    @Output() clickActionButton: EventEmitter<string> = (
      new EventEmitter());
    @Input() labelRequired: boolean;
    @Input() progressBarRequired: boolean;
    @Input() opportunityHeadingTruncationLength: number;
- 
+
    opportunityDataIsLoading: boolean = true;
    labelText: string;
    labelStyle: { 'background-color': string; };
    progressPercentage: string;
    progressBarStyle: { width: string; };
- 
+
    ngOnInit(): void {
      if (this.opportunity && this.labelRequired) {
        this.labelText = this.opportunity.labelText;
@@ -52,7 +52,7 @@
          'background-color': this.opportunity.labelColor
        };
      }
- 
+
      if (!this.opportunityHeadingTruncationLength) {
        this.opportunityHeadingTruncationLength = 40;
      }
@@ -60,15 +60,15 @@
        if (this.opportunity.progressPercentage) {
          this.progressPercentage = (
            this.opportunity.progressPercentage + '%');
-         this.progressBarStyle = {width: this.progressPercentage};
+         this.progressBarStyle = { width: this.progressPercentage };
        }
        this.opportunityDataIsLoading = false;
      } else {
        this.opportunityDataIsLoading = true;
      }
    }
- }
- 
- angular.module('oppia').directive(
-   'oppiaOpportunitiesListItem', downgradeComponent(
-     {component: OpportunitiesListItemComponent}));
+}
+
+angular.module('oppia').directive(
+  'oppiaOpportunitiesListItem', downgradeComponent(
+    {component: OpportunitiesListItemComponent}));
