@@ -167,10 +167,7 @@ var ExplorationEditorSettingsTab = function() {
       explorationCategoryInput,
       'Exploration category input takes too long to be visible.');
     var checkedElement = explorationCategoryInput.$('option:checked');
-    await waitFor.visibilityOf(
-      checkedElement,
-      'Checked Element takes too long to be visible.');
-    expect(await checkedElement.getText()).
+    expect(await action.getText('Checked Element', checkedElement)).
       toEqual(category);
   };
 
