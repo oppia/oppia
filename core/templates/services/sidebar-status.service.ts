@@ -28,7 +28,7 @@ import { WindowDimensionsService } from
 export class SidebarStatusService {
   constructor(private wds: WindowDimensionsService) {}
   private pendingSidebarClick: boolean = false;
-  public sidebarIsShown: boolean = false;
+  private sidebarIsShown: boolean = false;
 
   private _openSidebar(): void {
     if (this.wds.isWindowNarrow() && !this.sidebarIsShown) {

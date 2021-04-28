@@ -74,6 +74,7 @@ angular.module('oppia').directive('baseContent', [
           var ctrl = this;
           ctrl.loadingMessage = '';
           ctrl.mobileNavOptionsAreShown = false;
+          ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
           ctrl.toggleMobileNavOptions = () => {
             ctrl.mobileNavOptionsAreShown = !ctrl.mobileNavOptionsAreShown;
@@ -90,12 +91,6 @@ angular.module('oppia').directive('baseContent', [
             mainContentElement.tabIndex = -1;
             mainContentElement.scrollIntoView();
             mainContentElement.focus();
-          };
-
-          ctrl.isSidebarShown = function() {
-            SidebarStatusService.isSidebarShown();
-            console.log('base-content-response:' +
-            SidebarStatusService.sidebarIsShown);
           };
           ctrl.$onInit = function() {
             ctrl.iframed = UrlService.isIframed();
