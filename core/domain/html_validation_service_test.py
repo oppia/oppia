@@ -1255,7 +1255,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img1.svg&quot;"'
+                'svg_filename-with-value="&quot;img12.svg&quot;"'
                 ' alt-with-value="&quot;Image&quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-svgdiagram '
@@ -1271,7 +1271,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image&amp;quot;" '
                 'caption-with-value="" '
-                'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
+                'filepath-with-value="&amp;quot;img12.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image123&amp;quot;" '
@@ -1287,10 +1287,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img1.svg&quot;"'
-                ' alt-with-value="&quot;Image&quot;">'
-                '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img1.svg&quot;"'
+                'svg_filename-with-value="&quot;img11.svg&quot;"'
                 ' alt-with-value="&quot;Image&quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-image '
@@ -1303,7 +1300,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image&amp;quot;" '
                 'caption-with-value="" '
-                'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
+                'filepath-with-value="&amp;quot;img11.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image1&amp;quot;" '
