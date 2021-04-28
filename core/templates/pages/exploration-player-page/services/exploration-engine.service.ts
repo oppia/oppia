@@ -92,7 +92,8 @@ export class ExplorationEngineService {
    ) {
      this._explorationId = this.contextService.getExplorationId();
      this.version = this.urlService.getExplorationVersionFromUrl();
-     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+     this._editorPreviewMode = this.contextService
+       .isInExplorationEditorPage();
      this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
 
      if (!this._questionPlayerMode &&
