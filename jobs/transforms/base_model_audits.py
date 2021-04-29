@@ -301,7 +301,6 @@ class ValidateCommitCmdsSchema(beam.DoFn):
             try:
                 change_domain_object(commit_cmd_dict)
             except Exception as e:
-                cmd_name = commit_cmd_dict.get('cmd') # pylint: disable=unused-variable
                 yield audit_errors.CommitCmdsValidateError(
                     input_model, commit_cmd_dict, e)
 

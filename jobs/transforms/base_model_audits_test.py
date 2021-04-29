@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_fetchers
 from core.domain import state_domain
+from core.domain import change_domain
 from core.platform import models
 import feconf
 from jobs import job_test_utils
@@ -395,11 +396,7 @@ class MockValidateCommitCmdsSchemaChangeDomain(
 class MockValidateWrongSchema(base_model_audits.ValidateCommitCmdsSchema):
 
     def _get_change_domain_class(self, item):
-        print('the item received here is \n\n\n', item)
-        if (isinstance(item, base_models.BaseCommitLogEntryModel)):
-            return 'test'
-        else:
-            return change_domain.BaseChange(item) 
+        return change_domain.BaseChange
 
 
 class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
@@ -424,8 +421,8 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             audit_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])
 
-    # test failing
-    def test_validate_wrong_commit(self):
+
+    def test_validate_wrong_commit_cmd_missing(self):
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='invalid',
             created_on=self.YEAR_AGO,
@@ -445,7 +442,5 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 "{u'cmd-invalid': u'invalid_test_command'}",
-                'ValidationError. Missing cmd key in change dict')
-                # 'ValidationError. Missing cmd key in change dict')
-                # 'ValidationError. Command {} is not allowed')
+                'Missing cmd key in change dict')
         ])
