@@ -875,7 +875,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
             with self.swap(
                 exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
+                self.MockExploration.get_content_html
+            ):
                 translation_suggestion = suggestion_services.create_suggestion(
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     feconf.ENTITY_TYPE_EXPLORATION,

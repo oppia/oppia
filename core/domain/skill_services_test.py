@@ -148,7 +148,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertEqual(filenames, ['img.svg', 'img2.svg'])
+        self.assertEqual(filenames, ['img2.svg', 'img.svg'])
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -373,7 +373,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_filtered_skill_summaries(
                 1, None, None, None, None, None))
         self.assertEqual(len(augmented_skill_summaries), 2)
-        self.assertIsInstance(next_cursor, str)
+        self.assertIsInstance(next_cursor, bytes)
         self.assertTrue(more)
 
         augmented_skill_summaries, next_cursor, more = (
@@ -1112,7 +1112,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
         assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception, '\'unicode\' object has no attribute \'cmd\'')
+            Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(
@@ -1297,7 +1297,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         # in number.
 
         # List of mastery values (float values between 0.0 and 1.0)
-        masteries = [self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2, None]
+        masteries = [self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2,]
 
         # Creating feconf.MAX_NUMBER_OF_SKILL_IDS additional user skill
         # masteries.

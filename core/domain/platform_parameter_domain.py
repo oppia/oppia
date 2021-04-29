@@ -157,7 +157,7 @@ class EvaluationContext(python_utils.OBJECT):
                     ' specified.' % (
                         match.group(2), ALLOWED_APP_VERSION_FLAVORS))
 
-        if self._server_mode not in ALLOWED_SERVER_MODES:
+        if self._server_mode.value not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
                 'Invalid server mode \'%s\', must be one of %s.' % (
                     self._server_mode, ALLOWED_SERVER_MODES))
@@ -287,8 +287,10 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
         if self._type == 'server_mode':
             for _, mode in self._conditions:
-                if not any([mode == server_mode.value
-                            for server_mode in ALLOWED_SERVER_MODES]):
+                if not any([
+                        mode == server_mode
+                        for server_mode in ALLOWED_SERVER_MODES
+                ]):
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))

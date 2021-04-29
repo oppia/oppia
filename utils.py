@@ -423,7 +423,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value % 256])).decode('utf-8')
+    return base64.b64encode(bytes([int(value) % 256])).decode('utf-8')
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -554,7 +554,7 @@ def generate_random_string(length):
     Returns:
         str. Random string of specified length.
     """
-    return base64.urlsafe_b64encode(os.urandom(length))[:length]
+    return str(base64.urlsafe_b64encode(os.urandom(length))[:length])
 
 
 def generate_new_session_id():

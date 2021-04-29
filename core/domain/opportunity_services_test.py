@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import re
 
 from constants import constants
 from core.domain import exp_domain
@@ -874,8 +875,11 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
                 observed_log_messages[0],
-                'Missing language codes [u\'new_lang\'] in exploration '
-                'opportunity model with id 0')
+                re.escape(
+                    'Missing language codes [\'new_lang\'] in exploration '
+                    'opportunity model with id 0'
+                )
+            )
 
     def test_delete_exp_opportunities_corresponding_to_story_when_story_deleted(
             self):

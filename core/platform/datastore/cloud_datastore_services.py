@@ -270,7 +270,7 @@ def mock_datetime_for_datastore(mocked_now):
 
     old_datetime_type = datetime.datetime
 
-    class MockDatetimeType(type):
+    class MockDatetimeType(type(datetime.datetime)):
         """Pretends to be a datetime.datetime object."""
 
         def __instancecheck__(cls, other):

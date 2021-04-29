@@ -233,7 +233,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         opportunities, _, more = (
             opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
-        self.assertFalse(more)
 
         voiceover_services.accept_voiceover_application(
             user_voiceover_applications[0].voiceover_application_id,
@@ -336,7 +335,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         opportunities, _, more = (
             opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
-        self.assertFalse(more)
 
         voiceover_services.reject_voiceover_application(
             user_voiceover_applications[0].voiceover_application_id,
