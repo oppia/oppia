@@ -33,15 +33,15 @@ import apache_beam as beam
 
 
 class ValidateCanonicalNameMatchesNameInLowercaseTests(
-	job_test_utils.PipelinedTestBase):
+    job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
 
     def test_process_for_not_matching_canonical_name(self):
         model_with_different_name = topic_models.TopicModel(
-			id='123',
+            id='123',
             name='name',
-			created_on=self.NOW,
+            created_on=self.NOW,
             last_updated=self.NOW,
             url_fragment='name-two',
             canonical_name='canonical_name',
@@ -49,23 +49,23 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
             language_code='en',
             subtopic_schema_version=0,
             story_reference_schema_version=0
-		)
+        )
         output = (
             self.pipeline
             | beam.Create([model_with_different_name])
             | beam.ParDo(
-				topic_audits.ValidateCanonicalNameMatchesNameInLowercase())
+                topic_audits.ValidateCanonicalNameMatchesNameInLowercase())
         )
         self.assert_pcoll_equal(output, [
             audit_errors.ModelCanonicalNameMismatchError(
                 model_with_different_name)
         ])
 
-	def test_process_for_matching_canonical_name(self):
-		model_with_same_name = topic_models.TopicModel(
-			id='123',
+    def test_process_for_matching_canonical_name(self):
+        model_with_same_name = topic_models.TopicModel(
+            id='123',
             name='name',
-			created_on=self.NOW,
+            created_on=self.NOW,
             last_updated=self.NOW,
             url_fragment='name-two',
             canonical_name='canonical_name',
@@ -73,12 +73,12 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
             language_code='en',
             subtopic_schema_version=0,
             story_reference_schema_version=0
-		)
-		output = (
+        )
+        output = (
             self.pipeline
             | beam.Create([model_with_same_name])
             | beam.ParDo(
-				topic_audits.ValidateCanonicalNameMatchesNameInLowercase())
+                topic_audits.ValidateCanonicalNameMatchesNameInLowercase())
         )
-		self.assert_pcoll_equal(output,[])
+        self.assert_pcoll_equal(output,[])
 

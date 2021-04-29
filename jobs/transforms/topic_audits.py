@@ -35,21 +35,21 @@ import apache_beam as beam
 
 @audit_decorators.AuditsExisting(topic_models.TopicModel)
 class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
-	"""DoFn to validate canonical name matching with lower case name"""
+    """DoFn to validate canonical name matching with lower case name"""
 
-	def process(self, input_model):
-		"""Function that validate that canonical name of the model is same as
-		name of the model in lowercase.
+    def process(self, input_model):
+        """Function that validate that canonical name of the model is same as
+        name of the model in lowercase.
 
-		Args:
-			item: datastore_services.Model. TopicModel to validate.
+        Args:
+            item: datastore_services.Model. TopicModel to validate.
 
-		Yields:
-			ModelCanonicalNameMismatchError. An error class for
-			name mismatched models.
-		"""
-		model = job_utils.clone_model(input_model)
-		name = model.name
-		if name.lower() != model.canonical_name:
-			yield audit_errors.ModelCanonicalNameMismatchError(model)
+        Yields:
+            ModelCanonicalNameMismatchError. An error class for
+            name mismatched models.
+        """
+        model = job_utils.clone_model(input_model)
+        name = model.name
+        if name.lower() != model.canonical_name:
+            yield audit_errors.ModelCanonicalNameMismatchError(model)
 

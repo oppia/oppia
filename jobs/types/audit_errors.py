@@ -231,4 +231,4 @@ class ModelCanonicalNameMismatchError(BaseAuditError):
         super(ModelCanonicalNameMismatchError, self).__init__(model)
         self.message = (
             'Entity name %s in lowercase does not match '
-			'canonical name %s' % (model.name, model.canonical_name))
+            'canonical name %s' % (model.name, model.canonical_name))
