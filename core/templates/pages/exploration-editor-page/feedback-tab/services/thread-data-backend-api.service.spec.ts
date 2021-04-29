@@ -288,9 +288,9 @@ describe('retrieving threads service', () => {
 
   it('should throw error if trying to fetch messages of' +
     'null thread', async() => {
-      await expectAsync(threadDataBackendApiService.getMessagesAsync(null))
-        .toBeRejectedWithError('Trying to update a non-existent thread');
-    });
+    await expectAsync(threadDataBackendApiService.getMessagesAsync(null))
+      .toBeRejectedWithError('Trying to update a non-existent thread');
+  });
 
   it(
     'should call reject handler when fetching messages fails',

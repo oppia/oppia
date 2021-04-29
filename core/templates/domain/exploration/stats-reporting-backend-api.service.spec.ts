@@ -206,7 +206,7 @@ describe('Stats reporting backend API Service', () => {
     flushMicrotasks();
   }));
 
-  it('should handle errors correctly.', fakeAsync(async () => {
+  it('should handle errors correctly.', fakeAsync(async() => {
     let mockGetExpId = () => {
       return 'expId';
     };
@@ -224,7 +224,7 @@ describe('Stats reporting backend API Service', () => {
 
     flushMicrotasks();
     await expectAsync(statsReportingBackendApiService.postsStatsAsync(
-        aggregatedStats, expVersion, expId, currentState, nextExpId,
-        previousState, nextState)).toBeRejectedWithError();
+      aggregatedStats, expVersion, expId, currentState, nextExpId,
+      previousState, nextState)).toBeRejectedWithError();
   }));
 });

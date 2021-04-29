@@ -99,7 +99,8 @@ describe('Preview Tab Component', function() {
         stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo').and
         .returnValue(parameters);
-      spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
+      spyOn(
+        editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
       spyOnProperty(
         explorationEngineService,
@@ -229,7 +230,8 @@ describe('Preview Tab Component', function() {
         stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo')
         .and.returnValue([]);
-      spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
+      spyOn(
+        editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
 
       // Mock init just to call the callback directly.
