@@ -77,7 +77,6 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
     ROLE = 'ADMIN'
 
     def test_process_with_incorrect_keys(self):
-
         test_model = user_models.PendingDeletionRequestModel(
             id=self.USER_ID,
             email=self.EMAIL_ID,
@@ -101,7 +100,6 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         ])
 
     def test_process_with_correct_keys(self):
-
         test_model = user_models.PendingDeletionRequestModel(
             id=self.USER_ID,
             email=self.EMAIL_ID,
