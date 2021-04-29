@@ -34,7 +34,9 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require(
         './drag-and-drop-sort-input-interaction.directive.html'),
       controllerAs: '$ctrl',
@@ -108,8 +110,7 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
             }
 
             let savedSolution = (
-              $attrs.savedSolution !== undefined ?
-              JSON.parse($attrs.savedSolution) : []
+              ctrl.savedSolution !== undefined ? ctrl.savedSolution : []
             );
 
             if (savedSolution.length) {

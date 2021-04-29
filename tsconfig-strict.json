@@ -145,6 +145,8 @@
     "core/templates/services/debouncer.service.spec.ts",
     "core/templates/services/editability.service.ts",
     "core/templates/services/editability.service.spec.ts",
+    "core/templates/services/exploration-features.service.ts",
+    "core/templates/services/exploration-features.service.spec.ts",
     "core/templates/services/external-save.service.ts",
     "core/templates/services/external-save.service.spec.ts",
     "core/templates/services/i18n-language-code.service.ts",
