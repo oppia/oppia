@@ -56,13 +56,13 @@ describe('Change list service', function() {
       spyOn(mockWarningsData, 'addWarning');
       mockExplorationData = {
         explorationId: 0,
-        autosaveChangeList: function() {},
+        autosaveChangeListAsync: function() {},
         discardDraftAsync: function() {}
       };
       angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
-      spyOn(mockExplorationData, 'autosaveChangeList');
+      spyOn(mockExplorationData, 'autosaveChangeListAsync');
     });
 
     beforeEach(angular.mock.inject(function($injector) {
@@ -76,7 +76,7 @@ describe('Change list service', function() {
       tick(200);
       expect(cls.getChangeList()).not.toBe([]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -89,7 +89,7 @@ describe('Change list service', function() {
         state_name: 'newState'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -103,7 +103,7 @@ describe('Change list service', function() {
         new_state_name: 'newName'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -116,7 +116,7 @@ describe('Change list service', function() {
         state_name: 'deletedState'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -131,7 +131,7 @@ describe('Change list service', function() {
         old_value: 'oldTitle'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -140,7 +140,7 @@ describe('Change list service', function() {
       cls.editExplorationProperty('fake_property', 'newThing', 'oldThing');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Invalid exploration property: fake_property');
-      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
     });
 
     it('should correctly edit a state property', fakeAsync(() => {
@@ -155,7 +155,7 @@ describe('Change list service', function() {
         old_value: 'oldC'
       }]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -165,7 +165,7 @@ describe('Change list service', function() {
         'stateName', 'fake_property', 'newThing', 'oldThing');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Invalid state property: fake_property');
-      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
     });
 
     it('should correctly discard all changes', fakeAsync(() => {
@@ -175,7 +175,7 @@ describe('Change list service', function() {
       expect(cls.getChangeList()).not.toBe([]);
       cls.discardAllChanges();
       expect(cls.getChangeList()).toEqual([]);
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -194,7 +194,7 @@ describe('Change list service', function() {
           state_name: 'newState2'
         }]);
         tick(200);
-        expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+        expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
         $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
       }));
 
@@ -220,7 +220,7 @@ describe('Change list service', function() {
 
       cls.undoLastChange();
       expect(cls.getChangeList()).toEqual([]);
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
   });
@@ -248,13 +248,13 @@ describe('Exploration title service', function() {
     beforeEach(function() {
       mockExplorationData = {
         explorationId: 0,
-        autosaveChangeList: function() {}
+        autosaveChangeListAsync: function() {}
       };
       angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
         $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
       });
-      spyOn(mockExplorationData, 'autosaveChangeList');
+      spyOn(mockExplorationData, 'autosaveChangeListAsync');
     });
 
     beforeEach(angular.mock.inject(function($injector) {
@@ -275,7 +275,7 @@ describe('Exploration title service', function() {
       ets.displayed = 'New title';
       expect(ets.displayed).toEqual('New title');
       expect(ets.savedMemento).toEqual('A title');
-      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
     });
 
     it('should restore correctly from the memento', function() {
@@ -293,7 +293,7 @@ describe('Exploration title service', function() {
       ets.saveDisplayedValue();
       tick(200);
       expect(ets.savedMemento).toEqual('New title');
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -309,7 +309,7 @@ describe('Exploration title service', function() {
         expect(ets.hasChanged()).toBe(false);
 
         ets.saveDisplayedValue();
-        expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+        expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
         expect(ets.hasChanged()).toBe(false);
       });
   });

@@ -138,7 +138,7 @@ describe('Settings Tab Component', () => {
         param_changes: []
       },
       getDataAsync: () => $q.resolve(),
-      autosaveChangeList: () => {}
+      autosaveChangeListAsync: () => {}
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',

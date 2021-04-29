@@ -74,7 +74,7 @@ describe('Param Changes Editor Component', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
+      autosaveChangeListAsync: function() {}
     });
 
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
