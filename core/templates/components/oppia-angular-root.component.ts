@@ -100,8 +100,6 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ChangeListService } from
-  'pages/exploration-editor-page/services/change-list.service';
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { ClassroomBackendApiService } from
@@ -177,8 +175,6 @@ import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
-import { ExplorationPropertyService } from
-  'pages/exploration-editor-page/services/exploration-property.service';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ExplorationRecommendationsService } from
@@ -503,7 +499,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static browserCheckerService: BrowserCheckerService;
   static camelCaseToHyphensPipe: CamelCaseToHyphensPipe;
   static ckEditorCopyContentService: CkEditorCopyContentService;
-  static changeListService: ChangeListService;
   static classroomBackendApiService: ClassroomBackendApiService;
   static codeNormalizerService: CodeNormalizerService;
   static codeReplPredictionService: CodeReplPredictionService;
@@ -554,7 +549,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static expressionParserService: ExpressionParserService;
   static explorationPermissionsBackendApiService:
     ExplorationPermissionsBackendApiService;
-  static explorationPropertyService: ExplorationPropertyService;
   static explorationRecommendationsBackendApiService:
     ExplorationRecommendationsBackendApiService;
   static explorationRecommendationsService: ExplorationRecommendationsService;
@@ -787,7 +781,6 @@ private bottomNavbarStatusService: BottomNavbarStatusService,
 private browserCheckerService: BrowserCheckerService,
 private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
 private ckEditorCopyContentService: CkEditorCopyContentService,
-private changeListService: ChangeListService,
 private classroomBackendApiService: ClassroomBackendApiService,
 private codeNormalizerService: CodeNormalizerService,
 private codeReplPredictionService: CodeReplPredictionService,
@@ -842,7 +835,6 @@ private explorationObjectFactory: ExplorationObjectFactory,
 private expressionParserService: ExpressionParserService,
 private explorationPermissionsBackendApiService:
   ExplorationPermissionsBackendApiService,
-private explorationPropertyService: ExplorationPropertyService,
 private explorationRecommendationsBackendApiService:
   ExplorationRecommendationsBackendApiService,
 private explorationRecommendationsService: ExplorationRecommendationsService,
@@ -1094,8 +1086,6 @@ private injector: Injector
       this.camelCaseToHyphensPipe);
     OppiaAngularRootComponent.ckEditorCopyContentService = (
       this.ckEditorCopyContentService),
-    OppiaAngularRootComponent.changeListService = (
-      this.changeListService),
     OppiaAngularRootComponent.classroomBackendApiService = (
       this.classroomBackendApiService);
     OppiaAngularRootComponent.codeNormalizerService = (
@@ -1173,8 +1163,6 @@ private injector: Injector
       this.expressionParserService);
     OppiaAngularRootComponent.explorationPermissionsBackendApiService = (
       this.explorationPermissionsBackendApiService);
-    OppiaAngularRootComponent.explorationPropertyService = (
-      this.explorationPropertyService);
     OppiaAngularRootComponent.explorationRecommendationsBackendApiService = (
       this.explorationRecommendationsBackendApiService);
     OppiaAngularRootComponent.explorationRecommendationsService = (
