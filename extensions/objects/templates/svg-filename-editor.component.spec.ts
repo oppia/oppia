@@ -541,7 +541,7 @@ describe('SvgFilenameEditor', function() {
     // jqXHR<any>; ...}'.". We need to suppress this error because we need
     // to mock $.ajax to this function purposes.
     // @ts-expect-error
-    spyOn($, 'ajax').and.callFake(async function() {
+    spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.resolve(responseText);
       return d.promise();
@@ -569,7 +569,7 @@ describe('SvgFilenameEditor', function() {
     // jqXHR<any>; ...}'.". We need to suppress this error because we need
     // to mock $.ajax to this function purposes.
     // @ts-expect-error
-    spyOn($, 'ajax').and.callFake(async function() {
+    spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.reject({
         // Variable responseText contains a XSSI Prefix, which is represented by
