@@ -67,7 +67,7 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
             created_on=self.NOW,
             last_updated=self.NOW,
             url_fragment='name-two',
-            canonical_name='canonical_name',
+            canonical_name='name',
             next_subtopic_id=1,
             language_code='en',
             subtopic_schema_version=0,
