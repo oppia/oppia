@@ -31,11 +31,10 @@ var ClassroomPage = function() {
   this.expectNumberOfTopicsToBe = async function(count) {
     if (count > 0) {
       await waitFor.visibilityOf(
-        topicSummaryTiles.first(),'Topic summary tile not visible');
+        topicSummaryTiles.first(), 'Topic summary tile not visible');
       expect(await topicSummaryTiles.count()).toEqual(count);
-    }
-    else {
-      expect(await topicSummaryTiles.count()).toEqual(0);
+    } else {
+        expect(await topicSummaryTiles.count()).toEqual(0);
     }
   };
 };
