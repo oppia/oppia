@@ -80,10 +80,12 @@ angular.module('oppia').component('profilePage', {
 
             ctrl.userEditedExplorations = data.editedExpSummaries.sort(
               function(exploration1, exploration2) {
-                const avgRating1 = RatingComputationService.computeAverageRating(
-                  exploration1.ratings);
-                const avgRating2 = RatingComputationService.computeAverageRating(
-                  exploration2.ratings);
+                const avgRating1 = (
+                  RatingComputationService.computeAverageRating(
+                    exploration1.ratings));
+                const avgRating2 = (
+                  RatingComputationService.computeAverageRating(
+                    exploration2.ratings));
 
                 if (avgRating1 > avgRating2) {
                   return 1;
@@ -225,7 +227,7 @@ angular.module('oppia').component('profilePage', {
             LoaderService.hideLoadingScreen();
             $rootScope.$apply();
           });
-        };
-      }
-    ]
+      };
+    }
+  ]
 });

@@ -140,7 +140,8 @@ describe('Change list service', function() {
       cls.editExplorationProperty('fake_property', 'newThing', 'oldThing');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Invalid exploration property: fake_property');
-      expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
+      expect(
+        mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
     });
 
     it('should correctly edit a state property', fakeAsync(() => {
@@ -165,7 +166,8 @@ describe('Change list service', function() {
         'stateName', 'fake_property', 'newThing', 'oldThing');
       expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
         'Invalid state property: fake_property');
-      expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
+      expect(
+        mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
     });
 
     it('should correctly discard all changes', fakeAsync(() => {
@@ -275,7 +277,8 @@ describe('Exploration title service', function() {
       ets.displayed = 'New title';
       expect(ets.displayed).toEqual('New title');
       expect(ets.savedMemento).toEqual('A title');
-      expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
+      expect(
+        mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
     });
 
     it('should restore correctly from the memento', function() {
@@ -309,7 +312,8 @@ describe('Exploration title service', function() {
         expect(ets.hasChanged()).toBe(false);
 
         ets.saveDisplayedValue();
-        expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
+        expect(
+          mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
         expect(ets.hasChanged()).toBe(false);
       });
   });
