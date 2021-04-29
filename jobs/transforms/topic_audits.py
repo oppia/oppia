@@ -43,9 +43,9 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
 
 		Args:
 			item: datastore_services.Model. TopicModel to validate.
-		
+
 		Yields:
-            ModelCanonicalNameMismatchError. An error class for
+			ModelCanonicalNameMismatchError. An error class for
 			name mismatched models.
 		"""
 		model = job_utils.clone_model(input_model)
