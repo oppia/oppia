@@ -413,14 +413,14 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             commit_type='test',
             user_id='',
             post_commit_status='',
-            commit_cmds=[{'cmd-invalid': 'invalid_test_command'}])            
+            commit_cmds=[{'cmd-invalid': 'invalid_test_command'}])       
         error_message = 'Missing cmd key in change dict'
-    
-        error = audit_errors.CommitCmdsValidateError(model, "{u'cmd-invalid': u'invalid_test_command'}", error_message)
-        
+        error = audit_errors.CommitCmdsValidateError(model, 
+            '{u\'cmd-invalid\': u\'invalid_test_command\'}', error_message)
+
         self.assertEqual(
             error.message,
             'CommitCmdsValidateError in BaseCommitLogEntryModel(id=\'invalid\'): '
             'Commit command domain validation for '
-            "command: {u'cmd-invalid': u'invalid_test_command'} failed with error: "
+            'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed with error: '
             'Missing cmd key in change dict')
