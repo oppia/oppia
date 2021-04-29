@@ -27,6 +27,9 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { StoryViewerNavbarBreadcrumbComponent } from './navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
+import { StoryViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
+import { StoryViewerPageComponent } from './story-viewer-page.component';
 
 @NgModule({
   imports: [
@@ -35,10 +38,16 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    StoryViewerNavbarBreadcrumbComponent,
+    StoryViewerNavbarPreLogoActionComponent,
+    StoryViewerPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    StoryViewerNavbarBreadcrumbComponent,
+    StoryViewerNavbarPreLogoActionComponent,
+    StoryViewerPageComponent
   ],
   providers: [
     {
