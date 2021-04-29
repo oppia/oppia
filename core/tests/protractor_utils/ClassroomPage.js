@@ -34,7 +34,7 @@ var ClassroomPage = function() {
         topicSummaryTiles.first(), 'Topic summary tile not visible');
       expect(await topicSummaryTiles.count()).toEqual(count);
     } else {
-        expect(await topicSummaryTiles.count()).toEqual(0);
+      expect(await topicSummaryTiles.count()).toEqual(0);
     }
   };
 };
