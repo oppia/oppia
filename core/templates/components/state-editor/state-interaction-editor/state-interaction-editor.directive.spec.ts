@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-interaction-editor.directive.ts is upgraded to Angular 8.
 import { TestBed } from '@angular/core/testing';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
@@ -50,6 +51,7 @@ describe('State Interaction controller', function() {
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
+          ChangeListService,
           {
             provide: ExplorationDataService,
             useValue: {
@@ -61,6 +63,8 @@ describe('State Interaction controller', function() {
           }
         ]
       });
+
+      cls = TestBed.inject(ChangeListService);
     });
 
     beforeEach(function() {
@@ -100,7 +104,6 @@ describe('State Interaction controller', function() {
       $componentController = _$componentController_;
       scope = $rootScope.$new();
       ecs = $injector.get('StateEditorService');
-      cls = $injector.get('ChangeListService');
       ess = $injector.get('ExplorationStatesService');
       siis = $injector.get('StateInteractionIdService');
       scs = $injector.get('StateContentService');

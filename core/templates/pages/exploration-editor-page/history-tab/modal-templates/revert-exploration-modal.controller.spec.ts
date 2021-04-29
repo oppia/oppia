@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { TestBed } from "@angular/core/testing";
+import { ExplorationDataService } from "pages/exploration-editor-page/services/exploration-data.service";
+
 /**
  * @fileoverview Unit tests for RevertExplorationModalController.
  */
@@ -22,13 +25,20 @@ describe('Revert Exploration Modal Controller', function() {
   var version = '1';
   var explorationId = 'exp1';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.value('ExplorationDataService', {
-      explorationId: explorationId
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: explorationId,
+          }
+        }
+      ]
     });
-  }));
+  });
 
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

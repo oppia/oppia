@@ -51,6 +51,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
+import { ChangeListService } from './services/change-list.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -67,7 +68,7 @@ describe('Exploration editor page component', function() {
   var $scope = null;
   var $uibModal = null;
   let aims: AutosaveInfoModalsService = null;
-  var cls = null;
+  let cls: ChangeListService = null;
   var cs = null;
   var efbas = null;
   var eis = null;
@@ -204,6 +205,7 @@ describe('Exploration editor page component', function() {
       ],
       providers: [
         AutosaveInfoModalsService,
+        ChangeListService,
         ContextService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
@@ -229,6 +231,7 @@ describe('Exploration editor page component', function() {
     });
 
     aims = TestBed.inject(AutosaveInfoModalsService);
+    cls = TestBed.inject(ChangeListService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -239,7 +242,6 @@ describe('Exploration editor page component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
     eis = $injector.get('ExplorationImprovementsService');
@@ -394,10 +396,10 @@ describe('Exploration editor page component', function() {
     });
 
     it('should load change list by draft changes successfully', () => {
-      spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
+      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
       $scope.$apply();
 
-      expect(cls.loadAutosavedChangeList).toHaveBeenCalledWith(
+      expect(loadSpy).toHaveBeenCalledWith(
         explorationData.draft_changes);
     });
 

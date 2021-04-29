@@ -18,6 +18,7 @@
  */
 
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { AlertsService } from 'services/alerts.service';
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -51,7 +52,7 @@ describe('Change list service', function() {
   }));
 
   describe('change list service', function() {
-    var cls = null;
+    var cls: ChangeListService = null;
     var $httpBackend = null;
     let explorationDataService: MockExplorationDataService;
     let alertsService: AlertsService;
@@ -68,6 +69,7 @@ describe('Change list service', function() {
       TestBed.configureTestingModule({
         providers: [
           AlertsService,
+          ChangeListService,
           {
             provide: ExplorationDataService,
             useValue: explorationDataService
@@ -77,6 +79,7 @@ describe('Change list service', function() {
     });
 
     beforeEach(() => {
+      cls = TestBed.inject(ChangeListService);
       alertsService = TestBed.inject(AlertsService);
 
       warningSpy = spyOn(alertsService, 'addWarning');
@@ -85,7 +88,6 @@ describe('Change list service', function() {
     });
 
     beforeEach(angular.mock.inject(function($injector) {
-      cls = $injector.get('ChangeListService');
       $httpBackend = $injector.get('$httpBackend');
     }));
 

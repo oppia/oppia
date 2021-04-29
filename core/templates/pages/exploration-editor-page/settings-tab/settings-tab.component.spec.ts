@@ -46,6 +46,7 @@ import { ReadOnlyExplorationBackendApiService } from
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ChangeListService } from '../services/change-list.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -102,9 +103,14 @@ describe('Settings Tab Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        ChangeListService
+      ]
     });
+
     alertsService = TestBed.inject(AlertsService);
+    changeListService = TestBed.inject(ChangeListService);
     userExplorationPermissionsService = (
       TestBed.inject(UserExplorationPermissionsService));
     windowRef = TestBed.inject(WindowRef);
@@ -155,7 +161,6 @@ describe('Settings Tab Component', () => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      changeListService = $injector.get('ChangeListService');
       explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
@@ -793,12 +798,12 @@ describe('Settings Tab Component', () => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      changeListService = $injector.get('ChangeListService');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       editableExplorationBackendApiService = $injector.get(
         'EditableExplorationBackendApiService');
       explorationCategoryService = $injector.get('ExplorationCategoryService');
+      explorationDataService = $injector.get('ExplorationDataService');
       explorationInitStateNameService = $injector.get(
         'ExplorationInitStateNameService');
       explorationLanguageCodeService = $injector.get(
@@ -818,6 +823,7 @@ describe('Settings Tab Component', () => {
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
+      spyOn(explorationDataService, 'autosaveChangeList').and.returnValue(null);
 
       explorationCategoryService.init('Astrology');
       routerService.refreshSettingsTabEmitter = new EventEmitter();
