@@ -84,7 +84,7 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
     """DoFn to validate the last_update of draft change list"""
 
     def process(self, input_model):
-        """Function that checks if last_updated for draft change list is valid
+        """Function that checks if last_updated for draft change list is valid.
 
         Args:
             input_model: user_models.ExplorationUserDataModel.
@@ -92,9 +92,10 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
 
         Yields:
             DraftChangeListLastUpdatedNoneError. Error for models with
-                draft change list but no draft_change_list_last_updated
+            draft change list but no draft_change_list_last_updated
+
             DraftChangeListLastUpdatedInvalidError. Error for models with
-                draft_change_list_last_updated greater than current time.
+            draft_change_list_last_updated greater than current time.
         """
         model = job_utils.clone_model(input_model)
         if (model.draft_change_list and
@@ -104,4 +105,3 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
         if (model.draft_change_list_last_updated and
                 model.draft_change_list_last_updated > current_time):
             yield audit_errors.DraftChangeListLastUpdatedInvalidError(model)
-

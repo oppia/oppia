@@ -226,7 +226,7 @@ class ModelRelationshipError(BaseAuditError):
 
 class DraftChangeListLastUpdatedNoneError(BaseAuditError):
     """Error class for models with draft change list but draft change list
-    last_updated is None
+    last_updated is None.
     """
 
     def __init__(self, model):
@@ -237,7 +237,7 @@ class DraftChangeListLastUpdatedNoneError(BaseAuditError):
 
 
 class DraftChangeListLastUpdatedInvalidError(BaseAuditError):
-    """Error class for models with invalid draft change list last_updated"""
+    """Error class for models with invalid draft change list last_updated."""
 
     def __init__(self, model):
         super(DraftChangeListLastUpdatedInvalidError, self).__init__(model)

@@ -104,7 +104,7 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
 
-class ValidateDraftChangeListLastUpdated(job_test_utils.PipelinedTestBase):
+class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
     VALID_USER_ID = 'test_user'
@@ -141,7 +141,7 @@ class ValidateDraftChangeListLastUpdated(job_test_utils.PipelinedTestBase):
             exploration_id=self.VALID_EXPLORATION_ID,
             draft_change_list=self.VALID_DRAFT_CHANGE_LIST,
             draft_change_list_last_updated=(
-                    self.NOW + datetime.timedelta(days=5)),
+                self.NOW + datetime.timedelta(days=5)),
             created_on=self.NOW,
             last_updated=self.NOW
         )
@@ -161,13 +161,13 @@ class ValidateDraftChangeListLastUpdated(job_test_utils.PipelinedTestBase):
             exploration_id=self.VALID_EXPLORATION_ID,
             draft_change_list=self.VALID_DRAFT_CHANGE_LIST,
             draft_change_list_last_updated=(
-                    self.NOW - datetime.timedelta(days=2)),
+                self.NOW - datetime.timedelta(days=2)),
             created_on=self.NOW - datetime.timedelta(days=3),
             last_updated=self.NOW - datetime.timedelta(days=2)
         )
         output = (
-                self.pipeline
-                | beam.Create([model])
-                | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [])
