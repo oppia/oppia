@@ -42,7 +42,7 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
         name of the model in lowercase.
 
         Args:
-            item: datastore_services.Model. TopicModel to validate.
+            input_model: datastore_services.Model. TopicModel to validate.
 
         Yields:
             ModelCanonicalNameMismatchError. An error class for
@@ -52,4 +52,3 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
         name = model.name
         if name.lower() != model.canonical_name:
             yield audit_errors.ModelCanonicalNameMismatchError(model)
-
