@@ -20,52 +20,46 @@ import { EventEmitter } from '@angular/core';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationEngineService } from './exploration-engine.service';
+import { LearnerViewRatingBackendApiService } from './learner-view-rating-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerViewRatingService {
-  explorationId: string;
-  ratingUrl: string;
-  userRating;
-  private _ratingUpdatedEventEmitter = new EventEmitter();
+  userRating: number;
+  private _ratingUpdatedEventEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(
-    private
-  )
+    private explorationEngineService: ExplorationEngineService,
+    private learnerViewRatingBackendApiService:
+    LearnerViewRatingBackendApiService
+  ) {}
+
+  init(successCallback: (usrRating) => void): void {
+    this.learnerViewRatingBackendApiService.getUserRatingAsync()
+      .then((response) => {
+        successCallback(response.user_rating);
+        this.userRating = response.user_rating;
+      });
+  }
+
+  submitUserRating(ratingValue: number): void {
+    this.learnerViewRatingBackendApiService.submitUserRatingAsync(ratingValue)
+      .then(() => {
+        this.userRating = ratingValue;
+        this._ratingUpdatedEventEmitter.emit();
+      });
+  }
+
+  getUserRating(): number {
+    return this.userRating;
+  }
+
+  get onRatingUpdated(): EventEmitter<void> {
+    return this._ratingUpdatedEventEmitter;
+  }
 }
 
 angular.module('oppia').factory('LearnerViewRatingService',
   downgradeInjectable(LearnerViewRatingService));
-
-// angular.module('oppia').factory('LearnerViewRatingService', [
-//   '$http', 'ExplorationEngineService',
-//   function($http, ExplorationEngineService) {
-//     var explorationId = ExplorationEngineService.getExplorationId();
-//     var ratingsUrl = '/explorehandler/rating/' + explorationId;
-//     var userRating;
-//     var _ratingUpdatedEventEmitter = new EventEmitter();
-//     return {
-//       init: function(successCallback) {
-//         $http.get(ratingsUrl).then(function(response) {
-//           successCallback(response.data.user_rating);
-//           userRating = response.data.user_rating;
-//         });
-//       },
-//       submitUserRating: function(ratingValue) {
-//         $http.put(ratingsUrl, {
-//           user_rating: ratingValue
-//         }).then(() => {
-//           userRating = ratingValue;
-//           _ratingUpdatedEventEmitter.emit();
-//         }, () => {});
-//       },
-//       getUserRating: function() {
-//         return userRating;
-//       },
-//       get onRatingUpdated() {
-//         return _ratingUpdatedEventEmitter;
-//       }
-//     };
-//   }
-// ]);
