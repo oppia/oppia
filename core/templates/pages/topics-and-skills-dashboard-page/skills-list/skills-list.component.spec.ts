@@ -320,7 +320,7 @@ describe('Skills List Component', () => {
 
   it('should get skill editor url', () => {
     expect(componentInstance.getSkillEditorUrl('test_id'))
-      .toEqual('/skill_editor/test_id');
+      .toEqual('/skill_editor/test_id#/');
   });
 
   it('should delete skill', fakeAsync(() => {
