@@ -344,6 +344,7 @@ import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
+import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -510,6 +511,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionModalForLearnerDashboardService',
     SuggestionModalForLearnerDashboardService],
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
+  ['LearnerViewRatingBackendApiService', LearnerViewRatingBackendApiService],
   ['LearnerViewRatingService', LearnerViewRatingService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
