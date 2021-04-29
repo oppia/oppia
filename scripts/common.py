@@ -659,6 +659,10 @@ def wait_for_port_to_be_in_use(port_number):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' %
             port_number)
+        python_utils.PRINT(
+            'This may be because you do not have enough available '
+            'memory. Try quitting applications. We also recommend '
+            'using a machine with at least 8 GB RAM.')
         sys.exit(1)
 
 
