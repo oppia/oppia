@@ -30,7 +30,7 @@ from jobs.types import audit_errors
 from jobs.types import model_property
 import python_utils
 
-(base_models, user_models,topic_models) = models.Registry.import_models(
+(base_models, user_models, topic_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user, models.NAMES.topic])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -403,4 +403,4 @@ class ModelCanonicalNameMismatchErrorTests(AuditErrorsTestBase):
             error.message,
             'ModelCanonicalNameMismatchError in TopicModel(id=\'test\'): '
             'Entity name %s in lowercase does not match canonical name %s' %
-                (model.name, model.canonical_name))
+            (model.name, model.canonical_name))

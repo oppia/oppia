@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.platform import models
-import feconf
 from jobs import job_test_utils
 from jobs.transforms import topic_audits
 from jobs.types import audit_errors
@@ -33,7 +32,7 @@ import apache_beam as beam
 
 
 class ValidateCanonicalNameMatchesNameInLowercaseTests(
-    job_test_utils.PipelinedTestBase):
+        job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
 
@@ -80,5 +79,4 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
             | beam.ParDo(
                 topic_audits.ValidateCanonicalNameMatchesNameInLowercase())
         )
-        self.assert_pcoll_equal(output,[])
-
+        self.assert_pcoll_equal(output, [])

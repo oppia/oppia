@@ -19,13 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from core.platform import models
-import feconf
 from jobs import job_utils
 from jobs.decorators import audit_decorators
-from jobs.transforms import base_model_audits
 from jobs.types import audit_errors
 
 import apache_beam as beam
