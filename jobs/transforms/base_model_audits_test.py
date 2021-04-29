@@ -19,9 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import change_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
-from core.domain import change_domain
 from core.platform import models
 import feconf
 from jobs import job_test_utils
@@ -395,7 +395,7 @@ class MockValidateCommitCmdsSchemaChangeDomain(
 
 class MockValidateWrongSchema(base_model_audits.ValidateCommitCmdsSchema):
 
-    def _get_change_domain_class(self, item):
+    def _get_change_domain_class(self, item): # pylint: disable=unused-argument
         return change_domain.BaseChange
 
 
@@ -421,7 +421,6 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             audit_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])
 
-
     def test_validate_wrong_commit_cmd_missing(self):
         invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
             id='invalid',
@@ -441,6 +440,29 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                "{u'cmd-invalid': u'invalid_test_command'}",
+                '{u\'cmd-invalid\': u\'invalid_test_command\'}',
                 'Missing cmd key in change dict')
+        ])
+
+    def test_validate_wrong_commit_cmd(self):
+        invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
+            id='invalid',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{'cmd': 'invalid_test_command'}])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(MockValidateWrongSchema())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                '{u\'cmd\': u\'invalid_test_command\'}',
+                'Command invalid_test_command is not allowed')
         ])
