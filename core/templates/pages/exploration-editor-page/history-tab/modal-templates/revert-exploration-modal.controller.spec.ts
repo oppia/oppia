@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed } from "@angular/core/testing";
-import { ExplorationDataService } from "pages/exploration-editor-page/services/exploration-data.service";
+import { TestBed } from '@angular/core/testing';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 
 /**
  * @fileoverview Unit tests for RevertExplorationModalController.

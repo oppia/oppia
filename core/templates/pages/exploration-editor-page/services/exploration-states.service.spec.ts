@@ -104,7 +104,7 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(() => {
     changeListService = TestBed.inject(ChangeListService);
-  })
+  });
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ContextService_,
@@ -189,7 +189,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateAddedCallback', function() {
       it('should callback when a new state is added', function() {
         var spy = jasmine.createSpy('callback');
-        const changeListSpy = spyOn(changeListService, 'addState');
+        spyOn(changeListService, 'addState');
 
         ExplorationStatesService.registerOnStateAddedCallback(spy);
         ExplorationStatesService.addState('Me Llamo');
