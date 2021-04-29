@@ -23,9 +23,6 @@ var ClassroomPage = function() {
   var topicSummaryTiles = element.all(
     by.css('.protractor-test-topic-summary-tile'));
 
-  var topNavigationBar = element.all(
-    by.css('.protractor-test-top-navigation-bar'));
-
   this.get = async function(classroomName) {
     await browser.get('/learn/' + classroomName);
     await waitFor.pageToFullyLoad();
@@ -34,7 +31,7 @@ var ClassroomPage = function() {
   this.expectNumberOfTopicsToBe = async function(count) {
     if (count > 0) {
       await waitFor.visibilityOf(
-        topicSummaryTiles.first(),'Topic summary tile not displayed');
+        topicSummaryTiles.first(),'Topic summary tile not visible');
       expect(await topicSummaryTiles.count()).toEqual(count);
     }
     else {
