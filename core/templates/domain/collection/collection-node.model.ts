@@ -100,7 +100,7 @@ export class CollectionNode {
   // Sets the raw exploration summary object stored within this node.
   setExplorationSummaryObject(
       explorationSummaryBackendObject:
-      LearnerExplorationSummaryBackendDict): void {
+      LearnerExplorationSummaryBackendDict | null): void {
     this._explorationSummaryObject = cloneDeep(
       explorationSummaryBackendObject);
   }

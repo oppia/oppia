@@ -161,6 +161,32 @@ describe('Collection node model', () => {
 
       expect(summaryObject).toEqual(explorationSummaryBackendObject);
       expect(collectionNode.getCapitalizedObjective()).toBe('Test Objective');
-    }
-  );
+    });
+
+  it('should return null when Exploration Summary Object is null',
+    () => {
+      let explorationSummaryBackendObject:
+      LearnerExplorationSummaryBackendDict | null = null;
+      let collectionNodeBackendObject:
+      CollectionNodeBackendDict = {
+        exploration_id: 'exp_id0',
+        exploration_summary: null
+      };
+
+      let collectionNode: CollectionNode = CollectionNode.create(
+        collectionNodeBackendObject);
+
+      let summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toBeNull();
+      expect(collectionNode.getExplorationTitle()).toBeNull();
+      expect(collectionNode.isExplorationPrivate()).toBeFalse();
+
+      collectionNode.setExplorationSummaryObject(
+        explorationSummaryBackendObject);
+      summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toEqual(explorationSummaryBackendObject);
+      expect(collectionNode.getCapitalizedObjective()).toBeNull();
+    });
 });
