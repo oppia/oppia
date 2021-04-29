@@ -479,7 +479,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        self.assertIn('Creator Dashboard | Oppia', response.body)
+        self.assertIn(b'Creator Dashboard | Oppia', response.body)
 
         self.logout()
 

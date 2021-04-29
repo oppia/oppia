@@ -50,7 +50,8 @@ def generate_signature(secret, message, vm_id):
     """
     message = '%s|%s' % (base64.b64encode(message.encode('utf-8')), vm_id)
     return hmac.new(
-        secret, msg=message, digestmod=hashlib.sha256).hexdigest()
+        secret, msg=message.encode('utf-8'), digestmod=hashlib.sha256
+    ).hexdigest()
 
 
 def verify_signature(oppia_ml_auth_info):

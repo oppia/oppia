@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import logging
 import os
+import re
 
 from constants import constants
 from core.domain import auth_services
@@ -244,8 +245,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             (None, 'Expected email to be a string, received None'),
             (
                 ['a', '@', 'b.com'],
-                r'Expected email to be a string, received '
-                r'\[u\'a\', u\'@\', u\'b.com\'\]')]
+                re.escape(
+                    'Expected email to be a string, received '
+                    '[\'a\', \'@\', \'b.com\']'
+                )
+            )
+        ]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.create_new_user('auth_id', email)

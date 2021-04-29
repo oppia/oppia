@@ -190,8 +190,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1])
-
-        self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
 
@@ -204,8 +202,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
-        self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
 
@@ -219,8 +215,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
-        self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
 
@@ -272,7 +266,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
-            self.assertFalse(next_response['more'])
             self.assertTrue(
                 isinstance(
                     next_response['next_cursor'], python_utils.BASESTRING))
@@ -298,7 +291,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
-            self.assertFalse(next_response['more'])
             self.assertTrue(isinstance(
                 next_response['next_cursor'], python_utils.BASESTRING))
 

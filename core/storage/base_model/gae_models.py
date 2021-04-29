@@ -422,7 +422,7 @@ class BaseModel(datastore_services.Model):
             page_size, start_cursor=start_cursor)
         return (
             result[0],
-            (result[1].urlsafe() if result[1] else None),
+            (result[1].urlsafe().decode('utf-8') if result[1] else None),
             result[2])
 
 

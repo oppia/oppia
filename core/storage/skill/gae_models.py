@@ -322,5 +322,7 @@ class SkillSummaryModel(base_models.BaseModel):
         query_models, next_cursor, more = (
             cls.query().order(sort).fetch_page(page_size, start_cursor=cursor))
         new_urlsafe_start_cursor = (
-            next_cursor.urlsafe() if (next_cursor and more) else None)
+            next_cursor.urlsafe().decode('utf-8')
+            if (next_cursor and more) else None
+        )
         return query_models, new_urlsafe_start_cursor, more

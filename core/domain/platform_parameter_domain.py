@@ -157,7 +157,7 @@ class EvaluationContext(python_utils.OBJECT):
                     ' specified.' % (
                         match.group(2), ALLOWED_APP_VERSION_FLAVORS))
 
-        if self._server_mode.value not in ALLOWED_SERVER_MODES:
+        if self._server_mode not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
                 'Invalid server mode \'%s\', must be one of %s.' % (
                     self._server_mode, ALLOWED_SERVER_MODES))
@@ -726,7 +726,7 @@ class PlatformParameter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
-        if not any([self._feature_stage == feature_stage.value
+        if not any([self._feature_stage == feature_stage
                     for feature_stage in ALLOWED_FEATURE_STAGES]):
             raise utils.ValidationError(
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (

@@ -351,7 +351,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         opportunities, _, more = (
             opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
-        self.assertFalse(more)
 
     def test_author_rejects_own_voiceover_application_raise_exception(self):
         voiceover_services.create_new_voiceover_application(

@@ -168,7 +168,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         response = self.get_html_response(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
         self.assertIn(
-            '{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
+            b'{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
 
         self.logout()
 
@@ -341,6 +341,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.save_new_skill(
             skill_id, self.admin_id, description='Random Skill')
 
+        print(type(csrf_token))
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,
@@ -373,8 +374,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(json_response['skill_summary_dicts']), 1)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
-        self.assertFalse(json_response['more'])
-        self.assertEqual(json_response['next_cursor'], None)
 
     def test_fetch_filtered_skills_with_invalid_num_skills_to_fetch(self):
         self.login(self.ADMIN_EMAIL)

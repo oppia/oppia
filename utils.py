@@ -891,7 +891,7 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string).decode('utf-8')
+    return python_utils.urllib_unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str):

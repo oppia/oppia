@@ -367,9 +367,10 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX,
-            python_utils.convert_to_bytes(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME),
-            skill_ids_for_url, 'true')
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+            skill_ids_for_url,
+            'true'
+        )
         json_response = self.get_json(url)
         self.assertEqual(
             len(json_response['question_dicts']),
@@ -2336,8 +2337,9 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             }
         )
         self.assertIn(
-            '<exploration-player-page></exploration-player-page>',
-            response.body)
+            b'<exploration-player-page></exploration-player-page>',
+            response.body
+        )
 
         self.logout()
 

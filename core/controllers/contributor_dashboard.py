@@ -88,7 +88,6 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             'next_cursor': next_cursor,
             'more': more
         }
-
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(self, cursor):

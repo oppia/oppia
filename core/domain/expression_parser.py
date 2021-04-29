@@ -124,7 +124,7 @@ def tokenize(expression):
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
-            constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys() +
+            list(constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys()) +
             constants.MATH_FUNCTION_NAMES,
             reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))

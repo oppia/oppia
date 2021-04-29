@@ -516,16 +516,17 @@ def get_voiceover_opportunities(language_code, cursor):
                 this batch.
     """
     page_size = constants.OPPORTUNITIES_PAGE_SIZE
-    exp_opportunity_summary_models, cursor, more = (
+    exp_opportunity_summary_models, new_cursor, more = (
         opportunity_models.ExplorationOpportunitySummaryModel
         .get_all_voiceover_opportunities(page_size, cursor, language_code))
+
     opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
         opportunities.append(exp_opportunity_summary)
-    return opportunities, cursor, more
+    return opportunities, new_cursor, more
 
 
 def get_exploration_opportunity_summaries_by_ids(ids):

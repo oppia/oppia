@@ -64,6 +64,9 @@ import utils
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
+PARAM_NAMES = python_utils.create_enum('test_feature_1')  # pylint: disable=invalid-name
+FEATURE_STAGES = platform_parameter_domain.FEATURE_STAGES
+
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""

@@ -120,7 +120,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto.vm_id = feconf.DEFAULT_VM_ID
         self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
-            python_utils.convert_to_bytes(self.secret),
+            self.secret,
             self.payload_proto.job_result.SerializeToString(),
             self.payload_proto.vm_id)
 
