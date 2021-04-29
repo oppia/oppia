@@ -17,7 +17,6 @@
  */
 import { TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { SkillSummaryBackendDict, SkillSummary } from 'domain/skill/skill-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 class MockNgbModalRef {
@@ -48,19 +47,6 @@ describe('Story node editor directive', function() {
   var AlertsService = null;
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
-  let skillSummaryBackendDict: SkillSummaryBackendDict = {
-    id: '3',
-    description: 'description3',
-    language_code: 'language_code',
-    version: 1,
-    misconception_count: null,
-    worked_examples_count: null,
-    skill_model_created_on: 2,
-    skill_model_last_updated: 3
-  };
-  let summary: SkillSummary[] = (
-    [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
-
 
   beforeEach(angular.mock.inject(function($injector) {
     ngbModal = TestBed.inject(NgbModal);
@@ -74,7 +60,6 @@ describe('Story node editor directive', function() {
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     $q = $injector.get('$q');
-
 
     var sampleStoryBackendObject = {
       id: 'sample_story_id',

@@ -26,7 +26,6 @@ import { SelectSkillModalComponent } from './select-skill-modal.component';
 import { SkillSelectorComponent } from './skill-selector.component';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { ShortSkillSummary, ShortSkillSummaryBackendDict } from 'domain/skill/short-skill-summary.model';
-import { AugmentedSkillSummary, AugmentedSkillSummaryBackendDict } from 'domain/skill/augmented-skill-summary.model';
 import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 
 
@@ -46,24 +45,7 @@ describe('Select Skill Modal', () => {
       Subtopic1: [shortSkillSummary]
     }
   };
-
   let skillsInSameTopicCount: number = 3;
-  let augmentedSkillSummaryBackendDict: AugmentedSkillSummaryBackendDict = {
-    id: '2',
-    description: 'description2',
-    language_code: 'language_code',
-    version: 1,
-    misconception_count: null,
-    worked_examples_count: null,
-    skill_model_created_on: 2,
-    skill_model_last_updated: 3,
-    topic_names: ['topic_name'],
-    classroom_names: ['classroon_name']
-  };
-  let skillSummaries: AugmentedSkillSummary[] = (
-    [AugmentedSkillSummary.createFromBackendDict(
-      augmentedSkillSummaryBackendDict)]);
-
   let skillSummaryBackendDict: SkillSummaryBackendDict = {
     id: '3',
     description: 'description3',
@@ -76,7 +58,7 @@ describe('Select Skill Modal', () => {
   };
   let untriagedSkillSummaries: SkillSummary[] = (
     [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
-
+  let skillSummaries: SkillSummaryBackendDict[] = [skillSummaryBackendDict];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

@@ -63,8 +63,8 @@
     </state-solution-editor>
   </div>
   <div ng-if="explorationIsLinkedToStory">
-    <state-skill-editor on-save-state-content="onSaveStateContent"
-                        on-save-linked-skill-id="onSaveLinkedSkillId">
+    <state-skill-editor (on-save-state-content)="onSaveStateContent($event)"
+                        (on-save-linked-skill-id)="onSaveLinkedSkillId($event)">
     </state-skill-editor>
   </div>
 </div>
