@@ -10,3 +10,6 @@ assets/scripts/*
 third_party/*
 build/*
 *.min.js
+core/tests/protractor/*.js",
+core/tests/protractor_utils/*.js",
+core/tests/protractor_desktop/*.js"
