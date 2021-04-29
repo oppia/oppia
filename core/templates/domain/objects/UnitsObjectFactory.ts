@@ -77,10 +77,8 @@ export class UnitsObjectFactory {
     for (var i = 0; i < units.length; i++) {
       if ('*/()# '.includes(units[i]) && unit !== 'per') {
         if (unit.length > 0) {
-          const unitValue = unitList.slice(-1).pop();
           if ((unitList.length > 0) &&
-            (typeof unitValue !== undefined) &&
-            this.isunit(<string>unitValue)) {
+            this.isunit(<string> unitList.slice(-1).pop())) {
             unitList.push('*');
           }
           unitList.push(unit);
@@ -120,7 +118,10 @@ export class UnitsObjectFactory {
         }
       } else if (unitList[ind] === ')') {
         var elem = parenthesisStack.pop();
-        var parsed: number = elem ? parseInt(<string>elem[1]) : 1;
+        // If the parenthesisStack is empty then we don't need to
+        // modify the value of multiplier and this is being done
+        // using multiplicative identity property.
+        var parsed: number = elem ? parseInt(<string> elem[1]) : 1;
         multiplier = parsed * multiplier;
       } else if (this.isunit(unitList[ind])) {
         unitsWithMultiplier.push([unitList[ind], multiplier]);
