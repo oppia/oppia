@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.domain import app_feedback_report_constants as constants
 from core.platform import models
 import feconf
 import python_utils
@@ -29,6 +28,21 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+
+PLATFORM_CHOICE_ANDROID = 'android'
+PLATFORM_CHOICE_WEB = 'web'
+PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
+GITHUB_REPO_CHOICES = PLATFORM_CHOICES
+
+FilterFieldNames = python_utils.create_enum(
+    'platform', 'report_type', 'entry_point', 'submitted_on',
+    'android_device_model', 'android_sdk_version', 'text_language_code',
+    'audio_language_code', 'platform_version',
+    'android_device_country_locale_code')
+
+# An ID used for stats model entities tracking all unticketed reports.
+UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
+    'unticketed_android_reports_stats_ticket_id')
 
 
 class AppFeedbackReportModel(base_models.BaseModel):
@@ -50,7 +64,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # feedback corresponds to.
     platform = datastore_services.StringProperty(
         required=True, indexed=True,
-        choices=constants.PLATFORM_CHOICES)
+        choices=PLATFORM_CHOICES)
     # The ID of the user that scrubbed this report, if it has been scrubbed.
     scrubbed_by = datastore_services.StringProperty(
         required=False, indexed=True)
@@ -183,7 +197,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         android_schema_version = None
         web_schema_version = None
-        if platform == constants.PLATFORM_CHOICE_ANDROID:
+        if platform == PLATFORM_CHOICE_ANDROID:
             android_schema_version = (
                 feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION)
         else:
@@ -268,26 +282,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         query = cls.query(projection=[filter_name], distinct=True)
         filter_values = []
-        if filter_name == constants.FilterFieldNames.report_type:
+        if filter_name == FilterFieldNames.report_type:
             filter_values = [model.report_type for model in query]
-        elif filter_name == constants.FilterFieldNames.platform:
+        elif filter_name == FilterFieldNames.platform:
             filter_values = [model.platform for model in query]
-        elif filter_name == constants.FilterFieldNames.entry_point:
+        elif filter_name == FilterFieldNames.entry_point:
             filter_values = [model.entry_point for model in query]
-        elif filter_name == constants.FilterFieldNames.submitted_on:
+        elif filter_name == FilterFieldNames.submitted_on:
             filter_values = [model.submitted_on.date() for model in query]
-        elif filter_name == constants.FilterFieldNames.android_device_model:
+        elif filter_name == FilterFieldNames.android_device_model:
             filter_values = [model.android_device_model for model in query]
-        elif filter_name == constants.FilterFieldNames.android_sdk_version:
+        elif filter_name == FilterFieldNames.android_sdk_version:
             filter_values = [model.android_sdk_version for model in query]
-        elif filter_name == constants.FilterFieldNames.text_language_code:
+        elif filter_name == FilterFieldNames.text_language_code:
             filter_values = [model.text_language_code for model in query]
-        elif filter_name == constants.FilterFieldNames.audio_language_code:
+        elif filter_name == FilterFieldNames.audio_language_code:
             filter_values = [model.audio_language_code for model in query]
-        elif filter_name == constants.FilterFieldNames.platform_version:
+        elif filter_name == FilterFieldNames.platform_version:
             filter_values = [model.platform_version for model in query]
         elif filter_name == (
-                constants.FilterFieldNames.android_device_country_locale_code):
+                FilterFieldNames.android_device_country_locale_code):
             filter_values = [
                 model.android_device_country_locale_code for model in query]
         return filter_values
@@ -406,12 +420,12 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # The platform that the reports in this ticket pertain to.
     platform = datastore_services.StringProperty(
         required=True, indexed=True,
-        choices=constants.PLATFORM_CHOICES)
+        choices=PLATFORM_CHOICES)
     # The Github repository that has the associated issue for this ticket. The
     # possible values correspond to GITHUB_REPO_CHOICES.
     github_issue_repo_name = datastore_services.StringProperty(
         required=False, indexed=True,
-        choices=constants.GITHUB_REPO_CHOICES)
+        choices=GITHUB_REPO_CHOICES)
     # The Github issue number that applies to this ticket.
     github_issue_number = datastore_services.IntegerProperty(
         required=False, indexed=True)
@@ -538,7 +552,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # The platform that these statistics are for.
     platform = datastore_services.StringProperty(
         required=True, indexed=True,
-        choices=constants.PLATFORM_CHOICES)
+        choices=PLATFORM_CHOICES)
     # The date in UTC that this entity is tracking on -- this should correspond
     # to the creation date of the reports aggregated in this model.
     stats_tracking_date = datastore_services.DateProperty(
@@ -613,7 +627,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             '[platform]:[ticket_id]:[stats_date in YYYY-MM-DD]'.
         """
         if ticket_id is None:
-            ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+            ticket_id = UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
         return '%s:%s:%s' % (
             platform, ticket_id, stats_tracking_date.isoformat())
 

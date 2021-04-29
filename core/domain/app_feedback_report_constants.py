@@ -21,9 +21,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import python_utils
 
+(base_models, app_feedback_report_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.app_feedback_report_models])
 
-PLATFORM_CHOICE_ANDROID = 'android'
-PLATFORM_CHOICE_WEB = 'web'
+
+PLATFORM_CHOICE_ANDROID = app_feedback_report_models.PLATFORM_CHOICE_ANDROID
+PLATFORM_CHOICE_WEB = app_feedback_report_models.PLATFORM_CHOICE_WEB
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
@@ -31,7 +34,7 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 # reports.
 ALL_ANDROID_REPORTS_STATS_TICKET_ID = 'all_android_reports_stats_ticket_id'
 UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID = (
-    'unticketed_android_reports_stats_ticket_id')
+    app_feedback_report_models.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID)
 
 MAXIMUM_TICKET_NAME_LENGTH = 100
 MINIMUM_ANDROID_SDK_VERSION = 2
@@ -55,15 +58,11 @@ StatsParameterNames = python_utils.create_enum(
     'platform', 'report_type', 'country_locale_code',
     'entry_point_name', 'text_language_code', 'audio_language_code',
     'android_sdk_version', 'version_name')
-FilterFieldNames = python_utils.create_enum(
-    'platform', 'report_type', 'entry_point', 'submitted_on',
-    'android_device_model', 'android_sdk_version', 'text_language_code',
-    'audio_language_code', 'platform_version',
-    'android_device_country_locale_code')
 AndroidTextSize = python_utils.create_enum(
     'text_size_unspecified', 'small_text_size', 'medium_text_size',
     'large_text_size', 'extra_large_text_size')
 AndroidNetworkTypes = python_utils.create_enum('wifi', 'cellular', 'none')
+FilterFieldNames = app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
     EntryPoint.navigation_drawer, EntryPoint.lesson_player,
