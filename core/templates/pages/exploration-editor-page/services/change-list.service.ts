@@ -22,7 +22,7 @@ import { EventEmitter, OnInit, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service.ts';
+import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';

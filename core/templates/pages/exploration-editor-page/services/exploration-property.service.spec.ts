@@ -18,8 +18,8 @@
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
 
-import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service.ts';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service.ts';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';

@@ -342,9 +342,9 @@ import { ImageLocalStorageService } from './image-local-storage.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
-import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service.ts';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service.ts';
-import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service.ts';
+import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],

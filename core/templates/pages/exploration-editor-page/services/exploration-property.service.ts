@@ -22,7 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service.ts';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 
