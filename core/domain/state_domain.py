@@ -1598,18 +1598,34 @@ class WrittenTranslations(python_utils.OBJECT):
 
         return correctly_translated_content_ids
 
-    def add_translation(self, content_id, language_code, html):
+    def add_translation(
+            self, content_id, language_code, html, data_format, needs_update):
         """Adds a translation for the given content id in a given language.
 
         Args:
             content_id: str. The id of the content.
             language_code: str. The language code of the translated html.
             html: str. The translated html.
+            data_format: str. The data format of the translated content.
+            needs_update: bool. Whether the translation needs to be updated.
         """
         written_translation = WrittenTranslation(
-            WrittenTranslation.DATA_FORMAT_HTML, html, False)
+            data_format, html, needs_update)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
+
+    def mark_translation_as_needing_update(self, content_id):
+        """Marks translation as needing update for the given content id in all
+        languages.
+
+        Args:
+            content_id: str. The id of the content.
+        """
+        for (language_code, written_translation) in (
+                self.translations_mapping[content_id].items()):
+            written_translation.needs_update = True
+            self.translations_mapping[content_id][language_code] = (
+                written_translation)
 
     def validate(self, expected_content_id_list):
         """Validates properties of the WrittenTranslations.

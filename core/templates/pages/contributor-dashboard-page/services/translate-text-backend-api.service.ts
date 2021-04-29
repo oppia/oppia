@@ -21,6 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from 'services/image-local-storage.service';
 
+import { TRANSLATION_DATA_FORMAT_HTML } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +58,9 @@ export class TranslateTextBackendApiService {
         state_name: stateName,
         language_code: languageCode,
         content_html: contentHtml,
-        translation_html: translationHtml
+        translation_html: translationHtml,
+        data_format: TRANSLATION_DATA_FORMAT_HTML,
+        needs_update: false
       }
     };
 

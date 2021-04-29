@@ -290,10 +290,8 @@ angular.module('oppia').component('explorationEditorTab', {
               }
               if (writtenTranslations.hasUnflaggedWrittenTranslations(
                 contentId)) {
-                writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                  contentId);
-                ExplorationStatesService.saveWrittenTranslations(
-                  stateName, writtenTranslations);
+                ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
+                  stateName, contentId);
               }
             });
           }, function() {

@@ -477,7 +477,13 @@ def apply_change_list(exploration_id, change_list):
             elif change.cmd == exp_domain.CMD_ADD_TRANSLATION:
                 exploration.states[change.state_name].add_translation(
                     change.content_id, change.language_code,
-                    change.translation_html)
+                    change.translation_html, change.data_format,
+                    change.needs_update)
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_TRANSLATION_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_translation_as_needing_update(change.content_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
