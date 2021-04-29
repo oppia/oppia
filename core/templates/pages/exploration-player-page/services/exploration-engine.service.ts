@@ -374,7 +374,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
             AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
               oldStateName, oldState, answer,
               interactionRulesService));
-          StatsReportingService.recordAnswerSubmittedAsync(
+          StatsReportingService.recordAnswerSubmitted(
             oldStateName,
             LearnerParamsService.getAllParams(),
             answer,
