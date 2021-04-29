@@ -74,13 +74,13 @@ export class CkEditorCopyContentService {
         break;
       }
 
-      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
-        currentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
-        // Prevents errors if the element clicked on is itself the
-        // OUTPUT_VIEW_TAG_NAME (ie ANGULAR-HTML-BIND).
+      } else if (currentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+        break;
       }
-
+      // Prevents errors if the element clicked on is itself the
+      // OUTPUT_VIEW_TAG_NAME (ie ANGULAR-HTML-BIND).
       currentElement = currentElement.parentElement;
     }
 
