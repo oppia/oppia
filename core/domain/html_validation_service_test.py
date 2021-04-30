@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import os
 
 import bs4
@@ -500,7 +501,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'url-with-value="&amp;quot;http://google.com&amp;quot;">'
                 '</oppia-noninteractive-link></p>'
             )],
-            'Missing keys: [u\'title\'], Extra keys: [u\'url\']': [(
+            'Missing keys: [\'title\'], Extra keys: [\'url\']': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value="'
                 '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
                 'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url'
@@ -509,7 +510,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'Could not convert unicode to int: Hello': [(
+            'Could not convert str to int: Hello': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="&amp;quot;Hello&amp;'
                 'quot;" video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
@@ -580,7 +581,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'or \'https://\'; received htt://link.com'
             )],
             ['Missing attributes: alt-with-value, Extra attributes: '],
-            [u'Expected dict, received [1, 2, 3]']
+            ['Expected dict, received [1, 2, 3]']
         ]
         for test_case in test_cases:
             html_string = test_case['html_string']
@@ -779,7 +780,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
         with self.assertRaisesRegexp(
-            Exception, 'No JSON object could be decoded'
+            json.decoder.JSONDecodeError,
+            'Expecting value: line 1 column 1 (char 0)'
         ):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[0]['html_content'])

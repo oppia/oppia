@@ -4189,7 +4189,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '{u\'normalizedStrSet\': [[]], u\'contentId\': u\'rule_input_'
+                '{\'normalizedStrSet\': [[]], \'contentId\': \'rule_input_'
                 'Equals\'} has the wrong type. It should be a TranslatableSetOf'
                 'NormalizedString.'
             )
@@ -4233,7 +4233,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
         exploration.init_state.update_interaction_answer_groups(answer_groups)
 
-        with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
+        with logging_swap, self.assertRaisesRegexp(KeyError, '\'x\''):
             (
                 exploration.init_state.interaction.answer_groups[0]
                 .rule_specs[0].validate([], {})
@@ -4243,7 +4243,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([u\'x\'])'
+                'parameter names: set([\'x\'])'
             ]
         )
 

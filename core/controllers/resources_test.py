@@ -336,7 +336,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'],
             'Unsupported tags/attributes found in the SVG:\ntags: '
-            '[u\'badsvg\']\n')
+            '[\'badsvg\']\n')
 
         self.logout()
 

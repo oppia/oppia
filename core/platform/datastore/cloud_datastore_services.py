@@ -284,9 +284,12 @@ def mock_datetime_for_datastore(mocked_now):
         @classmethod
         def utcnow(cls):
             """Returns the mocked datetime."""
-
             return mocked_now
 
     setattr(datetime, 'datetime', MockDatetime)
     setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
-    yield
+    try:
+        yield
+    finally:
+        setattr(datetime, 'datetime', old_datetime_type)
+        setattr(ndb.DateTimeProperty, 'data_type', old_datetime_type)

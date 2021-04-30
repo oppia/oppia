@@ -420,7 +420,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             observed_log_messages[0],
             'ValidationError Command invalid command is not allowed '
-            'collection_id [{u\'cmd\': u\'invalid command\'}]')
+            'collection_id [{\'cmd\': \'invalid command\'}]')
 
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):

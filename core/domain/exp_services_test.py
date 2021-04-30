@@ -5234,7 +5234,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
             (
                 [
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=6)',
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=6)',
                 ], [], 5, 6
             )
         )
@@ -5276,8 +5276,8 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
             (
                 [], [
-                    'StateStats(exp_id=u\'ID1\', exp_version=6, '
-                    'state_name=u\'Introduction\')'
+                    'StateStats(exp_id=\'ID1\', exp_version=6, '
+                    'state_name=\'Introduction\')'
                 ], 5, 6
             )
         )
@@ -5323,8 +5323,8 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
             (
                 [
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=2)',
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=4)'
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=2)',
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=4)'
                 ], [], 4, 6
             )
         )
@@ -5371,9 +5371,9 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
             (
                 [
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=1)',
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=2)',
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=3)'
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=1)',
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=2)',
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=3)'
                 ], [], 3, 6
             )
         )
@@ -5415,8 +5415,8 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID1'),
             (
                 [
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=1)',
-                    'ExplorationStats(exp_id=u\'ID1\', exp_version=2)'
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=1)',
+                    'ExplorationStats(exp_id=\'ID1\', exp_version=2)'
                 ], [], 4, 6
             )
         )
@@ -5474,8 +5474,8 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             (
                 [],
                 [
-                    'StateStats(exp_id=u\'ID1\', exp_version=2, '
-                    'state_name=u\'Introduction\')'
+                    'StateStats(exp_id=\'ID1\', exp_version=2, '
+                    'state_name=\'Introduction\')'
                 ], 6, 5
             )
         )
@@ -5519,10 +5519,10 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             (
                 [],
                 [
-                    'StateStats(exp_id=u\'ID1\', exp_version=2, '
-                    'state_name=u\'Introduction\')',
-                    'StateStats(exp_id=u\'ID1\', exp_version=2, '
-                    'state_name=u\'END\')',
+                    'StateStats(exp_id=\'ID1\', exp_version=2, '
+                    'state_name=\'Introduction\')',
+                    'StateStats(exp_id=\'ID1\', exp_version=2, '
+                    'state_name=\'END\')',
                 ], 8, 5
             )
         )

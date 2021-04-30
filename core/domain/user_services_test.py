@@ -1615,15 +1615,18 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
             datetime.timedelta(hours=13)):
             user_services.record_user_created_an_exploration(self.owner_id)
 
+        print('a')
         owner_settings = user_services.get_user_settings(self.owner_id)
         previous_last_created_an_exploration = (
             owner_settings.last_created_an_exploration)
         self.assertIsNotNone(previous_last_created_an_exploration)
 
+        print('b')
         # The creator creates another exploration 13 hours later.
         self.save_new_valid_exploration(
             self.EXP_ID_B, self.owner_id, end_state_name='End')
 
+        print('c')
         # Make sure that last exploration created time gets updated.
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertGreater(
@@ -1943,6 +1946,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_1_id, 'hi')
+        self.process_and_flush_pending_tasks()
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)

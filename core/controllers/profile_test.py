@@ -832,9 +832,9 @@ class DeleteAccountTests(test_utils.GenericTestBase):
         self.enable_deletion_swap = (
             self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True))
         self.testapp_swap_1 = self.swap(
-            self, 'testapp', webtest.TestApp(main_cron.app))
+            self, 'testapp', webtest.TestApp(main_cron.app_without_context))
         self.testapp_swap_2 = self.swap(
-            self, 'testapp', webtest.TestApp(main_cron.app))
+            self, 'testapp', webtest.TestApp(main_cron.app_without_context))
 
     def _run_account_deletion(self):
         """Execute complete deletion for the user that is logged in."""

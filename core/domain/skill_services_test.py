@@ -373,7 +373,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_filtered_skill_summaries(
                 1, None, None, None, None, None))
         self.assertEqual(len(augmented_skill_summaries), 2)
-        self.assertIsInstance(next_cursor, bytes)
+        self.assertIsInstance(next_cursor, str)
         self.assertTrue(more)
 
         augmented_skill_summaries, next_cursor, more = (

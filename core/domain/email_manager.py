@@ -38,7 +38,7 @@ import utils
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
 transaction_services = models.Registry.import_transaction_services()
-
+app_identity_services = models.Registry.import_app_identity_services()
 
 def log_new_error(*args, **kwargs):
     """Logs an error message (This is a stub for logging.error(), so that the
@@ -571,7 +571,7 @@ def send_mail_to_admin(email_subject, email_body):
         email_body: str. Body (message) of the email.
     """
 
-    app_id = 'test id'
+    app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
     system_name_email = '%s <%s>' % (
         feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
@@ -1481,7 +1481,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     '<li><b>%s</b></li><br>' % (
                         utils.get_supported_audio_language_description(
                             language_code)) for language_code in
-                    language_codes_that_need_reviewers
+                    sorted(language_codes_that_need_reviewers)
                 ]
             )
             suggestion_types_needing_reviewers_paragraphs.append(

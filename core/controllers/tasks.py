@@ -195,8 +195,7 @@ class DeferredTasksHandler(base.BaseHandler):
                 'must contain a function_identifier in the payload.')
         if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
             raise Exception(
-                'The function id, %s, is not valid.' %
-                python_utils.convert_to_bytes(payload['fn_identifier']))
+                'The function id, %s, is not valid.' % payload['fn_identifier'])
 
         deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
             payload['fn_identifier']]

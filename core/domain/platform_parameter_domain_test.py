@@ -252,7 +252,9 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': 'invalid',
+                'server_mode': {
+                    'value': 'invalid'
+                },
             },
         )
         with self.assertRaisesRegexp(

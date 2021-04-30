@@ -53,6 +53,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             )
 
         for item, error_msg in invalid_items_with_error_messages:
+            print(item)
             with self.assertRaisesRegexp(Exception, error_msg):
                 object_class.normalize(item)
 
@@ -420,7 +421,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (
                 {'a': 1},
                 re.escape(
-                    'Missing keys: [\'svg_filename\', \'raw_latex\'], '
+                    'Missing keys: [\'raw_latex\', \'svg_filename\'], '
                     'Extra keys: [\'a\']'
                 )
             ),
@@ -473,7 +474,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         ]
 
         invalid_values_with_error_messages = [
-            ('http://¡Hola!.com', re.escape('\'\\xa1\'')),
             (
                 'javascript:alert(5);',
                 re.escape(
@@ -842,8 +842,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             (
                 {},
                 re.escape(
-                    'Missing keys: [\'isNegative\, \'numerator\', '
-                    '\'wholeNumber\', \'denominator\'], Extra keys: []'
+                    'Missing keys: [\'denominator\', \'isNegative\', '
+                    '\'numerator\', \'wholeNumber\'], Extra keys: []'
                 )
             ),
             ('1/3', 'Expected dict, received 1/3'),

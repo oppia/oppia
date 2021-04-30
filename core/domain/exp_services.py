@@ -286,10 +286,11 @@ def export_to_zip_file(exploration_id, version=None):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
+    print(type(yaml_repr))
 
     temp_file = python_utils.string_io()
     with zipfile.ZipFile(
-        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
@@ -302,12 +303,10 @@ def export_to_zip_file(exploration_id, version=None):
         for filepath in dir_list:
             if not filepath.startswith(asset_dirs_to_include_in_downloads):
                 continue
-            file_contents = fs.get(filepath)
+            file_contents = fs.get(filepath).decode('utf-8')
 
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, python_utils.UNICODE)
-            unicode_filepath = str_filepath.decode('utf-8')
-            zfile.writestr(unicode_filepath, file_contents)
+            zfile.writestr(str_filepath, file_contents)
 
     return temp_file.getvalue()
 
@@ -1959,20 +1958,19 @@ def regenerate_missing_stats_for_exploration(exp_id):
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
-    try:
-        snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
-            exp_id, exp_versions)
-        change_lists = [
-            [
+    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, exp_versions)
+    change_lists = []
+    for snapshot in snapshots:
+        try:
+            change_lists.append([
                 exp_domain.ExplorationChange(commit_cmd)
                 for commit_cmd in snapshot['commit_cmds']
-            ]
-            for snapshot in snapshots
-        ]
-    except utils.ValidationError:
-        raise Exception(
-            'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
-            % (exp_id, snapshot['commit_cmds']))
+            ])
+        except utils.ValidationError:
+            raise Exception(
+                'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
+                % (exp_id, snapshot['commit_cmds']))
 
     missing_exp_stats = []
     missing_state_stats = []

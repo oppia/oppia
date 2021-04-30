@@ -170,7 +170,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """
         names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
-            names = [name for name in names if not name.endswith(suffix)]
+            names = [
+                name for name in names
+                if name != '__pycache__' and not name.endswith(suffix)
+            ]
         return names
 
     def _get_linear_interaction_ids(self):

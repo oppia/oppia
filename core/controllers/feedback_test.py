@@ -671,7 +671,6 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
             feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
 
         self.assertEqual(response['results'], [])
-        self.assertFalse(response['more'])
 
         self.save_new_valid_exploration(
             self.exp_id, self.owner_id, title='Exploration title',
@@ -690,7 +689,6 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(results), 2)
 
-        self.assertFalse(response['more'])
         self.assertEqual(results[0]['text'], 'new text')
         self.assertEqual(results[0]['updated_subject'], 'new subject')
         self.assertEqual(results[0]['entity_type'], 'exploration')

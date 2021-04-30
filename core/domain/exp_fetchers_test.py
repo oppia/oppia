@@ -273,7 +273,7 @@ tags: []
 title: Old Title
 """) % (
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    python_utils.convert_to_bytes(feconf.DEFAULT_INIT_STATE_NAME),
+    feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     ALBERT_EMAIL = 'albert@example.com'

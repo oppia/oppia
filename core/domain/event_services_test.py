@@ -255,7 +255,7 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             observed_log_messages,
             [
-                'Aggregated stats contains an undefined state name: [u\''
+                'Aggregated stats contains an undefined state name: [\''
                 'undefined\']'
             ]
         )

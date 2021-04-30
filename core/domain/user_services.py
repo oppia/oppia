@@ -1370,6 +1370,8 @@ def record_user_created_an_exploration(user_id):
     Args:
         user_id: str. The unique ID of the user.
     """
+    print(user_id)
+    print(datetime.datetime.utcnow())
     user_settings = get_user_settings(user_id)
     if user_settings:
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
@@ -1994,6 +1996,7 @@ def remove_translation_review_rights_in_language(user_id, language_code):
     user_contribution_rights = get_user_contribution_rights(user_id)
     user_contribution_rights.can_review_translation_for_language_codes.remove(
         language_code)
+    print(user_contribution_rights)
     _update_user_contribution_rights(user_contribution_rights)
 
 

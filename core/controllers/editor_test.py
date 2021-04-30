@@ -983,7 +983,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
             observed_log_messages[:2],
             [
                 'Could not find state: invalid_state_name',
-                'Available states: [u\'Introduction\']'
+                'Available states: [\'Introduction\']'
             ]
         )
         # The last log message is the traceback for an Exception. It cannot be

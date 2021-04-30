@@ -35,7 +35,7 @@ memory_cache_services = models.Registry.import_cache_services()
 # NOTE: Namespaces and sub-namespaces cannot contain ':' because this is used as
 # an internal delimiter for cache keys that separates the namespace, the
 # sub-namespace, and the id in the cache keys.
-MEMCACHE_KEY_DELIMITER = b':'
+MEMCACHE_KEY_DELIMITER = ':'
 
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the explorations within the sub-namespace. The value for
@@ -126,7 +126,7 @@ def _get_memcache_key(namespace, sub_namespace, obj_id):
         str. The generated key for use in the memory cache in order to
         differentiate a passed-in key based on namespace and sub-namespace.
     """
-    sub_namespace_key_string = (sub_namespace or b'')
+    sub_namespace_key_string = (sub_namespace or '')
     if MEMCACHE_KEY_DELIMITER in sub_namespace_key_string:
         raise ValueError(
             'Sub-namespace %s cannot contain \':\'.' % sub_namespace_key_string)
