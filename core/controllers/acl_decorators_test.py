@@ -1234,7 +1234,7 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
                 ' this exploration.')
         self.logout()
 
-    def test_random_user_cannot_assign_voiceartist_in_public_exp(self):
+    def test_owner_cannot_assign_voiceartist_in_public_exp(self):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1245,6 +1245,19 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
                 'You do not have credentials to assign voiceartist to'
                 ' this exploration.')
         self.logout()
+
+    def test_random_user_cannot_assign_voiceartist_in_public_exp(self):
+        self.login(self.user_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                    csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(response['error'],
+                'You do not have credentials to assign voiceartist to'
+                ' this exploration.')
+        self.logout()
+
 
 class EditExplorationTests(test_utils.GenericTestBase):
     """Tests for can_edit_exploration decorator."""

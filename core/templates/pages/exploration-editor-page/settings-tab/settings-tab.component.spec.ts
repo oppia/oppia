@@ -92,7 +92,8 @@ describe('Settings Tab Component', () => {
     canDelete: true,
     canModifyRoles: true,
     canReleaseOwnership: true,
-    canUnpublish: true
+    canUnpublish: true,
+    canAssignVoiceartist: true
   };
   let mockWindowDimensionsService = {
     isWindowNarrow: () => true
@@ -223,6 +224,7 @@ describe('Settings Tab Component', () => {
         expect(ctrl.canReleaseOwnership).toBe(true);
         expect(ctrl.canUnpublish).toBe(true);
         expect(ctrl.explorationId).toBe(explorationId);
+        expect(ctrl.canAssignVoiceartist).toBe(true);
 
         expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
           id: 'Astrology',
@@ -393,6 +395,42 @@ describe('Settings Tab Component', () => {
 
       expect(
         explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
+    });
+
+    it('should open a modal when removeVoiceArtist is called', function() {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      ctrl.removeRole('username');
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should remove role when resolving remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync').and
+        .returnValue($q.resolve());
+
+      ctrl.removeVoiceArtist('username');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeVoiceArtistRoleAsync).toHaveBeenCalled();
+    });
+
+    it('should not remove role when rejecting remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
+
+      ctrl.removeVoiceArtist('username');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeVoiceArtistRoleAsync)
+        .not.toHaveBeenCalled();
     });
 
     it('should open a modal when reassignRole is called', () => {
@@ -621,6 +659,34 @@ describe('Settings Tab Component', () => {
       expect(ctrl.isRolesFormOpen).toBe(false);
       expect(ctrl.newMemberUsername).toBe('');
       expect(ctrl.newMemberRole.value).toBe('owner');
+    });
+
+    it('should open voiceartist edit roles form and edit username', () => {
+      ctrl.openVoiceoverRolesForm();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      expect(ctrl.isVoiceoverFormOpen).toBe(true);
+      expect(ctrl.newVoiceartistUsername).toBe('');
+
+      spyOn(explorationRightsService, 'saveVoiceArtist');
+      ctrl.editVoiseArtist('Username1');
+
+      expect(explorationRightsService.saveVoiceArtist).toHaveBeenCalledWith(
+        'Username1');
+      expect(ctrl.isVoiceoverFormOpen).toBe(false);
+    });
+
+    it('should open voiceartist edit roles form and close it', () => {
+      ctrl.openVoiceoverRolesForm();
+
+      expect(ctrl.isVoiceoverFormOpen).toBe(true);
+      expect(ctrl.newVoiceartistUsername).toBe('');
+
+      ctrl.closeVoiceoverForm();
+
+      expect(ctrl.isVoiceoverFormOpen).toBe(false);
+      expect(ctrl.newVoiceartistUsername).toBe('');
     });
 
     it('should evaluate when parameters are enabled', () => {

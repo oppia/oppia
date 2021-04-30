@@ -857,7 +857,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/voiceartist_management_handler/<entity_type>/<entity_id>',
-        voiceover_admin.VoiceartistAssignmentHandler),
+        voice_artist.VoiceartistManagementHandler),
 ]
 
 # Adding redirects for topic landing pages.

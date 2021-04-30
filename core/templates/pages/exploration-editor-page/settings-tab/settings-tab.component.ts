@@ -325,6 +325,30 @@ angular.module('oppia').component('settingsTab', {
         reassignRole(newMemberUsername, newMemberRole, oldRole);
       };
 
+      ctrl.removeRole = function(memberUsername, memberRole) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'remove-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => memberUsername,
+            role: () => memberRole
+          },
+          controller: 'RemoveRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.removeRoleAsync(
+            memberUsername);
+          ctrl.closeRolesForm();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
+        });
+      };
+
       ctrl.editVoiseArtist = function(newVoiceartistUsername) {
         ExplorationRightsService.saveVoiceArtist(newVoiceartistUsername);
         ctrl.closeVoiceoverForm();
@@ -347,30 +371,6 @@ angular.module('oppia').component('settingsTab', {
           ExplorationRightsService.removeVoiceArtistRoleAsync(
             voiceArtistUsername);
             ctrl.closeVoiceoverForm();
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
-        });
-      };
-
-      ctrl.removeRole = function(memberUsername, memberRole) {
-        AlertsService.clearWarnings();
-
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
-            'remove-role-confirmation-modal.directive.html'),
-          backdrop: true,
-          resolve: {
-            username: () => memberUsername,
-            role: () => memberRole
-          },
-          controller: 'RemoveRoleConfirmationModalController'
-        }).result.then(function() {
-          ExplorationRightsService.removeRoleAsync(
-            memberUsername);
-          ctrl.closeRolesForm();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is
@@ -640,9 +640,6 @@ angular.module('oppia').component('settingsTab', {
         }, {
           name: 'Collaborator (can make changes)',
           value: 'editor'
-        }, {
-          name: 'Voice Artist (can do voiceover)',
-          value: 'voice artist'
         }, {
           name: 'Playtester (can give feedback)',
           value: 'viewer'
