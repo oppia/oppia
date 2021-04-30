@@ -52,9 +52,6 @@ import {
 } from 'interactions/customization-args-defs';
 import { InteractionObjectFactory } from
 'domain/exploration/InteractionObjectFactory';
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-customization-args.service.ts');
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
@@ -102,7 +99,7 @@ export class Solution {
     };
   }
 
-  if (StateInteractionIdService) {
+  /*if (StateInteractionIdService) {
     var interactionSpec = INTERACTION_SPECS[
       StateInteractionIdService.savedMemento];
     this.customizationArgSpecs = interactionSpec.customization_arg_specs;
@@ -129,10 +126,10 @@ export class Solution {
     this.hasCustomizationArgs = (
       StateCustomizationArgsService.displayed &&
       Object.keys(StateCustomizationArgsService.displayed).length > 0
-    );*/
-  }
+    );
+  }*/
 
-  getSummary(interactionId: string): string {
+  getSummary(interactionId: string, customizationArgs: InteractionCustomizationArgs): string {
     var solutionType = (
       this.answerIsExclusive ? 'The only' : 'One');
     var correctAnswer = null;
@@ -159,6 +156,11 @@ export class Solution {
         let transformedArray = [];
         for (let elem of arr) {
           transformedArray.push(formatRtePreview.transform(elem));
+            (<
+              DragAndDropSortInputCustomizationArgs
+            > customizationArgs).choices.value.map(val => (
+              { val: val.contentId, label: val.html}
+            ));
         }
         correctAnswer.push(transformedArray);
       }
