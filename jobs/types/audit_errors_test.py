@@ -377,14 +377,13 @@ class ModelIncorrectKeyErrorTests(AuditErrorsTestBase):
             id='test'
         )
         incorrect_keys = ['incorrect key']
-
         error = audit_errors.ModelIncorrectKeyError(model, incorrect_keys)
 
         self.assertEqual(
             error.message,
             'ModelIncorrectKeyError in PendingDeletionRequestModel'
             '(id=\'test\'): contains keys %s are not allowed' %
-            (incorrect_keys))
+            incorrect_keys)
 
 
 class ModelRelationshipErrorTests(AuditErrorsTestBase):

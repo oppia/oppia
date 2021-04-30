@@ -72,7 +72,6 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
             name.value for name in
             models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES
         ]
-
         incorrect_keys = [
             key for key in model.pseudonymizable_entity_mappings.keys()
             if key not in allowed_keys
