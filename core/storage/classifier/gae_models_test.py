@@ -89,7 +89,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
 
         training_jobs, offset = (
             classifier_models.ClassifierTrainingJobModel.
-            query_new_and_pending_training_jobs(None))
+            query_new_and_pending_training_jobs())
 
         self.assertEqual(len(training_jobs), 2)
         self.assertEqual(training_jobs[0].algorithm_id, 'TextClassifier')

@@ -171,12 +171,12 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_new_and_pending_training_jobs(cls, offset=None):
+    def query_new_and_pending_training_jobs(cls, offset=0):
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
         Args:
-            offset: int or None. Number of query results to skip.
+            offset: int. Number of query results to skip.
 
         Returns:
             list(ClassifierTrainingJobModel). List of the
@@ -191,8 +191,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         job_models = query.fetch(10, offset=offset)
 
-        if not offset:
-            offset = 0
         offset = offset + len(job_models)
 
         return job_models, offset

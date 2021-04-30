@@ -351,7 +351,7 @@ def fetch_next_job():
     """
     classifier_training_jobs = []
     # Initially the offset for query is set to None.
-    offset = None
+    offset = 0
     valid_jobs = []
     timed_out_job_ids = []
 
