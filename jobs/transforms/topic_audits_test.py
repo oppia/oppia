@@ -63,11 +63,11 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
     def test_process_for_matching_canonical_name(self):
         model_with_same_name = topic_models.TopicModel(
             id='123',
-            name='name',
+            name='SOMEthing',
             created_on=self.NOW,
             last_updated=self.NOW,
             url_fragment='name-two',
-            canonical_name='name',
+            canonical_name='something',
             next_subtopic_id=1,
             language_code='en',
             subtopic_schema_version=0,
