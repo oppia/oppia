@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, flush } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -52,6 +52,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
 import { ChangeListService } from './services/change-list.service';
+import { ExplorationDataService } from './services/exploration-data.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -188,12 +189,6 @@ describe('Exploration editor page component', function() {
     show_state_editor_tutorial_on_load: true,
     show_state_translation_tutorial_on_load: true
   };
-  var mockExplorationDataService = {
-    getData: function(callback) {
-      callback();
-      return $q.resolve(explorationData);
-    }
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -221,7 +216,19 @@ describe('Exploration editor page component', function() {
         StateTopAnswersStatsBackendApiService,
         UserExplorationPermissionsService,
         UrlInterpolationService,
-        FocusManagerService
+        FocusManagerService,
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            getData: function(callback) {
+              callback();
+              return $q.resolve(explorationData);
+            },
+            autosaveChangeList: function() {
+              return;
+            }
+          }
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).overrideModule(BrowserDynamicTestingModule, {
@@ -233,10 +240,6 @@ describe('Exploration editor page component', function() {
     aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
   });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDataService', mockExplorationDataService);
-  }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
@@ -780,18 +783,19 @@ describe('Exploration editor page component', function() {
       expect(onStateDeletedSpy).toHaveBeenCalledWith('Final');
     }));
 
-    it('should callback state-renamed method for stats', () => {
+    it('should callback state-renamed method for stats', fakeAsync(() => {
       let onStateRenamedSpy = spyOn(stass, 'onStateRenamed');
       spyOn(cls, 'renameState');
 
       $scope.$apply();
+      flush();
 
       ess.renameState('Introduction', 'Start');
+      $scope.$apply();
+      flush();
 
-      waitForAsync(() => {
-        expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
-      });
-    });
+      expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
+    }));
 
     it('should callback interaction-changed method for stats', fakeAsync(() => {
       let onStateInteractionSavedSpy = spyOn(stass, 'onStateInteractionSaved');
