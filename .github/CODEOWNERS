@@ -659,6 +659,7 @@
 /extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
 /extensions/objects/protractor.js @U8NWXD @kevintab95
 /scripts/backend_test_shards.json @U8NWXD
+/.github/actions @U8NWXD
 
 
 # Python 3 Migration project.
