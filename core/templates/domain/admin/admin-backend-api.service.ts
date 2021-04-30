@@ -229,8 +229,8 @@ export class AdminBackendApiService {
         handlerUrl, { action, ...payload }).toPromise()
         .then(response => {
           resolve(response);
-        }, errorResonse => {
-          reject(errorResonse.error.error);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
         });
     });
   }

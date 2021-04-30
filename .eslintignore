@@ -10,8 +10,9 @@ assets/scripts/*
 third_party/*
 build/*
 *.min.js
-core/tests/protractor/*.js,
+core/tests/protractor/*.js
 core/tests/protractor_utils/*.js
 core/tests/protractor_desktop/*.js
 core/tests/protractor-browserstack.conf.js
 core/tests/puppeteer/lighthouse_setup.js
+core/tests/protractor_mobile/*.js
