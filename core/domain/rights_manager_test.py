@@ -29,6 +29,7 @@ from core.tests import test_utils
 
 import feconf
 
+
 class ExplorationRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on explorations work as expected."""
 

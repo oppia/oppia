@@ -245,7 +245,7 @@ describe('Exploration rights service', function() {
 
     $httpBackend.expect(
       'POST', '/voiceartist_management_handler/exploration/12345').respond(
-        200, sampleDataResultsCopy);
+      200, sampleDataResultsCopy);
     ers.saveVoiceArtist('newUser').then(function() {
       expect(ers.voiceArtistNames).toEqual(
         sampleDataResultsCopy.rights.voice_artist_names);
@@ -262,7 +262,7 @@ describe('Exploration rights service', function() {
 
     $httpBackend.expectDELETE(
       '/voiceartist_management_handler/exploration/12345?voice_artist=newUser')
-        .respond(200, sampleDataResultsCopy);
+      .respond(200, sampleDataResultsCopy);
 
     ers.removeVoiceArtistRoleAsync('newUser').then(successHandler, failHandler);
     $httpBackend.flush();
