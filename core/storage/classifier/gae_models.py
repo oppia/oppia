@@ -171,13 +171,12 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_new_and_pending_training_jobs(cls, cursor=None):
+    def query_new_and_pending_training_jobs(cls, offset=None):
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
         Args:
-            cursor: str or None. The list of returned entities starts from this
-                datastore cursor.
+            offset: int or None. Number of query results to skip.
 
         Returns:
             list(ClassifierTrainingJobModel). List of the
@@ -190,8 +189,13 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                     datetime.datetime.utcnow())).order(
                         cls.next_scheduled_check_time, cls._key)
 
-        job_models, cursor, more = query.fetch_page(10, start_cursor=cursor)
-        return job_models, cursor, more
+        job_models = query.fetch(10, offset=offset)
+
+        if not offset:
+            offset = 0
+        offset = offset + len(job_models)
+
+        return job_models, offset
 
     @classmethod
     def create_multi(cls, job_dicts_list):

@@ -87,7 +87,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, 1)
 
-        training_jobs, cursor, more = (
+        training_jobs, offset = (
             classifier_models.ClassifierTrainingJobModel.
             query_new_and_pending_training_jobs(None))
 
@@ -109,8 +109,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_jobs[1].status,
             feconf.TRAINING_JOB_STATUS_PENDING)
-        self.assertEqual(more, False)
-        self.assertEqual(cursor is not None, True)
+        self.assertEqual(offset, 2)
 
     def test_create_multi_jobs(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
