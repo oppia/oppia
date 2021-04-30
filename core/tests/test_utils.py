@@ -1923,16 +1923,19 @@ title: Title
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(self, email, username):
+    def signup(self, email, username, is_super_admin=False):
         """Complete the signup process for the user with the given username.
 
         Args:
             email: str. Email of the given user.
             username: str. Username of the given user.
+            is_super_admin: bool. Whether the user is a super admin.
         """
         user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
-        with self.login_context(email), requests_mock.Mocker() as m:
+        login_context = self.login_context(email, is_super_admin=is_super_admin)
+
+        with login_context, requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)

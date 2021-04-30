@@ -601,17 +601,17 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MaintenanceModeTests, self).setUp()
-        with contextlib2.ExitStack() as exit_stack:
-            exit_stack.enter_context(
+        with contextlib2.ExitStack() as context_stack:
+            context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
-            self.exit_stack = exit_stack.pop_all()
+            self.context_stack = context_stack.pop_all()
 
     def tearDown(self):
-        self.exit_stack.close()
+        self.context_stack.close()
         super(MaintenanceModeTests, self).tearDown()
 
     def test_html_response_is_rejected(self):
-        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_html_response(
@@ -622,8 +622,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
-        self.exit_stack.enter_context(self.super_admin_context())
-        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+        self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_html_response('/community-library')
@@ -633,7 +633,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_json_response_is_rejected(self):
-        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_json('/url_handler', expected_status_int=503)
@@ -646,8 +646,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_json_response_is_not_rejected_when_user_is_super_admin(self):
-        self.exit_stack.enter_context(self.super_admin_context())
-        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+        self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_json('/url_handler')
@@ -663,7 +663,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             base.CsrfTokenManager.is_csrf_token_valid(None, response['token']))
 
     def test_session_begin_handler_is_not_rejected(self):
-        call_counter = self.exit_stack.enter_context(
+        call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(
                 auth_services, 'establish_auth_session'))
 
@@ -672,7 +672,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
 
     def test_session_end_handler_is_not_rejected(self):
-        call_counter = self.exit_stack.enter_context(
+        call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         self.get_html_response('/session_end', expected_status_int=200)
@@ -680,7 +680,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.assertEqual(call_counter.times_called, 1)
 
     def test_seed_firebase_handler_is_not_rejected(self):
-        call_counter = self.exit_stack.enter_context(
+        call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'seed_firebase'))
 
         response = (
@@ -688,6 +688,31 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(call_counter.times_called, 1)
         self.assertEqual(response.location, 'http://localhost/')
+
+    def test_signup_fails(self):
+        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+            self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_signup_succeeds_when_maintenance_mode_is_disabled(self):
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_signup_succeeds_when_user_is_super_admin(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME, is_super_admin=True)
+
+    def test_auth_session_is_destroyed_only_while_in_maintenance_mode(self):
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
