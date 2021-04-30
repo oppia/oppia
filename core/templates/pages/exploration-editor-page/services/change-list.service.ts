@@ -78,6 +78,7 @@ angular.module('oppia').factory('ChangeListService', [
       param_changes: true,
       param_specs: true,
       solicit_answer_details: true,
+      card_is_checkpoint: true,
       solution: true,
       state_name: true,
       widget_customization_args: true,

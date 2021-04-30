@@ -50,6 +50,7 @@ export interface StateBackendDict {
   'param_changes': readonly ParamChangeBackendDict[];
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
+  'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
   'linked_skill_id': string;
   'next_content_id_index': number;
@@ -64,14 +65,15 @@ export class State {
   paramChanges: ParamChange[];
   recordedVoiceovers: RecordedVoiceovers;
   solicitAnswerDetails: boolean;
+  cardIsCheckpoint: boolean;
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
   constructor(
       name: string, classifierModelId: string, linkedSkillId: string,
       content: SubtitledHtml, interaction: Interaction,
       paramChanges: ParamChange[], recordedVoiceovers: RecordedVoiceovers,
-      solicitAnswerDetails: boolean, writtenTranslations: WrittenTranslations,
-      nextContentIdIndex: number) {
+      solicitAnswerDetails: boolean, cardIsCheckpoint: boolean,
+      writtenTranslations: WrittenTranslations, nextContentIdIndex: number) {
     this.name = name;
     this.classifierModelId = classifierModelId;
     this.linkedSkillId = linkedSkillId;
@@ -80,6 +82,7 @@ export class State {
     this.paramChanges = paramChanges;
     this.recordedVoiceovers = recordedVoiceovers;
     this.solicitAnswerDetails = solicitAnswerDetails;
+    this.cardIsCheckpoint = cardIsCheckpoint;
     this.writtenTranslations = writtenTranslations;
     this.nextContentIdIndex = nextContentIdIndex;
   }
@@ -98,6 +101,7 @@ export class State {
       }),
       recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
       solicit_answer_details: this.solicitAnswerDetails,
+      card_is_checkpoint: this.cardIsCheckpoint,
       written_translations: this.writtenTranslations.toBackendDict(),
       next_content_id_index: this.nextContentIdIndex
     };
@@ -111,6 +115,7 @@ export class State {
     this.paramChanges = otherState.paramChanges;
     this.recordedVoiceovers = otherState.recordedVoiceovers;
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
+    this.cardIsCheckpoint = otherState.cardIsCheckpoint;
     this.writtenTranslations = otherState.writtenTranslations;
     this.nextContentIdIndex = otherState.nextContentIdIndex;
   }
@@ -166,6 +171,7 @@ export class StateObjectFactory {
       param_changes: newStateTemplate.param_changes,
       recorded_voiceovers: newStateTemplate.recorded_voiceovers,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
+      card_is_checkpoint: newStateTemplate.card_is_checkpoint,
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
@@ -186,6 +192,7 @@ export class StateObjectFactory {
       RecordedVoiceovers.createFromBackendDict(
         stateDict.recorded_voiceovers),
       stateDict.solicit_answer_details,
+      stateDict.card_is_checkpoint,
       this.writtenTranslationsObject.createFromBackendDict(
         stateDict.written_translations),
       stateDict.next_content_id_index);

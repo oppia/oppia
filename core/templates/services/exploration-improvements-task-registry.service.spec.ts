@@ -138,6 +138,7 @@ describe('Exploration improvements task registrar service', () => {
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
       written_translations: {
         translations_mapping: {
           content: {},

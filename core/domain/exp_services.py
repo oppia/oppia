@@ -438,6 +438,13 @@ def apply_change_list(exploration_id, change_list):
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
                 elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected card_is_checkpoint to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_card_is_checkpoint(change.new_value)
+                elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(

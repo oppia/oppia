@@ -44,6 +44,7 @@ describe('Read only exploration backend API service', () => {
           classifier_model_id: null,
           recorded_voiceovers: null,
           solicit_answer_details: true,
+          card_is_checkpoint: true,
           written_translations: null,
           linked_skill_id: null,
           next_content_id_index: null,

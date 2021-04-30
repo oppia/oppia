@@ -204,6 +204,7 @@ param_specs: {}
 schema_version: %d
 states:
   End:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -229,6 +230,7 @@ states:
       translations_mapping:
         content: {}
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
