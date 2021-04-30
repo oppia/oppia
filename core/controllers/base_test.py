@@ -608,18 +608,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
-                self.capture_logging(min_level=logging.INFO))
+                self.capture_logging(min_level=logging.ERROR))
             exit_stack.enter_context(self.swap_to_always_raise(
                 auth_services, 'get_auth_claims_from_request',
                 error=auth_domain.StaleAuthSessionError('uh-oh')))
 
-            response = self.testapp.get('/', expect_errors=True)
+            response = self.get_html_response('/', expected_status_int=401)
 
         self.assert_matches_regexps(logs, [
-            r'User session has expired or has been revoked',
-            r'User must sign in again\nTraceback \(most recent call last\):\n',
+            r'Traceback \(most recent call last\):.*StaleAuthSessionError',
+            r'Exception raised:',
         ])
-        self.assertEqual(response.status_int, 500)
         self.assertEqual(call_counter.times_called, 1)
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
@@ -632,13 +631,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 auth_services, 'get_auth_claims_from_request',
                 error=auth_domain.InvalidAuthSessionError('uh-oh')))
 
-            response = self.testapp.get('/', expect_errors=True)
+            response = self.get_html_response('/', expected_status_int=401)
 
         self.assert_matches_regexps(logs, [
             r'User session is invalid!',
-            r'User must sign in again\nTraceback \(most recent call last\):\n',
+            r'Traceback \(most recent call last\):.*InvalidAuthSessionError',
+            r'Exception raised:',
         ])
-        self.assertEqual(response.status_int, 500)
         self.assertEqual(call_counter.times_called, 1)
 
 
@@ -1262,13 +1261,6 @@ class SignUpTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response('/community-library')
-
-    def test_500_error_is_raised_when_enable_user_creation_is_false(self):
-        self.login('abc@example.com')
-
-        with self.swap(feconf, 'ENABLE_USER_CREATION', False):
-            response = self.get_response_without_checking_for_errors(
-                '%s?return_url=/' % feconf.SIGNUP_URL, [500])
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):

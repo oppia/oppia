@@ -141,7 +141,12 @@ class UserFacingExceptions(python_utils.OBJECT):
         maintenance (error code 503).
         """
 
-        pass
+        def __init__(self):
+            super(
+                UserFacingExceptions.TemporaryMaintenanceException, self
+            ).__init__(
+                'Oppia is currently being upgraded, and the site should be up '
+                'and running again in a few hours. Thanks for your patience!')
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -177,18 +182,28 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
+        self.user_id = None
+        self.username = None
+        self.email = None
+        self.partially_logged_in = False
+        self.user_is_scheduled_for_deletion = False
+        self.current_user_is_super_admin = False
+
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
         except auth_domain.StaleAuthSessionError:
-            logging.info(
-                # NOTE: exc_info=1 appends the error's stack trace to the logs.
-                'User session has expired or has been revoked', exc_info=1)
             auth_services.destroy_auth_session(self.response)
-            raise self.UnauthorizedUserException('User must sign in again')
+            self.handle_exception(
+                self.UnauthorizedUserException('Please sign in again'),
+                self.app.debug)
+            return
         except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)
-            raise self.UnauthorizedUserException('User must sign in again')
+            self.handle_exception(
+                self.UnauthorizedUserException('Please sign in again'),
+                self.app.debug)
+            return
         else:
             self.current_user_is_super_admin = (
                 auth_claims is not None and auth_claims.role_is_super_admin)
@@ -197,12 +212,6 @@ class BaseHandler(webapp2.RequestHandler):
                 and not self.current_user_is_super_admin
                 and self.request.path not in AUTH_HANDLER_PATHS):
             return
-
-        self.user_id = None
-        self.username = None
-        self.email = None
-        self.partially_logged_in = False
-        self.user_is_scheduled_for_deletion = False
 
         if auth_claims:
             auth_id = auth_claims.auth_id
@@ -213,8 +222,6 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = auth_claims.email
                 if 'signup?' in self.request.uri:
-                    if not feconf.ENABLE_USER_CREATION:
-                        raise Exception('New sign-ups are temporarily disabled')
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
@@ -275,11 +282,7 @@ class BaseHandler(webapp2.RequestHandler):
                 and not self.current_user_is_super_admin
                 and self.request.path not in AUTH_HANDLER_PATHS):
             self.handle_exception(
-                self.TemporaryMaintenanceException(
-                    'Oppia is currently being upgraded, and the site should '
-                    'be up and running again in a few hours. '
-                    'Thanks for your patience!'),
-                self.app.debug)
+                self.TemporaryMaintenanceException(), self.app.debug)
             return
 
         if self.user_is_scheduled_for_deletion:
