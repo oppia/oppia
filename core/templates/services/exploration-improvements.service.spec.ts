@@ -140,7 +140,8 @@ describe('ExplorationImprovementsService', function() {
 
   const newExpPermissions = (canEdit: boolean) => {
     return (
-      new ExplorationPermissions(null, null, null, null, null, null, canEdit));
+      new ExplorationPermissions(null, null, null, null, null, null, canEdit,
+      null));
   };
 
   importAllAngularServices();

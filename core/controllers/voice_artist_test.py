@@ -372,5 +372,5 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         self.delete_json(
             '/voiceartist_management_handler/exploration/%s'
             % self.published_exp_id_1, params={
-                'username': self.VOICE_ARTIST_USERNAME})
+                'voice_artist': self.VOICE_ARTIST_USERNAME})
         self.logout()

@@ -148,7 +148,7 @@ class VoiceartistManagementHandler(base.BaseHandler):
             voice_artist)
         if voice_artist_id is None:
             raise self.InvalidInputException(
-                'Invalid voice artist username.')
+                'Sorry, we could not find the specified user.')
         rights_manager.assign_role_for_exploration(
             self.user, entity_id, voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST)
@@ -170,7 +170,7 @@ class VoiceartistManagementHandler(base.BaseHandler):
 
         if voice_artist_id is None:
             raise self.InvalidInputException(
-                'Invalid voice artist name')
+                'Sorry, we could not find the specified user.')
         rights_manager.deassign_role_for_exploration(
             self.user, entity_id, voice_artist_id)
 

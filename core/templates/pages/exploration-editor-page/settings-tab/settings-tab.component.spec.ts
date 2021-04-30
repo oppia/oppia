@@ -400,14 +400,14 @@ describe('Settings Tab Component', () => {
     it('should open a modal when removeVoiceArtist is called', function() {
       spyOn($uibModal, 'open').and.callThrough();
 
-      ctrl.removeRole('username');
+      ctrl.removeVoiceArtist('username');
 
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should remove role when resolving remove-role-modal', () => {
+    it('should remove voiceartist when resolving remove-role-modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
+        result: $q.resolve('username', 'voice artist')
       });
       spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync').and
         .returnValue($q.resolve());
@@ -416,10 +416,11 @@ describe('Settings Tab Component', () => {
       $scope.$apply();
 
       expect(
-        explorationRightsService.removeVoiceArtistRoleAsync).toHaveBeenCalled();
+        explorationRightsService.removeVoiceArtistRoleAsync)
+        .toHaveBeenCalledWith('username');
     });
 
-    it('should not remove role when rejecting remove-role-modal', () => {
+    it('should not remove voiceartist when rejecting remove-role-modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
