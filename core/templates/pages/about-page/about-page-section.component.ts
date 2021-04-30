@@ -16,7 +16,7 @@
  * @fileoverview Component for the about page.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+/*import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -52,4 +52,4 @@ export class AboutPageSectionComponent implements OnInit {
 }
 angular.module('oppia').directive(
   'oppiaAboutPageSection', downgradeComponent(
-    {component: AboutPageSectionComponent}));
+    {component: AboutPageSectionComponent}));*/
