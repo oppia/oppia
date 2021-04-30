@@ -313,7 +313,7 @@ export class ExplorationEngineService {
        explorationDict: ExplorationBackendDict,
        explorationVersion: number, preferredAudioLanguage: string,
        autoTtsEnabled: boolean, preferredContentLanguageCodes: string[],
-       successCallback: (StateCard, string) => void): void {
+       successCallback: (sateCard: StateCard, str: string) => void): void {
      this.exploration = this.explorationObjectFactory.createFromBackendDict(
        explorationDict);
      this.answerIsBeingProcessed = false;

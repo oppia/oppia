@@ -18,15 +18,16 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
-import { ExplorationFeaturesService, ExplorationDataDict, ParamChanges } from
+import { ExplorationFeaturesService, ParamChanges } from
   'services/exploration-features.service';
 
 describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService = null;
   let featureData = null;
-  let explorationData: ExplorationDataDict = null;
-  let explorationData2: ExplorationDataDict = null;
+  let explorationData: ExplorationBackendDict = null;
+  let explorationData2: ExplorationBackendDict = null;
   let testParamChanges: ParamChanges = null;
 
   beforeEach(() => {

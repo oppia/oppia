@@ -22,15 +22,7 @@ import { Injectable } from '@angular/core';
 
 import { ExplorationFeatures } from
   'services/exploration-features-backend-api.service';
-
-export interface ExplorationDataDict {
-  'param_changes': ParamChanges[] | [];
-  states: {
-    [propsName: string]: {
-      'param_changes': ParamChanges[] | []
-    }
-  };
-}
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
 export interface ParamChanges {
   name: string;
@@ -61,7 +53,7 @@ export class ExplorationFeaturesService {
    * @param featuresData - An ExplorationFeatures object.
    */
   init(
-      explorationData: ExplorationDataDict,
+      explorationData: ExplorationBackendDict,
       featuresData: ExplorationFeatures): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
