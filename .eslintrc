@@ -116,6 +116,7 @@
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
     "oppia/no-test-blockers": "error",
+    "oppia/no-then-method": "error",
     "angular/di": [
       "error",
       "array"
