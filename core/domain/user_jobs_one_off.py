@@ -1128,9 +1128,9 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class UserRolesPopulationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that populates the roles field of the UserSettingsModel.
+    """Job that populates the roles and banned fields of the UserSettingsModel.
 
-    It is a one-off job and can be removed from the codebase after March 2021
+    It is a one-off job and can be removed from the codebase after May 2021
     release.
     """
 
@@ -1144,7 +1144,7 @@ class UserRolesPopulationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model_instance):
-        model_instance.roles = [model_instance.role]
+        user_services.update_roles_and_banned_fileds(model_instance)
 
         model_instance.update_timestamps(update_last_updated_time=False)
         model_instance.put()

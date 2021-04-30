@@ -577,22 +577,18 @@ def _save_user_settings(user_settings):
 
     user_settings_dict = user_settings.to_dict()
 
-    # The "roles" field is keep in sync with the "role", this code will be
-    # removed once the "role" field gets depricated.
-    user_settings_dict['roles'] = [user_settings_dict['role']]
-
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
-        user_model.update_timestamps()
-        user_model.put()
     else:
         user_settings_dict['id'] = user_settings.user_id
-        model = user_models.UserSettingsModel(**user_settings_dict)
-        model.update_timestamps()
-        model.put()
+        user_model = user_models.UserSettingsModel(**user_settings_dict)
+
+    update_roles_and_banned_fileds(user_model)
+    user_model.update_timestamps()
+    user_model.put()
 
 
 def _get_user_settings_from_model(user_settings_model):
@@ -863,13 +859,9 @@ def _save_existing_users_settings(user_settings_list):
     for user_model, user_settings in python_utils.ZIP(
             user_settings_models, user_settings_list):
         user_settings.validate()
-        user_settings_dict = user_settings.to_dict()
+        user_model.populate(**user_settings.to_dict())
+        update_roles_and_banned_fileds(user_model)
 
-        # The "roles" field is keep in sync with the "role", this code will be
-        # removed once the "role" field gets depricated.
-        user_settings_dict['roles'] = [user_settings_dict['role']]
-
-        user_model.populate(**user_settings_dict)
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
 
@@ -2181,3 +2173,22 @@ def create_login_url(return_url):
     # flow on top of the Firebase SDK in "core/templates/pages/login-page", and
     # this function will always redirect to its static location ("/login").
     return '/login?%s' % python_utils.url_encode({'return_url': return_url})
+
+
+def update_roles_and_banned_fileds(user_settings_model):
+    """Updates the new roles and banned fileds in the UserSettingsModel which
+    are not in use but needs to kept in sync.
+
+    This function is expected to be remove soon once the roles and banned fields
+    will be in use. It is not recommended to use this function in new places.
+
+    Args:
+        user_settings_model: UserSettingsModel. The models which needs update.
+    """
+    if user_settings_model.role not in [
+            feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR]:
+        user_settings_model.roles = [user_settings_model.role]
+
+    if user_settings_model.role == feconf.ROLE_ID_BANNED_USER:
+        user_settings_model.banned = True
+        user_settings_model.roles = []

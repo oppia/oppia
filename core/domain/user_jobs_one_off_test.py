@@ -2912,6 +2912,30 @@ class UserRolesPopulationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             new_user_model.last_updated, old_user_model.last_updated)
 
+    def test_job_updates_banned_field_with_role(self):
+        model = user_models.UserSettingsModel(
+            id='user-id',
+            email='email@email.com',
+            normalized_username='username',
+            role=feconf.ROLE_ID_BANNED_USER)
+        model.update_timestamps()
+        model.put()
+
+        old_user_model = user_models.UserSettingsModel.get('user-id')
+        self.assertEqual(old_user_model.roles, [])
+
+        actual_output = self._run_one_off_job()
+
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+        new_user_model = user_models.UserSettingsModel.get('user-id')
+
+        self.assertTrue(new_user_model.banned)
+        self.assertEqual(new_user_model.roles, [])
+        self.assertEqual(
+            new_user_model.last_updated, old_user_model.last_updated)
+
 
 class DeleteNonExistentExpsFromUserModelsOneOffJobTests(
         test_utils.GenericTestBase):

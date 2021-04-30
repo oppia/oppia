@@ -120,9 +120,11 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
-    # Currently, "roles" field is not in use.
+    # Currently, "roles" and "banned" fields are not in use.
     # A list of roles assigned to the user.
     roles = datastore_services.StringProperty(repeated=True, indexed=True)
+    # Flag to indicate whether the user is banned.
+    banned = datastore_services.BooleanProperty(indexed=True, default=False)
 
     @staticmethod
     def get_deletion_policy():
