@@ -1,5 +1,5 @@
 <button mat-button
-        class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
+        class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button oppia-autofocus"
         [oppiaFocusOn]="focusLabel"
         (click)="clickContinueButton.emit()"
         attr.aria-label="Continue">
@@ -17,7 +17,7 @@
 
 <style>
   .oppia-learner-confirm-button {
-    margin-top: 12px;
+    margin-top: 0px;
   }
 
   .oppia-learner-confirm-button .icon {
