@@ -16,7 +16,8 @@
  * @fileoverview Component for edit thumbnail modal.
  */
 
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
@@ -24,29 +25,38 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
   selector: 'edit-thumbnail-modal',
   templateUrl: './edit-thumbnail-modal.component.html'
 })
-export class EditThumnailModalComponent {
+export class EditThumnailModalComponent implements OnChanges {
+  constructor(
+    private svgSanitizerService: SvgSanitizerService,
+    private modalInstance: NgbActiveModal,
+  ) {}
+  @Input() bgColor = '#C6DCDA';
+  @Input() uploadedImage: string | null;
+  @Input() invalidImageWarningIsShown = false;
+  @Input() invalidTagsAndAttributes: {
+    tags: string[];
+    attrs: string[];
+  };
+  @Input() allowedImageFormats = ['svg'];
+  @Input() aspectRatio: string;
+  @Input() previewDescription: string;
+  @Input() previewDescriptionBgColor: string;
+  @Input() previewFooter: string;
+  @Input() previewTitle: string;
   allowedBgColors: string[];
   dimensions: { height: number; width: number; };
   uploadedImageMimeType: string;
   file: Blob;
   openInUploadMode: boolean;
-  constructor(
-    private svgSanitizerService: SvgSanitizerService,
-    private modalInstance: NgbActiveModal,
-    private changeDetectorRef: ChangeDetectorRef
-  ) {}
-  @Input() bgColor = '#fff';
-  @Input() uploadedImage;
-  @Input() invalidImageWarningIsShown = false;
-  @Input() invalidTagsAndAttributes: {
-    tags: string[];
-    attrs: string[]; };
-  @Input() allowedImageFormats = ['svg'];
-  @Input() aspectRatio;
-  @Input() getPreviewDescription;
-  @Input() getPreviewDescriptionBgColor;
-  @Input() getPreviewFooter;
-  @Input() getPreviewTitle;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.uploadedImage &&
+        changes.uploadedImage.currentValue ===
+         changes.uploadedImage.previousValue) {
+      this.openInUploadMode = false;
+      this.updateBackgroundColor(this.bgColor);
+    }
+  }
 
   setImageDimensions(height: number, width: number): void {
     this.dimensions = {
@@ -78,7 +88,6 @@ export class EditThumnailModalComponent {
           let imgSrc = reader.result as string;
           this.updateBackgroundColor('#C6DCDA');
           let img = new Image();
-          this.changeDetectorRef.detectChanges();
 
           img.onload = () => {
           //   Setting a default height of 300px and width of
@@ -130,16 +139,9 @@ export class EditThumnailModalComponent {
       openInUploadMode: this.openInUploadMode,
       dimensions: this.dimensions
     });
-    console.log(this.uploadedImage);
   }
 
   cancel(): void {
     this.modalInstance.dismiss();
   }
-  // If (uploadedImage) {
-  //   $uibModalInstance.rendered.then(() => {
-  //     openInUploadMode = false;
-  //     $scope.updateBackgroundColor(tempBgColor);
-  //   });
-  // }
 }

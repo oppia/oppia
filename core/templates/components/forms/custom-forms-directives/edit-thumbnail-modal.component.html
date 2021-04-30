@@ -33,21 +33,21 @@
           <div [hidden]="!(allowedBgColors.length > 1)">Choose background color:</div>
           <div [hidden]="!(allowedBgColors.length > 1)" class="oppia-thumbnail-colour-select">
             <div *ngFor="let color of allowedBgColors"
-                 [ngStyle]="{background: color}"
+                 [ngStyle]="{'background': color}"
                  (click)="updateBackgroundColor(color)">
             </div>
           </div>
           <div [hidden]="!(allowedBgColors.length === 1)" class="alert alert-warning">
             <span>
               Please check that the thumbnail below has the following background color:
-              <i class="fa fa-square" [ngStyle]="{color: allowedBgColors[0]}"></i>.
+              <i class="fa fa-square" [ngStyle]="{'color': allowedBgColors[0]}"></i>.
               If not, please ensure that you are uploading an image with transparent background. Thanks!
             </span>
           </div>
         </div>
         <div class="oppia-thumbnail-container protractor-test-thumbnail-container"
              *ngIf="uploadedImage"
-             [ngStyle]="{background: getPreviewDescriptionBgColor, color: getPreviewDescriptionBgColor ? '#FFFFFF' : '', width: aspectRatio === '4:3' ? '248px' : '320px' }">
+             [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
           <button class="btn btn-secondary oppia-thumbnail-reset-button protractor-thumbnail-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
@@ -60,13 +60,13 @@
                                      [background]="bgColor">
             </oppia-thumbnail-display>
             <div class="oppia-thumbnail-preview-title">
-              {{ getPreviewTitle }}
+              {{ previewTitle }}
             </div>
             <div class="oppia-thumbnail-preview-description">
-              {{ getPreviewDescription }}
+              {{ previewDescription }}
             </div>
-            <div *ngIf="getPreviewFooter" class="oppia-thumbnail-preview-footer">
-              {{ getPreviewFooter }}
+            <div *ngIf="previewFooter" class="oppia-thumbnail-preview-footer">
+              {{ previewFooter }}
             </div>
           </div>
         </div>

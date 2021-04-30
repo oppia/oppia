@@ -57,13 +57,13 @@
       <div class="story-input-header">
         <span>Thumbnail Image*</span>
       </div>
-      <oppia-thumbnail-uploader [get-preview-title]="story.title"
-                          [get-aspect-ratio]="'4:3'"
-                          [disabled]="false"
-                          [use-local-storage]="true"
-                          [get-allowed-bg-colors]="allowedBgColors"
-                          [get-thumbnail-bg-color]="story.getThumbnailBgColor()"
-                          [get-preview-description-bg-color]="'#2F6687'">
+      <oppia-thumbnail-uploader [preview-title]="story.title"
+                                [aspect-ratio]="'4:3'"
+                                [disabled]="false"
+                                [use-local-storage]="true"
+                                [allowed-bg-colors]="allowedBgColors"
+                                [thumbnail-bg-color]="story.getThumbnailBgColor()"
+                                [preview-description-bg-color]="'#2F6687'">
       </oppia-thumbnail-uploader>
     </div>
   </div>

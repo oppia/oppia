@@ -16,6 +16,7 @@
  * @fileoverview Component for uploading images.
  */
 
+import { OnChanges, SimpleChanges } from '@angular/core';
 import { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -24,7 +25,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { EditThumnailModalComponent } from './edit-thumbnail-modal.component';
@@ -33,38 +33,36 @@ import { EditThumnailModalComponent } from './edit-thumbnail-modal.component';
   selector: 'oppia-thumbnail-uploader',
   templateUrl: './thumbnail-uploader.component.html'
 })
-export class ThumbnailUploaderComponent implements OnInit {
-  @Input() disabled;
-  @Input() useLocalStorage;
-  @Input() getAllowedBgColors;
-  @Input() getAspectRatio;
-  @Input() getBgColor;
-  @Input() getFilename;
-  @Input() getPreviewDescription;
-  @Input() getPreviewDescriptionBgColor;
-  @Input() getPreviewFooter;
-  @Input() getPreviewTitle;
-  @Input() updateBgColor;
-  @Input() updateFilename;
+export class ThumbnailUploaderComponent implements OnChanges {
+  @Input() disabled: boolean;
+  @Input() useLocalStorage: boolean;
+  @Input() allowedBgColors: boolean;
+  @Input() aspectRatio: string;
+  @Input() bgColor: string;
+  @Input() filename: string;
+  @Input() previewDescription: string;
+  @Input() previewDescriptionBgColor: string;
+  @Input() previewFooter: string;
+  @Input() previewTitle: string;
+  @Input() updateBgColor: (arg0: string) => void;
+  @Input() updateFilename: (arg0: string) => void;
   openInUploadMode: boolean;
-  tempBgColor;
+  tempBgColor: string;
   tempImageName: string;
   uploadedImageMimeType: string;
   dimensions: { height: number; width: number; };
-  allowedBgColors;
-  aspectRatio;
-  resampledFile;
-  filename: string;
-  newThumbnailDataUrl;
-  localStorageBgcolor;
+  resampledFile: Blob;
+  newThumbnailDataUrl: string;
+  localStorageBgcolor: string;
   imageUploadUrlTemplate: string;
-  editableThumbnailDataUrl: string;
+  editableThumbnailDataUrl: string = (
+    this.urlInterpolationService.getStaticImageUrl(
+      '/icons/story-image-icon.png'));
   transformedData: string;
   parsedResponse;
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
     private alertsService: AlertsService,
-    private csrfTokenService: CsrfTokenService,
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private ngbModal: NgbModal,
@@ -74,8 +72,7 @@ export class ThumbnailUploaderComponent implements OnInit {
   placeholderImageDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
-  uploadedImage = null;
-  thumbnailIsLoading = false;
+  thumbnailIsLoading = true;
   // $watch is required here to update the thumbnail image
   // everytime the thumbnail filename changes (eg. draft is discarded).
   // The trusted resource url for the thumbnail should not be directly
@@ -95,50 +92,62 @@ export class ThumbnailUploaderComponent implements OnInit {
   //           this.getFilename(),
   //           ContextService.getEntityType(),
   //           ContextService.getEntityId()));
-  //     uploadedImage = this.editableThumbnailDataUrl;
+  //     filename = this.editableThumbnailDataUrl;
   //   } else {
   //     this.editableThumbnailDataUrl = placeholderImageDataUrl;
-  //     uploadedImage = null;
+  //     filename = null;
   //   }
   //   this.thumbnailIsLoading = false;
   // });
 
-  filenameChanges(): void {
-    if (this.filename) {
+  filenameChanges(newFilename: string): void {
+    if (newFilename) {
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService
           .getTrustedResourceUrlForThumbnailFilename(
-            this.getFilename,
+            newFilename,
             this.contextService.getEntityType(),
             this.contextService.getEntityId()));
-      this.uploadedImage = this.editableThumbnailDataUrl;
+      console.log(this.editableThumbnailDataUrl);
+      this.filename = this.editableThumbnailDataUrl;
     } else {
       this.editableThumbnailDataUrl = this.placeholderImageDataUrl;
-      this.uploadedImage = null;
+      this.filename = null;
     }
     this.thumbnailIsLoading = true;
   }
 
-  ngOnInit(): void {
-    this.filenameChanges();
-  }
-
-  // ngOnChanges(): void {
+  // ngOnInit(): void {
   //   this.filenameChanges();
-  //   // This.thumbnailIsLoading = false;
   // }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // console.log(changes);
+    // if (
+    //   changes.filename &&
+    //   changes.filename.currentValue !== changes.filename.previousValue) {
+    //   console.log('prya');
+    //   const newValue = changes.filename.currentValue;
+    //   this.filenameChanges(newValue);
+    // }
+  }
+
+
   saveThumbnailBgColor(newBgColor: string): void {
-    if (newBgColor !== this.getBgColor) {
+    if (newBgColor !== this.bgColor) {
       this.updateBgColor(newBgColor);
     }
   }
 
   saveThumbnailImageData(imageURI: string, callback): void {
+    console.log(Blob);
     this.resampledFile = null;
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(
         imageURI));
+        console.log('priya1');
+        console.log(this.resampledFile);
+
     if (this.resampledFile === null) {
       this.alertsService.addWarning('Could not get resampled file.');
       return;
@@ -146,7 +155,7 @@ export class ThumbnailUploaderComponent implements OnInit {
     this.postImageToServer(this.resampledFile, callback);
   }
 
-  postImageToServer(resampledFile: File, callback: () => void): void {
+  postImageToServer(resampledFile: Blob, callback: () => void): void {
     this.assetsBackendApiService.saveMathExpresionImage(
       resampledFile, this.tempImageName,
       this.contextService.getEntityType(),
@@ -156,9 +165,11 @@ export class ThumbnailUploaderComponent implements OnInit {
           .getTrustedResourceUrlForThumbnailFilename(
             data.filename, this.contextService.getEntityType(),
             this.contextService.getEntityId()));
+      console.log('editable thumbnail url' + this.editableThumbnailDataUrl);
       callback();
     }), ((data) => {
     // Remove the XSSI prefix.
+      console.log('priya');
       let transformedData = data.responseText.substring(5);
       let parsedResponse = JSON.parse(transformedData);
       this.alertsService.addWarning(
@@ -174,37 +185,28 @@ export class ThumbnailUploaderComponent implements OnInit {
     // This refers to the temporary thumbnail background
     // color used for preview.
     this.tempBgColor = (
-      this.getBgColor ||
-      this.getAllowedBgColors[0]);
+      this.bgColor ||
+      this.allowedBgColors[0]);
     this.tempImageName = '';
     this.uploadedImageMimeType = '';
     this.dimensions = {
       height: 0,
       width: 0
     };
-    this.allowedBgColors = this.getAllowedBgColors;
-    this.aspectRatio = this.getAspectRatio;
-    // this.getPreviewDescription = this.getPreviewDescription;
-    // this.getPreviewDescriptionBgColor = (
-    //   this.getPreviewDescriptionBgColor);
-    // this.getPreviewFooter = this.getPreviewFooter;
-    // this.getPreviewTitle = this.getPreviewTitle;
-
-
     const modalRef = this.ngbModal.open(
       EditThumnailModalComponent,
       {backdrop: 'static'});
     modalRef.componentInstance.allowedBgColors = this.allowedBgColors;
     modalRef.componentInstance.aspectRatio = this.aspectRatio;
     modalRef.componentInstance.dimensions = this.dimensions;
-    modalRef.componentInstance.getPreviewDescription =
-     this.getPreviewDescription;
-    modalRef.componentInstance.getPreviewDescriptionBgColor =
-       this.getPreviewDescriptionBgColor;
-    modalRef.componentInstance.getPreviewFooter = this.getPreviewFooter;
-    modalRef.componentInstance.getPreviewTitle = this.getPreviewTitle;
+    modalRef.componentInstance.previewDescription =
+     this.previewDescription;
+    modalRef.componentInstance.previewDescriptionBgColor =
+       this.previewDescriptionBgColor;
+    modalRef.componentInstance.previewFooter = this.previewFooter;
+    modalRef.componentInstance.previewTitle = this.previewTitle;
     modalRef.componentInstance.openInUploadMode = this.openInUploadMode;
-    modalRef.componentInstance.uploadedImage = this.uploadedImage;
+    modalRef.componentInstance.uploadedImage = this.filename;
     modalRef.componentInstance.uploadedImageMimeType =
      this.uploadedImageMimeType;
     modalRef.componentInstance.tempBgColor = this.tempBgColor;
@@ -213,6 +215,7 @@ export class ThumbnailUploaderComponent implements OnInit {
       this.thumbnailIsLoading = true;
       this.filename = this.imageUploadHelperService.generateImageFilename(
         data.dimensions.height, data.dimensions.width, 'svg');
+      // console.log(this.filename);
       this.newThumbnailDataUrl = data.newThumbnailDataUrl;
       if (!this.useLocalStorage) {
         if (data.openInUploadMode) {
@@ -220,7 +223,8 @@ export class ThumbnailUploaderComponent implements OnInit {
             this.imageUploadHelperService.generateImageFilename(
               data.dimensions.height, data.dimensions.width, 'svg'));
           this.saveThumbnailImageData(data.newThumbnailDataUrl, () => {
-            this.uploadedImage = data.newThumbnailDataUrl;
+            console.log('priya1');
+            this.filename = data.newThumbnailDataUrl;
             this.updateFilename(this.tempImageName);
             this.saveThumbnailBgColor(data.newBgColor);
           });

@@ -88,16 +88,16 @@
             </div>
             <div class="story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
-              <oppia-thumbnail-uploader [get-filename]="story.getThumbnailFilename()"
-                                  [update-filename]="updateStoryThumbnailFilename"
-                                  [get-bg-color]="story.getThumbnailBgColor()"
-                                  [update-bg-color]="updateStoryThumbnailBgColor"
-                                  [get-allowed-bg-colors]="allowedBgColors"
-                                  [get-aspect-ratio]="'4:3'"
-                                  [get-preview-title]="editableTitle"
-                                  [get-preview-description]="editableDescription"
-                                  [get-preview-description-bg-color]=""
-                                  [get-preview-footer]="">
+              <oppia-thumbnail-uploader [filename]="story.getThumbnailFilename()"
+                                        [update-filename]="updateStoryThumbnailFilename"
+                                        [bg-color]="story.getThumbnailBgColor()"
+                                        [update-bg-color]="updateStoryThumbnailBgColor"
+                                        [allowed-bg-colors]="allowedBgColors"
+                                        [aspect-ratio]="'4:3'"
+                                        [preview-title]="editableTitle"
+                                        [preview-description]="editableDescription"
+                                        [preview-description-bg-color]=""
+                                        [preview-footer]="">
               </oppia-thumbnail-uploader>
             </div>
             <div class="story-notes">
