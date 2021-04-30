@@ -32,7 +32,7 @@ interface SubmitAnswerEventDataInterface {
 
 @Component({
   selector: 'oppia-learner-answer-info-card',
-  templateUrl: './learner-answer-info-car.component.html'
+  templateUrl: './learner-answer-info-card.component.html'
 })
 export class LearnerAnswerInfoCard {
   @Output() submitAnswer: EventEmitter<SubmitAnswerEventDataInterface> = (
