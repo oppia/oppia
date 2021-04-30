@@ -42,17 +42,20 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
     HttpClientModule,
     InteractionExtensionsModule,
     NgbModalModule,
+    MatButtonModule,
     SharedComponentsModule
   ],
   declarations: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    ContinueButtonComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    ContinueButtonComponent
   ],
   providers: [
     {
@@ -75,6 +78,8 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ContinueButtonComponent } from './learner-experience/continue-button.component';
+import { MatButtonModule } from '@angular/material/button';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

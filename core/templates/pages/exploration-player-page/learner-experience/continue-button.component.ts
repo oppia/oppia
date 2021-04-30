@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Continue button in exploration player and
+ * @fileoverview Component for the Continue button in exploration player and
  * editor.
  */
 
-angular.module('oppia').directive('continueButton', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickContinueButton: '&',
-        isLearnAgainButton: '&',
-        focusLabel: '@'
-      },
-      template: require('./continue-button.directive.html')
-    };
-  }
-]);
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'oppia-continue-button',
+  templateUrl: './continue-button.component.html'
+})
+export class ContinueButtonComponent {
+  @Input() isLearnAgainButton: boolean;
+  @Input() focusLabel: string;
+  @Output() clickContinueButton: EventEmitter<void> = (
+    new EventEmitter());
+}

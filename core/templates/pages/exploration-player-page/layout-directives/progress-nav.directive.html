@@ -32,12 +32,12 @@
                  translate="I18N_INTERACTIONS_SUBMIT">
       </md-button>
     </div>
-    <continue-button ng-if="shouldContinueButtonBeShown()"
-                     focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                     is-learn-again-button="isLearnAgainButton()"
-                     ng-click="onClickContinueButton()"
-                     class="d-block">
-    </continue-button>
+    <oppia-continue-button ng-if="shouldContinueButtonBeShown()"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL""
+                           [is-learn-again-button]="isLearnAgainButton()"
+                           (click-continue-button)="onClickContinueButton()"
+                           class="d-block">
+    </oppia-continue-button>
   </div>
 </div>
 
