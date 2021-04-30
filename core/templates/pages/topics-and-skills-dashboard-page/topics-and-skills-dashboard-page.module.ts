@@ -35,12 +35,14 @@ import { TopicsListComponent } from './topics-list/topics-list.component';
 import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    FormsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -51,7 +53,7 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
     AssignSkillToTopicModalComponent,
     MergeSkillModalComponent,
     TopicsListComponent,
-    DeleteTopicModalComponent,
+    DeleteTopicModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
