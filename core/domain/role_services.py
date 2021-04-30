@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Hierarchy Structure of roles for action
+"""This module contains the structure of roles for action
 inheritance, Actions permitted to the roles and the functions needed to
 access roles and actions.
 """
@@ -22,7 +22,6 @@ access roles and actions.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import copy
 import math
 import random
 import time
@@ -123,56 +122,28 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager'
 }
 
-# This dict represents how the actions are inherited among different
-# roles in the site.
-#   key -> name of role
-#   value -> list of direct neighbour roles from which actions are inherited
-# Eg -
-#   say, key 'COLLECTION_EDITOR' has ['EXPLORATION_EDITOR'] as its value, then
-#   'COLLECTION_EDITOR' can perform {all the actions that can be performed by
-#   'EXPLORATION_EDITOR' and its value recursively} plus {the actions
-#   corresponding to 'COLLECTION_EDITOR'.}
-#
-# NOTE FOR DEVELOPERS:
-# - Follow the Playbook in wiki (https://github.com/oppia/oppia/wiki/
-#   Instructions-for-editing-roles-or-actions) before making any changes to
-#   this dict.
-#
-# CAUTION: Before removing any role from this dict, please ensure that there is
-#   no existing user with that role.
-PARENT_ROLES = {
-    feconf.ROLE_ID_ADMIN: [feconf.ROLE_ID_MODERATOR],
-    feconf.ROLE_ID_BANNED_USER: [feconf.ROLE_ID_GUEST],
-    feconf.ROLE_ID_COLLECTION_EDITOR: [feconf.ROLE_ID_EXPLORATION_EDITOR],
-    feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_LEARNER],
-    feconf.ROLE_ID_GUEST: [],
-    feconf.ROLE_ID_LEARNER: [feconf.ROLE_ID_GUEST],
-    feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_TOPIC_MANAGER],
-    feconf.ROLE_ID_TOPIC_MANAGER: [feconf.ROLE_ID_COLLECTION_EDITOR]
-}
 
-# This dict represents the unique actions that belong to a particular role.
-# Unique in the sense that the action belongs to this role but can't be
-# inherited from any other role.
-#   key -> name of role
-#   value -> list of unique actions.
-#
-# NOTE FOR DEVELOPERS :
-# - Follow the Playbook in wiki (https://github.com/oppia/oppia/wiki/
-#   Instructions-for-editing-roles-or-actions) before making any changes to
-#   this dict.
+def _get_actions_set(*actions):
+    """Returns a set of unique actions out of the given list of actions.
 
-_get_actions_set = lambda *actions: set(actions)
+    Args:
+        *actions: list(str). List of actions whcihcan contain duplicate items.
 
-guest_allowed_actions = _get_actions_set(
+    Returns:
+        set(str). A set of unique action strings.
+    """
+    return set(actions)
+
+
+GUEST_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_PLAY_ANY_PUBLIC_ACTIVITY)
 
-learner_allowed_actions = _get_actions_set(
+LEARNER_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_FLAG_EXPLORATION,
     ACTION_ACCESS_LEARNER_DASHBOARD,
-    *guest_allowed_actions)
+    *GUEST_ALLOWED_ACTIONS)
 
-exploration_editor_allowed_actions = _get_actions_set(
+EXPLORATION_EDITOR_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_ACCESS_CREATOR_DASHBOARD,
     ACTION_CREATE_EXPLORATION,
     ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
@@ -184,13 +155,13 @@ exploration_editor_allowed_actions = _get_actions_set(
     ACTION_RATE_ANY_PUBLIC_EXPLORATION,
     ACTION_SUGGEST_CHANGES,
     ACTION_SUBMIT_VOICEOVER_APPLICATION,
-    *learner_allowed_actions)
+    *LEARNER_ALLOWED_ACTIONS)
 
-collection_editor_allowed_actions = _get_actions_set(
+COLLECTION_EDITOR_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_CREATE_COLLECTION,
-    *exploration_editor_allowed_actions)
+    *EXPLORATION_EDITOR_ALLOWED_ACTIONS)
 
-topic_manager_allowed_actions = _get_actions_set(
+TOPIC_MANAGER_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
     ACTION_DELETE_ANY_QUESTION,
     ACTION_EDIT_ANY_QUESTION,
@@ -201,18 +172,18 @@ topic_manager_allowed_actions = _get_actions_set(
     ACTION_MANAGE_QUESTION_SKILL_STATUS,
     ACTION_VISIT_ANY_QUESTION_EDITOR,
     ACTION_VISIT_ANY_TOPIC_EDITOR,
-    *collection_editor_allowed_actions)
+    *COLLECTION_EDITOR_ALLOWED_ACTIONS)
 
-moderator_allowed_actions = _get_actions_set(
+MODERATOR_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_ACCESS_MODERATOR_PAGE,
     ACTION_DELETE_ANY_PUBLIC_ACTIVITY,
     ACTION_EDIT_ANY_PUBLIC_ACTIVITY,
     ACTION_PLAY_ANY_PRIVATE_ACTIVITY,
     ACTION_SEND_MODERATOR_EMAILS,
     ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
-    *topic_manager_allowed_actions)
+    *TOPIC_MANAGER_ALLOWED_ACTIONS)
 
-admin_allowed_actions = _get_actions_set(
+ADMIN_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_ACCEPT_ANY_SUGGESTION,
     ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION,
     ACTION_CHANGE_STORY_STATUS,
@@ -232,17 +203,18 @@ admin_allowed_actions = _get_actions_set(
     ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,
     ACTION_PUBLISH_ANY_ACTIVITY,
     ACTION_PUBLISH_OWNED_SKILL,
-    *moderator_allowed_actions)
+    *MODERATOR_ALLOWED_ACTIONS)
 
+# This dict represents all the actions that belong to a particular role.
 _ROLE_ACTIONS = {
-    feconf.ROLE_ID_ADMIN: admin_allowed_actions,
+    feconf.ROLE_ID_ADMIN: ADMIN_ALLOWED_ACTIONS,
     feconf.ROLE_ID_BANNED_USER: [],
-    feconf.ROLE_ID_COLLECTION_EDITOR: collection_editor_allowed_actions,
-    feconf.ROLE_ID_EXPLORATION_EDITOR: exploration_editor_allowed_actions,
-    feconf.ROLE_ID_GUEST: guest_allowed_actions,
-    feconf.ROLE_ID_LEARNER: learner_allowed_actions,
-    feconf.ROLE_ID_MODERATOR: moderator_allowed_actions,
-    feconf.ROLE_ID_TOPIC_MANAGER: topic_manager_allowed_actions
+    feconf.ROLE_ID_COLLECTION_EDITOR: COLLECTION_EDITOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_EXPLORATION_EDITOR: EXPLORATION_EDITOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_GUEST: GUEST_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_LEARNER: LEARNER_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_MODERATOR: MODERATOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_TOPIC_MANAGER: TOPIC_MANAGER_ALLOWED_ACTIONS
 }
 
 
@@ -267,12 +239,23 @@ def get_all_actions(role):
 
 
 def get_role_actions():
-    """
+    """Returns the possible role to actions items in the application.
+
+    Returns:
+        dict(str, list(str)). A dict presenting key as role and values as set of
+        actions corresponding to the given role.
     """
     return {role: list(actions) for role, actions in _ROLE_ACTIONS.items()}
 
+
 def is_valid_role(role):
-    """
+    """Validates whether the given role is valid.
+
+    Args:
+        role: str. The given role to validate.
+
+    Returns:
+        boolean. Whether the given role is valid or not.
     """
     return role in _ROLE_ACTIONS
 

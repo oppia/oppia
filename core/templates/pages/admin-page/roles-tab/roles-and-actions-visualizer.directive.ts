@@ -30,40 +30,38 @@ angular.module('oppia').directive('rolesAndActionsVisualizer', [
         '/pages/admin-page/roles-tab/' +
         'roles-and-actions-visualizer.directive.html'),
       controllerAs: '$ctrl',
-      controller: [
-        '$filter', function() {
-          var ctrl = this;
-          ctrl.avatarPictureUrl = UrlInterpolationService.getStaticImageUrl(
-            '/avatar/user_blue_72px.png');
+      controller: [function() {
+        var ctrl = this;
+        ctrl.avatarPictureUrl = UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png');
 
-          var getSortedReadableTexts = function(texts) {
-            var readableTexts = [];
-            texts.forEach(text => {
-              readableTexts.push(
-                text.toLowerCase()
-                  .replaceAll('_', ' ')
-                  .replace(/^\w/, (c) => c.toUpperCase()));
-            });
+        var getSortedReadableTexts = function(texts) {
+          var readableTexts = [];
+          texts.forEach(text => {
+            readableTexts.push(
+              text.toLowerCase()
+                .replaceAll('_', ' ')
+                .replace(/^\w/, (c) => c.toUpperCase()));
+          });
 
-            return readableTexts.sort();
+          return readableTexts.sort();
+        };
+
+        ctrl.$onInit = function() {
+          for (var role in ctrl.roleToActions) {
+            var readableRole = getSortedReadableTexts([role])[0];
+            ctrl.roleToActions[readableRole] = getSortedReadableTexts(
+              ctrl.roleToActions[role]);
+            delete ctrl.roleToActions[role];
+          }
+
+          ctrl.roles = Object.keys(ctrl.roleToActions).sort();
+          ctrl.activeRole = ctrl.roles[0];
+
+          ctrl.setActiveRole = function(role) {
+            ctrl.activeRole = role;
           };
-
-          ctrl.$onInit = function() {
-            for (var role in ctrl.roleToActions) {
-              var readableRole = getSortedReadableTexts([role])[0];
-              ctrl.roleToActions[readableRole] = getSortedReadableTexts(
-                ctrl.roleToActions[role]);
-              delete ctrl.roleToActions[role];
-            }
-
-            ctrl.roles = Object.keys(ctrl.roleToActions).sort();
-            ctrl.activeRole = ctrl.roles[0];
-
-            ctrl.setActiveRole = function(role) {
-              ctrl.activeRole = role;
-            };
-          };
-        }
-      ]
+        };
+      }]
     };
   }]);
