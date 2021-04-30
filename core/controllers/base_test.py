@@ -700,7 +700,21 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
     def test_signup_succeeds_when_user_is_super_admin(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME, is_super_admin=True)
 
-    def test_auth_session_is_destroyed_only_while_in_maintenance_mode(self):
+    def test_admin_auth_session_is_preserved_when_in_maintenance_mode(self):
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+        self.context_stack.enter_context(self.super_admin_context())
+
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+        self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_non_admin_auth_session_is_destroyed_when_in_maintenance_mode(self):
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
