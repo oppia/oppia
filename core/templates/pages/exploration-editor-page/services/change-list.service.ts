@@ -257,10 +257,12 @@ angular.module('oppia').factory('ChangeListService', [
        * @param {string} translationHtml - The translation html.
        */
       addTranslation: function(
-          contentId, languageCode, stateName, translationHtml, needs_update) {
+          contentId, dataFormat, languageCode, stateName,
+          translationHtml, needs_update) {
         addChange({
           cmd: CMD_ADD_TRANSLATION,
           content_id: contentId,
+          data_format: dataFormat,
           language_code: languageCode,
           state_name: stateName,
           translation_html: translationHtml,

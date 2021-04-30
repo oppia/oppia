@@ -2669,17 +2669,21 @@ class State(python_utils.OBJECT):
                 self.written_translations.add_content_id_for_translation(
                     content_id)
 
-    def add_translation(self, content_id, language_code, translation_html):
-        """Adds translation to a given content id in a specific language.
+    def add_translation(
+            self, content_id, language_code, html, data_format, needs_update):
+        """Adds a translation for the given content id in a given language.
 
         Args:
             content_id: str. The id of the content.
-            language_code: str. The language code.
-            translation_html: str. The translated html content.
+            language_code: str. The language code of the translated html.
+            html: str. The translated html.
+            data_format: str. The data format of the translated content.
+            needs_update: bool. Whether the translation needs to be updated.
         """
-        translation_html = html_cleaner.clean(translation_html)
-        self.written_translations.add_translation(
-            content_id, language_code, translation_html)
+        written_translation = WrittenTranslation(
+            data_format, html, needs_update)
+        self.written_translations.translations_mapping[content_id][
+            language_code] = written_translation
 
     def update_content(self, content):
         """Update the content of this state.

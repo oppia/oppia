@@ -412,9 +412,11 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       // Only for adding a translation.
       saveWrittenTranslations: function(
-          contentId, languageCode, stateName, translationHtml, needsUpdate) {
+          contentId, dataFormat, languageCode, stateName,
+          translationHtml, needsUpdate) {
         ChangeListService.addTranslation(
-          contentId, languageCode, stateName, translationHtml, needsUpdate);
+          contentId, dataFormat, languageCode, stateName,
+          translationHtml, needsUpdate);
       },
       // Only for marking as needing update.
       markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {

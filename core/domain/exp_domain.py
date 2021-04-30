@@ -275,7 +275,7 @@ class ExplorationChange(change_domain.BaseChange):
         'name': CMD_ADD_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code',
-            'needs_update', 'translation_html'],
+            'needs_update', 'translation_html', 'data_format'],
         'optional_attribute_names': ['content_html'],
         'user_id_attribute_names': []
     }, {
