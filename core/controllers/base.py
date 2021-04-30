@@ -51,8 +51,6 @@ CSRF_SECRET = config_domain.ConfigProperty(
 # to access the site.
 AUTH_HANDLER_PATHS = (
     '/csrfhandler',
-    '/login',
-    '/logout',
     '/seed_firebase',
     '/session_begin',
     '/session_end',
@@ -211,6 +209,7 @@ class BaseHandler(webapp2.RequestHandler):
         if (feconf.ENABLE_MAINTENANCE_MODE
                 and not self.current_user_is_super_admin
                 and self.request.path not in AUTH_HANDLER_PATHS):
+            auth_services.destroy_auth_session(self.response)
             return
 
         if auth_claims:

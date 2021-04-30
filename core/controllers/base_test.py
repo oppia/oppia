@@ -220,54 +220,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/community-library/data', expected_status_int=404)
 
-    def test_maintenance_mode_when_enabled_html(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        with swap_maintenance_mode:
-            response = (
-                self.get_html_response(
-                    '/community-library', expected_status_int=503))
-            self.assertIn(
-                '<maintenance-page>', response.body)
-            self.assertNotIn('<library-page>', response.body)
-
-    def test_auth_handler_in_maintenance_mode_when_enabled_html(self):
-        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
-            self.get_html_response('/session_begin', expected_status_int=200)
-
-    def test_maintenance_mode_when_enabled_and_super_admin_html(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        login_super_admin = self.login_context(
-            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        with swap_maintenance_mode, login_super_admin:
-            response = self.get_html_response('/community-library')
-            self.assertIn('<library-page>', response.body)
-            self.assertNotIn(
-                'The Oppia site is temporarily unavailable', response.body)
-
-    def test_maintenance_mode_when_enabled_json(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        with swap_maintenance_mode:
-            response = (
-                self.get_json('/url_handler', expected_status_int=503))
-            self.assertIn('error', response)
-            self.assertEqual(
-                response['error'],
-                'Oppia is currently being upgraded, and the site should be up '
-                'and running again in a few hours. Thanks for your patience!')
-
-    def test_maintenance_mode_when_enabled_and_super_admin_json(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        login_super_admin = self.login_context(
-            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        with swap_maintenance_mode, login_super_admin:
-            response = self.get_json('/url_handler')
-            self.assertIn('login_url', response)
-            self.assertIsNone(response['login_url'])
-
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
@@ -639,6 +591,103 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             r'Exception raised:',
         ])
         self.assertEqual(call_counter.times_called, 1)
+
+
+class MaintenanceModeTests(test_utils.GenericTestBase):
+    """Tests BaseHandler behavior when maintenance mode is enabled.
+
+    Each test case runs within a context where ENABLE_MAINTENANCE_MODE is True.
+    """
+
+    def setUp(self):
+        super(MaintenanceModeTests, self).setUp()
+        with contextlib2.ExitStack() as exit_stack:
+            exit_stack.enter_context(
+                self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
+            self.exit_stack = exit_stack.pop_all()
+
+    def tearDown(self):
+        self.exit_stack.close()
+        super(MaintenanceModeTests, self).tearDown()
+
+    def test_html_response_is_rejected(self):
+        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response(
+            '/community-library', expected_status_int=503)
+
+        self.assertIn('<maintenance-page>', response.body)
+        self.assertNotIn('<library-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_html_response_is_not_rejected_when_user_is_super_admin(self):
+        self.exit_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response('/community-library')
+
+        self.assertIn('<library-page>', response.body)
+        self.assertNotIn('site is temporarily unavailable', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_json_response_is_rejected(self):
+        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_json('/url_handler', expected_status_int=503)
+
+        self.assertIn('error', response)
+        self.assertEqual(
+            response['error'],
+            'Oppia is currently being upgraded, and the site should be up '
+            'and running again in a few hours. Thanks for your patience!')
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_json_response_is_not_rejected_when_user_is_super_admin(self):
+        self.exit_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.exit_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_json('/url_handler')
+
+        self.assertIn('login_url', response)
+        self.assertIsNone(response['login_url'])
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_csrfhandler_handler_is_not_rejected(self):
+        response = self.get_json('/csrfhandler')
+
+        self.assertTrue(
+            base.CsrfTokenManager.is_csrf_token_valid(None, response['token']))
+
+    def test_session_begin_handler_is_not_rejected(self):
+        call_counter = self.exit_stack.enter_context(
+            self.swap_with_call_counter(
+                auth_services, 'establish_auth_session'))
+
+        self.get_html_response('/session_begin', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_session_end_handler_is_not_rejected(self):
+        call_counter = self.exit_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        self.get_html_response('/session_end', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_seed_firebase_handler_is_not_rejected(self):
+        call_counter = self.exit_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'seed_firebase'))
+
+        response = (
+            self.get_html_response('/seed_firebase', expected_status_int=302))
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(response.location, 'http://localhost/')
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
