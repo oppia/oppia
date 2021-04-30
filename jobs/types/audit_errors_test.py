@@ -391,7 +391,7 @@ class DraftChangeListLastUpdatedNoneErrorTests(AuditErrorsTestBase):
             'cmd': 'edit_exploration_property',
             'property_name': 'objective',
             'new_value': 'the objective'
-        }],
+        }]
         model = user_models.ExplorationUserDataModel(
             id='123',
             user_id='test',
@@ -417,7 +417,7 @@ class DraftChangeListLastUpdatedInvalidErrorTests(AuditErrorsTestBase):
             'cmd': 'edit_exploration_property',
             'property_name': 'objective',
             'new_value': 'the objective'
-        }],
+        }]
         last_updated = self.NOW + datetime.timedelta(days=5)
         model = user_models.ExplorationUserDataModel(
             id='123',
