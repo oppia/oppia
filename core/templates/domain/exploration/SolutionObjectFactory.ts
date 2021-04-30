@@ -45,6 +45,18 @@ import {
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import {
+  DragAndDropSortInputCustomizationArgs,
+  InteractionCustomizationArgs,
+} from 'interactions/customization-args-defs';
+import { InteractionObjectFactory } from
+'domain/exploration/InteractionObjectFactory';
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 export interface ExplanationBackendDict {
   'content_id': string;
@@ -65,6 +77,10 @@ interface ShortAnswerResponse {
 export class Solution {
   ehfs: ExplorationHtmlFormatterService;
   shof: SubtitledHtml;
+  customizationArgs: InteractionCustomizationArgs;
+  InteractionObjectFactory: InteractionObjectFactory;
+  StateInteractionIdService: StateInteractionIdService;
+  StateCustomizationArgService: StateCustomizationArgsService;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
@@ -84,6 +100,36 @@ export class Solution {
       correct_answer: this.correctAnswer,
       explanation: this.explanation.toBackendDict()
     };
+  }
+
+  if (StateInteractionIdService) {
+    var interactionSpec = INTERACTION_SPECS[
+      StateInteractionIdService.savedMemento];
+    this.customizationArgSpecs = interactionSpec.customization_arg_specs;
+  
+    StateInteractionIdService.displayed = angular.copy(
+      StateInteractionIdService.savedMemento);
+    StateCustomizationArgsService.displayed = (
+      StateCustomizationArgsService.savedMemento);
+  
+    // Ensure that StateCustomizationArgsService.displayed is
+    // fully populated.
+    for (var i = 0; i < this.customizationArgSpecs.length; i++) {
+      var argName = this.customizationArgSpecs[i].name;
+      if (
+        !StateCustomizationArgsService.savedMemento.hasOwnProperty(argName)
+      ) {
+        throw new Error(
+          `Interaction is missing customization argument ${argName}`);
+      }
+    }
+  
+    StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
+    /*this.form = {};
+    this.hasCustomizationArgs = (
+      StateCustomizationArgsService.displayed &&
+      Object.keys(StateCustomizationArgsService.displayed).length > 0
+    );*/
   }
 
   getSummary(interactionId: string): string {
