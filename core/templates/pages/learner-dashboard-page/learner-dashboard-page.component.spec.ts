@@ -36,7 +36,6 @@ import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
@@ -107,7 +106,6 @@ describe('Learner dashboard page', () => {
   let userService: UserService = null;
 
   let profilePictureDataUrl = 'profile-picture-url';
-  let windowRef: WindowRef = null;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -304,7 +302,6 @@ describe('Learner dashboard page', () => {
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
-          WindowRef,
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
@@ -324,7 +321,6 @@ describe('Learner dashboard page', () => {
       suggestionModalForLearnerDashboardService =
         TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
-      windowRef = TestBed.inject(WindowRef);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
         return Promise.resolve('sample-csrf-token');
@@ -461,16 +457,11 @@ describe('Learner dashboard page', () => {
       expect(component.explorationPlaylist.length).toBe(10);
     }));
 
-    it('should set focus on browse lesson btn and' +
-      ' scroll back to top of window after focusing', fakeAsync(() => {
-      const focusSpy = spyOn(focusManagerService, 'setFocus');
-      const windowSpy = spyOn(windowRef.nativeWindow, 'scrollTo');
-      component.addFocusWithoutScroll('ourLessonsBtn');
-
+    it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
+      const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      component.ngOnInit();
       flush();
-
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-      expect(windowSpy).toHaveBeenCalled();
     }));
 
     it('should get static image url', () => {

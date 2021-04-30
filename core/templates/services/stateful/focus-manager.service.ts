@@ -25,7 +25,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { IdGenerationService } from 'services/id-generation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
-
+import { WindowRef } from 'services/contextual/window-ref.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -35,8 +35,9 @@ export class FocusManagerService {
 
   constructor(
       private deviceInfoService: DeviceInfoService,
-      private idGenerationService: IdGenerationService) {}
-
+      private idGenerationService: IdGenerationService,
+      private windowRef: WindowRef = new WindowRef(),
+  ) {}
   clearFocus(): void {
     this.setFocus(AppConstants.LABEL_FOR_CLEARING_FOCUS);
   }
@@ -59,6 +60,13 @@ export class FocusManagerService {
 
   generateFocusLabel(): string {
     return this.idGenerationService.generateNewId();
+  }
+
+  setFocusWithoutScroll(name: string): void {
+    this.setFocus(name);
+    setTimeout(() => {
+      this.windowRef.nativeWindow.scrollTo(0, 0);
+    }, 5);
   }
 
   get onFocus(): EventEmitter<string> {
