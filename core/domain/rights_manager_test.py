@@ -1140,7 +1140,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.EXP_ID_FOR_COLLECTION)
         # Ensure User B is not an editor of the exploration within the
         # collection.
-        self.assertFalse(rights_activity_rightsmanager.check_can_access_activity(
+        self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_for_collection_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_for_collection_rights))
