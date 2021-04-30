@@ -1,9 +1,16 @@
 <div class="oppia-learner-answer-info-card">
   <div class="oppia-enter-answer-details">
-    <textarea class="form-control protractor-test-answer-details-text-area" ng-model="$ctrl.answerDetails" rows="4" placeholder="Enter your explanation here"></textarea>
+    <textarea class="form-control protractor-test-answer-details-text-area"
+              [(ngModel)]="answerDetails" rows="4"
+              placeholder="Enter your explanation here"></textarea>
   </div>
   <div class="oppia-submit-button">
-    <md-button class="oppia-learner-confirm-button protractor-test-answer-details-submit-button" ng-disabled="!($ctrl.answerDetails)" ng-click="$ctrl.submitLearnerAnswerInfo()">SUBMIT</md-button>
+    <button mat-button
+            class="oppia-learner-confirm-button protractor-test-answer-details-submit-button"
+            [disabled]="!answerDetails"
+            (click)="submitLearnerAnswerInfo()">
+            SUBMIT
+    </button>
   </div>
 </div>
 <style>

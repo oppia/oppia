@@ -127,7 +127,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'int-editor.component.ts',
     'item-selection-input-validation.service.ts',
     'language-util.service.ts',
-    'learner-answer-info-card.directive.ts',
+    'learner-answer-info-card.component.ts',
     'learner-answer-info.service.ts',
     'learner-local-nav.directive.ts',
     'learner-view-info.directive.ts',
