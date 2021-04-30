@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { CorrectnessFooterComponent } from './layout-directives/correctness-footer.component';
 
 @NgModule({
   imports: [
@@ -77,7 +78,6 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { CorrectnessFooterComponent } from './layout-directives/correctness-footer.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
