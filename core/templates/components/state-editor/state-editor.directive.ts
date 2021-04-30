@@ -30,8 +30,6 @@ require(
 require(
   'components/state-editor/state-solution-editor/' +
   'state-solution-editor.directive.ts');
-require(
-  'components/state-editor/state-editor.constants.ajs.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -96,15 +94,13 @@ angular.module('oppia').directive('stateEditor', [
         'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
-        'STICKY_HEADER_SCROLL_TOP',
         function(
             $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
             StateNextContentIdIndexService,
             StateParamChangesService, StateSolicitAnswerDetailsService,
-            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS,
-            STICKY_HEADER_SCROLL_TOP) {
+            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var updateInteractionVisibility = function(newInteractionId) {
@@ -128,12 +124,13 @@ angular.module('oppia').directive('stateEditor', [
           var questionSuggestionReview = angular.element(
             document.querySelector('.oppia-question-suggestion-review'));
           questionSuggestionReview.on('scroll', function() {
+            const stickyHeaderScrollTop = 50;
             var tutorialStateContent = document.getElementById(
               'tutorialStateContent');
             var cardAvatarOnSticky = document.querySelector(
               '.oppia-editor-card-avatar');
             if (questionSuggestionReview.scrollTop() >
-             STICKY_HEADER_SCROLL_TOP) {
+              stickyHeaderScrollTop) {
               tutorialStateContent.classList.remove(
                 'state-content-editor-parent-container');
               cardAvatarOnSticky.classList.add(

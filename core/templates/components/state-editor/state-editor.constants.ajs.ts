@@ -24,6 +24,3 @@ import { StateEditorConstants } from
 angular.module('oppia').constant(
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
   StateEditorConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION);
-angular.module('oppia').constant(
-  'STICKY_HEADER_SCROLL_TOP',
-  StateEditorConstants.STICKY_HEADER_SCROLL_TOP);

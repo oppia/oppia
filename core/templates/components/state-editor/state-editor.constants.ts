@@ -17,7 +17,6 @@
  */
 
 export const StateEditorConstants = {
-  STICKY_HEADER_SCROLL_TOP: 50,
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION:
     'The current solution does not correspond to a correct answer.'
 } as const;
