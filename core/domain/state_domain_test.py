@@ -3618,6 +3618,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, True)
 
+    def test_validate_state_linked_skill_id(self):
+        """Test validation of linked_skill_id."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.linked_skill_id, None)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected linked_skill_id to be ' +
+            'a str, received 12.'):
+            with self.swap(init_state, 'linked_skill_id', 12):
+                exploration.validate()
+        self.assertEqual(init_state.linked_skill_id, None)
+
     def test_validate_state_card_is_checkpoint(self):
         """Test validation of card_is_checkpoint."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')

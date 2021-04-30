@@ -3084,9 +3084,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
-    
+
     def test_update_linked_skill_id(self):
-        """Test updating linked_skill_id"""
+        """Test updating linked_skill_id."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.linked_skill_id, None)

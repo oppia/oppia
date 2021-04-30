@@ -32,6 +32,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 
 describe('State Skill Editor Component', () => {
@@ -39,6 +40,7 @@ describe('State Skill Editor Component', () => {
   let componentInstance: StateSkillEditorComponent;
   let mockNgbModal: MockNgbModal;
   let stateLinkedSkillIdService: StateLinkedSkillIdService;
+  let urlInterpolationService: UrlInterpolationService;
 
   class MockNgbModal {
     modal: string;
@@ -132,6 +134,7 @@ describe('State Skill Editor Component', () => {
       providers: [
         TopicsAndSkillsDashboardBackendApiService,
         StateLinkedSkillIdService,
+        UrlInterpolationService,
         {
           provide: NgbModal,
           useClass: MockNgbModal
@@ -151,6 +154,7 @@ describe('State Skill Editor Component', () => {
     componentInstance.categorizedSkills = null;
     componentInstance.skillEditorIsShown = null;
     componentInstance.untriagedSkillSummaries = [];
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     mockNgbModal = (TestBed.inject(NgbModal) as unknown) as MockNgbModal;
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     stateLinkedSkillIdService = (
@@ -202,6 +206,17 @@ describe('State Skill Editor Component', () => {
     mockNgbModal.success = false;
     componentInstance.deleteSkill();
     fixture.detectChanges();
+  });
+
+  it('should call getSkillEditorUrl and return skillEditor URL', () => {
+    const urlSpy = spyOn(
+      urlInterpolationService, 'interpolateUrl')
+      .and.returnValue('/skill_editor/skill_1');
+
+    stateLinkedSkillIdService.displayed = 'skill_1';
+    componentInstance.getSkillEditorUrl();
+    fixture.detectChanges();
+    expect(urlSpy).toHaveBeenCalled();
   });
 
   it('should toggle skillEditorIsShown', () => {

@@ -2477,8 +2477,8 @@ class State(python_utils.OBJECT):
                     self.linked_skill_id,
                     python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'Expected linked skill id to be a str, '
-                    'received %s' % self.linked_skill_id)
+                    'Expected linked_skill_id to be a str, '
+                    'received %s.' % self.linked_skill_id)
 
     def get_content_html(self, content_id):
         """Returns the content belongs to a given content id of the object.
