@@ -35,14 +35,16 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { ContinueButtonComponent } from './learner-experience/continue-button.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    NgbModalModule,
     MatButtonModule,
+    NgbModalModule,
     SharedComponentsModule
   ],
   declarations: [
@@ -78,8 +80,6 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ContinueButtonComponent } from './learner-experience/continue-button.component';
-import { MatButtonModule } from '@angular/material/button';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

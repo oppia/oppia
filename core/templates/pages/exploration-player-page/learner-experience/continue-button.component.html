@@ -1,8 +1,9 @@
 <h1>Continue Button Component here</h1>
-<mat-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
-            [oppiaFocusOn]="focusLabel"
-            (click)="clickContinueButton.emit()"
-            attr.aria-label="Continue">
+<button mat-button
+        class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
+        [oppiaFocusOn]="focusLabel"
+        (click)="clickContinueButton.emit()"
+        attr.aria-label="Continue">
   <div *ngIf="!isLearnAgainButton">
     <span class="protractor-test-next-card-button">{{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate }}</span>
     <i class="fas fa-arrow-right icon">
@@ -13,7 +14,7 @@
     <i class="fas fa-redo icon">
     </i>
   </div>
-</mat-button>
+</button>
 
 <style>
   .oppia-learner-confirm-button {

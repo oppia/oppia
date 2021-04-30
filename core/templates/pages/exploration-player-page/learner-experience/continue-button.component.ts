@@ -18,6 +18,7 @@
  */
 
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-continue-button',
@@ -29,3 +30,6 @@ export class ContinueButtonComponent {
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
 }
+
+angular.module('oppia').directive('oppiaContinueButton',
+  downgradeComponent({ component: ContinueButtonComponent }));
