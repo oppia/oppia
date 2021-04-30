@@ -3,7 +3,6 @@
   "parserOptions": {
     "sourceType": "module",
     "project": [
-      "./tsconfig.json",
       "./parser-tsconfig.eslint.json"
     ]
   },
