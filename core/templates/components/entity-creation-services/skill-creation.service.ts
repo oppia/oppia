@@ -109,6 +109,10 @@ angular.module('oppia').factory('SkillCreationService', [
           }, function(errorMessage) {
             AlertsService.addWarning(errorMessage);
           });
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
       }
     };

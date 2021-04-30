@@ -1006,10 +1006,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(MockContinuousComputationManager.TIMES_RUN, 0)
             MockContinuousComputationManager.start_computation()
-            (
-                MockContinuousComputationManager  # pylint: disable=protected-access
-                ._kickoff_batch_job_after_previous_one_ends()
-            )
+            MockContinuousComputationManager.on_batch_job_completion()
             status = MockContinuousComputationManager.get_status_code()
 
             self.assertEqual(
