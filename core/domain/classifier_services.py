@@ -370,7 +370,6 @@ def fetch_next_job():
             else:
                 valid_jobs.append(training_job)
 
-
     if timed_out_job_ids:
         mark_training_jobs_failed(timed_out_job_ids)
 
