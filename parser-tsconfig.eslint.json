@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "core/tests",
+        "puppeteer-login-script.js",
+        "scripts/linters/*",
+        "webpack.common.config.ts",
+        "webpack.common.macros.ts",
+        "webpack.dev.config.ts",
+        "webpack.dev.sourcemap.config.ts",
+        "webpack.prod.config.ts",
+        "webpack.prod.sourcemap.config.ts",
+        "webpack.terser.config.ts"
+    ]
+}
