@@ -257,17 +257,14 @@ export class LearnerDashboardPageComponent implements OnInit {
       }
     );
 
-
     Promise.all([
       userInfoPromise,
       dashboardDataPromise,
     ]).then(() => {
-      // The timeout is required because at execution time,
-      // the element may not be present in the DOM yet.Thus it ensure
-      // that the element is visible before focussing.
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
-        this.addFocusWithoutScroll('ourLessonsBtn');
+        // So that focus is applied after the loading screen has dissapeared.
+        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
       }, 0);
     // eslint-disable-next-line dot-notation
     }).catch(errorResponse => {
@@ -279,13 +276,6 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.newMessage = {
       text: ''
     };
-  }
-
-  addFocusWithoutScroll(label: string): void {
-    this.focusManagerService.setFocus(label);
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 5);
   }
 
   getStaticImageUrl(imagePath: string): string {
