@@ -1135,7 +1135,8 @@ def can_assign_voiceartist(handler):
         """Checks if the user can assign voiceartist to the exploration.
 
         Args:
-            exploration_id: str. The exploration id.
+            entity_type: str. The type of activity.
+            entity_id: str. Entity id of the activity.
             **kwargs: dict(str: *). Keyword arguments.
 
         Returns:
@@ -1165,6 +1166,7 @@ def can_assign_voiceartist(handler):
     test_can_assign_voiceartist.__wrapped__ = True
 
     return test_can_assign_voiceartist
+
 
 def can_save_exploration(handler):
     """Decorator to check whether user can save exploration.

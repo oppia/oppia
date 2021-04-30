@@ -1219,7 +1219,7 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/mock/exploration/%s' % self.published_exp_id_1,
-                    {}, csrf_token=csrf_token)
+                {}, csrf_token=csrf_token)
         self.logout()
 
     def test_voiceover_admin_cannot_assign_voiceartist_in_private_exp(self):
@@ -1228,10 +1228,10 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
-                    csrf_token=csrf_token, expected_status_int=401)
-            self.assertEqual(response['error'],
-                'You do not have credentials to assign voiceartist to'
-                ' this exploration.')
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to '
+                                   'assign voiceartist to this exploration.')
         self.logout()
 
     def test_owner_cannot_assign_voiceartist_in_public_exp(self):
@@ -1240,10 +1240,10 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
-                    csrf_token=csrf_token, expected_status_int=401)
-            self.assertEqual(response['error'],
-                'You do not have credentials to assign voiceartist to'
-                ' this exploration.')
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to assign '
+                                   'voiceartist to this exploration.')
         self.logout()
 
     def test_random_user_cannot_assign_voiceartist_in_public_exp(self):
@@ -1252,10 +1252,10 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
-                    csrf_token=csrf_token, expected_status_int=401)
-            self.assertEqual(response['error'],
-                'You do not have credentials to assign voiceartist to'
-                ' this exploration.')
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to assign '
+                                   'voiceartist to this exploration.')
         self.logout()
 
 

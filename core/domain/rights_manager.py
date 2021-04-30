@@ -586,7 +586,7 @@ def check_can_modify_voiceartist_in_activity(user, activity_rights):
             role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
         return True
     elif (activity_rights.is_published() and
-            role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
+          role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
         return True
     else:
         return False
@@ -645,7 +645,6 @@ def check_can_modify_activity_roles(user, activity_rights):
             given user.
         activity_rights: ActivityRights or None. Rights object for the given
             activity.
-        role: str. Role of the user.
 
     Returns:
         bool. Whether the user can modify roles for given activity.

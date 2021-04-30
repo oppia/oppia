@@ -2008,6 +2008,11 @@ title: Title
             self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
 
     def set_voiceover_admin(self, voiceover_admin_username):
+        """Sets role of given users as VOICEOVER ADMIN.
+
+        Args:
+            voiceover_admin_username: list(str). List of usernames.
+        """
         for name in voiceover_admin_username:
             self.set_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
 

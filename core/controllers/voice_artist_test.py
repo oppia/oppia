@@ -345,9 +345,9 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/voiceartist_management_handler/exploration/%s'
-                % self.published_exp_id_1, params,
-                csrf_token=csrf_token, expected_status_int=401)
-        self.logout
+            % self.published_exp_id_1, params,
+            csrf_token=csrf_token, expected_status_int=401)
+        self.logout()
 
     def test_voiceover_admin_can_assign_voiceartist(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
@@ -357,8 +357,8 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/voiceartist_management_handler/exploration/%s'
-                % self.published_exp_id_1, params, csrf_token=csrf_token)
-        self.logout
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
+        self.logout()
 
     def test_voiceover_admin_can_deassign_voiceartist(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
@@ -368,11 +368,9 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/voiceartist_management_handler/exploration/%s'
-                % self.published_exp_id_1, params, csrf_token=csrf_token)
-        params = {
-            'voice_artist': self.VOICE_ARTIST_USERNAME
-        }
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
         self.delete_json(
             '/voiceartist_management_handler/exploration/%s'
-                % self.published_exp_id_1, params)
-        self.logout
+            % self.published_exp_id_1, params={
+                'username': self.VOICE_ARTIST_USERNAME})
+        self.logout()

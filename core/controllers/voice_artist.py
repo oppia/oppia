@@ -23,8 +23,8 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain import rights_manager
 from core.domain import rights_domain
+from core.domain import rights_manager
 from core.domain import user_services
 import feconf
 import python_utils
@@ -138,8 +138,8 @@ class VoiceartistManagementHandler(base.BaseHandler):
 
     @acl_decorators.can_assign_voiceartist
     def post(self, entity_type, entity_id):
-        """  todo add docstring """
-        if (entity_type != feconf.ENTITY_TYPE_EXPLORATION):
+        """Handles Post requests."""
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
             raise self.InvalidInputException(
                 'Invalid entity type.')
 
@@ -150,7 +150,8 @@ class VoiceartistManagementHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid voice artist username.')
         rights_manager.assign_role_for_exploration(
-            self.user, entity_id, voice_artist_id, rights_domain.ROLE_VOICE_ARTIST)
+            self.user, entity_id, voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
 
         self.render_json({
             'rights': rights_manager.get_exploration_rights(
@@ -159,7 +160,10 @@ class VoiceartistManagementHandler(base.BaseHandler):
 
     @acl_decorators.can_assign_voiceartist
     def delete(self, entity_type, entity_id):
-
+        """Handles Delete requests."""
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            raise self.InvalidInputException(
+                'Invalid entity type.')
         voice_artist = self.request.get('voice_artist')
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)

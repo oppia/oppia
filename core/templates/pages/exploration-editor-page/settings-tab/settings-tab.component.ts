@@ -353,7 +353,8 @@ angular.module('oppia').component('settingsTab', {
         ExplorationRightsService.saveVoiceArtist(newVoiceartistUsername);
         ctrl.closeVoiceoverForm();
         return;
-      }
+      };
+
       ctrl.removeVoiceArtist = function(voiceArtistUsername) {
         AlertsService.clearWarnings();
 
@@ -370,7 +371,7 @@ angular.module('oppia').component('settingsTab', {
         }).result.then(function() {
           ExplorationRightsService.removeVoiceArtistRoleAsync(
             voiceArtistUsername);
-            ctrl.closeVoiceoverForm();
+          ctrl.closeVoiceoverForm();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is
