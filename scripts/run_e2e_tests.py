@@ -286,7 +286,7 @@ def build_js_files(
     """
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
-        build_args = ['--prod_env', '--maintenance_mode']
+        build_args = ['--prod_env']
 
         if deparallelize_terser:
             build_args.append('--deparallelize_terser')
