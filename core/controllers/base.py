@@ -46,6 +46,18 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
+# NOTE: These handlers manage user sessions. Thus, we should never reject or
+# replace them when running in maintenance mode; otherwise admins will be unable
+# to access the site.
+AUTH_HANDLER_PATHS = (
+    '/csrfhandler',
+    '/login',
+    '/logout',
+    '/seed_firebase',
+    '/session_begin',
+    '/session_end',
+)
+
 
 @backports.functools_lru_cache.lru_cache(maxsize=128)
 def load_template(filename):
@@ -181,8 +193,9 @@ class BaseHandler(webapp2.RequestHandler):
             self.current_user_is_super_admin = (
                 auth_claims is not None and auth_claims.role_is_super_admin)
 
-        if (feconf.ENABLE_MAINTENANCE_MODE and
-                not self.current_user_is_super_admin):
+        if (feconf.ENABLE_MAINTENANCE_MODE
+                and not self.current_user_is_super_admin
+                and self.request.path not in AUTH_HANDLER_PATHS):
             return
 
         self.user_id = None
@@ -258,8 +271,9 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if (feconf.ENABLE_MAINTENANCE_MODE and
-                not self.current_user_is_super_admin):
+        if (feconf.ENABLE_MAINTENANCE_MODE
+                and not self.current_user_is_super_admin
+                and self.request.path not in AUTH_HANDLER_PATHS):
             self.handle_exception(
                 self.TemporaryMaintenanceException(
                     'Oppia is currently being upgraded, and the site should '

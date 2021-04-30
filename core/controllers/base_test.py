@@ -231,6 +231,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 '<maintenance-page>', response.body)
             self.assertNotIn('<library-page>', response.body)
 
+    def test_auth_handler_in_maintenance_mode_when_enabled_html(self):
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True):
+            self.get_html_response('/session_begin', expected_status_int=200)
+
     def test_maintenance_mode_when_enabled_and_super_admin_html(self):
         swap_maintenance_mode = self.swap(
             feconf, 'ENABLE_MAINTENANCE_MODE', True)
