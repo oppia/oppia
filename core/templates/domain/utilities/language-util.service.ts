@@ -157,9 +157,9 @@ export class LanguageUtilService {
   getAllVoiceoverLanguageCodes(): string[] {
     return this.getAllAudioLanguageCodes();
   }
-  getAudioLanguageDescription(audioLanguageCode: string): string {
+  getAudioLanguageDescription(audioLanguageCode: string): string | null {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
-    return language ? language.description : '';
+    return language ? language.description : null;
   }
 
   getLanguageDirection(languageCode: string): string {
@@ -182,9 +182,9 @@ export class LanguageUtilService {
         languageCode);
   }
 
-  getContentLanguageDescription(contentLanguageCode: string): string {
+  getContentLanguageDescription(contentLanguageCode: string): string | null {
     const language = this.getSupportedContentLanguages()[contentLanguageCode];
-    return language ? language.description : '';
+    return language ? language.description : null;
   }
 
   // Given a list of audio language codes, returns the complement list, i.e.
