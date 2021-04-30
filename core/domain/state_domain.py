@@ -2748,10 +2748,6 @@ class State(python_utils.OBJECT):
         Args:
             linked_skill_id: str. The linked skill id to state.
         """
-        if not isinstance(linked_skill_id, str):
-            raise Exception(
-                'Expected linked_skill_id to be a string, received %s'
-                % linked_skill_id)
         self.linked_skill_id = linked_skill_id
 
     def update_interaction_customization_args(self, customization_args_dict):

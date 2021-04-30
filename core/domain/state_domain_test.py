@@ -1643,7 +1643,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_update_linked_skill_id(self):
         """Test updating linked_skill_id."""
         state = state_domain.State.create_default_state('state_1')
-        self.assertEqual(state.linked_skill_id, 'string_1')
+        self.assertEqual(state.linked_skill_id, None)
         state.update_linked_skill_id('string_2')
         self.assertEqual(state.linked_skill_id, 'string_2')
 

@@ -3480,7 +3480,7 @@ tags: []
 title: Title
 """)
 
-YAML_CONTENT_V50 = (
+    YAML_CONTENT_V50 = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
