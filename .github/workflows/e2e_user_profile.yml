@@ -22,31 +22,26 @@ jobs:
           python-version: '2.x'
           architecture: 'x64'
       - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install wheel==0.35.0
       - name: Install third party
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
-      - name: Install chrome version 88.0.4324.96-1
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: |
-          sudo apt-get update
-          sudo apt-get install libappindicator3-1
-          curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_88.0.4324.96-1_amd64.deb
-          sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-          sudo dpkg -i google-chrome.deb
-          google-chrome --version
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
+      - name: Install chrome
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.install_chrome_for_ci
       - name: Run e2e users test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="users" --prod_env
       - name: Run e2e profileMenu test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
       - name: Run e2e profileFeatures test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
       - name: Uploading protractor-screenshots as Artifacts
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots

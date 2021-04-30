@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import base_model_validators
-from core.domain import cron_services
 from core.domain import exp_domain
 from core.domain import learner_progress_services
 from core.domain import rights_manager
@@ -1268,8 +1267,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
         """
         date_four_weeks_ago = (
             datetime.datetime.utcnow() -
-            cron_services.PERIOD_TO_MARK_MODELS_AS_DELETED
-        )
+            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
         if item.last_updated < date_four_weeks_ago:
             cls._add_error(
                 'entity %s' % base_model_validators.ERROR_CATEGORY_STALE_CHECK,
@@ -1491,11 +1489,10 @@ class PendingDeletionRequestModelValidator(
         """
         incorrect_keys = []
         allowed_keys = [
-            name for name in
-            models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES.__dict__]
-        for key in item.pseudonymizable_entity_mappings.keys():
-            if key not in allowed_keys:
-                incorrect_keys.append(key)
+            name.value for name in models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES]
+        for module_name in item.pseudonymizable_entity_mappings.keys():
+            if module_name not in allowed_keys:
+                incorrect_keys.append(module_name)
 
         if incorrect_keys:
             cls._add_error(

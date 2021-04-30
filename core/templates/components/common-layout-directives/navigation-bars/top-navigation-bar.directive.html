@@ -25,19 +25,11 @@
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <li>
       <ul ng-if="$ctrl.windowIsNarrow && !$ctrl.inClassroomPage" class="nav oppia-navbar-tabs-narrow">
-        <li><create-activity-button></create-activity-button></li>
+        <li><oppia-create-activity-button></oppia-create-activity-button></li>
       </ul>
     </li>
     <li>
       <ul ng-if="!$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs">
-        <li ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY"
-            class="nav-item oppia-clickable-navbar-element">
-          <a ng-mouseover="$ctrl.blurNavigationLinks($event)"
-             class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
-             href="/community-library"
-             translate="I18N_TOPNAV_LIBRARY">
-          </a>
-        </li>
         <li ng-if="$ctrl.CLASSROOM_PROMOS_ARE_ENABLED"
             ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}"
             uib-dropdown
@@ -67,6 +59,14 @@
               </a>
             </li>
           </ul>
+        </li>
+        <li ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY"
+            class="nav-item oppia-clickable-navbar-element">
+          <a ng-mouseover="$ctrl.blurNavigationLinks($event)"
+             class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
+             href="/community-library"
+             translate="I18N_TOPNAV_LIBRARY">
+          </a>
         </li>
         <li ng-class="{'open': $ctrl.activeMenuName === 'aboutMenu'}"
             uib-dropdown
@@ -150,16 +150,8 @@
             </li>
           </ul>
         </li>
-        <li class="nav-item" ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
-          <div class="oppia-navbar-button-container">
-            <a href="/donate"
-               class="btn oppia-navbar-button nav-link oppia-navbar-hide-on-small-width oppia-transition-200">
-              <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
-            </a>
-          </div>
-        </li>
         <li ng-if="!$ctrl.inClassroomPage">
-          <create-activity-button ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
+          <oppia-create-activity-button ng-mouseover="$ctrl.blurNavigationLinks($event)" ng-show="$ctrl.navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></oppia-create-activity-button>
         </li>
       </ul>
     </li>
@@ -269,7 +261,7 @@
         <hr class="oppia-top-right-menu-item-separator">
         <li class="nav-item">
           <a ng-click="$ctrl.closeSubmenuIfNotMobile($event);$ctrl.onLogoutButtonClicked()" ng-href="<[$ctrl.logoutUrl]>"
-             class="dropdown-item nav-link"
+             class="dropdown-item nav-link protractor-test-logout-link"
              ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {tab: $ctrl.ACTION_CLOSE})">
             <span translate="I18N_TOPNAV_LOGOUT"></span>
           </a>
@@ -312,7 +304,7 @@
     outline: auto 5px -webkit-focus-ring-color;
   }
   top-navigation-bar .oppia-signin-google {
-    background-color: #FFFFFF;
+    background-color: #FFF;
     border-radius: 5px;
     border-width: 0;
     box-shadow: 1px 1px 0 1px rgba(0,0,0,0.05);

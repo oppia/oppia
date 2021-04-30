@@ -17,7 +17,7 @@
 """Tests interface for storage model switching."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
@@ -244,10 +244,10 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_auth_services(self):
         """Tests import auth services function."""
-        from core.platform.auth import gae_auth_services
+        from core.platform.auth import firebase_auth_services
         self.assertIs(
             self.registry_instance.import_auth_services(),
-            gae_auth_services)
+            firebase_auth_services)
 
     def test_import_app_identity_services(self):
         """Tests import app identity services function."""
@@ -301,6 +301,19 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertEqual(
             self.registry_instance.import_taskqueue_services(),
             dev_mode_taskqueue_services)
+
+    def test_import_cloud_translate_services(self):
+        """Tests import cloud translate services function."""
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            from core.platform.cloud_translate import cloud_translate_services
+            self.assertEqual(
+                self.registry_instance.import_cloud_translate_services(),
+                cloud_translate_services)
+        from core.platform.cloud_translate import (
+            dev_mode_cloud_translate_services)
+        self.assertEqual(
+            self.registry_instance.import_cloud_translate_services(),
+            dev_mode_cloud_translate_services)
 
     def test_import_search_services(self):
         """Tests import search services function."""

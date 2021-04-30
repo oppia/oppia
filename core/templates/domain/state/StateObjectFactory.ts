@@ -27,14 +27,12 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import {
   RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-  RecordedVoiceoversObjectFactory
-} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+  RecordedVoiceovers
+} from 'domain/exploration/recorded-voiceovers.model';
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml
+} from 'domain/exploration/subtitled-html.model';
 import {
   WrittenTranslationsBackendDict,
   WrittenTranslations,
@@ -52,6 +50,7 @@ export interface StateBackendDict {
   'param_changes': readonly ParamChangeBackendDict[];
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
+  'card_is_checkpoint': boolean;
   'written_translations': WrittenTranslationsBackendDict;
   'next_content_id_index': number;
 }
@@ -64,13 +63,15 @@ export class State {
   paramChanges: ParamChange[];
   recordedVoiceovers: RecordedVoiceovers;
   solicitAnswerDetails: boolean;
+  cardIsCheckpoint: boolean;
   writtenTranslations: WrittenTranslations;
   nextContentIdIndex: number;
   constructor(
       name: string, classifierModelId: string, content: SubtitledHtml,
       interaction: Interaction, paramChanges: ParamChange[],
       recordedVoiceovers: RecordedVoiceovers, solicitAnswerDetails: boolean,
-      writtenTranslations: WrittenTranslations, nextContentIdIndex: number) {
+      cardIsCheckpoint: boolean, writtenTranslations: WrittenTranslations,
+      nextContentIdIndex: number) {
     this.name = name;
     this.classifierModelId = classifierModelId;
     this.content = content;
@@ -78,6 +79,7 @@ export class State {
     this.paramChanges = paramChanges;
     this.recordedVoiceovers = recordedVoiceovers;
     this.solicitAnswerDetails = solicitAnswerDetails;
+    this.cardIsCheckpoint = cardIsCheckpoint;
     this.writtenTranslations = writtenTranslations;
     this.nextContentIdIndex = nextContentIdIndex;
   }
@@ -95,6 +97,7 @@ export class State {
       }),
       recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
       solicit_answer_details: this.solicitAnswerDetails,
+      card_is_checkpoint: this.cardIsCheckpoint,
       written_translations: this.writtenTranslations.toBackendDict(),
       next_content_id_index: this.nextContentIdIndex
     };
@@ -108,6 +111,7 @@ export class State {
     this.paramChanges = otherState.paramChanges;
     this.recordedVoiceovers = otherState.recordedVoiceovers;
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
+    this.cardIsCheckpoint = otherState.cardIsCheckpoint;
     this.writtenTranslations = otherState.writtenTranslations;
     this.nextContentIdIndex = otherState.nextContentIdIndex;
   }
@@ -136,15 +140,6 @@ export class State {
       allContentIds.delete('default_outcome');
     }
 
-    // TODO(#11581): Add rule translation support for TextInput and SetInput
-    // interactions. Delete below when completed.
-    allContentIds.forEach(contentId => {
-      if (contentId.indexOf(AppConstants.COMPONENT_NAME_RULE_INPUT) === 0) {
-        // eslint-disable-next-line dot-notation
-        allContentIds.delete(contentId);
-      }
-    });
-
     return allContentIds;
   }
 }
@@ -156,8 +151,6 @@ export class StateObjectFactory {
   constructor(
     private interactionObject: InteractionObjectFactory,
     private paramchangesObject: ParamChangesObjectFactory,
-    private recordedVoiceoversObject: RecordedVoiceoversObjectFactory,
-    private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
@@ -173,6 +166,7 @@ export class StateObjectFactory {
       param_changes: newStateTemplate.param_changes,
       recorded_voiceovers: newStateTemplate.recorded_voiceovers,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
+      card_is_checkpoint: newStateTemplate.card_is_checkpoint,
       written_translations: newStateTemplate.written_translations,
       next_content_id_index: newStateTemplate.next_content_id_index
     });
@@ -185,13 +179,14 @@ export class StateObjectFactory {
     return new State(
       stateName,
       stateDict.classifier_model_id,
-      this.subtitledHtmlObject.createFromBackendDict(stateDict.content),
+      SubtitledHtml.createFromBackendDict(stateDict.content),
       this.interactionObject.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(
         stateDict.param_changes),
-      this.recordedVoiceoversObject.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         stateDict.recorded_voiceovers),
       stateDict.solicit_answer_details,
+      stateDict.card_is_checkpoint,
       this.writtenTranslationsObject.createFromBackendDict(
         stateDict.written_translations),
       stateDict.next_content_id_index);

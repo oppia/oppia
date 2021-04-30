@@ -16,6 +16,9 @@
  * @fileoverview Directive for the rule editor.
  */
 
+import { EventBusGroup } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
@@ -53,18 +56,21 @@ angular.module('oppia').directive('ruleEditor', [
         isEditingRuleInline: '&',
         onCancelRuleEdit: '&',
         onSaveRule: '&',
-        rule: '='
+        rule: '=',
+        modalId: '<'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'PopulateRuleContentIdsService',
-        'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
+        '$scope', '$timeout', 'EventBusService',
+        'PopulateRuleContentIdsService', 'ResponsesService',
+        'StateEditorService', 'StateInteractionIdService',
         'INTERACTION_SPECS',
         function(
-            $scope, $timeout, PopulateRuleContentIdsService,
-            ResponsesService, StateEditorService, StateInteractionIdService,
+            $scope, $timeout, EventBusService,
+            PopulateRuleContentIdsService, ResponsesService,
+            StateEditorService, StateInteractionIdService,
             INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
@@ -265,6 +271,30 @@ angular.module('oppia').directive('ruleEditor', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.isInvalid = false;
+            /**
+             * Rule editors are usually used in two ways. Inline or in a modal.
+             * When in a modal, the save button is in the modal html and when
+             * inline it is in the rule editors template. When listening to the
+             * object validity change event, we need to know which button to
+             * disable. If we are inline, we disable the button in the
+             * rule-editor template. Which is why we using the if condition
+             * below.
+             */
+            if (ctrl.isEditingRuleInline()) {
+              const eventBusGroup: EventBusGroup = new EventBusGroup(
+                EventBusService);
+              ctrl.eventBusGroup = eventBusGroup;
+              ctrl.modalId = Symbol();
+              eventBusGroup.on(
+                ObjectFormValidityChangeEvent,
+                event => {
+                  if (event.message.modalId === ctrl.modalId) {
+                    ctrl.isInvalid = event.message.value;
+                    $scope.$applyAsync();
+                  }
+                });
+            }
             ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
             ctrl.editRuleForm = {};
             // Select a default rule type, if one isn't already selected.
@@ -278,6 +308,12 @@ angular.module('oppia').directive('ruleEditor', [
                 StateEditorService.updateCurrentRuleInputIsValid(!newValue);
               }
             );
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.eventBusGroup) {
+              ctrl.eventBusGroup.unsubscribe();
+            }
           };
         }
       ]

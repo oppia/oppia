@@ -63,6 +63,7 @@ from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
 from core.domain import user_services
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 import feconf
 
 from mapreduce import main as mapreduce_main
@@ -221,6 +222,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
+        r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
+    get_redirect_route(
         r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
@@ -282,6 +285,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
+    get_redirect_route(
+        r'%s' % feconf.MACHINE_TRANSLATION_DATA_URL,
+        contributor_dashboard.MachineTranslationStateTextsHandler),
     get_redirect_route(
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler),
@@ -802,8 +808,10 @@ URLS = MAPREDUCE_HANDLERS + [
         admin.VerifyUserModelsDeletedHandler),
     get_redirect_route(r'/deleteuserhandler', admin.DeleteUserHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
-    get_redirect_route(r'/logout', base.LogoutPage),
+
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
+    get_redirect_route(r'/session_end', base.SessionEndHandler),
+    get_redirect_route(r'/seed_firebase', base.SeedFirebaseHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (
@@ -863,3 +871,5 @@ URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
+
+firebase_auth_services.establish_firebase_connection()

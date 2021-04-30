@@ -23,7 +23,7 @@
 #
 #     TODO(#ISSUE_NUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
 #
-#   (See #10250 for an example.) Please make sure to restore ownership after
+#   (See #10252 for an example.) Please make sure to restore ownership after
 #   the above date passes.
 
 # Blanket codeowners
@@ -80,6 +80,10 @@
 /buf.gen.yaml @oppia/ml
 
 
+# App Feedback Reporting project
+/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
+
+
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep
@@ -104,14 +108,14 @@
 # Contributor Dashboard project.
 /core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
+/core/domain/translation*.py @vojtechjelinek
 /core/domain/voiceover_services*.py @sagangwee
+/core/storage/translation/ @vojtechjelinek
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 
 
 # Core documentation
-# TODO(#11811): For the following 5 files, as well as about-page.constants.ts,
-# replace @BenHenning with @seanlip after 2021-02-07.
 /AUTHORS @BenHenning
 /CHANGELOG @BenHenning
 /CONTRIBUTORS @BenHenning
@@ -156,7 +160,6 @@
 /.pylintrc @Hudda @DubeySandeep
 /.stylelintrc @Hudda @DubeySandeep
 /.yarnrc @DubeySandeep
-/codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @Hudda @DubeySandeep
 /tox.ini @Hudda @DubeySandeep
 /scripts/*.py @DubeySandeep
@@ -185,6 +188,7 @@
 /core/domain/summary_services*.py @aks681
 /core/domain/value_generators_domain*.py @vojtechjelinek
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
+/core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
@@ -231,7 +235,7 @@
 # Global components and filters.
 /core/templates/components/angular-html-bind/ @srijanreddy98
 /core/templates/components/button-directives/* @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @srijanreddy98
@@ -249,7 +253,9 @@
 /core/templates/components/profile-link-directives/ @srijanreddy98
 /core/templates/components/summary-tile/ @srijanreddy98
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
+/core/templates/directives/directives.module.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/directives/ng-init.directive.ts @srijanreddy98
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
 /core/templates/services/attribution.service*.ts @srijanreddy98
@@ -285,20 +291,24 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @brianrodri
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/core/domain/customization_args_util*.py @vojtechjelinek
 /core/domain/expression_parser*.py @iamprayush
 /core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
-/core/domain/obj_services*.py @iamprayush
+/core/domain/object_registry*.py @iamprayush
 /core/domain/rules_registry*.py @aks681
+/core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
-/core/templates/expressions/ @brianrodri
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/core/templates/expressions/ @kevintab95
 /core/templates/services/code-normalizer.service*.ts @iamprayush
 /core/templates/services/guppy-configuration.service.ts @iamprayush
 /core/templates/services/guppy-initialization.service.ts @iamprayush
 /core/templates/services/math-interactions.service.ts @iamprayush
-/extensions/domain*.py @brianrodri
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/extensions/domain*.py @kevintab95
 /extensions/interactions/ @iamprayush @vojtechjelinek
 /extensions/objects/ @iamprayush
 /extensions/value_generators/ @vojtechjelinek
@@ -306,40 +316,41 @@
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @brianrodri
-/core/controllers/improvements*.py @brianrodri
-/core/domain/action_registry*.py @brianrodri
-/core/domain/calculation_registry*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
-/core/domain/improvements_domain*.py @brianrodri
-/core/domain/improvements_services*.py @brianrodri
-/core/domain/improvements_validators*.py @brianrodri
-/core/domain/playthrough_issue_registry*.py @brianrodri
-/core/domain/stats*.py @brianrodri
-/core/domain/statistics_validators*.py @brianrodri
-/core/domain/visualization_registry*.py @brianrodri
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
-/core/templates/components/statistics-directives/ @brianrodri
-/core/templates/domain/statistics/ @brianrodri
-/core/templates/domain/improvements/ @brianrodri
-/core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
-/core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/services/exploration-improvements.service*.ts @brianrodri
-/core/templates/services/exploration-improvements-backend-api.service*.ts @brianrodri
-/core/templates/services/exploration-improvements-task-registry.service*.ts @brianrodri
-/core/templates/services/exploration-stats.service*.ts @brianrodri
-/core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
-/core/templates/services/improvements.service*.ts @brianrodri
-/core/templates/services/messenger.service.ts @brianrodri
-/core/templates/services/playthrough*.ts @brianrodri
-/core/templates/services/state-interaction-stats.service*.ts @brianrodri
-/core/templates/services/state-top-answers-stats*.ts @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# TODO(#12656): Revert block of ownership to @brianrodri after 2021-05-18.
+/core/controllers/features*.py @vojtechjelinek
+/core/controllers/improvements*.py @vojtechjelinek
+/core/domain/action_registry*.py @vojtechjelinek
+/core/domain/calculation_registry*.py @vojtechjelinek
+/core/domain/event_services*.py @vojtechjelinek
+/core/domain/improvements_domain*.py @vojtechjelinek
+/core/domain/improvements_services*.py @vojtechjelinek
+/core/domain/improvements_validators*.py @vojtechjelinek
+/core/domain/playthrough_issue_registry*.py @vojtechjelinek
+/core/domain/stats*.py @vojtechjelinek
+/core/domain/statistics_validators*.py @vojtechjelinek
+/core/domain/visualization_registry*.py @vojtechjelinek
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @kevintab95
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @kevintab95
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @kevintab95
+/core/templates/components/statistics-directives/ @kevintab95
+/core/templates/domain/statistics/ @kevintab95
+/core/templates/domain/improvements/ @kevintab95
+/core/templates/pages/exploration-editor-page/improvements-tab/ @kevintab95
+/core/templates/pages/exploration-editor-page/statistics-tab/ @kevintab95
+/core/templates/services/exploration-improvements.service*.ts @kevintab95
+/core/templates/services/exploration-improvements-backend-api.service*.ts @kevintab95
+/core/templates/services/exploration-improvements-task-registry.service*.ts @kevintab95
+/core/templates/services/exploration-stats.service*.ts @kevintab95
+/core/templates/services/exploration-stats-backend-api.service*.ts @kevintab95
+/core/templates/services/improvements.service*.ts @kevintab95
+/core/templates/services/messenger.service.ts @kevintab95
+/core/templates/services/playthrough*.ts @kevintab95
+/core/templates/services/state-interaction-stats.service*.ts @kevintab95
+/core/templates/services/state-top-answers-stats*.ts @kevintab95
+/extensions/actions/ @kevintab95
+/extensions/answer_summarizers/ @kevintab95
+/extensions/issues/ @kevintab95
+/extensions/visualizations/ @kevintab95
 
 
 # Library page.
@@ -353,8 +364,8 @@
 
 
 # Navigation bar project.
-/core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
-/core/templates/components/button-directives/create-activity-button.directive.html @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.ts @nithusha21
+/core/templates/components/button-directives/create-activity-button.component.html @nithusha21
 /core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/services/bottom-navbar-status.service*.ts @nithusha21
 /core/templates/services/navigation.service*.ts @nithusha21
@@ -370,6 +381,7 @@
 /core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
 /core/domain/rights_domain*.py @aks681
+/core/domain/subtopic_validators*.py @vojtechjelinek
 /core/templates/components/concept-card/ @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
@@ -434,47 +446,50 @@
 
 
 # Infrastructure.
-/jobs/__init__.py @brianrodri
-/jobs/base_model_*.py @brianrodri
-/jobs/jobs_utils.py @brianrodri
-/jobs/jobs_utils_test.py @brianrodri
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/jobs/ @vojtechjelinek
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
-/main_mail.py @aks681
 /main.py @DubeySandeep @nithusha21
 /feconf.py @DubeySandeep @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
-/core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
 /core/domain/audit_validators*.py @vojtechjelinek
 /core/domain/base_model_validators*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
 /core/domain/job_validators*.py @vojtechjelinek
-/core/domain/prod_validators*.py @vojtechjelinek
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
-/core/jobs*.py @brianrodri
-/core/platform/ @brianrodri
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/core/jobs*.py @vojtechjelinek
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/core/platform/ @vojtechjelinek
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/core/templates/pages/login-page/ @vojtechjelinek
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/core/templates/pages/logout-page/ @vojtechjelinek
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
+/core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
-# TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07.
 /redis.conf @BenHenning
 /release_constants.json @DubeySandeep @nithusha21
+# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
+/.firebase.json @vojtechjelinek
 
 
 # Miscellaneous.
@@ -510,6 +525,7 @@
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
+/core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
@@ -643,14 +659,16 @@
 /extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
 /extensions/objects/protractor.js @U8NWXD @kevintab95
 /scripts/backend_test_shards.json @U8NWXD
+/.github/actions @U8NWXD
 
 
 # Python 3 Migration project.
-/core/domain/auth*.py @brianrodri
-/core/domain/caching*.py @brianrodri
-/core/domain/taskqueue*.py @brianrodri
-/core/templates/services/auth.service*.ts @brianrodri
-/core/templates/services/auth-backend-api.service*.ts @brianrodri
+# TODO(#12656): Revert block of ownership to @brianrodri after 2021-05-18.
+/core/domain/auth*.py @vojtechjelinek
+/core/domain/caching*.py @vojtechjelinek
+/core/domain/taskqueue*.py @vojtechjelinek
+/core/templates/services/auth.service*.ts @kevintab95
+/core/templates/services/auth-backend-api.service*.ts @kevintab95
 
 
 # Critical files.
@@ -662,9 +680,7 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/linters/pre_commit_linter.py in sync with the modifications.
-# TODO(#11811): Replace @BenHenning with @seanlip after 2021-02-07 for the next
-# 8 lines.
+# in scripts/linters/codeowner_linter.py in sync with the modifications.
 /core/templates/services/svg-sanitizer.service.ts @BenHenning
 /scripts/linters/warranted_angular_security_bypasses.py @BenHenning
 /core/controllers/acl_decorators*.py @BenHenning
