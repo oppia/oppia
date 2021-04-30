@@ -80,7 +80,7 @@ describe('Audio translation language service', () => {
      'no preferred language is set and the exploration contains an audio ' +
      'language that is related to the exploration language', () => {
     allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-    const preferredLanguageCode = '';
+    const preferredLanguageCode = null;
     const explorationLanguageCode = 'hi';
     atls.init(
       allAudioLanguageCodesInExploration, preferredLanguageCode,
@@ -94,7 +94,7 @@ describe('Audio translation language service', () => {
     'no preferred language is set and the exploration contains an audio ' +
     'language that is no related to the exploration language', () => {
     allAudioLanguageCodesInExploration = ['hi', 'en'];
-    const preferredLanguageCode = '';
+    const preferredLanguageCode = null;
     const explorationLanguageCode = 'hi-en';
     atls.init(
       allAudioLanguageCodesInExploration, preferredLanguageCode,
@@ -108,7 +108,7 @@ describe('Audio translation language service', () => {
      'relevant language when multiple audio languages are related ' +
      'to the exploration language', () => {
     allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-    const preferredLanguageCode = '';
+    const preferredLanguageCode = null;
     const explorationLanguageCode = 'en';
     const languageOptions = [{
       value: 'hi-en',
@@ -133,20 +133,20 @@ describe('Audio translation language service', () => {
     const automaticTextToSpeechEnabled = false;
 
     // When preferredLanguageCode is set.
-    let preferredLanguageCode = 'hi';
+    let preferredLanguageCode: string | null = 'hi';
     atls.init(
       allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
-    expect(atls.getCurrentAudioLanguageCode()).toEqual('');
+    expect(atls.getCurrentAudioLanguageCode()).toEqual(null);
     expect(atls.getLanguageOptionsForDropdown()).toEqual([]);
     atls.clearCurrentAudioLanguageCode();
 
     // When preferredLanguageCode is not set.
-    preferredLanguageCode = '';
+    preferredLanguageCode = null;
     atls.init(
       allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
-    expect(atls.getCurrentAudioLanguageCode()).toEqual('');
+    expect(atls.getCurrentAudioLanguageCode()).toEqual(null);
     expect(atls.getLanguageOptionsForDropdown()).toEqual([]);
   });
 
@@ -154,7 +154,7 @@ describe('Audio translation language service', () => {
     'and automatic Text-to-speech is enabled in an exploration', () => {
     allAudioLanguageCodesInExploration = [];
     const explorationLanguageCode = 'en';
-    const preferredLanguageCode = '';
+    const preferredLanguageCode = null;
     const automaticTextToSpeechEnabled = true;
     const languageOptions = [{
       value: 'en-auto',
@@ -175,7 +175,7 @@ describe('Audio translation language service', () => {
     'Text-to-speech is enabled in it', () => {
     allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     const explorationLanguageCode = 'en';
-    const preferredLanguageCode = '';
+    const preferredLanguageCode = null;
     const languageOptions = [{
       value: 'hi-en',
       displayed: 'Hinglish'
@@ -198,7 +198,7 @@ describe('Audio translation language service', () => {
       spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
       allAudioLanguageCodesInExploration = [];
       const explorationLanguageCode = 'en';
-      const preferredLanguageCode = '';
+      const preferredLanguageCode = null;
       const automaticTextToSpeechEnabled = true;
       atls.init(
         allAudioLanguageCodesInExploration, preferredLanguageCode,
@@ -240,6 +240,6 @@ describe('Audio translation language service', () => {
     expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
     expect(atls.getCurrentAudioLanguageDescription()).toBe('Hinglish');
     atls.clearCurrentAudioLanguageCode();
-    expect(atls.getCurrentAudioLanguageDescription()).toBe('');
+    expect(atls.getCurrentAudioLanguageDescription()).toBe(null);
   });
 });

@@ -75,7 +75,8 @@ export class AudioTranslationLanguageService {
 
   _init(
       allAudioLanguageCodesInExploration: string[],
-      preferredAudioLanguageCode: string, explorationLanguageCode: string,
+      preferredAudioLanguageCode: string | null,
+      explorationLanguageCode: string,
       automaticTextToSpeechEnabled: boolean): void {
     this._allAudioLanguageCodesInExploration =
         allAudioLanguageCodesInExploration;
@@ -140,7 +141,7 @@ export class AudioTranslationLanguageService {
 
   init(
       allAudioLanguageCodesInExploration: string[],
-      preferredAudioLanguageCode: string,
+      preferredAudioLanguageCode: string | null,
       explorationLanguageCode: string,
       automaticTextToSpeechEnabled: boolean): void {
     this._init(
