@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
-require('pages/admin-page/roles-tab/role-graph.directive.ts');
+require('pages/admin-page/roles-tab/roles-and-actions-visualizer.directive.ts');
 
 require('domain/admin/admin-backend-api.service');
 require('domain/utilities/language-util.service.ts');
@@ -55,7 +55,7 @@ angular.module('oppia').directive('adminRolesTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin-page/roles-tab/role-graph.directive.html'),
+        '/pages/admin-page/roles-tab/admin-roles-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
@@ -346,37 +346,13 @@ angular.module('oppia').directive('adminRolesTab', [
                 };
               }));
           ctrl.topicSummaries = {};
-          ctrl.graphData = {};
-          ctrl.graphDataLoaded = false;
+          ctrl.roleToActions = null;
           AdminDataService.getDataAsync().then(function(adminDataObject) {
             ctrl.UPDATABLE_ROLES = adminDataObject.updatableRoles;
             ctrl.VIEWABLE_ROLES = adminDataObject.viewableRoles;
             ctrl.topicSummaries = adminDataObject.topicSummaries;
-            ctrl.graphData = adminDataObject.roleGraphData;
+            ctrl.roleToActions = adminDataObject.roleToActions;
 
-            ctrl.graphDataLoaded = false;
-            // Calculating initStateId and finalStateIds for graphData
-            // Since role graph is acyclic, node with no incoming edge
-            // is initState and nodes with no outgoing edge are finalStates.
-            var hasIncomingEdge = [];
-            var hasOutgoingEdge = [];
-            for (var i = 0; i < ctrl.graphData.links.length; i++) {
-              hasIncomingEdge.push(ctrl.graphData.links[i].target);
-              hasOutgoingEdge.push(ctrl.graphData.links[i].source);
-            }
-            var finalStateIds = [];
-            for (var role in ctrl.graphData.nodes) {
-              if (ctrl.graphData.nodes.hasOwnProperty(role)) {
-                if (hasIncomingEdge.indexOf(role) === -1) {
-                  ctrl.graphData.initStateId = role;
-                }
-                if (hasOutgoingEdge.indexOf(role) === -1) {
-                  finalStateIds.push(role);
-                }
-              }
-            }
-            ctrl.graphData.finalStateIds = finalStateIds;
-            ctrl.graphDataLoaded = true;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular.
             $rootScope.$apply();

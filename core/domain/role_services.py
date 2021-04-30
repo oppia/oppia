@@ -22,6 +22,7 @@ access roles and actions.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import math
 import random
 import time
@@ -160,83 +161,96 @@ PARENT_ROLES = {
 # - Follow the Playbook in wiki (https://github.com/oppia/oppia/wiki/
 #   Instructions-for-editing-roles-or-actions) before making any changes to
 #   this dict.
-ROLE_ACTIONS = {
-    feconf.ROLE_ID_ADMIN: [
-        ACTION_ACCEPT_ANY_SUGGESTION,
-        ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION,
-        ACTION_CHANGE_STORY_STATUS,
-        ACTION_CHANGE_TOPIC_STATUS,
-        ACTION_CREATE_NEW_SKILL,
-        ACTION_CREATE_NEW_TOPIC,
-        ACTION_DELETE_ANY_ACTIVITY,
-        ACTION_DELETE_ANY_SKILL,
-        ACTION_DELETE_TOPIC,
-        ACTION_EDIT_ANY_ACTIVITY,
-        ACTION_EDIT_ANY_STORY,
-        ACTION_EDIT_ANY_TOPIC,
-        ACTION_EDIT_SKILLS,
-        ACTION_EDIT_SKILL_DESCRIPTION,
-        ACTION_MANAGE_EMAIL_DASHBOARD,
-        ACTION_MANAGE_TOPIC_RIGHTS,
-        ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,
-        ACTION_PUBLISH_ANY_ACTIVITY,
-        ACTION_PUBLISH_OWNED_SKILL
-    ],
-    feconf.ROLE_ID_BANNED_USER: [
-    ],
-    feconf.ROLE_ID_COLLECTION_EDITOR: [
-        ACTION_CREATE_COLLECTION,
-    ],
-    feconf.ROLE_ID_EXPLORATION_EDITOR: [
-        ACTION_ACCESS_CREATOR_DASHBOARD,
-        ACTION_CREATE_EXPLORATION,
-        ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
-        ACTION_EDIT_OWNED_ACTIVITY,
-        ACTION_SUBSCRIBE_TO_USERS,
-        ACTION_MANAGE_ACCOUNT,
-        ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY,
-        ACTION_PUBLISH_OWNED_ACTIVITY,
-        ACTION_RATE_ANY_PUBLIC_EXPLORATION,
-        ACTION_SUGGEST_CHANGES,
-        ACTION_SUBMIT_VOICEOVER_APPLICATION,
-    ],
-    feconf.ROLE_ID_GUEST: [
-        ACTION_PLAY_ANY_PUBLIC_ACTIVITY,
-    ],
-    feconf.ROLE_ID_LEARNER: [
-        ACTION_FLAG_EXPLORATION,
-        ACTION_ACCESS_LEARNER_DASHBOARD,
-    ],
-    feconf.ROLE_ID_MODERATOR: [
-        ACTION_ACCESS_MODERATOR_PAGE,
-        ACTION_DELETE_ANY_PUBLIC_ACTIVITY,
-        ACTION_EDIT_ANY_PUBLIC_ACTIVITY,
-        ACTION_PLAY_ANY_PRIVATE_ACTIVITY,
-        ACTION_SEND_MODERATOR_EMAILS,
-        ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
-    ],
-    feconf.ROLE_ID_TOPIC_MANAGER: [
-        ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
-        ACTION_DELETE_ANY_QUESTION,
-        ACTION_EDIT_ANY_QUESTION,
-        ACTION_EDIT_OWNED_STORY,
-        ACTION_EDIT_OWNED_TOPIC,
-        ACTION_EDIT_SKILLS,
-        ACTION_EDIT_ANY_SUBTOPIC_PAGE,
-        ACTION_MANAGE_QUESTION_SKILL_STATUS,
-        ACTION_VISIT_ANY_QUESTION_EDITOR,
-        ACTION_VISIT_ANY_TOPIC_EDITOR
-    ]
+
+_get_actions_set = lambda *actions: set(actions)
+
+guest_allowed_actions = _get_actions_set(
+    ACTION_PLAY_ANY_PUBLIC_ACTIVITY)
+
+learner_allowed_actions = _get_actions_set(
+    ACTION_FLAG_EXPLORATION,
+    ACTION_ACCESS_LEARNER_DASHBOARD,
+    *guest_allowed_actions)
+
+exploration_editor_allowed_actions = _get_actions_set(
+    ACTION_ACCESS_CREATOR_DASHBOARD,
+    ACTION_CREATE_EXPLORATION,
+    ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
+    ACTION_EDIT_OWNED_ACTIVITY,
+    ACTION_SUBSCRIBE_TO_USERS,
+    ACTION_MANAGE_ACCOUNT,
+    ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY,
+    ACTION_PUBLISH_OWNED_ACTIVITY,
+    ACTION_RATE_ANY_PUBLIC_EXPLORATION,
+    ACTION_SUGGEST_CHANGES,
+    ACTION_SUBMIT_VOICEOVER_APPLICATION,
+    *learner_allowed_actions)
+
+collection_editor_allowed_actions = _get_actions_set(
+    ACTION_CREATE_COLLECTION,
+    *exploration_editor_allowed_actions)
+
+topic_manager_allowed_actions = _get_actions_set(
+    ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
+    ACTION_DELETE_ANY_QUESTION,
+    ACTION_EDIT_ANY_QUESTION,
+    ACTION_EDIT_OWNED_STORY,
+    ACTION_EDIT_OWNED_TOPIC,
+    ACTION_EDIT_SKILLS,
+    ACTION_EDIT_ANY_SUBTOPIC_PAGE,
+    ACTION_MANAGE_QUESTION_SKILL_STATUS,
+    ACTION_VISIT_ANY_QUESTION_EDITOR,
+    ACTION_VISIT_ANY_TOPIC_EDITOR,
+    *collection_editor_allowed_actions)
+
+moderator_allowed_actions = _get_actions_set(
+    ACTION_ACCESS_MODERATOR_PAGE,
+    ACTION_DELETE_ANY_PUBLIC_ACTIVITY,
+    ACTION_EDIT_ANY_PUBLIC_ACTIVITY,
+    ACTION_PLAY_ANY_PRIVATE_ACTIVITY,
+    ACTION_SEND_MODERATOR_EMAILS,
+    ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
+    *topic_manager_allowed_actions)
+
+admin_allowed_actions = _get_actions_set(
+    ACTION_ACCEPT_ANY_SUGGESTION,
+    ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION,
+    ACTION_CHANGE_STORY_STATUS,
+    ACTION_CHANGE_TOPIC_STATUS,
+    ACTION_CREATE_NEW_SKILL,
+    ACTION_CREATE_NEW_TOPIC,
+    ACTION_DELETE_ANY_ACTIVITY,
+    ACTION_DELETE_ANY_SKILL,
+    ACTION_DELETE_TOPIC,
+    ACTION_EDIT_ANY_ACTIVITY,
+    ACTION_EDIT_ANY_STORY,
+    ACTION_EDIT_ANY_TOPIC,
+    ACTION_EDIT_SKILLS,
+    ACTION_EDIT_SKILL_DESCRIPTION,
+    ACTION_MANAGE_EMAIL_DASHBOARD,
+    ACTION_MANAGE_TOPIC_RIGHTS,
+    ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,
+    ACTION_PUBLISH_ANY_ACTIVITY,
+    ACTION_PUBLISH_OWNED_SKILL,
+    *moderator_allowed_actions)
+
+_ROLE_ACTIONS = {
+    feconf.ROLE_ID_ADMIN: admin_allowed_actions,
+    feconf.ROLE_ID_BANNED_USER: [],
+    feconf.ROLE_ID_COLLECTION_EDITOR: collection_editor_allowed_actions,
+    feconf.ROLE_ID_EXPLORATION_EDITOR: exploration_editor_allowed_actions,
+    feconf.ROLE_ID_GUEST: guest_allowed_actions,
+    feconf.ROLE_ID_LEARNER: learner_allowed_actions,
+    feconf.ROLE_ID_MODERATOR: moderator_allowed_actions,
+    feconf.ROLE_ID_TOPIC_MANAGER: topic_manager_allowed_actions
 }
 
 
 def get_all_actions(role):
-    """Returns a list of all actions (including inherited actions)
-    that can be performed by the given role.
+    """Returns a list of all actions that can be performed by the given role.
 
     Args:
-        role: str. A string defining user role. It should be a key of
-            PARENT_ROLES.
+        role: str. A string defining user role.
 
     Returns:
         list(str). A list of actions accessible to the role.
@@ -244,89 +258,23 @@ def get_all_actions(role):
     Raises:
         Exception. The given role does not exist.
     """
-    if role not in PARENT_ROLES:
+    if role not in _ROLE_ACTIONS:
         raise Exception('Role %s does not exist.' % role)
 
-    role_actions = ROLE_ACTIONS[role]
+    role_actions_set = _ROLE_ACTIONS[role]
 
-    for parent_role in PARENT_ROLES[role]:
-        role_actions.extend(get_all_actions(parent_role))
-
-    return list(set(role_actions))
+    return list(role_actions_set)
 
 
-def get_role_graph_data():
-    """Returns dict for displaying roles graph.
-
-    Returns:
-        dict. A dict containing data in following format:
-        {
-            links: list(dict(str:str)). List of dicts defing each edge in
-                following format:
-                    {
-                        source: Role Id from which edge is going out.
-                        target: Role Id to which edge is incoming.
-                    }
-            nodes: dict(str:str). Mapping of role ID to its human readable
-                format.
-        }
+def get_role_actions():
     """
-    role_graph = {}
-    role_graph['links'] = []
-    role_graph['nodes'] = {}
-    for role in PARENT_ROLES:
-        role_graph['nodes'][role] = HUMAN_READABLE_ROLES[role]
-        for parent in PARENT_ROLES[role]:
-            role_graph['links'].append({'source': parent, 'target': role})
-    return role_graph
-
-
-def check_if_path_exists_in_roles_graph(source_node, destination_node):
-    """Breadth-first-search approach to check if a path from source
-    role node to destination role node exists in the roles based hierarchy
-    graph.
-
-    Args:
-        source_node: str. A string defining the role of the source node. It
-            should be a key of PARENT_ROLES.
-        destination_node: str. A string defining the role of the destination
-            node. It should be a key of PARENT_ROLES.
-
-    Returns:
-        Bool. Whether a path from source node role to the destination node role
-        exists in the roles based hierarchy graph or not.
-
-    Raises:
-        Exception. The given role for source node does not exist.
-        Exception. The given role for destination node does not exist.
     """
+    return {role: list(actions) for role, actions in _ROLE_ACTIONS.items()}
 
-    if source_node not in PARENT_ROLES:
-        raise Exception(
-            'Role %s defined by the source node does not exist.' % source_node)
-
-    if destination_node not in PARENT_ROLES:
-        raise Exception(
-            'Role %s defined by the destination node does not exist.'
-            % destination_node)
-
-    graph = get_role_graph_data()
-    adjacency_list = {}
-    for node in graph['nodes']:
-        adjacency_list[node] = []
-    for edges in graph['links']:
-        adjacency_list[edges['source']].append(edges['target'])
-    bfs_queue = [source_node]
-    is_path_found = False
-    while len(bfs_queue) > 0:
-        node = bfs_queue.pop(0)
-        if node == destination_node:
-            is_path_found = True
-            break
-        else:
-            for target_node in adjacency_list[node]:
-                bfs_queue.append(target_node)
-    return is_path_found
+def is_valid_role(role):
+    """
+    """
+    return role in _ROLE_ACTIONS
 
 
 def log_role_query(user_id, intent, role=None, username=None):
