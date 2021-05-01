@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the learner flow.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
