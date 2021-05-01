@@ -56,14 +56,14 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             // RTE is inside a CKEditor instance, check if the offsetParent
             // element contains the data attribute ckeWidgetId.
             // Also check if the copy mode is enabled within the CKEditor
-            // instance or not. If it is, don't show the RTE modal. The 
-            // concept card modal should get triggered instead of the 
+            // instance or not. If it is, don't show the RTE modal. The
+            // concept card modal should get triggered instead of the
             // RTE modal while copying stuff within the copy editor.
             if (event.currentTarget.offsetParent.dataset.ckeWidgetId ||
             document.body.style.cursor === 'copy') {
               return;
             }
-            
+
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             // The catch at the end was needed according to this thread:
             // https://github.com/angular-ui/bootstrap/issues/6501, where in
