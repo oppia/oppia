@@ -59,10 +59,10 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             // instance or not. If it is, don't show the RTE modal. The
             // concept card modal should get triggered instead of the
             // RTE modal while copying stuff within the copy editor.
-            if (event.currentTarget.offsetParent.dataset.ckeWidgetId ||
-            document.body.style.cursor === 'copy') {
+            if (ctrl.toggleModal(event)) {
               return;
             }
+
 
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             // The catch at the end was needed according to this thread:
@@ -88,6 +88,14 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
               }
             });
           };
+          // Function to check whether the RTE modal or the concept card
+          // modal should be triggered.
+          ctrl.toggleModal = function(event) {
+            return (
+              event.currentTarget.offsetParent.dataset.ckeWidgetId ||
+              document.body.style.cursor === 'cursor'
+            )
+          }
         }
       ]
     };
