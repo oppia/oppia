@@ -1,7 +1,7 @@
 <div class="thumbnail-editor form-group">
   <div>
     <div class="oppia-editable-section float-left" title="Change Thumbnail"
-         [ngStyle]="{background: getBgColor}">
+         [ngStyle]="{background: bgColor}">
       <div class="oppia-click-to-start-editing protractor-test-photo-button"
            (click)="showEditThumbnailModal()"
            aria-label="upload or edit thumbnail">
@@ -12,7 +12,7 @@
       <oppia-thumbnail-display [hidden]="!thumbnailIsLoading"
                                [imgSrc]="editableThumbnailDataUrl"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-                               [background]="getBgColor">
+                               [background]="bgColor">
       </oppia-thumbnail-display>
       <oppia-thumbnail-display *ngIf="useLocalStorage && newThumbnailDataUrl"
                                [imgSrc]="newThumbnailDataUrl"

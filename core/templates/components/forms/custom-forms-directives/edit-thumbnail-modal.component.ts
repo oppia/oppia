@@ -43,7 +43,7 @@ export class EditThumnailModalComponent implements OnChanges {
   @Input() previewDescriptionBgColor: string;
   @Input() previewFooter: string;
   @Input() previewTitle: string;
-  allowedBgColors: string[];
+  allowedBgColors: boolean;
   dimensions: { height: number; width: number; };
   uploadedImageMimeType: string;
   file: Blob;

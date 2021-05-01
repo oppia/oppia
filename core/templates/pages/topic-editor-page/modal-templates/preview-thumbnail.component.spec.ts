@@ -17,16 +17,25 @@
  * @fileoverview Unit tests for the preview thumbnail directive.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PreviewThumbnailComponent } from './preview-thumbnail.component';
 
-describe('Preview Thumbnail Component', () => {
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Preview Thumbnail Component', () => {
   let imageUploadHelperService: ImageUploadHelperService;
   let contextService: ContextService;
   let component: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
+
   class MockContextSerivce {
     getEntityType: () => 'topic';
     getEntityId: () => '1';
@@ -37,9 +46,9 @@ describe('Preview Thumbnail Component', () => {
       return (entityType + '/' + entityId + '/' + filename);
     }
   }
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [PreviewThumbnailComponent],
+      declarations: [PreviewThumbnailComponent, MockTranslatePipe],
       providers: [
         {
           provide: ContextService,
@@ -49,13 +58,16 @@ describe('Preview Thumbnail Component', () => {
           provide: ImageUploadHelperService,
           useClass: MockImageUploadHelperService
         }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  });
+  }));
 
   beforeEach(() => {
     contextService = TestBed.inject(ContextService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
+    spyOn(contextService, 'getEntityId').and.returnValue('1');
+    spyOn(contextService, 'getEntityType').and.returnValue('topic');
   });
 
   beforeEach(() => {
@@ -64,14 +76,12 @@ describe('Preview Thumbnail Component', () => {
     fixture.detectChanges();
   });
 
-  it('should init the controller', () => {
-    spyOn(contextService, 'getEntityId').and.callThrough();
-    spyOn(contextService, 'getEntityType').and.callThrough();
+  it('should init the controller', fakeAsync(() => {
     component.filename = 'img.svg';
     spyOn(
       imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename'
-    ).and.callThrough();
+    ).and.returnValue('topic/1/img.svg');
     component.ngOnInit();
     expect(component.editableThumbnailDataUrl).toEqual('topic/1/img.svg');
-  });
+  }));
 });

@@ -13,175 +13,200 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditThumbnailModalController.
+ * @fileoverview Unit tests for Edit Thumbnail Modal Component.
  */
 
-import { waitForAsync } from '@angular/core/testing';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-describe('Edit Thumbnail Modal Controller', function() {
-  let $q = null;
-  let $scope = null;
-  let $timeout = null;
-  let $uibModalInstance = null;
+import { ComponentFixture, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { EditThumnailModalComponent } from './edit-thumbnail-modal.component';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 
-  const allowedBgColors = true;
-  const aspectRatio = '';
-  const dimensions = {};
-  const getPreviewDescription = () => {};
-  const getPreviewDescriptionBgColor = () => {};
-  const getPreviewFooter = () => {};
-  const getPreviewTitle = () => {};
-  const openInUploadMode = true;
-  const tempBgColor = '';
-  const uploadedImage = new File([], 'uploaded.png');
-  const uploadedImageMimeType = 'image/svg+xml';
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+0
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Edit Thumbnail Modal Component', () => {
+  let svgSanitizerService: SvgSanitizerService;
+  let ngbActiveModal: NgbActiveModal;
+  let component: EditThumnailModalComponent;
+  let fixture: ComponentFixture<EditThumnailModalComponent>;
+  let allowedBgColors: boolean = true;
+  let aspectRatio: string = '';
+  let dimensions;
+  let previewDescription;
+  let previewDescriptionBgColor;
+  let previewFooter;
+  let previewTitle;
+  let openInUploadMode = true;
+  let tempBgColor: string = '';
+  let uploadedImage: File = new File([], 'uploaded.png');
+  let uploadedImageMimeType: string = 'image/svg+xml';
+  class MockSvgSanitizerService {
+    getInvalidSvgTagsAndAttrsFromDataUri(str: string): Object {
+      return str;
+    }
+  }
 
-  importAllAngularServices();
+  class MockActiveModal {
+    dismiss(): void {
+      return;
+    }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    $q = $injector.get('$q');
-    const $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
+    close(): void {
+      return;
+    }
+  }
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss'], {
-        rendered: $q.resolve()
-      });
-
-    $scope = $rootScope.$new();
-    $controller('EditThumbnailModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      allowedBgColors: allowedBgColors,
-      aspectRatio: aspectRatio,
-      dimensions: dimensions,
-      getPreviewDescription: getPreviewDescription,
-      getPreviewDescriptionBgColor: getPreviewDescriptionBgColor,
-      getPreviewFooter: getPreviewFooter,
-      getPreviewTitle: getPreviewTitle,
-      openInUploadMode: openInUploadMode,
-      tempBgColor: tempBgColor,
-      uploadedImage: uploadedImage,
-      uploadedImageMimeType: uploadedImageMimeType
-    });
-  }));
-
-  it('should set background color when modal is rendered', function() {
-    spyOn($scope, 'updateBackgroundColor').and.callThrough();
-    $scope.$apply();
-
-    expect($scope.updateBackgroundColor).toHaveBeenCalled();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [EditThumnailModalComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: SvgSanitizerService,
+          useClass: MockSvgSanitizerService
+        },
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.uploadedImage).toBe(uploadedImage);
-      expect($scope.invalidImageWarningIsShown).toBe(false);
-      expect($scope.allowedBgColors).toBe(allowedBgColors);
-      expect($scope.aspectRatio).toBe(aspectRatio);
-      expect($scope.getPreviewDescription).toEqual(getPreviewDescription);
-      expect($scope.getPreviewDescriptionBgColor).toEqual(
-        getPreviewDescriptionBgColor);
-      expect($scope.getPreviewFooter).toEqual(
-        getPreviewFooter);
-      expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(EditThumnailModalComponent);
+    component = fixture.componentInstance;
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    fixture.detectChanges();
+  });
+
+  it('should set background color when modal is rendered', () => {
+    spyOn(component, 'updateBackgroundColor').and.callThrough();
+    expect(component.updateBackgroundColor).toHaveBeenCalled();
+  });
+
+  it('should initialize component properties after component is initialized',
+    () => {
+      expect(component.uploadedImage).toBeUndefined();
+      expect(component.invalidImageWarningIsShown).toBe(false);
+      expect(component.allowedBgColors).toBe(allowedBgColors);
+      expect(component.aspectRatio).toBe(aspectRatio);
+      expect(component.previewDescription).toEqual(previewDescription);
+      expect(component.previewDescriptionBgColor).toEqual(
+        previewDescriptionBgColor);
+      expect(component.previewFooter).toEqual(
+        previewFooter);
+      expect(component.previewTitle).toEqual(previewTitle);
     });
 
-  it('should load a image file in onchange event and save it if it\'s a' +
-    ' svg file', function(done) {
+  it(
+    'should load a image file in onchange event and save it if it\'s a' +
+    ' svg file', (done) => {
     // This spy is to be sure that an image element will be returned from
     // document.querySelector method.
-    spyOn(document, 'querySelector').and.callFake(function() {
-      return document.createElement('img');
-    });
-
-    // This is just a mocked base 64 in order to test the FileReader event
-    // and its result property.
-    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    const file = new File([arrayBuffer], 'thumbnail.png', {
-      type: 'image/svg+xml'
-    });
-
-    // Mocking JQuery element method.
-    const element = $(document.createElement('div'));
-    spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
-      element);
-
-    // Spy Image constructor to handle its events.
-    const image = document.createElement('img');
-    spyOn(window, 'Image').and.returnValue(image);
-
-    expect($scope.invalidImageWarningIsShown).toBe(false);
-    $scope.onInvalidImageLoaded();
-
-    expect($scope.invalidImageWarningIsShown).toBe(true);
-    $scope.onFileChanged(file);
-
-    // The setTimeout is being used here to not conflict with $timeout.flush
-    // for fadeIn Jquery method. This first setTimeout is to wait the default
-    // time for fadeOut Jquery method to complete, which is 400 miliseconds.
-    // 1000ms is being used instead of 400ms just to be sure that fadeOut
-    // callback is already executed.
-    // Ref: https://api.jquery.com/fadeout/
-    setTimeout(function() {
-      $timeout.flush();
-      done();
-      // ---- Dispatch on load event ----
-      image.dispatchEvent(new Event('load'));
-
-      expect($scope.invalidTagsAndAttributes).toEqual({
-        tags: ['html', 'body', 'parsererror', 'h3', 'div', 'h3'],
-        attrs: []
+      spyOn(document, 'querySelector').and.callFake(() => {
+        return document.createElement('img');
       });
-      expect($scope.uploadedImage).toBe(null);
-      expect($scope.invalidImageWarningIsShown).toBe(false);
 
-      // ---- Save information ----
-      $scope.confirm();
-      expect($uibModalInstance.close).toHaveBeenCalled();
-    }, 1000);
-  });
+      // This is just a mocked base 64 in order to test the FileReader event
+      // and its result property.
+      let dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
+      var len = dataBase64Mock.length;
+      var arrayBuffer = new Uint8Array(len);
+      for (var i = 0; i < len; i++) {
+        arrayBuffer[i] = dataBase64Mock.charCodeAt(i);
+      }
+      // arrayBuffer = Uint8Array.from(
+      //   window.atob(dataBase64Mock), c => c.charCodeAt(0));
+      let file = new File([arrayBuffer.buffer], 'thumbnail.png', {
+        type: 'image/svg+xml'
+      });
+
+      // Mocking JQuery element method.
+      let element = $(document.createElement('div'));
+      spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
+        element);
+
+      // Spy Image letructor to handle its events.
+      let image = document.createElement('img');
+      spyOn(window, 'Image').and.returnValue(image);
+
+      expect(component.invalidImageWarningIsShown).toBe(false);
+      component.onInvalidImageLoaded();
+
+      expect(component.invalidImageWarningIsShown).toBe(true);
+      component.onFileChanged(file);
+
+      // The setTimeout is being used here to not conflict with $timeout.flush
+      // for fadeIn Jquery method. This first setTimeout is to wait the default
+      // time for fadeOut Jquery method to complete, which is 400 miliseconds.
+      // 1000ms is being used instead of 400ms just to be sure that fadeOut
+      // callback is already executed.
+      // Ref: https://api.jquery.com/fadeout/
+      setTimeout(() => {
+        flushMicrotasks();
+        tick(150);
+        done();
+        // ---- Dispatch on load event ----
+        image.dispatchEvent(new Event('load'));
+
+        expect(component.invalidTagsAndAttributes).toEqual({
+          tags: ['html', 'body', 'parsererror', 'h3', 'div', 'h3'],
+          attrs: []
+        });
+        expect(component.uploadedImage).toBe(null);
+        expect(component.invalidImageWarningIsShown).toBe(false);
+
+        // ---- Save information ----
+        component.confirm();
+        expect(ngbActiveModal.close).toHaveBeenCalled();
+      }, 1000);
+    });
 
   it('should perform fadeIn and fadeOut operations correctly' +
-    'after uploading thumbnail image', function() {
+    'after uploading thumbnail image', () => {
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.
-    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    const arrayBuffer = Uint8Array.from(
+    let dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
+    let arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    const file = new File([arrayBuffer], 'thumbnail.png', {
+    let file = new File([arrayBuffer], 'thumbnail.png', {
       type: 'image/svg+xml'
     });
 
     // Mocking JQuery element method.
-    const element = $(document.createElement('div'));
+    let element = $(document.createElement('div'));
     spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
       element);
-    const fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
+    let fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
 
-    $scope.onFileChanged(file);
+    component.onFileChanged(file);
 
     waitForAsync(() => {
       expect(fadeInElementSpy).toHaveBeenCalled();
     });
   });
 
-  it('should not load file if it is not a svg type', function() {
-    expect($scope.invalidImageWarningIsShown).toBe(false);
+  it('should not load file if it is not a svg type', () => {
+    expect(component.invalidImageWarningIsShown).toBeFalse();
 
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.
-    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    const arrayBuffer = Uint8Array.from(
+    let dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
+    let arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    const file = new File([arrayBuffer], 'thumbnail.png');
+    let file = new File([arrayBuffer], 'thumbnail.png');
 
-    $scope.onFileChanged(file);
+    component.onFileChanged(file);
 
-    expect($scope.uploadedImage).toBe(null);
-    expect($scope.invalidImageWarningIsShown).toBe(true);
+    expect(component.uploadedImage).toBeNull();
+    expect(component.invalidImageWarningIsShown).toBeTrue();
   });
 });
