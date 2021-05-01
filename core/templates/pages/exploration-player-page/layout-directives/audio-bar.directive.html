@@ -1,5 +1,5 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
-  <div ng-if="audioBarIsExpanded" class="audio-controls" ng-class="{'audio-controls-margin':progressBarIsShown}" headroom>
+  <div ng-if="audioBarIsExpanded" class="audio-controls" ng-class="{'audio-controls-margin': progressBarIsShown}" headroom>
     <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
         <a ng-click="onBackwardButtonClicked()">
@@ -48,7 +48,7 @@
        ng-if="audioBarIsExpanded"
        ng-click="collapseAudioBar()"
        aria-label="Audio menu collapse"
-       ng-class="{'audio-controls-margin':progressBarIsShown}"
+       ng-class="{'audio-controls-margin': progressBarIsShown}"
        headroom>
     <i class="fas fa-sort-up"></i>
   </div>
