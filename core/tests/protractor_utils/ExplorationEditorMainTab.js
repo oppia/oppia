@@ -247,8 +247,6 @@ var ExplorationEditorMainTab = function() {
       createNewState, ruleName) {
     await action.waitForAutosave();
     // Open the "Add Response" modal if it is not already open.
-    await waitFor.elementToBeClickable(
-      addResponseButton, 'Response Editor button is not clickable');
     await action.click('Response Editor Button', addResponseButton);
     await this.setResponse.apply(null, arguments);
   };
@@ -306,8 +304,6 @@ var ExplorationEditorMainTab = function() {
       var isVisible = await responseBody(responseNum).isPresent();
       if (!isVisible) {
         expect(await headerElem.isDisplayed()).toBe(true);
-        await waitFor.elementToBeClickable(
-          headerElem, 'Response Editor header is not clickable');
         await action.click('Response Editor Header', headerElem);
       }
     } else {
@@ -401,7 +397,7 @@ var ExplorationEditorMainTab = function() {
         expect(actualOptionTexts).toEqual(expectedOptionTexts);
 
         // Cancel editing the destination.
-        await cancelOutcomeDestButton.click();
+        await action.click('Cancel Outcome Button', cancelOutcomeDestButton);
       },
       addRule: async function(interactionId, ruleName) {
         // Additional parameters may be provided after ruleName.
@@ -472,6 +468,8 @@ var ExplorationEditorMainTab = function() {
 
     if (createNewDest) {
       await editOutcomeDestStateInput.sendKeys(destName);
+      await action.sendKeys(
+        'Edit Outcome State Input', editOutcomeDestStateInput, destName);
     } else if (refresherExplorationId) {
       await editOutcomeDestAddExplorationId.sendKeys(refresherExplorationId);
     }
@@ -497,10 +495,8 @@ var ExplorationEditorMainTab = function() {
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
-    await richTextEditor.clear();
+    await action.clear('Rich Text Editor', richTextEditor);
     await richTextInstructions(richTextEditor);
-    expect(await saveStateContentButton.isDisplayed()).toBe(true);
-    await waitFor.elementToBeClickable(saveStateContentButton);
     await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
       saveStateContentButton,
@@ -535,11 +531,8 @@ var ExplorationEditorMainTab = function() {
     var hintTextButton = element(
       by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
     await action.click('Hint Text Button', hintTextButton);
-    await browser.switchTo().activeElement().sendKeys(hint);
-
-    await waitFor.elementToBeClickable(
-      saveHintButton,
-      'Save Hint button takes too long to be clickable');
+    var browserActiveElement = browser.switchTo().activeElement();
+    await action.sendKeys('Browser Active Element', browserActiveElement, hint);
     await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
@@ -557,16 +550,15 @@ var ExplorationEditorMainTab = function() {
     await interaction.submitAnswer(
       element(by.css('.protractor-test-interaction-html')),
       solution.correctAnswer);
-    var explanationTextAreaButton = element(
+    var explanationTextArea = element(
       by.css('.protractor-test-explanation-textarea')).all(
       by.tagName('p')).first();
-    await action.click('Explanation Text Area', explanationTextAreaButton);
-    await browser.switchTo().activeElement().sendKeys(solution.explanation);
+    await action.click('Explanation Text Area', explanationTextArea);
+    var browserActiveElement = browser.switchTo().activeElement();
+    await action.sendKeys(
+      'Browser Active Element', browserActiveElement, solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
-    await waitFor.elementToBeClickable(
-      submitSolutionButton,
-      'Submit Solution button takes too long to be clickable');
     await action.click('Submit Solution Button', submitSolutionButton);
     await waitFor.invisibilityOf(
       addOrUpdateSolutionModal,
@@ -639,23 +631,11 @@ var ExplorationEditorMainTab = function() {
       InteractiveMap: 'geography'
     };
 
-    expect(
-      await interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
-        .isDisplayed()).toBe(true);
     var interactionTabButton =
       interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]);
     await action.click('Interaction Tab', interactionTabButton);
 
     var targetTile = interactionTile(interactionId);
-    await waitFor.visibilityOf(
-      targetTile,
-      'Interaction tile ' + interactionId + ' takes too long to be visible'
-    );
-    await waitFor.elementToBeClickable(
-      targetTile,
-      'Interaction tile ' + interactionId + ' takes too long to be clickable'
-    );
-    expect(await targetTile.isDisplayed()).toBe(true);
     await action.click('Interaction tile ' + interactionId, targetTile);
   };
 
@@ -690,7 +670,6 @@ var ExplorationEditorMainTab = function() {
     // If the "Add Response" modal opens, close it.
     var isVisible = await addResponseHeader.isPresent();
     if (isVisible) {
-      expect(await closeAddResponseButton.isDisplayed()).toBe(true);
       await action.click('Close Add Response Button', closeAddResponseButton);
     }
   };
@@ -718,7 +697,7 @@ var ExplorationEditorMainTab = function() {
       feedbackBubble, 'Feedback bubble takes too long to be visible.');
     var feedbackEditor = await forms.RichTextEditor(
       feedbackBubble);
-    await feedbackEditor.clear();
+    await action.clear('Feedback Editor', feedbackEditor);
     await richTextInstructions(feedbackEditor);
   };
 
@@ -862,7 +841,6 @@ var ExplorationEditorMainTab = function() {
       by.css('.protractor-test-delete-node'));
     await action.click('Delete Node', deleteNode);
 
-    expect(await confirmDeleteStateButton.isDisplayed());
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');
