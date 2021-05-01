@@ -51,7 +51,7 @@ var GraphEditor = function(graphInputContainer) {
   var createVertex = async function(xOffset, yOffset) {
     var addNodeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Node-button'));
-    await action.click('Add Node Button', addNodeButton);
+    await action.click('Test Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
@@ -89,7 +89,7 @@ var GraphEditor = function(graphInputContainer) {
     clearDefaultGraph: async function() {
       var deleteButton = graphInputContainer.element(
         by.css('.protractor-test-Delete-button'));
-      await action.click('Delete Button', deleteButton);
+      await action.click('Test Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
         await action.click(`Vertex Element ${i}`, vertexElement(i));
