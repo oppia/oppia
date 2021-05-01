@@ -282,7 +282,6 @@ var ExplorationEditorMainTab = function() {
     }
 
     // Close new response modal.
-    expect(await addNewResponseButton.isDisplayed()).toBe(true);
     await action.click('New Response Button', addNewResponseButton);
     await waitFor.invisibilityOf(
       addNewResponseButton, 'Add New Response Modal is not closed');
@@ -303,7 +302,6 @@ var ExplorationEditorMainTab = function() {
 
       var isVisible = await responseBody(responseNum).isPresent();
       if (!isVisible) {
-        expect(await headerElem.isDisplayed()).toBe(true);
         await action.click('Response Editor Header', headerElem);
       }
     } else {
@@ -636,6 +634,10 @@ var ExplorationEditorMainTab = function() {
     await action.click('Interaction Tab', interactionTabButton);
 
     var targetTile = interactionTile(interactionId);
+    await waitFor.visibilityOf(
+      targetTile,
+      'Interaction tile ' + interactionId + ' takes too long to be visible'
+    );
     await action.click('Interaction tile ' + interactionId, targetTile);
   };
 
@@ -779,10 +781,10 @@ var ExplorationEditorMainTab = function() {
   };
 
   /**
-     * Parse for rule input placeholders in ruleDescription and replace them.
-     * @param {string} [ruleDescription] - Interaction type.
-     * @param {string[]} [providedText] - Feedback text to replace with.
-     */
+   * Parse for rule input placeholders in ruleDescription and replace them.
+   * @param {string} [ruleDescription] - Interaction type.
+   * @param {string[]} [providedText] - Feedback text to replace with.
+   */
   var _replaceRuleInputPlaceholders = function(ruleDescription, providedText) {
     // An example of rule description:
     // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
