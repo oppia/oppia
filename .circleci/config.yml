@@ -82,13 +82,13 @@ commands:
           name: Checking Memory Usage
           command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
 
-  check_release_changelog_update_branch:
-    description: "Skip job for release changelog update PRs"
+  skip_for_low_risk_prs:
+    description: "Skip job for low-risk PRs"
     steps:
       - run:
-          name: Skip build for release changelog update PRs
+          name: Skip build for low-risk PRs
           command: |
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ ${CIRCLE_BRANCH} == update-changelog-for-release* ]]; then
+            if python -m scripts.check_if_pr_is_low_risk ${CIRCLE_PULL_REQUEST}; then
               circleci-agent step halt
             fi
 
@@ -147,13 +147,13 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - skip_for_low_risk_prs
       - install_chrome
       - install_ffmpeg
       - run:
@@ -176,13 +176,13 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - skip_for_low_risk_prs
       - install_chrome
       - install_ffmpeg
       - run:
