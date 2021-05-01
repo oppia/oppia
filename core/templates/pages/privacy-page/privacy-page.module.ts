@@ -27,6 +27,9 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { MatCardModule } from '@angular/material/card';
+import { PrivacyPageComponent } from './privacy-page.component';
+
 
 @NgModule({
   imports: [
@@ -64,8 +67,6 @@ class PrivacyPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { MatCardModule } from '@angular/material/card';
-import { PrivacyPageComponent } from './privacy-page.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
