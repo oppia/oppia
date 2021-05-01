@@ -36,7 +36,7 @@ export class ExplorationPropertyService {
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
-  propertyName: string;
+  propertyName: string = null;
 
   @Output() _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(

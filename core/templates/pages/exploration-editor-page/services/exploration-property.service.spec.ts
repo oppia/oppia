@@ -41,7 +41,7 @@ describe('Exploration Property Service', () => {
     paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
 
     editExplorationPropertySpy = spyOn(
-      changeListService, 'editExplorationProperty').and.callThrough();
+      changeListService, 'editExplorationProperty').and.returnValue(null);
   });
 
   it('should create a new exploration properties object', function() {
