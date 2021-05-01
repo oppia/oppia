@@ -31,7 +31,7 @@ import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
   providedIn: 'root'
 })
 export class AutosaveInfoModalsService {
- private _isModalOpen: boolean = false;
+  private _isModalOpen: boolean = false;
 
   constructor(
     private localStorageService: LocalStorageService,
