@@ -249,7 +249,7 @@ var ExplorationEditorMainTab = function() {
     // Open the "Add Response" modal if it is not already open.
     await waitFor.elementToBeClickable(
       addResponseButton, 'Response Editor button is not clickable');
-    await addResponseButton.click();
+    await action.click('Response Editor Button', addResponseButton);
     await this.setResponse.apply(null, arguments);
   };
 
@@ -285,7 +285,7 @@ var ExplorationEditorMainTab = function() {
 
     // Close new response modal.
     expect(await addNewResponseButton.isDisplayed()).toBe(true);
-    await addNewResponseButton.click();
+    await action.click('New Response Button', addNewResponseButton);
     await waitFor.invisibilityOf(
       addNewResponseButton, 'Add New Response Modal is not closed');
   };
@@ -308,7 +308,7 @@ var ExplorationEditorMainTab = function() {
         expect(await headerElem.isDisplayed()).toBe(true);
         await waitFor.elementToBeClickable(
           headerElem, 'Response Editor header is not clickable');
-        await headerElem.click();
+        await action.click('Response Editor Header', headerElem);
       }
     } else {
       headerElem = addResponseHeader;
@@ -384,7 +384,8 @@ var ExplorationEditorMainTab = function() {
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: async function(stateNames) {
         // Begin editing destination.
-        await openOutcomeDestEditor.click();
+        await action.click(
+          'Outcome Destination Editor Open Button', openOutcomeDestEditor);
 
         var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
           stateNames.slice(1));
@@ -406,7 +407,7 @@ var ExplorationEditorMainTab = function() {
         // Additional parameters may be provided after ruleName.
 
         // Add the rule.
-        await addAnswerButton.click();
+        await action.click('Add Answer Button', addAnswerButton);
 
         // Set the rule description.
         var ruleDetails = element(by.css('.protractor-test-rule-details'));
@@ -418,11 +419,12 @@ var ExplorationEditorMainTab = function() {
         await _setRuleParameters.apply(null, args);
 
         // Save the new rule.
-        await saveAnswerButton.click();
+        await action.click('Save Answer Button', saveAnswerButton);
       },
       deleteResponse: async function() {
-        await deleteResponseButton.click();
-        await confirmDeleteResponseButton.click();
+        await action.click('Delete Response Button', deleteResponseButton);
+        await action.click(
+          'Confirm Delete Response Button', confirmDeleteResponseButton);
       },
       expectCannotSetFeedback: async function() {
         expect(await openOutcomeFeedBackEditor.isPresent()).toBeFalsy();
@@ -499,7 +501,7 @@ var ExplorationEditorMainTab = function() {
     await richTextInstructions(richTextEditor);
     expect(await saveStateContentButton.isDisplayed()).toBe(true);
     await waitFor.elementToBeClickable(saveStateContentButton);
-    await saveStateContentButton.click();
+    await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
       saveStateContentButton,
       'State content editor takes too long to disappear');
@@ -530,14 +532,15 @@ var ExplorationEditorMainTab = function() {
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
-    await element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
-      .last().click();
+    var hintTextButton = element(
+      by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
+    await action.click('Hint Text Button', hintTextButton);
     await browser.switchTo().activeElement().sendKeys(hint);
 
     await waitFor.elementToBeClickable(
       saveHintButton,
       'Save Hint button takes too long to be clickable');
-    await saveHintButton.click();
+    await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
   };
@@ -554,15 +557,17 @@ var ExplorationEditorMainTab = function() {
     await interaction.submitAnswer(
       element(by.css('.protractor-test-interaction-html')),
       solution.correctAnswer);
-    await element(by.css('.protractor-test-explanation-textarea'))
-      .all(by.tagName('p')).first().click();
+    var explanationTextAreaButton = element(
+      by.css('.protractor-test-explanation-textarea')).all(
+      by.tagName('p')).first();
+    await action.click('Explanation Text Area', explanationTextAreaButton);
     await browser.switchTo().activeElement().sendKeys(solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
     await waitFor.elementToBeClickable(
       submitSolutionButton,
       'Submit Solution button takes too long to be clickable');
-    await submitSolutionButton.click();
+    await action.click('Submit Solution Button', submitSolutionButton);
     await waitFor.invisibilityOf(
       addOrUpdateSolutionModal,
       'Add/Update Solution modal takes too long to close');
@@ -637,7 +642,9 @@ var ExplorationEditorMainTab = function() {
     expect(
       await interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
         .isDisplayed()).toBe(true);
-    await interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
+    var interactionTabButton =
+      interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]);
+    await action.click('Interaction Tab', interactionTabButton);
 
     var targetTile = interactionTile(interactionId);
     await waitFor.visibilityOf(
@@ -649,7 +656,7 @@ var ExplorationEditorMainTab = function() {
       'Interaction tile ' + interactionId + ' takes too long to be clickable'
     );
     expect(await targetTile.isDisplayed()).toBe(true);
-    await targetTile.click();
+    await action.click('Interaction tile ' + interactionId, targetTile);
   };
 
   // This function should not usually be invoked directly; please consider
@@ -670,7 +677,7 @@ var ExplorationEditorMainTab = function() {
     // options to customize.
     var result = await saveInteractionButton.isPresent();
     if (result) {
-      await saveInteractionButton.click();
+      await action.click('Save Interaction Button', saveInteractionButton);
     }
     await waitFor.invisibilityOf(
       saveInteractionButton,
@@ -684,7 +691,7 @@ var ExplorationEditorMainTab = function() {
     var isVisible = await addResponseHeader.isPresent();
     if (isVisible) {
       expect(await closeAddResponseButton.isDisplayed()).toBe(true);
-      await closeAddResponseButton.click();
+      await action.click('Close Add Response Button', closeAddResponseButton);
     }
   };
 
@@ -770,14 +777,21 @@ var ExplorationEditorMainTab = function() {
         parameterTypes[i])(parameterElement);
 
       if (interactionId === 'MultipleChoiceInput') {
-      // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        await parameterElement.element(by.tagName('button')).click();
-        await multipleChoiceAnswerOptions(parameterValues[i])
-          .click();
+        // This is a special case as it uses a dropdown to set a NonnegativeInt.
+        var parameterElementButton = parameterElement.element(
+          by.tagName('button'));
+        await action.click('Parameter Element Button', parameterElementButton);
+        var multipleChoiceAnswerOption =
+          multipleChoiceAnswerOptions(parameterValues[i]);
+        await action.click(
+          'Multiple Choice Answer Option', multipleChoiceAnswerOption);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var j = 0; j < answerArray.length; j++) {
-          await itemSelectionAnswerOptions(answerArray[j]).click();
+          var itemSelectionAnswerOption =
+            itemSelectionAnswerOptions(answerArray[j]);
+          await action.click(
+            'Item Selection Answer Option', itemSelectionAnswerOption);
         }
       } else {
         await parameterEditor.setValue(parameterValues[i]);
@@ -786,10 +800,10 @@ var ExplorationEditorMainTab = function() {
   };
 
   /**
-   * Parse for rule input placeholders in ruleDescription and replace them.
-   * @param {string} [ruleDescription] - Interaction type.
-   * @param {string[]} [providedText] - Feedback text to replace with.
-   */
+     * Parse for rule input placeholders in ruleDescription and replace them.
+     * @param {string} [ruleDescription] - Interaction type.
+     * @param {string[]} [providedText] - Feedback text to replace with.
+     */
   var _replaceRuleInputPlaceholders = function(ruleDescription, providedText) {
     // An example of rule description:
     // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
@@ -844,9 +858,12 @@ var ExplorationEditorMainTab = function() {
     await waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    await nodeElement.element(by.css('.protractor-test-delete-node')).click();
+    var deleteNode = nodeElement.element(
+      by.css('.protractor-test-delete-node'));
+    await action.click('Delete Node', deleteNode);
+
     expect(await confirmDeleteStateButton.isDisplayed());
-    await confirmDeleteStateButton.click();
+    await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');
   };
@@ -871,7 +888,7 @@ var ExplorationEditorMainTab = function() {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === targetName) {
-        await stateNodes.get(i).click();
+        await action.click('State Node: ' + i, stateNodes.get(i));
         matched = true;
         // Wait to re-load the entire state editor.
       }
