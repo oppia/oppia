@@ -51,7 +51,7 @@ var GraphEditor = function(graphInputContainer) {
   var createVertex = async function(xOffset, yOffset) {
     var addNodeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Node-button'));
-    await addNodeButton.click();
+    await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
@@ -61,7 +61,7 @@ var GraphEditor = function(graphInputContainer) {
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
-    await addEdgeButton.click();
+    await action.click('Add Edge Button', addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
@@ -89,10 +89,10 @@ var GraphEditor = function(graphInputContainer) {
     clearDefaultGraph: async function() {
       var deleteButton = graphInputContainer.element(
         by.css('.protractor-test-Delete-button'));
-      await deleteButton.click();
+      await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await vertexElement(i).click();
+        await action.click(`Vertex Element ${i}`, vertexElement(i));
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -130,7 +130,9 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
-    await elem.element(by.css('.protractor-test-add-list-entry')).click();
+    var testAddListEntry = elem.element(by.css(
+      '.protractor-test-add-list-entry'));
+    await action.click('Test Add List Entry', testAddListEntry);
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -139,9 +141,10 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    await elem.element(
-      await by.repeater('item in localValue track by $index').row(index)
-    ).element(by.css('.protractor-test-delete-list-entry')).click();
+    var testDeleteListEntry = elem.element(
+      await by.repeater('item in localValue track by $index').row(index))
+      .element(by.css('.protractor-test-delete-list-entry'));
+    await action.click('Test Delete List Entry', testDeleteListEntry);
   };
 
   return {
@@ -170,31 +173,35 @@ var ListEditor = function(elem) {
 var RealEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(value);
+      var realEditorInput = elem.element(by.tagName('input'));
+      await action.clear('Real Editor Input', realEditorInput);
+      await action.sendKeys('Real Editor Input', realEditorInput, value);
     }
   };
 };
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(elem.all(by.css('.oppia-rte')).first());
-  await (await elem.all(by.css('.oppia-rte')).first()).click();
+  var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+  await action.click('First of oppia rte', firstOfOppiaRte);
 
   var _appendContentText = async function(text) {
     await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
+    var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+    await action.sendKeys(
+      'First of Oppia Rte', firstOfOppiaRte, text);
   };
   var _clickToolbarButton = async function(buttonName) {
-    await waitFor.elementToBeClickable(
-      elem.element(by.css('.' + buttonName)),
-      'Toolbar button takes too long to be clickable.');
-    await elem.element(by.css('.' + buttonName)).click();
+    var clickToolbarButton = elem.element(by.css('.' + buttonName));
+    await action.click(
+      `Click Toolbar Button: ${buttonName}`, clickToolbarButton);
   };
   var _clearContent = async function() {
     expect(
       await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
     ).toBe(true);
-    await (await elem.all(by.css('.oppia-rte')).first()).clear();
+    var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+    await action.clear('First of oppia rte', firstOfOppiaRte);
   };
 
   return {
@@ -255,10 +262,7 @@ var RichTextEditor = async function(elem) {
       var doneButton = modal.element(
         by.css(
           '.protractor-test-close-rich-text-component-editor'));
-      await waitFor.elementToBeClickable(
-        doneButton,
-        'save button taking too long to be clickable');
-      await doneButton.click();
+      await action.click('Done Button', doneButton);
       await waitFor.invisibilityOf(
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
@@ -267,13 +271,16 @@ var RichTextEditor = async function(elem) {
         [
           'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
         ].includes(componentName)) {
-        await elem.all(
-          by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+        var firstOfOppiaRte = elem.all(by.css('.oppia-rte')).first();
+        await action.sendKeys(
+          'First of Oppia Rte', firstOfOppiaRte, protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      await elem.all(by.css('.oppia-rte')).first().sendKeys(
-        protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
+      var firstOfOppiaRte = elem.all(by.css('.oppia-rte')).first();
+      await action.sendKeys(
+        'First of Oppia Rte', firstOfOppiaRte, protractor.Key.chord(
+          protractor.Key.CONTROL, protractor.Key.END));
     }
   };
 };
@@ -294,8 +301,9 @@ var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(text);
+      var unicodeEditorInput = elem.element(by.tagName('input'));
+      await action.clear('Unicode Editor Input', unicodeEditorInput);
+      await action.sendKeys('Unicode Editor Input', unicodeEditorInput, text);
     }
   };
 };
@@ -303,15 +311,19 @@ var UnicodeEditor = function(elem) {
 var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.element(by.css('.select2-container')).click();
+      var select2Container = elem.element(by.css('.select2-container'));
+      await action.click('Select2 Container', select2Container);
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      await element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys(text + '\n');
+      var select2SearchInput = element(
+        by.css('.select2-dropdown')).element(by.css('.select2-search input'));
+      await action.sendKeys(
+        'Select2 Search Input in Dropdown', select2SearchInput, text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await elem.element(by.css('.select2-container')).click();
+      var select2Container = elem.element(by.css('.select2-container'));
+      await action.click('Select2 Container', select2Container);
       var actualOptions = await element(by.css('.select2-dropdown'))
         .all(by.tagName('li')).map(
           async function(optionElem) {
@@ -320,8 +332,9 @@ var AutocompleteDropdownEditor = function(elem) {
         );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      await element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys('\n');
+      var select2Dropdown = element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input'));
+      await action.sendKeys('Select2 Dropdown', select2Dropdown, '\n');
     }
   };
 };
@@ -340,13 +353,15 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       // removes the element from the DOM. We also omit the last element
       // because it is the field for new input.
       for (var i = deleteButtons.length - 2; i >= 0; i--) {
-        await deleteButtons[i].click();
+        await action.click(`Delete Button ${i}`, deleteButtons[i]);
       }
 
       for (var i = 0; i < texts.length; i++) {
-        await elem.element(by.css('.select2-container')).click();
-        await elem.element(by.css('.select2-search__field')).sendKeys(
-          texts[i] + '\n');
+        var select2Container = elem.element(by.css('.select2-container'));
+        await action.click('Select2 Container', select2Container);
+        var select2SearchField = elem.element(by.css('.select2-search__field'));
+        await action.sendKeys(
+          'Select2 Search Field', select2SearchField, texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
@@ -369,8 +384,10 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    await elem.element(by.css(
-      '.protractor-test-search-bar-dropdown-toggle')).click();
+    var testSearchBarDropdownToggle = elem.element(by.css(
+      '.protractor-test-search-bar-dropdown-toggle'));
+    await action.click(
+      'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
 
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
@@ -381,7 +398,7 @@ var MultiSelectEditor = function(elem) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
-        await filteredElement.click();
+        await action.click('Filtered Element', filteredElement);
       }
     }
 
@@ -392,8 +409,10 @@ var MultiSelectEditor = function(elem) {
     }
 
     // Close the dropdown menu at the end.
-    await elem.element(by.css(
-      '.protractor-test-search-bar-dropdown-toggle')).click();
+    var testSearchBarDropdownToggle = elem.element(by.css(
+      '.protractor-test-search-bar-dropdown-toggle'));
+    await action.click(
+      'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
   };
 
   return {
@@ -407,8 +426,10 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      await elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
+      var testSearchBarDropdownToggle = elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle'));
+      await action.click(
+        'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
 
       // Find the selected elements.
       var actualSelection = await elem.element(
@@ -420,8 +441,10 @@ var MultiSelectEditor = function(elem) {
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
-      await elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
+      var testSearchBarDropdownToggle = elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle'));
+      await action.click(
+        'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
     }
   };
 };
@@ -697,8 +720,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 var CodeStringEditor = function(elem) {
   return {
     setValue: async function(code) {
-      await elem.element(by.tagName('textarea')).clear();
-      await elem.element(by.tagName('textarea')).sendKeys(code);
+      var codeStringEditorInput = elem.element(by.tagName('input'));
+      await action.clear('Code String Editor Input', codeStringEditorInput);
+      await action.sendKeys(
+        'Code String Editor Input', codeStringEditorInput, code);
     }
   };
 };
