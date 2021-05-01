@@ -244,7 +244,7 @@ describe('High bounce rate task', function() {
         statsWithWrongId, 1, config
       )).toThrowError(
         'Expected stats for exploration id="eid" v1 but given stats are for ' +
-          'exploration id="eid2" v1');
+        'exploration id="eid2" v1');
 
       const statsWithWrongVersion = (
         ExplorationStats.createFromBackendDict({
