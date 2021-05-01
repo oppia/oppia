@@ -1,3 +1,49 @@
+<div class="footer navbar-fixed-bottom oppia-exploration-footer" *ngIf="!iframed">
+  <h1 style="color: red">Exploration Footer here....</h1>
+  <div class="row">
+    <div class="col-sm-5">
+      <ul class="author-profile">
+        <li>
+          <img [src]="getStaticImageUrl('/general/apple.svg')"
+               class="exploration-footer-img"
+               alt="">
+        </li>
+        <li class="hover-link"
+            (mouseenter)="hovering = true"
+            (mouseleave)="hovering = false"
+            tabindex="0"
+            attr.aria-haspopup="true"
+            attr.aria-expanded="false">
+          <div ngbDropdown class="dropup" [ngClass]="{'open':hovering}">
+            <a ngbDropdownToggle id="dropdownMenu2"
+               [ngClass]="{'hovered-text':hovering}"
+               *ngIf="contributorNames.length > 0"
+               attr.aria-haspopup="true"
+               attr.aria-expanded="false">
+              <h4 class="author-profile-text"
+                  [ngClass]="{'hovered-text':hovering, 'not-hovered' : !hovering}">
+                  {{ 'I18N_FOOTER_AUTHOR_PROFILES' | translate }}
+              </h4>
+            </a>
+            <ul ngbDropdownMenu class="author-profile-dropdown-menu uib-dropdown-menu"
+                attr.aria-labelledby="dropdownMenu2">
+              <li *ngFor="let name of contributorNames | limitTo: 5">
+                <a href="/profile/{{ name }}" target="_blank" rel="noopener">{{ name }}</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <!-- <hint-and-solution-buttons *ngIf="windowIsNarrow"></hint-and-solution-buttons> -->
+    </div>
+    <div class="col-sm-7">
+      <div class="float-right">
+        <!-- <hint-and-solution-buttons *ngIf="!windowIsNarrow"></hint-and-solution-buttons> -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   .oppia-exploration-footer {
     background-color: #094142;
@@ -159,47 +205,3 @@
     }
   }
 </style>
-
-<div class="footer navbar-fixed-bottom oppia-exploration-footer" ng-if="!iframed">
-  <div class="row">
-    <div class="col-sm-5">
-      <ul class="author-profile">
-        <li>
-          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>"
-               class="exploration-footer-img"
-               alt="">
-        </li>
-        <li class="hover-link"
-            ng-mouseenter="hovering = true"
-            ng-mouseleave="hovering = false"
-            tabindex="0"
-            aria-haspopup="true"
-            aria-expanded="false">
-          <div uib-dropdown class="dropup" ng-class="{'open':hovering}">
-            <a uib-dropdown-toggle id="dropdownMenu2"
-               ng-class="{'hovered-text':hovering}"
-               ng-if="contributorNames.length > 0"
-               aria-haspopup="true"
-               aria-expanded="false">
-              <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
-                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}">
-              </h4>
-            </a>
-            <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu"
-                aria-labelledby="dropdownMenu2">
-              <li ng-repeat="name in contributorNames | limitTo: 5">
-                <a href="/profile/<[name]>" target="_blank" rel="noopener"><[name]></a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-      <hint-and-solution-buttons ng-if="windowIsNarrow"></hint-and-solution-buttons>
-    </div>
-    <div class="col-sm-7">
-      <div class="float-right">
-        <hint-and-solution-buttons ng-if="!windowIsNarrow"></hint-and-solution-buttons>
-      </div>
-    </div>
-  </div>
-</div>

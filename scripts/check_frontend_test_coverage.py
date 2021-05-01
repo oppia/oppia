@@ -93,7 +93,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-creation.service.ts',
     'exploration-diff.service.ts',
     'exploration-engine.service.ts',
-    'exploration-footer.directive.ts',
+    'exploration-footer.component.ts',
     'exploration-player-state.service.ts',
     'exploration-save.service.ts',
     'exploration-states.service.ts',

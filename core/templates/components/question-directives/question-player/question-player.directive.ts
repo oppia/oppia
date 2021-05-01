@@ -107,7 +107,7 @@ require(
   'conversation-skin.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-local-nav.directive.ts');

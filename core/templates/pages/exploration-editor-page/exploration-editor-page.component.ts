@@ -74,7 +74,7 @@ require(
   'conversation-skin.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('interactions/interactionsRequires.ts');

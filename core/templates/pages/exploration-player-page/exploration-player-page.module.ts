@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { ExplorationFooterComponent } from './layout-directives/exploration-footer.component';
 
 @NgModule({
   imports: [
@@ -42,17 +43,19 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
     HttpClientModule,
     InteractionExtensionsModule,
     NgbModalModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationFooterComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationFooterComponent
   ],
   providers: [
     {
