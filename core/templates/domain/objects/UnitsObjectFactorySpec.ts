@@ -173,7 +173,7 @@ describe('UnitsObjectFactory', () => {
     expect(units.unitWithMultiplier(
       ['cent', '*', '(', 'kg', '/', 'N', ')']))
       .toEqual([['cent', 1], ['kg', 1], ['N', -1]]);
-    expect(units.unitWithMultiplier(
+    expect(() => units.unitWithMultiplier(
       ['cm', '/', 'kg', '/', 'N', ')']))
       .toThrowError('Close parenthesis with no open parenthesis');
   });
