@@ -49,7 +49,7 @@ require(
   'exploration-footer.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'learner-local-nav.directive.ts');
+  'learner-local-nav.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
