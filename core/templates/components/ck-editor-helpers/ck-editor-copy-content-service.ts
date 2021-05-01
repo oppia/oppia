@@ -34,6 +34,8 @@ interface CkEditorCopyEvent {
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
   private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
+  // Allows skillreview components to be copied as well by making them
+  // a part of the allowed widgets.
   private readonly ALLOWLISTED_WIDGETS = new Set([
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
@@ -44,8 +46,6 @@ export class CkEditorCopyContentService {
     'oppia-noninteractive-skillreview'
   ]);
 
-  // Allows skillreview components to be copied as well by making them
-  // a part of the allowed widgets.
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
   private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
 
@@ -73,14 +73,12 @@ export class CkEditorCopyContentService {
         containedWidgetTagName = currentTagName;
         break;
       }
-
-      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
-        break;
-      } else if (currentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+      // Prevents reference errors if the element clicked on is itself the
+      // OUTPUT_VIEW_TAG_NAME (i.e, ANGULAR-HTML-BIND).
+      if (this.isElementParentElementOutputView(currentElement)) {
         break;
       }
-      // Prevents errors if the element clicked on is itself the
-      // OUTPUT_VIEW_TAG_NAME (ie ANGULAR-HTML-BIND).
+      
       currentElement = currentElement.parentElement;
     }
 
@@ -98,6 +96,7 @@ export class CkEditorCopyContentService {
         ...Array.from(currentDescendant.childNodes)
       ];
     }
+
     if (containedWidgetTagName &&
         !this.ALLOWLISTED_WIDGETS.has(containedWidgetTagName)) {
       return {};
@@ -157,6 +156,16 @@ export class CkEditorCopyContentService {
 
   toggleCopyMode(): void {
     this.copyModeActive = !this.copyModeActive;
+  }
+
+  // Function to check if the parent element or the current element is
+  // ANGULAR_HTML_BIND or not.
+  isElementParentElementOutputView(target: HTMLElement): boolean {
+    if (target.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME || 
+      target.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+        return true;
+    }
+    return false;
   }
 
   /**
