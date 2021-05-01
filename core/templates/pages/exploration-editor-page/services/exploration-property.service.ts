@@ -21,6 +21,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { AlertsService } from 'services/alerts.service';
@@ -35,7 +36,7 @@ export class ExplorationPropertyService {
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
   // SUBCLASSES.
-  propertyName: string = null;
+  propertyName: string;
 
   @Output() _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(
@@ -46,7 +47,7 @@ export class ExplorationPropertyService {
 
   private BACKEND_CONVERSIONS = {
     param_changes: (paramChanges) => {
-      return paramChanges.map(function(paramChange) {
+      return paramChanges.map(paramChange => {
         return paramChange.toBackendDict();
       });
     },
@@ -56,7 +57,7 @@ export class ExplorationPropertyService {
   };
 
   init(value: string): void {
-    if (this.propertyName === null) {
+    if (!this.propertyName) {
       throw new Error('Exploration property name cannot be null.');
     }
 
@@ -65,12 +66,12 @@ export class ExplorationPropertyService {
 
     // The current value of the property (which may not have been saved to
     // the frontend yet). In general, this will be bound directly to the UI.
-    this.displayed = angular.copy(value);
+    this.displayed = cloneDeep(value);
 
     // The previous (saved-in-the-frontend) value of the property. Here,
     // 'saved' means that this is the latest value of the property as
     // determined by the frontend change list.
-    this.savedMemento = angular.copy(value);
+    this.savedMemento = cloneDeep(value);
 
     this._explorationPropertyChangedEventEmitter.emit();
   }
@@ -110,8 +111,8 @@ export class ExplorationPropertyService {
 
     this.alertsService.clearWarnings();
 
-    let newBackendValue = angular.copy(this.displayed);
-    let oldBackendValue = angular.copy(this.savedMemento);
+    let newBackendValue = cloneDeep(this.displayed);
+    let oldBackendValue = cloneDeep(this.savedMemento);
 
     if (this.BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
       newBackendValue =
@@ -122,14 +123,14 @@ export class ExplorationPropertyService {
 
     this.changeListService.editExplorationProperty(
       this.propertyName, newBackendValue, oldBackendValue);
-    this.savedMemento = angular.copy(this.displayed);
+    this.savedMemento = cloneDeep(this.displayed);
 
     this._explorationPropertyChangedEventEmitter.emit();
   }
 
   // Reverts the displayed value to the saved memento.
   restoreFromMemento(): void {
-    this.displayed = angular.copy(this.savedMemento);
+    this.displayed = cloneDeep(this.savedMemento);
   }
 
   get onExplorationPropertyChanged(): EventEmitter<void> {

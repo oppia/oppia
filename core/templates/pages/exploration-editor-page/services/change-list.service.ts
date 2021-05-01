@@ -43,16 +43,8 @@ export class ChangeListService implements OnInit {
 
   // Stack for storing undone changes. The last element is the most recently
   // undone change.
-  undoneChangeStack: Object[] = [];
+  undoneChangeStack: ExplorationChange[] = [];
   loadingMessage: string = '';
-
-  // All these constants should correspond to those in exp_domain.py.
-  // TODO(sll): Enforce this in code.
-  CMD_ADD_STATE: string = 'add_state';
-  CMD_RENAME_STATE: string = 'rename_state';
-  CMD_DELETE_STATE: string = 'delete_state';
-  CMD_EDIT_STATE_PROPERTY: string = 'edit_state_property';
-  CMD_EDIT_EXPLORATION_PROPERTY: string = 'edit_exploration_property';
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
@@ -137,7 +129,7 @@ export class ChangeListService implements OnInit {
     );
   }
 
-  private addChange(changeDict) {
+  private addChange(changeDict: ExplorationChange) {
     if (this.loadingMessage) {
       return;
     }
@@ -161,7 +153,7 @@ export class ChangeListService implements OnInit {
 
   addState(stateName: string): void {
     this.addChange({
-      cmd: this.CMD_ADD_STATE,
+      cmd: 'add_state',
       state_name: stateName
     });
   }
@@ -176,7 +168,7 @@ export class ChangeListService implements OnInit {
 
   deleteState(stateName: string): void {
     this.addChange({
-      cmd: this.CMD_DELETE_STATE,
+      cmd: 'delete_state',
       state_name: stateName
     });
   }
@@ -206,7 +198,7 @@ export class ChangeListService implements OnInit {
       return;
     }
     this.addChange({
-      cmd: this.CMD_EDIT_EXPLORATION_PROPERTY,
+      cmd: 'edit_exploration_property',
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
       property_name: backendName
@@ -232,7 +224,7 @@ export class ChangeListService implements OnInit {
       return;
     }
     this.addChange({
-      cmd: this.CMD_EDIT_STATE_PROPERTY,
+      cmd: 'edit_state_property',
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
       property_name: backendName,
@@ -271,7 +263,7 @@ export class ChangeListService implements OnInit {
    */
   renameState(newStateName: string, oldStateName: string): void {
     this.addChange({
-      cmd: this.CMD_RENAME_STATE,
+      cmd: 'rename_state',
       new_state_name: newStateName,
       old_state_name: oldStateName
     });
