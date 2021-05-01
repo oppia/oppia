@@ -86,7 +86,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
-
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 
 // Services.
 import { AuthService } from 'services/auth.service';
@@ -184,7 +184,8 @@ const toastrConfig = {
     UploadActivityModalComponent,
     PromoBarComponent,
     SortByPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    PreviewThumbnailComponent
   ],
 
   entryComponents: [
@@ -219,7 +220,8 @@ const toastrConfig = {
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    PreviewThumbnailComponent
   ],
 
   exports: [
@@ -270,7 +272,8 @@ const toastrConfig = {
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
     LoadingDotsComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    PreviewThumbnailComponent
   ],
 })
 
