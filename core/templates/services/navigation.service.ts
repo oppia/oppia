@@ -21,6 +21,17 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+interface EventType {
+  keyCode?: number,
+  shiftKey?: boolean,
+  currentTarget?: string
+}
+
+interface EventToCodes {
+  enter?,
+  tab?,
+  shiftTab?,
+}
  @Injectable({
    providedIn: 'root'
  })
@@ -50,19 +61,12 @@ export class NavigationService {
     * @param {String} menuName - name of menu, on which
     * open/close action to be performed (category,language).
     */
-    openSubmenu(evt: {
-     keyCode: string;
-     shiftKey: string;
-     currentTarget: string; }, menuName: string): void {
+    openSubmenu(evt: EventType, menuName: string): void {
       // Focus on the current target before opening its submenu.
       this.activeMenuName = menuName;
     }
 
-    closeSubmenu(evt: {
-     keyCode: string;
-     shiftKey: string;
-     currentTarget?: string;
-     }): void {
+    closeSubmenu(evt: EventType): void {
       this.activeMenuName = '';
     }
     /**
@@ -76,14 +80,13 @@ export class NavigationService {
      * @example
      *  onMenuKeypress($event, 'category', {enter: 'open'})
      */
-    onMenuKeypress(evt: {
-         keyCode: string;
-         shiftKey: string;
-         currentTarget: string; }, menuName: string, eventsTobeHandled: {
-          [key: string]: string; }): void {
-      var targetEvents = Object.keys(eventsTobeHandled);
-      for (var i = 0; i < targetEvents.length; i++) {
-        var keyCodeSpec =
+    onMenuKeypress(
+        evt: EventType,
+        menuName: string,
+        eventsTobeHandled: EventToCodes): void {
+      let targetEvents = Object.keys(eventsTobeHandled);
+      for (let i = 0; i < targetEvents.length; i++) {
+        let keyCodeSpec =
           this.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
         if (keyCodeSpec.keyCode === evt.keyCode &&
           evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
