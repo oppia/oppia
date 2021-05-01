@@ -61,7 +61,7 @@ var GraphEditor = function(graphInputContainer) {
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
-    await action.click('Add Edge Button', addEdgeButton);
+    await action.click('Test Add Edge Button', addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
