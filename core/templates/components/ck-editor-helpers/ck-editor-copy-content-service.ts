@@ -161,11 +161,10 @@ export class CkEditorCopyContentService {
   // Function to check if the parent element or the current element is
   // ANGULAR_HTML_BIND or not.
   isElementOrParentElementOutputView(target: HTMLElement): boolean {
-    if (target.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
-      target.tagName === this.OUTPUT_VIEW_TAG_NAME) {
-      return true;
-    }
-    return false;
+    return (
+      target.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
+      target.tagName === this.OUTPUT_VIEW_TAG_NAME
+    )
   }
 
   /**
