@@ -49,12 +49,14 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationSuccessfullyFlaggedModalComponent,
     LearnerLocalNavComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationSuccessfullyFlaggedModalComponent,
     LearnerLocalNavComponent
   ],
   providers: [
@@ -78,6 +80,8 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
+import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
