@@ -51,9 +51,11 @@ CSRF_SECRET = config_domain.ConfigProperty(
 # to access the site.
 AUTH_HANDLER_PATHS = (
     '/csrfhandler',
-    '/seed_firebase',
     '/session_begin',
     '/session_end',
+    # TODO(#11462): Delete this handler once the Firebase migration logic is
+    # rollback-safe and all backup data is using post-migration data.
+    '/seed_firebase',
 )
 
 
