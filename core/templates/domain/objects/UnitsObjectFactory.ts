@@ -121,7 +121,7 @@ export class UnitsObjectFactory {
         if (elem) {
           multiplier = parseInt(<string> elem[1]) * multiplier;
         } else {
-          throw new Error('The Parenthesis Stack is empty, elem not defined');
+          throw new Error('Close parenthesis with no open parenthesis');
         }
       } else if (this.isunit(unitList[ind])) {
         unitsWithMultiplier.push([unitList[ind], multiplier]);
