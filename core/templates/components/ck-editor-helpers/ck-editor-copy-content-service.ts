@@ -164,7 +164,7 @@ export class CkEditorCopyContentService {
     return (
       target.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
       target.tagName === this.OUTPUT_VIEW_TAG_NAME
-    )
+    );
   }
 
   /**
