@@ -1,6 +1,12 @@
 <form autocomplete="off" [attr.disabled]="!isValid ? true : null" role="form" class="form-horizontal fraction-input-interaction">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
-  <input type="text" name="answer" [(ngModel)]="answer" (ngModelChange)="answerValueChanged()" class="form-control" (keyup.enter)="submitAnswer()"
+  <input type="text"
+         name="answer"
+         [(ngModel)]="answer"
+         (ngModelChange)="answerValueChanged()"
+         class="form-control"
+         (keyup.enter)="submitAnswer()"
+         [oppiaFocusOn]="labelForFocusTarget"
          placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}">
 
   <div class="oppia-form-error oppia-fraction-input-error">
