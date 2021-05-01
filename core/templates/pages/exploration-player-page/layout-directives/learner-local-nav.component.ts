@@ -27,7 +27,10 @@ import { AttributionService } from 'services/attribution.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
+import { ExplorationSuccessfullyFlaggedModalComponent } from '../modals/exploration-successfully-flagged-modal.component';
+import { FlagExplorationModalComponent, FlagExplorationModalResult } from '../modals/flag-exploration-modal.component';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-backend-api.service';
 
 @Component({
   selector: 'oppia-learner-local-nav',
@@ -50,7 +53,8 @@ export class LearnerLocalNavComponent {
     ReadOnlyExplorationBackendApiService,
     private urlInterpolationService:
     UrlInterpolationService,
-    private userService: UserService
+    private userService: UserService,
+    private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService
   ) {}
 
   getFeedbackPopoverUrl(): string {
@@ -59,7 +63,27 @@ export class LearnerLocalNavComponent {
   }
 
   showFlagExplorationModal(): void {
-    // this.ngbModal.open()
+    this.ngbModal.open(FlagExplorationModalComponent, {
+      backdrop: 'static'
+    }).result.then((result: FlagExplorationModalResult) => {
+      this.learnerLocalNavBackendApiService
+        .postReportAsync(this.explorationId, result).then(() => {},
+          (error) => {
+            this.alertsService.addWarning(error);
+          });
+
+      this.ngbModal.open(ExplorationSuccessfullyFlaggedModalComponent, {
+        backdrop: true
+      }).result.then(() => {}, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   toggleAttributionModal(): void {
@@ -93,109 +117,3 @@ export class LearnerLocalNavComponent {
 
 angular.module('oppia').directive('oppiaLearnerLocalNav',
   downgradeComponent({ component: LearnerLocalNavComponent }));
-
-// Angular.module('oppia').directive('learnerLocalNav', [
-//   'UrlInterpolationService', function(UrlInterpolationService) {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       bindToController: {},
-//       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-//         '/pages/exploration-player-page/layout-directives/' +
-//         'learner-local-nav.directive.html'),
-//       controllerAs: '$ctrl',
-//       controller: [
-//         '$http', '$rootScope', '$uibModal', 'AlertsService',
-//         'AttributionService', 'ExplorationEngineService',
-//         'LoaderService', 'ReadOnlyExplorationBackendApiService',
-//         'UrlInterpolationService', 'UserService',
-//         'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
-//         'FLAG_EXPLORATION_URL_TEMPLATE',
-//         function(
-//             $http, $rootScope, $uibModal, AlertsService,
-//             AttributionService, ExplorationEngineService,
-//             LoaderService, ReadOnlyExplorationBackendApiService,
-//             UrlInterpolationService, UserService,
-//             ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS, FEEDBACK_POPOVER_PATH,
-//             FLAG_EXPLORATION_URL_TEMPLATE) {
-//           var ctrl = this;
-//           ctrl.getFeedbackPopoverUrl = function() {
-//             return UrlInterpolationService.getDirectiveTemplateUrl(
-//               FEEDBACK_POPOVER_PATH);
-//           };
-
-//           ctrl.showFlagExplorationModal = function() {
-//             $uibModal.open({
-//               template: require(
-//                 'pages/exploration-player-page/templates/' +
-//                 'flag-exploration-modal.template.html'),
-//               backdrop: 'static',
-//               controller: 'FlagExplorationModalController',
-//             }).result.then(function(result) {
-//               var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
-//                 FLAG_EXPLORATION_URL_TEMPLATE, {
-//                   exploration_id: ctrl.explorationId
-//                 }
-//               );
-//               var report = (
-//                 '[' + result.state + '] (' + result.report_type + ') ' +
-//                 result.report_text);
-//               $http.post(flagExplorationUrl, {
-//                 report_text: report
-//               }, function(error) {
-//                 AlertsService.addWarning(error);
-//               });
-//               $uibModal.open({
-//                 template: require(
-//                   'pages/exploration-player-page/templates/' +
-//                   'exploration-successfully-flagged-modal.template.html'),
-//                 backdrop: true,
-//                 controller: 'ConfirmOrCancelModalController'
-//               }).result.then(function() {}, function() {
-//                 // Note to developers:
-//                 // This callback is triggered when the Cancel button is clicked.
-//                 // No further action is needed.
-//               });
-//             }, function() {
-//               // Note to developers:
-//               // This callback is triggered when the Cancel button is clicked.
-//               // No further action is needed.
-//             });
-//           };
-
-//           ctrl.toggleAttributionModal = function() {
-//             if (AttributionService.isAttributionModalShown()) {
-//               AttributionService.hideAttributionModal();
-//             } else {
-//               AttributionService.showAttributionModal();
-//             }
-//           };
-
-//           ctrl.$onInit = function() {
-//             ctrl.explorationId = ExplorationEngineService.getExplorationId();
-//             ReadOnlyExplorationBackendApiService
-//               .loadExploration(ctrl.explorationId)
-//               .then(function(exploration) {
-//                 ctrl.canEdit = exploration.can_edit;
-//                 $rootScope.$applyAsync();
-//               });
-//             ctrl.username = '';
-//             ctrl.feedbackOptionIsShown = true;
-//             LoaderService.showLoadingScreen('Loading');
-//             UserService.getUserInfoAsync().then(function(userInfo) {
-//               ctrl.username = userInfo.getUsername();
-//               if (
-//                 ctrl.username === null &&
-//                 !ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS) {
-//                 ctrl.feedbackOptionIsShown = false;
-//               }
-//               LoaderService.hideLoadingScreen();
-//               // TODO(#8521): Remove the use of $rootScope.$apply()
-//               // once the controller is migrated to angular.
-//               $rootScope.$applyAsync();
-//             });
-//           };
-//         }
-//       ]
-//     };
-//   }]);

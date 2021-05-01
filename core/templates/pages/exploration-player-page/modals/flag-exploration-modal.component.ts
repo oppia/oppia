@@ -22,6 +22,12 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 
+export interface FlagExplorationModalResult {
+  'report_type': boolean,
+  'report_text': string,
+  state: string
+}
+
 @Component({
   selector: 'oppia-flag-exploration-modal',
   templateUrl: './flag-exploration-component.html'
