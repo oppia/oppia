@@ -1,5 +1,5 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
-  <div ng-if="audioBarIsExpanded" class="audio-controls">
+  <div ng-if="audioBarIsExpanded" class="audio-controls" headroom>
     <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
         <a ng-click="onBackwardButtonClicked()">
@@ -44,7 +44,9 @@
       </div>
     </div>
   </div>
-  <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse"><i class="fas fa-sort-up"></i></div>
+  <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse" headroom>
+    <i class="fas fa-sort-up"></i>
+  </div>
   <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()" aria-label="Audio menu expand">
     <div class="container protractor-test-audio-bar">
       <div class="row">
@@ -255,6 +257,17 @@
   @media(max-width: 768px) {
     .audio-header {
       top: 3.5em;
+    }
+
+    .audio-collapse-button.audio-toggle-button.headroom--unpinned {
+      position: relative;
+      top: 52px;
+    }
+
+    .audio-controls.headroom--unpinned {
+      margin-top: 42px;
+      position: fixed;
+      top: 0;
     }
 
     .audio-header.headroom--unpinned {
