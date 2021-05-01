@@ -94,8 +94,8 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             return (
               event.currentTarget.offsetParent.dataset.ckeWidgetId ||
               document.body.style.cursor === 'cursor'
-            )
-          }
+            );
+          };
         }
       ]
     };
