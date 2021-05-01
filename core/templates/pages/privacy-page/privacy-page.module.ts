@@ -32,13 +32,16 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   imports: [
     BrowserModule,
     HttpClientModule,
+    MatCardModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PrivacyPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PrivacyPageComponent
   ],
   providers: [
     {
@@ -61,6 +64,8 @@ class PrivacyPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { MatCardModule } from '@angular/material/card';
+import { PrivacyPageComponent } from './privacy-page.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
