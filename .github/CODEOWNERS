@@ -369,13 +369,11 @@
 
 
 # Navigation bar project.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 373-378
-/core/templates/domain/sidebar/ @aks681
-/core/templates/components/button-directives/create-activity-button.directive.ts @aks681
-/core/templates/components/button-directives/create-activity-button.directive.html @aks681
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 373-376
 /core/templates/components/common-layout-directives/navigation-bars/ @aks681
 /core/templates/services/bottom-navbar-status.service*.ts @aks681
 /core/templates/services/navigation.service*.ts @aks681
+/core/templates/services/sidebar-status.service*.ts @aks681
 
 
 # New structures team.
@@ -511,7 +509,7 @@
 
 
 # Miscellaneous.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 515-528
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 513-518
 /__init__.py @DubeySandeep
 /core/__init__.py @DubeySandeep
 /core/controllers/__init__.py @DubeySandeep
@@ -570,7 +568,7 @@
 
 # Suggestion and feedback team.
 # Suggestion project.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 574-578
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 572-576
 /core/controllers/suggestion*.py @DubeySandeep
 /core/domain/suggestion*.py @DubeySandeep
 /core/templates/domain/suggestion/ @DubeySandeep
@@ -579,7 +577,7 @@
 
 
 # Feedback project.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 583-589
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 581-587
 /core/controllers/feedback*.py @aks681
 /core/domain/feedback*.py @aks681
 /core/templates/components/ratings/rating-display/rating-display.directive.html @aks681
@@ -661,7 +659,7 @@
 
 
 # Frontend unit tests
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 665-668
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 663-666
 /core/templates/**/*.spec.ts @srijanreddy98
 /core/templates/**/*Spec.ts @srijanreddy98
 /extensions/**/*.spec.ts @srijanreddy98
