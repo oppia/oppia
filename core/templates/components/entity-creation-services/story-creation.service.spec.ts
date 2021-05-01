@@ -37,7 +37,6 @@ describe('story Creation service', () => {
   let AlertsService: AlertsService = null;
   let loaderService: LoaderService = null;
   let window: Window = null;
-  var $uibModal = null;
   let httpTestingController: HttpTestingController;
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTwE';
   let ERROR_STATUS_CODE = 500;
