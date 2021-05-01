@@ -111,7 +111,8 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
             set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_EXPLORATION_EDITOR]) |
             set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_BANNED_USER]) |
             set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_GUEST]) |
-            set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_COLLECTION_EDITOR]))
+            set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_COLLECTION_EDITOR]) |
+            set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_VOICEOVER_ADMIN]))
 
         # Sets are compared as their element order don't need to be same.
         self.assertEqual(
