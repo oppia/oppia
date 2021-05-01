@@ -369,7 +369,7 @@
 
 
 # Navigation bar project.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 373-376
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, lines 373-378
 /core/templates/components/button-directives/create-activity-button.component.ts @aks681
 /core/templates/components/button-directives/create-activity-button.component.html @aks681
 /core/templates/components/common-layout-directives/navigation-bars/ @aks681
