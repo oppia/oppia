@@ -15,7 +15,6 @@
 /**
  * @fileoverview Utility service for the learner's view of an exploration.
  */
-// Trigger CI
 
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
