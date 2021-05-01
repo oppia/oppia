@@ -71,6 +71,12 @@ angular.module('oppia').directive('schemaBasedEditor', [
         '$rootScope', function($rootScope) {
           let ctrl = this;
           ctrl.$onInit = function() {
+            /**
+             * $rootScope.$applyAsync() is called here to fix the change
+             * detection issue with moderator page. Please refer #12602.
+             * If you are using this directive as an example for the
+             * usage of UpgradeComponent. This call is not mandatory.
+             */
             $rootScope.$applyAsync();
           };
         }]
