@@ -919,6 +919,14 @@ textarea {
   border-top: 0;
   content: "";
 }
+
+.oppia-navbar-nav .dropdown-menu {
+  left: auto;
+  right: 0;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
 .dropup .dropdown-menu,
 .navbar-fixed-bottom .dropdown .dropdown-menu {
   bottom: 100%;
@@ -1033,13 +1041,6 @@ textarea {
 .oppia-share-dropdown-menu:hover .oppia-share-dropdown-toggle {
   background-color: white;
   color: #009688;
-}
-
-.oppia-navbar-nav .dropdown-menu {
-  left: auto;
-  right: 0;
-  white-space: normal;
-  word-wrap: break-word;
 }
 
 .oppia-navbar-nav .uib-dropdown-menu {
