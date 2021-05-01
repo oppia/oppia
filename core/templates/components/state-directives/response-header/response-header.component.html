@@ -1,0 +1,154 @@
+<div class="oppia-response-header-block">
+  <div class="oppia-response-header">
+    <span *ngIf="showWarning">⚠</span>
+    <div class="oppia-response-container-desktop">
+      <i class="material-icons md-18 oppia-response-tick-cross oppia-response-cross"
+         *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+         &#x2718;
+      </i>
+      <i class="material-icons md-18 oppia-response-tick-cross  oppia-response-tick protractor-test-correct-tick-mark"
+         *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+         &#10004;
+      </i>
+    </div>
+    <div class="oppia-responses-mobile">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect"
+           *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+        Incorrect
+      </div>
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct"
+           *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+        Correct
+      </div>
+    </div>
+    <span class="oppia-response-summary"
+          [attr.title]="getSummary">
+      <span class="oppia-response-short-summary">{{ getShortSummary }}</span>
+      <span *ngIf="getNumRules > 1" class="badge badge-primary position-relative oppia-num-rules">
+        +{{ getNumRules - 1 }}
+      </span>
+    </span>
+  </div>
+
+  <br class="break-in-mobile">
+  <span *ngIf="getOutcome"> →</span>
+  <span *ngIf="isCorrect() && isInQuestionMode()">
+    Correct
+  </span>
+  <span *ngIf="getOutcome && !isOutcomeLooping() && !isCreatingNewState() && !isInQuestionMode()"
+        (click)="navigateToState(getOutcome.dest)"
+        class="oppia-nested-link">
+    {{ getOutcome.dest }}
+  </span>
+  <span class="oppia-nested-link"
+        *ngIf="getOutcome && !isOutcomeLooping() && isCreatingNewState()">
+    <em *ngIf="getOutcome.newStateName">({{ getOutcome.newStateName }})</em>
+    <em *ngIf="!getOutcome.newStateName">Nowhere yet...</em>
+  </span>
+  <span *ngIf="getOutcome && !isInQuestionMode() && isOutcomeLooping()">
+    <em>(try again)</em>
+  </span>
+  <span *ngIf="getOutcome && isInQuestionMode() && !isCorrect()">
+    <em>Wrong<br> (try again)</em>
+  </span>
+</div>
+
+<span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
+      *ngIf="isEditable && getOnDeleteFn"
+      (click)="deleteResponse($event)">
+  <i class="material-icons md-18">&#xE5CD;</i>
+</span>
+
+<style>
+  .oppia-delete-response-button {
+    cursor: pointer;
+    opacity: 0.5;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+  }
+  .oppia-delete-response-button:hover {
+    opacity: 1;
+  }
+  .oppia-response-header-block {
+    overflow: hidden;
+    padding-left: 24px;
+    white-space: nowrap;
+  }
+  .oppia-nested-link {
+    color: #0844aa;
+    cursor: pointer;
+    display: inline-block;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    word-wrap: break-word;
+  }
+  .oppia-nested-link:hover {
+    color: #3f2c76;
+    text-decoration: underline;
+  }
+  .oppia-response-header {
+    float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 78%;
+  }
+  .oppia-response-tick-cross {
+    margin-bottom: 7px;
+  }
+  .oppia-response-cross {
+    color: #C55F45;
+  }
+  .oppia-response-tick {
+    color: #00645C;
+  }
+  .oppia-response-summary {
+    display: flex;
+    flex-flow: row;
+  }
+  .oppia-response-short-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .badge {
+    vertical-align: bottom;
+  }
+  /* This is to break the line only when screen is too narrow to have both divs
+     in same line.*/
+  @media screen and (min-width: 370px) {
+    .break-in-mobile {
+      display: none;
+    }
+  }
+  .oppia-responses-mobile {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-responses-mobile {
+      display: block;
+    }
+    .oppia-response-mobile-item {
+      border-radius: 10px 0 0 0;
+      bottom: 0;
+      color: #FFF;
+      padding-left: 10px;
+      padding-right: 6px;
+      padding-top: 1px;
+      position: absolute;
+      right: 0;
+    }
+    .oppia-response-mobile-item-incorrect {
+      background-color: #FFA500;
+    }
+    .oppia-response-mobile-item-correct {
+      background-color: #449d44;
+    }
+    .oppia-response-container-desktop {
+      display: none;
+    }
+  }
+</style>

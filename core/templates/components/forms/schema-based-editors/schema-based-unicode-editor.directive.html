@@ -10,10 +10,16 @@
   </textarea>
 
   <span ng-if="!$ctrl.getCodingMode() && !$ctrl.getRows()">
-    <input type="text" ng-disabled="$ctrl.isDisabled()" class="form-control display-inline"
-           ng-model="$ctrl.localValue" ng-blur="$ctrl.onInputBlur()"
-           ng-focus="$ctrl.onInputFocus()" focus-on="<[$ctrl.labelForFocusTarget()]>"
-           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()"
+    <input type="text"
+           ng-disabled="$ctrl.isDisabled()"
+           class="form-control display-inline"
+           ng-model="$ctrl.localValue"
+           ng-blur="$ctrl.onInputBlur()"
+           ng-focus="$ctrl.onInputFocus()"
+           focus-on="<[$ctrl.labelForFocusTarget()]>"
+           ng-keypress="$ctrl.onKeypress($event)"
+           placeholder="<[$ctrl.getPlaceholder()]>"
+           apply-validation validators="$ctrl.validators()"
            aria-label="text input">
   </span>
 
