@@ -61,7 +61,6 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     if (this.imgSrc !== undefined) {
-      console.log(this.imgSrc);
       this.updateSvgInViewIfSafe();
       this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
       this.height = this.aspectRatio === '4:3' ? '186px' : '180px';

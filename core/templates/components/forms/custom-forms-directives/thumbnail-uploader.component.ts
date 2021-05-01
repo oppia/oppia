@@ -17,14 +17,13 @@
  */
 
 import { OnChanges, SimpleChanges } from '@angular/core';
-import { OnInit } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { EditThumnailModalComponent } from './edit-thumbnail-modal.component';
@@ -66,39 +65,13 @@ export class ThumbnailUploaderComponent implements OnChanges {
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private ngbModal: NgbModal,
-    private assetsBackendApiService: AssetsBackendApiService,
+    private csrfTokenService: CsrfTokenService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
   placeholderImageDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
   thumbnailIsLoading = true;
-  // $watch is required here to update the thumbnail image
-  // everytime the thumbnail filename changes (eg. draft is discarded).
-  // The trusted resource url for the thumbnail should not be directly
-  // bound to ngSrc because it can cause an infinite digest error.
-  // eslint-disable-next-line max-len
-  // https://github.com/angular/angular.js/blob/master/CHANGELOG.md#sce-
-  // This watcher is triggered only if the thumbnail filename of the
-  // model changes. It would change for the following operations:
-  // 1. Initial render of the page containing this directive.
-  // 2. When a thumbnail is uploaded.
-  // 3. When a saved draft is discarded.
-  // this.$watch('getFilename()', function(filename) {
-  //   if (filename) {
-  //     this.editableThumbnailDataUrl = (
-  //       ImageUploadHelperService
-  //         .getTrustedResourceUrlForThumbnailFilename(
-  //           this.getFilename(),
-  //           ContextService.getEntityType(),
-  //           ContextService.getEntityId()));
-  //     filename = this.editableThumbnailDataUrl;
-  //   } else {
-  //     this.editableThumbnailDataUrl = placeholderImageDataUrl;
-  //     filename = null;
-  //   }
-  //   this.thumbnailIsLoading = false;
-  // });
 
   filenameChanges(newFilename: string): void {
     if (newFilename) {
@@ -108,7 +81,6 @@ export class ThumbnailUploaderComponent implements OnChanges {
             newFilename,
             this.contextService.getEntityType(),
             this.contextService.getEntityId()));
-      console.log(this.editableThumbnailDataUrl);
       this.filename = this.editableThumbnailDataUrl;
     } else {
       this.editableThumbnailDataUrl = this.placeholderImageDataUrl;
@@ -117,19 +89,13 @@ export class ThumbnailUploaderComponent implements OnChanges {
     this.thumbnailIsLoading = true;
   }
 
-  // ngOnInit(): void {
-  //   this.filenameChanges();
-  // }
-
   ngOnChanges(changes: SimpleChanges): void {
-    // console.log(changes);
-    // if (
-    //   changes.filename &&
-    //   changes.filename.currentValue !== changes.filename.previousValue) {
-    //   console.log('prya');
-    //   const newValue = changes.filename.currentValue;
-    //   this.filenameChanges(newValue);
-    // }
+    if (
+      changes.filename &&
+      changes.filename.currentValue !== changes.filename.previousValue) {
+      const newValue = changes.filename.currentValue;
+      this.filenameChanges(newValue);
+    }
   }
 
 
@@ -140,13 +106,10 @@ export class ThumbnailUploaderComponent implements OnChanges {
   }
 
   saveThumbnailImageData(imageURI: string, callback): void {
-    console.log(Blob);
     this.resampledFile = null;
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(
         imageURI));
-        console.log('priya1');
-        console.log(this.resampledFile);
 
     if (this.resampledFile === null) {
       this.alertsService.addWarning('Could not get resampled file.');
@@ -156,24 +119,47 @@ export class ThumbnailUploaderComponent implements OnChanges {
   }
 
   postImageToServer(resampledFile: Blob, callback: () => void): void {
-    this.assetsBackendApiService.saveMathExpresionImage(
-      resampledFile, this.tempImageName,
-      this.contextService.getEntityType(),
-      this.contextService.getEntityId()).then((data) => {
-      this.editableThumbnailDataUrl = (
-        this.imageUploadHelperService
-          .getTrustedResourceUrlForThumbnailFilename(
-            data.filename, this.contextService.getEntityType(),
-            this.contextService.getEntityId()));
-      console.log('editable thumbnail url' + this.editableThumbnailDataUrl);
-      callback();
-    }), ((data) => {
-    // Remove the XSSI prefix.
-      console.log('priya');
-      let transformedData = data.responseText.substring(5);
-      let parsedResponse = JSON.parse(transformedData);
-      this.alertsService.addWarning(
-        parsedResponse.error || 'Error communicating with server.');
+    let form = new FormData();
+    form.append('image', resampledFile);
+    form.append('payload', JSON.stringify({
+      filename: this.tempImageName,
+      filename_prefix: 'thumbnail'
+    }));
+    var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+      '<entity_type>/<entity_id>';
+    this.csrfTokenService.getTokenAsync().then((token) => {
+      form.append('csrf_token', token);
+      $.ajax({
+        url: this.urlInterpolationService.interpolateUrl(
+          imageUploadUrlTemplate, {
+            entity_type: this.contextService.getEntityType(),
+            entity_id: this.contextService.getEntityId()
+          }
+        ),
+        data: form,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        dataFilter: (data) => {
+          // Remove the XSSI prefix.
+          var transformedData = data.substring(5);
+          return JSON.parse(transformedData);
+        },
+        dataType: 'text'
+      }).done((data) => {
+        this.editableThumbnailDataUrl = (
+          this.imageUploadHelperService
+            .getTrustedResourceUrlForThumbnailFilename(
+              data.filename, this.contextService.getEntityType(),
+              this.contextService.getEntityId()));
+        callback();
+      }).fail((data) => {
+        // Remove the XSSI prefix.
+        var transformedData = data.responseText.substring(5);
+        var parsedResponse = JSON.parse(transformedData);
+        this.alertsService.addWarning(
+          parsedResponse.error || 'Error communicating with server.');
+      });
     });
   }
 
@@ -215,7 +201,6 @@ export class ThumbnailUploaderComponent implements OnChanges {
       this.thumbnailIsLoading = true;
       this.filename = this.imageUploadHelperService.generateImageFilename(
         data.dimensions.height, data.dimensions.width, 'svg');
-      // console.log(this.filename);
       this.newThumbnailDataUrl = data.newThumbnailDataUrl;
       if (!this.useLocalStorage) {
         if (data.openInUploadMode) {
@@ -223,7 +208,6 @@ export class ThumbnailUploaderComponent implements OnChanges {
             this.imageUploadHelperService.generateImageFilename(
               data.dimensions.height, data.dimensions.width, 'svg'));
           this.saveThumbnailImageData(data.newThumbnailDataUrl, () => {
-            console.log('priya1');
             this.filename = data.newThumbnailDataUrl;
             this.updateFilename(this.tempImageName);
             this.saveThumbnailBgColor(data.newBgColor);
