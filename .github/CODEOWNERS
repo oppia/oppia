@@ -106,6 +106,7 @@
 
 
 # Contributor Dashboard project.
+# TODO(#12691): Revert codeowners after 2021-05-10.
 /core/controllers/contributor_dashboard*.py @kevintab95
 /core/domain/opportunity*.py @kevintab95
 /core/domain/translation*.py @vojtechjelinek
