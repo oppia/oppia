@@ -75,7 +75,7 @@ export class CkEditorCopyContentService {
       }
       // Prevents reference errors if the element clicked on is itself the
       // OUTPUT_VIEW_TAG_NAME (i.e, ANGULAR-HTML-BIND).
-      if (this.isElementParentElementOutputView(currentElement)) {
+      if (this.isElementOrParentElementOutputView(currentElement)) {
         break;
       }
 
@@ -160,7 +160,7 @@ export class CkEditorCopyContentService {
 
   // Function to check if the parent element or the current element is
   // ANGULAR_HTML_BIND or not.
-  isElementParentElementOutputView(target: HTMLElement): boolean {
+  isElementOrParentElementOutputView(target: HTMLElement): boolean {
     if (target.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
       target.tagName === this.OUTPUT_VIEW_TAG_NAME) {
       return true;
