@@ -629,7 +629,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.get_html_response('/community-library')
 
         self.assertIn('<library-page>', response.body)
-        self.assertNotIn('site is temporarily unavailable', response.body)
+        self.assertNotIn('<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_json_response_is_rejected(self):
@@ -643,6 +643,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             response['error'],
             'Oppia is currently being upgraded, and the site should be up '
             'and running again in a few hours. Thanks for your patience!')
+        self.assertNotIn('login_url', response)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_json_response_is_not_rejected_when_user_is_super_admin(self):
@@ -654,6 +655,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertIn('login_url', response)
         self.assertIsNone(response['login_url'])
+        self.assertNotIn('error', response)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_csrfhandler_handler_is_not_rejected(self):
@@ -714,6 +716,9 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
+    # TODO(#12692): Use stateful login sessions to assert the behavior of
+    # logging out, rather than asserting that destroy_auth_session() gets
+    # called.
     def test_non_admin_auth_session_is_destroyed_when_in_maintenance_mode(self):
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
