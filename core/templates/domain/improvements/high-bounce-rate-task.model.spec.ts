@@ -241,7 +241,8 @@ describe('High bounce rate task', function() {
           },
         }));
       expect(() => task.refreshStatus(
-        statsWithWrongId, 1, config)).toThrowError(
+        statsWithWrongId, 1, config
+      )).toThrowError(
         'Expected stats for exploration id="eid" v1 but given stats are for ' +
           'exploration id="eid2" v1');
 

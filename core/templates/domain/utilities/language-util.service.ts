@@ -157,6 +157,7 @@ export class LanguageUtilService {
   getAllVoiceoverLanguageCodes(): string[] {
     return this.getAllAudioLanguageCodes();
   }
+
   getAudioLanguageDescription(audioLanguageCode: string): string | null {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
     return language ? language.description : null;

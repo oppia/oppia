@@ -118,11 +118,11 @@ export class UnitsObjectFactory {
         }
       } else if (unitList[ind] === ')') {
         var elem = parenthesisStack.pop();
-        // If the parenthesisStack is empty then we don't need to
-        // modify the value of multiplier and this is being done
-        // using multiplicative identity property.
-        var parsed: number = elem ? parseInt(<string> elem[1]) : 1;
-        multiplier = parsed * multiplier;
+        if (elem) {
+          multiplier = parseInt(<string> elem[1]) * multiplier;
+        } else {
+          throw new Error('The Parenthesis Stack is empty, elem not defined');
+        }
       } else if (this.isunit(unitList[ind])) {
         unitsWithMultiplier.push([unitList[ind], multiplier]);
         // If previous element was division then we need to invert
@@ -176,8 +176,8 @@ export class UnitsObjectFactory {
   }
 
   createCurrencyUnits(): void {
-    var keys = <CurrencyUnitsKeys>(
-      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+    var keys = (
+      <CurrencyUnitsKeys>(Object.keys(ObjectsDomainConstants.CURRENCY_UNITS))
     );
     for (var i = 0; i < keys.length; i++) {
       let baseUnitValue = (
@@ -208,8 +208,9 @@ export class UnitsObjectFactory {
     // Special symbols need to be replaced as math.js doesn't support custom
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
-    var keys = <CurrencyUnitsKeys>
-      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+    var keys = (
+      <CurrencyUnitsKeys>Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+    );
     for (var i = 0; i < keys.length; i++) {
       for (
         var j = 0;
