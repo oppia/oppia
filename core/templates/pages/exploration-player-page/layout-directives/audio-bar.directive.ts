@@ -282,7 +282,7 @@ angular.module('oppia').directive('audioBar', [
               )
             );
             $scope.audioBarIsExpanded = false;
-            $scope.progressBarIsShown = true;
+            $scope.progressBarIsShown = false;
 
             $scope.languagesInExploration =
               AudioTranslationLanguageService.getLanguageOptionsForDropdown();
