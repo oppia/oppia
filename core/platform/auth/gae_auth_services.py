@@ -74,10 +74,6 @@ def get_auth_claims_from_request(unused_request):
     Returns:
         AuthClaims|None. Claims about the currently signed in user. If no user
         is signed in, then returns None.
-
-    Raises:
-        InvalidAuthSessionError. The request contains an invalid session.
-        StaleAuthSessionError. The cookie has lost its authority.
     """
     gae_user = users.get_current_user()
     if gae_user is not None:
