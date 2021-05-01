@@ -702,6 +702,9 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
     def test_signup_succeeds_when_user_is_super_admin(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME, is_super_admin=True)
 
+    # TODO(#12692): Use stateful login sessions to assert the behavior of
+    # logging out, rather than asserting that destroy_auth_session() gets
+    # called.
     def test_admin_auth_session_is_preserved_when_in_maintenance_mode(self):
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
