@@ -261,6 +261,7 @@ const toastrConfig = {
     TranslateModule,
     // Components, directives, and pipes.
     AlertMessageComponent,
+    AttributionGuideComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
