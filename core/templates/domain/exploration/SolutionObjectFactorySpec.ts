@@ -144,6 +144,10 @@ describe('Solution object factory', () => {
         customizationArgsForItemSelectionAndDragAndDropInput)).toEqual(
         'One solution is "[[Choice 1],[Choice 2]]".' +
         ' This is the explanation to the answer.');
+      expect(solution.getDADAnswer(
+        'DragAndDropSortInput',
+        customizationArgsForItemSelectionAndDragAndDropInput
+      )).toEqual([['Choice 1'],['Choice 2']]);
     });
 
     it('should get oppia short answer', () => {
