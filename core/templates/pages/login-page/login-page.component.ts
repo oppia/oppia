@@ -45,35 +45,36 @@ export class LoginPageComponent implements OnInit {
     return AppConstants.EMULATOR_MODE;
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     if (this.emulatorModeIsEnabled) {
       this.loaderService.showLoadingScreen('');
     } else {
       this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     }
 
-    const userInfo = await this.userService.getUserInfoAsync();
-
-    if (userInfo.isLoggedIn()) {
-      this.redirectToHomePage();
-    } else if (this.emulatorModeIsEnabled) {
-      this.loaderService.hideLoadingScreen();
-    } else {
-      let redirectSucceeded = false;
-
-      try {
-        redirectSucceeded = await this.authService.handleRedirectResultAsync();
-      } catch (error) {
-        this.onSignInError(error);
-        return;
-      }
-
-      if (redirectSucceeded) {
-        this.redirectToSignUp();
+    this.userService.getUserInfoAsync().then(async(userInfo) => {
+      if (userInfo.isLoggedIn()) {
+        this.redirectToHomePage();
+      } else if (this.emulatorModeIsEnabled) {
+        this.loaderService.hideLoadingScreen();
       } else {
-        await this.authService.signInWithRedirectAsync();
+        let redirectSucceeded = false;
+
+        try {
+          redirectSucceeded = (
+            await this.authService.handleRedirectResultAsync());
+        } catch (error) {
+          this.onSignInError(error);
+          return;
+        }
+
+        if (redirectSucceeded) {
+          this.redirectToSignUp();
+        } else {
+          await this.authService.signInWithRedirectAsync();
+        }
       }
-    }
+    });
   }
 
   async onClickSignInButtonAsync(email: string): Promise<void> {
