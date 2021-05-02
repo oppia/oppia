@@ -60,7 +60,19 @@ export class StateSkillEditorComponent implements OnInit {
     this.skillEditorIsShown = (!this.windowDimensionsService.isWindowNarrow());
     this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
       .then((response: TopicsAndSkillDashboardData) => {
+        /**
+         * CategorizedSkills: dict. It represents the categorized
+         *   skills on the topic-and-skill-dashboard page.
+         *   Contains the following key:
+         *   key: dict. Contains the following key:
+         *      key: list(ShortSkillSummary). List of all the
+         *        categorized skills in the topic.
+        */
         this.categorizedSkills = response.categorizedSkillsDict;
+        /**
+         * UntriagedSkillSummaries: list(SkillSummary). A list of all
+         *   untriaged skills on the topic-and-skill-dashboard page.
+        */
         this.untriagedSkillSummaries = response.untriagedSkillSummaries;
       });
   }

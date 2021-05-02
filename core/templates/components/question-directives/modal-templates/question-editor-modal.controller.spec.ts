@@ -258,6 +258,19 @@ describe('Question Editor Modal Controller', function() {
       expect(modalSpy).toHaveBeenCalled();
     });
 
+    it('should close the modal on clicking cancel', () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>(
+          { componentInstance: MockNgbModalRef,
+            result: Promise.reject()
+          });
+      });
+      $scope.addSkill();
+      $scope.$apply();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
     it('should save and commit when there is no pending changes', function() {
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(true);
