@@ -67,7 +67,7 @@ describe('Moderator Page', function() {
     $rootScope = $injector.get('$rootScope');
     AlertsService = $injector.get('AlertsService');
     CsrfService = $injector.get('CsrfTokenService');
-    loadingMessage = '';
+    loadingMessage = null;
     LoaderService = $injector.get('LoaderService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
@@ -138,7 +138,7 @@ describe('Moderator Page', function() {
     expect(loadingMessage).toEqual('Loading');
     $httpBackend.flush(3);
 
-    expect(loadingMessage).toEqual('');
+    expect(loadingMessage).toBeNull();
     expect(ctrl.explorationData).toEqual(explorationIdsToExplorationData);
     expect(ctrl.allCommits).toEqual(commitsResults);
     expect(ctrl.allFeedbackMessages.length).toEqual(2);

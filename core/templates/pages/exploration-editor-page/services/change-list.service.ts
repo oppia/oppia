@@ -40,7 +40,7 @@ angular.module('oppia').factory('ChangeListService', [
     // Stack for storing undone changes. The last element is the most recently
     // undone change.
     var undoneChangeStack = [];
-    var loadingMessage = '';
+    var loadingMessage = null;
     LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     );
@@ -122,7 +122,7 @@ angular.module('oppia').factory('ChangeListService', [
     };
 
     var addChange = function(changeDict) {
-      if (loadingMessage) {
+      if (loadingMessage !== null) {
         return;
       }
       explorationChangeList.push(changeDict);

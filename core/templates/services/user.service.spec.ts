@@ -119,26 +119,6 @@ describe('User Api Service', () => {
       });
     }));
 
-  it('should return new userInfo data when url path is logout',
-    fakeAsync(() => {
-      spyOn(urlService, 'getPathname').and.returnValue('/logout');
-      const sampleUserInfo = UserInfo.createDefault();
-
-      userService.getUserInfoAsync().then((userInfo) => {
-        expect(userInfo).toEqual(sampleUserInfo);
-      });
-    }));
-
-  it('should return new userInfo data when url path is login',
-    fakeAsync(() => {
-      spyOn(urlService, 'getPathname').and.returnValue('/login');
-      const sampleUserInfo = UserInfo.createDefault();
-
-      userService.getUserInfoAsync().then((userInfo) => {
-        expect(userInfo).toEqual(sampleUserInfo);
-      });
-    }));
-
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
@@ -286,14 +266,12 @@ describe('User Api Service', () => {
     }));
 
   it('should return the login url', fakeAsync(() => {
+    spyOn(urlService, 'getPathname').and.returnValue('home');
     const loginUrl = '/login';
-    const currentUrl = 'home';
 
-    userService.getLoginUrlAsync().then((dataUrl) => {
-      expect(dataUrl).toBe(loginUrl);
-    });
+    userService.getLoginUrlAsync().then(url => expect(url).toEqual(loginUrl));
     const req = httpTestingController.expectOne(
-      '/url_handler?current_url=' + currentUrl);
+      '/url_handler?current_url=home');
     expect(req.request.method).toEqual('GET');
     req.flush({login_url: loginUrl});
 

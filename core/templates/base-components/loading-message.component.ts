@@ -24,7 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
    templateUrl: './loading-message.component.html'
  })
 export class LoadingMessageComponent {
-   @Input() message: string;
+   @Input() message: string = null;
 }
 
 angular.module('oppia').directive('oppiaLoadingMessage',

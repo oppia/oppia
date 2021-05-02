@@ -17,6 +17,7 @@
  */
 var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
@@ -98,9 +99,8 @@ describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', async function() {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.protractor-test-dev-mode')).isPresent())
-      .toBe(general.isInDevMode());
+    expect(await element(by.css('.protractor-test-dev-mode')).isPresent())
+      .toEqual(general.isInDevMode());
   });
 });
 
@@ -129,6 +129,28 @@ describe('Static Pages Tour', function() {
     expect(await element(
       by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
   });
+
+  it('should visit the Login page', async function() {
+    await browser.get('/login');
+    await waitFor.pageToFullyLoad();
+    expect(await element(
+      by.css('.protractor-test-login-page')).isPresent()).toBe(true);
+  });
+
+  it('should redirect to Home page if Login page is visited while logged in',
+    async function() {
+      await users.createAndLoginUser('user@navigation.com', 'navigationUser');
+      await browser.get('/login');
+      await waitFor.pageToFullyLoad();
+      expect(await element(
+        by.css('.protractor-test-login-page')).isPresent()).toBe(false);
+
+      await users.logout();
+      await browser.get('/login');
+      await waitFor.pageToFullyLoad();
+      expect(await element(
+        by.css('.protractor-test-login-page')).isPresent()).toBe(true);
+    });
 
   it('should visit the Teach page', async function() {
     await browser.get('/teach');

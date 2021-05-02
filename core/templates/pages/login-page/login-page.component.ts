@@ -26,6 +26,7 @@ import firebase from 'firebase/app';
 
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { UserService } from 'services/user.service';
 
 @Component({
   selector: 'login-page',
@@ -37,33 +38,42 @@ export class LoginPageComponent implements OnInit {
 
   constructor(
       private alertsService: AlertsService, private authService: AuthService,
-      private loaderService: LoaderService, private windowRef: WindowRef) {}
-
-  get enabled(): boolean {
-    return AppConstants.ENABLE_LOGIN_PAGE;
-  }
+      private loaderService: LoaderService, private userService: UserService,
+      private windowRef: WindowRef) {}
 
   get emulatorModeIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
   }
 
-  ngOnInit(): void {
-    if (!this.enabled) {
-      this.alertsService.addWarning(
-        'Sign-in is temporarily disabled. Please try again later.');
-      this.redirectToHomePage();
-      return;
-    }
-
+  async ngOnInit(): Promise<void> {
     if (this.emulatorModeIsEnabled) {
-      return;
+      this.loaderService.showLoadingScreen('');
+    } else {
+      this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     }
 
-    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
-    this.authService.handleRedirectResultAsync().then(
-      redirectSucceeded => redirectSucceeded ?
-        this.redirectToSignUp() : this.authService.signInWithRedirectAsync(),
-      error => this.onSignInError(error));
+    const userInfo = await this.userService.getUserInfoAsync();
+
+    if (userInfo.isLoggedIn()) {
+      this.redirectToHomePage();
+    } else if (this.emulatorModeIsEnabled) {
+      this.loaderService.hideLoadingScreen();
+    } else {
+      let redirectSucceeded = false;
+
+      try {
+        redirectSucceeded = await this.authService.handleRedirectResultAsync();
+      } catch (error) {
+        this.onSignInError(error);
+        return;
+      }
+
+      if (redirectSucceeded) {
+        this.redirectToSignUp();
+      } else {
+        await this.authService.signInWithRedirectAsync();
+      }
+    }
   }
 
   async onClickSignInButtonAsync(email: string): Promise<void> {

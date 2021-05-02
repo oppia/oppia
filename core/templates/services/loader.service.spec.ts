@@ -21,26 +21,25 @@ import { Subscription } from 'rxjs';
 
 describe('Loader Service', () => {
   const loaderService = new LoaderService();
-  let loadingMessage: string = '';
-  let subscriptions: Subscription;
+  let loadingMessage: string | null = null;
+  let subscription: Subscription;
+
   beforeEach(() => {
-    subscriptions = new Subscription();
-    subscriptions.add(loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
+    subscription = loaderService.onLoadingMessageChange.subscribe(
+      (m: string) => loadingMessage = m);
   });
 
   afterEach(() => {
-    subscriptions.unsubscribe();
+    subscription.unsubscribe();
   });
 
   it('should set the loading message', () => {
     loaderService.showLoadingScreen('Loading');
-    expect(loadingMessage).toBe('Loading');
+    expect(loadingMessage).toEqual('Loading');
   });
 
-  it('should set the loading message to empty quotes when unset', () => {
+  it('should set the loading message to null when unset', () => {
     loaderService.hideLoadingScreen();
-    expect(loadingMessage).toBe('');
+    expect(loadingMessage).toBeNull();
   });
 });

@@ -72,7 +72,7 @@ angular.module('oppia').directive('baseContent', [
           };
 
           var ctrl = this;
-          ctrl.loadingMessage = '';
+          ctrl.loadingMessage = null;
           ctrl.mobileNavOptionsAreShown = false;
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();

@@ -131,7 +131,7 @@ describe('Classroom page', () => {
 
       $rootScope.$apply();
 
-      expect(loadingMessage).toBe('');
+      expect(loadingMessage).toBeNull();
       expect(ctrl.bannerImageFileUrl).toBe('/assets/images/splash/books.svg');
       expect(ctrl.classroomDisplayName).toBe('Math');
 
