@@ -23,8 +23,6 @@ import feconf
 from jobs import job_utils
 import python_utils
 
-ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
-
 
 class BaseAuditError(python_utils.OBJECT):
     """Base class for model audit errors.

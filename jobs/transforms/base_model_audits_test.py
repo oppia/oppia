@@ -386,6 +386,12 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
         ])
 
 
+class MockValidateCommitCmdsSchema(base_model_audits.ValidateCommitCmdsSchema):
+
+    def process(self, input_model):
+        self._get_change_domain_class(input_model)
+
+
 class MockValidateCommitCmdsSchemaChangeDomain(
         base_model_audits.ValidateCommitCmdsSchema):
 
@@ -429,7 +435,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             commit_type='test',
             user_id='',
             post_commit_status='',
-            commit_cmds=[{'cmd-invalid': 'invalid_test_command'}])
+            commit_cmds=[{'cmd-invalid': 'invalid_test_command'}, {}])
 
         output = (
             self.pipeline
@@ -466,3 +472,37 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 '{u\'cmd\': u\'invalid_test_command\'}',
                 'Command invalid_test_command is not allowed')
         ])
+
+    def test_validate_raise_not_implemented(self):
+        invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{}])
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_change_domain_class\(\) method is missing from the '
+            'derived class. It should be implemented in the derived class.'):
+            MockValidateCommitCmdsSchema().process(invalid_commit_cmd_model)
+
+    def test_validate_commit_cmds(self):
+        invalid_commit_cmd_model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(MockValidateWrongSchema())
+        )
+
+        self.assert_pcoll_equal(output, [])
