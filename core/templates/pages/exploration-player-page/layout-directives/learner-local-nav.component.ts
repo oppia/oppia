@@ -16,7 +16,7 @@
  * @fileoverview Component for the local navigation in the learner view.
  */
 
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
@@ -62,7 +62,8 @@ export class LearnerLocalNavComponent {
       backdrop: 'static'
     }).result.then((result: FlagExplorationModalResult) => {
       this.learnerLocalNavBackendApiService
-        .postReportAsync(this.explorationId, result).then(() => {},
+        .postReportAsync(this.explorationId, result).then(
+          () => {},
           (error) => {
             this.alertsService.addWarning(error);
           });
