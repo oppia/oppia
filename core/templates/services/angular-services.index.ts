@@ -343,8 +343,9 @@ import { ExplorationCreationService } from 'components/entity-creation-services/
 import { ImageLocalStorageService } from './image-local-storage.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
-import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
+import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
+import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -430,6 +431,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
+  ['ExplorationEngineService', ExplorationEngineService],
   ['ExplorationFeaturesBackendApiService',
     ExplorationFeaturesBackendApiService],
   ['ExplorationFeaturesService', ExplorationFeaturesService],
@@ -533,6 +535,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
+  ['NotificationsDashboardPageBackendApiService',
+    NotificationsDashboardPageBackendApiService],
   ['NumberAttemptsService', NumberAttemptsService],
   ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],

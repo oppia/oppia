@@ -38,6 +38,7 @@ import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
@@ -45,6 +46,7 @@ import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashb
     HttpClientModule,
     SharedComponentsModule,
     DynamicContentModule,
+    FormsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -59,6 +61,7 @@ import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashb
     SelectTopicsComponent,
     TopicsAndSkillsDashboardPageComponent,
     CreateNewTopicModalComponent
+    DeleteTopicModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
