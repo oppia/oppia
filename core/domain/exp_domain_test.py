@@ -1040,28 +1040,36 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
         old_answer_groups = copy.deepcopy(init_state.interaction.answer_groups)
-        old_answer_groups.append(
-            state_domain.AnswerGroup(
-                state_domain.Outcome(
-                    exploration.init_state_name, state_domain.SubtitledHtml(
-                        'feedback_1', '<p>Feedback</p>'),
-                    False, [], None, None),
-                [
-                    state_domain.RuleSpec(
-                        'Contains',
-                        {
-                            'x':
-                            {
-                                'contentId': 'rule_input_Equals',
-                                'normalizedStrSet': ['Test']
-                            }
-                        })
-                ],
-                [],
-                None
-            )
-        )
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        old_answer_groups.append({
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        })
+
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
 
         exploration.validate()
 
@@ -1075,7 +1083,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid exploration.
         self.set_interaction_for_state(
             init_state, 'TextInput')
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
         answer_group.outcome.dest = exploration.init_state_name
@@ -1108,17 +1120,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name],
             'PencilCodeEditor')
-        temp_rule = old_answer_groups[0].rule_specs[0]
-        old_answer_groups[0].rule_specs[0] = state_domain.RuleSpec(
-            'ErrorContains',
-            {
-                'x': '{{ExampleParam}}'
-            }
-        )
-        old_answer_groups[0].rule_specs[0].rule_type = 'ErrorContains'
-
-        init_state.update_interaction_answer_groups(old_answer_groups)
-        old_answer_groups[0].rule_specs[0] = temp_rule
+        temp_rule = old_answer_groups[0]['rule_specs'][0]
+        old_answer_groups[0]['rule_specs'][0] = {
+            'rule_type': 'ErrorContains',
+            'inputs': {'x': '{{ExampleParam}}'}
+        }
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        old_answer_groups[0]['rule_specs'][0] = temp_rule
 
         self._assert_validation_error(
             exploration,
@@ -1224,7 +1236,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.id = 'PencilCodeEditor'
 
         self.set_interaction_for_state(init_state, 'TextInput')
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
         rule_spec.inputs = {'x': {
             'contentId': 'rule_input_Equals',
@@ -1262,7 +1278,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
 
-        init_state.update_interaction_answer_groups(old_state_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
@@ -1275,7 +1295,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Non-terminal interactions must have a default outcome.')
 
         self.set_interaction_for_state(init_state, 'EndExploration')
-        init_state.interaction.answer_groups = answer_groups
+        init_state.interaction.answer_groups = [answer_groups]
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
@@ -1288,7 +1308,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid exploration.
         self.set_interaction_for_state(init_state, 'TextInput')
         answer_groups_list = [
-            answer_group for answer_group in answer_groups]
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in [answer_groups]
+            ]
         init_state.update_interaction_answer_groups(answer_groups_list)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
