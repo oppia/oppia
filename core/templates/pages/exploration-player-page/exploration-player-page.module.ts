@@ -39,6 +39,7 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { MatButtonModule } from '@angular/material/button';
+import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 
 @NgModule({
   imports: [
@@ -89,7 +90,6 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
