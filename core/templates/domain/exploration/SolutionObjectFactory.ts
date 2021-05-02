@@ -20,12 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import {
-  CapitalizePipe
-} from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -37,7 +33,6 @@ import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import {
-  DragAndDropAnswer,
   FractionAnswer,
   InteractionAnswer,
   LogicProofAnswer,
@@ -45,14 +40,12 @@ import {
   PencilCodeEditorAnswer
 } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {
   DragAndDropSortInputCustomizationArgs,
   InteractionCustomizationArgs,
 } from 'interactions/customization-args-defs';
 import { InteractionObjectFactory } from
-'domain/exploration/InteractionObjectFactory';
-import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+  'domain/exploration/InteractionObjectFactory';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 export interface ExplanationBackendDict {
@@ -77,7 +70,6 @@ export class Solution {
   customizationArgs: InteractionCustomizationArgs;
   InteractionObjectFactory: InteractionObjectFactory;
   StateInteractionIdService: StateInteractionIdService;
-  StateCustomizationArgService: StateCustomizationArgsService;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
@@ -99,37 +91,9 @@ export class Solution {
     };
   }
 
-  /*if (StateInteractionIdService) {
-    var interactionSpec = INTERACTION_SPECS[
-      StateInteractionIdService.savedMemento];
-    this.customizationArgSpecs = interactionSpec.customization_arg_specs;
-  
-    StateInteractionIdService.displayed = angular.copy(
-      StateInteractionIdService.savedMemento);
-    StateCustomizationArgsService.displayed = (
-      StateCustomizationArgsService.savedMemento);
-  
-    // Ensure that StateCustomizationArgsService.displayed is
-    // fully populated.
-    for (var i = 0; i < this.customizationArgSpecs.length; i++) {
-      var argName = this.customizationArgSpecs[i].name;
-      if (
-        !StateCustomizationArgsService.savedMemento.hasOwnProperty(argName)
-      ) {
-        throw new Error(
-          `Interaction is missing customization argument ${argName}`);
-      }
-    }
-  
-    StateCustomizationArgsService.onSchemaBasedFormsShown.emit();
-    /*this.form = {};
-    this.hasCustomizationArgs = (
-      StateCustomizationArgsService.displayed &&
-      Object.keys(StateCustomizationArgsService.displayed).length > 0
-    );
-  }*/
-
-  getSummary(interactionId: string, customizationArgs: InteractionCustomizationArgs): string {
+  getSummary(
+      interactionId: string,
+      customizationArgs: InteractionCustomizationArgs): string {
     var solutionType = (
       this.answerIsExclusive ? 'The only' : 'One');
     var correctAnswer = null;
@@ -150,18 +114,17 @@ export class Solution {
         new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
         <NumberWithUnitsAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
-      let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
       correctAnswer = [];
-      for (let arr of <DragAndDropAnswer> this.correctAnswer) {
+      customizationArgs = (
+        <DragAndDropSortInputCustomizationArgs>
+        customizationArgs).choices.value.map(
+        choice => choice.html);
+      let transformedArrayone = [];
+      var transformedArraytwo = transformedArrayone.concat(customizationArgs);
+      transformedArrayone.push(customizationArgs);
+      for (let elem of transformedArraytwo) {
         let transformedArray = [];
-        for (let elem of arr) {
-          transformedArray.push(formatRtePreview.transform(elem));
-            (<
-              DragAndDropSortInputCustomizationArgs
-            > customizationArgs).choices.value.map(val => (
-              { val: val.contentId, label: val.html}
-            ));
-        }
+        transformedArray.push(elem);
         correctAnswer.push(transformedArray);
       }
       correctAnswer = JSON.stringify(correctAnswer);
@@ -178,6 +141,24 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
+  getDADAnswer(
+      interactionId: 'DragAndDropSortInput',
+      customizationArgs: InteractionCustomizationArgs): string {
+    var correctAnswer = null;
+    correctAnswer = [];
+    customizationArgs = (
+      <DragAndDropSortInputCustomizationArgs> customizationArgs
+    ).choices.value.map(
+      choice => choice.html);
+    let transformedArrayone = [];
+    var transformedArraytwo = transformedArrayone.concat(customizationArgs);
+    for (let elem of transformedArraytwo) {
+      let transformedArray = [];
+      transformedArray.push(elem);
+      correctAnswer.push(transformedArray);
+    }
+    return correctAnswer;
+  }
   setCorrectAnswer(correctAnswer: InteractionAnswer): void {
     this.correctAnswer = correctAnswer;
   }

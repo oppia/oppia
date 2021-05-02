@@ -129,12 +129,21 @@ describe('Solution object factory', () => {
         'One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
-        ['<p>1</p>', '<b>3</b>'],
-        ['c', '<oppia-noninteractive-math></oppia-noninteractive-math>']
+        ['Choice 1'], ['Choice 2']
       ]);
-      expect(solution.getSummary('DragAndDropSortInput')).toEqual(
-        'One solution is "[[1,3],[c,[Math]]]". This is the explanation to ' +
-        'the answer.');
+      const customizationArgsForItemSelectionAndDragAndDropInput = {
+        choices: {
+          value: [
+            new SubtitledHtml('Choice 1', 'ca_choices_0'),
+            new SubtitledHtml('Choice 2', 'ca_choices_1')
+          ]
+        }
+      };
+      expect(solution.getSummary(
+        'DragAndDropSortInput',
+        customizationArgsForItemSelectionAndDragAndDropInput)).toEqual(
+        'One solution is "[[Choice 1],[Choice 2]]".' +
+        ' This is the explanation to the answer.');
     });
 
     it('should get oppia short answer', () => {

@@ -132,9 +132,11 @@ angular.module('oppia').directive('stateSolutionEditor', [
           };
 
           $scope.getSolutionSummary = function() {
-            var solution = (StateSolutionService.savedMemento, StateCustomizationArgsService.savedMemento);
+            var solution = (StateSolutionService.savedMemento);
             var solutionAsPlainText =
-              solution.getSummary(StateInteractionIdService.savedMemento, StateCustomizationArgsService.savedMemento);
+              solution.getSummary(
+                StateInteractionIdService.savedMemento,
+                StateCustomizationArgsService.savedMemento);
             solutionAsPlainText =
               $filter('convertToPlainText')(solutionAsPlainText);
             return solutionAsPlainText;

@@ -74,10 +74,28 @@ angular.module('oppia').directive('solutionEditor', [
         function(StateSolutionService) {
           var ctrl = this;
           ctrl.getAnswerHtml = function() {
-            return ExplorationHtmlFormatterService.getAnswerHtml(
-              StateSolutionService.savedMemento.correctAnswer,
-              StateInteractionIdService.savedMemento,
-              StateCustomizationArgsService.savedMemento);
+            var interactionId = StateInteractionIdService.savedMemento;
+            if (interactionId === 'DragAndDropSortInput') {
+              var answer = ctrl.getSolutionSummary();
+              return ExplorationHtmlFormatterService.getAnswerHtml(
+                answer,
+                StateInteractionIdService.savedMemento,
+                StateCustomizationArgsService.savedMemento);
+            } else {
+              return ExplorationHtmlFormatterService.getAnswerHtml(
+                StateSolutionService.savedMemento.correctAnswer,
+                StateInteractionIdService.savedMemento,
+                StateCustomizationArgsService.savedMemento);
+            }
+          };
+
+          ctrl.getSolutionSummary = function() {
+            var solution = (StateSolutionService.savedMemento);
+            var solutionAsPlainText =
+              solution.getDADAnswer(
+                StateInteractionIdService.savedMemento,
+                StateCustomizationArgsService.savedMemento);
+            return solutionAsPlainText;
           };
           ctrl.$onInit = function() {
             ctrl.StateSolutionService = StateSolutionService;
