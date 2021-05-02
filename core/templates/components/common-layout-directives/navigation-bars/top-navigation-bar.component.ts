@@ -36,6 +36,12 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NavigationBackendApiService } from 'services/navigation-backend-api.service';
 
+interface EventType {
+  keyCode?: number,
+  shiftKey?: boolean,
+  currentTarget?: string
+}
+
 @Component({
   selector: 'top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
@@ -237,10 +243,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
      * @param {String} menuName - name of menu, on which
      * open/close action to be performed (aboutMenu,profileMenu).
      */
-   openSubmenu(evt: {
-    keyCode: string;
-    shiftKey: string;
-    currentTarget: string; }, menuName: string): void {
+   openSubmenu(evt: EventType, menuName: string): void {
      // Focus on the current target before opening its submenu.
      this.navigationService.openSubmenu(evt, menuName);
    }
@@ -253,17 +256,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
      $('nav a').blur();
    }
 
-   closeSubmenu(evt: {
-    keyCode: string;
-    shiftKey: string;
-    currentTarget: string; }): void {
+   closeSubmenu(evt: EventType): void {
      this.navigationService.closeSubmenu(evt);
    }
 
-   closeSubmenuIfNotMobile(evt: {
-    keyCode: string;
-    shiftKey: string;
-    currentTarget: string; }): void {
+   closeSubmenuIfNotMobile(evt: EventType): void {
      if (this.deviceInfoService.isMobileDevice()) {
        return;
      }
@@ -280,10 +277,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
      * @example
      *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
      */
-   onMenuKeypress(evt: {
-    keyCode: string;
-    shiftKey: string;
-    currentTarget: string; }, menuName: string, eventsTobeHandled: {
+   onMenuKeypress(evt: EventType, menuName: string, eventsTobeHandled: {
        [key: string]: string; }): void {
      this.navigationService.onMenuKeypress(
        evt, menuName, eventsTobeHandled);
