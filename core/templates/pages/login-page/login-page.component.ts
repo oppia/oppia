@@ -52,29 +52,40 @@ export class LoginPageComponent implements OnInit {
       this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     }
 
-    this.userService.getUserInfoAsync().then(async(userInfo) => {
-      if (userInfo.isLoggedIn()) {
-        this.redirectToHomePage();
-      } else if (this.emulatorModeIsEnabled) {
-        this.loaderService.hideLoadingScreen();
-      } else {
-        let redirectSucceeded = false;
+    this.userService.getUserInfoAsync().then(
+      async(userInfo) => {
+        if (userInfo.isLoggedIn()) {
+          this.redirectToHomePage();
+          return;
+        }
 
+        if (this.emulatorModeIsEnabled) {
+          this.loaderService.hideLoadingScreen();
+          return;
+        }
+
+        let userDidRedirect = false;
         try {
-          redirectSucceeded = (
-            await this.authService.handleRedirectResultAsync());
+          userDidRedirect = await this.authService.handleRedirectResultAsync();
         } catch (error) {
           this.onSignInError(error);
           return;
         }
 
-        if (redirectSucceeded) {
+        if (userDidRedirect) {
           this.redirectToSignUp();
-        } else {
-          await this.authService.signInWithRedirectAsync();
+          return;
         }
-      }
-    });
+
+        try {
+          await this.authService.signInWithRedirectAsync();
+        } catch (error) {
+          this.onSignInError(error);
+        }
+      },
+      error => {
+        this.onSignInError(error);
+      });
   }
 
   async onClickSignInButtonAsync(email: string): Promise<void> {
@@ -90,8 +101,8 @@ export class LoginPageComponent implements OnInit {
     }
 
     this.alertsService.addWarning(error.message);
-    this.loaderService.hideLoadingScreen();
     if (this.emulatorModeIsEnabled) {
+      this.loaderService.hideLoadingScreen();
       this.email.setValue('');
     } else {
       setTimeout(() => this.redirectToHomePage(), 2000);

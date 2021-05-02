@@ -84,6 +84,12 @@ describe('Login Page', () => {
     return pending;
   };
 
+  const spyOnSignInWithRedirectAsync = () => {
+    const pending = new PendingPromise<void>();
+    authService.signInWithRedirectAsync.and.returnValue(pending.promise);
+    return pending;
+  };
+
   const spyOnSignInWithEmail = () => {
     const pending = new PendingPromise();
     authService.signInWithEmail.and.returnValue(pending.promise);
@@ -299,7 +305,7 @@ describe('Login Page', () => {
 
       expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
 
-      redirectResultPromise.resolve(null);
+      redirectResultPromise.resolve(false);
       flushMicrotasks();
 
       expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
@@ -319,6 +325,35 @@ describe('Login Page', () => {
       flushMicrotasks();
 
       expect(windowRef.location).toEqual('/signup?return_url=/admin');
+    }));
+
+    it('should redirect to home page when sign in with redirect fails',
+      fakeAsync(() => {
+        const signInWithRedirectAsyncPromise = spyOnSignInWithRedirectAsync();
+
+        loginPageComponent.ngOnInit();
+        flushMicrotasks();
+
+        expect(windowRef.location).toBeNull();
+
+        signInWithRedirectAsyncPromise.reject(
+          {code: 'auth/unknown-error', message: '?'});
+
+        flush();
+
+        expect(windowRef.location).toEqual('/');
+      }));
+
+    it('should redirect to home page when it cannot determine if user is ' +
+      'logged in', fakeAsync(() => {
+      userService.getUserInfoAsync.and.rejectWith(Error('uh-oh!'));
+
+      expect(windowRef.location).toBeNull();
+
+      loginPageComponent.ngOnInit();
+      flush();
+
+      expect(windowRef.location).toEqual('/');
     }));
   });
 });
