@@ -208,6 +208,7 @@
         "jobs.transforms.audits_registry_test",
         "jobs.transforms.auth_audits_test",
         "jobs.transforms.base_model_audits_test",
+        "jobs.transforms.exp_model_audits_test",
         "jobs.transforms.user_audits_test",
         "jobs.types.audit_errors_test",
         "jobs.types.model_property_test"
