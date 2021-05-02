@@ -38,7 +38,7 @@
 /core/templates/components/ @srijanreddy98
 /core/templates/domain/ @kevintab95
 /core/templates/pages/ @srijanreddy98
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/services/ @DubeySandeep
 /extensions/ @vojtechjelinek
 /scripts/ @DubeySandeep
@@ -131,7 +131,7 @@
 
 
 # Dashboard pages.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, next 16 lines
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08, next 16 lines
 /core/controllers/creator_dashboard*.py @DubeySandeep
 /core/controllers/email_dashboard*.py @DubeySandeep
 /core/controllers/learner_dashboard*.py @DubeySandeep
@@ -167,7 +167,7 @@
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
 # TODO(#12694): Add @nithusha21 as owner after 2021-05-08
-/scripts/check_frontend_test_coverage*.py @DubeySandeep @kevintab95
+/scripts/check_frontend_test_coverage*.py @DubeySandeep
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @DubeySandeep @vojtechjelinek
@@ -228,9 +228,9 @@
 
 
 # Google-app-engine configurations
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /appengine_config*.py @vojtechjelinek
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /cron.yaml @vojtechjelinek
 /index.yaml @vojtechjelinek
 /queue.yaml @vojtechjelinek
@@ -369,7 +369,7 @@
 
 
 # Navigation bar project.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, next 6 lines
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08, next 6 lines
 /core/templates/components/button-directives/create-activity-button.component.ts @aks681
 /core/templates/components/button-directives/create-activity-button.component.html @aks681
 /core/templates/components/common-layout-directives/navigation-bars/ @aks681
@@ -454,19 +454,19 @@
 # Infrastructure.
 # TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
 /jobs/ @vojtechjelinek
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/controllers/cron*.py @vojtechjelinek
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/domain/cron_services*.py @vojtechjelinek
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /main_cron.py @vojtechjelinek
 # TODO(#12694): Add @nithusha21 as owner after 2021-05-08
 /main.py @DubeySandeep
 # TODO(#12694): Add @nithusha21 as owner after 2021-05-08
 /feconf.py @DubeySandeep @seanlip
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /constants*.py @vojtechjelinek
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /assets/constants.ts @vojtechjelinek
 /core/controllers/tasks*.py @aks681
 /core/domain/audit_validators*.py @vojtechjelinek
@@ -485,15 +485,15 @@
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/pages/interaction-specs.constants.ts @kevintab95
 # TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
 /core/templates/pages/login-page/ @vojtechjelinek
 # TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
 /core/templates/pages/logout-page/ @vojtechjelinek
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/I18nFooter.ts @kevintab95
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/i18n-footer.directive.html @kevintab95
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
@@ -501,7 +501,7 @@
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @srijanreddy98
 /redis.conf @BenHenning
 # TODO(#12694): Add @nithusha21 as owner after 2021-05-08
@@ -511,14 +511,14 @@
 
 
 # Miscellaneous.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, next 4 lines
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08, next 4 lines
 /__init__.py @DubeySandeep
 /core/__init__.py @DubeySandeep
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @DubeySandeep
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/tests/ @DubeySandeep
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
@@ -570,7 +570,7 @@
 
 # Suggestion and feedback team.
 # Suggestion project.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, next 5 lines
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08, next 5 lines
 /core/controllers/suggestion*.py @DubeySandeep
 /core/domain/suggestion*.py @DubeySandeep
 /core/templates/domain/suggestion/ @DubeySandeep
@@ -579,7 +579,7 @@
 
 
 # Feedback project.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, next 7 lines
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08, next 7 lines
 /core/controllers/feedback*.py @aks681
 /core/domain/feedback*.py @aks681
 /core/templates/components/ratings/rating-display/rating-display.directive.html @aks681
@@ -661,7 +661,7 @@
 
 
 # Frontend unit tests
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08, next 4 lines
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08, next 4 lines
 /core/templates/**/*.spec.ts @srijanreddy98
 /core/templates/**/*Spec.ts @srijanreddy98
 /extensions/**/*.spec.ts @srijanreddy98
@@ -672,11 +672,11 @@
 
 
 # QA team.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/tests/ @kevintab95
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /assets/ @kevintab95
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+# TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /data/ @kevintab95
 /core/templates/karma.module.ts @vojtechjelinek
 /core/tests/protractor_utils/ @U8NWXD @kevintab95
