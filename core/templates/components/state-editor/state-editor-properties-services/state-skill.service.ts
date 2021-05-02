@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
-  // eslint-disable-next-line
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
 import { UtilsService } from 'services/utils.service';
 
