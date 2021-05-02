@@ -46,48 +46,41 @@ export class LoginPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.emulatorModeIsEnabled) {
-      // NOTE: Using 'Loading' instead of an I18N string because emulator mode
-      // is only enabled for developers, who must use English for Oppia anyway.
-      this.loaderService.showLoadingScreen('Loading');
-    } else {
-      this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
-    }
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
 
-    this.userService.getUserInfoAsync().then(
-      async(userInfo) => {
-        if (userInfo.isLoggedIn()) {
-          this.redirectToHomePage();
-          return;
-        }
+    this.userService.getUserInfoAsync().then(async(userInfo) => {
+      if (userInfo.isLoggedIn()) {
+        this.redirectToHomePage();
+        return;
+      }
 
-        if (this.emulatorModeIsEnabled) {
-          this.loaderService.hideLoadingScreen();
-          return;
-        }
+      if (this.emulatorModeIsEnabled) {
+        this.loaderService.hideLoadingScreen();
+        return;
+      }
 
-        let userDidSignIn = false;
-        try {
-          userDidSignIn = await this.authService.handleRedirectResultAsync();
-        } catch (error) {
-          this.onSignInError(error);
-          return;
-        }
-
-        if (userDidSignIn) {
-          this.redirectToSignUp();
-          return;
-        }
-
-        try {
-          await this.authService.signInWithRedirectAsync();
-        } catch (error) {
-          this.onSignInError(error);
-        }
-      },
-      error => {
+      let userDidSignIn = false;
+      try {
+        userDidSignIn = await this.authService.handleRedirectResultAsync();
+      } catch (error) {
         this.onSignInError(error);
-      });
+        return;
+      }
+
+      if (userDidSignIn) {
+        this.redirectToSignUp();
+        return;
+      }
+
+      try {
+        await this.authService.signInWithRedirectAsync();
+      } catch (error) {
+        this.onSignInError(error);
+      }
+    },
+    error => {
+      this.onSignInError(error);
+    });
   }
 
   async onClickSignInButtonAsync(email: string): Promise<void> {
