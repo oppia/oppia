@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
 import firebase from 'firebase/app';
 
+import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 @Component({
   selector: 'login-page',
@@ -54,7 +54,7 @@ export class LoginPageComponent implements OnInit {
 
     this.userService.getUserInfoAsync().then(async(userInfo) => {
       if (userInfo.isLoggedIn()) {
-        this.redirectTo('/');
+        this.redirectToPath('/');
         return;
       }
 
@@ -102,7 +102,7 @@ export class LoginPageComponent implements OnInit {
 
   private onSignInError(error: firebase.auth.Error): void {
     if (error.code === 'auth/user-disabled') {
-      this.redirectTo('/pending-account-deletion');
+      this.redirectToPath('/pending-account-deletion');
       return;
     }
 
@@ -112,17 +112,17 @@ export class LoginPageComponent implements OnInit {
       this.email.setValue('');
       this.loaderService.hideLoadingScreen();
     } else {
-      setTimeout(() => this.redirectTo('/'), 2000);
+      setTimeout(() => this.redirectToPath('/'), 2000);
     }
   }
 
   private redirectToSignUp(): void {
     const queryParams = this.windowRef.nativeWindow.location.search;
     const returnUrl = new URLSearchParams(queryParams).get('return_url') ?? '/';
-    this.redirectTo(`/signup?return_url=${returnUrl}`);
+    this.redirectToPath(`/signup?return_url=${returnUrl}`);
   }
 
-  private redirectTo(destination: string): void {
+  private redirectToPath(destination: string): void {
     this.windowRef.nativeWindow.location.assign(destination);
   }
 }
