@@ -147,7 +147,7 @@ describe('Solution object factory', () => {
       expect(solution.getDADAnswer(
         'DragAndDropSortInput',
         customizationArgsForItemSelectionAndDragAndDropInput
-      )).toEqual([['Choice 1'],['Choice 2']]);
+      )).toEqual([['Choice 1'], ['Choice 2']]);
     });
 
     it('should get oppia short answer', () => {
