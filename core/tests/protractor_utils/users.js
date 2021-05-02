@@ -85,13 +85,20 @@ var logout = async function() {
 // that this will fail if the user already has a username.
 var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
+
+  var signupPage = element(by.css('.protractor-test-signup-page'));
+  await waitFor.presenceOf(signupPage, 'Signup page did not load');
+
   var usernameInput = element(by.css('.protractor-test-username-input'));
-  var agreeToTermsCheckbox = element(
-    by.css('.protractor-test-agree-to-terms-checkbox'));
-  var registerUser = element(by.css('.protractor-test-register-user'));
   await action.sendKeys('Username input', usernameInput, username);
-  await action.click('agreeToTerms Checkbox', agreeToTermsCheckbox);
-  await action.click('Register User button', registerUser);
+
+  var agreeToTermsCheckbox = (
+    element(by.css('.protractor-test-agree-to-terms-checkbox')));
+  await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
+
+  var registerUser = element(by.css('.protractor-test-register-user'));
+  await action.click('Register user button', registerUser);
+
   await waitFor.pageToFullyLoad();
 };
 
