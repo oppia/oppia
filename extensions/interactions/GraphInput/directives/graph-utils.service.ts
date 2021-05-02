@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { GraphAnswer } from 'interactions/answer-defs.ts';
+import { GraphAnswer } from 'interactions/answer-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +48,7 @@ export class GraphUtilsService {
    */
   constructAdjacencyLists(
       graph: GraphAnswer, adjacencyListMode: string): number[][] {
-    var adjacencyLists = [];
+    var adjacencyLists: number[][] = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       adjacencyLists.push([]);
     }
@@ -117,8 +117,8 @@ export class GraphUtilsService {
     return false;
   }
 
-  constructAdjacencyMatrix(graph: GraphAnswer): number[][] {
-    var adjMatrix = [];
+  constructAdjacencyMatrix(graph: GraphAnswer): (number | null)[][] {
+    var adjMatrix: (number | null)[][] = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       var adjMatrixRow = [];
       for (var j = 0; j < graph.vertices.length; j++) {
@@ -137,13 +137,13 @@ export class GraphUtilsService {
     return adjMatrix;
   }
 
-  nextPermutation(permutation: number[]): number[] {
+  nextPermutation(permutation: number[]): number[] | null {
     // Generates (in place) the next lexicographical permutation.
     // permutation is a permutation of [0, 1, 2, ..., permutation.length - 1].
 
     // Find the pivot to longest decreasing suffix and successor.
-    var pivot = null;
-    var successor = null;
+    var pivot: number | null = null;
+    var successor: number | null = null;
     permutation.reduce((
         previousValue: number, currentValue: number, currentIndex: number) => {
       if (previousValue < currentValue) {
@@ -155,7 +155,7 @@ export class GraphUtilsService {
       return currentValue;
     });
 
-    if (pivot === null) {
+    if (pivot === null || successor === null) {
       return null;
     }
 
@@ -168,7 +168,7 @@ export class GraphUtilsService {
   }
 
   areAdjacencyMatricesEqualWithPermutation(
-      adj1: number[][], adj2: number[][],
+      adj1: (number | null)[][], adj2: (number | null)[][],
       permutation: number[]): boolean {
     var numVertices = adj1.length;
     for (var i = 0; i < numVertices; i++) {
