@@ -26,6 +26,8 @@ import { FlagExplorationModalResult } from '../modals/flag-exploration-modal.com
   providedIn: 'root'
 })
 export class LearnerLocalNavBackendApiService {
+  flagExplorationUrl: string;
+
   constructor(
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -34,7 +36,7 @@ export class LearnerLocalNavBackendApiService {
   async postReportAsync(
       explorationId: string, result: FlagExplorationModalResult):
     Promise<Object> {
-    let flagExplorationUrl = this.urlInterpolationService.interpolateUrl(
+    this.flagExplorationUrl = this.urlInterpolationService.interpolateUrl(
       ExplorationPlayerConstants.FLAG_EXPLORATION_URL_TEMPLATE, {
         exploration_id: explorationId
       }
@@ -42,7 +44,7 @@ export class LearnerLocalNavBackendApiService {
     let report = (
       '[' + result.state + '] (' + result.report_type + ')' +
         result.report_text);
-    return this.httpClient.post(flagExplorationUrl, {
+    return this.httpClient.post(this.flagExplorationUrl, {
       report_text: report
     }).toPromise();
   }
