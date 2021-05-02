@@ -31,7 +31,7 @@
                (change)="showFlagMessageTextarea(flag)">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate }}
       </label>
-      <p *ngIf="flageMessageTextareaIsShown">
+      <p *ngIf="flagMessageTextareaIsShown">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}
         <textarea rows="3" cols="50"
                   [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}"
