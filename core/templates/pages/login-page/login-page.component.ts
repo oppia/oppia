@@ -50,7 +50,7 @@ export class LoginPageComponent implements OnInit {
 
     this.userService.getUserInfoAsync().then(async(userInfo) => {
       if (userInfo.isLoggedIn()) {
-        this.redirectToHomePage();
+        this.redirectTo('/');
         return;
       }
 
@@ -59,15 +59,15 @@ export class LoginPageComponent implements OnInit {
         return;
       }
 
-      let userDidSignIn = false;
+      let authSucceeded = false;
       try {
-        userDidSignIn = await this.authService.handleRedirectResultAsync();
+        authSucceeded = await this.authService.handleRedirectResultAsync();
       } catch (error) {
         this.onSignInError(error);
         return;
       }
 
-      if (userDidSignIn) {
+      if (authSucceeded) {
         this.redirectToSignUp();
         return;
       }
@@ -85,39 +85,41 @@ export class LoginPageComponent implements OnInit {
 
   async onClickSignInButtonAsync(email: string): Promise<void> {
     this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
-    await this.authService.signInWithEmail(email).then(
-      () => this.redirectToSignUp(), error => this.onSignInError(error));
+
+    try {
+      await this.authService.signInWithEmail(email);
+    } catch (error) {
+      this.onSignInError(error);
+      return;
+    }
+
+    this.redirectToSignUp();
   }
 
   private onSignInError(error: firebase.auth.Error): void {
     if (error.code === 'auth/user-disabled') {
-      this.redirectToPendingAccountDeletionPage();
+      this.redirectTo('/pending-account-deletion');
       return;
     }
 
     this.alertsService.addWarning(error.message);
+
     if (this.emulatorModeIsEnabled) {
-      this.loaderService.hideLoadingScreen();
       this.email.setValue('');
+      this.loaderService.hideLoadingScreen();
     } else {
-      setTimeout(() => this.redirectToHomePage(), 2000);
+      setTimeout(() => this.redirectTo('/'), 2000);
     }
   }
 
   private redirectToSignUp(): void {
-    const searchParams = (
-      new URLSearchParams(this.windowRef.nativeWindow.location.search));
-    const returnUrl = searchParams.get('return_url') ?? '/';
-    this.windowRef.nativeWindow.location.assign(
-      `/signup?return_url=${returnUrl}`);
+    const queryParams = this.windowRef.nativeWindow.location.search;
+    const returnUrl = new URLSearchParams(queryParams).get('return_url') ?? '/';
+    this.redirectTo(`/signup?return_url=${returnUrl}`);
   }
 
-  private redirectToHomePage(): void {
-    this.windowRef.nativeWindow.location.assign('/');
-  }
-
-  private redirectToPendingAccountDeletionPage(): void {
-    this.windowRef.nativeWindow.location.assign('/pending-account-deletion');
+  private redirectTo(destination: string): void {
+    this.windowRef.nativeWindow.location.assign(destination);
   }
 }
 
