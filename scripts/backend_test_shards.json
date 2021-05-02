@@ -78,7 +78,8 @@
     ],
     "4": [
         "core.domain.visualization_registry_test",
-        "core.domain.exp_services_test"
+        "core.domain.exp_services_test",
+        "scripts.check_if_pr_is_low_risk_test"
     ],
     "5": [
         "core.domain.subtopic_page_domain_test",

@@ -32,6 +32,7 @@ import types
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
@@ -47,6 +48,8 @@ import main
 import python_utils
 import utils
 
+import contextlib2
+from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
@@ -441,6 +444,44 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Tests that the old '/splash' URL is redirected to '/'.
         response = self.get_html_response('/splash', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
+
+    def test_unauthorized_user_exception_raised_when_session_is_stale(self):
+        with contextlib2.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.INFO))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                auth_services, 'get_auth_claims_from_request',
+                error=auth_domain.StaleAuthSessionError('uh-oh')))
+
+            response = self.testapp.get('/', expect_errors=True)
+
+        self.assert_matches_regexps(logs, [
+            r'User session has expired or has been revoked',
+            r'User must sign in again\nTraceback \(most recent call last\):\n',
+        ])
+        self.assertEqual(response.status_int, 500)
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
+        with contextlib2.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                auth_services, 'get_auth_claims_from_request',
+                error=auth_domain.InvalidAuthSessionError('uh-oh')))
+
+            response = self.testapp.get('/', expect_errors=True)
+
+        self.assert_matches_regexps(logs, [
+            r'User session is invalid!',
+            r'User must sign in again\nTraceback \(most recent call last\):\n',
+        ])
+        self.assertEqual(response.status_int, 500)
+        self.assertEqual(call_counter.times_called, 1)
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):

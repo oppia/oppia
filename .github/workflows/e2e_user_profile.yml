@@ -22,25 +22,26 @@ jobs:
           python-version: '3.7'
           architecture: 'x64'
       - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install wheel==0.35.0
       - name: Install third party
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Install chrome
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
       - name: Run e2e users test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="users" --prod_env
       - name: Run e2e profileMenu test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
       - name: Run e2e profileFeatures test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
       - name: Uploading protractor-screenshots as Artifacts
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots
