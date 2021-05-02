@@ -31,6 +31,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import re
 
+from core.domain import change_domain
 from core.platform import models
 import feconf
 from jobs import job_utils
@@ -40,7 +41,8 @@ import python_utils
 
 import apache_beam as beam
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.exploration])
 
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
@@ -303,6 +305,14 @@ class ValidateCommitCmdsSchema(beam.DoFn):
             except Exception as e:
                 yield audit_errors.CommitCmdsValidateError(
                     input_model, commit_cmd_dict, e)
+
+
+@audit_decorators.AuditsExisting(exp_models.ExplorationSnapshotMetadataModel)
+class ValidateExplorationSnapshotMetadataModelCommitCmdsSchema(
+    ValidateCommitCmdsSchema):
+
+    def _get_change_domain_class(self, input_model):
+        return change_domain.BaseChange
 
 
 @audit_decorators.AuditsExisting(
