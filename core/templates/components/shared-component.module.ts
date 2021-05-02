@@ -60,6 +60,8 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
+
 import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
@@ -77,6 +79,7 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
@@ -155,8 +158,10 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    ResponseHeaderComponent,
     PromoBarComponent,
     SharingLinksComponent,
+    SideNavigationBarComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
@@ -194,11 +199,13 @@ const toastrConfig = {
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
+    ResponseHeaderComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
+    SideNavigationBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
@@ -220,6 +227,7 @@ const toastrConfig = {
     ObjectComponentsModule,
     TranslateModule,
     // Components, directives, and pipes.
+    AttributionGuideComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
@@ -235,7 +243,9 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     SchemaBasedEditorDirective,
+    SideNavigationBarComponent,
     SharingLinksComponent,
+    ResponseHeaderComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
