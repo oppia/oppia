@@ -706,9 +706,8 @@ def is_parsable_as_xml(xml_string):
 
 
 def convert_svg_diagram_tags_to_image_tags(html_string):
-    """Renames all the oppia-noninteractive-svgdiagram on the
-    server to oppia-noninteractive-image and changes
-    corresponding attributes
+    """Renames all the oppia-noninteractive-svgdiagram on the server to
+    oppia-noninteractive-image and changes corresponding attributes.
 
     Args:
         html_string: str. The HTML string to check.
@@ -720,15 +719,14 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
         html_string.encode(encoding='utf-8'), 'html.parser')
 
     for image in soup.findAll(name='oppia-noninteractive-svgdiagram'):
-        # The 'filepath-with-value' and 'alt-with-value'
-        # attribute values should be enclosed in
-        # double quotes(&amp;quot;).
+        # All the attribute values should be enclosed in double
+        # quotes(&amp;quot;).
         escaped_svg_filepath = escape_html(image['svg_filename-with-value'])
         escaped_svg_alt_value = escape_html(image['alt-with-value'])
         del image['svg_filename-with-value']
         del image['alt-with-value']
         image['filepath-with-value'] = escaped_svg_filepath
-        image['caption-with-value'] = ''
+        image['caption-with-value'] = escape_html('""')
         image['alt-with-value'] = escaped_svg_alt_value
         image.name = 'oppia-noninteractive-image'
     return python_utils.UNICODE(soup)
