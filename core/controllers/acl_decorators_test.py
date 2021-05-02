@@ -1151,7 +1151,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class VoiceartistAssignmentTests(test_utils.GenericTestBase):
+class VoiceartistManagementTests(test_utils.GenericTestBase):
 
     role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
@@ -1173,7 +1173,7 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
                 'entity_id': entity_id})
 
     def setUp(self):
-        super(VoiceartistAssignmentTests, self).setUp()
+        super(VoiceartistManagementTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -1257,6 +1257,22 @@ class VoiceartistAssignmentTests(test_utils.GenericTestBase):
                 response['error'], 'You do not have credentials to assign '
                                    'voiceartist to this exploration.')
         self.logout()
+
+    def test_voiceover_admin_cannot_assign_voiceartist_in_invalid_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/invalid_exp_id', {},
+                csrf_token=csrf_token, expected_status_int=404)
+        self.logout()
+
+    def test_voiceover_admin_cannot_assign_voiceartist_without_login(self):
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
 
 
 class EditExplorationTests(test_utils.GenericTestBase):
