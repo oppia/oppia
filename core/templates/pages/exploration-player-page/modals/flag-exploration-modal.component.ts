@@ -33,7 +33,7 @@ export interface FlagExplorationModalResult {
   templateUrl: './flag-exploration-modal.component.html'
 })
 export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
-  flageMessageTextareaIsShown: boolean = false;
+  flagMessageTextareaIsShown: boolean = false;
   stateName: string;
   flag: boolean;
   flagMessage: string;
@@ -49,16 +49,16 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
 
   showFlagMessageTextarea(value: boolean): void {
     if (value) {
-      this.flageMessageTextareaIsShown = true;
+      this.flagMessageTextareaIsShown = true;
       this.focusManagerService.setFocus('flagMessageTextarea');
     }
   }
 
   submitReport(): void {
-    if (this.flageMessageTextareaIsShown) {
+    if (this.flagMessageTextareaIsShown) {
       this.ngbActiveModal.close({
         report_type: this.flag,
-        report_text: this.flageMessageTextareaIsShown,
+        report_text: this.flagMessageTextareaIsShown,
         state: this.stateName
       });
     }

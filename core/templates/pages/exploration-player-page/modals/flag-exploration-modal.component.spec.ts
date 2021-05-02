@@ -15,3 +15,80 @@
 /**
  * @fileoverview Unit tests for FlagExplorationModalComponent.
  */
+
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule } from 'filters/translate.module';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { PlayerPositionService } from '../services/player-position.service';
+import { FlagExplorationModalComponent } from './flag-exploration-modal.component';
+
+describe('Flag Exploration modal', () => {
+  let component: FlagExplorationModalComponent;
+  let fixture: ComponentFixture<FlagExplorationModalComponent>;
+  let stateName: string = 'test_state';
+  let focusManagerService: FocusManagerService;
+  let ngbActiveModal: NgbActiveModal;
+
+  class MockPlayerPositionService {
+    getCurrentStateName(): string {
+      return stateName;
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        TranslateModule,
+        FormsModule
+      ],
+      declarations: [
+        FlagExplorationModalComponent
+      ],
+      providers: [
+        NgbActiveModal,
+        FocusManagerService,
+        {
+          provide: PlayerPositionService,
+          useClass: MockPlayerPositionService
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(FlagExplorationModalComponent);
+    component = fixture.componentInstance;
+    focusManagerService = (TestBed.inject(FocusManagerService) as unknown) as
+      jasmine.SpyObj<FocusManagerService>;
+    ngbActiveModal = (TestBed.inject(NgbActiveModal) as unknown) as
+          jasmine.SpyObj<NgbActiveModal>;
+  });
+
+  it('should create', () => {
+    expect(component).toBeDefined();
+    expect(component.stateName).toEqual(stateName);
+  });
+
+  it('should show flag message textarea', () => {
+    spyOn(focusManagerService, 'setFocus');
+    component.showFlagMessageTextarea(true);
+    expect(component.flagMessageTextareaIsShown).toBeTrue();
+    expect(focusManagerService.setFocus).toHaveBeenCalled();
+  });
+
+  it('should submit report', () => {
+    let flag = true;
+    let flagMessageTextareaIsShown = true;
+    spyOn(ngbActiveModal, 'close');
+    component.flagMessageTextareaIsShown = flagMessageTextareaIsShown;
+    component.flag = flag;
+    component.submitReport();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      report_type: flag,
+      report_text: flagMessageTextareaIsShown,
+      state: stateName
+    });
+  });
+});
