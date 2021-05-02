@@ -137,7 +137,7 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-login-page')).isPresent()).toBe(true);
   });
 
-  it('should redirect to Home page if Login page is visited while logged in',
+  it('should redirect away if Login page is visited while already logged in',
     async function() {
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
       await browser.get('/login');

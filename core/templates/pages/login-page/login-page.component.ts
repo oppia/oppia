@@ -47,7 +47,9 @@ export class LoginPageComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.emulatorModeIsEnabled) {
-      this.loaderService.showLoadingScreen('');
+      // NOTE: Using 'Loading' instead of an I18N string because emulator mode
+      // is only enabled for developers, who must use English for Oppia anyway.
+      this.loaderService.showLoadingScreen('Loading');
     } else {
       this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     }
@@ -64,15 +66,15 @@ export class LoginPageComponent implements OnInit {
           return;
         }
 
-        let userDidRedirect = false;
+        let userDidSignIn = false;
         try {
-          userDidRedirect = await this.authService.handleRedirectResultAsync();
+          userDidSignIn = await this.authService.handleRedirectResultAsync();
         } catch (error) {
           this.onSignInError(error);
           return;
         }
 
-        if (userDidRedirect) {
+        if (userDidSignIn) {
           this.redirectToSignUp();
           return;
         }

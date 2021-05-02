@@ -136,7 +136,7 @@ describe('Activity tiles infinity grid component', function() {
 
     expect(searchService.loadMoreData).not.toHaveBeenCalled();
 
-    loadingMessageChangeEventEmitter.emit(null);
+    loadingMessageChangeEventEmitter.emit('');
 
     loadMoreDataSpy.and.callFake(
       (successCallback, failCallback) => successCallback({

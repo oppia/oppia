@@ -32,10 +32,10 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
         WindowDimensionsService
     ) {
       var ctrl = this;
-      ctrl.loadingMessage = null;
+      ctrl.loadingMessage = '';
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.showMoreActivities = function() {
-        if (ctrl.loadingMessage === null && !ctrl.endOfPageIsReached) {
+        if (!ctrl.loadingMessage && !ctrl.endOfPageIsReached) {
           ctrl.searchResultsAreLoading = true;
           SearchService.loadMoreData(function(data, endOfPageIsReached) {
             ctrl.allActivitiesInOrder = (

@@ -109,9 +109,19 @@ describe('User Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return new userInfo data when url path is signup',
+  it('should return default userInfo data when url path is signup',
     fakeAsync(() => {
       spyOn(urlService, 'getPathname').and.returnValue('/signup');
+      const sampleUserInfo = UserInfo.createDefault();
+
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+    }));
+
+  it('should return default userInfo data when url path is logout',
+    fakeAsync(() => {
+      spyOn(urlService, 'getPathname').and.returnValue('/logout');
       const sampleUserInfo = UserInfo.createDefault();
 
       userService.getUserInfoAsync().then((userInfo) => {
@@ -149,30 +159,31 @@ describe('User Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return new userInfo data if user is not logged', fakeAsync(() => {
-    // Creating a test user for checking profile picture of user.
-    const sampleUserInfoBackendObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: false
-    };
-    const sampleUserInfo = UserInfo.createDefault();
+  it('should return default userInfo data if user is not logged',
+    fakeAsync(() => {
+      // Creating a test user for checking profile picture of user.
+      const sampleUserInfoBackendObject = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: true,
+        preferred_site_language_code: null,
+        username: 'tester',
+        email: 'test@test.com',
+        user_is_logged_in: false
+      };
+      const sampleUserInfo = UserInfo.createDefault();
 
-    userService.getUserInfoAsync().then((userInfo) => {
-      expect(userInfo).toEqual(sampleUserInfo);
-    });
-    const req = httpTestingController.expectOne('/userinfohandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleUserInfoBackendObject);
+      userService.getUserInfoAsync().then((userInfo) => {
+        expect(userInfo).toEqual(sampleUserInfo);
+      });
+      const req = httpTestingController.expectOne('/userinfohandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleUserInfoBackendObject);
 
-    flushMicrotasks();
-  }));
+      flushMicrotasks();
+    }));
 
   it('should return image data', fakeAsync(() => {
     var requestUrl = '/preferenceshandler/profile_picture';

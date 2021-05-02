@@ -48,7 +48,7 @@ describe('Email Dashboard Page', function() {
     UserService = $injector.get('UserService');
     EMAIL_DASHBOARD_PREDICATE_DEFINITION = $injector.get(
       'EMAIL_DASHBOARD_PREDICATE_DEFINITION');
-    loadingMessage = null;
+    loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
@@ -211,7 +211,7 @@ describe('Email Dashboard Page', function() {
       $scope.$apply();
 
       expect(ctrl.username).toBe('username');
-      expect(loadingMessage).toBeNull();
+      expect(loadingMessage).toBe('');
       expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
 
       expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(true);

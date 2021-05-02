@@ -4,7 +4,7 @@
          ng-cloak>
       <oppia-loading-message [message]="$ctrl.loadingMessage"></oppia-loading-message>
       <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
-      <div ng-show="$ctrl.loadingMessage === null">
+      <div ng-show="!$ctrl.loadingMessage">
         <div ng-transclude="content">
         </div>
         <div ng-transclude="footer">
@@ -58,7 +58,7 @@
                  class="protractor-test-main-content" ng-cloak>
               <oppia-loading-message [message]="$ctrl.loadingMessage"></oppia-loading-message>
               <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
-              <div ng-show="$ctrl.loadingMessage === null">
+              <div ng-show="!$ctrl.loadingMessage">
                 <div ng-transclude="content">
                 </div>
                 <div ng-transclude="footer">

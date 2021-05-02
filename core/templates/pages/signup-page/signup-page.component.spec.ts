@@ -41,7 +41,7 @@ describe('Signup page', function() {
 
   var addWarningSpy = null;
   var clearWarningsSpy = null;
-  var loadingMessage = null;
+  var loadingMessage;
   var subscriptions = [];
   var mockWindow = {
     location: {
@@ -67,7 +67,7 @@ describe('Signup page', function() {
     $q = $injector.get('$q');
     AlertsService = $injector.get('AlertsService');
     CsrfService = $injector.get('CsrfTokenService');
-    loadingMessage = null;
+    loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     UrlService = $injector.get('UrlService');
@@ -195,7 +195,7 @@ describe('Signup page', function() {
       function() {
         expect(loadingMessage).toBe('I18N_SIGNUP_LOADING');
         $httpBackend.flush();
-        expect(loadingMessage).toBeNull();
+        expect(loadingMessage).toBeFalsy();
       });
 
     it('should show warning when user has not agreed to terms', function() {

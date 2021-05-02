@@ -27,8 +27,8 @@ export class LoaderService {
   // Until then, we need to use static so that the two instances of the service
   // created by our hybrid app (one for Angular, the other for AngularJS) can
   // refer to the same objects.
-  static loadingMessageChangedEventEmitter = new EventEmitter<string | null>();
-  get onLoadingMessageChange(): EventEmitter<string | null> {
+  static loadingMessageChangedEventEmitter = new EventEmitter<string>();
+  get onLoadingMessageChange(): EventEmitter<string> {
     // TODO(#9154): Change LoaderService to "this".
     return LoaderService.loadingMessageChangedEventEmitter;
   }
@@ -42,7 +42,7 @@ export class LoaderService {
 
   hideLoadingScreen(): void {
     // TODO(#9154): Change LoaderService to "this".
-    LoaderService.loadingMessageChangedEventEmitter.emit(null);
+    LoaderService.loadingMessageChangedEventEmitter.emit('');
   }
 }
 
