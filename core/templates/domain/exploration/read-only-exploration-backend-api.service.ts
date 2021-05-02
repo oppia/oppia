@@ -38,21 +38,6 @@ export interface ReadOnlyExplorationBackendDict {
   'correctness_feedback_enabled': boolean;
 }
 
-export interface ExplorationBackendDict {
-  'auto_tts_enabled'?: boolean;
-  'draft_changes': ExplorationChange[];
-  'is_version_of_draft_valid': boolean;
-  'init_state_name': string;
-  'param_changes': ParamChangeBackendDict[];
-  'param_specs': ParamSpecsBackendDict;
-  'states': StateObjectsBackendDict;
-  'title': string;
-  'language_code': string;
-  'draft_change_list_id'?: number;
-  'version'?: string;
-  'correctness_feedback_enabled'?: boolean
-}
-
 export interface FetchExplorationBackendResponse {
   'can_edit': boolean;
   'exploration': ReadOnlyExplorationBackendDict;

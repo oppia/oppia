@@ -39,6 +39,12 @@ import { PlayerTranscriptService } from './player-transcript.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
 
+interface QuestionPlayerConfigDict {
+  skillList: string[],
+  questionCount: number,
+  questionsSortedByDifficulty: boolean
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -125,7 +131,7 @@ export class ExplorationPlayerStateService {
   initializePretestServices(
       pretestQuestionDicts: QuestionBackendDict[],
       callback: (
-        initialCard: StateCard, nextFocusLabel: string) => void):void {
+        initialCard: StateCard, nextFocusLabel: string) => void): void {
     this.playerCorrectnessFeedbackEnabledService.init(true);
     this.questionPlayerEngineService.init(
       pretestQuestionDicts, callback, () => {});
@@ -184,7 +190,7 @@ export class ExplorationPlayerStateService {
   }
 
   initQuestionPlayer(
-      questionPlayerConfig,
+      questionPlayerConfig: QuestionPlayerConfigDict,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.setQuestionPlayerMode();
@@ -213,10 +219,12 @@ export class ExplorationPlayerStateService {
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
         this.explorationId),
     ]).then((combinedData) => {
-      let explorationData = combinedData[0];
+      let explorationData: FetchExplorationBackendResponse = combinedData[0];
       let pretestQuestionsData = combinedData[1];
       let featuresData = combinedData[2];
-      this.explorationFeaturesService.init(explorationData, featuresData);
+      this.explorationFeaturesService.init({
+        ...explorationData.exploration,
+      }, featuresData);
       if (pretestQuestionsData.length > 0) {
         this.setPretestMode();
         this.initializeExplorationServices(explorationData, true, callback);
@@ -244,7 +252,7 @@ export class ExplorationPlayerStateService {
   }
 
   initializeQuestionPlayer(
-      config,
+      config: QuestionPlayerConfigDict,
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.playerTranscriptService.init();
@@ -275,10 +283,6 @@ export class ExplorationPlayerStateService {
   isInStoryChapterMode(): boolean {
     return this.explorationMode ===
     ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER;
-  }
-
-  getPretestQuestionCount(): number {
-    return this.questionPlayerEngineService.getPretestQuestionCount();
   }
 
   moveToExploration(
