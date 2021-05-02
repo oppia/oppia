@@ -24,6 +24,14 @@ import { ExplorationFeatures } from
   'services/exploration-features-backend-api.service';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
+export interface ExplorationDataDict {
+  'param_changes': ParamChanges[] | [];
+  states: {
+    [propsName: string]: {
+      'param_changes': ParamChanges[] | []
+    }
+  };
+}
 export interface ParamChanges {
   name: string;
   'generator_id': string;
@@ -53,7 +61,7 @@ export class ExplorationFeaturesService {
    * @param featuresData - An ExplorationFeatures object.
    */
   init(
-      explorationData: ExplorationBackendDict,
+      explorationData: ExplorationDataDict,
       featuresData: ExplorationFeatures): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;

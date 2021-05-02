@@ -18,9 +18,8 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 
-import { ExplorationFeaturesService, ParamChanges } from
+import { ExplorationFeaturesService, ExplorationDataDict, ParamChanges } from
   'services/exploration-features.service';
 import { ExplorationFeatures } from './exploration-features-backend-api.service';
 
