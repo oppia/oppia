@@ -62,6 +62,8 @@ describe('Learner View Rating Backend Api Service', () => {
     expect(req.request.method).toEqual('PUT');
     req.flush({});
 
+    flushMicrotasks();
+
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
