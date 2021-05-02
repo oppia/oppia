@@ -21,7 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -36,6 +36,9 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
+import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
+import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   imports: [
@@ -43,21 +46,27 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
     HttpClientModule,
     InteractionExtensionsModule,
     NgbModalModule,
-    SharedComponentsModule
+    MatButtonModule,
+    SharedComponentsModule,
+    NgbPopoverModule
   ],
   declarations: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    LearnerLocalNavComponent
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    LearnerLocalNavComponent
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent
   ],
   providers: [
     {
@@ -81,7 +90,6 @@ class ExplorationPlayerPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

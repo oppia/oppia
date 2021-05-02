@@ -344,6 +344,7 @@ import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
+import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -459,6 +460,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EventBusService', EventBusService],
   ['FatigueDetectionService',
     FatigueDetectionService],
+  ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FilterForMatchingSubstringPipe', FilterForMatchingSubstringPipe],
   ['FocusManagerService', FocusManagerService],

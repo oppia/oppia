@@ -22,7 +22,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 
 @Component({
   selector: 'oppia-exploration-successfully-flagged-modal',
-  template: './exploration-successfully-flagged-modal.component.html'
+  templateUrl: './exploration-successfully-flagged-modal.component.html'
 })
 export class ExplorationSuccessfullyFlaggedModalComponent
   extends ConfirmOrCancelModal {

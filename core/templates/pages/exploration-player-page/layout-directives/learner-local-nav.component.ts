@@ -16,9 +16,9 @@
  * @fileoverview Component for the local navigation in the learner view.
  */
 
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -26,7 +26,6 @@ import { AlertsService } from 'services/alerts.service';
 import { AttributionService } from 'services/attribution.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
-import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { ExplorationSuccessfullyFlaggedModalComponent } from '../modals/exploration-successfully-flagged-modal.component';
 import { FlagExplorationModalComponent, FlagExplorationModalResult } from '../modals/flag-exploration-modal.component';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
@@ -42,6 +41,7 @@ export class LearnerLocalNavComponent {
   version: number;
   username: string = '';
   feedbackOptionIsShown: boolean = true;
+  @ViewChild('feedbackPopOver') feedbackPopOver: NgbPopover;
 
   constructor(
     private ngbModal: NgbModal,
@@ -56,11 +56,6 @@ export class LearnerLocalNavComponent {
     private userService: UserService,
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService
   ) {}
-
-  getFeedbackPopoverUrl(): string {
-    return this.urlInterpolationService.getDirectiveTemplateUrl(
-      ExplorationPlayerConstants.FEEDBACK_POPOVER_PATH);
-  }
 
   showFlagExplorationModal(): void {
     this.ngbModal.open(FlagExplorationModalComponent, {
@@ -112,6 +107,14 @@ export class LearnerLocalNavComponent {
       }
       this.loaderService.hideLoadingScreen();
     });
+  }
+
+  togglePopover(): void {
+    this.feedbackPopOver.toggle();
+  }
+
+  closePopover(): void {
+    this.feedbackPopOver.close();
   }
 }
 

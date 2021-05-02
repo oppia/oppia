@@ -10,24 +10,32 @@
   <form>
     <div class="oppia-flag-modal-long-text radio">
       <label>
-        <input type="radio" value="ad" [(ngModel)]="flag" (change)="showFlagMessageTextarea(flag)">
+        <input type="radio" value="ad" [(ngModel)]="flag"
+               [ngModelOptions]="{standalone: true}"
+               (change)="showFlagMessageTextarea(flag)">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate }}
       </label>
     </div>
     <div class="oppia-flag-modal-long-text radio">
       <label>
-        <input type="radio" value="poor_experience" [(ngModel)]="flag" (change)="showFlagMessageTextarea(flag)">
+        <input type="radio" value="poor_experience" [(ngModel)]="flag"
+               [ngModelOptions]="{standalone: true}"
+               (change)="showFlagMessageTextarea(flag)">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate }}
       </label>
     </div>
     <div class="oppia-flag-modal-long-text radio">
       <label>
-        <input type="radio" value="other" [(ngModel)]="flag" (change)="showFlagMessageTextarea(flag)">
+        <input type="radio" value="other" [(ngModel)]="flag"
+               [ngModelOptions]="{standalone: true}"
+               (change)="showFlagMessageTextarea(flag)">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate }}
       </label>
-      <p *ngIf="flagMessageTextareaIsShown">
+      <p *ngIf="flageMessageTextareaIsShown">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}
-        <textarea rows="3" cols="50" [(ngModel)]="flagMessage" class="form-control" [oppiaFocusOn]="flagMessageTextarea">
+        <textarea rows="3" cols="50"
+                  [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}"
+                  class="form-control" oppiaFocusOn="flagMessageTextarea">
         </textarea>
       </p>
     </div>

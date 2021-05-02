@@ -30,7 +30,7 @@ export interface FlagExplorationModalResult {
 
 @Component({
   selector: 'oppia-flag-exploration-modal',
-  templateUrl: './flag-exploration-component.html'
+  templateUrl: './flag-exploration-modal.component.html'
 })
 export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   flageMessageTextareaIsShown: boolean = false;
