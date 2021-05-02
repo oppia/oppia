@@ -187,7 +187,6 @@ var RichTextEditor = async function(elem) {
   await action.click('First of oppia rte', firstOfOppiaRte);
 
   var _appendContentText = async function(text) {
-    await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
     var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
     await action.sendKeys(
       'First of Oppia Rte', firstOfOppiaRte, text);
@@ -333,9 +332,11 @@ var AutocompleteDropdownEditor = function(elem) {
         );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      var select2Dropdown = element(by.css('.select2-dropdown')).element(
+      var select2DropdownSearchInput = element(
+        by.css('.select2-dropdown')).element(
         by.css('.select2-search input'));
-      await action.sendKeys('Select2 Dropdown', select2Dropdown, '\n');
+      await action.sendKeys(
+        'Select2 Dropdown Search Input', select2DropdownSearchInput, '\n');
     }
   };
 };
