@@ -1153,7 +1153,9 @@ export class UpgradedServices {
     upgradedServices['UserService'] = new UserService(
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
-      upgradedServices['UserBackendApiService']);
+      upgradedServices['WindowRef'],
+      upgradedServices['UserBackendApiService']
+    );
 
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =

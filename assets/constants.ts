@@ -5548,6 +5548,9 @@ export default {
 
   "FIREBASE_AUTH_ENABLED": true,
 
+  // TODO(#11462): Delete this after Firebase authentication has been deployed.
+  "ENABLE_LOGIN_PAGE": true,
+
   // Data required for Firebase authentication.
   //
   // NOTE TO RELEASE COORDINATORS: Please change these to the production values,

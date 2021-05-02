@@ -20,12 +20,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { AlertsService } from 'services/alerts.service';
-import { LoaderService } from 'services/loader.service';
 import firebase from 'firebase/app';
 
+import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 
 @Component({
@@ -40,6 +40,10 @@ export class LoginPageComponent implements OnInit {
       private alertsService: AlertsService, private authService: AuthService,
       private loaderService: LoaderService, private userService: UserService,
       private windowRef: WindowRef) {}
+
+  get enabled(): boolean {
+    return AppConstants.ENABLE_LOGIN_PAGE;
+  }
 
   get emulatorModeIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
