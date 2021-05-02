@@ -17,6 +17,7 @@
  */
 
 import { Component, Output, EventEmitter } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';

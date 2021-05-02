@@ -65,7 +65,7 @@ require(
 require('pages/exploration-player-page/services/fatigue-detection.service.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'feedback-popup.component.ts');
+  'feedback-popup.directive.ts');
 require(
   'pages/exploration-player-page/services/' +
   'hints-and-solution-manager.service.ts');
