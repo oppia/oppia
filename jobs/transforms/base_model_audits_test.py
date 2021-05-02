@@ -506,28 +506,3 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [])
-
-
-class ValidateExplorationSnapshotMetadataModelCommitCmdsSchemaTests(
-    job_test_utils.PipelinedTestBase):
-
-    def test_validate_change_domain_implemented(self):
-        invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
-
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                base_model_audits.ValidateExplorationSnapshotMetadataModelCommitCmdsSchema())
-        )
-
-        self.assert_pcoll_equal(output, [])

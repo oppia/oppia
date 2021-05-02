@@ -31,7 +31,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import re
 
-from core.domain import change_domain
 from core.platform import models
 import feconf
 from jobs import job_utils
@@ -305,14 +304,6 @@ class ValidateCommitCmdsSchema(beam.DoFn):
             except Exception as e:
                 yield audit_errors.CommitCmdsValidateError(
                     input_model, commit_cmd_dict, e)
-
-
-@audit_decorators.AuditsExisting(exp_models.ExplorationSnapshotMetadataModel)
-class ValidateExplorationSnapshotMetadataModelCommitCmdsSchema(
-    ValidateCommitCmdsSchema):
-
-    def _get_change_domain_class(self, input_model):
-        return change_domain.BaseChange
 
 
 @audit_decorators.AuditsExisting(
