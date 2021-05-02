@@ -27,6 +27,7 @@ import sys
 import time
 import traceback
 
+from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -164,9 +165,21 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        auth_claims = auth_services.get_auth_claims_from_request(request)
-        self.current_user_is_super_admin = (
-            auth_claims is not None and auth_claims.role_is_super_admin)
+        try:
+            auth_claims = auth_services.get_auth_claims_from_request(request)
+        except auth_domain.StaleAuthSessionError:
+            logging.info(
+                # NOTE: exc_info=1 appends the error's stack trace to the logs.
+                'User session has expired or has been revoked', exc_info=1)
+            auth_services.destroy_auth_session(self.response)
+            raise self.UnauthorizedUserException('User must sign in again')
+        except auth_domain.InvalidAuthSessionError:
+            logging.exception('User session is invalid!')
+            auth_services.destroy_auth_session(self.response)
+            raise self.UnauthorizedUserException('User must sign in again')
+        else:
+            self.current_user_is_super_admin = (
+                auth_claims is not None and auth_claims.role_is_super_admin)
 
         if (feconf.ENABLE_MAINTENANCE_MODE and
                 not self.current_user_is_super_admin):
