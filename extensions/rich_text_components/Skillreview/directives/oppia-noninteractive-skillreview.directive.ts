@@ -63,7 +63,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             // instance or not. If it is, don't show the RTE modal. The
             // concept card modal should get triggered instead of the
             // RTE modal while copying stuff within the copy editor.
-            if (ctrl.toggleModal(event)) {
+            if (ctrl.canOpenConceptCardModal(event)) {
               return;
             }
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
@@ -92,7 +92,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           };
           // Function to check whether the RTE modal or the concept card
           // modal should be triggered.
-          ctrl.toggleModal = function(event) {
+          ctrl.canOpenConceptCardModal = function(event) {
             return (
               event.currentTarget.offsetParent.dataset.ckeWidgetId ||
               $scope.CkEditorCopyContentService.copyModeActive
