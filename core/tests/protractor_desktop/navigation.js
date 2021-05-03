@@ -133,23 +133,27 @@ describe('Static Pages Tour', function() {
   it('should visit the Login page', async function() {
     await browser.get('/login');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.protractor-test-login-page')).isPresent()).toBe(true);
+    var loginPage = element(by.css('.protractor-test-login-page'));
+    await waitFor.presenceOf(loginPage, 'Login page did not load');
   });
 
-  it('should redirect away if Login page is visited while already logged in',
+  it('should redirect away from the Login page when visited by logged-in user',
     async function() {
+      var loginPage = element(by.css('.protractor-test-login-page'));
+      var learnerDashboardPage = (
+        element(by.css('.protractor-test-learner-dashboard-page')));
+
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
       await browser.get('/login');
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-login-page')).isPresent()).toBe(false);
+      await waitFor.presenceOf(
+        learnerDashboardPage, 'Learner dashboard page did not load');
+      expect(await loginPage.isPresent()).toBe(false);
 
       await users.logout();
       await browser.get('/login');
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-login-page')).isPresent()).toBe(true);
+      await waitFor.presenceOf(loginPage, 'Login page did not load');
     });
 
   it('should visit the Teach page', async function() {
