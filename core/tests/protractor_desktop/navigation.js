@@ -99,8 +99,9 @@ describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', async function() {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
-    expect(await element(by.css('.protractor-test-dev-mode')).isPresent())
-      .toEqual(general.isInDevMode());
+    expect(await element(
+      by.css('.protractor-test-dev-mode')).isPresent())
+      .toBe(general.isInDevMode());
   });
 });
 
