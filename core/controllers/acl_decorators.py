@@ -2990,7 +2990,7 @@ def can_update_suggestion(handler):
 
         if ((suggestion.suggestion_type !=
              feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT) and
-                (suggestion.suggestion_type != 
+                (suggestion.suggestion_type !=
                  feconf.SUGGESTION_TYPE_ADD_QUESTION)):
             raise self.InvalidInputException(
                 'Invalid suggestion type')
