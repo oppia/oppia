@@ -121,7 +121,7 @@ angular.module('oppia').controller(
               $scope.isAdmin || (
                 userCanReviewTranslationSuggestionsInLanguages.includes(
                   languageCode) && $scope.username !== $scope.activeSuggestion.
-                    author_name)
+                  author_name)
             );
           });
         $scope.resolvingSuggestion = false;
