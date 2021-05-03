@@ -232,3 +232,25 @@ class ModelCanonicalNameMismatchError(BaseAuditError):
         self.message = (
             'Entity name %s in lowercase does not match '
             'canonical name %s' % (model.name, model.canonical_name))
+
+
+class DraftChangeListLastUpdatedNoneError(BaseAuditError):
+    """Error class for models with draft change list but draft change list
+    last_updated is None.
+    """
+
+    def __init__(self, model):
+        super(DraftChangeListLastUpdatedNoneError, self).__init__(model)
+        self.message = (
+            'draft change list %s exists but draft change list '
+            'last updated is None' % model.draft_change_list)
+
+
+class DraftChangeListLastUpdatedInvalidError(BaseAuditError):
+    """Error class for models with invalid draft change list last_updated."""
+
+    def __init__(self, model):
+        super(DraftChangeListLastUpdatedInvalidError, self).__init__(model)
+        self.message = (
+            'draft change list last updated %s is greater than the time '
+            'when job was run' % model.draft_change_list_last_updated)
