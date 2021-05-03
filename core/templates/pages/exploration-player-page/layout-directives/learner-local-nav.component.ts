@@ -21,7 +21,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { AttributionService } from 'services/attribution.service';
 import { LoaderService } from 'services/loader.service';
@@ -51,8 +50,6 @@ export class LearnerLocalNavComponent {
     private loaderService: LoaderService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
-    private urlInterpolationService:
-    UrlInterpolationService,
     private userService: UserService,
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService
   ) {}
@@ -120,4 +117,6 @@ export class LearnerLocalNavComponent {
 }
 
 angular.module('oppia').directive('oppiaLearnerLocalNav',
-  downgradeComponent({ component: LearnerLocalNavComponent }));
+  downgradeComponent({
+    component: LearnerLocalNavComponent
+  }) as angular.IDirectiveFactory);

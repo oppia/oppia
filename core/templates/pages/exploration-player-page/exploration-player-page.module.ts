@@ -47,7 +47,7 @@ import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/explorati
     HttpClientModule,
     InteractionExtensionsModule,
     NgbModalModule,
-    MatButtonModule,
+    MaterialModule,
     SharedComponentsModule,
     NgbPopoverModule
   ],
@@ -90,6 +90,7 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { MaterialModule } from 'components/material.module';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
