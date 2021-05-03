@@ -28,6 +28,7 @@ describe('Contributor dashboard page', function() {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
+  var $window = null;
   var LocalStorageService = null;
   var $timeout = null;
   var UserService = null;
@@ -58,6 +59,7 @@ describe('Contributor dashboard page', function() {
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     UserService = $injector.get('UserService');
     $q = $injector.get('$q');
+    $window = $injector.get('$window');
     $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');
     focusManagerService = $injector.get('FocusManagerService');
@@ -70,10 +72,13 @@ describe('Contributor dashboard page', function() {
   }));
 
   it('should set focus on select lang field', function() {
-    var focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+    var focusSpy = spyOn(focusManagerService, 'setFocus');
+    var windowSpy = spyOn ($window, 'scrollTo');
     ctrl.onTabClick('translateTextTab');
     $timeout.flush();
     expect(focusSpy).toHaveBeenCalled();
+    $timeout.flush();
+    expect(windowSpy).toHaveBeenCalled();
   });
 
   describe('when user is logged in', function() {

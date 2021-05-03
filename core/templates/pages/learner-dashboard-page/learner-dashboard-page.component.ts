@@ -33,7 +33,7 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -257,14 +257,17 @@ export class LearnerDashboardPageComponent implements OnInit {
       }
     );
 
+
     Promise.all([
       userInfoPromise,
       dashboardDataPromise,
     ]).then(() => {
+      // The timeout is required because at execution time,
+      // the element may not be present in the DOM yet.Thus it ensure
+      // that the element is visible before focussing.
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
-        // So that focus is applied after the loading screen has dissapeared.
-        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
+        this.addFocusWithoutScroll('ourLessonsBtn');
       }, 0);
     // eslint-disable-next-line dot-notation
     }).catch(errorResponse => {
@@ -276,6 +279,13 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.newMessage = {
       text: ''
     };
+  }
+
+  addFocusWithoutScroll(label: string): void {
+    this.focusManagerService.setFocus(label);
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 5);
   }
 
   getStaticImageUrl(imagePath: string): string {
