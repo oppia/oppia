@@ -77,3 +77,31 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
 def user_email_preferences_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [user_models.UserSettingsModel]
+
+
+@audit_decorators.AuditsExisting(user_models.ExplorationUserDataModel)
+class ValidateDraftChangeListLastUpdated(beam.DoFn):
+    """DoFn to validate the last_update of draft change list"""
+
+    def process(self, input_model):
+        """Function that checks if last_updated for draft change list is valid.
+
+        Args:
+            input_model: user_models.ExplorationUserDataModel.
+                Entity to validate.
+
+        Yields:
+            DraftChangeListLastUpdatedNoneError. Error for models with
+            draft change list but no draft_change_list_last_updated
+
+            DraftChangeListLastUpdatedInvalidError. Error for models with
+            draft_change_list_last_updated greater than current time.
+        """
+        model = job_utils.clone_model(input_model)
+        if (model.draft_change_list and
+                not model.draft_change_list_last_updated):
+            yield audit_errors.DraftChangeListLastUpdatedNoneError(model)
+        current_time = datetime.datetime.utcnow()
+        if (model.draft_change_list_last_updated and
+                model.draft_change_list_last_updated > current_time):
+            yield audit_errors.DraftChangeListLastUpdatedInvalidError(model)
