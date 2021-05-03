@@ -882,8 +882,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The new change cmd must be equal to %s' % 
-            exp_domain.CMD_ADD_TRANSLATION
+            'The new change cmd must be equal to %s' % exp_domain.CMD_ADD_TRANSLATION
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
