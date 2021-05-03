@@ -21,6 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { GraphAnswer } from 'interactions/answer-defs';
 
+type AdjacencyMatrix = (number | null)[][];
+
 @Injectable({
   providedIn: 'root'
 })
@@ -117,8 +119,8 @@ export class GraphUtilsService {
     return false;
   }
 
-  constructAdjacencyMatrix(graph: GraphAnswer): (number | null)[][] {
-    var adjMatrix: (number | null)[][] = [];
+  constructAdjacencyMatrix(graph: GraphAnswer): AdjacencyMatrix {
+    var adjMatrix: AdjacencyMatrix = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       var adjMatrixRow = [];
       for (var j = 0; j < graph.vertices.length; j++) {
@@ -168,7 +170,8 @@ export class GraphUtilsService {
   }
 
   areAdjacencyMatricesEqualWithPermutation(
-      adj1: (number | null)[][], adj2: (number | null)[][],
+      adj1: AdjacencyMatrix,
+      adj2: AdjacencyMatrix,
       permutation: number[]): boolean {
     var numVertices = adj1.length;
     for (var i = 0; i < numVertices; i++) {
