@@ -38,7 +38,7 @@ import { CodeReplRulesService } from './code-repl-rules.service';
   styleUrls: []
 })
 export class InteractiveCodeReplComponent implements
-  OnInit, AfterViewInit, OnDestroy {
+    OnInit, AfterViewInit, OnDestroy {
   @Input() lastAnswer;
   @Input() languageWithValue;
   @Input() placeholderWithValue;
@@ -273,7 +273,7 @@ export class InteractiveCodeReplComponent implements
   sendResponse(evaluation: string, err: string): void {
     this.currentInteractionService.onSubmit({
       // Replace tabs with 2 spaces.
-      // TODO(sll): Change the default Python indentation to 4 spaces.
+      // TODO(#12712): 1. CodeRepl interaction TODOs
       code: this.code.replace(/\t/g, '  ') || '',
       output: this.output,
       evaluation: this.evaluation,

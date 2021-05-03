@@ -47,8 +47,6 @@ export class ResponseCodeReplComponent implements OnInit {
     }
   }
 }
-require('services/html-escaper.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaResponseCodeRepl', downgradeComponent({
   component: ResponseCodeReplComponent

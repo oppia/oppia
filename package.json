@@ -128,6 +128,7 @@
     "@ctrl/ngx-codemirror": "^4.1.1",
     "@ng-bootstrap/ng-bootstrap": "^8.0.0",
     "@types/angular-translate": "^2.16.2",
+    "@types/codemirror": "^0.0.109",
     "angular": "^1.8.2",
     "angular-cookies": "^1.8.2",
     "angular-route": "^1.8.2",

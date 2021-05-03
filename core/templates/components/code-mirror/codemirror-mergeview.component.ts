@@ -16,21 +16,21 @@
  * @fileoverview Wrapper angular component for code mirror.
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-codemirror-mergeview',
-  template: ''
+  template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-
 export class CodemirrorMergeviewComponent implements
   AfterViewInit, OnInit, OnChanges {
   @Input() options = {};
   @Input() leftValue;
   @Input() rightValue;
   codeMirrorInstance: CodeMirror.MergeView.MergeViewEditor;
-  constructor(private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef, private ngZone: NgZone) { }
 
   ngOnInit(): void {
     // Require CodeMirror.
@@ -42,14 +42,16 @@ export class CodemirrorMergeviewComponent implements
   ngAfterViewInit(): void {
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
-    this.codeMirrorInstance = window.CodeMirror.MergeView(
-      this.elementRef.nativeElement,
-      {
-        value: this.leftValue !== undefined ? this.leftValue : ' ',
-        orig: this.rightValue !== undefined ? this.rightValue : ' ',
-        ...this.options
-      }
-    );
+    this.ngZone.runOutsideAngular(() => {
+      this.codeMirrorInstance = window.CodeMirror.MergeView(
+        this.elementRef.nativeElement,
+        {
+          value: this.leftValue !== undefined ? this.leftValue : ' ',
+          orig: this.rightValue !== undefined ? this.rightValue : ' ',
+          ...this.options
+        }
+      );
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -61,8 +63,10 @@ export class CodemirrorMergeviewComponent implements
       if (this.leftValue === undefined) {
         throw new Error('Left pane value is not defined.');
       }
-      this.codeMirrorInstance.editor().setValue(
-        changes.leftValue.currentValue);
+      this.ngZone.runOutsideAngular(() => {
+        this.codeMirrorInstance.editor().setValue(
+          changes.leftValue.currentValue);
+      });
     }
     // Watch for changes and set value in right pane.
     if (changes.rightValue &&
@@ -72,8 +76,10 @@ export class CodemirrorMergeviewComponent implements
       if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
-      this.codeMirrorInstance.rightOriginal().setValue(
-        changes.rightValue.currentValue);
+      this.ngZone.runOutsideAngular(() => {
+        this.codeMirrorInstance.rightOriginal().setValue(
+          changes.rightValue.currentValue);
+      });
     }
   }
 }
