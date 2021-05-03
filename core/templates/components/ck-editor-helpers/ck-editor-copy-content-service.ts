@@ -34,8 +34,6 @@ interface CkEditorCopyEvent {
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
   private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
-  // Allows skillreview components to be copied as well by making them
-  // a part of the allowed widgets.
   private readonly ALLOWLISTED_WIDGETS = new Set([
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
@@ -75,7 +73,7 @@ export class CkEditorCopyContentService {
       }
       // Prevents reference errors if the element clicked on is itself the
       // OUTPUT_VIEW_TAG_NAME (i.e, ANGULAR-HTML-BIND).
-      if (this.isElementOrParentElementOutputView(currentElement)) {
+      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
       }
 
@@ -156,15 +154,6 @@ export class CkEditorCopyContentService {
 
   toggleCopyMode(): void {
     this.copyModeActive = !this.copyModeActive;
-  }
-
-  // Function to check if the parent element or the current element is
-  // ANGULAR_HTML_BIND or not.
-  isElementOrParentElementOutputView(target: HTMLElement): boolean {
-    return (
-      target.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
-      target.tagName === this.OUTPUT_VIEW_TAG_NAME
-    );
   }
 
   /**

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { CkEditorCopyContentService } from "components/ck-editor-helpers/ck-editor-copy-content-service";
+
 /**
  * @fileoverview Directive for the concept card rich-text component.
  */
@@ -24,6 +26,7 @@ require('components/concept-card/concept-card.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
@@ -37,8 +40,8 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
       template: require('./skillreview.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$uibModal', 'ContextService', 'ENTITY_TYPE',
-        function($attrs, $uibModal, ContextService, ENTITY_TYPE) {
+        '$attrs', '$scope', '$uibModal', 'CkEditorCopyContentService', 'ContextService', 'ENTITY_TYPE',
+        function($attrs, $scope, $uibModal, CkEditorCopyContentService, ContextService, ENTITY_TYPE) {
           var ctrl = this;
           var skillId = HtmlEscaperService.escapedJsonToObj(
             $attrs.skillIdWithValue);
@@ -62,8 +65,6 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             if (ctrl.toggleModal(event)) {
               return;
             }
-
-
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             // The catch at the end was needed according to this thread:
             // https://github.com/angular-ui/bootstrap/issues/6501, where in
@@ -93,7 +94,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           ctrl.toggleModal = function(event) {
             return (
               event.currentTarget.offsetParent.dataset.ckeWidgetId ||
-              document.body.style.cursor === 'cursor'
+              CkEditorCopyContentService.copyModeActive
             );
           };
         }
