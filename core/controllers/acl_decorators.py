@@ -2989,9 +2989,9 @@ def can_update_suggestion(handler):
             raise self.PageNotFoundException
 
         if suggestion.suggestion_type != (
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT) and
-                suggestion.suggestion_type != (
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT) and 
+            suggestion.suggestion_type != (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)):
             raise self.InvalidInputException(
                 'Invalid suggestion type')
 
