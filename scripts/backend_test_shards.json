@@ -207,6 +207,7 @@
         "jobs.job_utils_test",
         "jobs.registry_test",
         "jobs.transforms.audits_registry_test",
+        "jobs.transforms.topic_audits_test",
         "jobs.transforms.auth_audits_test",
         "jobs.transforms.base_model_audits_test",
         "jobs.transforms.user_audits_test",
