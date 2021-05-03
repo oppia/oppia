@@ -30,7 +30,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
     [max]="max"
     (change)="setProgress($event)"
     tick-interval="auto"
-    step=1
+    [step]="1"
     aria-label="audio-slider">
   </mat-slider>`
 })

@@ -28,11 +28,9 @@
         </div>
         <div ng-if="!audioLoadingIndicatorIsShown">
           <oppia-audio-slider [value]="AudioPlayerService.getCurrentTime()"
-                      [max]="AudioPlayerService.getAudioDuration()"
-                      (value-change)="setProgress($event)"
-                      tick-interval="auto"
-                      step=1
-                      aria-label="audio-slider">
+                              [max]="AudioPlayerService.getAudioDuration()"
+                              (value-change)="setProgress($event)"
+                              aria-label="audio-slider">
           </oppia-audio-slider>
         </div>
         <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
