@@ -106,7 +106,8 @@ angular.module('oppia').controller(
 
       var init = function() {
         let userCanReviewTranslationSuggestionsInLanguages: string[] = [];
-        const languageCode: string = $scope.activeSuggestion.change.language_code;
+        const languageCode: string = $scope.activeSuggestion.change.
+          language_code;
         UserService.getUserInfoAsync().then(function(userInfo) {
           $scope.username = userInfo.getUsername();
           $scope.isAdmin = userInfo.isAdmin();
@@ -116,12 +117,11 @@ angular.module('oppia').controller(
             userCanReviewTranslationSuggestionsInLanguages = (
               userContributionRights
                 .can_review_translation_for_language_codes);
-            console.log(userContributionRights
-              .can_review_translation_for_language_codes)
             $scope.canEditTranslation = (
               $scope.isAdmin || (
-                userCanReviewTranslationSuggestionsInLanguages.includes(languageCode) &&
-                $scope.username != $scope.activeSuggestion.author_name)
+                userCanReviewTranslationSuggestionsInLanguages.includes(
+                  languageCode) && $scope.username !== $scope.activeSuggestion.
+                    author_name)
             );
           });
         $scope.resolvingSuggestion = false;
@@ -131,8 +131,8 @@ angular.module('oppia').controller(
         $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
-        // The 'html' value is passed as an object as it is required for 
-        // schema-based-editor
+        // The 'html' value is passed as an object as it is required for
+        // schema-based-editor.
         $scope.editedContent = {
           html: $scope.translationHtml
         };

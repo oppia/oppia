@@ -124,15 +124,14 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         }, () => onFailure && onFailure(suggestionId));
       },
       updateTranslationSuggestionAsync: async function(
-          suggestionId, new_change,
+          suggestionId, newChange,
           onSuccess, onFailure) {
-        console.log(new_change);
         var url = UrlInterpolationService.interpolateUrl(
           _UPDATE_TRANSLATION_HANDLER_URL, {
             suggestion_id: suggestionId
           });
         return $http.put(url, {
-          change: new_change
+          change: newChange
         }).then(function() {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));

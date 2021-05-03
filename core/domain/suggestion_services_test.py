@@ -786,7 +786,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             }
         )
 
-        suggestion_services.update_suggestion(self.suggestion_id, updated_change)
+        suggestion_services.update_suggestion(
+            self.suggestion_id, updated_change)
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)

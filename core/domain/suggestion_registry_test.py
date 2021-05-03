@@ -882,7 +882,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The new change cmd must be equal to %s' % exp_domain.CMD_ADD_TRANSLATION
+            'The new change cmd must be equal to %s' % 
+            exp_domain.CMD_ADD_TRANSLATION
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
@@ -920,7 +921,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
-        print(suggestion.change.cmd)
         change = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': 'Introduction',
@@ -945,7 +945,6 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], self.fake_date)
-        print(suggestion.change.cmd)
         change = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': 'Introduction',
@@ -956,9 +955,11 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The new change content_html must be equal to <p>This is a content.</p>'
+            'The new change content_html must be equal to <p>This is a ' +
+            'content.</p>'
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                exp_domain.ExplorationChange(change))
 
     def test_create_suggestion_add_translation(self):
         expected_suggestion_dict = self.suggestion_dict

@@ -3668,7 +3668,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_author_cannot_update_suggestion(self):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.translation_suggestion_id, expected_status_int=401)
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id, expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You are not allowed to update suggestions that you created.')
@@ -3677,8 +3678,10 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_admin_can_update_translation_suggestion(self):
         self.login(self.admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.translation_suggestion_id)
-        self.assertEqual(response['suggestion_id'], self.translation_suggestion_id)
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id)
+        self.assertEqual(
+            response['suggestion_id'], self.translation_suggestion_id)
         self.logout()
 
     def test_admin_can_update_question_suggestion(self):
@@ -3691,29 +3694,35 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     def test_reviewer_can_update_translation_suggestion(self):
         self.login(self.reviewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.translation_suggestion_id)
-        self.assertEqual(response['suggestion_id'], self.translation_suggestion_id)
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id)
+        self.assertEqual(
+            response['suggestion_id'], self.translation_suggestion_id)
         self.logout()
 
     def test_reviewer_can_update_question_suggestion(self):
         self.login(self.reviewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
-        self.assertEqual(response['suggestion_id'], self.question_suggestion_id)
+        self.assertEqual(
+            response['suggestion_id'], self.question_suggestion_id)
         self.logout()
 
     def test_invalid_suggestions_cannot_be_updated(self):
         self.login(self.reviewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.invalid_suggestion_id, expected_status_int=400)
-        self.assertEqual(response['error'],
-            'Invalid suggestion type')
+            response = self.get_json(
+                '/mock/%s' % self.invalid_suggestion_id,
+                expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid suggestion type')
         self.logout()
 
     def test_guest_cannot_update_suggestion(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s' % self.translation_suggestion_id, expected_status_int=401)
+                '/mock/%s' % self.translation_suggestion_id,
+                expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')

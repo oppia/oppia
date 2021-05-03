@@ -857,9 +857,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'exp1', 1, self.translator_id, change_dict, 'description')
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json('%s/%s' % (
-            feconf.UPDATE_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {},
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.UPDATE_SUGGESTION_URL_PREFIX,
+                suggestion.suggestion_id), {},
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
