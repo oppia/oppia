@@ -24,12 +24,13 @@ require('components/concept-card/concept-card.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
+require(
+  'components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
-  'HtmlEscaperService',
+  'HtmlEscaperService'
   function(HtmlEscaperService) {
     return {
       restrict: 'E',
@@ -59,10 +60,6 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             // instance, then open the concept card modal. To determine if the
             // RTE is inside a CKEditor instance, check if the offsetParent
             // element contains the data attribute ckeWidgetId.
-            // Also check if the copy mode is enabled within the CKEditor
-            // instance or not. If it is, don't show the RTE modal. The
-            // concept card modal should get triggered instead of the
-            // RTE modal while copying stuff within the copy editor.
             if (ctrl.canOpenConceptCardModal(event)) {
               return;
             }
@@ -90,12 +87,10 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
               }
             });
           };
-          // Function to check whether the RTE modal or the concept card
-          // modal should be triggered.
           ctrl.canOpenConceptCardModal = function(event) {
             return (
               event.currentTarget.offsetParent.dataset.ckeWidgetId ||
-              $scope.CkEditorCopyContentService.copyModeActive
+              CkEditorCopyContentService.copyModeActive
             );
           };
         }
