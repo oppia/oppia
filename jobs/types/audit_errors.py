@@ -224,6 +224,16 @@ class ModelRelationshipError(BaseAuditError):
                 target_kind))
 
 
+class ModelCanonicalNameMismatchError(BaseAuditError):
+    """Error class for models that have mismatching names."""
+
+    def __init__(self, model):
+        super(ModelCanonicalNameMismatchError, self).__init__(model)
+        self.message = (
+            'Entity name %s in lowercase does not match '
+            'canonical name %s' % (model.name, model.canonical_name))
+
+
 class DraftChangeListLastUpdatedNoneError(BaseAuditError):
     """Error class for models with draft change list but draft change list
     last_updated is None.
