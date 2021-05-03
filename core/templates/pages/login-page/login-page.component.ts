@@ -25,7 +25,7 @@ import { LoaderService } from 'services/loader.service';
 import firebase from 'firebase/app';
 
 import { AuthService } from 'services/auth.service';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'login-page',

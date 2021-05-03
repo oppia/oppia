@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service.ts';
+import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 
 describe('TranslateTextService', () => {
   let translateTextService;

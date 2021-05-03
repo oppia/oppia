@@ -26,9 +26,9 @@ import { Injectable } from '@angular/core';
 
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants.ts';
+  'classifiers/classifiers-extension.constants';
 import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants.ts';
+  'interactions/interactions-extension.constants';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
