@@ -132,7 +132,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
           };
 
           $scope.getSolutionSummary = function() {
-            var solution = (StateSolutionService.savedMemento);
+            var solution = StateSolutionService.savedMemento;
             var solutionAsPlainText =
               solution.getSummary(
                 StateInteractionIdService.savedMemento,
