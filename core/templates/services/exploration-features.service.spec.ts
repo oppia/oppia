@@ -18,8 +18,9 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
 
-import { ExplorationFeaturesService, ExplorationDataDict, ParamChanges } from
+import { ExplorationFeaturesService, ExplorationDataDict} from
   'services/exploration-features.service';
 import { ExplorationFeatures } from './exploration-features-backend-api.service';
 
@@ -28,7 +29,7 @@ describe('ExplorationFeatureService', () => {
   let featureData: ExplorationFeatures;
   let explorationData: ExplorationDataDict;
   let explorationData2: ExplorationDataDict;
-  let testParamChanges: ParamChanges;
+  let testParamChanges: ParamChangeBackendDict;
 
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
