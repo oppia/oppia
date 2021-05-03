@@ -183,7 +183,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 list(ClassifierTrainingJobModel). List of the
                 ClassifierTrainingJobModels with status new or pending.
                 int. The offset value.
-
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,

@@ -66,7 +66,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def test_query_new_and_pending_training_jobs(self):
         offset = 0
         next_scheduled_check_time = datetime.datetime.utcnow()
-        # creating 14 jobs out of which 12 will be fetched in steps
+        # Creating 14 jobs out of which 12 will be fetched in steps.
         classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', 'exp_id01', 1,
             next_scheduled_check_time,
