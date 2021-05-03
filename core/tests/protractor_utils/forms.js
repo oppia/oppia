@@ -55,7 +55,7 @@ var GraphEditor = function(graphInputContainer) {
     await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await waitFor.visibilityOf(
-        graphInputContainer, 'Graph Input Container taking too long to appear');
+      graphInputContainer, 'Graph Input Container taking too long to appear');
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
     await browser.actions().click().perform();
@@ -66,14 +66,14 @@ var GraphEditor = function(graphInputContainer) {
       by.css('.protractor-test-Add-Edge-button'));
     await action.click('Add Edge Button', addEdgeButton);
     await waitFor.visibilityOf(
-        vertexElement(
-            vertexIndex1), `Vertex element ${vertexIndex1} taking too long`);
+      vertexElement(
+        vertexIndex1), `Vertex element ${vertexIndex1} taking too long`);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
     await waitFor.visibilityOf(
-        vertexElement(
-            vertexIndex2), `Vertex element ${vertexIndex2} taking too long`);
+      vertexElement(
+        vertexIndex2), `Vertex element ${vertexIndex2} taking too long`);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex2)).perform();
     await browser.actions().mouseUp().perform();
