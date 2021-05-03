@@ -22,14 +22,14 @@ module.exports = {
   meta: {
     type: 'suggestion',
     docs: {
-      dexcription: 'Rule to disallow using .then() method on a variable',
+      description: 'Rule to disallow using .then() method on a variable',
       category: 'Best Practices',
       recommended: true
     },
     fixable: null,
     schema: [],
     messages: {
-      avoidMethod: 'Please avoid using .then() method'
+      avoidThenMethod: 'Please avoid using .then() method'
     }
   },
   create: function(context) {
@@ -39,7 +39,7 @@ module.exports = {
           context.report({
             node: node.callee.property,
             loc: node.callee.property.loc,
-            messageId: 'avoidMethod'
+            messageId: 'avoidThenMethod'
           });
         }
       }
