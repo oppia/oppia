@@ -194,7 +194,7 @@ var RichTextEditor = async function(elem) {
   var _clickToolbarButton = async function(buttonName) {
     var clickToolbarButton = elem.element(by.css('.' + buttonName));
     await action.click(
-      `Click Toolbar Button: ${buttonName}`, clickToolbarButton);
+      `Toolbar Button: ${buttonName}`, clickToolbarButton);
   };
   var _clearContent = async function() {
     expect(
