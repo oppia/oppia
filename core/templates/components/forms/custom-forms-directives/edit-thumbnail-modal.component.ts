@@ -16,6 +16,7 @@
  * @fileoverview Component for edit thumbnail modal.
  */
 
+import { trigger, transition, style, animate } from '@angular/animations';
 import { SimpleChanges } from '@angular/core';
 import { Component, Input, OnChanges } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -23,7 +24,15 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Component({
   selector: 'edit-thumbnail-modal',
-  templateUrl: './edit-thumbnail-modal.component.html'
+  templateUrl: './edit-thumbnail-modal.component.html',
+  animations: [
+    trigger('fade', [
+      transition('void => *', [
+        style({opacity: 0}),
+        animate(500, style({opacity: 1}))
+      ])
+    ])
+  ]
 })
 export class EditThumbnailModalComponent implements OnChanges {
   @Input() bgColor: string;
@@ -83,38 +92,33 @@ export class EditThumbnailModalComponent implements OnChanges {
       attrs: []
     };
     if (this.isUploadedImageSvg()) {
-      $('.oppia-thumbnail-uploader').fadeOut(() => {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () =>{
-          let imgSrc = reader.result as string;
-          this.updateBackgroundColor(this.tempBgColor);
-          let img = new Image();
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () =>{
+        let imgSrc = reader.result as string;
+        this.updateBackgroundColor(this.tempBgColor);
+        let img = new Image();
 
-          img.onload = () => {
+        img.onload = () => {
           //   Setting a default height of 300px and width of
           //   150px since most browsers use these dimensions
           //   for SVG files that do not have an explicit
           //   height and width defined.
-            this.setImageDimensions(
-              img.naturalHeight || 150,
-              img.naturalWidth || 300);
-          };
-          img.src = imgSrc;
-          this.uploadedImage = imgSrc;
-          this.invalidTagsAndAttributes = (
-            this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
-              imgSrc));
-          let tags = this.invalidTagsAndAttributes.tags;
-          let attrs = this.invalidTagsAndAttributes.attrs;
-          if (tags.length > 0 || attrs.length > 0) {
-            this.reset();
-          }
+          this.setImageDimensions(
+            img.naturalHeight || 150,
+            img.naturalWidth || 300);
         };
-        setTimeout(() => {
-          $('.oppia-thumbnail-uploader').fadeIn();
-        }, 100);
-      });
+        img.src = imgSrc;
+        this.uploadedImage = imgSrc;
+        this.invalidTagsAndAttributes = (
+          this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+            imgSrc));
+        let tags = this.invalidTagsAndAttributes.tags;
+        let attrs = this.invalidTagsAndAttributes.attrs;
+        if (tags.length > 0 || attrs.length > 0) {
+          this.reset();
+        }
+      };
     } else {
       this.reset();
       this.invalidImageWarningIsShown = true;
