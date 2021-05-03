@@ -252,13 +252,15 @@ angular.module('oppia').factory('ChangeListService', [
        * content html in a state.
        *
        * @param {string} contentId - The content id of the translated content.
+       * @param {string} dataFormat - The data format of the content.
        * @param {string} languageCode - The language code.
        * @param {string} stateName - The current state name.
        * @param {string} translationHtml - The translation html.
+       * @param {boolean} needsUpdate - Whether the content needs to be updated.
        */
       addTranslation: function(
           contentId, dataFormat, languageCode, stateName,
-          translationHtml, needs_update) {
+          translationHtml, needsUpdate) {
         addChange({
           cmd: CMD_ADD_TRANSLATION,
           content_id: contentId,
@@ -266,7 +268,7 @@ angular.module('oppia').factory('ChangeListService', [
           language_code: languageCode,
           state_name: stateName,
           translation_html: translationHtml,
-          needs_update: needs_update
+          needs_update: needsUpdate
         });
       },
       /**
