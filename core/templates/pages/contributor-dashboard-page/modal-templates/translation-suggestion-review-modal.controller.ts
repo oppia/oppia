@@ -20,23 +20,24 @@
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$http', '$scope', '$uibModalInstance', 'AlertsService',
+    '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
     'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
-    'ACTION_REJECT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT',
     function(
-        $http, $scope, $uibModalInstance, AlertsService,
+        $http, $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
         SiteAnalyticsService, UrlInterpolationService, UserService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
-        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
@@ -161,6 +162,9 @@ angular.module('oppia').controller(
 
         [$scope.activeSuggestionId, $scope.activeSuggestion] = (
           remainingSuggestions.pop());
+        ContextService.setCustomEntityContext(
+          IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+          $scope.activeSuggestion.target_id);
         init();
       };
 

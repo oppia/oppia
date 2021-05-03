@@ -28,7 +28,7 @@ import { ResponseGraphInput } from './directives/oppia-response-graph-input.comp
 import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
 import { TranslateModule } from 'filters/translate.module';
 import { MaterialModule } from 'components/material.module';
-import { DirectivesModule } from 'components/../directives/directives.module';
+import { DirectivesModule } from 'directives/directives.module';
 
 @NgModule({
   imports: [
