@@ -31,7 +31,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
     tick-interval="auto"
     [step]="1"
     aria-label="audio-slider">
-  </mat-slider>`
+  </mat-slider>`,
+  styles: [`
+  .mat-accent /deep/ .mat-slider-track-fill,
+  .mat-accent /deep/ .mat-slider-thumb,
+  .mat-accent /deep/ .mat-slider-thumb-label {
+    background: #ff4081;
+  }`]
 })
 export class AudioSliderComponent {
   @Input() value;
