@@ -30,7 +30,7 @@ require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
-  'HtmlEscaperService'
+  'HtmlEscaperService',
   function(HtmlEscaperService) {
     return {
       restrict: 'E',
