@@ -179,8 +179,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             offset: int. Number of query results to skip.
 
         Returns:
-            list(ClassifierTrainingJobModel). List of the
-            ClassifierTrainingJobModels with status new or pending.
+            tuple(list(ClassifierTrainingJobModel), int).
+                list(ClassifierTrainingJobModel). List of the
+                ClassifierTrainingJobModels with status new or pending.
+                int. The offset value.
+
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
