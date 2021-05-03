@@ -77,7 +77,7 @@ angular.module('oppia').directive('baseContent', [
           // This is added as a temporary fix for change detection to enable
           // side-navigation-bar while migrating Top-Navigation-Bar.It needs to
           // be removed with migration of this directive along with changes made
-          // in SidebarStatusService
+          // in SidebarStatusService.
           SidebarStatusService.toggleSidebarEventEmitter.subscribe(() => {
             $rootScope.$applyAsync();
           });
