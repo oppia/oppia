@@ -193,16 +193,12 @@ class BaseHandler(webapp2.RequestHandler):
             auth_claims = auth_services.get_auth_claims_from_request(request)
         except auth_domain.StaleAuthSessionError:
             auth_services.destroy_auth_session(self.response)
-            self.handle_exception(
-                self.UnauthorizedUserException('Please sign in again'),
-                self.app.debug)
+            self.redirect(user_services.create_login_url(self.request.uri))
             return
         except auth_domain.InvalidAuthSessionError:
             logging.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)
-            self.handle_exception(
-                self.UnauthorizedUserException('Please sign in again'),
-                self.app.debug)
+            self.redirect(user_services.create_login_url(self.request.uri))
             return
         else:
             self.current_user_is_super_admin = (

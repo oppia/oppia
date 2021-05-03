@@ -565,13 +565,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 auth_services, 'get_auth_claims_from_request',
                 error=auth_domain.StaleAuthSessionError('uh-oh')))
 
-            response = self.get_html_response('/', expected_status_int=401)
+            response = self.get_html_response('/', expected_status_int=302)
 
-        self.assert_matches_regexps(logs, [
-            r'Traceback \(most recent call last\):.*StaleAuthSessionError',
-            r'Exception raised:',
-        ])
         self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(
+            response.location,
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
         with contextlib2.ExitStack() as exit_stack:
@@ -583,14 +582,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 auth_services, 'get_auth_claims_from_request',
                 error=auth_domain.InvalidAuthSessionError('uh-oh')))
 
-            response = self.get_html_response('/', expected_status_int=401)
+            response = self.get_html_response('/', expected_status_int=302)
 
-        self.assert_matches_regexps(logs, [
-            r'User session is invalid!',
-            r'Traceback \(most recent call last\):.*InvalidAuthSessionError',
-            r'Exception raised:',
-        ])
+        self.assert_matches_regexps(logs, ['User session is invalid!'])
         self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(
+            response.location,
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
 
 class MaintenanceModeTests(test_utils.GenericTestBase):
