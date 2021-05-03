@@ -28,7 +28,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let AlertsService = null;
   let userService = null;
   let userInfoSpy = null;
-  let deferred = null;
   let contributionRightsDataSpy = null;
 
   importAllAngularServices();
@@ -78,8 +77,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       userService = $injector.get('UserService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-      deferred = $q.defer();
-      
+
       userInfoSpy = spyOn(userService, 'getUserInfoAsync')
         .and.returnValue($q.resolve({
           isLoggedIn: () => true,
