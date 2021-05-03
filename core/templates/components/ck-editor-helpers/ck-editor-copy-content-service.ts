@@ -71,8 +71,7 @@ export class CkEditorCopyContentService {
         containedWidgetTagName = currentTagName;
         break;
       }
-      // Prevents reference errors if the element clicked on is itself the
-      // OUTPUT_VIEW_TAG_NAME (i.e, ANGULAR-HTML-BIND).
+
       if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
       }
