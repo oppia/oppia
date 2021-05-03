@@ -96,6 +96,7 @@ uritemplate==3.0.1        # via google-api-python-client
 urllib3==1.26.4           # via elasticsearch, requests
 webapp2==2.5.2            # via -r requirements.in
 webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
+webob==1.8.7              # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
