@@ -22,8 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { NavigationBackendApiService } from './navigation-backend-api.service';
 import { Title } from '@angular/platform-browser';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Navigation Backend Api Service', () => {
+describe('Navigation Backend Api Service', () => {
   let navigationBackendApiService: NavigationBackendApiService;
   let httpTestingController: HttpTestingController;
   let titleService: Title;
