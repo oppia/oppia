@@ -273,7 +273,7 @@ export class InteractiveCodeReplComponent implements
   sendResponse(evaluation: string, err: string): void {
     this.currentInteractionService.onSubmit({
       // Replace tabs with 2 spaces.
-      // TODO(#12712): 1. CodeRepl interaction TODOs
+      // TODO(#12712): (1) CodeRepl interaction TODOs.
       code: this.code.replace(/\t/g, '  ') || '',
       output: this.output,
       evaluation: this.evaluation,
