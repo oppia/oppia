@@ -52,7 +52,7 @@ var GraphEditor = function(graphInputContainer) {
   var createVertex = async function(xOffset, yOffset) {
     var addNodeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Node-button'));
-    await action.click('Test Add Node Button', addNodeButton);
+    await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
@@ -62,7 +62,7 @@ var GraphEditor = function(graphInputContainer) {
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
-    await action.click('Test Add Edge Button', addEdgeButton);
+    await action.click('Add Edge Button', addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
@@ -90,7 +90,7 @@ var GraphEditor = function(graphInputContainer) {
     clearDefaultGraph: async function() {
       var deleteButton = graphInputContainer.element(
         by.css('.protractor-test-Delete-button'));
-      await action.click('Test Delete Button', deleteButton);
+      await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
         await action.click(`Vertex Element ${i}`, vertexElement(i));
@@ -131,9 +131,9 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
-    var testAddListEntry = elem.element(by.css(
+    var AddListEntry = elem.element(by.css(
       '.protractor-test-add-list-entry'));
-    await action.click('Test Add List Entry', testAddListEntry);
+    await action.click('Add List Entry', AddListEntry);
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -142,10 +142,10 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    var testDeleteListEntry = elem.element(
+    var DeleteListEntry = elem.element(
       await by.repeater('item in localValue track by $index').row(index))
       .element(by.css('.protractor-test-delete-list-entry'));
-    await action.click('Test Delete List Entry', testDeleteListEntry);
+    await action.click('Delete List Entry', DeleteListEntry);
   };
 
   return {
@@ -386,10 +386,10 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    var testSearchBarDropdownToggle = elem.element(by.css(
+    var SearchBarDropdownToggle = elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle'));
     await action.click(
-      'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+      'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
 
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
@@ -411,10 +411,10 @@ var MultiSelectEditor = function(elem) {
     }
 
     // Close the dropdown menu at the end.
-    var testSearchBarDropdownToggle = elem.element(by.css(
+    var SearchBarDropdownToggle = elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle'));
     await action.click(
-      'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+      'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
   };
 
   return {
@@ -428,10 +428,10 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      var testSearchBarDropdownToggle = elem.element(by.css(
+      var SearchBarDropdownToggle = elem.element(by.css(
         '.protractor-test-search-bar-dropdown-toggle'));
       await action.click(
-        'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+        'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
 
       // Find the selected elements.
       var actualSelection = await elem.element(
@@ -443,10 +443,10 @@ var MultiSelectEditor = function(elem) {
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
-      var testSearchBarDropdownToggle = elem.element(by.css(
+      var SearchBarDropdownToggle = elem.element(by.css(
         '.protractor-test-search-bar-dropdown-toggle'));
       await action.click(
-        'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+        'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
     }
   };
 };
