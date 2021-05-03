@@ -341,7 +341,7 @@ exports.config = {
 
     var ADD_VIDEO_REPORTER = true;
     var spw = '';
-    var ffmpegArgs = ['-video_size','1024x768','-framerate','25','-f','x11grab']
+    var ffmpegArgs = ['-video_size','1024x768','-framerate','25','-f','x11grab','-i','process.env.DISPLAY'] // add -i argument
 
     if (ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter({
