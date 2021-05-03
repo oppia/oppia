@@ -103,6 +103,7 @@ export class InteractiveCodeReplComponent implements
         postCodeWithValue: this.postCodeWithValue,
       }
     ) as CodeReplCustomizationArgs;
+
     this.interactionIsActive = (this.lastAnswer === null);
     this.language = language.value;
     this.placeholder = placeholder.value;
@@ -185,8 +186,9 @@ export class InteractiveCodeReplComponent implements
   }
 
   runCode(
-      codeInput: string, onFinishRunCallback: (
-        x: string, error: string) => void): void {
+      codeInput: string,
+      onFinishRunCallback: (x: string, error: string) => void
+  ): void {
     this.code = codeInput;
     this.output = '';
 
@@ -286,6 +288,7 @@ export class InteractiveCodeReplComponent implements
     this.componentSubscriptions.unsubscribe();
   }
 }
+
 angular.module('oppia').directive(
   'oppiaInteractiveCodeRepl', downgradeComponent({
     component: InteractiveCodeReplComponent
