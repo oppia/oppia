@@ -40,8 +40,9 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
       controller: [
         '$attrs', '$scope', '$uibModal', 'CkEditorCopyContentService',
         'ContextService', 'ENTITY_TYPE',
-        function($attrs, $scope, $uibModal, CkEditorCopyContentService,
-          ContextService, ENTITY_TYPE) {
+        function
+            ($attrs, $scope, $uibModal, CkEditorCopyContentService,
+            ContextService, ENTITY_TYPE) {
           var ctrl = this;
           var skillId = HtmlEscaperService.escapedJsonToObj(
             $attrs.skillIdWithValue);
@@ -94,7 +95,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           ctrl.toggleModal = function(event) {
             return (
               event.currentTarget.offsetParent.dataset.ckeWidgetId ||
-              scope.CkEditorCopyContentService.copyModeActive
+              $scope.CkEditorCopyContentService.copyModeActive
             );
           };
         }
