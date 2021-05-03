@@ -577,9 +577,9 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
         args.push(arguments[i]);
       }
       expect(
-            await action.getText(
-              `${elem} in Array of Elements in Rich Text Area`, elem))
-              .toBe(arrayOfTexts[arrayPointer]);
+        await action.getText(
+          `${elem} in Array of Elements in Rich Text Area`, elem))
+          .toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
