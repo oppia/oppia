@@ -74,9 +74,15 @@ angular.module('oppia').directive('schemaBasedEditor', [
 import { Directive, ElementRef, Injector, Input, Output, EventEmitter } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 import { Schema } from 'services/schema-default-value.service';
-
+// Allow $scope to be provided to parent Component.
+export const ScopeProvider = {
+  deps: ['$injector'],
+  provide: '$scope',
+  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
+};
 @Directive({
-  selector: 'schema-based-editor'
+  selector: 'schema-based-editor',
+  providers: [ScopeProvider]
 })
 export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() schema: () => Schema;

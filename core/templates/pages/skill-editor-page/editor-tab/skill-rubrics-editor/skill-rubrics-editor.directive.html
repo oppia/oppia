@@ -13,10 +13,10 @@
         </i>
       </div>
       <div ng-if="rubricsListIsShown" class="oppia-mobile-collapsible-card-content">
-        <rubrics-editor rubrics="skill.getRubrics()"
-                        on-save-rubric="onSaveRubric"
-                        new-skill-being-created="false">
-        </rubrics-editor>
+        <oppia-rubrics-editor [rubrics]="skill.getRubrics()"
+                              (save-rubric)="onSaveRubric($event.difficulty, $event.data)"
+                              [new-skill-being-created]="false">
+        </oppia-rubrics-editor>
       </div>
     </div>
   </div>

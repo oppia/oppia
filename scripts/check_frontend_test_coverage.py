@@ -239,7 +239,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'response-header.directive.ts',
     'review-material-editor.directive.ts',
     'role-graph.directive.ts',
-    'rubrics-editor.directive.ts',
     'rule-editor.directive.ts',
     'rule-type-selector.directive.ts',
     'sanitized-url-editor.directive.ts',
