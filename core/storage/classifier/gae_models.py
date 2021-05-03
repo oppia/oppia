@@ -190,9 +190,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                         cls.next_scheduled_check_time, cls._key)
 
         job_models = query.fetch(10, offset=offset)
-
         offset = offset + len(job_models)
-
         return job_models, offset
 
     @classmethod
