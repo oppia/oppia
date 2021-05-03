@@ -27,7 +27,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { MatCardModule } from '@angular/material/card';
 import { PrivacyPageComponent } from './privacy-page.component';
 
 
@@ -35,7 +34,6 @@ import { PrivacyPageComponent } from './privacy-page.component';
   imports: [
     BrowserModule,
     HttpClientModule,
-    MatCardModule,
     SharedComponentsModule
   ],
   declarations: [
