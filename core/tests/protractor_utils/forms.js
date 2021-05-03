@@ -119,6 +119,8 @@ var GraphEditor = function(graphInputContainer) {
         // dict's edges.
         var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
+        await waitFor.visibilityOf(
+          allEdgesElement, 'All edges element taking too long to appear');
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
