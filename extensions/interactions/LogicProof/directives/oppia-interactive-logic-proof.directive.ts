@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('third-party-imports/ui-codemirror.import.ts');
-
+import 'components/code-mirror/codemirror.component';
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');

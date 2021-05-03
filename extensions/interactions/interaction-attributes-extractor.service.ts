@@ -36,7 +36,8 @@ export class InteractionAttributesExtractorService {
     'Continue',
     'FractionInput',
     'GraphInput',
-    'ImageClickInput'
+    'ImageClickInput',
+    'CodeRepl'
   ];
 
   constructor(

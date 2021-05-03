@@ -28,14 +28,14 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { PendingAccountDeletionPageComponent } from './pending-account-deletion-page.component';
-import { TranslateModule } from 'filters/translate.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
-    TranslateModule
+    SharedPipesModule
   ],
   declarations: [
     PendingAccountDeletionPageComponent,

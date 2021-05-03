@@ -27,12 +27,14 @@ import { ContinueExtensionsModule } from './Continue/continue-interactions.modul
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
+import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     AlgebraicExpressionInputExtensionsModule,
+    CodeReplInteractionModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,
@@ -42,6 +44,7 @@ import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-
   entryComponents: [],
   exports: [
     AlgebraicExpressionInputExtensionsModule,
+    CodeReplInteractionModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,

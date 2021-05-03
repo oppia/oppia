@@ -37,6 +37,7 @@ import { InteractionCustomizationArgs } from
 export class ExplorationHtmlFormatterService {
   private readonly migratedInteractions: string[] = [
     'AlgebraicExpressionInput',
+    'CodeRepl',
     'Continue',
     'FractionInput',
     'GraphInput',

@@ -24,10 +24,10 @@
 </table>
 
 <div class="modal-body" ng-cloak>
-  <codemirror-mergeview options="CODEMIRROR_MERGEVIEW_OPTIONS"
-                        left-value="yamlStrs.leftPane"
-                        right-value="yamlStrs.rightPane">
-  </codemirror-mergeview>
+  <oppia-codemirror-mergeview [options]="CODEMIRROR_MERGEVIEW_OPTIONS"
+                              [left-value]="yamlStrs.leftPane"
+                              [right-value]="yamlStrs.rightPane">
+  </oppia-codemirror-mergeview>
   <div align="center" class="oppia-click-arrows-text">
     <strong>Click arrows to desynchronize scrolling</strong>
   </div>
