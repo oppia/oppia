@@ -42,7 +42,7 @@ require(
   'pages/topic-editor-page/modal-templates/' +
   'questions-list-select-skill-and-difficulty-modal.controller.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
@@ -303,6 +303,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.changeLinkedSkillDifficulty = function() {
+            ctrl.isSkillDifficultyChanged = true;
             if (ctrl.newQuestionSkillIds.length === 1) {
               ctrl.newQuestionSkillDifficulties = (
                 [ctrl.linkedSkillsWithDifficulty[0].getDifficulty()]);
@@ -350,6 +351,7 @@ angular.module('oppia').directive('questionsList', [
               ctrl.editorIsOpen = true;
             }
             ctrl.skillLinkageModificationsArray = [];
+            ctrl.isSkillDifficultyChanged = false;
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
@@ -370,6 +372,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.editQuestion = function(
               questionSummaryForOneSkill, skillDescription, difficulty) {
             ctrl.skillLinkageModificationsArray = [];
+            ctrl.isSkillDifficultyChanged = false;
             if (ctrl.editorIsOpen) {
               return;
             }
@@ -489,7 +492,14 @@ angular.module('oppia').directive('questionsList', [
                   return summary.getId() !== skillId;
                 });
           };
-          ctrl.isQuestionValid = function() {
+          ctrl.isQuestionSavable = function() {
+            // Not savable if there are no changes.
+            if (!QuestionUndoRedoService.hasChanges() && (
+              ctrl.skillLinkageModificationsArray &&
+              ctrl.skillLinkageModificationsArray.length === 0
+            ) && !ctrl.isSkillDifficultyChanged) {
+              return false;
+            }
             let questionIdValid = QuestionValidationService.isQuestionValid(
               ctrl.question, ctrl.misconceptionsBySkill);
             if (!ctrl.questionIsBeingUpdated) {
