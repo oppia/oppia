@@ -26,6 +26,10 @@ describe('Translation Suggestion Review Modal Controller', function() {
   let SiteAnalyticsService = null;
   let contributionAndReviewService = null;
   let AlertsService = null;
+  let userService = null;
+  let userInfoSpy = null;
+  let deferred = null;
+  let contributionRightsDataSpy = null;
 
   importAllAngularServices();
 
@@ -69,11 +73,24 @@ describe('Translation Suggestion Review Modal Controller', function() {
       suggestion_1: suggestion1,
       suggestion_2: suggestion2
     };
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function($injector, $controller, $q) {
       const $rootScope = $injector.get('$rootScope');
+      userService = $injector.get('UserService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-
+      deferred = $q.defer();
+      
+      userInfoSpy = spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true,
+          getUsername: () => 'admin-1'
+        }));
+      contributionRightsDataSpy = spyOn(
+        userService, 'getUserContributionRightsDataAsync')
+        .and.returnValue($q.resolve({
+          can_review_translation_for_language_codes: () => 'hi',
+          getUsername: () => 'admin-1'
+        }));
       $scope = $rootScope.$new();
       $controller('TranslationSuggestionReviewModalController', {
         $scope: $scope,
@@ -81,9 +98,19 @@ describe('Translation Suggestion Review Modal Controller', function() {
         initialSuggestionId: 'suggestion_1',
         subheading: subheading,
         reviewable: reviewable,
-        suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
+        suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion),
+        userService: userService
       });
+      $rootScope.$apply();
+      $scope.init();
     }));
+
+    it('should user service at initialization.',
+      function() {
+        $scope.$apply();
+        expect(userInfoSpy).toHaveBeenCalled();
+        expect(contributionRightsDataSpy).toHaveBeenCalled();
+      });
 
     it('should initialize $scope properties after controller is initialized',
       function() {

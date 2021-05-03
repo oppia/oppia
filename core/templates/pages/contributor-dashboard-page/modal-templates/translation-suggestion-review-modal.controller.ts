@@ -104,16 +104,16 @@ angular.module('oppia').controller(
         });
       };
 
-      var init = function() {
+      $scope.init = function() {
         let userCanReviewTranslationSuggestionsInLanguages: string[] = [];
         const languageCode: string = $scope.activeSuggestion.change.
           language_code;
-        UserService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(userInfo => {
           $scope.username = userInfo.getUsername();
           $scope.isAdmin = userInfo.isAdmin();
         });
         UserService.getUserContributionRightsDataAsync().then(
-          function(userContributionRights) {
+          userContributionRights => {
             userCanReviewTranslationSuggestionsInLanguages = (
               userContributionRights
                 .can_review_translation_for_language_codes);
@@ -150,7 +150,7 @@ angular.module('oppia').controller(
         }
       };
 
-      init();
+      $scope.init();
 
       $scope.showNextItemToReview = function(suggestionId) {
         resolvedSuggestionIds.push($scope.activeSuggestionId);
@@ -165,7 +165,7 @@ angular.module('oppia').controller(
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
           $scope.activeSuggestion.target_id);
-        init();
+        $scope.init();
       };
 
       $scope.acceptAndReviewNext = function() {
