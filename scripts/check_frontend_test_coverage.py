@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import fnmatch
 import os
 import re
 import sys
@@ -25,6 +26,10 @@ import python_utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
+EXCLUDED_DIRECTORIES = [
+  'node_modules/*',
+  'extensions/classifiers/proto/*'
+]
 
 # Contains the name of all files that is not 100% coverage.
 # This list must be kept up-to-date; the changes (only remove) should be done
@@ -457,7 +462,8 @@ def check_coverage_changes():
         file_name = stanza.file_name
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
-        if stanza.file_path.startswith('node_modules/'):
+        if any(fnmatch.fnmatch(
+            stanza.file_path, pattern) for pattern in EXCLUDED_DIRECTORIES):
             continue
         if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
