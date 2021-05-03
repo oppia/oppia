@@ -28,6 +28,9 @@ import { ActivityIdTypeDict, FeaturedActivityResponse,
 describe('Moderator Page Backend Api Service', () => {
   let moderatorPageBackendApiService: ModeratorPageBackendApiService;
   let httpTestingController: HttpTestingController;
+  let successHandler = jasmine.createSpy('success');
+  let failHandler = jasmine.createSpy('fail');
+
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -48,16 +51,17 @@ describe('Moderator Page Backend Api Service', () => {
       id: 'test_id1',
       type: 'type1'
     }];
+
     moderatorPageBackendApiService
       .saveFeaturedActivityReferencesAsync(activityReferences)
-      .then((responseData) => {
-        expect(responseData).toEqual({});
-      });
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/moderatorhandler/featured');
-    expect(req.request.method).toEqual('POST');
+
     req.flush({});
     flushMicrotasks();
+    expect(req.request.method).toEqual('POST');
+    expect(successHandler).toHaveBeenCalled();
   }));
 
   it('should get recent commits', fakeAsync(() => {
@@ -68,17 +72,16 @@ describe('Moderator Page Backend Api Service', () => {
       exp_ids_to_exp_data: []
     };
     moderatorPageBackendApiService
-      .getRecentCommitsAsync().then((responseData) => {
-        expect(responseData).toEqual(expectedResponseData);
-      });
+      .getRecentCommitsAsync().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/recentcommitshandler/recent_commits' +
       '?query_type=all_non_private_commits');
     req.flush(expectedResponseData);
+    flushMicrotasks();
 
     expect(req.request.method).toEqual('GET');
-    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalledWith(expectedResponseData);
   }));
 
   it('should get recent feedback messages', fakeAsync(() => {
@@ -88,14 +91,14 @@ describe('Moderator Page Backend Api Service', () => {
       more: true
     };
     moderatorPageBackendApiService
-      .getRecentFeedbackMessagesAsync().then((responseData) => {
-        expect(responseData).toEqual(expectedResponseData);
-      });
+      .getRecentFeedbackMessagesAsync().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/recent_feedback_messages');
-    expect(req.request.method).toEqual('GET');
     req.flush(expectedResponseData);
     flushMicrotasks();
+
+    expect(req.request.method).toEqual('GET');
+    expect(successHandler).toHaveBeenCalledWith(expectedResponseData);
   }));
 
   it('should get recent featured activity references', fakeAsync(() => {
@@ -103,13 +106,13 @@ describe('Moderator Page Backend Api Service', () => {
       featured_activity_references: []
     };
     moderatorPageBackendApiService
-      .getFeaturedActivityReferencesAsync().then((responseData) => {
-        expect(responseData).toEqual(expectedResponseData);
-      });
+      .getFeaturedActivityReferencesAsync().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/moderatorhandler/featured');
-    expect(req.request.method).toEqual('GET');
     req.flush(expectedResponseData);
     flushMicrotasks();
+
+    expect(req.request.method).toEqual('GET');
+    expect(successHandler).toHaveBeenCalledWith(expectedResponseData);
   }));
 });
