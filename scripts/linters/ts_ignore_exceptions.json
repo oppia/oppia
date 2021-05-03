@@ -15,5 +15,10 @@
   ],
   "core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts": [
     "expect(component.pathIconParameters).toEqual([{"
+  ],
+  "core/templates/components/code-mirror/codemirror-mergeview.component.spec.ts": [
+    "",
+    "",
+    ""
   ]
 }
