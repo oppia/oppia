@@ -193,13 +193,13 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
-  await action.click('First of oppia rte', firstOfOppiaRte);
+  var firstOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+  await action.click('First Rich Text Editor', firstOppiaRte);
 
   var _appendContentText = async function(text) {
-    var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+    var firstOppiaRte = await elem.all(by.css('.oppia-rte')).first();
     await action.sendKeys(
-      'First of Oppia Rte', firstOfOppiaRte, text);
+      'First Rich Text Editor', firstOppiaRte, text);
   };
   var _clickToolbarButton = async function(buttonName) {
     var clickToolbarButton = elem.element(by.css('.' + buttonName));
@@ -210,8 +210,8 @@ var RichTextEditor = async function(elem) {
     expect(
       await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
     ).toBe(true);
-    var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
-    await action.clear('First of oppia rte', firstOfOppiaRte);
+    var firstOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+    await action.clear('First Rich Text Editor', firstOppiaRte);
   };
 
   return {
@@ -281,15 +281,15 @@ var RichTextEditor = async function(elem) {
         [
           'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
         ].includes(componentName)) {
-        var firstOfOppiaRte = elem.all(by.css('.oppia-rte')).first();
+        var firstOppiaRte = elem.all(by.css('.oppia-rte')).first();
         await action.sendKeys(
-          'First of Oppia Rte', firstOfOppiaRte, protractor.Key.DOWN);
+          'First Rich Text Editor', firstOppiaRte, protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      var firstOfOppiaRte = elem.all(by.css('.oppia-rte')).first();
+      var firstOppiaRte = elem.all(by.css('.oppia-rte')).first();
       await action.sendKeys(
-        'First of Oppia Rte', firstOfOppiaRte, protractor.Key.chord(
+        'First Rich Text Editor', firstOppiaRte, protractor.Key.chord(
           protractor.Key.CONTROL, protractor.Key.END));
     }
   };
