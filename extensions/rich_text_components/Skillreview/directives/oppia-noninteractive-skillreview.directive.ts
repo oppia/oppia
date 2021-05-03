@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CkEditorCopyContentService } from "components/ck-editor-helpers/ck-editor-copy-content-service";
-
 /**
  * @fileoverview Directive for the concept card rich-text component.
  */
@@ -40,8 +38,10 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
       template: require('./skillreview.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$scope', '$uibModal', 'CkEditorCopyContentService', 'ContextService', 'ENTITY_TYPE',
-        function($attrs, $scope, $uibModal, CkEditorCopyContentService, ContextService, ENTITY_TYPE) {
+        '$attrs', '$scope', '$uibModal', 'CkEditorCopyContentService',
+        'ContextService', 'ENTITY_TYPE',
+        function($attrs, $scope, $uibModal, CkEditorCopyContentService,
+          ContextService, ENTITY_TYPE) {
           var ctrl = this;
           var skillId = HtmlEscaperService.escapedJsonToObj(
             $attrs.skillIdWithValue);
@@ -94,7 +94,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           ctrl.toggleModal = function(event) {
             return (
               event.currentTarget.offsetParent.dataset.ckeWidgetId ||
-              CkEditorCopyContentService.copyModeActive
+              scope.CkEditorCopyContentService.copyModeActive
             );
           };
         }
