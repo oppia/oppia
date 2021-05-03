@@ -272,7 +272,9 @@ export class ExplorationDiffService {
         } else if (
           change.cmd !== 'migrate_states_schema_to_latest_version' &&
           change.cmd !== 'AUTO_revert_version_number' &&
-          change.cmd !== 'edit_exploration_property'
+          change.cmd !== 'edit_exploration_property' &&
+          change.cmd !== 'add_translation' &&
+          change.cmd !== 'mark_translation_as_needing_update'
         ) {
           throw new Error('Invalid change command: ' + change.cmd);
         }

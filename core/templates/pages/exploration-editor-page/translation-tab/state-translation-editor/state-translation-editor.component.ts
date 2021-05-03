@@ -132,7 +132,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           var stateName = StateEditorService.getActiveStateName();
           showMarkAudioAsNeedingUpdateModalIfRequired(
             contentId, languageCode);
-          ExplorationStatesService.saveWrittenTranslations(
+          ExplorationStatesService.saveWrittenTranslation(
             contentId, newWrittenTranslation.dataFormat, languageCode,
             stateName, newWrittenTranslation.translation,
             newWrittenTranslation.needsUpdate);

@@ -79,6 +79,7 @@ describe('Exploration editor tab component', function() {
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
+  var translationStatusService = null;
 
   importAllAngularServices();
 
@@ -137,6 +138,7 @@ describe('Exploration editor tab component', function() {
     focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
+    translationStatusService = $injector.get('TranslationStatusService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
@@ -577,27 +579,14 @@ describe('Exploration editor tab component', function() {
       result: $q.resolve()
     });
     stateEditorService.setActiveStateName('First State');
-
     expect(
-      explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-      false);
-    expect(
-      explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-      .toBe(false);
-
+      translationStatusService.getAllStatesNeedUpdatewarning()['First State']
+    ).toBeUndefined();
     ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
     $scope.$apply();
-
     expect(
-      explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
-      true);
-    expect(
-      explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-      .toBe(true);
+      translationStatusService.getAllStatesNeedUpdatewarning()['First State']
+    ).toEqual(['Translation needs update!']);
   });
 
   it('should not mark all audio as needing update when dismissing modal',

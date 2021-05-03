@@ -75,7 +75,8 @@ angular.module('oppia').component('explorationEditorTab', {
     'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
     'StateEditorService', 'StateTutorialFirstTimeService',
-    'UrlInterpolationService', 'UserExplorationPermissionsService',
+    'TranslationStatusService', 'UrlInterpolationService',
+    'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
@@ -84,7 +85,8 @@ angular.module('oppia').component('explorationEditorTab', {
         LoaderService,
         RouterService, SiteAnalyticsService, StateEditorRefreshService,
         StateEditorService, StateTutorialFirstTimeService,
-        UrlInterpolationService, UserExplorationPermissionsService) {
+        TranslationStatusService, UrlInterpolationService,
+        UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       // Replace the ng-joyride template with one that uses <[...]>
@@ -290,8 +292,11 @@ angular.module('oppia').component('explorationEditorTab', {
               }
               if (writtenTranslations.hasUnflaggedWrittenTranslations(
                 contentId)) {
-                ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
-                  stateName, contentId);
+                writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                  contentId);
+                TranslationStatusService.setStateNeedsUpdate(stateName);
+                ExplorationStatesService.markWrittenTranslationAsNeedingUpdate(
+                  contentId, stateName);
               }
             });
           }, function() {

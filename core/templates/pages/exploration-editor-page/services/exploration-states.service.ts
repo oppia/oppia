@@ -410,16 +410,14 @@ angular.module('oppia').factory('ExplorationStatesService', [
       getWrittenTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'written_translations');
       },
-      // Only for adding a translation.
-      saveWrittenTranslations: function(
+      saveWrittenTranslation: function(
           contentId, dataFormat, languageCode, stateName,
           translationHtml, needsUpdate) {
         ChangeListService.addTranslation(
           contentId, dataFormat, languageCode, stateName,
           translationHtml, needsUpdate);
       },
-      // Only for marking as needing update.
-      markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
+      markWrittenTranslationAsNeedingUpdate: function(contentId, stateName) {
         ChangeListService.markTranslationAsNeedingUpdate(contentId, stateName);
       },
       isInitialized: function() {

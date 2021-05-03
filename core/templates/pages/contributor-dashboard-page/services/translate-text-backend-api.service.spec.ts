@@ -105,7 +105,9 @@ describe('TranslateTextBackendApiService', () => {
           state_name: 'activeStateName',
           language_code: 'languageCode',
           content_html: 'contentHtml',
-          translation_html: 'translationHtml'
+          translation_html: 'translationHtml',
+          data_format: 'html',
+          needs_update: false
         }
       };
 
