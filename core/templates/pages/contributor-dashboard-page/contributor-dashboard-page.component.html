@@ -6,9 +6,8 @@
             class="oppia-opportunities-tab-item"
             ng-repeat="(tabName, tabDetails) in $ctrl.tabsDetails"
             ng-if="tabDetails.enabled"
-            aria-label="<[tabDetails.ariaLabel]>"
-            role="button">
-          <a ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text protractor-test-<[tabName]>"><[tabDetails.tabName]></a>
+            aria-label="<[tabDetails.ariaLabel]>">
+          <a role="button" ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text protractor-test-<[tabName]>"><[tabDetails.tabName]></a>
           <div class="oppia-active-tab-hilighter"></div>
         </li>
       </ul>
@@ -274,7 +273,7 @@
     width: 100%;
   }
   .oppia-active-opportunities-tab a {
-    color: #009688;
+    color: #00645D;
     text-decoration: none;
   }
   .oppia-active-tab-hilighter {
@@ -286,20 +285,20 @@
     width: 60%;
   }
   .oppia-active-opportunities-tab .oppia-active-tab-hilighter {
-    background-color: #009688;
-    border: 2px solid #009688;
+    background-color: #00645D;
+    border: 2px solid #00645D;
     text-decoration: none;
     transform: scale(1);
   }
   .oppia-opportunities-tabs-text:hover {
-    color: #009688;
+    color: #00645D;
     text-decoration: none;
   }
   .oppia-active-opportunities-tab a:hover {
-    color: #009688;
+    color: #00645D;
   }
   .oppia-review-item-detail-container {
-    background-color: #009688;
+    background-color: #00645D;
     border-radius: 10%;
     color: #fff;
     padding: 1px 5px;
@@ -314,7 +313,7 @@
     transform: translateY(0%);
   }
   .collapsed-oppia-contributor-username-container {
-    color: #009688;
+    color: #00645D;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 15px;
     height: 30%;
@@ -327,7 +326,7 @@
     margin: auto;
   }
   .collapsed-oppia-opportunities-tabs-explanation {
-    color: #009688;
+    color: #00615A;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 15px;
     position: relative;

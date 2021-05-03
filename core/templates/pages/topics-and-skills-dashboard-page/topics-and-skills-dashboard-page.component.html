@@ -17,10 +17,10 @@
   </div>
   <div class="create-button-mobile">
     <div ng-if="($ctrl.activeTab === $ctrl.TAB_NAME_TOPICS) && $ctrl.totalTopicSummaries.length">
-      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic"></i>
+      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic" tabindex="-1"></i>
     </div>
     <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.skillSummaries.length">
-      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createSkill()" ng-if="$ctrl.userCanCreateSkill"></i>
+      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createSkill()" ng-if="$ctrl.userCanCreateSkill" tabindex="-1"></i>
     </div>
   </div>
   <div ng-if="$ctrl.totalTopicSummaries.length > 0 || $ctrl.untriagedSkillSummaries.length > 0">
@@ -66,7 +66,7 @@
                 </select>
               </div>
               <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-                <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
+                <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value"
                       ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
                   <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active">
@@ -74,14 +74,14 @@
                   </span>
                   <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
               </div>
               <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-                <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
+                <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
                 <span class="dashboard-list-pagination-value">
                   <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
                 </span>
-                <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+                <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
               </div>
             </div>
           </div>
@@ -115,18 +115,18 @@
           </div>
           <div class="pagination-mobile">
             <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
-              <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
+              <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-value"
                     ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
                 <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active"><[$index+1]></span>
                 <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
               </span>
-              <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+              <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
             </div>
             <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
-              <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
+              <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
               <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
-              <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+              <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
             </div>
           </div>
         </div>
@@ -524,7 +524,7 @@
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text {
     border-bottom: 2px solid #aaaac1;
-    color: #009688;
+    color: #00645D;
     font-size: 16px;
     padding: 10px;
     text-decoration: none;
@@ -534,12 +534,12 @@
   .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
   .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
     background-color: #d8f4f2;
-    border-bottom: 4px solid #009688;
+    border-bottom: 4px solid #00645D;
     border-radius: 0;
-    color: #009688;
+    color: #00645D;
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
-    color: #009688;
+    color: #00645D;
     font-size: 16px;
     padding: 10px;
     text-decoration: none;
