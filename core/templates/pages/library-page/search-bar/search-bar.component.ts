@@ -287,15 +287,3 @@ angular.module('oppia').component('searchBar', {
     }
   ]
 });
-
-import { Directive, ElementRef, Injector } from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
-
-@Directive({
-  selector: 'search-bar'
-})
-export class SearchBarDirective extends UpgradeComponent {
-  constructor(elementRef: ElementRef, injector: Injector) {
-    super('searchBar', elementRef, injector);
-  }
-}
