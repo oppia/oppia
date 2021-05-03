@@ -2273,7 +2273,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
             'question_dict': {
                 'question_state_data': self.VERSION_27_STATE_DICT,
-                'question_state_data_schema_version': 27,
+                'question_state_data_schema_version': 23,
                 'language_code': 'en',
                 'linked_skill_ids': ['skill_id'],
                 'inapplicable_skill_misconception_ids': []
@@ -2282,7 +2282,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
         self.assertEqual(
-            change['question_dict']['question_state_data_schema_version'], 27)
+            change['question_dict']['question_state_data_schema_version'], 23)
 
         with self.assertRaisesRegexp(
             utils.ValidationError,

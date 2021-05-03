@@ -154,15 +154,9 @@ class CreatorDashboardHandler(base.BaseHandler):
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
-        # TODO(bhenning): Update this to use unresolved answers from
-        # stats_services once the training interface is enabled and it's cheaper
-        # to retrieve top answers from stats_services.
-        for ind, exploration in enumerate(exp_summary_dicts):
-            exploration.update(feedback_thread_analytics[ind].to_dict())
-
         exp_summary_dicts = sorted(
             exp_summary_dicts,
-            key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
+            key=lambda x: x['last_updated_msec'],
             reverse=True)
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()

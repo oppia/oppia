@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
+
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 import feconf
@@ -245,6 +247,8 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             context.validate()
 
     def test_validate_with_invalid_server_mode_raises_exception(self):
+        MockEnum = collections.namedtuple('Enum', ['value'])
+        mock_enum = MockEnum('invalid')
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'platform_type': 'Android',
@@ -252,9 +256,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': {
-                    'value': 'invalid'
-                },
+                'server_mode': mock_enum,
             },
         )
         with self.assertRaisesRegexp(

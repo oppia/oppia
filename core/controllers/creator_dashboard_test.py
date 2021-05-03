@@ -288,10 +288,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
-        self.assertEqual(
-            response['explorations_list'][0]['num_open_threads'], 0)
-        self.assertEqual(
-            response['explorations_list'][0]['num_total_threads'], 0)
 
         def mock_get_thread_analytics_multi(unused_exploration_ids):
             return [feedback_domain.FeedbackAnalytics(
@@ -303,10 +299,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
-            self.assertEqual(
-                response['explorations_list'][0]['num_open_threads'], 2)
-            self.assertEqual(
-                response['explorations_list'][0]['num_total_threads'], 3)
 
         self.logout()
 
