@@ -337,7 +337,8 @@ var AutocompleteDropdownEditor = function(elem) {
       var actualOptions = await element(by.css('.select2-dropdown'))
         .all(by.tagName('li')).map(
           async function(optionElem) {
-            return await optionElem.getText();
+            return await action.getText(
+              `Select2 Dropdown Option Element ${optionElem}`, optionElem);
           }
         );
       expect(actualOptions).toEqual(expectedOptions);
@@ -380,7 +381,8 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       actualSelection = await elem.element(
         by.css('.select2-selection__rendered')
       ).all(by.tagName('li')).map(async function(choiceElem) {
-        return await choiceElem.getText();
+        return await action.getText(
+          `Select2 selection rendered ${choiceElem}`, choiceElem);
       });
       // Remove the element corresponding to the last <li>, which actually
       // corresponds to the field for new input.
@@ -448,7 +450,8 @@ var MultiSelectEditor = function(elem) {
         by.css('.protractor-test-search-bar-dropdown-menu')
       ).all(by.css('.protractor-test-selected'))
         .map(async function(selectedElem) {
-          return await selectedElem.getText();
+          return await action.getText(
+            `Search bar dropdown menu ${selectedElem}`, selectedElem);
         });
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
@@ -490,11 +493,12 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await entry.getText();
+        return await action.getText(
+          `${entry} in Array of texts in Rich Text Area`, entry);
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
-    var fullText = await elem.getText();
+    var fullText = await action.getText('Elements of Rich Text Area', elem);
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
@@ -572,7 +576,10 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      expect(
+            await action.getText(
+              `${elem} in Array of Elements in Rich Text Area`, elem))
+              .toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
@@ -668,7 +675,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       var totalCount = await lineNumberElements.count();
       for (var i = 0; i < totalCount; i++) {
         var lineNumberElement = await lineNumberElements.get(i);
-        var lineNumber = await lineNumberElement.getText();
+        var lineNumber = await action.getText(
+          `Line number elements at ${i}`, lineNumberElement);
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
@@ -676,7 +684,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineElement = await lineContentElements.get(i);
         var isHighlighted = await lineDivElement.element(
           by.css('.CodeMirror-linebackground')).isPresent();
-        var text = await lineElement.getText();
+        var text = await action.getText(
+          `CodeMirror Line element at ${lineNumber}`, lineElement);
         actualDiffDict[lineNumber] = {
           text: text,
           highlighted: isHighlighted
