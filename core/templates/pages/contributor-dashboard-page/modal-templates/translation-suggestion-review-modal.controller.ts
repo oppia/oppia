@@ -27,14 +27,14 @@ angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'SiteAnalyticsService', 'UrlInterpolationService',
+    'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
     'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION',
     function(
         $http, $scope, $uibModalInstance, AlertsService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        SiteAnalyticsService, UrlInterpolationService,
+        SiteAnalyticsService, UrlInterpolationService, UserService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
@@ -48,13 +48,15 @@ angular.module('oppia').controller(
       $scope.HTML_SCHEMA = {
         type: 'html'
       };
+      $scope.canEditTranslation = false;
 
       $scope.updateSuggestion = function() {
         const updatedTranslation = $scope.editedContent.html;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
+        $scope.activeSuggestion.change.translation_html = updatedTranslation;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
-          updatedTranslation,
+          $scope.activeSuggestion.change,
           (success) => {
             $scope.translationHtml = updatedTranslation;
             $scope.translationUpdated = true;
@@ -102,6 +104,25 @@ angular.module('oppia').controller(
       };
 
       var init = function() {
+        let userCanReviewTranslationSuggestionsInLanguages: string[] = [];
+        const languageCode: string = $scope.activeSuggestion.change.language_code;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          $scope.username = userInfo.getUsername();
+          $scope.isAdmin = userInfo.isAdmin();
+        });
+        UserService.getUserContributionRightsDataAsync().then(
+          function(userContributionRights) {
+            userCanReviewTranslationSuggestionsInLanguages = (
+              userContributionRights
+                .can_review_translation_for_language_codes);
+            console.log(userContributionRights
+              .can_review_translation_for_language_codes)
+            $scope.canEditTranslation = (
+              $scope.isAdmin || (
+                userCanReviewTranslationSuggestionsInLanguages.includes(languageCode) &&
+                $scope.username != $scope.activeSuggestion.author_name)
+            );
+          });
         $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
         $scope.translationHtml = (
@@ -109,6 +130,8 @@ angular.module('oppia').controller(
         $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
+        // The 'html' value is passed as an object as it is required for 
+        // schema-based-editor
         $scope.editedContent = {
           html: $scope.translationHtml
         };

@@ -26,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_domain
@@ -3555,11 +3556,17 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         'state_name': 'State 1',
         'translation_html': '<p>Translation for content.</p>'
     }
+    edit_state_change_dict = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'State A',
+        'new_value': 'TextInput'
+    }
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_update_suggestions
+        @acl_decorators.can_update_suggestion
         def get(self, suggestion_id):
             self.render_json({'suggestion_id': suggestion_id})
 
@@ -3578,6 +3585,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         user_services.update_user_role(self.admin_id, feconf.ROLE_ID_ADMIN)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
+        user_services.allow_user_to_review_question(self.reviewer_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -3607,12 +3615,14 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.resubmit_change_content = state_domain.SubtitledHtml(
             'content', '<p>resubmit change content html</p>').to_dict()
 
+        self.save_new_skill('skill_123', self.admin_id)
+
         add_question_change_dict = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
@@ -3621,7 +3631,6 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'skill_id': 'skill_123',
             'skill_difficulty': 0.3
         }
-        self.save_new_skill('skill_123', self.admin_id)
 
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, self.TARGET_TYPE,
@@ -3630,57 +3639,81 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             self.change_dict, '')
 
         suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, self.TARGET_TYPE,
+            self.exploration_id, self.target_version_id,
+            self.author_id,
+            self.edit_state_change_dict, '')
+
+        suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             'skill_123', feconf.CURRENT_STATE_SCHEMA_VERSION,
-            self.admin_id, add_question_change_dict,
+            self.author_id, add_question_change_dict,
             'test description')
 
-        suggestion_01 = suggestion_services.query_suggestions(
+        translation_suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', self.exploration_id)])[0]
-        suggestion_02 = suggestion_services.query_suggestions(
-            [('author_id', self.admin_id),
+        question_suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id),
              ('target_id', 'skill_123')])[0]
-        self.suggestion_id_01 = suggestion_01.suggestion_id
-        self.suggestion_id_02 = suggestion_02.suggestion_id
+        invalid_suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id),
+             ('target_id', self.exploration_id)])[1]
+        self.translation_suggestion_id = translation_suggestion.suggestion_id
+        self.question_suggestion_id = question_suggestion.suggestion_id
+        self.invalid_suggestion_id = invalid_suggestion.suggestion_id
         self.logout()
 
-    def test_author_can_update_suggestion(self):
+    def test_author_cannot_update_suggestion(self):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.suggestion_id_01)
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_01)
-        self.logout()
-
-    def test_admin_can_update_suggestion(self):
-        self.login(self.admin_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.suggestion_id_01)
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_01)
-        self.logout()
-
-    def test_reviewer_can_update_suggestion(self):
-        self.login(self.reviewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.suggestion_id_01)
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_01)
-        self.logout()
-
-    def test_non_author_cannot_update_suggestion(self):
-        self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock/%s' % self.suggestion_id_01, expected_status_int=401)
+            response = self.get_json('/mock/%s' % self.translation_suggestion_id, expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'You are not allowed to update the suggestion.')
+            'You are not allowed to update suggestions that you created.')
+        self.logout()
+
+    def test_admin_can_update_translation_suggestion(self):
+        self.login(self.admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.translation_suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.translation_suggestion_id)
+        self.logout()
+
+    def test_admin_can_update_question_suggestion(self):
+        self.login(self.admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.question_suggestion_id)
+        self.logout()
+
+    def test_reviewer_can_update_translation_suggestion(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.translation_suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.translation_suggestion_id)
+        self.logout()
+
+    def test_reviewer_can_update_question_suggestion(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.question_suggestion_id)
+        self.logout()
+
+    def test_invalid_suggestions_cannot_be_updated(self):
+        self.login(self.reviewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.invalid_suggestion_id, expected_status_int=400)
+        self.assertEqual(response['error'],
+            'Invalid suggestion type')
         self.logout()
 
     def test_guest_cannot_update_suggestion(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s' % self.suggestion_id_01, expected_status_int=401)
+                '/mock/%s' % self.translation_suggestion_id, expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
@@ -3703,14 +3736,4 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 '/mock/%s' % 'exploration.exp1.' +
                 'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
                 expected_status_int=404)
-        self.logout()
-
-    def test_non_translation_suggestions_are_rejected(self):
-        self.login(self.admin_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock/%s' % self.suggestion_id_02, expected_status_int=401)
-        self.assertEqual(
-            response['error'],
-            'You are not allowed to update the suggestion.')
         self.logout()

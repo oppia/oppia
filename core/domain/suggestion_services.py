@@ -541,7 +541,7 @@ def resubmit_rejected_suggestion(
             'The suggestion with id %s was accepted. '
             'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
-
+    
     suggestion.pre_update_validate(change)
     suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
@@ -1267,16 +1267,14 @@ def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount)
 
 
-def update_translation_suggestion(suggestion_id, translation_html):
-    """Updates the change.translation_html of translation suggestion with the
-        given suggestion_id.
+def update_suggestion(suggestion_id, change):
+    """Updates the change of a suggestion with the given suggestion_id.
 
     Args:
         suggestion_id: str. The id of the suggestion to be updated.
-        translation_html: str. The new translation html.
+        change: obj. The new change object.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
-
-    suggestion.change.translation_html = translation_html
-
+    suggestion.pre_update_validate(change)
+    suggestion.change = change
     _update_suggestion(suggestion)

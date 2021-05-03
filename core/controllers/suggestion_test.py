@@ -85,6 +85,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
+        user_services.allow_user_to_review_question(self.reviewer_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
@@ -112,6 +113,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'content', '<p>new content html</p>').to_dict()
         self.resubmit_change_content = state_domain.SubtitledHtml(
             'content', '<p>resubmit change content html</p>').to_dict()
+        self.update_change_content = state_domain.SubtitledHtml(
+            'content', '<p>update change content html</p>').to_dict()
 
         self.logout()
 
@@ -770,39 +773,37 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
 
-    def test_update_translation_updates_translation_suggestion_change(self):
+    def test_update_suggestion_updates_translation_suggestion_change(self):
         self.login(self.TRANSLATOR_EMAIL)
-        change_dict = {
-            'cmd': 'add_translation',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>old content html</p>',
-            'state_name': 'State 1',
-            'translation_html': '<p>Translation for content.</p>'
-        }
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'exp1', 1, self.translator_id, change_dict, 'description')
+        csrf_token = self.get_new_csrf_token()
+
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.translator_id), ('target_id', self.EXP_ID)])[0]
         self.logout()
 
-        self.login(self.REVIEWER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/translation/%s' % (
-            feconf.UPDATE_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
-                'translation_html': '<p>Test Trans</p>'
+
+        self.put_json('%s/%s' % (
+            feconf.UPDATE_SUGGESTION_URL_PREFIX, suggestion.suggestion_id), {
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'State 3',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>old content html</p>',
+                    'translation_html': '<p>Updated In Hindi</p>'
+                }
             }, csrf_token=csrf_token)
 
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion.suggestion_id)
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.translator_id), ('target_id', self.EXP_ID)])[0]
         self.assertEqual(
-            updated_suggestion.change.translation_html,
-            '<p>Test Trans</p>')
+            suggestion.change.translation_html, '<p>Updated In Hindi</p>')
         self.logout()
 
-    def test_update_translation_already_accepted_suggestion_exception(self):
-        self.login(self.TRANSLATOR_EMAIL)
+    def test_update_suggestion_already_accepted_suggestion_exception(self):
+        self.login(self.ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -821,10 +822,17 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         )
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json('%s/translation/%s' % (
+        response = self.put_json('%s/%s' % (
             feconf.UPDATE_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
-                'trnaslation_html': '<p>Test Trans</p>'
+                'change': {
+                    'cmd': 'add_translation',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>old content html</p>',
+                    'state_name': 'State 1',
+                    'translation_html': '<p>Translation for content.</p>'
+                }
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
@@ -832,8 +840,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id))
         self.logout()
 
-    def test_update_translation_parameter_missing_exception(self):
-        self.login(self.TRANSLATOR_EMAIL)
+    def test_update_suggestion__change_parameter_missing_exception(self):
+        self.login(self.ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -849,41 +857,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'exp1', 1, self.translator_id, change_dict, 'description')
 
         csrf_token = self.get_new_csrf_token()
-        response = self.put_json('%s/translation/%s' % (
+        response = self.put_json('%s/%s' % (
             feconf.UPDATE_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
-                'invalid_html': '<p>Test Trans</p>'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            suggestion.suggestion_id), {},
+            csrf_token=csrf_token,
+            expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'The parameter \'translation_html\' is missing.')
-        self.logout()
-
-    def test_update_translation_invalid_input_exception(self):
-        self.login(self.TRANSLATOR_EMAIL)
-        change_dict = {
-            'cmd': 'add_translation',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>old content html</p>',
-            'state_name': 'State 1',
-            'translation_html': '<p>Translation for content.</p>'
-        }
-
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'exp1', 1, self.translator_id, change_dict, 'description')
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json('%s/translation/%s' % (
-            feconf.UPDATE_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), {
-                'translation_html': '123'
-            }, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'],
-            'The parameter \'translation_html\' is invalid.')
+            'The parameter \'change\' is missing.')
         self.logout()
 
 

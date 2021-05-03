@@ -2935,7 +2935,7 @@ def is_from_oppia_ml(handler):
     return test_request_originates_from_valid_oppia_ml_instance
 
 
-def can_update_suggestions(handler):
+def can_update_suggestion(handler):
     """Decorator to check whether the current user can update suggestions.
 
     Args:
@@ -2944,8 +2944,7 @@ def can_update_suggestions(handler):
     Returns:
         function. The newly decorated function that has common checks and
         permissions specified by passed in decorator. This function is allowed
-        to be called for users who have the rights to accept suggestions and
-        the suggesters who made their own suggestions.
+        to be called for users who have the rights to accept suggestions.
 
     Raises:
         NotLoggedInException. The user is not logged in.
@@ -2957,8 +2956,8 @@ def can_update_suggestions(handler):
     """
     def test_can_update_suggestion(
             self, suggestion_id, **kwargs):
-        """Returns a handler to test whether a
-        suggestion can be updated based on the user's roles.
+        """Returns a handler to test whether a suggestion can be updated based
+        on the user's roles.
 
         Args:
             suggestion_id: str. The suggestion id.
@@ -2981,7 +2980,7 @@ def can_update_suggestions(handler):
 
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException(
-                'Invalid format for suggestion_id.'
+                'Invalid format for suggestion_id.' +
                 ' It must contain 3 parts separated by \'.\'')
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -2989,22 +2988,28 @@ def can_update_suggestions(handler):
         if suggestion is None:
             raise self.PageNotFoundException
 
-        # TODO(#11735): Currently, only checks whether users can review
-        # translation sugeestions. Another check should be added to check
-        # whether users can review question suggestions if the suggestion
-        # type is add question.
+        if suggestion.suggestion_type != (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT) and suggestion.suggestion_type != (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            raise self.InvalidInputException(
+                'Invalid suggestion type')
+
+        if suggestion.author_id == self.user_id:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You are not allowed to update suggestions that you created.')
+
+        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+            return handler(self, suggestion_id, **kwargs)
+
         if suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            if user_services.can_review_translation_suggestions(
-                    self.user_id,
-                    language_code=suggestion.change.language_code):
-                return handler(self, suggestion_id, **kwargs)
-
-            if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
-                return handler(self, suggestion_id, **kwargs)
-
-            if suggestion_services.check_can_resubmit_suggestion(
-                    suggestion_id, self.user_id):
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                if user_services.can_review_translation_suggestions(
+                        self.user_id,
+                        language_code=suggestion.change.language_code):
+                    return handler(self, suggestion_id, **kwargs)
+        elif suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, suggestion_id, **kwargs)
 
         raise base.UserFacingExceptions.UnauthorizedUserException(

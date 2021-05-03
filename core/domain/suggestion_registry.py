@@ -586,6 +586,33 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected language_code to be %s, received %s' % (
                     self.change.language_code, self.language_code))
 
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+
+        Args:
+            change: ExplorationChange. The new change.
+
+        Raises:
+            ValidationError. Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        elif self.change.state_name != change.state_name:
+            raise utils.ValidationError(
+                'The new change state_name must be equal to %s' %
+                self.change.state_name)
+        elif self.change.content_html != change.content_html:
+            raise utils.ValidationError(
+                'The new change content_html must be equal to %s' %
+                self.change.content_html)
+        elif self.change.language_code != change.language_code:
+            raise utils.ValidationError(
+                'The language code must be equal to %s' %
+                self.change.language_code)
+
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
