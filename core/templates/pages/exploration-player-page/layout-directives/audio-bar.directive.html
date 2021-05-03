@@ -1,56 +1,57 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
-  <div ng-if="audioBarIsExpanded" class="audio-controls" ng-class="{'audio-controls-margin': progressBarIsShown}" headroom>
-    <div class="oppia-audio-header-control-buttons">
-      <div class="audio-header-control-icons">
-        <a ng-click="onBackwardButtonClicked()">
-          <span class="oppia-replay-white-circle"  ng-if="progressBarIsShown">
-            <i class="fas fa-undo audio-undo-icon"></i>
-            <span class="oppia-five-icon">5</span>
-          </span>
-        </a>
-        <a ng-click="onPlayButtonClicked()"
-           uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
-           tooltip-append-to-body="true" tooltip-placement="right">
-          <i class="fas oppia-audio-controls-button-icon" tabindex="0"
-             ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
-          </i>
-        </a>
-        <a ng-click="onForwardButtonClicked()">
-          <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-if="progressBarIsShown">
-            <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
-            <span class="oppia-five-icon oppia-five-icon-forward">5</span>
-          </span>
-        </a>
-      </div>
-      <div class="slider-section" ng-if="progressBarIsShown">
-        <div ng-if="audioLoadingIndicatorIsShown">
-          <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+  <div ng-if="audioBarIsExpanded" class="audio-bar-expanded" headroom>
+    <div class="audio-controls" ng-class="{'audio-controls-margin': progressBarIsShown}">
+      <div class="oppia-audio-header-control-buttons">
+        <div class="audio-header-control-icons">
+          <a ng-click="onBackwardButtonClicked()">
+            <span class="oppia-replay-white-circle"  ng-if="progressBarIsShown">
+              <i class="fas fa-undo audio-undo-icon"></i>
+              <span class="oppia-five-icon">5</span>
+            </span>
+          </a>
+          <a ng-click="onPlayButtonClicked()"
+            uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
+            tooltip-append-to-body="true" tooltip-placement="right">
+            <i class="fas oppia-audio-controls-button-icon" tabindex="0"
+              ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+            </i>
+          </a>
+          <a ng-click="onForwardButtonClicked()">
+            <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-if="progressBarIsShown">
+              <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
+              <span class="oppia-five-icon oppia-five-icon-forward">5</span>
+            </span>
+          </a>
         </div>
-        <div ng-if="!audioLoadingIndicatorIsShown">
-          <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
-          </md-slider>
+        <div class="slider-section" ng-if="progressBarIsShown">
+          <div ng-if="audioLoadingIndicatorIsShown">
+            <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+          </div>
+          <div ng-if="!audioLoadingIndicatorIsShown">
+            <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
+            </md-slider>
+          </div>
+          <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
+          <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
+          <!--Filler space for message-->
+          <span class="audio-controls-message">&zwnj;</span>
         </div>
-        <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
-        <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
-        <!--Filler space for message-->
-        <span class="audio-controls-message">&zwnj;</span>
-      </div>
-      <div class="oppia-audio-header-select">
-        <select class="audio-language-select protractor-test-audio-lang-select"
-                ng-model="selectedLanguage.value"
-                ng-options="o.value as o.displayed for o in languagesInExploration"
-                ng-change="onNewLanguageSelected()">
-        </select>
+        <div class="oppia-audio-header-select">
+          <select class="audio-language-select protractor-test-audio-lang-select"
+                  ng-model="selectedLanguage.value"
+                  ng-options="o.value as o.displayed for o in languagesInExploration"
+                  ng-change="onNewLanguageSelected()">
+          </select>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="audio-collapse-button audio-toggle-button"
-       ng-if="audioBarIsExpanded"
-       ng-click="collapseAudioBar()"
-       aria-label="Audio menu collapse"
-       ng-class="{'audio-controls-margin': progressBarIsShown}"
-       headroom>
-    <i class="fas fa-sort-up"></i>
+    <div class="audio-collapse-button audio-toggle-button"
+        ng-if="audioBarIsExpanded"
+        ng-click="collapseAudioBar()"
+        aria-label="Audio menu collapse"
+        ng-class="{'audio-controls-margin': progressBarIsShown}">
+      <i class="fas fa-sort-up"></i>
+    </div>
   </div>
   <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()" aria-label="Audio menu expand">
     <div class="container protractor-test-audio-bar">
@@ -131,6 +132,7 @@
     position: absolute;
     top: 44px;
     width: 30px;
+    transition: top 200ms linear;
   }
 
   .audio-toggle-button {
@@ -211,6 +213,7 @@
     justify-content: center;
     padding: 0 4px;
     width: 100%;
+    transition: margin-top 200ms linear;
   }
 
   .audio-controls.ng-enter,
@@ -250,12 +253,11 @@
     position: fixed;
     text-align: center;
     top: 126px;
-    transition: margin-top 0.2s ease-in-out;
     width: 100%;
     z-index: 100;
   }
 
-  .audio-header-margin {
+  .audio-header-margin 
     top: 3.5em;
   }
 
@@ -264,32 +266,14 @@
       top: 3.5em;
     }
 
-    .audio-collapse-button.audio-controls-margin.headroom--unpinned {
-      position: relative;
-      top: 92px;
-    }
-
-    .audio-collapse-button.headroom--unpinned {
-      position: relative;
-      top: 62px;
-    }
-
-    .audio-controls.audio-controls-margin.headroom--unpinned {
-      margin-top: 82px;
-      position: fixed;
-      top: 0;
-    }
-
-    .audio-controls.headroom--unpinned {
-      margin-top: 52px;
-      position: fixed;
-      top: 0;
-    }
-
     .audio-header.headroom--unpinned {
       margin-top: 32px;
       top: 0;
       }
+
+    .audio-bar-expanded.headroom--unpinned  {
+
+    }
   }
   .audio-language-select {
     border-radius: 9px;
@@ -344,6 +328,7 @@
   @media screen and (max-width: 550px) {
     .audio-controls {
       height: auto;
+      margin: -1px;
       padding: 20px 0;
     }
     audio-bar .slider-section {
