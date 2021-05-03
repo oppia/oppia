@@ -56,9 +56,6 @@ describe('Oppia CodeMirror Component', () => {
     const mockCodeMirror: typeof CodeMirror = {
       MergeView: mergeView
     } as unknown as typeof CodeMirror;
-    // This throws an error because it is not able to match namespaces with
-    // codemirror type properly.
-    // @ts-ignore
     window.CodeMirror = mockCodeMirror;
     component.ngAfterViewInit();
     expect(mergeViewCalled).toBe(true);
@@ -68,9 +65,6 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    // This throws an error because it is not able to match namespaces with
-    // CodeMirror.MergeView.MergeViewEditor type properly.
-    // @ts-ignore
     component.codeMirrorInstance = {
       editor: () => {
         return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
@@ -108,9 +102,6 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    // This throws an error because it is not able to match namespaces with
-    // CodeMirror.MergeView.MergeViewEditor type properly.
-    // @ts-ignore
     component.codeMirrorInstance = {
       editor: () => {
         return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
