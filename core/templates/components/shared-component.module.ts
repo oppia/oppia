@@ -81,7 +81,6 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
@@ -160,7 +159,6 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
-    ResponseHeaderComponent,
     PromoBarComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
@@ -204,9 +202,8 @@ const toastrConfig = {
     // These elements will remain here even after migration.
     SelectSkillModalComponent,
     SkillSelectorComponent,
-    StateSkillEditorComponent,
-    ResponseHeaderComponent,
     TakeBreakModalComponent,
+    StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
@@ -254,7 +251,6 @@ const toastrConfig = {
     SelectSkillModalComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
-    ResponseHeaderComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
