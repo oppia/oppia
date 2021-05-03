@@ -22,38 +22,24 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
-import { MaterialModule } from 'components/material.module';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
-import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
-import { AudioSliderComponent } from './slider/audio-slider.component';
+import { TranslatePipe } from './translate.pipe';
+import { TruncateAtFirstLinePipe } from './string-utility-filters/truncate-at-first-line.pipe';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    MaterialModule,
-    DynamicContentModule,
-    NgbTooltipModule,
-    NgbModalModule,
     FormsModule,
-    SharedPipesModule,
-    CustomFormsComponentsModule
   ],
   declarations: [
-    SchemaBasedEditorDirective,
-    AudioSliderComponent
+    TranslatePipe,
+    TruncateAtFirstLinePipe
   ],
-  entryComponents: [
-    AudioSliderComponent
-  ],
+  entryComponents: [],
   exports: [
-    CustomFormsComponentsModule,
-    AudioSliderComponent,
-    SchemaBasedEditorDirective
+    TranslatePipe,
+    TruncateAtFirstLinePipe
   ],
 })
 
-export class SharedFormsModule { }
+export class SharedPipesModule { }
