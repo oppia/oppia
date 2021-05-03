@@ -17,8 +17,8 @@
     "expect(component.pathIconParameters).toEqual([{"
   ],
   "core/templates/components/code-mirror/codemirror-mergeview.component.spec.ts": [
-    "",
-    "",
-    ""
+    "window.CodeMirror = mockCodeMirror;",
+    "component.codeMirrorInstance = {",
+    "component.codeMirrorInstance = {"
   ]
 }
