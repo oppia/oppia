@@ -27,6 +27,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list/skills-list.component';
 import { DeleteSkillModalComponent } from './modals/delete-skill-modal.component';
@@ -67,6 +68,7 @@ import { FormsModule } from '@angular/forms';
     DeleteTopicModalComponent,
   ],
   providers: [
+    SkillCreationService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
