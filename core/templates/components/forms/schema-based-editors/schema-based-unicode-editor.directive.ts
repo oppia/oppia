@@ -27,14 +27,16 @@ require(
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('services/contextual/device-info.service.ts');
 require('services/schema-form-submitted.service.ts');
-
+require('services/stateful/focus-manager.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
   function() {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        labelForFocusTarget: '&'
+      },
       bindToController: {
         localValue: '=',
         isDisabled: '&',
@@ -48,14 +50,17 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$sce', '$scope', '$timeout', '$translate',
-        'DeviceInfoService', 'SchemaFormSubmittedService',
+        'DeviceInfoService', 'FocusManagerService',
+        'SchemaFormSubmittedService',
         'StateCustomizationArgsService',
         function(
             $filter, $sce, $scope, $timeout, $translate,
-            DeviceInfoService, SchemaFormSubmittedService,
+            DeviceInfoService, FocusManagerService,
+            SchemaFormSubmittedService,
             StateCustomizationArgsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
+          var labelForFocus = $scope.labelForFocusTarget();
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
@@ -151,6 +156,11 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
                   })
               );
             }
+            // So that focus is applied after all the functions in
+            // main thread have executed.
+            $timeout(function() {
+              FocusManagerService.setFocusWithoutScroll(labelForFocus);
+            }, 5);
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
