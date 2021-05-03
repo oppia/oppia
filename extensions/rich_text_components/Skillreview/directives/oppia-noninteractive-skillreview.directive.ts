@@ -39,10 +39,10 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
       template: require('./skillreview.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$scope', '$uibModal', 'CkEditorCopyContentService',
+        '$attrs', '$uibModal', 'CkEditorCopyContentService',
         'ContextService', 'ENTITY_TYPE',
         function(
-            $attrs, $scope, $uibModal, CkEditorCopyContentService,
+            $attrs, $uibModal, CkEditorCopyContentService,
             ContextService, ENTITY_TYPE) {
           var ctrl = this;
           var skillId = HtmlEscaperService.escapedJsonToObj(
