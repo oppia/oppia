@@ -25,36 +25,38 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
   selector: 'edit-thumbnail-modal',
   templateUrl: './edit-thumbnail-modal.component.html'
 })
-export class EditThumnailModalComponent implements OnChanges {
-  constructor(
-    private svgSanitizerService: SvgSanitizerService,
-    private modalInstance: NgbActiveModal,
-  ) {}
-  @Input() bgColor = '#C6DCDA';
+export class EditThumbnailModalComponent implements OnChanges {
+  @Input() bgColor: string;
   @Input() uploadedImage: string | null;
-  @Input() invalidImageWarningIsShown = false;
-  @Input() invalidTagsAndAttributes: {
-    tags: string[];
-    attrs: string[];
-  };
-  @Input() allowedImageFormats = ['svg'];
   @Input() aspectRatio: string;
   @Input() previewDescription: string;
   @Input() previewDescriptionBgColor: string;
   @Input() previewFooter: string;
   @Input() previewTitle: string;
-  allowedBgColors: boolean;
-  dimensions: { height: number; width: number; };
-  uploadedImageMimeType: string;
+  @Input() allowedBgColors: string[];
+  @Input() tempBgColor: string;
+  @Input() dimensions: { height: number; width: number; };
+  @Input() openInUploadMode: boolean;
+  @Input() uploadedImageMimeType: string;
+
+  invalidImageWarningIsShown = false;
+  invalidTagsAndAttributes: {
+    tags: string[];
+    attrs: string[];
+  };
+  allowedImageFormats = ['svg'];
   file: Blob;
-  openInUploadMode: boolean;
+  constructor(
+    private svgSanitizerService: SvgSanitizerService,
+    private modalInstance: NgbActiveModal,
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.uploadedImage &&
         changes.uploadedImage.currentValue ===
          changes.uploadedImage.previousValue) {
       this.openInUploadMode = false;
-      this.updateBackgroundColor(this.bgColor);
+      this.updateBackgroundColor(this.tempBgColor);
     }
   }
 
@@ -86,7 +88,7 @@ export class EditThumnailModalComponent implements OnChanges {
         reader.readAsDataURL(file);
         reader.onload = () =>{
           let imgSrc = reader.result as string;
-          this.updateBackgroundColor('#C6DCDA');
+          this.updateBackgroundColor(this.tempBgColor);
           let img = new Image();
 
           img.onload = () => {
@@ -117,9 +119,6 @@ export class EditThumnailModalComponent implements OnChanges {
       this.reset();
       this.invalidImageWarningIsShown = true;
     }
-  }
-  tempBgColor(tempBgColor: string): string {
-    throw new Error('Method not implemented.');
   }
 
   reset(): void {
