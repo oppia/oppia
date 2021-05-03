@@ -426,3 +426,57 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             '(id=\'invalid\'): Commit command domain validation for '
             'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed'
             ' with error: Missing cmd key in change dict')
+
+
+class DraftChangeListLastUpdatedNoneErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        draft_change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }]
+        model = user_models.ExplorationUserDataModel(
+            id='123',
+            user_id='test',
+            exploration_id='exploration_id',
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=None,
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_AGO
+        )
+        error = audit_errors.DraftChangeListLastUpdatedNoneError(model)
+
+        self.assertEqual(
+            error.message,
+            'DraftChangeListLastUpdatedNoneError in ExplorationUserDataModel'
+            '(id=\'123\'): draft change list %s exists but draft change list '
+            'last updated is None' % draft_change_list)
+
+
+class DraftChangeListLastUpdatedInvalidErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        draft_change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }]
+        last_updated = self.NOW + datetime.timedelta(days=5)
+        model = user_models.ExplorationUserDataModel(
+            id='123',
+            user_id='test',
+            exploration_id='exploration_id',
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=last_updated,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW
+        )
+        error = audit_errors.DraftChangeListLastUpdatedInvalidError(model)
+
+        self.assertEqual(
+            error.message,
+            'DraftChangeListLastUpdatedInvalidError in '
+            'ExplorationUserDataModel(id=\'123\'): draft change list last '
+            'updated %s is greater than the time when job was run' %
+            last_updated)
