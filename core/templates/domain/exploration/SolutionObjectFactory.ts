@@ -44,9 +44,6 @@ import {
   DragAndDropSortInputCustomizationArgs,
   InteractionCustomizationArgs,
 } from 'interactions/customization-args-defs';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 export interface ExplanationBackendDict {
   'content_id': string;
@@ -68,8 +65,6 @@ export class Solution {
   ehfs: ExplorationHtmlFormatterService;
   shof: SubtitledHtml;
   customizationArgs: InteractionCustomizationArgs;
-  InteractionObjectFactory: InteractionObjectFactory;
-  StateInteractionIdService: StateInteractionIdService;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
@@ -117,16 +112,9 @@ export class Solution {
       correctAnswer = [];
       customizationArgs = (
         <DragAndDropSortInputCustomizationArgs>
-        customizationArgs).choices.value.map(
-        choice => choice.html);
-      let transformedArrayone = [];
-      var transformedArraytwo = transformedArrayone.concat(customizationArgs);
-      transformedArrayone.push(customizationArgs);
-      for (let elem of transformedArraytwo) {
-        let transformedArray = [];
-        transformedArray.push(elem);
-        correctAnswer.push(transformedArray);
-      }
+        customizationArgs);
+      correctAnswer = this.getDragAndDropAnswer(
+        interactionId, customizationArgs);
       correctAnswer = JSON.stringify(correctAnswer);
       correctAnswer = correctAnswer.replace(/"/g, '');
     } else {
@@ -141,7 +129,8 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
-  getDADAnswer(
+  // Function to get the answer of Drag and Drop Sort Input interaction.
+  getDragAndDropAnswer(
       interactionId: 'DragAndDropSortInput',
       customizationArgs: InteractionCustomizationArgs): string {
     var correctAnswer = null;

@@ -76,7 +76,7 @@ angular.module('oppia').directive('solutionEditor', [
           ctrl.getAnswerHtml = function() {
             var interactionId = StateInteractionIdService.savedMemento;
             if (interactionId === 'DragAndDropSortInput') {
-              var answer = ctrl.getSolutionSummary();
+              var answer = ctrl.getDragAndDropSolution();
               return ExplorationHtmlFormatterService.getAnswerHtml(
                 answer,
                 StateInteractionIdService.savedMemento,
@@ -89,10 +89,10 @@ angular.module('oppia').directive('solutionEditor', [
             }
           };
 
-          ctrl.getSolutionSummary = function() {
+          ctrl.getDragAndDropSolution = function() {
             var solution = (StateSolutionService.savedMemento);
             var solutionAsPlainText =
-              solution.getDADAnswer(
+              solution.getDragAndDropAnswer(
                 StateInteractionIdService.savedMemento,
                 StateCustomizationArgsService.savedMemento);
             return solutionAsPlainText;
