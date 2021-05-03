@@ -68,7 +68,7 @@
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek
 /tsconfig-strict.json @vojtechjelinek
-/parser-tsconfig.eslint.json @vojtechjelinek
+/parser-tsconfig.eslint.json @vojtechjelinek @DubeySandeep @Hudda
 
 # Answer classification team.
 /core/controllers/classifier*.py @oppia/ml
