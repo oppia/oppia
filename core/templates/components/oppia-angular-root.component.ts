@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -153,6 +153,8 @@ import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
+import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
+import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -744,6 +746,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static workedExampleObjectFactory: WorkedExampleObjectFactory;
   static writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
   static writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  static ajsValueProvider: (string, unknown) => void;
+  static injector: Injector;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -808,6 +812,10 @@ private emailDashboardDataService: EmailDashboardDataService,
 private endExplorationRulesService: EndExplorationRulesService,
 private endExplorationValidationService: EndExplorationValidationService,
 private explorationDiffService: ExplorationDiffService,
+private explorationCreationBackendApiService:
+  ExplorationCreationBackendApiService,
+private explorationCreationService:
+  ExplorationCreationService,
 private explorationFeaturesBackendApiService:
   ExplorationFeaturesBackendApiService,
 private explorationFeaturesService: ExplorationFeaturesService,
@@ -1023,7 +1031,8 @@ private windowRef: WindowRef,
 private winnowingPreprocessingService: WinnowingPreprocessingService,
 private workedExampleObjectFactory: WorkedExampleObjectFactory,
 private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
-private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
+private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory,
+private injector: Injector
   ) {}
 
   public ngAfterViewInit(): void {
@@ -1088,7 +1097,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.computeGraphService = this.computeGraphService;
     OppiaAngularRootComponent.conceptCardObjectFactory = (
       this.conceptCardObjectFactory);
-    OppiaAngularRootComponent.contextService = this.contextService;
     OppiaAngularRootComponent.continueRulesService = this.continueRulesService;
     OppiaAngularRootComponent.continueValidationService = (
       this.continueValidationService);
@@ -1471,6 +1479,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.writtenTranslationObjectFactory);
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = (
       this.writtenTranslationsObjectFactory);
+
+    OppiaAngularRootComponent.injector = this.injector;
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

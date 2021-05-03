@@ -4875,6 +4875,10 @@ export default {
     "description": "polszczyzna (Polish)",
     "direction": "ltr"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)",
+    "direction": "rtl"
+  }, {
     "code": "pt",
     "description": "português (Portuguese)",
     "direction": "ltr"
@@ -4918,6 +4922,10 @@ export default {
     "code": "uk",
     "description": "yкраїнська (Ukrainian)",
     "direction": "ltr"
+  }, {
+    "code": "ur",
+    "description": "اُردُو (Urdu)",
+    "direction": "rtl"
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
@@ -5036,7 +5044,7 @@ export default {
     "id": "prs",
     "description": "Dari",
     "relatedLanguages": ["prs"],
-    "direction": "ltr"
+    "direction": "rtl"
   }, {
     "id": "nl",
     "description": "Dutch",
@@ -5212,6 +5220,11 @@ export default {
     "description": "Ukrainian",
     "relatedLanguages": ["uk"],
     "direction": "ltr"
+  }, {
+    "id": "ur",
+    "description": "Urdu",
+    "relatedLanguages": ["ur"],
+    "direction": "rtl"
   }, {
     "id": "vi",
     "description": "Vietnamese",
@@ -5520,6 +5533,7 @@ export default {
       }
     },
     "solicit_answer_details": false,
+    "card_is_checkpoint": false,
     "written_translations": {
       "translations_mapping": {
         "content": {},
@@ -5792,6 +5806,30 @@ export default {
         }]
       },
       "default_value": null
+    },
+    {
+      "backend_id": "created_collection",
+      "backend_attr": "created_collection",
+      "description": "Has created collection",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
+    },
+    {
+      "backend_id": "used_logic_proof_interaction",
+      "backend_attr": "used_logic_proof_interaction",
+      "description": "Has used LogicProof interaction in any exploration",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
     }
   ],
 

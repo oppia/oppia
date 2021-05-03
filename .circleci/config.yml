@@ -21,13 +21,10 @@ workflows:
       - setup_and_typescript_tests
       - e2e_new_structure_tests:
           requires:
-            - e2e_navigation_and_misc
-      - e2e_navigation_and_misc:
+            - e2e_library
+      - e2e_library:
           requires:
             - setup_and_typescript_tests
-      - e2e_library_and_collections:
-          requires:
-            - e2e_navigation_and_misc
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -77,14 +74,21 @@ commands:
                 git pull origin $target_branch --no-edit
               fi
             fi
-
-  check_release_changelog_update_branch:
-    description: "Skip job for release changelog update PRs"
+  
+  check_memory_usage:
+    description: "Checking max memory usage to debug out-of-memory issues"
     steps:
       - run:
-          name: Skip build for release changelog update PRs
+          name: Checking Memory Usage
+          command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
+
+  skip_for_low_risk_prs:
+    description: "Skip job for low-risk PRs"
+    steps:
+      - run:
+          name: Skip build for low-risk PRs
           command: |
-            if [[ -n ${CIRCLE_PULL_REQUEST} ]] && [[ ${CIRCLE_BRANCH} == update-changelog-for-release* ]]; then
+            if python -m scripts.check_if_pr_is_low_risk ${CIRCLE_PULL_REQUEST}; then
               circleci-agent step halt
             fi
 
@@ -131,11 +135,10 @@ jobs:
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
   # should be run in the non-prod environment.
-  e2e_navigation_and_misc:
+  e2e_library:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
@@ -143,10 +146,11 @@ jobs:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - install_chrome
+      - skip_for_low_risk_prs
       - run:
-          name: Run e2e admin page test
+          name: Run e2e library test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="adminPage"
+            python -m scripts.run_e2e_tests --skip-install --deparallelize_terser --suite="library" --prod_env
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -157,40 +161,19 @@ jobs:
             - oppia/build/
             - oppia/third_party/generated/
       - upload_screenshots
-
-  e2e_library_and_collections:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - check_release_changelog_update_branch
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Set up python by installing protobuf and enum
-          command: pip install enum34==1.1.10 protobuf==3.13.0
-      - install_chrome
-      - run:
-          name: Run e2e publication test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --server_log_level="info" --prod_env
-      - run:
-          name: Run e2e library test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
-      - upload_screenshots
+      - check_memory_usage
 
   e2e_new_structure_tests:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_changelog_update_branch
       - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
+      - skip_for_low_risk_prs
       - install_chrome
       - run:
           name: Run e2e topics and skills dashboard test
@@ -209,6 +192,7 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
       - upload_screenshots
+      - check_memory_usage
 
 notify:
   webhooks:
