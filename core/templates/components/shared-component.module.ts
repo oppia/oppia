@@ -82,7 +82,6 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
@@ -157,7 +156,6 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
-    ResponseHeaderComponent,
     PromoBarComponent,
     SharingLinksComponent,
     SearchBarDirective,
@@ -200,7 +198,6 @@ const toastrConfig = {
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
-    ResponseHeaderComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
@@ -248,7 +245,6 @@ const toastrConfig = {
     SearchBarDirective,
     SideNavigationBarComponent,
     SharingLinksComponent,
-    ResponseHeaderComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
