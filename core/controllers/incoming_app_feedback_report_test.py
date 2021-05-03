@@ -21,8 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.tests import test_utils
 from core.platform import models
+from core.tests import test_utils
 
 import feconf
 
@@ -71,6 +71,7 @@ ANDROID_API_KEY_STRING = str(feconf.ANDROID_API_KEY) # pylint: disable=disallowe
 ANDROID_APP_PACKAGE_NAME_STRING = str(feconf.ANDROID_APP_PACKAGE_NAME) # pylint: disable=disallowed-function-calls
 ANDROID_APP_VERSION_NAME_STRING = str(feconf.ANDROID_APP_VERSION_NAME) # pylint: disable=disallowed-function-calls
 ANDROID_APP_VERSION_CODE_STRING = str(feconf.ANDROID_APP_VERSION_CODE) # pylint: disable=disallowed-function-calls
+
 
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 

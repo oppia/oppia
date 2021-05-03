@@ -34,7 +34,7 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
-FilterFieldNames = python_utils.create_enum(
+FILTER_FIELD_NAMES = python_utils.create_enum(
     'platform', 'report_type', 'entry_point', 'submitted_on',
     'android_device_model', 'android_sdk_version', 'text_language_code',
     'audio_language_code', 'platform_version',
@@ -282,26 +282,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         query = cls.query(projection=[filter_name], distinct=True)
         filter_values = []
-        if filter_name == FilterFieldNames.report_type:
+        if filter_name == FILTER_FIELD_NAMES.report_type:
             filter_values = [model.report_type for model in query]
-        elif filter_name == FilterFieldNames.platform:
+        elif filter_name == FILTER_FIELD_NAMES.platform:
             filter_values = [model.platform for model in query]
-        elif filter_name == FilterFieldNames.entry_point:
+        elif filter_name == FILTER_FIELD_NAMES.entry_point:
             filter_values = [model.entry_point for model in query]
-        elif filter_name == FilterFieldNames.submitted_on:
+        elif filter_name == FILTER_FIELD_NAMES.submitted_on:
             filter_values = [model.submitted_on.date() for model in query]
-        elif filter_name == FilterFieldNames.android_device_model:
+        elif filter_name == FILTER_FIELD_NAMES.android_device_model:
             filter_values = [model.android_device_model for model in query]
-        elif filter_name == FilterFieldNames.android_sdk_version:
+        elif filter_name == FILTER_FIELD_NAMES.android_sdk_version:
             filter_values = [model.android_sdk_version for model in query]
-        elif filter_name == FilterFieldNames.text_language_code:
+        elif filter_name == FILTER_FIELD_NAMES.text_language_code:
             filter_values = [model.text_language_code for model in query]
-        elif filter_name == FilterFieldNames.audio_language_code:
+        elif filter_name == FILTER_FIELD_NAMES.audio_language_code:
             filter_values = [model.audio_language_code for model in query]
-        elif filter_name == FilterFieldNames.platform_version:
+        elif filter_name == FILTER_FIELD_NAMES.platform_version:
             filter_values = [model.platform_version for model in query]
         elif filter_name == (
-                FilterFieldNames.android_device_country_locale_code):
+                FILTER_FIELD_NAMES.android_device_country_locale_code):
             filter_values = [
                 model.android_device_country_locale_code for model in query]
         return filter_values

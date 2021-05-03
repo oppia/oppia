@@ -527,7 +527,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.navigation_drawer)
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -537,7 +537,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.navigation_drawer)):
+                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)):
             self.entry_point.validate()
 
 
@@ -552,7 +552,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.lesson_player),
+                app_feedback_report_constants.ENTRY_POINT.lesson_player),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -565,7 +565,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.lesson_player))
+                app_feedback_report_constants.ENTRY_POINT.lesson_player))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -614,7 +614,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.revision_card),
+                app_feedback_report_constants.ENTRY_POINT.revision_card),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -626,7 +626,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.revision_card))
+                app_feedback_report_constants.ENTRY_POINT.revision_card))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -665,7 +665,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.crash)
+                app_feedback_report_constants.ENTRY_POINT.crash)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -675,7 +675,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.crash)):
+                app_feedback_report_constants.ENTRY_POINT.crash)):
             self.entry_point.validate()
 
 
@@ -694,7 +694,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.EntryPoint.navigation_drawer
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
                 ),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -726,7 +726,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.EntryPoint.navigation_drawer
+                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
                 ),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,

@@ -120,18 +120,18 @@ def _get_entry_point_from_json(entry_point_json):
         InvalidInputException. The given entry point is invalid.
     """
     entry_point_name = entry_point_json['entry_point_name']
-    if entry_point_name == constants.EntryPoint.navigation_drawer:
+    if entry_point_name == constants.ENTRY_POINT.navigation_drawer:
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == constants.EntryPoint.lesson_player:
+    elif entry_point_name == constants.ENTRY_POINT.lesson_player:
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_story_id'],
             entry_point_json['entry_point_exploration_id'])
-    elif entry_point_name == constants.EntryPoint.revision_card:
+    elif entry_point_name == constants.ENTRY_POINT.revision_card:
         return app_feedback_report_domain.RevisionCardEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_subtopic_id'])
-    elif entry_point_name == constants.EntryPoint.crash:
+    elif entry_point_name == constants.ENTRY_POINT.crash:
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(
@@ -200,25 +200,25 @@ def _update_report_stats_model_in_transaction(
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            constants.StatsParameterNames.report_type: {
+            constants.STATS_PARAMETER_NAMES.report_type: {
                 report_type: 1
             },
-            constants.StatsParameterNames.country_locale_code: {
+            constants.STATS_PARAMETER_NAMES.country_locale_code: {
                 country_locale_code: 1
             },
-            constants.StatsParameterNames.entry_point_name: {
+            constants.STATS_PARAMETER_NAMES.entry_point_name: {
                 entry_point_name: 1
             },
-            constants.StatsParameterNames.text_language_code: {
+            constants.STATS_PARAMETER_NAMES.text_language_code: {
                 text_language_code: 1
             },
-            constants.StatsParameterNames.audio_language_code: {
+            constants.STATS_PARAMETER_NAMES.audio_language_code: {
                 audio_language_code: 1
             },
-            constants.StatsParameterNames.android_sdk_version: {
+            constants.STATS_PARAMETER_NAMES.android_sdk_version: {
                 sdk_version: 1
             },
-            constants.StatsParameterNames.version_name: {
+            constants.STATS_PARAMETER_NAMES.version_name: {
                 version_name: 1
             }
         }
@@ -231,33 +231,33 @@ def _update_report_stats_model_in_transaction(
         # Update existing stats model.
         stats_dict = stats_model.daily_param_stats
 
-        stats_dict[constants.StatsParameterNames.report_type] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.report_type] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.StatsParameterNames.report_type],
+                stats_dict[constants.STATS_PARAMETER_NAMES.report_type],
                 report_type, delta))
-        stats_dict[constants.StatsParameterNames.country_locale_code] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.StatsParameterNames.country_locale_code],
+                stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code],
                 country_locale_code, delta))
-        stats_dict[constants.StatsParameterNames.entry_point_name] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.StatsParameterNames.entry_point_name],
+                stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name],
                 entry_point_name, delta))
-        stats_dict[constants.StatsParameterNames.audio_language_code] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.StatsParameterNames.audio_language_code],
+                stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code],
                 audio_language_code, delta))
-        stats_dict[constants.StatsParameterNames.text_language_code] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.StatsParameterNames.text_language_code],
+                stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code],
                 text_language_code, delta))
-        stats_dict[constants.StatsParameterNames.android_sdk_version] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.StatsParameterNames.android_sdk_version],
+                stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version],
                 sdk_version, delta))
-        stats_dict[constants.StatsParameterNames.version_name] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.version_name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.StatsParameterNames.version_name],
+                stats_dict[constants.STATS_PARAMETER_NAMES.version_name],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
@@ -462,15 +462,15 @@ def _get_entry_point(
     Returns:
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
     """
-    if entry_point_name == constants.EntryPoint.navigation_drawer:
+    if entry_point_name == constants.ENTRY_POINT.navigation_drawer:
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == constants.EntryPoint.lesson_player:
+    elif entry_point_name == constants.ENTRY_POINT.lesson_player:
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             topic_id, story_id, exploration_id)
-    elif entry_point_name == constants.EntryPoint.revision_card:
+    elif entry_point_name == constants.ENTRY_POINT.revision_card:
         return app_feedback_report_domain.RevisionCardEntryPoint(
             topic_id, subtopic_id)
-    elif entry_point_name == constants.EntryPoint.crash:
+    elif entry_point_name == constants.ENTRY_POINT.crash:
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(

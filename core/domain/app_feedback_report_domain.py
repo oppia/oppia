@@ -998,7 +998,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
     def __init__(self):
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super(NavigationDrawerEntryPoint, self).__init__(
-            constants.EntryPoint.navigation_drawer, None,
+            constants.ENTRY_POINT.navigation_drawer, None,
             None, None, None)
 
     def to_dict(self):
@@ -1022,7 +1022,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            constants.EntryPoint.navigation_drawer)
+            constants.ENTRY_POINT.navigation_drawer)
 
 
 class LessonPlayerEntryPoint(EntryPoint):
@@ -1041,7 +1041,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         """
         super(LessonPlayerEntryPoint, self).__init__(
             entry_point_name=(
-                constants.EntryPoint.lesson_player),
+                constants.ENTRY_POINT.lesson_player),
             topic_id=topic_id, story_id=story_id, exploration_id=exploration_id,
             subtopic_id=None)
 
@@ -1067,7 +1067,7 @@ class LessonPlayerEntryPoint(EntryPoint):
                 LessonPlayerEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
-            self.entry_point_name, constants.EntryPoint.lesson_player)
+            self.entry_point_name, constants.ENTRY_POINT.lesson_player)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         story_domain.Story.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
@@ -1087,7 +1087,7 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super(RevisionCardEntryPoint, self).__init__(
-            constants.EntryPoint.revision_card,
+            constants.ENTRY_POINT.revision_card,
             topic_id, None, None, subtopic_id)
 
     def to_dict(self):
@@ -1113,7 +1113,7 @@ class RevisionCardEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            constants.EntryPoint.revision_card)
+            constants.ENTRY_POINT.revision_card)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
@@ -1128,7 +1128,7 @@ class CrashEntryPoint(EntryPoint):
         """Constructs an CrashEntryPoint domain object."""
         super(
             CrashEntryPoint, self).__init__(
-                constants.EntryPoint.crash, None, None,
+                constants.ENTRY_POINT.crash, None, None,
                 None, None)
 
     def to_dict(self):
@@ -1151,7 +1151,7 @@ class CrashEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            constants.EntryPoint.crash)
+            constants.ENTRY_POINT.crash)
 
 
 class AppFeedbackReportTicket(python_utils.OBJECT):
