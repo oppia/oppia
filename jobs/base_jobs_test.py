@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.tests import test_utils
 from jobs import base_jobs
 from jobs import job_test_utils
@@ -82,5 +84,6 @@ class JobBaseTests(job_test_utils.PipelinedTestBase):
     def test_run_raises_not_implemented_error(self):
         self.assertRaisesRegexp(
             NotImplementedError,
-            r'Subclasses must implement the run\(\) method',
+            re.escape(
+                'Subclasses must implement the run() method'),
             base_jobs.JobBase(self.pipeline).run)

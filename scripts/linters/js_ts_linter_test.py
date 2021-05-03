@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import multiprocessing
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -122,7 +123,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
         with esprima_swap, self.assertRaisesRegexp(
-            Exception, r'Exception raised from parse_script\(\)'):
+            Exception, re.escape('Exception raised from parse_script()')):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE).perform_all_lint_checks()
 

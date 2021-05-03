@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
+import re
+
 from constants import constants
 from core.platform import models
 from core.tests import test_utils
@@ -326,5 +328,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests NotImplementedError of Platform."""
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'import_models\(\) method is not overwritten in derived classes'):
+            re.escape(
+                'import_models() method is not overwritten in'
+                ' derived classes')):
             models.Platform().import_models()
