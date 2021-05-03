@@ -346,10 +346,12 @@ exports.config = {
     if (ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter({
         jasmineStarted: function(result){
-          var name = result.fullName + Math.floor(Math.random() * 10) + '.mp4';
-          var vidPath = path.resolve('__dirname', '../protractor-video/') + '/' + name;
+          var name = result.fullName + '.mp4';
+          console.log(result.fullName);
+          var vidPath = path.resolve('__dirname', '../protractor-video/') + name;
           console.log(vidPath);
           ffmpegArgs.push(vidPath);
+          console.log(ffmpegArgs);
           spw = childProcess.spawn('ffmpeg', ffmpegArgs);
           spw.stdout.on('data',function(data) {console.log(data);});
           spw.stderr.on('data',function(data) {console.error(data)});
@@ -357,6 +359,9 @@ exports.config = {
         },
         jasmineDone: async function() {
           await spw.kill();
+          spw.stdout.on('data',function(data) {console.log(data);});
+          spw.stderr.on('data',function(data) {console.error(data)});
+          spw.on('close',function(data){console.log(data)});
         }
       });
     }
