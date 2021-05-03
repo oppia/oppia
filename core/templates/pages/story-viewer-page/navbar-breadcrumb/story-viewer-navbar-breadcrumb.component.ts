@@ -73,4 +73,4 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
 }
 
 angular.module('oppia').directive('oppiaStoryViewerNavbarBreadcrumb',
-  downgradeComponent({component: StoryViewerNavbarBreadcrumbComponent}));
+  downgradeComponent({ component: StoryViewerNavbarBreadcrumbComponent }));

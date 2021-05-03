@@ -16,7 +16,7 @@
  * @fileoverview Use this directive on html tags to run on the tag init.
  */
 
-import {Directive, OnInit, Output, EventEmitter} from '@angular/core';
+import { Directive, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Directive({
   // This should be same as the Ouput below. Please change both if changing one.

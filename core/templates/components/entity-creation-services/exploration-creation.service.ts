@@ -77,7 +77,7 @@ export class ExplorationCreationService {
     this.alertsService.clearWarnings();
     this.ngbModal.open(
       UploadActivityModalComponent,
-      {backdrop: 'static'}
+      { backdrop: 'static' }
     ).result.then((result) => {
       const yamlFile = result.yamlFile;
 

@@ -108,11 +108,11 @@ describe('Customize Interaction Modal Controller', function() {
 
       spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
       stateCustomizationArgsService.init(stateName, {
-        imageAndRegions: {value: {
+        imageAndRegions: { value: {
           imagePath: '',
           labeledRegions: []
-        }},
-        highlightRegionsOnHover: {value: false}
+        } },
+        highlightRegionsOnHover: { value: false }
       });
       stateInteractionIdService.init(stateName, 'ImageClickInput');
 
@@ -160,11 +160,11 @@ describe('Customize Interaction Modal Controller', function() {
 
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
       stateCustomizationArgsService.init(stateName, {
-        imageAndRegions: {value: {
+        imageAndRegions: { value: {
           imagePath: '',
           labeledRegions: []
-        }},
-        highlightRegionsOnHover: {value: false}
+        } },
+        highlightRegionsOnHover: { value: false }
       });
       stateInteractionIdService.init(stateName, 'ImageClickInput');
 
@@ -199,7 +199,7 @@ describe('Customize Interaction Modal Controller', function() {
               labeledRegions: []
             }
           },
-          highlightRegionsOnHover: {value: false}
+          highlightRegionsOnHover: { value: false }
         });
 
         expect(schemaBasedFormsSpy).toHaveBeenCalled();
@@ -223,8 +223,8 @@ describe('Customize Interaction Modal Controller', function() {
     it('should get a customization args warning message when' +
       ' customization args warning message button has no value', function() {
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {value: ''},
-        highlightRegionsOnHover: {value: false}
+        imageAndRegions: { value: '' },
+        highlightRegionsOnHover: { value: false }
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -247,7 +247,7 @@ describe('Customize Interaction Modal Controller', function() {
 
       expect($scope.customizationArgSpecs.length).toBe(1);
       expect(stateCustomizationArgsService.displayed).toEqual({
-        question: {value: {
+        question: { value: {
           assumptions: [{
             arguments: [],
             top_kind_name: 'variable',
@@ -261,7 +261,7 @@ describe('Customize Interaction Modal Controller', function() {
             top_operator_name: 'p'
           }],
           default_proof_string: ''
-        }}
+        } }
       });
       expect($scope.hasCustomizationArgs).toBe(true);
 
@@ -323,8 +323,8 @@ describe('Customize Interaction Modal Controller', function() {
         $valid: true
       };
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {value: ''},
-        highlightRegionsOnHover: {value: false}
+        imageAndRegions: { value: '' },
+        highlightRegionsOnHover: { value: false }
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -341,12 +341,12 @@ describe('Customize Interaction Modal Controller', function() {
     it('should have save interaction button disabled when form entries' +
       ' are invalid', function() {
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {value: {
+        imageAndRegions: { value: {
           imagePath: 'imagepath',
           labeledRegions: [{
             label: 'abc'
           }]
-        }}
+        } }
       };
       stateCustomizationArgsService.saveDisplayedValue();
 
@@ -367,13 +367,13 @@ describe('Customize Interaction Modal Controller', function() {
     it('should have save interaction button enabled when there is no' +
       ' warning message', function() {
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {value: {
+        imageAndRegions: { value: {
           imagePath: 'imagepath',
           labeledRegions: [{
             label: 'abc'
           }]
-        }},
-        highlightRegionsOnHover: {value: false}
+        } },
+        highlightRegionsOnHover: { value: false }
       };
       stateCustomizationArgsService.saveDisplayedValue();
       $scope.form.schemaForm = {
@@ -459,8 +459,8 @@ describe('Customize Interaction Modal Controller', function() {
       ' interaction being displayed', function() {
       // Change customization args.
       stateCustomizationArgsService.displayed = {
-        imageAndRegions: {value: null},
-        highlightRegionsOnHover: {value: false}
+        imageAndRegions: { value: null },
+        highlightRegionsOnHover: { value: false }
       };
       // Save logicProof on cache.
       stateInteractionIdService.displayed = 'LogicProof';
@@ -488,20 +488,20 @@ describe('Customize Interaction Modal Controller', function() {
       stateNextContentIdIndexService.displayed = 0;
       stateInteractionIdService.displayed = 'MultipleChoiceInput';
       stateCustomizationArgsService.displayed = {
-        choices: {value: [
+        choices: { value: [
           new SubtitledHtml('<p>1</p>', null),
           new SubtitledHtml('<p>2</p>', null)
-        ]},
-        showChoicesInShuffledOrder: {value: false}
+        ] },
+        showChoicesInShuffledOrder: { value: false }
       };
 
       $scope.save();
       expect(stateCustomizationArgsService.displayed).toEqual({
-        choices: {value: [
+        choices: { value: [
           new SubtitledHtml('<p>1</p>', 'ca_choices_0'),
           new SubtitledHtml('<p>2</p>', 'ca_choices_1')
-        ]},
-        showChoicesInShuffledOrder: {value: false}
+        ] },
+        showChoicesInShuffledOrder: { value: false }
       });
       expect(stateNextContentIdIndexService.displayed).toEqual(2);
     });
@@ -561,14 +561,14 @@ describe('Customize Interaction Modal Controller', function() {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
 
       stateCustomizationArgsService.init(stateName, {
-        dummyCustArg: {value: [{
+        dummyCustArg: { value: [{
           content: new SubtitledUnicode('first', null),
           show: true
         },
         {
           content: new SubtitledUnicode('second', null),
           show: true
-        }]}
+        }] }
       });
       stateInteractionIdService.init(stateName, 'DummyInteraction');
 
@@ -616,7 +616,7 @@ describe('Customize Interaction Modal Controller', function() {
     stateNextContentIdIndexService.displayed = 0;
     $scope.save();
     expect(stateCustomizationArgsService.displayed).toEqual({
-      dummyCustArg: {value: [{
+      dummyCustArg: { value: [{
         content:
           new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
         show: true
@@ -625,7 +625,7 @@ describe('Customize Interaction Modal Controller', function() {
         content:
           new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
         show: true
-      }]}
+      }] }
     });
     expect(stateNextContentIdIndexService.displayed).toEqual(2);
 
@@ -651,7 +651,7 @@ describe('Customize Interaction Modal Controller', function() {
         placeholder: {
           value: new SubtitledUnicode('old value', 'ca_placeholder')
         },
-        rows: {value: 1}
+        rows: { value: 1 }
       });
       stateInteractionIdService.init(stateName, 'TextInput');
 
@@ -675,7 +675,7 @@ describe('Customize Interaction Modal Controller', function() {
       placeholder: {
         value: new SubtitledUnicode('new value', 'ca_placeholder')
       },
-      rows: {value: 1}
+      rows: { value: 1 }
     };
 
     $scope.save();

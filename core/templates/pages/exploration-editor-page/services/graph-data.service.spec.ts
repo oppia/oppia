@@ -37,7 +37,7 @@ describe('Graph Data Service', function() {
 
     ExplorationStatesService.init({
       Hola: {
-        content: {content_id: 'content', html: ''},
+        content: { content_id: 'content', html: '' },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},

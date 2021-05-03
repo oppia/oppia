@@ -121,7 +121,7 @@ describe('Translation language selector', () => {
     Object.defineProperty(
       fakeClickAwayEvent,
       'target',
-      {value: document.createElement('div')});
+      { value: document.createElement('div') });
     component.onDocumentClick(fakeClickAwayEvent);
     fixture.detectChanges();
     expect(component.dropdownShown).toBe(false);

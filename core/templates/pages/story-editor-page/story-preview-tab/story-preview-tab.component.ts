@@ -116,4 +116,4 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
 }
 angular.module('oppia').directive(
   'oppiaStoryPreviewTab', downgradeComponent(
-    {component: StoryPreviewTabComponent}));
+    { component: StoryPreviewTabComponent }));

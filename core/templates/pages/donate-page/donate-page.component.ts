@@ -74,4 +74,4 @@ export class DonatePageComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'donatePage', downgradeComponent({component: DonatePageComponent}));
+  'donatePage', downgradeComponent({ component: DonatePageComponent }));

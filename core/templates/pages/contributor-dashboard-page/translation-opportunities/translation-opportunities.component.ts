@@ -51,7 +51,7 @@ export class TranslationOpportunitiesComponent {
   }
 
   getPresentableOpportunitiesData(
-      {opportunities, more}: ExplorationOpportunitiesDict): {
+      { opportunities, more }: ExplorationOpportunitiesDict): {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   } {
@@ -74,7 +74,7 @@ export class TranslationOpportunitiesComponent {
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       opportunitiesDicts.push(opportunityDict);
     }
-    return {opportunitiesDicts, more};
+    return { opportunitiesDicts, more };
   }
 
   onClickButton(expId: string): void {
@@ -123,4 +123,4 @@ export class TranslationOpportunitiesComponent {
 
 angular.module('oppia').directive(
   'oppiaTranslationOpportunities', downgradeComponent(
-    {component: TranslationOpportunitiesComponent}));
+    { component: TranslationOpportunitiesComponent }));

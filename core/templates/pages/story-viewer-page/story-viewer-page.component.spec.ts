@@ -31,7 +31,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string): string {
     return value;

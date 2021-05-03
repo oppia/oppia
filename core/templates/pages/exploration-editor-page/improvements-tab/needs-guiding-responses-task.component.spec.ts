@@ -31,8 +31,8 @@ describe('NeedsGuidingResponsesTask component', function() {
   const stateName = 'Introduction';
   const totalAnswersCount = 50;
 
-  let task = {targetId: stateName};
-  let stats = {answerStats: [], stateStats: {totalAnswersCount}};
+  let task = { targetId: stateName };
+  let stats = { answerStats: [], stateStats: { totalAnswersCount } };
 
   importAllAngularServices();
 
@@ -41,14 +41,14 @@ describe('NeedsGuidingResponsesTask component', function() {
     RouterService = _RouterService_;
 
     $ctrl = $componentController(
-      'needsGuidingResponsesTask', null, {task, stats});
+      'needsGuidingResponsesTask', null, { task, stats });
     $ctrl.$onInit();
   }));
 
   it('should configure sorted tiles viz based on input task and stats', () => {
     expect($ctrl.sortedTilesData).toBe(stats.answerStats);
     expect($ctrl.sortedTilesOptions)
-      .toEqual({header: '', use_percentages: true});
+      .toEqual({ header: '', use_percentages: true });
     expect($ctrl.sortedTilesTotalFrequency).toEqual(totalAnswersCount);
   });
 

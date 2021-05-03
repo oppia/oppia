@@ -425,7 +425,7 @@ angular.module('oppia').component('stateTranslation', {
         if (!$scope.isDisabled(tabId)) {
           var color = TranslationStatusService
             .getActiveStateComponentStatusColor(tabId);
-          return {'border-top-color': color};
+          return { 'border-top-color': color };
         }
       };
 
@@ -442,7 +442,7 @@ angular.module('oppia').component('stateTranslation', {
       $scope.contentIdStatusColorStyle = function(contentId) {
         var color = TranslationStatusService
           .getActiveStateContentIdStatusColor(contentId);
-        return {'border-left': '3px solid ' + color};
+        return { 'border-left': '3px solid ' + color };
       };
 
       $scope.getSubtitledContentSummary = function(subtitledContent) {

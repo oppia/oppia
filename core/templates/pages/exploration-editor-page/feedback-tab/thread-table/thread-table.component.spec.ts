@@ -41,7 +41,7 @@ describe('Thread table component', () => {
           useClass: MockDateTimeFormatService
         },
         ThreadStatusDisplayService
-      ]}).compileComponents();
+      ] }).compileComponents();
   }));
 
   beforeEach(() => {

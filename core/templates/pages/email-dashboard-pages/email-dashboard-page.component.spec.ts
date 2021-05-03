@@ -32,12 +32,12 @@ describe('Email Dashboard Page', function() {
   var loadingMessage = null;
   var subscriptions = [];
   var firstPageQueries = [
-    {id: 1, status: 'completed'},
-    {id: 2, status: 'completed'}
+    { id: 1, status: 'completed' },
+    { id: 2, status: 'completed' }
   ];
   var secondPageQueries = [
-    {id: 3, status: 'processing'},
-    {id: 4, status: 'processing'}
+    { id: 3, status: 'processing' },
+    { id: 4, status: 'processing' }
   ];
   var EMAIL_DASHBOARD_PREDICATE_DEFINITION = null;
 
@@ -172,7 +172,7 @@ describe('Email Dashboard Page', function() {
 
         expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
 
-        var updatedQuery = {id: 3, status: 'completed'};
+        var updatedQuery = { id: 3, status: 'completed' };
         spyOn(EmailDashboardDataService, 'fetchQueryAsync').and.callFake(
           function() {
             var deferred = $q.defer();

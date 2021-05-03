@@ -272,7 +272,7 @@ describe('Exploration editor page component', function() {
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+        .and.returnValue($q.resolve({ canEdit: true, canVoiceover: true }));
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
         mockOpenEditorTutorialEmitter);
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
@@ -491,7 +491,7 @@ describe('Exploration editor page component', function() {
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({canEdit: false}));
+        .and.returnValue($q.resolve({ canEdit: false }));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
       spyOnProperty(cls, 'autosaveIsInProgress$').and.returnValue(
         autosaveIsInProgress);
@@ -659,7 +659,7 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync')
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve({canEdit: true}));
+        .and.returnValue(Promise.resolve({ canEdit: true }));
       spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(
         mockEnterEditorForTheFirstTime);
 
@@ -719,7 +719,7 @@ describe('Exploration editor page component', function() {
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({canEdit: false}));
+        .and.returnValue($q.resolve({ canEdit: false }));
       $scope.$apply();
 
       explorationData.is_version_of_draft_valid = true;
@@ -750,7 +750,7 @@ describe('Exploration editor page component', function() {
     it('should callback state-deleted method for stats', fakeAsync(() => {
       let onStateDeletedSpy = spyOn(stass, 'onStateDeleted');
       spyOn(cls, 'deleteState');
-      spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
+      spyOn($uibModal, 'open').and.returnValue({ result: Promise.resolve() });
 
       $scope.$apply();
       flushMicrotasks();

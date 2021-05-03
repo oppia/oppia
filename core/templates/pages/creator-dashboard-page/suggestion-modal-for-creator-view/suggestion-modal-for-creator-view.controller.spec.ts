@@ -81,7 +81,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
         expect($scope.summaryMessage).toBe(null);
         expect($scope.canReviewActiveThread).toBe(true);
         expect($scope.suggestionData).toEqual(
-          {newSuggestionHtml: 'New content'});
+          { newSuggestionHtml: 'New content' });
         expect($scope.suggestionEditorIsShown).toBe(false);
       });
 
@@ -194,7 +194,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
         expect($scope.summaryMessage).toBe(null);
         expect($scope.canReviewActiveThread).toBe(true);
         expect($scope.suggestionData).toEqual(
-          {newSuggestionHtml: 'New content'});
+          { newSuggestionHtml: 'New content' });
         expect($scope.suggestionEditorIsShown).toBe(false);
       });
 
@@ -279,7 +279,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
         expect($scope.summaryMessage).toBe(null);
         expect($scope.canReviewActiveThread).toBe(true);
         expect($scope.suggestionData).toEqual(
-          {newSuggestionHtml: 'Same content'});
+          { newSuggestionHtml: 'Same content' });
         expect($scope.suggestionEditorIsShown).toBe(false);
       });
 

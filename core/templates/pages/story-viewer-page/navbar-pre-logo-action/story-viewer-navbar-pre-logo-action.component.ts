@@ -70,4 +70,4 @@ implements OnInit, OnDestroy {
   }
 }
 angular.module('oppia').directive('oppiaStoryViewerNavbarPreLogoAction',
-  downgradeComponent({component: StoryViewerNavbarPreLogoActionComponent}));
+  downgradeComponent({ component: StoryViewerNavbarPreLogoActionComponent }));

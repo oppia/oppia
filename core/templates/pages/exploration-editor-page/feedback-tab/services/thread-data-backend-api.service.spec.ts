@@ -348,7 +348,8 @@ describe('retrieving threads service', () => {
 
       let req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error on fetch feedback stats', {status: 500, statusText: ''});
+      req.flush(
+        'Error on fetch feedback stats', { status: 500, statusText: '' });
 
       flushMicrotasks();
     }));
@@ -483,7 +484,7 @@ describe('retrieving threads service', () => {
       req = httpTestingController.expectOne(
         '/threadhandler/exploration.exp1.abc1');
       expect(req.request.method).toEqual('POST');
-      req.flush({messages: []});
+      req.flush({ messages: [] });
 
       flushMicrotasks();
     }));
@@ -515,7 +516,7 @@ describe('retrieving threads service', () => {
       req = httpTestingController.expectOne(
         '/threadhandler/exploration.exp1.abc1');
       expect(req.request.method).toEqual('POST');
-      req.flush({messages: []});
+      req.flush({ messages: [] });
 
       flushMicrotasks();
     }));
@@ -546,7 +547,7 @@ describe('retrieving threads service', () => {
       req = httpTestingController.expectOne(
         '/threadhandler/exploration.exp1.abc1');
       expect(req.request.method).toEqual('POST');
-      req.flush({messages: mockMessages});
+      req.flush({ messages: mockMessages });
 
       flushMicrotasks();
     }));
@@ -574,7 +575,7 @@ describe('retrieving threads service', () => {
 
     req = httpTestingController.expectOne('/feedbackstatshandler/exp1');
     expect(req.request.method).toEqual('GET');
-    req.flush({num_open_threads: 1});
+    req.flush({ num_open_threads: 1 });
     flushMicrotasks();
     expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
 
@@ -596,7 +597,7 @@ describe('retrieving threads service', () => {
     req = httpTestingController.expectOne(
       '/threadhandler/exploration.exp1.ghi3');
     expect(req.request.method).toEqual('GET');
-    req.flush({messages: []});
+    req.flush({ messages: [] });
 
     flushMicrotasks();
   }));

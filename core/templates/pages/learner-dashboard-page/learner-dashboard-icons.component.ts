@@ -16,7 +16,7 @@
  * @fileoverview Component for showing learner dashboard icons.
  */
 
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -164,4 +164,4 @@ export class LearnerDashboardIconsComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaLearnerDashboardIcons', downgradeComponent(
-    {component: LearnerDashboardIconsComponent}));
+    { component: LearnerDashboardIconsComponent }));

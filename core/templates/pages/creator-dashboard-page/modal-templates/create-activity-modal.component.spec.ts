@@ -27,7 +27,7 @@ import { Pipe } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string): string {
     return value;

@@ -18,13 +18,13 @@
 
 angular.module('oppia').component('needsGuidingResponsesTask', {
   template: require('./needs-guiding-responses-task.component.html'),
-  bindings: {task: '<', stats: '<'},
+  bindings: { task: '<', stats: '<' },
   controller: [
     'RouterService',
     function(RouterService) {
       this.$onInit = () => {
         this.sortedTilesData = this.stats.answerStats;
-        this.sortedTilesOptions = {header: '', use_percentages: true};
+        this.sortedTilesOptions = { header: '', use_percentages: true };
         this.sortedTilesTotalFrequency = (
           this.stats.stateStats.totalAnswersCount);
 

@@ -29,11 +29,11 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
 
-@Component({selector: 'learner-dashboard-icons', template: ''})
+@Component({ selector: 'learner-dashboard-icons', template: '' })
 class LearnerDashboardIconsComponentStub {
 }
 
-@Pipe({name: 'truncateAndCapitalize'})
+@Pipe({ name: 'truncateAndCapitalize' })
 class MockTruncteAndCapitalizePipe {
   transform(value: string, params: Object | undefined): string {
     return value;

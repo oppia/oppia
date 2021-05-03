@@ -32,7 +32,7 @@ describe('Image preloader service', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -183,7 +183,7 @@ describe('Image preloader service', () => {
                 content_id: ''
               }]
             },
-            showChoicesInShuffledOrder: {value: false}
+            showChoicesInShuffledOrder: { value: false }
           },
           answer_groups: [
             {
@@ -203,7 +203,7 @@ describe('Image preloader service', () => {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 0}
+                inputs: { x: 0 }
               }],
               training_data: null,
               tagged_skill_misconception_id: null,
@@ -222,7 +222,7 @@ describe('Image preloader service', () => {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 1}
+                inputs: { x: 1 }
               }],
               training_data: null,
               tagged_skill_misconception_id: null,
@@ -286,10 +286,10 @@ describe('Image preloader service', () => {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['1']
-              }}
+              } }
             }],
             outcome: {
               dest: 'State 1',
@@ -307,10 +307,10 @@ describe('Image preloader service', () => {
           }, {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['2']
-              }}
+              } }
             }],
             outcome: {
               dest: 'State 1',
@@ -368,7 +368,7 @@ describe('Image preloader service', () => {
   const requestUrl4 = (
     `/assetsdevhandler/exploration/1/assets/image/${filename4}`);
 
-  const imageBlob = new Blob(['image data'], {type: 'imagetype'});
+  const imageBlob = new Blob(['image data'], { type: 'imagetype' });
 
   let exploration: Exploration;
 
@@ -558,7 +558,7 @@ describe('Image preloader service', () => {
       flushMicrotasks();
 
       httpTestingController.expectOne(requestUrl3)
-        .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+        .flush(imageBlob, { status: 404, statusText: 'Status Text' });
       httpTestingController.expectOne(requestUrl4);
       expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
         .toEqual([filename3, filename4]);
@@ -572,7 +572,7 @@ describe('Image preloader service', () => {
       imagePreloaderService.restartImagePreloader('State 6');
 
       httpTestingController.expectOne(requestUrl4)
-        .flush(imageBlob, {status: 408, statusText: 'Status Text'});
+        .flush(imageBlob, { status: 408, statusText: 'Status Text' });
       flushMicrotasks();
 
       expect(imagePreloaderService.isInFailedDownload(filename4)).toBeTrue();
@@ -650,7 +650,7 @@ describe('Image preloader service', () => {
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
     httpTestingController.expectOne(requestUrl1)
-      .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+      .flush(imageBlob, { status: 404, statusText: 'Status Text' });
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
     expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
@@ -683,7 +683,7 @@ describe('Image preloader service', () => {
       imagePreloaderService.kickOffImagePreloader(initStateName);
 
       httpTestingController.expectOne(requestUrl1)
-        .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+        .flush(imageBlob, { status: 404, statusText: 'Status Text' });
       httpTestingController.expectOne(requestUrl2);
       httpTestingController.expectOne(requestUrl3);
       expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
@@ -703,7 +703,7 @@ describe('Image preloader service', () => {
       imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
 
       httpTestingController.expectOne(requestUrl1)
-        .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+        .flush(imageBlob, { status: 404, statusText: 'Status Text' });
       flushMicrotasks();
 
       expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
@@ -749,7 +749,7 @@ describe('Image preloader service', () => {
     imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1)
-      .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+      .flush(imageBlob, { status: 404, statusText: 'Status Text' });
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
     expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())

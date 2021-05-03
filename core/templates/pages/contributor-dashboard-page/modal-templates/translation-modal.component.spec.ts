@@ -165,8 +165,8 @@ describe('Translation Modal Component', () => {
       expect(translateTextService.init).toHaveBeenCalled();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: { contentId1: 'text1' },
+        stateName2: { contentId2: 'text2' }
       };
 
       const req = httpTestingController.expectOne(
@@ -249,8 +249,8 @@ describe('Translation Modal Component', () => {
         component.ngOnInit();
 
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: 'text1'},
-          stateName2: {contentId2: 'text2'}
+          stateName1: { contentId1: 'text1' },
+          stateName2: { contentId2: 'text2' }
         };
 
         const req = httpTestingController.expectOne(
@@ -293,8 +293,8 @@ describe('Translation Modal Component', () => {
       component.ngOnInit();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: { contentId1: 'text1' },
+        stateName2: { contentId2: 'text2' }
       };
 
       const req = httpTestingController.expectOne(

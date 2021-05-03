@@ -41,7 +41,7 @@ describe('Topic Selector Component', () => {
     uncategorizedSkillCount: 0,
     urlFragment: 'd',
     isSelected: false,
-    version: 2},
+    version: 2 },
   {
     additionalStoryCount: 0,
     canEditTopic: true,

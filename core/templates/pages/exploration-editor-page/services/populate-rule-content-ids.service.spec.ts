@@ -31,11 +31,11 @@ describe('Populate Rule Content Ids Service', () => {
   it('should populate null content ids on save', () => {
     let rule = {
       type: 'Equals',
-      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
-      inputs: {x: {
+      inputTypes: { x: 'TranslatableSetOfNormalizedString' },
+      inputs: { x: {
         contentId: null,
         normalizedStrSet: []
-      }}
+      } }
     };
     expect(rule.inputs.x.contentId).toBeNull();
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
@@ -49,8 +49,8 @@ describe('Populate Rule Content Ids Service', () => {
     };
 
     let rule = {
-      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
-      inputs: {x: ruleInput}
+      inputTypes: { x: 'TranslatableSetOfNormalizedString' },
+      inputs: { x: ruleInput }
     };
 
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
@@ -60,10 +60,10 @@ describe('Populate Rule Content Ids Service', () => {
   it('should not populate content ids if input does not need one', () => {
     let rule = {
       type: 'HasNumberOfTermsEqualTo',
-      inputTypes: {y: 'NonnegativeInt'},
-      inputs: {y: 1}
+      inputTypes: { y: 'NonnegativeInt' },
+      inputs: { y: 1 }
     };
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
-    expect(rule.inputs).toEqual({y: 1});
+    expect(rule.inputs).toEqual({ y: 1 });
   });
 });

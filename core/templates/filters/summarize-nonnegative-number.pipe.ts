@@ -21,7 +21,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 // the appropriate metric prefix (K, M or B). For example, 167656
 // becomes 167.7K.
 // Users of this filter should ensure that the input is a non-negative number.
-@Pipe({name: 'summarizeNonnegativeNumber'})
+@Pipe({ name: 'summarizeNonnegativeNumber' })
 export class SummarizeNonnegativeNumberPipe implements PipeTransform {
   transform(input: number): number | string {
     // Nine zeros for billions (e.g. 146008788788 --> 146.0B).

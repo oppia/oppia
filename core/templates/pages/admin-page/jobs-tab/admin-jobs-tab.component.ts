@@ -135,4 +135,4 @@ export class AdminJobsTabComponent {
 }
 
 angular.module('oppia').directive('oppiaAdminJobsTab',
-  downgradeComponent({component: AdminJobsTabComponent}));
+  downgradeComponent({ component: AdminJobsTabComponent }));

@@ -152,11 +152,11 @@ describe('Translation tab component', function() {
         interaction: {
           id: 'TextInput',
           customization_args: {
-            placeholder: {value: {
+            placeholder: { value: {
               content_id: 'ca_placeholder',
               unicode_str: ''
-            }},
-            rows: {value: 1}
+            } },
+            rows: { value: 1 }
           },
           answer_groups: [{
             rule_specs: [],

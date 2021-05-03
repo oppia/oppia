@@ -183,7 +183,7 @@ describe('Login Page', () => {
 
       expect(windowRef.location).toBeNull();
 
-      signInPromise.reject({code: 'auth/user-disabled', message: '!'});
+      signInPromise.reject({ code: 'auth/user-disabled', message: '!' });
       flushMicrotasks();
 
       expect(windowRef.location).toEqual('/pending-account-deletion');
@@ -198,7 +198,7 @@ describe('Login Page', () => {
 
       expect(windowRef.location).toBeNull();
 
-      signInPromise.reject({code: 'auth/unknown-error', message: '?'});
+      signInPromise.reject({ code: 'auth/unknown-error', message: '?' });
       flush();
 
       expect(windowRef.location).toBeNull();
@@ -253,7 +253,8 @@ describe('Login Page', () => {
 
       expect(windowRef.location).toBeNull();
 
-      redirectResultPromise.reject({code: 'auth/user-disabled', message: '!'});
+      redirectResultPromise.reject(
+        { code: 'auth/user-disabled', message: '!' });
       flushMicrotasks();
 
       expect(windowRef.location).toEqual('/pending-account-deletion');
@@ -268,7 +269,8 @@ describe('Login Page', () => {
 
       expect(windowRef.location).toBeNull();
 
-      redirectResultPromise.reject({code: 'auth/unknown-error', message: '?'});
+      redirectResultPromise.reject(
+        { code: 'auth/unknown-error', message: '?' });
 
       // An error should have appeared, but it will not redirect immediately.
       flushMicrotasks();

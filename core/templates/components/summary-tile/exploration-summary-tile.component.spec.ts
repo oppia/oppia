@@ -33,32 +33,32 @@ import { of } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 
-@Component({selector: 'learner-dashboard-icons', template: ''})
+@Component({ selector: 'learner-dashboard-icons', template: '' })
 class LearnerDashboardIconsComponentStub {
 }
 
-@Pipe({name: 'truncateAndCapitalize'})
+@Pipe({ name: 'truncateAndCapitalize' })
 class MockTruncteAndCapitalizePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
-@Pipe({name: 'truncate'})
+@Pipe({ name: 'truncate' })
 class MockTruncatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
-@Pipe({name: 'summarizeNonnegativeNumber'})
+@Pipe({ name: 'summarizeNonnegativeNumber' })
 class MockSummarizeNonnegativeNumberPipe {
   transform(value: string, params: Object | undefined): string {
     return value;

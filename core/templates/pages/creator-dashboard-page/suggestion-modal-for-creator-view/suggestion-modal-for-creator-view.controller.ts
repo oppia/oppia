@@ -59,7 +59,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
     // The ng-model needs to bind to a property of an object on
     // the scope (the property cannot sit directly on the scope)
     // Reference https://stackoverflow.com/q/12618342
-    $scope.suggestionData = {newSuggestionHtml: newContent.html};
+    $scope.suggestionData = { newSuggestionHtml: newContent.html };
     $scope.suggestionEditorIsShown = false;
     $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
 

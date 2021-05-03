@@ -95,4 +95,4 @@ export class ContentLanguageSelectorComponent implements OnInit {
 
 angular.module('oppia').directive(
   'contentLanguageSelector',
-  downgradeComponent({component: ContentLanguageSelectorComponent}));
+  downgradeComponent({ component: ContentLanguageSelectorComponent }));

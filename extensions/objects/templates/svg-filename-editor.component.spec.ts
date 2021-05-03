@@ -480,7 +480,7 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.uploadSvgFile();
     expect(svgFilenameCtrl.isSvgUploadEnabled()).toBe(true);
     expect(svgFilenameCtrl.isDrawModeSvgUpload()).toBe(true);
-    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    var file = new File([fileContent], 'circle.svg', { type: 'image/svg' });
     svgFilenameCtrl.onFileChanged(file, 'circle.svg');
     svgFilenameCtrl.uploadedSvgDataUrl = fileContent;
     expect(svgFilenameCtrl.isFileUploaded()).toBe(true);
@@ -491,7 +491,7 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.displayFontStyles).toBe(false);
     svgFilenameCtrl.uploadSvgFile();
     expect(svgFilenameCtrl.isDrawModeSvgUpload()).toBe(true);
-    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    var file = new File([fileContent], 'circle.svg', { type: 'image/svg' });
     svgFilenameCtrl.onFileChanged(file, 'circle.svg');
     svgFilenameCtrl.uploadedSvgDataUrl = fileContent;
     expect(svgFilenameCtrl.isFileUploaded()).toBe(true);

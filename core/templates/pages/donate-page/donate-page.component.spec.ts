@@ -33,7 +33,7 @@ describe('Donate page', () => {
     TestBed.configureTestingModule({
       declarations: [DonatePageComponent],
       providers: [
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
         UrlInterpolationService,
         {
           provide: WindowDimensionsService,

@@ -29,7 +29,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;

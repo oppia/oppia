@@ -97,4 +97,4 @@ export class CollectionSummaryTileComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaCollectionSummaryTile', downgradeComponent(
-    {component: CollectionSummaryTileComponent}));
+    { component: CollectionSummaryTileComponent }));

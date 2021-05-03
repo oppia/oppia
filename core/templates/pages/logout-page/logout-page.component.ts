@@ -55,4 +55,4 @@ export class LogoutPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'logoutPage', downgradeComponent({component: LogoutPageComponent}));
+  'logoutPage', downgradeComponent({ component: LogoutPageComponent }));

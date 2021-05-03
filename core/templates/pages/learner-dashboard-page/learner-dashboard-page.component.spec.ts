@@ -47,21 +47,21 @@ import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
-@Pipe({name: 'slice'})
+@Pipe({ name: 'slice' })
 class MockSlicePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
 
-@Pipe({name: 'truncate'})
+@Pipe({ name: 'truncate' })
 class MockTrunctePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
@@ -76,19 +76,19 @@ class MockLearnerDashboardActivityBackendApiService {
   }
 }
 
-@Component({selector: 'background-banner', template: ''})
+@Component({ selector: 'background-banner', template: '' })
 class BackgroundBannerComponentStub {
 }
 
-@Component({selector: 'exploration-summary-tile', template: ''})
+@Component({ selector: 'exploration-summary-tile', template: '' })
 class ExplorationSummaryTileComponentStub {
 }
 
-@Component({selector: 'collection-summary-tile', template: ''})
+@Component({ selector: 'collection-summary-tile', template: '' })
 class CollectionSummaryTileComponentStub {
 }
 
-@Component({selector: 'loading-dots', template: ''})
+@Component({ selector: 'loading-dots', template: '' })
 class LoadingDotsComponentStub {
 }
 

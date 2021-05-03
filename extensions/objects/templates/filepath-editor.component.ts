@@ -747,7 +747,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.data.metadata.originalWidth = width;
     this.data.metadata.originalHeight = height;
     // Check point 1 in the note before imports and after fileoverview.
-    this.data = {...this.data};
+    this.data = { ...this.data };
     // Re-calculate the dimensions of the base image and reset the
     // coordinates of the crop area to the boundaries of the image.
     const dimensions = this.calculateTargetImageDimensions();

@@ -98,7 +98,7 @@ export class LearnerDashboardActivityBackendApiService {
       activityId: string, activityTitle: string, activityType: string,
       learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
     const modelRef = this.ngbModal.open(
-      LearnerPlaylistModalComponent, {backdrop: true});
+      LearnerPlaylistModalComponent, { backdrop: true });
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
     modelRef.componentInstance.activityType = activityType;
@@ -127,7 +127,7 @@ export class LearnerDashboardActivityBackendApiService {
       activityId: string, activityTitle: string): Promise<void> {
     this.removeActivityModalStatus = null;
     const modelRef = this.ngbModal.open(
-      RemoveActivityModalComponent, {backdrop: true});
+      RemoveActivityModalComponent, { backdrop: true });
     modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
     modelRef.componentInstance.subsectionName = subsectionName;
     modelRef.componentInstance.activityId = activityId;

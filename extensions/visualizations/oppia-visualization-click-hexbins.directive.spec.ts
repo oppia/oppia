@@ -31,7 +31,7 @@ describe('Oppia click hexbins visualization', function() {
       getEntityType: () => 'exploration',
     });
     $provide.value('ImagePreloaderService', {
-      getDimensionsOfImage: (_: string) => ({width: 300, height: 250}),
+      getDimensionsOfImage: (_: string) => ({ width: 300, height: 250 }),
     });
   }));
 
@@ -47,8 +47,10 @@ describe('Oppia click hexbins visualization', function() {
       '</oppia-visualization-click-hexbins>');
     const scope = $rootScope.$new();
     scope.data = [
-      {answer: {clickPosition: [0.03, 0.03], clickedRegions: []}, frequency: 2},
-      {answer: {clickPosition: [0.50, 0.50], clickedRegions: []}, frequency: 1},
+      { answer: { clickPosition: [0.03, 0.03], clickedRegions: [] },
+        frequency: 2 },
+      { answer: { clickPosition: [0.50, 0.50], clickedRegions: [] },
+        frequency: 1 },
     ];
     scope.interactionArgs = {
       imageAndRegions: {

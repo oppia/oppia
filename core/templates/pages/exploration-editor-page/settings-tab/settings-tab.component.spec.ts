@@ -403,7 +403,7 @@ describe('Settings Tab Component', () => {
         ['owner'], [], [], [], '', false, false, true);
 
       spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
+        .and.returnValue({ result: $q.resolve() });
       spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
         result: $q.resolve()
       });
@@ -422,7 +422,7 @@ describe('Settings Tab Component', () => {
         ['owner'], [], [], [], '', false, false, true);
 
       spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
+        .and.returnValue({ result: $q.resolve() });
       spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
         result: $q.resolve()
       });
@@ -443,7 +443,7 @@ describe('Settings Tab Component', () => {
         ['owner'], [], [], [], '', false, false, true);
 
       spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
-        .and.returnValue({result: $q.resolve()});
+        .and.returnValue({ result: $q.resolve() });
       spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
         result: $q.resolve()
       });

@@ -138,7 +138,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       this.warningText = '';
     }
     this.eventBusGroup.emit(new ObjectFormValidityChangeEvent(
-      {value: !answerIsValid, modalId: this.modalId}));
+      { value: !answerIsValid, modalId: this.modalId }));
     return answerIsValid;
   }
 

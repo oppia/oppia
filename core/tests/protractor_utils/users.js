@@ -43,7 +43,7 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
   });
   if (isSuperAdmin) {
     await FirebaseAdmin.auth().setCustomUserClaims(
-      user.uid, {role: 'super_admin'});
+      user.uid, { role: 'super_admin' });
   }
 };
 

@@ -91,4 +91,4 @@ export class RemoveActivityModalComponent implements OnInit {
 angular.module('oppia').directive(
   'oppiaRemoveActivityModalComponent',
   downgradeComponent(
-    {component: RemoveActivityModalComponent}));
+    { component: RemoveActivityModalComponent }));

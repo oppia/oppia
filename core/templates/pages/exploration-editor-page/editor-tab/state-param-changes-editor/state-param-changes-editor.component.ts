@@ -38,4 +38,4 @@ export class StateParamChangesEditorComponent implements OnInit {
 }
 angular.module('oppia').directive(
   'stateParamChangesEditor', downgradeComponent(
-    {component: StateParamChangesEditorComponent}));
+    { component: StateParamChangesEditorComponent }));

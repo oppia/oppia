@@ -94,4 +94,4 @@ export class ResponseHeaderComponent {
 
 angular.module('oppia').directive(
   'oppiaResponseHeader', downgradeComponent(
-    {component: ResponseHeaderComponent}));
+    { component: ResponseHeaderComponent }));

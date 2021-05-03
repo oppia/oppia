@@ -35,7 +35,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 export class TranslationLanguageSelectorComponent implements OnInit {
   @Input() activeLanguageCode: string;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef;
+  @ViewChild('dropdown', { 'static': false }) dropdownRef;
 
   options: {id: string, description: string}[];
   languageIdToDescription: {[id: string]: string} = {};

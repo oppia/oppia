@@ -41,7 +41,7 @@ export class SuggestionModalForLearnerDashboardService {
   private _showEditStateContentSuggestionModal(
       newContent: string, oldContent: string, description: string): void {
     const modelRef = this.ngbModal.open(
-      LearnerDashboardSuggestionModalComponent, {backdrop: true});
+      LearnerDashboardSuggestionModalComponent, { backdrop: true });
     modelRef.componentInstance.newContent = newContent;
     modelRef.componentInstance.oldContent = oldContent;
     modelRef.componentInstance.description = description;

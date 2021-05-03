@@ -54,7 +54,7 @@ describe('Learner Action Render Service', function() {
         interaction: {
           id: 'Continue',
           customizationArgs: {
-            buttonText: {value: new SubtitledUnicode('', '')}
+            buttonText: { value: new SubtitledUnicode('', '') }
           }
         }
       })
@@ -62,8 +62,8 @@ describe('Learner Action Render Service', function() {
         interaction: {
           id: 'TextInput',
           customizationArgs: {
-            placeholder: {value: new SubtitledUnicode('', '')},
-            rows: {value: 1}
+            placeholder: { value: new SubtitledUnicode('', '') },
+            rows: { value: 1 }
           }
         }
       })
@@ -71,12 +71,12 @@ describe('Learner Action Render Service', function() {
         interaction: {
           id: 'MultipleChoiceInput',
           customizationArgs: {
-            choices: {value: [
+            choices: { value: [
               new SubtitledHtml('Choice1', ''),
               new SubtitledHtml('Choice2', ''),
               new SubtitledHtml('Choice3', '')
-            ]},
-            showChoicesInShuffledOrder: {value: true}
+            ] },
+            showChoicesInShuffledOrder: { value: true }
           }
         }
       });
@@ -86,27 +86,27 @@ describe('Learner Action Render Service', function() {
     it('should render correct learner actions', () => {
       let actions = [
         learnerActionObjectFactory.createNewExplorationStartAction({
-          state_name: {value: 'stateName1'},
+          state_name: { value: 'stateName1' },
         }),
         learnerActionObjectFactory.createNewAnswerSubmitAction({
-          state_name: {value: 'stateName1'},
-          dest_state_name: {value: 'stateName2'},
-          interaction_id: {value: 'Continue'},
-          submitted_answer: {value: ''},
-          feedback: {value: 'Welcome'},
-          time_spent_state_in_msecs: {value: 30000},
+          state_name: { value: 'stateName1' },
+          dest_state_name: { value: 'stateName2' },
+          interaction_id: { value: 'Continue' },
+          submitted_answer: { value: '' },
+          feedback: { value: 'Welcome' },
+          time_spent_state_in_msecs: { value: 30000 },
         }),
         learnerActionObjectFactory.createNewAnswerSubmitAction({
-          state_name: {value: 'stateName2'},
-          dest_state_name: {value: 'stateName2'},
-          interaction_id: {value: 'TextInput'},
-          submitted_answer: {value: 'Hello'},
-          feedback: {value: 'Try again'},
-          time_spent_state_in_msecs: {value: 30000},
+          state_name: { value: 'stateName2' },
+          dest_state_name: { value: 'stateName2' },
+          interaction_id: { value: 'TextInput' },
+          submitted_answer: { value: 'Hello' },
+          feedback: { value: 'Try again' },
+          time_spent_state_in_msecs: { value: 30000 },
         }),
         learnerActionObjectFactory.createNewExplorationQuitAction({
-          state_name: {value: 'stateName2'},
-          time_spent_in_state_in_msecs: {value: 120000},
+          state_name: { value: 'stateName2' },
+          time_spent_in_state_in_msecs: { value: 120000 },
         }),
       ];
 
@@ -126,7 +126,7 @@ describe('Learner Action Render Service', function() {
       () => {
         // We pass a sample learner actions array just to find out whether
         // the directive rendered is being initialised with the right values.
-        let learnerActions = [{key: 'value'}];
+        let learnerActions = [{ key: 'value' }];
         let tableDirective = (
           learnerActionRenderService.renderFinalDisplayBlockForMISIssueHTML(
             learnerActions, 1));

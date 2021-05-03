@@ -44,7 +44,7 @@ export class LearnerViewInfoBackendApiService {
         params: {
           stringified_exp_ids: stringifiedExpIds,
           include_private_explorations: includePrivateExplorations
-        }}).toPromise();
+        } }).toPromise();
   }
 }
 

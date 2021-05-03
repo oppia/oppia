@@ -43,7 +43,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   numberOfElementsInQueue: number;
   svgString: string;
   active: boolean;
-  localValue: {label: string} = {label: ''};
+  localValue: { label: string } = { label: '' };
 
   constructor(
     private alertsService: AlertsService,

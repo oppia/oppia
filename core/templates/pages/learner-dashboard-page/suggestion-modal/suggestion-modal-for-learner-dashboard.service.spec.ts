@@ -19,7 +19,7 @@
 import { async, TestBed } from '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { SuggestionModalForLearnerDashboardService } from './suggestion-modal-for-learner-dashboard.service';
 

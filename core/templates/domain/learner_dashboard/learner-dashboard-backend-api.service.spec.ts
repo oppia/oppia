@@ -271,7 +271,7 @@ describe('Learner Dashboard Backend API Service', () => {
     expect(req.request.body).toEqual(payload);
 
     req.flush(
-      { status: 200, statusText: 'Success.'});
+      { status: 200, statusText: 'Success.' });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -303,8 +303,8 @@ describe('Learner Dashboard Backend API Service', () => {
     expect(req.request.body).toEqual(payload);
 
     req.flush(
-      { error: 'Given URL is invalid.'},
-      { status: 500, statusText: 'Internal Server Error'});
+      { error: 'Given URL is invalid.' },
+      { status: 500, statusText: 'Internal Server Error' });
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
@@ -349,7 +349,7 @@ describe('Learner Dashboard Backend API Service', () => {
           updated_status: null
         }]
       },
-      { status: 200, statusText: 'Success.'});
+      { status: 200, statusText: 'Success.' });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(result);
@@ -372,8 +372,8 @@ describe('Learner Dashboard Backend API Service', () => {
     expect(req.request.method).toEqual('GET');
 
     req.flush(
-      { error: 'Given URL is invalid.'},
-      { status: 500, statusText: 'Internal Server Error'});
+      { error: 'Given URL is invalid.' },
+      { status: 500, statusText: 'Internal Server Error' });
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();

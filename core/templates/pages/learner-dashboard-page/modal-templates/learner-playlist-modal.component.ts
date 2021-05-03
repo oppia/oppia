@@ -62,4 +62,4 @@ export class LearnerPlaylistModalComponent implements OnInit {
 angular.module('oppia').directive(
   'oppiaLearnerPlaylistModalComponent',
   downgradeComponent(
-    {component: LearnerPlaylistModalComponent}));
+    { component: LearnerPlaylistModalComponent }));

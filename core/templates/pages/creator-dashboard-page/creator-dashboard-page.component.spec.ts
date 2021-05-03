@@ -221,8 +221,8 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: { html: ''},
-            old_value: { html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0
         }, {
@@ -234,8 +234,8 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: { html: ''},
-            old_value: { html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0
         }],
@@ -259,8 +259,8 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: { html: ''},
-            old_value: { html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0
         }, {
@@ -272,8 +272,8 @@ describe('Creator dashboard controller', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: { html: ''},
-            old_value: { html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0
         }]
@@ -675,8 +675,8 @@ describe('Creator dashboard controller', () => {
         author_name: '',
         change: {
           state_name: '',
-          new_value: { html: ''},
-          old_value: { html: ''},
+          new_value: { html: '' },
+          old_value: { html: '' },
         },
         last_updated_msecs: 0
       }],

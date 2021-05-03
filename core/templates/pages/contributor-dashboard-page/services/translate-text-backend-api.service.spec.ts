@@ -47,8 +47,8 @@ describe('TranslateTextBackendApiService', () => {
       failHandler = jasmine.createSpy('error');
       const sampleDataResults = {
         state_names_to_content_id_mapping: {
-          stateName1: {contentId1: 'text1', contentId2: 'text2'},
-          stateName2: {contentId3: 'text3'}
+          stateName1: { contentId1: 'text1', contentId2: 'text2' },
+          stateName2: { contentId3: 'text3' }
         },
         version: '1'
       };

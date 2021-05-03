@@ -212,7 +212,7 @@ describe('Improvements tab', function() {
           stateName: 'Introduction',
           ngrTask: newNgrTask(),
           siaTask: newSiaTask(),
-          supportingStats: {stateStats},
+          supportingStats: { stateStats },
         }
       ]);
 
@@ -234,13 +234,13 @@ describe('Improvements tab', function() {
           stateName: 'Introduction',
           ngrTask: newNgrTask(true),
           siaTask: newSiaTask(false),
-          supportingStats: {stateStats: emptyStateStats},
+          supportingStats: { stateStats: emptyStateStats },
         },
         End: {
           stateName: 'End',
           ngrTask: newNgrTask(true),
           siaTask: newSiaTask(true),
-          supportingStats: {stateStats: emptyStateStats},
+          supportingStats: { stateStats: emptyStateStats },
         },
       };
       this.stateTasksSpy.and.callFake(stateName => stateTasks[stateName]);
@@ -264,13 +264,13 @@ describe('Improvements tab', function() {
           stateName: 'Introduction',
           ngrTask: newNgrTask(),
           siaTask: newSiaTask(),
-          supportingStats: {stateStats: emptyStateStats},
+          supportingStats: { stateStats: emptyStateStats },
         },
         {
           stateName: 'End',
           ngrTask: newNgrTask(),
           siaTask: newSiaTask(),
-          supportingStats: {stateStats: emptyStateStats},
+          supportingStats: { stateStats: emptyStateStats },
         },
       ]);
 

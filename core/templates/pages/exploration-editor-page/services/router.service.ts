@@ -41,14 +41,14 @@ angular.module('oppia').factory('RouterService', [
       ExplorationStatesService, ExternalSaveService,
       StateEditorRefreshService, StateEditorService) {
     var TABS = {
-      MAIN: {name: 'main', path: '/main'},
-      TRANSLATION: {name: 'translation', path: '/translation'},
-      PREVIEW: {name: 'preview', path: '/preview'},
-      SETTINGS: {name: 'settings', path: '/settings'},
-      STATS: {name: 'stats', path: '/stats'},
-      IMPROVEMENTS: {name: 'improvements', path: '/improvements'},
-      HISTORY: {name: 'history', path: '/history'},
-      FEEDBACK: {name: 'feedback', path: '/feedback'},
+      MAIN: { name: 'main', path: '/main' },
+      TRANSLATION: { name: 'translation', path: '/translation' },
+      PREVIEW: { name: 'preview', path: '/preview' },
+      SETTINGS: { name: 'settings', path: '/settings' },
+      STATS: { name: 'stats', path: '/stats' },
+      IMPROVEMENTS: { name: 'improvements', path: '/improvements' },
+      HISTORY: { name: 'history', path: '/history' },
+      FEEDBACK: { name: 'feedback', path: '/feedback' },
     };
     /** @private */
     var centerGraphEventEmitter = new EventEmitter();

@@ -67,7 +67,7 @@ export class FractionEditorComponent implements OnInit {
       this.currentFractionValueIsValid = false;
     } finally {
       this.eventBus.emit(new ObjectFormValidityChangeEvent(
-        {value: !this.currentFractionValueIsValid, modalId: this.modalId}));
+        { value: !this.currentFractionValueIsValid, modalId: this.modalId }));
     }
   }
 }

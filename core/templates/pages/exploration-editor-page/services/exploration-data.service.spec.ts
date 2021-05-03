@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ExplorationDataService } from './exploration-data.service';
 import { LocalStorageService } from 'services/local-storage.service';
@@ -43,7 +43,7 @@ describe('Exploration data service', function() {
     is_version_of_draft_valid: true,
     init_state_name: 'init',
     param_changes: [],
-    param_specs: {randomProp: {obj_type: 'randomVal'}},
+    param_specs: { randomProp: { obj_type: 'randomVal' } },
     states: {},
     title: 'Test Exploration',
     language_code: 'en'
@@ -113,13 +113,13 @@ describe('Exploration data service', function() {
       providers: [
         {
           provide: UrlService,
-          useValue: {getPathname: () => '/create/0'}
+          useValue: { getPathname: () => '/create/0' }
         },
         {
           provide: EditableExplorationBackendApiService,
           useClass: MockEditableExplorationBackendApiService
         },
-        {provide: WindowRef, useValue: windowMock }
+        { provide: WindowRef, useValue: windowMock }
       ]
     });
   });
@@ -396,7 +396,7 @@ describe('Exploration data service', function() {
       providers: [
         {
           provide: UrlService,
-          useValue: {getPathname: () => '/exploration/0'}
+          useValue: { getPathname: () => '/exploration/0' }
         }
       ]
     });

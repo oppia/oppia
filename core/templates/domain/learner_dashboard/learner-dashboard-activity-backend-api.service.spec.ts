@@ -23,7 +23,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
 import { AlertsService } from 'services/alerts.service';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerDashboardActivityBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from

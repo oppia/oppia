@@ -205,7 +205,7 @@ describe('Translation status service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 0}
+                inputs: { x: 0 }
               }],
               training_data: []
             },
@@ -224,7 +224,7 @@ describe('Translation status service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 1}
+                inputs: { x: 1 }
               }],
               training_data: []
             }],
@@ -235,7 +235,7 @@ describe('Translation status service', function() {
               choices: {
                 value: ['<p>1</p>', '<p>2</p>']
               },
-              showChoicesInShuffledOrder: {value: false}
+              showChoicesInShuffledOrder: { value: false }
             },
             default_outcome: {
               refresher_exploration_id: null,
@@ -289,7 +289,7 @@ describe('Translation status service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 0}
+                inputs: { x: 0 }
               }],
               training_data: []
             }],
@@ -300,7 +300,7 @@ describe('Translation status service', function() {
               choices: {
                 value: ['<p>1</p>'],
               },
-              showChoicesInShuffledOrder: {value: false}
+              showChoicesInShuffledOrder: { value: false }
             },
             default_outcome: {
               refresher_exploration_id: null,

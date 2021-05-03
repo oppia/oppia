@@ -204,4 +204,4 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
 angular.module('oppia').directive(
   'oppiaExplorationSummaryTile', downgradeComponent(
-    {component: ExplorationSummaryTileComponent}));
+    { component: ExplorationSummaryTileComponent }));

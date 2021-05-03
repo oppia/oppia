@@ -45,9 +45,9 @@ class MockContentTranslationLanguageService {
   }
   getLanguageOptionsForDropdown() {
     return [
-      {value: 'fr', displayed: 'français (French)'},
-      {value: 'zh', displayed: '中文 (Chinese)'},
-      {value: 'en', displayed: 'English'}
+      { value: 'fr', displayed: 'français (French)' },
+      { value: 'zh', displayed: '中文 (Chinese)' },
+      { value: 'en', displayed: 'English' }
     ];
   }
   setCurrentContentLanguageCode(languageCode: string) {}
@@ -95,9 +95,9 @@ describe('Content language selector component', () => {
      'languagesInExploration', () => {
     expect(component.selectedLanguageCode).toBe('en');
     expect(component.languageOptions).toEqual([
-      {value: 'fr', displayed: 'français (French)'},
-      {value: 'zh', displayed: '中文 (Chinese)'},
-      {value: 'en', displayed: 'English'}
+      { value: 'fr', displayed: 'français (French)' },
+      { value: 'zh', displayed: '中文 (Chinese)' },
+      { value: 'en', displayed: 'English' }
     ]);
   });
 

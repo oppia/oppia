@@ -1300,14 +1300,14 @@ describe('State translation component', function() {
 
     it('should format TranslatableSetOfNormalizedString values', function() {
       expect($scope.getHumanReadableRuleInputValues(
-        {normalizedStrSet: ['input1', 'input2']},
+        { normalizedStrSet: ['input1', 'input2'] },
         'TranslatableSetOfNormalizedString'
       )).toEqual('[input1, input2]');
     });
 
     it('should format TranslatableSetOfUnicodeString values', function() {
       expect($scope.getHumanReadableRuleInputValues(
-        {unicodeStrSet: ['input1', 'input2']},
+        { unicodeStrSet: ['input1', 'input2'] },
         'TranslatableSetOfUnicodeString'
       )).toEqual('[input1, input2]');
     });

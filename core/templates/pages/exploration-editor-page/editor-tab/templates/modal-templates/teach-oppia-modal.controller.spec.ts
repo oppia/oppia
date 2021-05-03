@@ -85,7 +85,7 @@ describe('Teach Oppia Modal Controller', function() {
           inputs: { x: {
             contentId: 'rule_input',
             normalizedStrSet: ['Correct Answer']
-          }}
+          } }
         }],
         outcome: {
           dest: 'outcome 1',

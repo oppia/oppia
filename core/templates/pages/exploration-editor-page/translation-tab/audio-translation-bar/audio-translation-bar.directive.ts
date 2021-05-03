@@ -261,7 +261,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             cancelTimer();
             $scope.voiceoverRecorder.getMp3Data().then(function(audio) {
               var fileType = 'audio/mp3';
-              $scope.audioBlob = new Blob(audio, {type: fileType});
+              $scope.audioBlob = new Blob(audio, { type: fileType });
               // Free the browser from web worker.
               $scope.voiceoverRecorder.closeRecorder();
               // Create audio play and pause for unsaved recording.
@@ -308,7 +308,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             var contentId = $scope.contentId;
             var languageCode = $scope.languageCode;
             var recordedAudioFile = new File(
-              [$scope.audioBlob], filename, {type: fileType});
+              [$scope.audioBlob], filename, { type: fileType });
             $scope.showRecorderWarning = false;
             $q.when(
               AssetsBackendApiService.saveAudio(

@@ -548,8 +548,8 @@ describe('Exploration Warnings Service', function() {
         spyOn(StateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
           .and.returnValue(Promise.resolve(
             new StateTopAnswersStats(
-              {Hola: [new AnswerStats('hola', 'hola', 7, false)]},
-              {Hola: 'TextInput'})));
+              { Hola: [new AnswerStats('hola', 'hola', 7, false)] },
+              { Hola: 'TextInput' })));
         await StateTopAnswersStatsService.initAsync(
           'expId', ExplorationStatesService.getStates());
 
@@ -875,10 +875,10 @@ describe('Exploration Warnings Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: {
+                inputs: { x: {
                   contentId: 'rule_input',
                   normalizedStrSet: ['10']
-                }}
+                } }
               }],
               training_data: ['1'],
               tagged_skill_misconception_id: null

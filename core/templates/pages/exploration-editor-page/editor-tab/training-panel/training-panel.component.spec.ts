@@ -159,8 +159,8 @@ describe('Training Panel Component', function() {
 
     stateInteractionIdService.init(stateName, 'MultipleChoiceInput');
     stateCustomizationArgsService.init(stateName, {
-      choices: {value: []},
-      showChoicesInShuffledOrder: {value: true}
+      choices: { value: [] },
+      showChoicesInShuffledOrder: { value: true }
     });
 
     $scope = $rootScope.$new();

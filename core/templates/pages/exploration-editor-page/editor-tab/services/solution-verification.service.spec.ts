@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service.ts';
-import { StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service.ts';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service.ts';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service.ts';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -114,10 +114,10 @@ describe('Solution Verification Service', () => {
             },
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['abc']
-              }}
+              } }
             }],
           }],
           customization_args: {

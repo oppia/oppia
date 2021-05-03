@@ -16,7 +16,7 @@
  * @fileoverview Tests for collection-node.model.
  */
 
-import { CollectionNode, CollectionNodeBackendDict}
+import { CollectionNode, CollectionNodeBackendDict }
   from 'domain/collection/collection-node.model';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';

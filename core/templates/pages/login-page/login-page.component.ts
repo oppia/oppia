@@ -33,7 +33,7 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
 })
 export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
-  formGroup = new FormGroup({email: this.email});
+  formGroup = new FormGroup({ email: this.email });
 
   constructor(
       private alertsService: AlertsService, private authService: AuthService,
@@ -105,4 +105,4 @@ export class LoginPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'loginPage', downgradeComponent({component: LoginPageComponent}));
+  'loginPage', downgradeComponent({ component: LoginPageComponent }));

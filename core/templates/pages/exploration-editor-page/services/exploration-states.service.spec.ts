@@ -108,7 +108,7 @@ describe('ExplorationStatesService', function() {
 
     ExplorationStatesService.init({
       Hola: {
-        content: {content_id: 'content', html: ''},
+        content: { content_id: 'content', html: '' },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
@@ -122,10 +122,10 @@ describe('ExplorationStatesService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: {
+              inputs: { x: {
                 contentId: 'rule_input',
                 normalizedStrSet: ['hola']
-              }}
+              } }
             }],
             outcome: {
               dest: 'Me Llamo',
@@ -187,7 +187,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateDeletedCallback', function() {
       it('should callback when a state is deleted', function(done) {
         spyOn($uibModal, 'open').and.callFake(function() {
-          return {result: $q.resolve()};
+          return { result: $q.resolve() };
         });
         spyOn(ChangeListService, 'deleteState');
 

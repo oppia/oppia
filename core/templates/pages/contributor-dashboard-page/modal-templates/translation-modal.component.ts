@@ -55,7 +55,7 @@ export interface HTMLSchema {
 })
 export class TranslationModalComponent {
   @Input() opportunity: TranslationOpportunity;
-  activeWrittenTranslation: {html: string} = {html: ''};
+  activeWrittenTranslation: { html: string } = { html: '' };
   uploadingTranslation = false;
   subheading: string;
   heading: string;
@@ -194,4 +194,4 @@ export class TranslationModalComponent {
 
 angular.module('oppia').directive(
   'oppiaTranslationModal', downgradeComponent(
-    {component: TranslationModalComponent}));
+    { component: TranslationModalComponent }));

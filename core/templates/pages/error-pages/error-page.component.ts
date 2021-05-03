@@ -49,4 +49,4 @@ export class ErrorPageComponent implements OnInit {
 
 angular.module('oppia').directive(
   'errorPage', downgradeComponent(
-    {component: ErrorPageComponent}));
+    { component: ErrorPageComponent }));

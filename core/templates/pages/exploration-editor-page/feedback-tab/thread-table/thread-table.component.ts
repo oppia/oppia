@@ -56,4 +56,4 @@ export class ThreadTableComponent {
 
 angular.module('oppia').directive(
   'oppiaThreadTable', downgradeComponent(
-    {component: ThreadTableComponent}));
+    { component: ThreadTableComponent }));

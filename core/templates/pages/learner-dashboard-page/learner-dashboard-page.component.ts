@@ -618,4 +618,4 @@ export class LearnerDashboardPageComponent implements OnInit {
 
 angular.module('oppia').directive(
   'oppiaLearnerDashboardPage', downgradeComponent(
-    {component: LearnerDashboardPageComponent}));
+    { component: LearnerDashboardPageComponent }));

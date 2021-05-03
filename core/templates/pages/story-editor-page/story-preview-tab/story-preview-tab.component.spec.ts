@@ -25,7 +25,7 @@ import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryPreviewTabComponent } from './story-preview-tab.component';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string): string {
     return value;

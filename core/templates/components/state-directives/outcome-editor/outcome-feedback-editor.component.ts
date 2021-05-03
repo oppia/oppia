@@ -54,4 +54,4 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
 }
 angular.module('oppia').directive(
   'oppiaOutcomeFeedbackEditor', downgradeComponent(
-    {component: OutcomeFeedbackEditorComponent}));
+    { component: OutcomeFeedbackEditorComponent }));

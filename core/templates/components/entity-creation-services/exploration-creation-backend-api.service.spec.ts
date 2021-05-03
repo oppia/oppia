@@ -53,7 +53,7 @@ describe('Collection Creation backend api service', () => {
     let req = httpTestingController.expectOne(
       '/contributehandler/create_new');
     expect(req.request.method).toEqual('POST');
-    req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
+    req.flush({ exploration_id: SAMPLE_EXPLORATION_ID });
 
     flushMicrotasks();
 

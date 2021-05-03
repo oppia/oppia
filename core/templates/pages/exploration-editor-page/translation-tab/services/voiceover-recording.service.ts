@@ -38,20 +38,20 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
         var lameWorkerFileUrl = '/third_party/static/lamejs-1.2.0/' +
           'worker-example/worker-realtime.js';
         // Config the mp3 encoding worker.
-        var config = {sampleRate: 44100, bitRate: 128};
+        var config = { sampleRate: 44100, bitRate: 128 };
         mp3Worker = new Worker(lameWorkerFileUrl);
         mp3Worker.onmessage = function(e) {
           // Async data flow.
           defer.resolve(e.data.buf);
         };
-        mp3Worker.postMessage({cmd: 'init', config: config});
+        mp3Worker.postMessage({ cmd: 'init', config: config });
       }
     };
 
     var _postMessage = function(buffer) {
       // Ensure the mp3Worker is available when this is run.
       if (mp3Worker) {
-        mp3Worker.postMessage({cmd: 'encode', buf: buffer});
+        mp3Worker.postMessage({ cmd: 'encode', buf: buffer });
       }
     };
 
@@ -101,7 +101,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
     };
 
     var _startMicrophone = function() {
-      return navigator.mediaDevices.getUserMedia({audio: true, video: false});
+      return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     };
 
     var _stopRecord = function() {
@@ -111,7 +111,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
         processor.disconnect();
         processor.onaudioprocess = null;
         // Issue command to retrieve converted audio.
-        mp3Worker.postMessage({cmd: 'finish'});
+        mp3Worker.postMessage({ cmd: 'finish' });
         // Stop microphone stream.
         microphoneStream.getTracks().forEach(function(track) {
           track.stop();

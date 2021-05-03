@@ -72,7 +72,7 @@ export class CreateActivityButtonComponent implements OnInit {
      } else {
        this.ngbModal.open(
          CreateActivityModalComponent,
-         {backdrop: true}
+         { backdrop: true }
        ).result.then(() => {}, () => {
          this.creationInProgress = false;
        });
@@ -104,4 +104,4 @@ export class CreateActivityButtonComponent implements OnInit {
 }
 angular.module('oppia').directive(
   'oppiaCreateActivityButton', downgradeComponent(
-    {component: CreateActivityButtonComponent}));
+    { component: CreateActivityButtonComponent }));

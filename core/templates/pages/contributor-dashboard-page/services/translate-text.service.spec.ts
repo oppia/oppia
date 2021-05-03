@@ -42,8 +42,8 @@ describe('TranslateTextService', () => {
     it('should return all texts per state', fakeAsync(() => {
       let textAndAvailability;
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1', contentId2: 'text2'},
-        stateName2: {contentId3: 'text3'}
+        stateName1: { contentId1: 'text1', contentId2: 'text2' },
+        stateName2: { contentId3: 'text3' }
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
@@ -103,8 +103,8 @@ describe('TranslateTextService', () => {
           more: false
         };
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: 'text1'},
-          stateName2: {contentId2: ''}
+          stateName1: { contentId1: 'text1' },
+          stateName2: { contentId2: '' }
         };
         translateTextService.init('1', 'en', () => {});
         const req = httpTestingController.expectOne(
@@ -128,8 +128,8 @@ describe('TranslateTextService', () => {
           more: false
         };
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: ''},
-          stateName2: {contentId2: ''}
+          stateName1: { contentId1: '' },
+          stateName2: { contentId2: '' }
         };
         translateTextService.init('1', 'en', () => {});
         const req = httpTestingController.expectOne(

@@ -22,7 +22,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;

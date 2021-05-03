@@ -181,4 +181,4 @@ export class StoryViewerPageComponent implements OnInit {
 }
 
 angular.module('oppia').directive('oppiaStoryViewerPage',
-  downgradeComponent({component: StoryViewerPageComponent}));
+  downgradeComponent({ component: StoryViewerPageComponent }));

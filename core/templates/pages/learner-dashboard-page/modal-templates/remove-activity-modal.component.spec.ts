@@ -23,7 +23,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { RemoveActivityModalComponent } from './remove-activity-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-@Pipe({name: 'translate'})
+@Pipe({ name: 'translate' })
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;

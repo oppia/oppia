@@ -34,7 +34,8 @@ angular.module('oppia').controller('StateStatsModalController', [
   function(
       $controller, $scope, $uibModalInstance, RouterService,
       interactionArgs, stateName, stateStats, visualizationsInfo) {
-    $controller('ConfirmOrCancelModalController', {$scope, $uibModalInstance});
+    $controller(
+      'ConfirmOrCancelModalController', { $scope, $uibModalInstance });
 
     const numTimesSolutionViewed = stateStats.numTimesSolutionViewed;
     const totalAnswersCount = stateStats.totalAnswersCount;
