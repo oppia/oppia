@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a set of audio controls for a specific
- * audio translation in the learner view.
+ * @fileoverview Wrapper over mat-slider for audio-bar.
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
