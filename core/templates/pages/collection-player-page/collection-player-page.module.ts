@@ -23,38 +23,35 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { CollectionFooterComponent } from
-  'pages/collection-player-page/collection-footer/collection-footer.component';
-import { CollectionLocalNavComponent } from 'pages/collection-player-page/collection-local-nav/collection-local-nav.component';
-import { CollectionNavbarComponent } from
-  'pages/collection-player-page/collection-navbar/collection-navbar.component';
-import { CollectionNodeListComponent } from
-// eslint-disable-next-line max-len
-  'pages/collection-player-page/collection-node-list/collection-node-list.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { CollectionFooterComponent } from './collection-footer/collection-footer.component';
+import { CollectionLocalNavComponent } from './collection-local-nav/collection-local-nav.component';
+import { CollectionNavbarComponent } from './collection-navbar/collection-navbar.component';
+import { CollectionNodeListComponent } from './collection-node-list/collection-node-list.component';
+import { CollectionPlayerPageComponent } from './collection-player-page.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [
     OppiaAngularRootComponent,
     CollectionFooterComponent,
     CollectionLocalNavComponent,
     CollectionNavbarComponent,
-    CollectionNodeListComponent
+    CollectionNodeListComponent,
+    CollectionPlayerPageComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CollectionFooterComponent,
     CollectionLocalNavComponent,
     CollectionNodeListComponent,
-    CollectionNavbarComponent
+    CollectionNavbarComponent,
+    CollectionPlayerPageComponent,
   ],
   providers: [
     {
@@ -67,7 +64,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    }
+    },
   ]
 })
 class CollectionPlayerPageModule {
