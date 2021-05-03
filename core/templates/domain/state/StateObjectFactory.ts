@@ -44,15 +44,15 @@ import constants from 'assets/constants';
 import { AppConstants } from 'app.constants';
 
 export interface StateBackendDict {
-  'classifier_model_id': string;
-  'content': SubtitledHtmlBackendDict;
-  'interaction': InteractionBackendDict;
+  'classifier_model_id'?: string;
+  'content'?: SubtitledHtmlBackendDict;
+  'interaction'?: InteractionBackendDict;
   'param_changes': readonly ParamChangeBackendDict[];
-  'recorded_voiceovers': RecordedVoiceOverBackendDict;
-  'solicit_answer_details': boolean;
-  'card_is_checkpoint': boolean;
-  'written_translations': WrittenTranslationsBackendDict;
-  'next_content_id_index': number;
+  'recorded_voiceovers'?: RecordedVoiceOverBackendDict;
+  'solicit_answer_details'?: boolean;
+  'card_is_checkpoint'?: boolean;
+  'written_translations'?: WrittenTranslationsBackendDict;
+  'next_content_id_index'?: number;
 }
 
 export class State {

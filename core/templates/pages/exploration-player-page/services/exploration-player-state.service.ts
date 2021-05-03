@@ -180,7 +180,11 @@ export class ExplorationPlayerStateService {
     ]).then((combinedData) => {
       let explorationData: ExplorationBackendDict = combinedData[0];
       let featuresData: ExplorationFeatures = combinedData[1];
-      this.explorationFeaturesService.init(explorationData, featuresData);
+
+      this.explorationFeaturesService.init({
+        param_changes: explorationData.param_changes,
+        states: explorationData.states
+      }, featuresData);
       this.explorationEngineService.init(
         explorationData, null, null, null, null, callback);
       this.playerCorrectnessFeedbackEnabledService.init(
