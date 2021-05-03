@@ -3669,7 +3669,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s' % self.translation_suggestion_id, expected_status_int=401)
+                '/mock/%s' % self.translation_suggestion_id,
+                expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You are not allowed to update suggestions that you created.')

@@ -541,7 +541,7 @@ def resubmit_rejected_suggestion(
             'The suggestion with id %s was accepted. '
             'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
-   
+
     suggestion.pre_update_validate(change)
     suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
