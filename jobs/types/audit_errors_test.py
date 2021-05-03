@@ -30,8 +30,8 @@ from jobs.types import audit_errors
 from jobs.types import model_property
 import python_utils
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models, user_models, topic_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user, models.NAMES.topic])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -426,6 +426,28 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             '(id=\'invalid\'): Commit command domain validation for '
             'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed'
             ' with error: Missing cmd key in change dict')
+
+
+class ModelCanonicalNameMismatchErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = topic_models.TopicModel(
+            id='test',
+            name='name',
+            url_fragment='name-two',
+            canonical_name='canonical_name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopic_schema_version=0,
+            story_reference_schema_version=0
+        )
+        error = audit_errors.ModelCanonicalNameMismatchError(model)
+
+        self.assertEqual(
+            error.message,
+            'ModelCanonicalNameMismatchError in TopicModel(id=\'test\'): '
+            'Entity name %s in lowercase does not match canonical name %s' %
+            (model.name, model.canonical_name))
 
 
 class DraftChangeListLastUpdatedNoneErrorTests(AuditErrorsTestBase):
