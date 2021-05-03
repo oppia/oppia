@@ -41,11 +41,6 @@ export class StateSkillEditorComponent implements OnInit {
     new EventEmitter<string>());
   @Output() onSaveStateContent: EventEmitter<string> = (
     new EventEmitter<string>());
-  /**
-   * SkillsCategorizedByTopics: Contains the following key:
-   *   key: dict. Topic name. Contains the following key:
-   *      key: list(ShortSkillSummary). Subtopic name: List of skills.
-  */
   categorizedSkills: SkillsCategorizedByTopics = null;
   untriagedSkillSummaries: SkillSummary[] = null;
   skillEditorIsShown: boolean = true;
