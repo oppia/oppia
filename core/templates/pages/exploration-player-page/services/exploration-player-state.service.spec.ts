@@ -22,7 +22,8 @@
 // // ^^^ This block is to be removed.
 
 // require(
-//   'pages/exploration-player-page/services/exploration-player-state.service.ts');
+//   'pages/exploration-player-page/
+// services/exploration-player-state.service.ts');
 
 // describe('Exploration Player State Service', () => {
 //   let ExplorationEngineService = null;
