@@ -41,10 +41,10 @@
               </div>
               <a ng-click="toggleInlineSolutionEditorIsActive()"
                  class="oppia-rule-tab protractor-test-oppia-solution-tab">
-                <oppia-response-header [get-summary]="getSolutionSummary()"
-                                       [get-short-summary]="getSolutionSummary()"
-                                       (get-on-delete-fn)="deleteSolution($event.index, $event.event)">
-                </oppia-response-header>
+                <response-header summary="getSolutionSummary()"
+                                 short-summary="getSolutionSummary()"
+                                 on-delete-fn="deleteSolution">
+                </response-header>
               </a>
 
               <div ng-if="inlineSolutionEditorIsActive">
