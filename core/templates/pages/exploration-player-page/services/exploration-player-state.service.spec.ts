@@ -17,27 +17,33 @@
  */
 
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
+import { EditableExplorationBackendApiService }
+  from 'domain/exploration/editable-exploration-backend-api.service';
+import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
+  from 'domain/exploration/read-only-exploration-backend-api.service';
+import { PretestQuestionBackendApiService }
+  from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
-import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
+import { ExplorationFeatures, ExplorationFeaturesBackendApiService }
+  from 'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { ExplorationEngineService } from './exploration-engine.service';
 import { ExplorationPlayerStateService } from './exploration-player-state.service';
 import { NumberAttemptsService } from './number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from './player-correctness-feedback-enabled.service';
+import { PlayerCorrectnessFeedbackEnabledService }
+  from './player-correctness-feedback-enabled.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
 
 // eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Exploration Player State Service', () => {
+describe('Exploration Player State Service', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let playerTranscriptService: PlayerTranscriptService;
   let statsReportingService: StatsReportingService;
@@ -53,10 +59,9 @@ fdescribe('Exploration Player State Service', () => {
   let explorationFeaturesService: ExplorationFeaturesService;
   let numberAttemptsService: NumberAttemptsService;
   let questionBackendApiService: QuestionBackendApiService;
-  let readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService;
   let pretestQuestionBackendApiService:
     PretestQuestionBackendApiService;
+  let exploration: Exploration;
 
   let returnDict = {
     can_edit: true,
@@ -111,7 +116,7 @@ fdescribe('Exploration Player State Service', () => {
     }
 
     getPathname(): string {
-      return '';
+      return '/no_skill_editor/in/path/name';
     }
   }
 
@@ -121,11 +126,23 @@ fdescribe('Exploration Player State Service', () => {
     }
 
     isInQuestionPlayerMode(): boolean {
-      return true;
+      return false;
     }
 
     getExplorationId(): string {
       return '123';
+    }
+  }
+
+  class MockReadOnlyExplorationBackendApiService {
+    loadLatestExploration(explorationId: string):
+    Promise<FetchExplorationBackendResponse> {
+      return Promise.resolve(returnDict);
+    }
+
+    loadExploration(explorationId: string, version: number):
+    Promise<FetchExplorationBackendResponse> {
+      return Promise.resolve(returnDict);
     }
   }
 
@@ -135,6 +152,7 @@ fdescribe('Exploration Player State Service', () => {
         ExplorationPlayerStateService,
         PlayerTranscriptService,
         StatsReportingService,
+        Exploration,
         {
           provide: ContextService,
           useClass: MockContextService
@@ -142,6 +160,10 @@ fdescribe('Exploration Player State Service', () => {
         {
           provide: UrlService,
           useClass: MockUrlService
+        },
+        {
+          provide: ReadOnlyExplorationBackendApiService,
+          useClass: MockReadOnlyExplorationBackendApiService
         }
       ]
     }).compileComponents();
@@ -192,16 +214,13 @@ fdescribe('Exploration Player State Service', () => {
     questionBackendApiService = (
       questionBackendApiService as unknown) as
       jasmine.SpyObj<QuestionBackendApiService>;
-    readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService);
-    readOnlyExplorationBackendApiService = (
-      readOnlyExplorationBackendApiService as unknown) as
-      jasmine.SpyObj<ReadOnlyExplorationBackendApiService>;
     pretestQuestionBackendApiService = TestBed.inject(
       PretestQuestionBackendApiService);
     pretestQuestionBackendApiService = (
       pretestQuestionBackendApiService as unknown) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
+    exploration = TestBed.inject(Exploration);
+    exploration = (exploration as unknown) as jasmine.SpyObj<Exploration>;
   });
 
   it('should properly initialize player', () => {
@@ -356,26 +375,46 @@ fdescribe('Exploration Player State Service', () => {
       .toHaveBeenCalled();
   }));
 
-  // it('should init exploration player', fakeAsync(() => {
-  //   spyOn(readOnlyExplorationBackendApiService, 'loadExploration').and
-  //     .returnValue(Promise.resolve(returnDict));
-  //   spyOn(readOnlyExplorationBackendApiService, 'loadLatestExploration').and
-  //     .returnValue(Promise.resolve(returnDict));
-  //   let explorationFeatures: ExplorationFeatures = {
-  //     isExplorationWhitelisted: true,
-  //     alwaysAskLearnersForAnswerDetails: false
-  //   };
-  //   spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
-  //     .and.returnValue(Promise.resolve(explorationFeatures));
-  //   spyOn(pretestQuestionBackendApiService, 'fetchPretestQuestionsAsync')
-  //     .and.returnValue(Promise.resolve([questionBackendDict]));
-  //   spyOn(explorationFeaturesService, 'init');
+  it('should init exploration player', fakeAsync(() => {
+    let explorationFeatures: ExplorationFeatures = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
+    };
+    spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
+      .and.returnValue(Promise.resolve(explorationFeatures));
+    spyOn(pretestQuestionBackendApiService, 'fetchPretestQuestionsAsync')
+      .and.returnValue(Promise.resolve([questionBackendDict]));
+    spyOn(explorationFeaturesService, 'init');
+    spyOn(explorationPlayerStateService, 'initializePretestServices');
 
-  //   let successCallback = () => {};
-  //   explorationPlayerStateService.initExplorationPlayer(successCallback);
-  //   tick();
-  //   expect(explorationFeaturesService.init).toHaveBeenCalled();
-  // }));
+    let successCallback = () => {};
+    explorationPlayerStateService.initExplorationPlayer(successCallback);
+    tick();
+    expect(explorationFeaturesService.init).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializePretestServices)
+      .toHaveBeenCalled();
+  }));
+
+  it('should init exploration player without pretests', fakeAsync(() => {
+    let explorationFeatures: ExplorationFeatures = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
+    };
+    spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
+      .and.returnValue(Promise.resolve(explorationFeatures));
+    spyOn(pretestQuestionBackendApiService, 'fetchPretestQuestionsAsync')
+      .and.returnValue(Promise.resolve([]));
+    spyOn(explorationFeaturesService, 'init');
+    spyOn(explorationPlayerStateService, 'setExplorationMode');
+    spyOn(explorationPlayerStateService, 'initializeExplorationServices');
+
+    let successCallback = () => {};
+    explorationPlayerStateService.initExplorationPlayer(successCallback);
+    tick();
+    expect(explorationPlayerStateService.setExplorationMode).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeExplorationServices)
+      .toHaveBeenCalled();
+  }));
 
   it('should intialize question player', () => {
     spyOn(playerTranscriptService, 'init');
@@ -405,6 +444,11 @@ fdescribe('Exploration Player State Service', () => {
     expect(explorationPlayerStateService.isInQuestionMode()).toBeTrue();
   });
 
+  it('should tell if is in question player mode', () => {
+    explorationPlayerStateService.setQuestionPlayerMode();
+    expect(explorationPlayerStateService.isInQuestionPlayerMode()).toBeTrue();
+  });
+
   it('should tell if in story chapter mode', () => {
     explorationPlayerStateService.setStoryChapterMode();
     expect(explorationPlayerStateService.isInStoryChapterMode()).toBeTrue();
@@ -417,11 +461,11 @@ fdescribe('Exploration Player State Service', () => {
     expect(explorationEngineService.moveToExploration).toHaveBeenCalled();
   });
 
-  it('should get language code', () => {
+  fit('should get language code', () => {
+    exploration.languageCode = 'language_code';
     explorationPlayerStateService.setExplorationMode();
-    expect(explorationPlayerStateService.getLanguageCode())
-      .toEqual(
-        explorationEngineService.getLanguageCode());
+    expect(explorationPlayerStateService.getLanguageCode()).toEqual(
+      exploration.languageCode);
   });
 
   it('should record new card added', () => {
@@ -429,5 +473,13 @@ fdescribe('Exploration Player State Service', () => {
     spyOn(explorationEngineService, 'recordNewCardAdded');
     explorationPlayerStateService.recordNewCardAdded();
     expect(explorationEngineService.recordNewCardAdded).toHaveBeenCalled();
+  });
+
+  it('should test getters', () => {
+    expect(explorationPlayerStateService.onTotalQuestionsReceived)
+      .toBeDefined();
+    expect(explorationPlayerStateService.onPlayerStateChange).toBeDefined();
+    expect(explorationPlayerStateService.onOppiaFeedbackAvailable)
+      .toBeDefined();
   });
 });
