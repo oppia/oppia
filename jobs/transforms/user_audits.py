@@ -146,7 +146,7 @@ class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
         """Function that checks query_status is not archived.
 
         Args:
-            input_model: user_models.ExplorationUserDataModel.
+            input_model: user_models.UserQueryModel.
                 Entity to validate.
 
         Yields:
