@@ -33,8 +33,8 @@ interface UnitsDict {
   [unit: string]: number;
 }
 
-type CurrencyUnitsKeys =
-  (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+type CurrencyUnitsKeys = (
+  keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
 
 export class Units {
   units: Unit[];
