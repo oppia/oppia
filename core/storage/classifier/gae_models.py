@@ -28,6 +28,7 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
+NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 10
 
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
@@ -183,7 +184,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             List of the ClassifierTrainingJobModels with status new or pending.
             The offset value.
         """
-        fetch_limit = 10
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
             feconf.TRAINING_JOB_STATUS_PENDING])).filter(
@@ -191,7 +191,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                     datetime.datetime.utcnow())).order(
                         cls.next_scheduled_check_time, cls._key)
 
-        job_models = query.fetch(fetch_limit, offset=offset)
+        job_models = query.fetch(
+            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
         offset = offset + len(job_models)
         return job_models, offset
 
