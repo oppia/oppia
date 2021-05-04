@@ -160,5 +160,3 @@ class DraftChangeListLastUpdatedInvalidError(BaseAuditError):
         self.message = (
             'draft change list last updated %s is greater than the time '
             'when job was run' % model.draft_change_list_last_updated)
-
-

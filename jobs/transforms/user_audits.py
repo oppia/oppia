@@ -78,7 +78,8 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
         ]
 
         if incorrect_keys:
-            yield user_model_errors.ModelIncorrectKeyError(model, incorrect_keys)
+            yield user_model_errors.ModelIncorrectKeyError(
+                model, incorrect_keys)
 
 
 @audit_decorators.AuditsExisting(user_models.UserQueryModel)
@@ -133,4 +134,5 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
         current_time = datetime.datetime.utcnow()
         if (model.draft_change_list_last_updated and
                 model.draft_change_list_last_updated > current_time):
-            yield user_model_errors.DraftChangeListLastUpdatedInvalidError(model)
+            yield user_model_errors.DraftChangeListLastUpdatedInvalidError(
+                model)

@@ -386,4 +386,3 @@ class ModelCanonicalNameMismatchErrorTests(AuditErrorsTestBase):
             'ModelCanonicalNameMismatchError in TopicModel(id=\'test\'): '
             'Entity name %s in lowercase does not match canonical name %s' %
             (model.name, model.canonical_name))
-
