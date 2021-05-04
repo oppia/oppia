@@ -180,8 +180,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         Returns:
             tuple(list(ClassifierTrainingJobModel), int).
-            List of the ClassifierTrainingJobModels with status new or pending.
-            The offset value.
+            A tuple containing the list of the ClassifierTrainingJobModels with status 
+            new or pending and the offset value.
         """
         fetch_limit = 10
         query = cls.query(cls.status.IN([
