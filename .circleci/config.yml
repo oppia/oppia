@@ -161,6 +161,10 @@ jobs:
           name: Run e2e library test
           command: |
             python -m scripts.run_e2e_tests --skip-install --deparallelize_terser --suite="library" --prod_env
+      - run:
+          name: DEBUGGING List Video Files
+          command: |
+            ls /home/runner/work/oppia/protractor-video
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -202,6 +206,10 @@ jobs:
           name: Run e2e topic and story viewer test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
+      - run:
+          name: DEBUGGING List Video Files
+          command: |
+            ls /home/runner/work/oppia/protractor-video
       - upload_screenshots
       - check_memory_usage
 
