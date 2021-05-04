@@ -245,7 +245,7 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should open a modal when adding a new skill', function() {
+    it('should open add skill modal when adding a new skill', function() {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
         return <NgbModalRef>(
@@ -258,13 +258,14 @@ describe('Question Editor Modal Controller', function() {
       expect(modalSpy).toHaveBeenCalled();
     });
 
-    it('should show warnings if a skill is already linked to a question',
+    it('should not add a new skill when it\'s already exists',
       () => {
+        const summary = {id: '1', description: 'Description 1'};
         const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
           setTimeout(opt.beforeDismiss);
           return <NgbModalRef>(
             { componentInstance: MockNgbModalRef,
-              result: Promise.resolve({id: '1', description: 'Description 1'})
+              result: Promise.resolve(summary)
             });
         });
         $scope.addSkill();
@@ -272,7 +273,7 @@ describe('Question Editor Modal Controller', function() {
         expect(modalSpy).toHaveBeenCalled();
       });
 
-    it('should close the modal on clicking cancel', () => {
+    it('should close add skill modal on clicking cancel', () => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
         return <NgbModalRef>(
