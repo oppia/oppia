@@ -80,6 +80,8 @@
     "core/templates/domain/skill/assigned-skill.model.spec.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.spec.ts",
+    "core/templates/domain/skill/MisconceptionObjectFactory.ts",
+    "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/story/story-node.model.ts",
     "core/templates/domain/story/story-node.model.spec.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.ts",
