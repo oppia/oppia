@@ -32,7 +32,7 @@ require(
   'pages/exploration-player-page/layout-directives/progress-nav.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'learner-answer-info-card.directive.ts');
+  'learner-answer-info-card.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'supplemental-card.directive.ts');
