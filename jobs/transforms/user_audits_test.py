@@ -226,7 +226,8 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
 
-class ValidateArchivedModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
+class ValidateArchivedModelsMarkedDeletedTests(
+    job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
     VALID_USER_ID = 'test_user'
