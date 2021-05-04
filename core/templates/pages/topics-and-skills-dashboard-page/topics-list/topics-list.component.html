@@ -103,7 +103,7 @@
             </div>
           </div>
           <div class="topic-item-options">
-            <p class="fas fa-ellipsis-v topic-edit-box-icon" (click)="changeEditOptions(topic.id)"></p>
+            <p class="fas fa-ellipsis-v topic-edit-box-icon" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></p>
             <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
               <a class="topic-edit-options-edit" [href]="getTopicEditorUrl(topic.id)">
                 <i class="fa fa-pen"></i>
