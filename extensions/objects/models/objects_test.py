@@ -998,7 +998,7 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             AssertionError,
-            re.escape('Expected unicode string, ''received [u\'abc\']')):
+            re.escape('Expected unicode string, received [u\'abc\']')):
             objects.TranslatableUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStr': ['abc']
