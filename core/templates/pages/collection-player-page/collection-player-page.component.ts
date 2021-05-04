@@ -33,6 +33,7 @@ import { HttpClient } from '@angular/common/http';
 import { AppConstants } from 'app.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
 // Angular.module('oppia').animation(
 //   '.oppia-collection-animate-slide', function() {
@@ -83,24 +84,24 @@ interface CollectionHandler {
 export class CollectionPlayerPageComponent implements OnInit {
   activeHighlightedIconIndex: number;
   explorationCardIsShown: boolean;
-  collection;
+  collection: Collection;
   collectionPlaythrough;
   currentExplorationId: string;
-  summaryToPreview;
+  summaryToPreview: LearnerExplorationSummaryBackendDict;
   pathSvgParameters: string;
   pathIconParameters: IconParametersArray[];
-  svgHeight;
-  MIN_HEIGHT_FOR_PATH_SVG_PX;
-  EVEN_SVG_HEIGHT_OFFSET_PX;
-  ODD_SVG_HEIGHT_OFFSET_PX;
+  svgHeight: number;
+  MIN_HEIGHT_FOR_PATH_SVG_PX: number;
+  EVEN_SVG_HEIGHT_OFFSET_PX: number;
+  ODD_SVG_HEIGHT_OFFSET_PX: number;
   y: number;
-  ICON_X_MIDDLE_PX;
-  ICON_Y_INITIAL_PX;
-  ICON_Y_INCREMENT_PX;
-  ICON_X_LEFT_PX;
-  ICON_X_RIGHT_PX;
+  ICON_X_MIDDLE_PX: number;
+  ICON_Y_INITIAL_PX: number;
+  ICON_Y_INCREMENT_PX: number;
+  ICON_X_LEFT_PX: number;
+  ICON_X_RIGHT_PX: number;
   collectionId: string;
-  nextExplorationId;
+  nextExplorationId: string;
   whitelistedCollectionIdsForGuestProgress;
   collectionSummary;
   isLoggedIn: boolean;

@@ -114,13 +114,13 @@
                     attr.id="{{'highlight' + index}}"
                     fill="#FF8C00"
                     fill-opacity="0.5"/>
-            <circle [hidden]="!((index===activeHighlightedIconIndex)?true:false)"
+            <!-- <circle [hidden]="!((index===activeHighlightedIconIndex)?true:false)"
                     cx="50"
                     cy="70"
                     r="50"
                     attr.id="{{'highlight' + index}}"
                     fill="#A6DACF"
-                    fill-opacity="0.5"/>
+                    fill-opacity="0.5"/> -->
             <circle cx="50"
                     cy="70"
                     r="42"
@@ -129,7 +129,7 @@
                     stroke-width="2"/>
           </a>
         </svg>
-        {{index+1}}
+        {{node.getExplorationId()}}
       </a>
     </div>
 
@@ -140,7 +140,7 @@
       <div class="mobile-path-segment"
            *ngFor="let node of collection.getCollectionNodes();let index = index"
            id="mobile-path-anchor-index">
-        <a href=""
+        <a href="#"
            [attr.title-data]="index + 1 + '. ' + node?.getExplorationTitle()"
            class="oppia-collection-node-small-screen">
           <svg class="protractor-mobile-test-collection-exploration"
@@ -205,13 +205,13 @@
                     attr.id="{{'highlight' + index}}"
                     fill="#FF8C00"
                     fill-opacity="0.5"/>
-            <circle [hidden]="!((index===activeHighlightedIconIndex)?true:false)"
+            <!-- <circle [hidden]="!((index===activeHighlightedIconIndex)?true:false)"
                     cx="50"
                     cy="70"
                     r="50"
                     attr.id="{{'highlight' + index}}"
                     fill="#A6DACF"
-                    fill-opacity="0.5"/>
+                    fill-opacity="0.5"/> -->
             <circle cx="50"
                     cy="70"
                     r="42"
@@ -225,22 +225,22 @@
         <div class="oppia-exploration-summary-tile-container">
           <div [ngClass]="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}"
                (click)="closeOnClickingOutside()">
-            <!-- <oppia-exploration-summary-tile *ngIf="explorationCardIsShown"
+            <oppia-exploration-summary-tile *ngIf="explorationCardIsShown"
                                             (click)="onClickStopPropagation($event)"
-                                            [collectionId]="collectionId"
-                                            [explorationId]="currentExplorationId"
-                                            [explorationTitle]="summaryToPreview.title"
-                                            [lastUpdatedMsec]="summaryToPreview.last_updated_msec"
-                                            [objective]="summaryToPreview.objective"
-                                            [category]="summaryToPreview.category"
-                                            [ratings]="summaryToPreview.ratings"
-                                            [numViews]="summaryToPreview.num_views"
-                                            [thumbnailIconUrl]="summaryToPreview.thumbnail_icon_url"
-                                            [thumbnailBgColor]="summaryToPreview.thumbnail_bg_color"
+                                            [getCollectionId]="collectionId"
+                                            [getExplorationId]="currentExplorationId"
+                                            [getExplorationTitle]="summaryToPreview.title"
+                                            [getLastUpdatedMsec]="summaryToPreview.last_updated_msec"
+                                            [getObjective]="summaryToPreview.objective"
+                                            [getCategory]="summaryToPreview.category"
+                                            [getRatings]="summaryToPreview.ratings"
+                                            [getNumViews]="summaryToPreview.num_views"
+                                            [getThumbnailIconUrl]="summaryToPreview.thumbnail_icon_url"
+                                            [getThumbnailBgColor]="summaryToPreview.thumbnail_bg_color"
                                             [isCommunityOwned]="summaryToPreview.community_owned"
                                             [isCollectionPreviewTile]="true"
                                             class="oppia-exploration-summary-tile">
-            </oppia-exploration-summary-tile> -->
+            </oppia-exploration-summary-tile>
           </div>
         </div>
       </div>
@@ -260,24 +260,24 @@
           </span>
         </div>
       </mat-card>
-      <!-- <oppia-exploration-summary-tile *ngIf="explorationCardIsShown"
-                                      [collectionId]="collectionId"
-                                      [explorationId]="currentExplorationId"
-                                      [explorationTitle]="summaryToPreview.title"
-                                      [lastUpdatedMsec]="summaryToPreview.last_updated_msec"
-                                      [objective]="summaryToPreview.objective"
-                                      [category]="summaryToPreview.category"
-                                      [ratings]="summaryToPreview.ratings"
-                                      [numViews]="summaryToPreview.num_views"
-                                      [thumbnailIconUrl]="summaryToPreview.thumbnail_icon_url"
-                                      [thumbnailBgColor]="summaryToPreview.thumbnail_bg_color"
+      <oppia-exploration-summary-tile *ngIf="explorationCardIsShown"
+                                      [getCollectionId]="collectionId"
+                                      [getExplorationId]="currentExplorationId"
+                                      [getExplorationTitle]="summaryToPreview.title"
+                                      [getLastUpdatedMsec]="summaryToPreview.last_updated_msec"
+                                      [getObjective]="summaryToPreview.objective"
+                                      [getCategory]="summaryToPreview.category"
+                                      [getRatings]="summaryToPreview.ratings"
+                                      [getNumViews]="summaryToPreview.num_views"
+                                      [getThumbnailIconUrl]="summaryToPreview.thumbnail_icon_url"
+                                      [getThumbnailBgColor]="summaryToPreview.thumbnail_bg_color"
                                       [isCommunityOwned]="summaryToPreview.community_owned"
                                       class="oppia-exploration-preview-summary-tile">
-      </oppia-exploration-summary-tile> -->
+      </oppia-exploration-summary-tile>
     </div>
   </div>
 </div>
-<!-- <attribution-guide></attribution-guide> -->
+<attribution-guide></attribution-guide>
 
 <style>
   @media screen and (max-width: 942px) {
