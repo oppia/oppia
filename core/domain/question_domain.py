@@ -1063,7 +1063,23 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v43_dict_to_v44_dict(cls, question_state_dict):
-        """Converts from version 43 to 44. Version 44 adds a new
+        """Converts from version 43 to version 44. Version 44 adds
+        card_is_checkpoint boolean to the state, which allows creators to
+        mark a state as a checkpoint for the learners.
+
+        Args:
+            question_state_dict: dict. A dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict['card_is_checkpoint'] = False
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v44_dict_to_v45_dict(cls, question_state_dict):
+        """Converts from version 44 to 45. Version 45 adds a new
         customization arg to NumericInput interaction which allows
         creators to set input range greater than or equal to zero.
         Args:
@@ -1083,7 +1099,6 @@ class Question(python_utils.OBJECT):
                     }
                 }
             })
-
         return question_state_dict
 
     @classmethod
