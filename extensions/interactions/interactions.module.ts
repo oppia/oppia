@@ -26,23 +26,29 @@ import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionI
 import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
 import { FractionInputInteractionModule } from './FractionInput/fraction-input-interactions.module';
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
+import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
+import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     AlgebraicExpressionInputExtensionsModule,
+    CodeReplInteractionModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule,
-    GraphInputInteractionModule
+    GraphInputInteractionModule,
+    ImageClickInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
   exports: [
     AlgebraicExpressionInputExtensionsModule,
+    CodeReplInteractionModule,
     ContinueExtensionsModule,
     FractionInputInteractionModule,
-    GraphInputInteractionModule
+    GraphInputInteractionModule,
+    ImageClickInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }
