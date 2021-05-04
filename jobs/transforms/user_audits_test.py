@@ -224,3 +224,42 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [])
+
+
+class ValidateArchivedModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
+
+    NOW = datetime.datetime.utcnow()
+    VALID_USER_ID = 'test_user'
+    SUBMITTER_ID = 'submitter_id'
+
+    def test_model_archived(self):
+        model = user_models.UserQueryModel(
+            id=self.VALID_USER_ID,
+            submitter_id=self.SUBMITTER_ID,
+            query_status=feconf.USER_QUERY_STATUS_ARCHIVED,
+            created_on=self.NOW - datetime.timedelta(days=3),
+            last_updated=self.NOW - datetime.timedelta(days=2)
+        )
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateArchivedModelsMarkedDeleted())
+        )
+        self.assert_pcoll_equal(output, [
+            audit_errors.ArchivedModelNotDeletedError(model)
+        ])
+
+    def test_model_not_archived(self):
+        model = user_models.UserQueryModel(
+            id=self.VALID_USER_ID,
+            submitter_id=self.SUBMITTER_ID,
+            query_status=feconf.USER_QUERY_STATUS_COMPLETED,
+            created_on=self.NOW - datetime.timedelta(days=3),
+            last_updated=self.NOW - datetime.timedelta(days=2)
+        )
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateArchivedModelsMarkedDeleted())
+        )
+        self.assert_pcoll_equal(output, [])

@@ -134,3 +134,26 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
         if (model.draft_change_list_last_updated and
                 model.draft_change_list_last_updated > current_time):
             yield audit_errors.DraftChangeListLastUpdatedInvalidError(model)
+
+
+@audit_decorators.AuditsExisting(user_models.UserQueryModel)
+class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
+    """DoFn to validate there are no models that are archived but not deleted."""
+
+    def process(self, input_model):
+        """Function that checks query_status is not archived.
+
+        Args:
+            input_model: user_models.ExplorationUserDataModel.
+                Entity to validate.
+
+        Yields:
+            DraftChangeListLastUpdatedNoneError. Error for models with
+            draft change list but no draft_change_list_last_updated
+
+            DraftChangeListLastUpdatedInvalidError. Error for models with
+            draft_change_list_last_updated greater than current time.
+        """
+        model = job_utils.clone_model(input_model)
+        if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
+            yield audit_errors.ArchivedModelNotDeletedError(model)
