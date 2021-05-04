@@ -150,8 +150,6 @@ export class ExplorationPlayerStateService {
     this.explorationMode = ExplorationPlayerConstants
       .EXPLORATION_MODE.EXPLORATION;
     this.currentEngineService = this.explorationEngineService;
-    console.log('HIT 1');
-    console.log(this.currentEngineService);
   }
 
   setPretestMode(): void {
@@ -304,7 +302,6 @@ export class ExplorationPlayerStateService {
   }
 
   getLanguageCode(): string {
-    console.log('HIT 2');
     return this.currentEngineService.getLanguageCode();
   }
 

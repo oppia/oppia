@@ -19,7 +19,6 @@
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { EditableExplorationBackendApiService }
   from 'domain/exploration/editable-exploration-backend-api.service';
-import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
   from 'domain/exploration/read-only-exploration-backend-api.service';
 import { PretestQuestionBackendApiService }
@@ -42,7 +41,6 @@ import { PlayerTranscriptService } from './player-transcript.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 import { StatsReportingService } from './stats-reporting.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
 describe('Exploration Player State Service', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let playerTranscriptService: PlayerTranscriptService;
@@ -61,7 +59,7 @@ describe('Exploration Player State Service', () => {
   let questionBackendApiService: QuestionBackendApiService;
   let pretestQuestionBackendApiService:
     PretestQuestionBackendApiService;
-  let exploration: Exploration;
+  let urlService: UrlService;
 
   let returnDict = {
     can_edit: true,
@@ -152,7 +150,6 @@ describe('Exploration Player State Service', () => {
         ExplorationPlayerStateService,
         PlayerTranscriptService,
         StatsReportingService,
-        Exploration,
         {
           provide: ContextService,
           useClass: MockContextService
@@ -219,8 +216,8 @@ describe('Exploration Player State Service', () => {
     pretestQuestionBackendApiService = (
       pretestQuestionBackendApiService as unknown) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
-    exploration = TestBed.inject(Exploration);
-    exploration = (exploration as unknown) as jasmine.SpyObj<Exploration>;
+    urlService = (TestBed.inject(UrlService) as unknown) as
+      jasmine.SpyObj<UrlService>;
   });
 
   it('should properly initialize player', () => {
@@ -386,11 +383,16 @@ describe('Exploration Player State Service', () => {
       .and.returnValue(Promise.resolve([questionBackendDict]));
     spyOn(explorationFeaturesService, 'init');
     spyOn(explorationPlayerStateService, 'initializePretestServices');
+    spyOn(explorationPlayerStateService, 'setPretestMode');
+    spyOn(explorationPlayerStateService, 'initializeExplorationServices');
 
     let successCallback = () => {};
     explorationPlayerStateService.initExplorationPlayer(successCallback);
     tick();
     expect(explorationFeaturesService.init).toHaveBeenCalled();
+    expect(explorationPlayerStateService.setPretestMode).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeExplorationServices)
+      .toHaveBeenCalled();
     expect(explorationPlayerStateService.initializePretestServices)
       .toHaveBeenCalled();
   }));
@@ -412,6 +414,33 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService.initExplorationPlayer(successCallback);
     tick();
     expect(explorationPlayerStateService.setExplorationMode).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeExplorationServices)
+      .toHaveBeenCalled();
+  }));
+
+  it('should init exploration player with story chapter mode', fakeAsync(() => {
+    let explorationFeatures: ExplorationFeatures = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
+    };
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      story_url_fragment: 'fragment',
+      node_id: 'id'
+    });
+    spyOn(
+      explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
+      .and.returnValue(Promise.resolve(explorationFeatures));
+    spyOn(pretestQuestionBackendApiService, 'fetchPretestQuestionsAsync')
+      .and.returnValue(Promise.resolve([]));
+    spyOn(explorationFeaturesService, 'init');
+    spyOn(explorationPlayerStateService, 'setStoryChapterMode');
+    spyOn(explorationPlayerStateService, 'initializeExplorationServices');
+
+    let successCallback = () => {};
+    explorationPlayerStateService.initExplorationPlayer(successCallback);
+    tick();
+    expect(explorationPlayerStateService.setStoryChapterMode)
+      .toHaveBeenCalled();
     expect(explorationPlayerStateService.initializeExplorationServices)
       .toHaveBeenCalled();
   }));
@@ -456,16 +485,33 @@ describe('Exploration Player State Service', () => {
 
   it('should move to exploration', () => {
     spyOn(explorationEngineService, 'moveToExploration');
+    spyOn(explorationPlayerStateService, 'setStoryChapterMode');
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      story_url_fragment: 'fragment',
+      node_id: 'id'
+    });
     let callback = () => {};
     explorationPlayerStateService.moveToExploration(callback);
+
+    expect(explorationPlayerStateService.setStoryChapterMode)
+      .toHaveBeenCalled();
     expect(explorationEngineService.moveToExploration).toHaveBeenCalled();
   });
 
-  fit('should get language code', () => {
-    exploration.languageCode = 'language_code';
+  it('should move to exploration with chapter mode', () => {
+    spyOn(explorationEngineService, 'moveToExploration');
+    let callback = () => {};
+    explorationPlayerStateService.moveToExploration(callback);
+    expect(explorationEngineService.moveToExploration).toHaveBeenCalled();
+  })
+
+  it('should get language code', () => {
+    let languageCode: string = 'test_lang_code';
+    spyOn(explorationEngineService, 'getLanguageCode')
+      .and.returnValue(languageCode);
     explorationPlayerStateService.setExplorationMode();
-    expect(explorationPlayerStateService.getLanguageCode()).toEqual(
-      exploration.languageCode);
+    expect(explorationPlayerStateService.getLanguageCode())
+      .toEqual(languageCode);
   });
 
   it('should record new card added', () => {
