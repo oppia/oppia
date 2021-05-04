@@ -86,18 +86,38 @@ export class ExplorationPlayerStateService {
     private statsReportingService: StatsReportingService,
     private urlService: UrlService
   ) {
-    this.editorPreviewMode = this.contextService.isInExplorationEditorPage();
-    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
-    this.explorationId = this.contextService.getExplorationId();
-    this.version = urlService.getExplorationVersionFromUrl();
+    let pathnameArray = this.urlService.getPathname().split('/');
+    let explorationContext = false;
 
-    if (!this.questionPlayerMode &&
-    !('skill_editor' === this.urlService.getPathname()
-      .split('/')[1].replace(/"/g, "'"))) {
-      this.readOnlyExplorationBackendApiService.loadExploration(
-        this.explorationId, this.version).then((exploration) => {
-        this.version = exploration.version;
-      });
+    for (let i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'explore' ||
+            pathnameArray[i] === 'create' ||
+            pathnameArray[i] === 'skill_editor' ||
+            pathnameArray[i] === 'embed') {
+        explorationContext = true;
+        break;
+      }
+    }
+
+    if (explorationContext) {
+      this.editorPreviewMode = this.contextService.isInExplorationEditorPage();
+      this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+      this.explorationId = this.contextService.getExplorationId();
+      this.version = urlService.getExplorationVersionFromUrl();
+
+      if (!this.questionPlayerMode &&
+      !('skill_editor' === this.urlService.getPathname()
+        .split('/')[1].replace(/"/g, "'"))) {
+        this.readOnlyExplorationBackendApiService.loadExploration(
+          this.explorationId, this.version).then((exploration) => {
+          this.version = exploration.version;
+        });
+      }
+    } else {
+      this.explorationId = 'test_id';
+      this.version = 1;
+      this.editorPreviewMode = false;
+      this.questionPlayerMode = false;
     }
 
     this.storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
