@@ -1077,46 +1077,6 @@ class TestBase(unittest.TestCase):
             setattr(obj, attr, original)
 
     @contextlib.contextmanager
-    def swap_conditionally(
-            self, obj, attr, returns=None, condition=None,
-            use_call_counter=False):
-        """Swap the obj.attr function to return a value when a condition is met.
-
-        When the condition is not met, then the original function will be called
-        instead.
-
-        This function can be used when the target being swapped is used by
-        unrelated code. For example, os.path.exists() is used extensively by
-        psutil to manage processes. If we swap it to always return True or
-        False, then the process management will result in bugs or exceptions.
-
-        Args:
-            obj: *. The object whose attribute will be swapped.
-            attr: str. The attribute of the object to swap.
-            returns: *. The value returned when the condition is met.
-            condition: callable|None. A function which returns True or False
-                depending on the arguments passed to the original function.
-                When None, the original function is always used.
-            use_call_counter: bool. Whether the function swap should be an
-                instance of CallCounter.
-
-        Yields:
-            callable. The function object which has been swapped in.
-        """
-        original = getattr(obj, attr)
-        def function_that_conditionally_returns(*args, **kwargs):
-            """Returns a constant value only when the condition is met."""
-            if condition and condition(*args, **kwargs):
-                return returns
-            else:
-                return original(*args, **kwargs)
-        if use_call_counter:
-            function_that_conditionally_returns = CallCounter(
-                function_that_conditionally_returns)
-        with self.swap(obj, attr, function_that_conditionally_returns):
-            yield function_that_conditionally_returns
-
-    @contextlib.contextmanager
     def swap_to_always_return(self, obj, attr, value=None):
         """Swap obj.attr with a function that always returns the given value."""
         def function_that_always_returns(*unused_args, **unused_kwargs):
