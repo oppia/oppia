@@ -81,7 +81,7 @@ export class AboutPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userIsLoggedIn = false;
+    //this.userIsLoggedIn = false;
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT

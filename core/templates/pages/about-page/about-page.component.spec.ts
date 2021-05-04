@@ -221,7 +221,7 @@ describe('About Page', () => {
       siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
     component.onClickVisitClassroomButton();
-    component.windowRef.nativeWindow.location.href = '/learn/math';
+    //component.windowRef.nativeWindow.location.href = '/learn/math';
 
     expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalledWith();
@@ -235,7 +235,7 @@ describe('About Page', () => {
       .and.callThrough();
 
     component.onClickBrowseLibraryButton();
-    component.windowRef.nativeWindow.location.href = '/community-library';
+    //component.windowRef.nativeWindow.location.href = '/community-library';
 
     expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalledWith();
@@ -249,8 +249,8 @@ describe('About Page', () => {
       .and.callThrough();
 
     component.onClickCreateLessonButton();
-    component.windowRef.nativeWindow.location.href =
-    '/creator-dashboard?mode=create';
+    //component.windowRef.nativeWindow.location.href =
+    //'/creator-dashboard?mode=create';
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
