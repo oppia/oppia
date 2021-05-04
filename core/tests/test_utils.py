@@ -1194,19 +1194,17 @@ class TestBase(unittest.TestCase):
             # Includes assertion error information in addition to the message.
             self.longMessage = True
 
-            next_expected_args = python_utils.NEXT(expected_args_iter, None)
-            if next_expected_args is not None:
+            if expected_args:
+                next_args = python_utils.NEXT(expected_args_iter, None)
                 self.assertEqual(
-                    args, next_expected_args,
-                    msg='%s during call #%d' % (
-                        msg, new_function_with_checks.call_num))
+                    args, next_args, msg='*args to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
 
-            next_expected_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
-            if next_expected_kwargs is not None:
+            if expected_kwargs:
+                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
                 self.assertEqual(
-                    kwargs, next_expected_kwargs,
-                    msg='%s during call #%d' % (
-                        msg, new_function_with_checks.call_num))
+                    kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
 
             # Reset self.longMessage just in case `new_function()` raises.
             self.longMessage = original_long_message_value
@@ -1223,8 +1221,29 @@ class TestBase(unittest.TestCase):
 
             self.assertEqual(
                 new_function_with_checks.call_num > 0, called, msg=msg)
-            self.assertEqual(list(expected_args_iter), [], msg=msg)
-            self.assertEqual(list(expected_kwargs_iter), [], msg=msg)
+            pretty_unused_args = [
+                ', '.join(itertools.chain(
+                    (repr(a) for a in args),
+                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
+                for args, kwargs in itertools.izip_longest( # pylint: disable=deprecated-itertools-function
+                    expected_args_iter, expected_kwargs_iter, fillvalue={})
+            ]
+            if pretty_unused_args:
+                num_expected_calls = (
+                    new_function_with_checks.call_num + len(pretty_unused_args))
+                missing_call_summary = '\n'.join(
+                    '\tCall %d of %d: %s(%s)' % (
+                        i, num_expected_calls, attr, call_args)
+                    for i, call_args in enumerate(
+                        pretty_unused_args,
+                        start=new_function_with_checks.call_num + 1))
+                self.fail(
+                    msg='Only %d of the %d expected calls were made.\n'
+                    '\n'
+                    'Missing:\n'
+                    '%s : %s' % (
+                        new_function_with_checks.call_num, num_expected_calls,
+                        missing_call_summary, msg))
         finally:
             self.longMessage = original_long_message_value
             setattr(obj, attr, original_function)
