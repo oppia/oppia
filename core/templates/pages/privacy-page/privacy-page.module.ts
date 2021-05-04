@@ -29,7 +29,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { PrivacyPageComponent } from './privacy-page.component';
 
-
 @NgModule({
   imports: [
     BrowserModule,
