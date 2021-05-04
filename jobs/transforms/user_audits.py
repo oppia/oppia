@@ -150,11 +150,8 @@ class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
                 Entity to validate.
 
         Yields:
-            DraftChangeListLastUpdatedNoneError. Error for models with
-            draft change list but no draft_change_list_last_updated
-
-            DraftChangeListLastUpdatedInvalidError. Error for models with
-            draft_change_list_last_updated greater than current time.
+            ArchivedModelNotDeletedError. Error for models with query_status
+            as Archived but not deleted.
         """
         model = job_utils.clone_model(input_model)
         if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
