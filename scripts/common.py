@@ -661,10 +661,8 @@ def wait_for_port_to_be_in_use(port_number):
             port_number)
         python_utils.PRINT(
             'This may be because you do not have enough available '
-            'memory. Try quitting applications. We also recommend '
-            'using a machine with at least 8 GB RAM. For more '
-            'information, see '
-            'https://github.com/oppia/oppia/wiki/Troubleshooting')
+            'memory. Please refer to '
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
         sys.exit(1)
 
 
