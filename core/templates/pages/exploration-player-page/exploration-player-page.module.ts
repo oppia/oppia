@@ -36,6 +36,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { CorrectnessFooterComponent } from './layout-directives/correctness-footer.component';
+import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 
 @NgModule({
   imports: [
@@ -49,13 +50,15 @@ import { CorrectnessFooterComponent } from './layout-directives/correctness-foot
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    CorrectnessFooterComponent
+    CorrectnessFooterComponent,
+    LearnerAnswerInfoCard,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    CorrectnessFooterComponent
+    CorrectnessFooterComponent,
+    LearnerAnswerInfoCard,
   ],
   providers: [
     {
