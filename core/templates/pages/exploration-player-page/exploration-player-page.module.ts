@@ -39,7 +39,7 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
-import { MaterialModule } from 'components/material.module';
+import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 
 @NgModule({
   imports: [
@@ -57,7 +57,8 @@ import { MaterialModule } from 'components/material.module';
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -66,7 +67,8 @@ import { MaterialModule } from 'components/material.module';
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
-    FeedbackPopupComponent
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard
   ],
   providers: [
     {
