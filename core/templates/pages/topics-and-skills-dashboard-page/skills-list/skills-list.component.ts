@@ -249,7 +249,7 @@ export class SkillsListComponent {
         // that the merged skills are not shown anymore.
         setTimeout(() => {
           this.topicsAndSkillsDashboardBackendApiService.
-            onTopicsAndSkillsDashboardReinitialized.emit();
+            onTopicsAndSkillsDashboardReinitialized.emit(true);
           let successToast: string = 'Merged Skills.';
           this.alertsService.addSuccessMessage(successToast, 1000);
         }, 100);

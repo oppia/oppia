@@ -24,11 +24,13 @@ import { AppConstants } from 'app.constants';
 import { IdGenerationService } from 'services/id-generation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Focus Manager Service', () => {
   let focusManagerService: FocusManagerService;
   let deviceInfoService: DeviceInfoService;
   let idGenerationService: IdGenerationService;
+  let windowRef: WindowRef = new WindowRef;
 
   const clearLabel = AppConstants.LABEL_FOR_CLEARING_FOCUS;
   const focusLabel = 'FocusLabel';
@@ -41,6 +43,7 @@ describe('Focus Manager Service', () => {
     focusManagerService = TestBed.get(FocusManagerService);
     deviceInfoService = TestBed.get(DeviceInfoService);
     idGenerationService = TestBed.get(IdGenerationService);
+    windowRef = TestBed.get(WindowRef);
 
     focusOnSpy = jasmine.createSpy('focusOn');
     testSubscriptions = new Subscription();
@@ -78,5 +81,14 @@ describe('Focus Manager Service', () => {
       flush();
       expect(focusOnSpy).toHaveBeenCalledWith(focusLabel);
     }
+  }));
+
+  it('should set focus without scrolling', fakeAsync(() => {
+    spyOn(focusManagerService, 'setFocus');
+    spyOn(windowRef.nativeWindow, 'scrollTo');
+    focusManagerService.setFocusWithoutScroll(focusLabel);
+    flush();
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(focusLabel);
+    expect(windowRef.nativeWindow.scrollTo).toHaveBeenCalledWith(0, 0);
   }));
 });
