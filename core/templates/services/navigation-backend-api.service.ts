@@ -26,9 +26,10 @@ import { Title } from '@angular/platform-browser';
 interface UnseenNotifications {
   'num_unseen_notifications': number
 }
- @Injectable({
-   providedIn: 'root'
- })
+
+@Injectable({
+  providedIn: 'root'
+})
 export class NavigationBackendApiService {
   constructor(
       private http: HttpClient,

@@ -17,7 +17,7 @@
 float
   <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block"
      href="/"
-     focus-on="::LABEL_FOR_CLEARING_FOCUS"
+     [oppiaFocusOn]="labelForClearingFocus"
      [ngClass]="windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'">
     <picture>
       <source type="image/webp"
@@ -32,7 +32,7 @@ float
   </a>
 </div>
 <div class="nav-mobile-header-text-container"
-     *ngIf="headerText?.length">
+     *ngIf="headerText.length">
   <span class="nav-mobile-header-editor">
     {{ headerText }}
   </span>
@@ -40,8 +40,8 @@ float
     {{ subheaderText }}
   </span>
 </div>
-<div  class="float-right navbar-header"
-      *ngIf="userMenuIsShown">
+<div class="float-right navbar-header"
+     *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"
       *ngIf="standardNavIsShown">
     <li>
@@ -57,15 +57,15 @@ float
             [ngClass]="{'open' : activeMenuName === 'classroomMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
-            aria-hidden="false"
+            attr.aria-hidden="false"
             class="nav-item  dropdown oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle"
              role="menuitem"
-             aria-haspopup="true"
-             aria-expanded="false"
-             aria-hidden="false"
+             attr.aria-haspopup="true"
+             attr.aria-expanded="false"
+             attr.aria-hidden="false"
              data-toggle="dropdown"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'classroomMenu')"
@@ -106,8 +106,8 @@ float
           <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              ngbDropdownToggle
              class="nav-link oppia-navbar-tab dropdown-toggle"
-             aria-haspopup="true"
-             aria-expanded="false"
+             attr.aria-haspopup="true"
+             attr.aria-expanded="false"
              tabindex="0"
              data-toggle="dropdown"
              (mouseover)="openSubmenu($event, 'aboutMenu')"
@@ -153,8 +153,8 @@ float
             class="nav-item dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle"
-             aria-haspopup="true"
-             aria-expanded="false"
+             attr.aria-haspopup="true"
+             attr.aria-expanded="false"
              data-toggle="dropdown"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
@@ -208,9 +208,9 @@ float
         class="nav-item dropdown protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
       <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
          class="nav-link oppia-navbar-dropdown-toggle"
-         aria-haspopup="true"
-         aria-expanded="false"
-         aria-label="User Menu"
+         attr.aria-haspopup="true"
+         attr.aria-expanded="false"
+         attr.aria-label="User Menu"
          tabindex="0"
          (mouseover)="openSubmenu($event, 'profileMenu')"
          (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -363,8 +363,7 @@ float
       <ul ngbDropdownMenu
           class="dropdown-menu oppia-navbar-dropdown oppia-navbar-dropdown-menu">
         <li class="nav-item">
-          <a href=""
-             (click)="onLoginButtonClicked()"
+          <a (click)="onLoginButtonClicked()"
              class="nav-link oppia-nav-link">
             <div class="oppia-signin-google">
               <div class="oppia-signin-g-icon">
