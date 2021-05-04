@@ -188,7 +188,6 @@ describe('Audio translation language service', () => {
   it('should get correct speech synthesis language code',
     () => {
       expect(atls.getSpeechSynthesisLanguageCode()).toBe(null);
-
       allAudioLanguageCodesInExploration = [];
       let explorationLanguageCode = 'en';
       const preferredLanguageCode = null;
