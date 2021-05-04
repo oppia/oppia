@@ -352,40 +352,6 @@ class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
             'Commit type invalid-type is not allowed')
 
 
-class ModelExpiringErrorTests(AuditErrorsTestBase):
-
-    def test_message(self):
-        model = user_models.UserQueryModel(
-            id='test',
-            submitter_id='submitter',
-            created_on=self.YEAR_AGO,
-            last_updated=self.YEAR_AGO
-        )
-        error = audit_errors.ModelExpiringError(model)
-
-        self.assertEqual(
-            error.message,
-            'ModelExpiringError in UserQueryModel(id=\'test\'): mark model '
-            'as deleted when older than %s days' % (
-                feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
-
-
-class ModelIncorrectKeyErrorTests(AuditErrorsTestBase):
-
-    def test_message(self):
-        model = user_models.PendingDeletionRequestModel(
-            id='test'
-        )
-        incorrect_keys = ['incorrect key']
-        error = audit_errors.ModelIncorrectKeyError(model, incorrect_keys)
-
-        self.assertEqual(
-            error.message,
-            'ModelIncorrectKeyError in PendingDeletionRequestModel'
-            '(id=\'test\'): contains keys %s are not allowed' %
-            incorrect_keys)
-
-
 class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
@@ -421,56 +387,3 @@ class ModelCanonicalNameMismatchErrorTests(AuditErrorsTestBase):
             'Entity name %s in lowercase does not match canonical name %s' %
             (model.name, model.canonical_name))
 
-
-class DraftChangeListLastUpdatedNoneErrorTests(AuditErrorsTestBase):
-
-    def test_message(self):
-        draft_change_list = [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }]
-        model = user_models.ExplorationUserDataModel(
-            id='123',
-            user_id='test',
-            exploration_id='exploration_id',
-            draft_change_list=draft_change_list,
-            draft_change_list_last_updated=None,
-            created_on=self.YEAR_AGO,
-            last_updated=self.YEAR_AGO
-        )
-        error = audit_errors.DraftChangeListLastUpdatedNoneError(model)
-
-        self.assertEqual(
-            error.message,
-            'DraftChangeListLastUpdatedNoneError in ExplorationUserDataModel'
-            '(id=\'123\'): draft change list %s exists but draft change list '
-            'last updated is None' % draft_change_list)
-
-
-class DraftChangeListLastUpdatedInvalidErrorTests(AuditErrorsTestBase):
-
-    def test_message(self):
-        draft_change_list = [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }]
-        last_updated = self.NOW + datetime.timedelta(days=5)
-        model = user_models.ExplorationUserDataModel(
-            id='123',
-            user_id='test',
-            exploration_id='exploration_id',
-            draft_change_list=draft_change_list,
-            draft_change_list_last_updated=last_updated,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW
-        )
-        error = audit_errors.DraftChangeListLastUpdatedInvalidError(model)
-
-        self.assertEqual(
-            error.message,
-            'DraftChangeListLastUpdatedInvalidError in '
-            'ExplorationUserDataModel(id=\'123\'): draft change list last '
-            'updated %s is greater than the time when job was run' %
-            last_updated)

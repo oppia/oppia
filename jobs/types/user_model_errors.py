@@ -115,42 +115,21 @@ class BaseAuditError(python_utils.OBJECT):
         return hash((self.__class__, self.message))
 
 
-class InconsistentTimestampsError(BaseAuditError):
-    """Error class for models with inconsistent timestamps."""
+class ModelIncorrectKeyError(BaseAuditError):
+    """Error class for incorrect key in PendingDeletionRequestModel."""
+
+    def __init__(self, model, incorrect_keys):
+        super(ModelIncorrectKeyError, self).__init__(model)
+        self.message = 'contains keys %s are not allowed' % (incorrect_keys)
+
+
+class ModelExpiringError(BaseAuditError):
+    """Error class for models that are expiring."""
 
     def __init__(self, model):
-        super(InconsistentTimestampsError, self).__init__(model)
-        self.message = 'created_on=%r is later than last_updated=%r' % (
-            model.created_on, model.last_updated)
-
-
-class InvalidCommitStatusError(BaseAuditError):
-    """Error class for commit models with inconsistent status values."""
-
-    def __init__(self, model):
-        super(InvalidCommitStatusError, self).__init__(model)
-        self.message = (
-            'post_commit_status is %s' % model.post_commit_status)
-
-
-class InvalidPrivateCommitStatusError(BaseAuditError):
-    """Error class for commit models with inconsistent private status values."""
-
-    def __init__(self, model):
-        super(InvalidPrivateCommitStatusError, self).__init__(model)
-        self.message = (
-            'post_commit_status="%s" but post_commit_is_private=%r' % (
-                model.post_commit_status, model.post_commit_is_private))
-
-
-class ModelMutatedDuringJobError(BaseAuditError):
-    """Error class for models mutated during a job."""
-
-    def __init__(self, model):
-        super(ModelMutatedDuringJobError, self).__init__(model)
-        self.message = (
-            'last_updated=%r is later than the audit job\'s start time' % (
-                model.last_updated))
+        super(ModelExpiringError, self).__init__(model)
+        self.message = 'mark model as deleted when older than %s days' % (
+            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
 
 
 class ModelIdRegexError(BaseAuditError):
@@ -161,65 +140,25 @@ class ModelIdRegexError(BaseAuditError):
         self.message = 'id does not match the expected regex=%r' % regex_string
 
 
-class ModelDomainObjectValidateError(BaseAuditError):
-    """Error class for domain object validation errors."""
-
-    def __init__(self, model, error_message):
-        super(ModelDomainObjectValidateError, self).__init__(model)
-        self.message = (
-            'Entity fails domain validation with the '
-            'error: %s' % error_message)
-
-
-class ModelExpiredError(BaseAuditError):
-    """Error class for expired models."""
+class DraftChangeListLastUpdatedNoneError(BaseAuditError):
+    """Error class for models with draft change list but draft change list
+    last_updated is None.
+    """
 
     def __init__(self, model):
-        super(ModelExpiredError, self).__init__(model)
-        self.message = 'deleted=True when older than %s days' % (
-            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+        super(DraftChangeListLastUpdatedNoneError, self).__init__(model)
+        self.message = (
+            'draft change list %s exists but draft change list '
+            'last updated is None' % model.draft_change_list)
 
 
-class InvalidCommitTypeError(BaseAuditError):
-    """Error class for commit_type validation errors."""
+class DraftChangeListLastUpdatedInvalidError(BaseAuditError):
+    """Error class for models with invalid draft change list last_updated."""
 
     def __init__(self, model):
-        super(InvalidCommitTypeError, self).__init__(model)
+        super(DraftChangeListLastUpdatedInvalidError, self).__init__(model)
         self.message = (
-            'Commit type %s is not allowed' % model.commit_type)
+            'draft change list last updated %s is greater than the time '
+            'when job was run' % model.draft_change_list_last_updated)
 
 
-class ModelRelationshipError(BaseAuditError):
-    """Error class for models with invalid relationships."""
-
-    def __init__(self, id_property, model_id, target_kind, target_id):
-        """Initializes a new ModelRelationshipError.
-
-        Args:
-            id_property: ModelProperty. The property referring to the ID of the
-                target model.
-            model_id: bytes. The ID of the model with problematic ID property.
-            target_kind: str. The kind of model the property refers to.
-            target_id: bytes. The ID of the specific model that the property
-                refers to. NOTE: This is the value of the ID property.
-        """
-        # NOTE: IDs are converted to bytes because that's how they're read from
-        # and written to the datastore.
-        super(ModelRelationshipError, self).__init__(
-            id_property.model_kind,
-            model_id=python_utils.convert_to_bytes(model_id))
-        self.message = (
-            '%s=%r should correspond to the ID of an existing %s, '
-            'but no such model exists' % (
-                id_property, python_utils.convert_to_bytes(target_id),
-                target_kind))
-
-
-class ModelCanonicalNameMismatchError(BaseAuditError):
-    """Error class for models that have mismatching names."""
-
-    def __init__(self, model):
-        super(ModelCanonicalNameMismatchError, self).__init__(model)
-        self.message = (
-            'Entity name %s in lowercase does not match '
-            'canonical name %s' % (model.name, model.canonical_name))

@@ -26,7 +26,7 @@ import feconf
 from jobs import job_utils
 from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
-from jobs.types import audit_errors
+from jobs.types import user_model_errors
 
 import apache_beam as beam
 
@@ -78,7 +78,7 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
         ]
 
         if incorrect_keys:
-            yield audit_errors.ModelIncorrectKeyError(model, incorrect_keys)
+            yield user_model_errors.ModelIncorrectKeyError(model, incorrect_keys)
 
 
 @audit_decorators.AuditsExisting(user_models.UserQueryModel)
@@ -99,7 +99,7 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
             datetime.datetime.utcnow() -
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
         if expiration_date > model.last_updated:
-            yield audit_errors.ModelExpiringError(model)
+            yield user_model_errors.ModelExpiringError(model)
 
 
 @audit_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
@@ -129,8 +129,8 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
         model = job_utils.clone_model(input_model)
         if (model.draft_change_list and
                 not model.draft_change_list_last_updated):
-            yield audit_errors.DraftChangeListLastUpdatedNoneError(model)
+            yield user_model_errors.DraftChangeListLastUpdatedNoneError(model)
         current_time = datetime.datetime.utcnow()
         if (model.draft_change_list_last_updated and
                 model.draft_change_list_last_updated > current_time):
-            yield audit_errors.DraftChangeListLastUpdatedInvalidError(model)
+            yield user_model_errors.DraftChangeListLastUpdatedInvalidError(model)

@@ -25,7 +25,7 @@ from core.platform import models
 import feconf
 from jobs import job_test_utils
 from jobs.transforms import user_audits
-from jobs.types import audit_errors
+from jobs.types import user_model_errors
 
 import apache_beam as beam
 
@@ -48,7 +48,7 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelIdRegexError(
+            user_model_errors.ModelIdRegexError(
                 model_with_invalid_id, feconf.USER_ID_REGEX),
         ])
 
@@ -95,7 +95,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelIncorrectKeyError(
+            user_model_errors.ModelIncorrectKeyError(
                 test_model, [self.INCORRECT_KEY])
         ])
 
@@ -139,7 +139,7 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelExpiringError(model)
+            user_model_errors.ModelExpiringError(model)
         ])
 
     def test_model_not_marked_as_deleted_recently(self):
@@ -184,7 +184,7 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [
-            audit_errors.DraftChangeListLastUpdatedNoneError(model)
+            user_model_errors.DraftChangeListLastUpdatedNoneError(model)
         ])
 
     def test_model_with_draft_change_list_last_updated_greater_than_now(self):
@@ -204,7 +204,7 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [
-            audit_errors.DraftChangeListLastUpdatedInvalidError(model)
+            user_model_errors.DraftChangeListLastUpdatedInvalidError(model)
         ])
 
     def test_model_with_valid_draft_change_list_last_updated(self):
