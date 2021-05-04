@@ -24,7 +24,7 @@ import datetime
 from core.platform import models
 import feconf
 from jobs import job_utils
-from jobs.decorators import audit_decorators
+from jobs.decorators import user_model_audit_decorators
 from jobs.transforms import base_model_audits
 from jobs.types import user_model_errors
 
@@ -34,7 +34,7 @@ import apache_beam as beam
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-@audit_decorators.AuditsExisting(
+@user_model_audit_decorators.AuditsExisting(
     auth_models.UserAuthDetailsModel,
     user_models.UserEmailPreferencesModel,
     user_models.UserSettingsModel,
@@ -52,7 +52,7 @@ class ValidateModelWithUserId(base_model_audits.ValidateBaseModelId):
         self._pattern = feconf.USER_ID_REGEX
 
 
-@audit_decorators.AuditsExisting(user_models.PendingDeletionRequestModel)
+@user_model_audit_decorators.AuditsExisting(user_models.PendingDeletionRequestModel)
 class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
     """DoFn to check for Validates that pseudonymizable_entity_mappings."""
 
@@ -82,7 +82,7 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
                 model, incorrect_keys)
 
 
-@audit_decorators.AuditsExisting(user_models.UserQueryModel)
+@user_model_audit_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateOldModelsMarkedDeleted(beam.DoFn):
     """DoFn to validate old models and mark them for deletion"""
 
@@ -103,13 +103,13 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
             yield user_model_errors.ModelExpiringError(model)
 
 
-@audit_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
+@user_model_audit_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
 def user_email_preferences_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [user_models.UserSettingsModel]
 
 
-@audit_decorators.AuditsExisting(user_models.ExplorationUserDataModel)
+@user_model_audit_decorators.AuditsExisting(user_models.ExplorationUserDataModel)
 class ValidateDraftChangeListLastUpdated(beam.DoFn):
     """DoFn to validate the last_update of draft change list"""
 
