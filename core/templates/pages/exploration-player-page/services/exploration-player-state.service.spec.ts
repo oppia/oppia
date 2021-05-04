@@ -503,7 +503,7 @@ describe('Exploration Player State Service', () => {
     let callback = () => {};
     explorationPlayerStateService.moveToExploration(callback);
     expect(explorationEngineService.moveToExploration).toHaveBeenCalled();
-  })
+  });
 
   it('should get language code', () => {
     let languageCode: string = 'test_lang_code';
