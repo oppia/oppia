@@ -37,6 +37,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { ContinueButtonComponent } from './learner-experience/continue-button.component';
 import { MatButtonModule } from '@angular/material/button';
+import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 
 @NgModule({
   imports: [
@@ -51,13 +52,15 @@ import { MatButtonModule } from '@angular/material/button';
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    ContinueButtonComponent
+    ContinueButtonComponent,
+    LearnerAnswerInfoCard,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    ContinueButtonComponent
+    ContinueButtonComponent,
+    LearnerAnswerInfoCard,
   ],
   providers: [
     {
