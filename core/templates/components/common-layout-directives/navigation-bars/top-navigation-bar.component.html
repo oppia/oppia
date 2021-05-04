@@ -57,16 +57,15 @@ float
             [ngClass]="{'open' : activeMenuName === 'classroomMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM"
-            attr.aria-hidden="false"
+            aria-hidden="false"
             class="nav-item  dropdown oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'classroomMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle"
              role="menuitem"
-             attr.aria-haspopup="true"
-             attr.aria-expanded="false"
-             attr.aria-hidden="false"
-             data-toggle="dropdown"
+             aria-haspopup="true"
+             aria-expanded="false"
+             aria-hidden="false"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'classroomMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -106,10 +105,9 @@ float
           <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              ngbDropdownToggle
              class="nav-link oppia-navbar-tab dropdown-toggle"
-             attr.aria-haspopup="true"
-             attr.aria-expanded="false"
+             aria-haspopup="true"
+             aria-expanded="false"
              tabindex="0"
-             data-toggle="dropdown"
              (mouseover)="openSubmenu($event, 'aboutMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
              autofocus>
@@ -150,12 +148,11 @@ float
         <li [ngClass]="{'open': activeMenuName === 'getInvolvedMenu'}"
             ngDropdown
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
-            class="nav-item dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+            class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle"
-             attr.aria-haspopup="true"
-             attr.aria-expanded="false"
-             data-toggle="dropdown"
+             aria-haspopup="true"
+             aria-expanded="false"
              tabindex="0"
              (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
              (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -205,19 +202,17 @@ float
     <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         *ngIf="userIsLoggedIn"
-        class="nav-item dropdown protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
-      <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
+        class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
+      <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
          class="nav-link oppia-navbar-dropdown-toggle"
-         attr.aria-haspopup="true"
-         attr.aria-expanded="false"
-         attr.aria-label="User Menu"
+         aria-haspopup="true"
+         aria-expanded="false"
+         aria-label="User Menu"
          tabindex="0"
          (mouseover)="openSubmenu($event, 'profileMenu')"
          (mouseleave)="closeSubmenuIfNotMobile($event)"
          autofocus>
-        <div ngbDropdownToggle
-             data-toggle="dropdown"
-             class="oppia-navbar-profile-picture-container dropdown-toggle">
+        <div class="oppia-navbar-profile-picture-container dropdown-toggle">
           <span *ngIf="profilePictureDataUrl">
             <img [src]="profilePictureDataUrl"
                  class="oppia-navbar-profile-picture rounded-circle"
@@ -355,7 +350,6 @@ float
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
-                data-toggle="dropdown"
                 (click)="onLoginButtonClicked()">
           <span [innerHTML]="'I18N_TOPNAV_SIGN_IN' | translate"></span>
         </button>

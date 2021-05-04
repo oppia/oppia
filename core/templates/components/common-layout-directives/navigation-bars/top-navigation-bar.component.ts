@@ -37,10 +37,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NavigationBackendApiService } from 'services/navigation-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-interface EventType {
-  keyCode?: number,
-  shiftKey?: boolean,
-  currentTarget?: string
+interface EventToCodes {
+  enter?,
+  tab?,
+  shiftTab?,
 }
 
 @Component({
@@ -248,7 +248,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (aboutMenu,profileMenu).
    */
-  openSubmenu(evt: EventType, menuName: string): void {
+  openSubmenu(evt: KeyboardEvent, menuName: string): void {
     // Focus on the current target before opening its submenu.
     this.navigationService.openSubmenu(evt, menuName);
   }
@@ -261,11 +261,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     $('nav a').blur();
   }
 
-  closeSubmenu(evt: EventType): void {
+  closeSubmenu(evt: KeyboardEvent): void {
     this.navigationService.closeSubmenu(evt);
   }
 
-  closeSubmenuIfNotMobile(evt: EventType): void {
+  closeSubmenuIfNotMobile(evt: KeyboardEvent): void {
     if (this.deviceInfoService.isMobileDevice()) {
       return;
     }
@@ -283,8 +283,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    * @example
    *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
    */
-  onMenuKeypress(evt: EventType, menuName: string, eventsTobeHandled: {
-      [key: string]: string; }): void {
+  onMenuKeypress(
+      evt: KeyboardEvent, menuName: string,
+      eventsTobeHandled: EventToCodes): void {
     this.navigationService.onMenuKeypress(
       evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;

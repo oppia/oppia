@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 interface EventType {
   keyCode?: number,
   shiftKey?: boolean,
-  currentTarget?: string
+  currentTarget?
 }
 
 interface EventToCodes {
@@ -81,7 +81,7 @@ export class NavigationService {
      *  onMenuKeypress($event, 'category', {enter: 'open'})
      */
     onMenuKeypress(
-        evt: EventType,
+        evt: KeyboardEvent,
         menuName: string,
         eventsTobeHandled: EventToCodes): void {
       let targetEvents = Object.keys(eventsTobeHandled);
