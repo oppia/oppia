@@ -47,7 +47,6 @@ import { MaterialModule } from 'components/material.module';
     HttpClientModule,
     InteractionExtensionsModule,
     NgbModalModule,
-    MaterialModule,
     SharedComponentsModule,
     NgbPopoverModule
   ],
