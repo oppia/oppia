@@ -410,6 +410,8 @@ var MultiSelectEditor = function(elem) {
           '.protractor-test-search-bar-dropdown-menu span', texts[i]));
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
+        await waitFor.visibilityOf(
+          filteredElement, `${filteredElement} is taking too long to appear`);
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         await action.click('Filtered Element', filteredElement);
@@ -536,6 +538,9 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   var justPassedRteComponent = false;
 
   var _readFormattedText = async function(text, tagName) {
+    await waitFor.visibilityOf(
+      await arrayOfElems.get(
+        arrayPointer), `element at ${arrayPointer} is not visible`);
     expect(
       await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
@@ -568,6 +573,8 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     // passed on to the relevant RTE component editor.
     readRteComponent: async function(componentName) {
       var elem = await arrayOfElems.get(arrayPointer);
+      await waitFor.visibilityOf(
+        elem, `${elem} is taking too long to appear`);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
       // Need to convert arguments to an actual array; we tell the component
@@ -660,6 +667,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await browser.executeScript(
         '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
         '().scrollTop(' + String(scrollTo) + ');');
+      await waitFor.visibilityOf(
+        elem.element(by.css(
+          '.CodeMirror-linenumber')), 'code mirror linenumber is not visible');
       var lineHeight = await elem.element(
         by.css('.CodeMirror-linenumber')).getAttribute('clientHeight');
       var currentScrollTop = await browser.executeScript(
