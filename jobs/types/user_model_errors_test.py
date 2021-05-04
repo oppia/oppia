@@ -26,7 +26,6 @@ from core.platform import models
 from core.tests import test_utils as core_test_utils
 import feconf
 from jobs import job_utils
-from jobs.types import model_property
 from jobs.types import user_model_errors
 import python_utils
 
