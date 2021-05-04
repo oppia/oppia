@@ -13,50 +13,50 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the graph interaction components.
+ * @fileoverview Module for the CodeRepl interaction components.
  */
+
 import 'core-js/es7/reflect';
 import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { FormsModule } from '@angular/forms';
-import { GraphVizComponent } from './directives/graph-viz.component';
-import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
-import { ResponseGraphInput } from './directives/oppia-response-graph-input.component';
-import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { MaterialModule } from 'components/material.module';
+import { MatButtonModule } from '@angular/material/button';
+import { InteractiveCodeReplComponent } from './directives/oppia-interactive-code-repl.component';
 import { DirectivesModule } from 'directives/directives.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { ResponseCodeReplComponent } from './directives/oppia-response-code-repl.component';
+import { ShortResponseCodeRepl } from './directives/oppia-short-response-code-repl.component';
+
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    FormsModule,
-    MaterialModule,
+    CodemirrorModule,
     DirectivesModule,
+    FormsModule,
+    MatButtonModule,
     SharedPipesModule
   ],
   declarations: [
-    InteractiveGraphInput,
-    GraphVizComponent,
-    ResponseGraphInput,
-    ShortResponseGraphInput
+    InteractiveCodeReplComponent,
+    ResponseCodeReplComponent,
+    ShortResponseCodeRepl
   ],
   entryComponents: [
-    InteractiveGraphInput,
-    GraphVizComponent,
-    ResponseGraphInput,
-    ShortResponseGraphInput
+    InteractiveCodeReplComponent,
+    ResponseCodeReplComponent,
+    ShortResponseCodeRepl
   ],
   exports: [
-    InteractiveGraphInput,
-    GraphVizComponent,
-    ResponseGraphInput,
-    ShortResponseGraphInput
+    InteractiveCodeReplComponent,
+    ResponseCodeReplComponent,
+    ShortResponseCodeRepl
   ],
 })
 
-export class GraphInputInteractionModule { }
+export class CodeReplInteractionModule { }

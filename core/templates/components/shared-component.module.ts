@@ -29,8 +29,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule } from 'filters/translate.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 
@@ -90,6 +90,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { CodeMirrorModule } from './code-mirror/codemirror.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -123,6 +124,7 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
@@ -132,7 +134,7 @@ const toastrConfig = {
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
-    TranslateModule,
+    SharedPipesModule,
     ...firebaseAuthModules,
   ],
 
@@ -225,6 +227,7 @@ const toastrConfig = {
 
   exports: [
     // Modules.
+    CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
     FormsModule,
@@ -233,7 +236,7 @@ const toastrConfig = {
     NgbModalModule,
     ObjectComponentsModule,
     SharedFormsModule,
-    TranslateModule,
+    SharedPipesModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioFileUploaderComponent,
