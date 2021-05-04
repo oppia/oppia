@@ -30,6 +30,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 10
 
+
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
 
