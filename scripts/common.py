@@ -143,7 +143,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60 * 2
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
@@ -659,6 +659,10 @@ def wait_for_port_to_be_in_use(port_number):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' %
             port_number)
+        python_utils.PRINT(
+            'This may be because you do not have enough available '
+            'memory. Please refer to '
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
         sys.exit(1)
 
 
