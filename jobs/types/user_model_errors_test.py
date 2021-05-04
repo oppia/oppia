@@ -85,7 +85,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             error.message, 'FooError in BaseModel(id=\'123\'): foo')
 
     def test_message_raises_not_implemented_error_if_not_assigned_a_value(self):
-        class ErrorWithoutMessage(audit_errors.BaseAuditError):
+        class ErrorWithoutMessage(user_model_errors.BaseAuditError):
             """Subclass that does not assign a value to self.message."""
 
             pass
@@ -98,7 +98,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             lambda: error.message)
 
     def test_message_raises_type_error_if_reassigned_a_value(self):
-        class ErrorWithUpdateMessageMethod(audit_errors.BaseAuditError):
+        class ErrorWithUpdateMessageMethod(user_model_errors.BaseAuditError):
             """Subclass that tries to reassign to self.message in a method."""
 
             def __init__(self, model):
@@ -124,7 +124,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             'message')
 
     def test_message_raises_type_error_if_assigned_a_non_string_value(self):
-        class ErrorWithIntMessage(audit_errors.BaseAuditError):
+        class ErrorWithIntMessage(user_model_errors.BaseAuditError):
             """Subclass that tries to assign an int value to self.message."""
 
             def __init__(self, model):
@@ -136,7 +136,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             lambda: ErrorWithIntMessage(self.model))
 
     def test_message_raises_value_error_if_assigned_an_empty_value(self):
-        class ErrorWithEmptyMessage(audit_errors.BaseAuditError):
+        class ErrorWithEmptyMessage(user_model_errors.BaseAuditError):
             """Subclass that tries to assign an empty value to self.message."""
 
             def __init__(self, model):
@@ -179,7 +179,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
         self.assertRaisesRegexp(
             NotImplementedError,
             'self.message must be assigned a value in __init__',
-            lambda: pickle.dumps(audit_errors.BaseAuditError(self.model)))
+            lambda: pickle.dumps(user_model_errors.BaseAuditError(self.model)))
 
     def test_pickling_sub_classes(self):
         foo_error, bar_error = FooError(self.model), BarError(self.model)
