@@ -2713,9 +2713,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Check that updates cannot be made to non-existent parameters."""
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            re.escape(
-                'The parameter with name \'myParam\' .* does not exist .*'
-            )
+            r'The parameter with name \'myParam\' .* does not exist .*'
         ):
             exp_services.update_exploration(
                 self.owner_id,

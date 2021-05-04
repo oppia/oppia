@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import re
 
 from core.domain import email_manager
 from core.tests import test_utils
@@ -698,10 +697,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
     def test_global_validators_raise_exception_when_error_in_dict(self):
         with self.assertRaisesRegexp(
             AssertionError,
-            re.escape(
-                '^Validation failed: does_not_contain_email'
-                ' .* email@email.com$'
-            )
+            r'^Validation failed: does_not_contain_email .* email@email.com$'
         ):
             obj = {
                 'unicodeListProp': ['not email', 'not email 2'],
@@ -715,10 +711,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
     def test_global_validators_raise_exception_when_error_in_list(self):
         with self.assertRaisesRegexp(
             AssertionError,
-            re.escape(
-                '^Validation failed: does_not_contain_email'
-                ' .* email2@email.com$'
-            )
+            r'^Validation failed: does_not_contain_email .* email2@email.com$'
         ):
             obj = {
                 'unicodeListProp': ['email2@email.com', 'not email 2'],
