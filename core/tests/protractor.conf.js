@@ -2,6 +2,7 @@ var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
+var fs = require('fs');
 var childProcess = require('child_process');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
@@ -341,28 +342,42 @@ exports.config = {
 
     var ADD_VIDEO_REPORTER = true;
     var spw = '';
-    var ffmpegArgs = ['-video_size','1024x768','-framerate','25','-f','x11grab','-i','process.env.DISPLAY'] // add -i argument
+    var videoCounter = 0;
 
     if (ADD_VIDEO_REPORTER) {
       jasmine.getEnv().addReporter({
-        jasmineStarted: function(result){
-          var name = result.fullName + '.mp4';
+        specStarted: function(result){
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1366x768',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-vcodec', 'qtrle',
+          ];
+          var name = videoCounter.toString() + '.mp4';
+          videoCounter++;
           console.log(result.fullName);
-          var vidPath = path.resolve('__dirname', '../protractor-video/') + name;
-          console.log(vidPath);
+          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          let vidPath = path.resolve(dirPath, name);
+          console.log(`Video path: ${vidPath}`);
           ffmpegArgs.push(vidPath);
-          console.log(ffmpegArgs);
+          console.log(`ffmpeg args: ${ffmpegArgs}`);
           spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-          spw.stdout.on('data',function(data) {console.log(data);});
-          spw.stderr.on('data',function(data) {console.error(data)});
-          spw.on('close',function(data){console.log(data)});
+          spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
+          spw.stderr.on('data', function(data) {console.error(`ffmpeg stderr: ${data}`)});
+          spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
+          console.log('Attached spw output handlers');
         },
-        jasmineDone: async function() {
-          await spw.kill();
-          spw.stdout.on('data',function(data) {console.log(data);});
-          spw.stderr.on('data',function(data) {console.error(data)});
-          spw.on('close',function(data){console.log(data)});
-        }
+        specDone: function() {
+          console.log('Killing spw');
+          let success = spw.kill();
+          console.log(`Killing was successful: ${success}`);
+        },
       });
     }
 
