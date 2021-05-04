@@ -258,6 +258,20 @@ describe('Question Editor Modal Controller', function() {
       expect(modalSpy).toHaveBeenCalled();
     });
 
+    it('should show warnings if a skill is already linked to a question',
+      () => {
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          setTimeout(opt.beforeDismiss);
+          return <NgbModalRef>(
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve({id: '1', description: 'Description 1'})
+            });
+        });
+        $scope.addSkill();
+        $scope.$apply();
+        expect(modalSpy).toHaveBeenCalled();
+      });
+
     it('should close the modal on clicking cancel', () => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
