@@ -180,10 +180,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         Returns:
             tuple(list(ClassifierTrainingJobModel), int).
-            list(ClassifierTrainingJobModel). List of the
-            ClassifierTrainingJobModels with status new or pending.
-            int. The offset value.
+            List of the ClassifierTrainingJobModels with status new or pending.
+            The offset value.
         """
+        FETCH_LIMIT = 10
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
             feconf.TRAINING_JOB_STATUS_PENDING])).filter(
@@ -191,7 +191,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                     datetime.datetime.utcnow())).order(
                         cls.next_scheduled_check_time, cls._key)
 
-        job_models = query.fetch(10, offset=offset)
+        job_models = query.fetch(FETCH_LIMIT, offset=offset)
         offset = offset + len(job_models)
         return job_models, offset
 

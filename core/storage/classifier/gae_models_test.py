@@ -64,6 +64,54 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_job.algorithm_version, 1)
 
     def test_query_new_and_pending_training_jobs(self):
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        classifier_models.ClassifierTrainingJobModel.create(
+            'TextClassifier', 'TextInput', 'exp_id1', 1,
+            next_scheduled_check_time,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
+        classifier_models.ClassifierTrainingJobModel.create(
+            'TextClassifier', 'TextInput', 'exp_id2', 2,
+            next_scheduled_check_time,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
+        classifier_models.ClassifierTrainingJobModel.create(
+            'TextClassifier', 'TextInput', 'exp_id3', 3,
+            next_scheduled_check_time + datetime.timedelta(
+                minutes=feconf.CLASSIFIER_JOB_TTL_MINS),
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
+        classifier_models.ClassifierTrainingJobModel.create(
+            'TextClassifier', 'TextInput', 'exp_id4', 4,
+            next_scheduled_check_time,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, 1)
+
+        training_jobs, offset = (
+            classifier_models.ClassifierTrainingJobModel.
+            query_new_and_pending_training_jobs(0))
+
+        self.assertEqual(len(training_jobs), 2)
+        self.assertEqual(training_jobs[0].algorithm_id, 'TextClassifier')
+        self.assertEqual(training_jobs[0].interaction_id, 'TextInput')
+        self.assertEqual(training_jobs[0].exp_id, 'exp_id1')
+        self.assertEqual(training_jobs[0].exp_version, 1)
+        self.assertEqual(
+            training_jobs[0].next_scheduled_check_time,
+            next_scheduled_check_time)
+        self.assertEqual(training_jobs[0].state_name, 'state_name2')
+        self.assertEqual(
+            training_jobs[0].status,
+            feconf.TRAINING_JOB_STATUS_NEW)
+        self.assertEqual(
+            training_jobs[0].training_data,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
+        self.assertEqual(
+            training_jobs[1].status,
+            feconf.TRAINING_JOB_STATUS_PENDING)
+        self.assertEqual(offset, 2)
+
+    def test_query_new_and_pending_training_jobs_with_multiple_fetches(self):
         offset = 0
         next_scheduled_check_time = datetime.datetime.utcnow()
         # Creating 14 jobs out of which 12 will be fetched in steps.
