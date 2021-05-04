@@ -354,7 +354,6 @@ exports.config = {
             '-s', '1280x1024',
             '-i', process.env.DISPLAY,
             '-g', '300',
-            '-vcodec', 'qtrle',
           ];
           var name = videoCounter.toString() + '.mp4';
           videoCounter++;
