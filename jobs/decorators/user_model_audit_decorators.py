@@ -26,8 +26,8 @@ import re
 
 from core.platform import models
 from jobs import job_utils
-from jobs.types import user_model_errors
 from jobs.types import model_property
+from jobs.types import user_model_errors
 import python_utils
 
 import apache_beam as beam
