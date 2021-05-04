@@ -72,7 +72,7 @@ describe('Topics and Skills Dashboard Page', function() {
       can_delete_topic: true,
       can_delete_skill: true
     };
-    var SkillCreationService;
+    let CreateNewSkillModalService;
 
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
@@ -116,7 +116,7 @@ describe('Topics and Skills Dashboard Page', function() {
       var MockWindowDimensionsService = {
         isWindowNarrow: () => false
       };
-      SkillCreationService = $injector.get('SkillCreationService');
+      CreateNewSkillModalService = $injector.get('CreateNewSkillModalService');
 
       ctrl = $componentController('topicsAndSkillsDashboardPage', {
         $scope: $scope,
@@ -197,24 +197,9 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should open Create Skill Modal', function() {
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      let modalSpy = spyOn(CreateNewSkillModalService, 'createNewSkill');
       ctrl.createSkill();
       expect(modalSpy).toHaveBeenCalled();
-    });
-
-    it('should call the skill creation service', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          description: 'Description',
-          rubrics: 'Easy',
-          explanation: 'Explanation'
-        })
-      });
-
-      var skillSpy = spyOn(SkillCreationService, 'createNewSkill');
-      ctrl.createSkill();
-      $rootScope.$apply();
-      expect(skillSpy).toHaveBeenCalled();
     });
 
     it('should navigate the page', function() {
