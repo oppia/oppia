@@ -50,7 +50,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           ctrl.linkText = HtmlEscaperService.escapedJsonToObj(
             $attrs.textWithValue);
           ctrl.openConceptCard = function(event) {
-            if (canOpenConceptCardModal(event)) {
+            if (shouldOpenRTEModal(event)) {
               return;
             }
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
@@ -87,7 +87,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           // instance, then open the concept card modal. To determine if the
           // RTE is inside a CKEditor instance, check if the offsetParent
           // element contains the data attribute ckeWidgetId.
-          var canOpenConceptCardModal = function(event) {
+          var shouldOpenRTEModal = function(event) {
             return (
               event.currentTarget.offsetParent.dataset.ckeWidgetId ||
               CkEditorCopyContentService.copyModeActive
