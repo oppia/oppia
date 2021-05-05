@@ -31,7 +31,7 @@ import apache_beam as beam
     [models.NAMES.base_model, models.NAMES.exploration])
 
 
-class ValidateExplorationSnapshotMetadataModelCommitCmdsSchemaTests(
+class ValidateExplorationCommitCmdsSchemaTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
@@ -51,26 +51,29 @@ class ValidateExplorationSnapshotMetadataModelCommitCmdsSchemaTests(
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
                 exp_model_audits
-                .ValidateExplorationSnapshotMetadataModelCommitCmdsSchema())
+                .ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [])
 
     def test_exp_change_object_with_missing_cmd(self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Missing cmd key in change dict'):
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
             exp_domain.ExplorationChange({'invalid': 'data'})
 
     def test_exp_change_object_with_invalid_cmd(self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Command invalid is not allowed'):
+            utils.ValidationError, 'Command invalid is not allowed'
+        ):
             exp_domain.ExplorationChange({'cmd': 'invalid'})
 
     def test_exp_change_object_with_missing_attribute_in_cmd(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
                 'The following required attributes are missing: '
-                'new_value')):
+                'new_value')
+        ):
             exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
@@ -80,7 +83,8 @@ class ValidateExplorationSnapshotMetadataModelCommitCmdsSchemaTests(
     def test_exp_change_object_with_extra_attribute_in_cmd(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
+                'The following extra attributes are present: invalid')
+        ):
             exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': 'old_state_name',
@@ -92,7 +96,8 @@ class ValidateExplorationSnapshotMetadataModelCommitCmdsSchemaTests(
         with self.assertRaisesRegexp(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_exploration_property: '
-                'invalid is not allowed')):
+                'invalid is not allowed')
+        ):
             exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'invalid',
@@ -104,7 +109,8 @@ class ValidateExplorationSnapshotMetadataModelCommitCmdsSchemaTests(
         with self.assertRaisesRegexp(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_state_property: '
-                'invalid is not allowed')):
+                'invalid is not allowed')
+        ):
             exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': 'state_name',

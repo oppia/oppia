@@ -30,7 +30,7 @@ from jobs.transforms import base_model_audits
 @audit_decorators.AuditsExisting(
     exp_models.ExplorationSnapshotMetadataModel,
     exp_models.ExplorationCommitLogEntryModel)
-class ValidateExplorationSnapshotMetadataModelCommitCmdsSchema(
+class ValidateExplorationCommitCmdsSchema(
         base_model_audits.ValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class and define """
 

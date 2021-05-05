@@ -252,7 +252,6 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
             yield audit_errors.ModelDomainObjectValidateError(input_model, e)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidateCommitCmdsSchema(beam.DoFn):
     """DoFn to validate schema of commit commands in commit_cmds dict.
     """

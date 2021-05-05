@@ -424,8 +424,8 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             error.message,
             'CommitCmdsValidateError in BaseCommitLogEntryModel'
             '(id=\'invalid\'): Commit command domain validation for '
-            'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed'
-            ' with error: Missing cmd key in change dict')
+            'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed '
+            'with error: Missing cmd key in change dict')
 
 
 class ModelCanonicalNameMismatchErrorTests(AuditErrorsTestBase):
