@@ -42,7 +42,7 @@ export class UserService {
 
     async getUserInfoAsync(): Promise<UserInfo> {
       const pathname = this.urlService.getPathname();
-      if (['/login', '/logout', '/signup'].includes(pathname)) {
+      if (['/logout', '/signup'].includes(pathname)) {
         return UserInfo.createDefault();
       }
       if (!this.userInfo) {
