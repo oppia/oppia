@@ -493,7 +493,7 @@ var ExplorationEditorMainTab = function() {
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
-    await action.clear('Rich Text Editor', richTextEditor);
+    await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
