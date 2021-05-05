@@ -20,8 +20,7 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
-require(
-  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
+require('components/code-mirror/codemirror-mergeview.component');
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'state-diff-modal.controller.ts');
