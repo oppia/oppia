@@ -19,7 +19,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from 'filters/translate.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { FlagExplorationModalComponent } from './flag-exploration-modal.component';
@@ -40,7 +40,7 @@ describe('Flag Exploration modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        TranslateModule,
+        SharedPipesModule,
         FormsModule
       ],
       declarations: [
