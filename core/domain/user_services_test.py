@@ -414,6 +414,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
 
+    def test_set_and_get_profile_picture_data_url(self):
+        auth_id = 'someUser'
+        profile_picture_data_url = ''
+
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+
+        user_services.update_profile_picture_data_url(
+            user_settings.user_id, profile_picture_data_url)
+
+        user_settings = user_services.get_user_settings(
+            user_settings.user_id, strict=True)
+
+        self.assertEqual(
+            user_settings.profile_picture_data_url,
+            user_services.DEFAULT_IDENTICON_DATA_URL)
+
     def test_set_and_get_user_email_preferences(self):
         auth_id = 'someUser'
         username = 'username'

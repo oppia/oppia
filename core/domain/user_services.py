@@ -1062,8 +1062,7 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
     """
 
     if profile_picture_data_url == '':
-        user_email = get_email_from_user_id(user_id)
-        profile_picture_data_url = fetch_gravatar(user_email)
+        profile_picture_data_url = DEFAULT_IDENTICON_DATA_URL
 
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.profile_picture_data_url = profile_picture_data_url
