@@ -1,5 +1,6 @@
 var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
+var VideoReporter = require('protractor-video-reporter');
 var glob = require('glob');
 var path = require('path');
 var Constants = require('./protractor_utils/ProtractorConstants');
@@ -338,6 +339,27 @@ exports.config = {
       }));
     }
 
+    // Adding a video reporter. For more information see
+    // https://www.npmjs.com/package/protractor-video-reporter
+
+    var ffmpegArguments = [
+      '-y',
+      '-r', '30',
+      '-f', 'x11grab',
+      '-s', '1366x768',
+      '-i', process.env.DISPLAY,
+      '-g', '300',
+      '-vcodec', 'qtrle',
+    ]
+
+    jasmine.getEnv().addReporter(new VideoReporter({
+      baseDirectory: path.resolve(__dirname, '../../../protractor-video'),
+      singleVideo: false,
+      singleVideoPath: 'uuid',
+      saveSuccessVideos: true,
+      ffmpegArgs: ffmpegArguments
+    }));
+    
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'pretty',
