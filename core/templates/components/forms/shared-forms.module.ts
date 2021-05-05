@@ -34,24 +34,24 @@ import { AudioSliderComponent } from './slider/audio-slider.component';
   imports: [
     CommonModule,
     BrowserModule,
-    MaterialModule,
+    CustomFormsComponentsModule,
     DynamicContentModule,
+    FormsModule,
+    MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
-    FormsModule,
-    SharedPipesModule,
-    CustomFormsComponentsModule
+    SharedPipesModule
   ],
   declarations: [
-    SchemaBasedEditorDirective,
-    AudioSliderComponent
+    AudioSliderComponent,
+    SchemaBasedEditorDirective
   ],
   entryComponents: [
     AudioSliderComponent
   ],
   exports: [
-    CustomFormsComponentsModule,
     AudioSliderComponent,
+    CustomFormsComponentsModule,
     SchemaBasedEditorDirective
   ],
 })

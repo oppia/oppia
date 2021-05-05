@@ -402,7 +402,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             var audioTranslation = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslation) {
-              (AudioPlayerService.load(audioTranslation.filename))
+              (AudioPlayerService.loadAsync(audioTranslation.filename))
                 .then(function() {
                   $scope.audioLoadingIndicatorIsShown = false;
                   $scope.audioIsLoading = false;

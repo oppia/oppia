@@ -40,10 +40,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
   }`]
 })
 export class AudioSliderComponent {
-  @Input() value;
-  @Input() max;
-  @Input() thumbLabel= false;
-  @Output() valueChange = new EventEmitter();
+  @Input() value: number;
+  @Input() max: number;
+  @Input() thumbLabel = false;
+  @Output() valueChange = new EventEmitter<{ value: number }>();
   constructor() { }
 
   setProgress(event: {value: number}): void {
