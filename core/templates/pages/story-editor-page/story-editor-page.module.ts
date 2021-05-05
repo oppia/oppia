@@ -27,6 +27,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.component';
+import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
 
 @NgModule({
   imports: [
@@ -35,10 +37,14 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StoryEditorNavbarComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StoryEditorNavbarComponent
   ],
   providers: [
     {
