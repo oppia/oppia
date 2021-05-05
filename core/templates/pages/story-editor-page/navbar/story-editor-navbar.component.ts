@@ -24,8 +24,8 @@ import { Story } from 'domain/story/StoryObjectFactory';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
-import { StorySavePendingChangesModalComponent } from '../modal-templates/story-save-pending-changes-modal.component';
-import { Component } from '@angular/core';
+import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -33,6 +33,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './story-editor-navbar.component.html'
 })
 export class StoryEditorNavbarComponent {
+  @Input() commitMessage;
   validationIssues: string[];
   prepublishValidationIssues: string | string[];
   story: Story;
@@ -152,7 +153,7 @@ export class StoryEditorNavbarComponent {
       if (explorationIds.length > 0) {
         this.editableStoryBackendApiService.validateExplorations(
           this.story.getId(), explorationIds
-        ).then(function(validationIssues) {
+        ).then((validationIssues) => {
           this.explorationValidationIssues =
             this.explorationValidationIssues.concat(validationIssues);
         });
@@ -162,10 +163,11 @@ export class StoryEditorNavbarComponent {
   }
 
   saveChanges(): void {
-    this.ngbModal.open(
-      StorySavePendingChangesModalComponent,
-      { backdrop: 'static' },
-    ).result.then((commitMessage) => {
+    const modalRef = this.ngbModal.open(
+      StoryEditorSaveModalComponent,
+      { backdrop: 'static' });
+    modalRef.componentInstance.bindedMessage = this.commitMessage;
+    modalRef.result.then((commitMessage) => {
       this.storyEditorStateService.saveStory(
         commitMessage, () => {
         }, (errorMessage: string) => {
@@ -181,7 +183,7 @@ export class StoryEditorNavbarComponent {
 
   publishStory(): void {
     this.storyEditorStateService.changeStoryPublicationStatus(
-      true, function() {
+      true, () => {
         this.storyIsPublished =
           this.storyEditorStateService.isStoryPublished();
       });

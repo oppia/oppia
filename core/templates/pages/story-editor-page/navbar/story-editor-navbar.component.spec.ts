@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the story editor navbar directive.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Story editor navbar directive', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -29,6 +29,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.component';
 import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
+import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
+import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
 
 @NgModule({
   imports: [
@@ -39,11 +41,15 @@ import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navb
   declarations: [
     OppiaAngularRootComponent,
     StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
     StoryEditorNavbarComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
     StoryEditorNavbarComponent
   ],
   providers: [

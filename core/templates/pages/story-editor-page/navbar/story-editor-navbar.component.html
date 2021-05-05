@@ -1,51 +1,71 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right ng-cloak">
+<ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
   <li class="oppia-dropdown-menu-container">
-    <div uib-dropdown>
-      <button class="btn btn-light oppia-save-changes-button float-left protractor-test-save-story-button"
-              ng-class="{'btn-success': isStorySaveable()}"
-              ng-click="saveChanges()"
-              ng-disabled="!isStorySaveable()">
-        <span ng-if="!$ctrl.isSaveInProgress()">
+    <div ngbDropdown>
+      <button class="btn btn-light dropdown oppia-save-changes-button float-left protractor-test-save-story-button"
+              [ngClass]="{'btn-success': isStorySaveable()}"
+              (click)="saveChanges()"
+              [disabled]="!isStorySaveable()">
+        <span *ngIf="!isSaveInProgress()">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
              alt="Save Story">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">Save Draft</span>
+          <span class="oppia-save-publish-button-label oppia-save-draft-text float-left">
+            Save Draft
+          </span>
           <span class="d-none d-md-block float-left oppia-changes-count"
-                ng-if="getChangeListLength() > 0">
-            (<[getChangeListLength()]>)
+                *ngIf="getChangeListLength() > 0">
+            ({{ getChangeListLength() }})
           </span>
         </span>
 
-        <span ng-if="$ctrl.isSaveInProgress()">
-          <span class="oppia-save-publish-button-label">Saving</span>
+        <span *ngIf="isSaveInProgress()">
+          <span class="oppia-save-publish-button-label">
+            Saving
+          </span>
           <loading-dots></loading-dots>
         </span>
       </button>
-      <button type="button" class="btn btn-light uib-dropdown-toggle dropdown-toggle oppia-dropdown-toggle protractor-test-show-discard-option"
-              ng-disabled="!getChangeListLength()" aria-label="Dropdown toggle" uib-dropdown-toggle>
+      <button type="button"
+              class="btn btn-light dropdown-toggle oppia-dropdown-toggle protractor-test-show-discard-option"
+              [disabled]="!getChangeListLength()"
+              aria-label="Dropdown toggle"
+              data-toggle="dropdown"
+              ngbDropdownToggle>
       </button>
-      <ul uib-dropdown-menu class="oppia-dropdown-menu" ng-style="{ width: getChangeListLength() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item protractor-test-discard-story-changes">Discard Draft</a></li>
+      <ul ngbDropdownMenu
+          class="oppia-dropdown-menu dropdown-menu"
+          [ngStyle]="{ width: getChangeListLength() ? '150px' : '120px' }">
+        <li title="Discard all pending changes">
+          <a (click)="discardChanges()"
+             [ngClass]="{'oppia-disabled-link': !getChangeListLength()}"
+             class="dropdown-item protractor-test-discard-story-changes">
+             Discard Draft
+            </a>
+        </li>
       </ul>
     </div>
   </li>
   <li class="oppia-editor-publish-button-container">
-    <button type="button" ng-if="!$ctrl.isStoryPublished()"
+    <button type="button"
+            *ngIf="!isStoryPublished()"
             class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
-            ng-click="publishStory()"
-            ng-class="{'btn-success': !isStorySaveable() && getWarningsCount() === 0 && validationIssues.length === 0 && explorationValidationIssues.length === 0 && prepublishValidationIssues.length === 0}"
-            ng-disabled="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0 || prepublishValidationIssues.length > 0">
+            (click)="publishStory()"
+            [ngClass]="{'btn-success': !isStorySaveable() && getWarningsCount() === 0 && validationIssues.length === 0 && explorationValidationIssues.length === 0 && prepublishValidationIssues.length === 0}"
+            [disabled]="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0 || prepublishValidationIssues.length > 0">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
       </i>
-      <span class="oppia-save-publish-button-label">Publish Story</span>
+      <span class="oppia-save-publish-button-label">
+        Publish Story
+      </span>
     </button>
-    <button type="button" ng-click="unpublishStory()"
-            ng-if="$ctrl.isStoryPublished()"
+    <button type="button"
+            (click)="unpublishStory()"
+            *ngIf="isStoryPublished()"
             class="btn btn-secondary protractor-test-unpublish-story-button"
-            ng-disabled="isStorySaveable()">
+            [disabled]="isStorySaveable()">
       Unpublish Story
     </button>
   </li>
@@ -53,72 +73,89 @@
 <div class="story-nav-mobile">
   <div class="story-navbar-mobile-tabs">
     <div class="story-nav-dropdown-container">
-      <div class="story-nav-story-nav-dropdown-options" ng-if="showNavigationOptions">
-        <div class="story-nav-dropdown-option" ng-click="selectMainTab()">
-          <i class="material-icons">&#xE254;</i><span>Editor</span>
+      <div class="story-nav-story-nav-dropdown-options"
+           *ngIf="showNavigationOptions">
+        <div class="story-nav-dropdown-option"
+             (click)="selectMainTab()">
+          <i class="material-icons">
+            &#xE254;
+          </i>
+          <span>Editor</span>
         </div>
-        <div class="story-nav-dropdown-option" ng-click="selectPreviewTab()">
-          <i class="material-icons">&#xE037;</i><span>Preview</span>
+        <div class="story-nav-dropdown-option"
+            (click)="selectPreviewTab()">
+          <i class="material-icons">&#xE037;</i>
+          <span>Preview</span>
         </div>
       </div>
       <div>
-        <div ng-if="warningsAreShown" class="warning-box">
+        <div *ngIf="warningsAreShown" class="warning-box">
           <span>Warnings</span>
-          <div ng-repeat="issue in validationIssues track by $index">
+          <div *ngFor="let issue of validationIssues;trackBy:$index">
             <hr class="oppia-editor-warnings-separator">
-            <[issue]>
+            {{ issue }}
           </div>
-          <div ng-repeat="issue in prepublishValidationIssues track by $index">
+          <div *ngFor="let issue of prepublishValidationIssues; trackBy:$index">
             <hr class="oppia-editor-warnings-separator">
-            <[issue]>
+            {{ issue }}
           </div>
         </div>
       </div>
       <div class="story-nav-dropdown-content">
-        <div class="story-nav-dropdown-text" ng-click="toggleWarningText()">
-          <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
-          <span><[activeTab]></span>
-          <span ng-if="getTotalWarningsCount()">(<[getTotalWarningsCount()]> <i class="fa fa-exclamation-triangle error-icon"></i>)</span>
+        <div class="story-nav-dropdown-text" (click)="toggleWarningText()">
+          <i *ngIf="!getTotalWarningsCount()" class="material-icons">
+            &#xE254;
+          </i>
+          <span>{{ activeTab }}</span>
+          <span *ngIf="getTotalWarningsCount()">
+            ({{ getTotalWarningsCount()}} <i class="fa fa-exclamation-triangle error-icon"></i>)
+          </span>
         </div>
-        <div class="story-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleNavigationOptions()">
           <i class="fa fa-caret-down"></i>
         </div>
       </div>
     </div>
     <div class="story-nav-dropdown-container save-options-dropdown">
-      <div class="story-nav-story-nav-dropdown-options" ng-if="showStoryEditOptions">
-        <div class="story-nav-dropdown-option" ng-click="discardChanges()">
+      <div class="story-nav-story-nav-dropdown-options"
+           *ngIf="showStoryEditOptions">
+        <div class="story-nav-dropdown-option"
+             (click)="discardChanges()">
           <i class="material-icons">&#xE254;</i>
           <span>Discard Changes</span>
         </div>
         <div class="story-nav-dropdown-option">
-          <div ng-if="!$ctrl.isStoryPublished()"
-               ng-click="publishStory()"
-               ng-disabled="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+          <div *ngIf="!isStoryPublished()"
+               (click)="publishStory()"
+               [attr.disabled]="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="material-icons">&#xE254;</i>
             <span>Publish Story</span>
           </div>
-          <div ng-click="unpublishStory()"
-               ng-if="$ctrl.isStoryPublished()"
-               ng-disabled="isStorySaveable()">
+          <div (click)="unpublishStory()"
+               *ngIf="isStoryPublished()"
+               [attr.disabled]="isStorySaveable()">
             <i class="material-icons">&#xE254;</i>
             <span>Unpublish Story</span>
           </div>
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
-        <div class="story-nav-dropdown-text" ng-disabled="!isStorySaveable()" ng-click="saveChanges()">
-          <span ng-if="$ctrl.isSaveInProgress()">
+        <div class="story-nav-dropdown-text"
+             [attr.disabled]="!isStorySaveable()"
+             (click)="saveChanges()">
+          <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
           </span>
-          <span ng-if="!$ctrl.isSaveInProgress()">
+          <span *ngIf="!isSaveInProgress()">
             Save Changes
           </span>
-          <span ng-if="getChangeListLength() > 0">
-            (<[getChangeListLength()]>)
+          <span *ngIf="getChangeListLength() > 0">
+            ({{ getChangeListLength() }})
           </span>
         </div>
-        <div class="story-nav-dropdown-icon" ng-click="toggleStoryEditOptions()">
+        <div class="story-nav-dropdown-icon"
+             (click)="toggleStoryEditOptions()">
           <i class="fa fa-caret-down"></i>
         </div>
       </div>
@@ -130,63 +167,63 @@
     width: 100%;
     word-wrap: break-word;
   }
-  story-editor-navbar .icon {
+  .icon {
     width: 3.5em;
   }
-  story-editor-navbar .icon .material-icons {
+  .icon .material-icons {
     font-size: 1.4em;
     margin-left: 0.3vw;
   }
-  story-editor-navbar .story-nav-mobile {
+  .story-nav-mobile {
     display: none;
   }
-  story-editor-navbar .oppia-dropdown-menu-container {
+  .oppia-dropdown-menu-container {
     margin-right: 5px;
     margin-top: 8px;
   }
-  story-editor-navbar .oppia-save-draft-text {
+  .oppia-save-draft-text {
     width: 80px;
   }
-  story-editor-navbar .oppia-changes-count {
+  .oppia-changes-count {
     margin-left: 2px;
     opacity: 0.5;
   }
-  story-editor-navbar .oppia-dropdown-toggle {
+  .oppia-dropdown-toggle {
     height: 34px;
   }
-  story-editor-navbar .oppia-dropdown-menu {
+  .oppia-dropdown-menu {
     min-width: 125px;
     right: inherit;
   }
-  story-editor-navbar .oppia-editor-publish-button-container {
+  .oppia-editor-publish-button-container {
     margin-right: 20px;
     margin-top: 8px;
   }
   @media screen and (max-width: 768px) {
-    story-editor-navbar .navbar-desktop li {
+    .navbar-desktop li {
       display: none;
     }
-    story-editor-navbar .story-nav-mobile {
+    .story-nav-mobile {
       display: block;
     }
-    story-editor-navbar .story-navbar-mobile-tabs {
+    .story-navbar-mobile-tabs {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-evenly;
       padding: 10px 0;
     }
-    story-editor-navbar .save-change-btn-container {
+    .save-change-btn-container {
       display: flex;
       flex-wrap: wrap;
       width: 50%;
     }
-    story-editor-navbar .save-changes-btn {
+    .save-changes-btn {
       background-color: #008098;
       color: #FFF;
       font-weight: bold;
       width: 80%;
     }
-    story-editor-navbar .discard-changes-btn {
+    .discard-changes-btn {
       background-color: #008098;
       bottom: 47px;
       color: #FFF;
@@ -195,7 +232,7 @@
       position: absolute;
       width: 144px;
     }
-    story-editor-navbar .btn-publish-topic {
+    .btn-publish-topic {
       background-color: white;
       border: 2px solid #008098;
       color: #008098;
@@ -219,19 +256,19 @@
     .publish-button-container button {
       width: 100%;
     }
-    story-editor-navbar .story-nav-dropdown-container {
+    .story-nav-dropdown-container {
       position: relative;
       text-align: left;
       width: 45%;
     }
-    story-editor-navbar .story-nav-story-nav-dropdown-options {
+    .story-nav-story-nav-dropdown-options {
       background-color: #FFF;
       border: 1px solid #000;
       bottom: 100%;
       position: absolute;
       width: 100%;
     }
-    story-editor-navbar .story-nav-dropdown-content {
+    .story-nav-dropdown-content {
       background-color: #FFF;
       border: 1.5px solid #6d6969;
       border-radius: 5px;
@@ -240,16 +277,16 @@
       justify-content: space-between;
     }
 
-    story-editor-navbar .right-container {
+    .right-container {
       background-color: #419889;
       color: #FFF;
     }
 
-    story-editor-navbar .story-nav-dropdown-option {
+    .story-nav-dropdown-option {
       padding: 5px 0;
     }
 
-    story-editor-navbar .story-nav-dropdown-icon {
+    .story-nav-dropdown-icon {
       align-items: center;
       background-color: #e6e6e6;
       border-left: 1.5px solid #6d6969;
@@ -259,19 +296,19 @@
       text-align: center;
       width: 20%;
     }
-    story-editor-navbar .story-nav-dropdown-text {
+    .story-nav-dropdown-text {
       padding: 5px 10px;
     }
-    story-editor-navbar .save-options-dropdown {
+    .save-options-dropdown {
       width: 52%;
     }
-    story-editor-navbar .warning-box {
+    .warning-box {
       background-color: #f5f55a;
       border: 1px solid #000;
       bottom: 100%;
       position: absolute;
     }
-    story-editor-navbar .error-icon {
+    .error-icon {
       background-color: #f5f55a;
     }
   }
