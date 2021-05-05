@@ -155,10 +155,10 @@ export class AnswerClassificationService {
         const classifier = (
           this.stateClassifierMappingService.getClassifier(stateName));
         if (classifier && classifier.classifierData &&
-            classifier.algorithmId && classifier.dataSchemaVersion) {
+            classifier.algorithmId && classifier.algorithmVersion) {
           const predictionService = (
             this.predictionAlgorithmRegistryService.getPredictionService(
-              classifier.algorithmId, classifier.dataSchemaVersion));
+              classifier.algorithmId, classifier.algorithmVersion));
           // If prediction service exists, we run classifier. We return the
           // default outcome otherwise.
           if (predictionService) {
@@ -169,12 +169,13 @@ export class AnswerClassificationService {
                 new AnswerClassificationResult(
                   defaultOutcome, answerGroups.length, 0,
                   ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+            } else {
+              answerClassificationResult = (
+                new AnswerClassificationResult(
+                  answerGroups[predictedAnswerGroupIndex].outcome,
+                  predictedAnswerGroupIndex, null,
+                  ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
             }
-            answerClassificationResult = (
-              new AnswerClassificationResult(
-                answerGroups[predictedAnswerGroupIndex].outcome,
-                predictedAnswerGroupIndex, null,
-                ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
           }
         }
       }

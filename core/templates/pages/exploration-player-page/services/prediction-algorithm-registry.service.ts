@@ -19,8 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { CodeReplPredictionService } from
-  'interactions/CodeRepl/code-repl-prediction.service';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 
@@ -36,12 +34,8 @@ export class PredictionAlgorithmRegistryService {
   private algorithmIdPredictionServiceMapping: AlgorithmIdPredictionServiceMap;
 
   constructor(
-      private codeReplPredictionService: CodeReplPredictionService,
       private textInputPredictionService: TextInputPredictionService) {
     this.algorithmIdPredictionServiceMapping = new Map(Object.entries({
-      CodeClassifier: new Map([
-        [1, this.codeReplPredictionService]
-      ]),
       TextClassifier: new Map([
         [1, this.textInputPredictionService]
       ])

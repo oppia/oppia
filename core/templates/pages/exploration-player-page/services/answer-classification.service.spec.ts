@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResult } from
@@ -25,6 +26,7 @@ import { AnswerClassificationService, InteractionRulesService } from
 import { AppService } from 'services/app.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { Classifier } from 'domain/classifier/classifier.model';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
@@ -35,6 +37,7 @@ import { PredictionAlgorithmRegistryService } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
@@ -51,7 +54,10 @@ describe('Answer Classification Service', () => {
   let textInputRulesService: InteractionRulesService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [CamelCaseToHyphensPipe],
+    });
 
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);
@@ -66,6 +72,7 @@ describe('Answer Classification Service', () => {
 
   describe('with string classifier disabled', () => {
     let stateDict;
+    let expId = '0';
 
     beforeEach(() => {
       spyOn(
@@ -73,6 +80,7 @@ describe('Answer Classification Service', () => {
       ).and.returnValue(false);
       spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(false);
+      stateClassifierMappingService.init(expId, 0);
 
       stateDict = {
         content: {
@@ -283,43 +291,49 @@ describe('Answer Classification Service', () => {
 
   describe('with string classifier enabled', () => {
     let stateDict;
+    let expId = '0';
 
     beforeEach(() => {
       spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(true);
 
-      stateClassifierMappingService.init({
-        [stateName]: {
-          algorithm_id: 'TestClassifier',
-          classifier_data: {
-            KNN: {
-              occurrence: 40,
-              K: 30,
-              T: 20,
-              top: 10,
-              fingerprint_data: {},
-              token_to_id: {}
-            },
-            SVM: {
-              classes: [],
-              kernel_params: {
-                kernel: 'kernel',
-                coef0: 1,
-                degree: 2,
-                gamma: 3,
-              },
-              intercept: [],
-              n_support: [],
-              probA: [],
-              support_vectors: [[]],
-              probB: [],
-              dual_coef: [[]]
-            },
-            cv_vocabulary: {}
+      let modelJson = {
+        KNN: {
+          occurrence: 40,
+          K: 30,
+          T: 20,
+          top: 10,
+          fingerprint_data: {},
+          token_to_id: {}
+        },
+        SVM: {
+          classes: [],
+          kernel_params: {
+            kernel: 'kernel',
+            coef0: 1,
+            degree: 2,
+            gamma: 3,
           },
-          data_schema_version: 1
-        }
-      });
+          intercept: [],
+          n_support: [],
+          probA: [],
+          support_vectors: [[]],
+          probB: [],
+          dual_coef: [[]]
+        },
+        cv_vocabulary: {}
+      };
+      let textClassifierModel = new TextClassifierFrozenModel();
+      // The model_json attribute in TextClassifierFrozenModel class can't be
+      // changed to camelcase since the class definition is automatically
+      // compiled with the help of protoc.
+      textClassifierModel.model_json = JSON.stringify(modelJson);
+      let testClassifier = new Classifier(
+        'TestClassifier', textClassifierModel.serialize(), 1);
+
+      stateClassifierMappingService.init(expId, 0);
+      stateClassifierMappingService.testOnlySetClassifierData(
+        stateName, testClassifier);
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
         'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
 
@@ -472,6 +486,7 @@ describe('Answer Classification Service', () => {
 
   describe('with training data classification', () => {
     let stateDict;
+    let expId = '0';
 
     beforeEach(() => {
       spyOn(
@@ -479,6 +494,7 @@ describe('Answer Classification Service', () => {
       ).and.returnValue(true);
       spyOn(appService, 'isMachineLearningClassificationEnabled')
         .and.returnValue(true);
+      stateClassifierMappingService.init(expId, 0);
 
       stateDict = {
         content: {
