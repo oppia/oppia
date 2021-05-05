@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -52,6 +53,7 @@ describe('Solution Verification Service', () => {
     };
 
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
         { provide: INTERACTION_SPECS, useValue: mockInteractionState }
       ]
