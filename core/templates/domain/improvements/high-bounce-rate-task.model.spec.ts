@@ -268,7 +268,7 @@ describe('High bounce rate task', function() {
         statsWithWrongVersion, 1, config
       )).toThrowError(
         'Expected stats for exploration id="eid" v1 but given stats are for ' +
-          'exploration id="eid" v2');
+        'exploration id="eid" v2');
     });
 
     it('should not update status when number of starts is too low', () => {
