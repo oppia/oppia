@@ -329,6 +329,6 @@ class RegistryUnitTest(test_utils.TestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'import_models() method is not overwritten in'
-                ' derived classes')):
+                'import_models() method is not overwritten in '
+                'derived classes')):
             models.Platform().import_models()

@@ -3502,7 +3502,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Object type of answer must match that of correct_answer.
         with self.assertRaisesRegexp(
             AssertionError,
-            re.escape('Expected unicode string, received [0, 0]')):
+            re.escape('Expected unicode string, received [0, 0]')
+        ):
             init_state.interaction.solution = (
                 state_domain.Solution.from_dict(
                     init_state.interaction.id, solution_dict))

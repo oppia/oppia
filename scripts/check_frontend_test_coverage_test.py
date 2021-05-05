@@ -199,8 +199,8 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     SystemExit,
                     re.escape(
-                        '\033[1mfile.ts\033[0m seems to be not completely'
-                        ' tested. Make sure it\'s fully covered.\n')):
+                        '\033[1mfile.ts\033[0m seems to be not completely '
+                        'tested. Make sure it\'s fully covered.\n')):
                     check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_remove_file(self):
@@ -222,13 +222,13 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     SystemExit,
                     re.escape(
-                        '\033[1mfile.ts\033[0m seems to be fully covered!'
-                        ' Before removing it manually from the denylist'
-                        ' in the file'
-                        ' scripts/check_frontend_test_coverage.py, please'
-                        ' make sure you\'ve followed the unit tests rules'
-                        ' correctly on:'
-                        ' https://github.com/oppia/oppia/wiki/Frontend-unit'
+                        '\033[1mfile.ts\033[0m seems to be fully covered! '
+                        'Before removing it manually from the denylist '
+                        'in the file '
+                        'scripts/check_frontend_test_coverage.py, please '
+                        'make sure you\'ve followed the unit tests rules '
+                        'correctly on: '
+                        'https://github.com/oppia/oppia/wiki/Frontend-unit'
                         '-tests-guide#rules\n')):
                     check_frontend_test_coverage.check_coverage_changes()
 
@@ -251,13 +251,13 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     SystemExit,
                     re.escape(
-                        '\033[1mnewfilename.ts\033[0m seems to be not'
-                        ' completely tested. Make sure it\'s fully covered.\n'
-                        '\033[1mfile.ts\033[0m is in the frontend test coverage'
-                        ' denylist but it doesn\'t exist anymore. If you have'
-                        ' renamed it, please make sure to remove the old'
-                        ' file name and add the new file name in the denylist'
-                        ' in the file scripts/'
+                        '\033[1mnewfilename.ts\033[0m seems to be not '
+                        'completely tested. Make sure it\'s fully covered.\n'
+                        '\033[1mfile.ts\033[0m is in the frontend test '
+                        'coverage denylist but it doesn\'t exist anymore. If '
+                        'you have renamed it, please make sure to remove the '
+                        'old file name and add the new file name in the '
+                        'denylist in the file scripts/'
                         'check_frontend_test_coverage.py.\n')):
                     check_frontend_test_coverage.check_coverage_changes()
 
@@ -326,8 +326,8 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     SystemExit,
                     re.escape(
-                        'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list'
-                        ' must be kept in alphabetical order.')):
+                        'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list '
+                        'must be kept in alphabetical order.')):
                     (
                         check_frontend_test_coverage
                         .check_not_fully_covered_filenames_list_is_sorted())

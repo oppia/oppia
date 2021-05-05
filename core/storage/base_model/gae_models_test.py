@@ -46,18 +46,18 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The get_deletion_policy() method is missing from the'
-                ' derived class. It should be implemented in the'
-                ' derived class.')):
+                'The get_deletion_policy() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.')):
             base_models.BaseModel.get_deletion_policy()
 
     def test_has_reference_to_user_id(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The has_reference_to_user_id() method is missing from the'
-                ' derived class. It should be implemented in the'
-                ' derived class.')):
+                'The has_reference_to_user_id() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.')):
             base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_error_cases_for_get_method(self):
@@ -77,26 +77,26 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The export_data() method is missing from the'
-                ' derived class. It should be implemented in the'
-                ' derived class.')):
+                'The export_data() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.')):
             base_models.BaseModel.export_data('')
 
     def test_get_model_association_to_user_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The get_model_association_to_user() method is missing from'
-                ' the derived class. It should be implemented in the'
-                ' derived class.')):
+                'The get_model_association_to_user() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.')):
             base_models.BaseModel.get_model_association_to_user()
 
     def test_export_data(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The export_data() method is missing from the derived'
-                ' class. It should be implemented in the derived class.')):
+                'The export_data() method is missing from the derived '
+                'class. It should be implemented in the derived class.')):
             base_models.BaseModel.export_data('user_id')
 
     def test_generic_query_put_get_and_delete_operations(self):
@@ -165,14 +165,16 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Immediately calling `put` again fails, because update_timestamps needs
         # to be called first.
         with self.assertRaisesRegexp(
-            Exception, re.escape('did not call update_timestamps()')):
+            Exception, re.escape('did not call update_timestamps()')
+        ):
             model.put()
 
         model = base_models.BaseModel.get_by_id(model.id)
 
         # Getting a fresh model requires update_timestamps too.
         with self.assertRaisesRegexp(
-            Exception, re.escape('did not call update_timestamps()')):
+            Exception, re.escape('did not call update_timestamps()')
+        ):
             model.put()
 
         model.update_timestamps()
@@ -425,8 +427,8 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The get_instance_id() method is missing from the derived'
-                ' class. It should be implemented in the derived class.')):
+                'The get_instance_id() method is missing from the derived '
+                'class. It should be implemented in the derived class.')):
             base_models.BaseCommitLogEntryModel.get_commit('id', 1)
 
 
@@ -616,8 +618,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The put() method is missing from the derived'
-                ' class. It should be implemented in the derived class.')):
+                'The put() method is missing from the derived '
+                'class. It should be implemented in the derived class.')):
             model1.update_timestamps()
             model1.put()
 

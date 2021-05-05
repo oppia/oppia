@@ -76,9 +76,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     NotImplementedError,
                     re.escape(
-                        'The has_reference_to_user_id() method is missing from'
-                        ' the derived class. It should be implemented in the'
-                        ' derived class.'
+                        'The has_reference_to_user_id() method is missing from '
+                        'the derived class. It should be implemented in the '
+                        'derived class.'
                     )
                 ):
                     clazz.has_reference_to_user_id('any_id')

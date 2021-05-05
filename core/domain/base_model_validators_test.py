@@ -154,18 +154,18 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The _get_external_id_relationships() method is missing'
-                ' from the derived class. It should be implemented in the'
-                ' derived class.')):
+                'The _get_external_id_relationships() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             MockBaseModelValidator().validate(self.invalid_model)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The _get_external_model_properties() method is missing'
-                ' from the derived class. It should be implemented in the'
-                ' derived class.')):
+                'The _get_external_model_properties() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             MockSummaryModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
@@ -178,8 +178,8 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             NotImplementedError,
             re.escape(
                 'The _get_change_domain_class() method is missing from the '
-                'derived class. It should be implemented in the'
-                ' derived class.')):
+                'derived class. It should be implemented in the '
+                'derived class.')):
             snapshot_model = MockSnapshotModel(id='mockmodel')
             snapshot_model.update_timestamps()
             snapshot_model.put()
@@ -191,9 +191,9 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The entity_classes_to_map_over() method is missing from'
-                ' the derived class. It should be implemented in the'
-                ' derived class.')):
+                'The entity_classes_to_map_over() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.')):
             with self.swap(jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
                 job_id = job_class.create_new()
                 job_class.enqueue(job_id)

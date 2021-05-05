@@ -1057,8 +1057,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                'unsupported operand type(s) for +=: \'NoneType\''
-                ' and \'int\'')):
+                'unsupported operand type(s) for +=: \'NoneType\' '
+                'and \'int\'')):
             stats_services.get_exp_issues_from_model(exp_issues_model)
 
     def test_actual_update_exp_issue_from_model_raises_error(self):
@@ -1068,9 +1068,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The _convert_issue_v1_dict_to_v2_dict() method is missing'
-                ' from the derived class. It should be implemented in the'
-                ' derived class.')):
+                'The _convert_issue_v1_dict_to_v2_dict() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             stats_domain.ExplorationIssue.update_exp_issue_from_model(
                 exp_issue_dict)
 
@@ -1260,8 +1260,8 @@ class LearnerActionTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                'unsupported operand type(s) for +=: \'NoneType\''
-                ' and \'int\'')):
+                'unsupported operand type(s) for +=: \'NoneType\' '
+                'and \'int\'')):
             stats_services.get_playthrough_from_model(playthrough_model)
 
     def test_actual_update_learner_action_from_model_raises_error(self):
@@ -1271,9 +1271,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'The _convert_action_v1_dict_to_v2_dict() method is missing'
-                ' from the derived class. It should be implemented in the'
-                ' derived class.')):
+                'The _convert_action_v1_dict_to_v2_dict() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             stats_domain.LearnerAction.update_learner_action_from_model(
                 learner_action_dict)
 

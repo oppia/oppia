@@ -998,7 +998,8 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             AssertionError,
-            re.escape('Expected unicode string, received [u\'abc\']')):
+            re.escape('Expected unicode string, received [u\'abc\']')
+        ):
             objects.TranslatableUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStr': ['abc']
@@ -1019,7 +1020,8 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             AssertionError,
-            re.escape('Expected unicode string, received [u\'abc\']')):
+            re.escape('Expected unicode string, received [u\'abc\']')
+        ):
             objects.TranslatableUnicodeString.normalize_value(['abc'])
 
         self.assertEqual(
@@ -1074,7 +1076,8 @@ class TranslatableHtmlTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             AssertionError,
-            re.escape('Expected unicode string, received [u\'abc\']')):
+            re.escape('Expected unicode string, received [u\'abc\']')
+        ):
             objects.TranslatableUnicodeString.normalize_value(['abc'])
 
         self.assertEqual(

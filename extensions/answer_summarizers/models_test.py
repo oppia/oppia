@@ -34,9 +34,9 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'Subclasses of BaseCalculation should implement the'
-                ' calculate_from_state_answers_dict(state_answers_dict)'
-                ' method.')):
+                'Subclasses of BaseCalculation should implement the '
+                'calculate_from_state_answers_dict(state_answers_dict) '
+                'method.')):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
                 {})
 

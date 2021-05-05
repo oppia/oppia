@@ -162,9 +162,9 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             ValueError,
             re.escape(
-                'Value for document field abc should be a (unicode) string,'
-                ' numeric type, datetime.date, datetime.datetime or list of'
-                ' such types, got <type \'set\'>')):
+                'Value for document field abc should be a (unicode) string, '
+                'numeric type, datetime.date, datetime.datetime or list of '
+                'such types, got <type \'set\'>')):
             gae_search_services.add_documents_to_index([doc], 'my_index')
 
 

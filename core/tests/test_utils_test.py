@@ -597,7 +597,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
         with self.assertRaisesRegexp(
-            ValueError, re.escape('Exception raised from getcwd()')):
+            ValueError, re.escape('Exception raised from getcwd()')
+        ):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
 

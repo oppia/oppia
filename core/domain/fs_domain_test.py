@@ -67,7 +67,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
         with self.assertRaisesRegexp(
-            IOError, re.escape('File abc.png not found')):
+            IOError, re.escape('File abc.png not found')
+        ):
             self.fs.get('abc.png')
 
         with self.assertRaisesRegexp(

@@ -84,6 +84,5 @@ class JobBaseTests(job_test_utils.PipelinedTestBase):
     def test_run_raises_not_implemented_error(self):
         self.assertRaisesRegexp(
             NotImplementedError,
-            re.escape(
-                'Subclasses must implement the run() method'),
+            re.escape('Subclasses must implement the run() method'),
             base_jobs.JobBase(self.pipeline).run)
