@@ -52,8 +52,10 @@ var GraphEditor = function(graphInputContainer) {
   var createVertex = async function(xOffset, yOffset) {
     var addNodeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Node-button'));
-    await action.click('Test Add Node Button', addNodeButton);
+    await action.click('Add Node Button', addNodeButton);
     // Offsetting from the graph container.
+    await waitFor.visibilityOf(
+      graphInputContainer, 'Graph Input Container taking too long to appear');
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
     await browser.actions().click().perform();
@@ -63,9 +65,15 @@ var GraphEditor = function(graphInputContainer) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
     await action.click('Add Edge Button', addEdgeButton);
+    await waitFor.visibilityOf(
+      vertexElement(
+        vertexIndex1), `Vertex element ${vertexIndex1} taking too long`);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
+    await waitFor.visibilityOf(
+      vertexElement(
+        vertexIndex2), `Vertex element ${vertexIndex2} taking too long`);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex2)).perform();
     await browser.actions().mouseUp().perform();
@@ -90,7 +98,7 @@ var GraphEditor = function(graphInputContainer) {
     clearDefaultGraph: async function() {
       var deleteButton = graphInputContainer.element(
         by.css('.protractor-test-Delete-button'));
-      await action.click('Test Delete Button', deleteButton);
+      await action.click('Delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
         await action.click(`Vertex Element ${i}`, vertexElement(i));
@@ -111,6 +119,8 @@ var GraphEditor = function(graphInputContainer) {
         // dict's edges.
         var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
+        await waitFor.visibilityOf(
+          allEdgesElement, 'All edges element taking too long to appear');
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
@@ -131,9 +141,9 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
-    var testAddListEntry = elem.element(by.css(
+    var AddListEntry = elem.element(by.css(
       '.protractor-test-add-list-entry'));
-    await action.click('Test Add List Entry', testAddListEntry);
+    await action.click('Add List Entry', AddListEntry);
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -142,10 +152,10 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    var testDeleteListEntry = elem.element(
+    var DeleteListEntry = elem.element(
       await by.repeater('item in localValue track by $index').row(index))
       .element(by.css('.protractor-test-delete-list-entry'));
-    await action.click('Test Delete List Entry', testDeleteListEntry);
+    await action.click('Delete List Entry', DeleteListEntry);
   };
 
   return {
@@ -183,26 +193,25 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
-  await action.click('First of oppia rte', firstOfOppiaRte);
+  var firstOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+  await action.click('First Rich Text Editor', firstOppiaRte);
 
   var _appendContentText = async function(text) {
-    await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
-    var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+    var firstOppiaRte = await elem.all(by.css('.oppia-rte')).first();
     await action.sendKeys(
-      'First of Oppia Rte', firstOfOppiaRte, text);
+      'First Rich Text Editor', firstOppiaRte, text);
   };
   var _clickToolbarButton = async function(buttonName) {
     var clickToolbarButton = elem.element(by.css('.' + buttonName));
     await action.click(
-      `Click Toolbar Button: ${buttonName}`, clickToolbarButton);
+      `Toolbar Button: ${buttonName}`, clickToolbarButton);
   };
   var _clearContent = async function() {
     expect(
       await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
     ).toBe(true);
-    var firstOfOppiaRte = await elem.all(by.css('.oppia-rte')).first();
-    await action.clear('First of oppia rte', firstOfOppiaRte);
+    var firstOppiaRte = await elem.all(by.css('.oppia-rte')).first();
+    await action.clear('First Rich Text Editor', firstOppiaRte);
   };
 
   return {
@@ -272,15 +281,15 @@ var RichTextEditor = async function(elem) {
         [
           'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
         ].includes(componentName)) {
-        var firstOfOppiaRte = elem.all(by.css('.oppia-rte')).first();
+        var firstOppiaRte = elem.all(by.css('.oppia-rte')).first();
         await action.sendKeys(
-          'First of Oppia Rte', firstOfOppiaRte, protractor.Key.DOWN);
+          'First Rich Text Editor', firstOppiaRte, protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      var firstOfOppiaRte = elem.all(by.css('.oppia-rte')).first();
+      var firstOppiaRte = elem.all(by.css('.oppia-rte')).first();
       await action.sendKeys(
-        'First of Oppia Rte', firstOfOppiaRte, protractor.Key.chord(
+        'First Rich Text Editor', firstOppiaRte, protractor.Key.chord(
           protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -328,14 +337,17 @@ var AutocompleteDropdownEditor = function(elem) {
       var actualOptions = await element(by.css('.select2-dropdown'))
         .all(by.tagName('li')).map(
           async function(optionElem) {
-            return await optionElem.getText();
+            return await action.getText(
+              `Select2 Dropdown Option Element ${optionElem}`, optionElem);
           }
         );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      var select2Dropdown = element(by.css('.select2-dropdown')).element(
+      var select2DropdownSearchInput = element(
+        by.css('.select2-dropdown')).element(
         by.css('.select2-search input'));
-      await action.sendKeys('Select2 Dropdown', select2Dropdown, '\n');
+      await action.sendKeys(
+        'Select2 Dropdown Search Input', select2DropdownSearchInput, '\n');
     }
   };
 };
@@ -369,7 +381,8 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       actualSelection = await elem.element(
         by.css('.select2-selection__rendered')
       ).all(by.tagName('li')).map(async function(choiceElem) {
-        return await choiceElem.getText();
+        return await action.getText(
+          `Select2 selection rendered ${choiceElem}`, choiceElem);
       });
       // Remove the element corresponding to the last <li>, which actually
       // corresponds to the field for new input.
@@ -385,10 +398,10 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    var testSearchBarDropdownToggle = elem.element(by.css(
+    var SearchBarDropdownToggle = elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle'));
     await action.click(
-      'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+      'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
 
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
@@ -397,6 +410,8 @@ var MultiSelectEditor = function(elem) {
           '.protractor-test-search-bar-dropdown-menu span', texts[i]));
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
+        await waitFor.visibilityOf(
+          filteredElement, `${filteredElement} is taking too long to appear`);
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         await action.click('Filtered Element', filteredElement);
@@ -410,10 +425,10 @@ var MultiSelectEditor = function(elem) {
     }
 
     // Close the dropdown menu at the end.
-    var testSearchBarDropdownToggle = elem.element(by.css(
+    var SearchBarDropdownToggle = elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle'));
     await action.click(
-      'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+      'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
   };
 
   return {
@@ -427,25 +442,26 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      var testSearchBarDropdownToggle = elem.element(by.css(
+      var SearchBarDropdownToggle = elem.element(by.css(
         '.protractor-test-search-bar-dropdown-toggle'));
       await action.click(
-        'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+        'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
 
       // Find the selected elements.
       var actualSelection = await elem.element(
         by.css('.protractor-test-search-bar-dropdown-menu')
       ).all(by.css('.protractor-test-selected'))
         .map(async function(selectedElem) {
-          return await selectedElem.getText();
+          return await action.getText(
+            `Search bar dropdown menu ${selectedElem}`, selectedElem);
         });
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
-      var testSearchBarDropdownToggle = elem.element(by.css(
+      var SearchBarDropdownToggle = elem.element(by.css(
         '.protractor-test-search-bar-dropdown-toggle'));
       await action.click(
-        'Test Search Bar Dropdown Toggle', testSearchBarDropdownToggle);
+        'Search Bar Dropdown Toggle', SearchBarDropdownToggle);
     }
   };
 };
@@ -479,11 +495,12 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await entry.getText();
+        return await action.getText(
+          `${entry} in Array of texts in Rich Text Area`, entry);
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
-    var fullText = await elem.getText();
+    var fullText = await action.getText('Elements of Rich Text Area', elem);
     var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
@@ -521,6 +538,9 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   var justPassedRteComponent = false;
 
   var _readFormattedText = async function(text, tagName) {
+    await waitFor.visibilityOf(
+      await arrayOfElems.get(
+        arrayPointer), `element at ${arrayPointer} is not visible`);
     expect(
       await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
@@ -553,6 +573,8 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     // passed on to the relevant RTE component editor.
     readRteComponent: async function(componentName) {
       var elem = await arrayOfElems.get(arrayPointer);
+      await waitFor.visibilityOf(
+        elem, `${elem} is taking too long to appear`);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
       // Need to convert arguments to an actual array; we tell the component
@@ -561,7 +583,10 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      expect(
+        await action.getText(
+          `${elem} in Array of Elements in Rich Text Area`, elem))
+        .toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
@@ -642,6 +667,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await browser.executeScript(
         '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
         '().scrollTop(' + String(scrollTo) + ');');
+      await waitFor.visibilityOf(
+        elem.element(by.css(
+          '.CodeMirror-linenumber')), 'code mirror linenumber is not visible');
       var lineHeight = await elem.element(
         by.css('.CodeMirror-linenumber')).getAttribute('clientHeight');
       var currentScrollTop = await browser.executeScript(
@@ -657,7 +685,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       var totalCount = await lineNumberElements.count();
       for (var i = 0; i < totalCount; i++) {
         var lineNumberElement = await lineNumberElements.get(i);
-        var lineNumber = await lineNumberElement.getText();
+        var lineNumber = await action.getText(
+          'Line number element', lineNumberElement);
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
@@ -665,7 +694,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineElement = await lineContentElements.get(i);
         var isHighlighted = await lineDivElement.element(
           by.css('.CodeMirror-linebackground')).isPresent();
-        var text = await lineElement.getText();
+        var text = await action.getText(
+          `CodeMirror Line element at ${lineNumber}`, lineElement);
         actualDiffDict[lineNumber] = {
           text: text,
           highlighted: isHighlighted
