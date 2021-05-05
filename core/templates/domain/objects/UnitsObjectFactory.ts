@@ -209,7 +209,7 @@ export class UnitsObjectFactory {
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
     var keys = (
-      <CurrencyUnitsKeys>Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+      <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
     );
     for (var i = 0; i < keys.length; i++) {
       for (
