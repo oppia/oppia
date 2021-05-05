@@ -33,6 +33,17 @@ from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
 import contextlib2
+from google.cloud import ndb
+
+CLIENT = ndb.Client()
+
+
+class DirectRunnerWithCloudNDB(runners.DirectRunner):
+  """Executes a single pipeline inside the Cloud NDB context."""
+
+  def run_pipeline(self, pipeline, options):
+      with CLIENT.context():
+          super().run_pipeline(pipeline, options)
 
 
 class PipelinedTestBase(test_utils.TestBase):
@@ -46,7 +57,7 @@ class PipelinedTestBase(test_utils.TestBase):
     def __init__(self, *args, **kwargs):
         super(PipelinedTestBase, self).__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
-            runner=runners.DirectRunner(),
+            runner=DirectRunnerWithCloudNDB(),
             options=test_pipeline.PipelineOptions(runtime_type_check=True))
         self._close_stack = None
 

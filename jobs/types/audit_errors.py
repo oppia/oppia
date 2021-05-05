@@ -224,12 +224,10 @@ class ModelRelationshipError(BaseAuditError):
         # and written to the datastore.
         super(ModelRelationshipError, self).__init__(
             id_property.model_kind,
-            model_id=python_utils.convert_to_bytes(model_id))
+            model_id=model_id)
         self.message = (
             '%s=%r should correspond to the ID of an existing %s, '
-            'but no such model exists' % (
-                id_property, python_utils.convert_to_bytes(target_id),
-                target_kind))
+            'but no such model exists' % (id_property, target_id, target_kind))
 
 
 class ModelCanonicalNameMismatchError(BaseAuditError):

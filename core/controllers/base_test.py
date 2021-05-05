@@ -49,7 +49,6 @@ import python_utils
 import utils
 
 import contextlib2
-from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 

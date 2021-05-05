@@ -241,13 +241,13 @@ class RelationshipsOfTests(test_utils.TestBase):
         self.assertEqual(
             MockRelationshipsOf
             .get_id_referencing_properties_by_kind_of_possessor(), {
-                b'BarModel': (
-                    (self.get_property_of(BarModel, 'foo_id'), (b'FooModel',)),
+                'BarModel': (
+                    (self.get_property_of(BarModel, 'foo_id'), ('FooModel',)),
                 ),
             })
         self.assertEqual(
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
-            {b'FooModel'})
+            {'FooModel'})
 
     def test_accepts_id_as_property(self):
         @MockRelationshipsOf(BarModel)
@@ -258,13 +258,13 @@ class RelationshipsOfTests(test_utils.TestBase):
         self.assertEqual(
             MockRelationshipsOf
             .get_id_referencing_properties_by_kind_of_possessor(), {
-                b'BarModel': (
-                    (self.get_property_of(BarModel, 'id'), (b'BazModel',)),
+                'BarModel': (
+                    (self.get_property_of(BarModel, 'id'), ('BazModel',)),
                 ),
             })
         self.assertEqual(
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
-            {b'BazModel'})
+            {'BazModel'})
 
     def test_rejects_values_that_are_not_types(self):
         foo_model = FooModel()

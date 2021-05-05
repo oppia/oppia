@@ -955,6 +955,7 @@ class TestBase(unittest.TestCase):
                 defaultTestResult() method) and used instead.
         """
         with main.client.context(namespace=self.id()[-100:]):
+            print(self.id()[-100:])
             super(TestBase, self).run(result=result)
 
     def _get_unicode_test_string(self, suffix):

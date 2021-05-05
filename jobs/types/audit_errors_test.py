@@ -150,10 +150,10 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_str(self):
         self.assertEqual(
             repr(FooError(self.model)),
-            'u"FooError in BaseModel(id=\'123\'): foo"')
+            '"FooError in BaseModel(id=\'123\'): foo"')
         self.assertEqual(
             python_utils.UNICODE(FooError(self.model)),
-            'u"FooError in BaseModel(id=\'123\'): foo"')
+            '"FooError in BaseModel(id=\'123\'): foo"')
 
     def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))
@@ -291,7 +291,7 @@ class ModelIdRegexErrorTests(AuditErrorsTestBase):
         self.assertEqual(
             error.message,
             'ModelIdRegexError in BaseModel(id=\'?!"\'): id does not '
-            'match the expected regex=u\'[abc]{3}\'')
+            'match the expected regex=\'[abc]{3}\'')
 
 
 class ModelExpiredErrorTests(AuditErrorsTestBase):
