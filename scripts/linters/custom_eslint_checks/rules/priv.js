@@ -23,6 +23,7 @@
 
 const console = require("node:console");
 const { isVariableDeclaration } = require("typescript");
+const { global } = require("yargs");
 
 // TODO(#10479): Implement this rule using the nodes instead of tokens.
 
@@ -36,6 +37,7 @@ module.exports = {
             'that start with _ are tagged as private'),
             category: "Possible Errors",
             recommended: true,
+            url: "https://eslint.org/docs/rules/no-extra-semi"
         },
         fixable: "code",
         schema: [], 
@@ -45,37 +47,31 @@ module.exports = {
         }
     },
     create: function(context) {
-        return {
-          // get variables from the object
-        Identifier(node)  // I don't know what this does,  
-        //I referenced Eslint Rule writing Docs for most of it.
-        // for your reference: https://eslint.org/docs/developer-guide/working-with-rules
-        /*
-        Content as Pseudocode 
-        { list[] = getDeclaredVariables(node)  
-          Variable =  List [0] (individual element of the list.
- 
-         // I assumed that the above function returns me a list of variables 
-          if(list contains private variable && whitespaceafterscope(Variable))
-          {  
-            context.report({
-               node: node,
-              message: expectedPriv
-              suggest : [ fix: function (fixer) {
-                return insertTextAfterRange(range = length of scope type length, _)}]
-            });
-          }
-        }*/
+      var checkPrivWith_ = function(testVarNode, testVar) {
+        if (!testVar.startsWith('_') && testVar.getScope() != 'global') {
+          context.report({
+            testVarNode,
+            loc: testVarNode.loc,
+            messageId: 'Private variables should start with _'
+          });
+        }
+      };
+
+      var checkvar = function(node, testVar) {
+        checkPrivWith_(node, testVar);
+        //check_WithPriv(node, testvar);
+      };
+      
+      var getvar = function(node) {
+        return getDeclaredVariables(node);
+      };
+      
+      return {
+        CallExpression(node) {
+            const testVarNode = node.arguments[0];
+            var testVar = getvar(testVarNode);
+            checkvar(testVarNode, testVar);
+        }
       };
     },
 };
-
-function whitespaceafterscope(Variable) {
-  for(let i = 0; i < Variable.length(); i++)
-  {
-    if(Variable[i] == ' ' && Variable[i+1] == '_')
-    {return true;}
-    else
-    {return false;}
-  }
-}
