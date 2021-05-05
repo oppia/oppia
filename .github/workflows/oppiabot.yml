@@ -4,6 +4,10 @@ on:
   issues:
     types:
       - labeled
+  pull_request_target:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   oppiabot:
@@ -11,6 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Ensure that appropriate labels are added to issues
-        uses: oppia/oppiabot@1.1.0
+        uses: oppia/oppiabot@1.2.0
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
+        env:
+          SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
+          SHEETS_CRED: ${{ secrets.SHEETS_CRED }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
