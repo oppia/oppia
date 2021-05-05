@@ -70,6 +70,11 @@ export class UnitsObjectFactory {
     return !('/*() '.includes(unit));
   }
 
+  isLastElementUnit(unitList: string[]): boolean {
+    return (unitList.length > 0) &&
+            this.isunit(<string> unitList.slice(-1).pop());
+  }
+
   stringToLexical(units: string): string[] {
     units += '#';
     var unitList = [];
@@ -77,8 +82,7 @@ export class UnitsObjectFactory {
     for (var i = 0; i < units.length; i++) {
       if ('*/()# '.includes(units[i]) && unit !== 'per') {
         if (unit.length > 0) {
-          if ((unitList.length > 0) &&
-            this.isunit(<string> unitList.slice(-1).pop())) {
+          if (this.isLastElementUnit(unitList)) {
             unitList.push('*');
           }
           unitList.push(unit);
