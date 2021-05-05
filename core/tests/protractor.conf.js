@@ -4,7 +4,7 @@ var glob = require('glob');
 var path = require('path');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
-var exitCode=0;
+var exitCode = 0;
 
 var suites = {
     // The tests on Travis are run individually to parallelize

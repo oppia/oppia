@@ -146,6 +146,9 @@ describe('Voiceover upload features', function() {
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.playAudioRecord();
       await explorationEditorTranslationTab.deleteAudioRecord();
+      await explorationEditorPage.saveChanges(
+        'Adds audio file in translation tab.');
+      await workflow.publishExploration();
     });
 
   afterEach(async function() {
