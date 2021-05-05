@@ -31,6 +31,7 @@ import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.compone
 import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
 import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
 import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
+import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
 
 @NgModule({
   imports: [
@@ -50,7 +51,8 @@ import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-sa
     StoryEditorNavbarBreadcrumbComponent,
     StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
-    StoryEditorNavbarComponent
+    StoryEditorNavbarComponent,
+    StoryPreviewTabComponent
   ],
   providers: [
     {

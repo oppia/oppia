@@ -33,6 +33,9 @@ require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
   template: require('./numeric-expression-input-interaction.component.html'),
+  bindings: {
+    savedSolution: '<'
+  },
   controller: [
     '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
@@ -93,8 +96,8 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
         GuppyInitializationService.init(
           'guppy-div-learner',
           placeholder.unicode,
-          $attrs.savedSolution !== undefined ?
-          JSON.parse($attrs.savedSolution) : ''
+          ctrl.savedSolution !== undefined ?
+          ctrl.savedSolution : ''
         );
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&

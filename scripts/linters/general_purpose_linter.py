@@ -44,6 +44,7 @@ EXCLUDED_PATHS = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
+    'extensions/classifiers/proto/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -216,7 +217,10 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
             'ck-editor-copy-content-service.spec.ts',
-            'core/templates/tests/unit-test-utils.ts'),
+            'core/templates/tests/unit-test-utils.ts',
+            'core/templates/directives/mathjax.directive.ts',
+            'extensions/objects/templates/' +
+            'math-expression-content-editor.component.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
