@@ -67,7 +67,7 @@ import { WarningsAndAlertsComponent } from '../base-components/warnings-and-aler
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
 
 // Directives.
-import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.component';
+import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
 import { SchemaBasedEditorDirective } from './forms/schema-based-editors/schema-based-editor.directive';
 
@@ -165,7 +165,7 @@ const toastrConfig = {
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
-    StorySummaryTileDirective,
+    StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
@@ -205,6 +205,7 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
+    StorySummaryTileComponent,
     SideNavigationBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
@@ -248,7 +249,7 @@ const toastrConfig = {
     ResponseHeaderComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
-    StorySummaryTileDirective,
+    StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
