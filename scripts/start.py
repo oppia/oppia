@@ -27,7 +27,6 @@ import re
 import subprocess
 import time
 
-from constants import constants
 
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
@@ -37,6 +36,7 @@ install_third_party_libs.main()
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
+from constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import feconf # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 

@@ -8,7 +8,7 @@
       <strong [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER' | translate"></strong>
       <div class="oppia-suggestion-review-panel">
         <div>
-          <angular-html-bind-wrapper *ngIf="oldContent" html-data="oldContent">
+          <angular-html-bind-wrapper *ngIf="oldContent" [htmlData]="oldContent">
           </angular-html-bind-wrapper>
         </div>
         <div *ngIf="!oldContent" class="oppia-no-current-state" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE' | translate"></div>
@@ -17,7 +17,7 @@
     <div class="oppia-suggestion-review-panel-container float-right">
       <strong [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER' | translate"></strong>
       <div class="oppia-suggestion-review-panel">
-        <angular-html-bind-wrapper html-data="newContent">
+        <angular-html-bind-wrapper [htmlData]="newContent">
         </angular-html-bind-wrapper>
       </div>
     </div>
@@ -25,7 +25,7 @@
   <div class="oppia-dashboard-suggestin-description-text">
     <span [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION' | translate"></span>
     <div class="oppia-suggestion-review-panel">
-      <angular-html-bind-wrapper html-data="description">
+      <angular-html-bind-wrapper [htmlData]="description">
       </angular-html-bind-wrapper>
     </div>
   </div>
