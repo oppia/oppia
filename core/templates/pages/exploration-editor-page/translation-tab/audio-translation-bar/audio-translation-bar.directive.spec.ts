@@ -550,7 +550,7 @@ describe('Audio translation bar directive', function() {
   it('should play a not loaded audio translation', function() {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
-    spyOn(audioPlayerService, 'load').and.returnValue($q.resolve());
+    spyOn(audioPlayerService, 'loadAsync').and.returnValue($q.resolve());
     spyOn(audioPlayerService, 'play');
 
     expect($scope.isPlayingUploadedAudio()).toBe(false);
