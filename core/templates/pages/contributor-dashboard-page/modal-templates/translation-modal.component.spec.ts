@@ -325,7 +325,10 @@ describe('Translation Modal Component', () => {
     }));
 
     it('should correctly submit a translation suggestion', fakeAsync(() => {
-      spyOn(translateTextService, 'getPreviousTextToTranslate').and.returnValue({
+      spyOn(
+        translateTextService,
+        'getPreviousTextToTranslate'
+      ).and.returnValue({
         text: 'abc',
         more: true,
         status: 'submitted',

@@ -23,7 +23,6 @@ import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
-import { logging } from 'selenium-webdriver';
 
 /**
  * @fileoverview A service for handling contribution opportunities in different
@@ -195,7 +194,7 @@ export class TranslateTextService {
   getTextToTranslate(): TranslatableObject {
     let {
       status = this.PENDING,
-      translationHtml = '' 
+      translationHtml = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return {
       text: this._getNextText(),
@@ -208,7 +207,7 @@ export class TranslateTextService {
   getPreviousTextToTranslate(): TranslatableObject {
     let {
       status = this.PENDING,
-      translationHtml = '' 
+      translationHtml = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return {
       text: this._getPreviousText(),
@@ -230,12 +229,13 @@ export class TranslateTextService {
       languageCode,
       this.stateWiseContents[this.activeStateName][this.activeContentId],
       translationHtml,
-      imagesData).then(() => {
-        this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
-        this.stateAndContent[this.activeIndex].translationHtml = (
-          translationHtml);
-        successCallback();
-      }, errorCallback);
+      imagesData
+    ).then(() => {
+      this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
+      this.stateAndContent[this.activeIndex].translationHtml = (
+        translationHtml);
+      successCallback();
+    }, errorCallback);
   }
 }
 

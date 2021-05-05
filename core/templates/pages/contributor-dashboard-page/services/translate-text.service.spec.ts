@@ -110,7 +110,7 @@ describe('TranslateTextService', () => {
           text: 'text1',
           more: false,
           status: 'pending',
-	        translationHtml: ''
+          translationHtml: ''
         };
         const sampleStateWiseContentMapping = {
           stateName1: {contentId1: 'text1'},
@@ -137,7 +137,7 @@ describe('TranslateTextService', () => {
           text: null,
           more: false,
           status: 'pending',
-	        translationHtml: ''
+          translationHtml: ''
         };
         const sampleStateWiseContentMapping = {
           stateName1: {contentId1: ''},
