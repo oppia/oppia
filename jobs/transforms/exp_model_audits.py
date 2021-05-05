@@ -31,7 +31,7 @@ from jobs.transforms import base_model_audits
     exp_models.ExplorationSnapshotMetadataModel,
     exp_models.ExplorationCommitLogEntryModel)
 class ValidateExplorationCommitCmdsSchema(
-        base_model_audits.ValidateCommitCmdsSchema):
+        base_model_audits.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class and define """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
