@@ -252,8 +252,11 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
             yield audit_errors.ModelDomainObjectValidateError(input_model, e)
 
 
-class ValidateCommitCmdsSchema(beam.DoFn):
+class BaseValidateCommitCmdsSchema(beam.DoFn):
     """DoFn to validate schema of commit commands in commit_cmds dict.
+
+    Decorators are not required here as _get_change_domain_class is implemented
+    in exp_model_audits
     """
 
     def _get_change_domain_class(self, unused_item):

@@ -386,20 +386,21 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
         ])
 
 
-class MockValidateCommitCmdsSchema(base_model_audits.ValidateCommitCmdsSchema):
+class MockValidateCommitCmdsSchema(
+        base_model_audits.BaseValidateCommitCmdsSchema):
 
     def process(self, input_model):
         self._get_change_domain_class(input_model)
 
 
 class MockValidateCommitCmdsSchemaChangeDomain(
-        base_model_audits.ValidateCommitCmdsSchema):
+        base_model_audits.BaseValidateCommitCmdsSchema):
 
     def _get_change_domain_class(self, item):
         pass
 
 
-class MockValidateWrongSchema(base_model_audits.ValidateCommitCmdsSchema):
+class MockValidateWrongSchema(base_model_audits.BaseValidateCommitCmdsSchema):
 
     def _get_change_domain_class(self, item): # pylint: disable=unused-argument
         return change_domain.BaseChange
