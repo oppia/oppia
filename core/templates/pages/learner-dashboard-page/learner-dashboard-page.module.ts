@@ -28,6 +28,7 @@ import { LearnerDashboardPageComponent } from './learner-dashboard-page.componen
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 
 @NgModule({
   imports: [
@@ -38,12 +39,14 @@ import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal
   declarations: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
-    RemoveActivityModalComponent
+    RemoveActivityModalComponent,
+    LearnerDashboardSuggestionModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
-    RemoveActivityModalComponent
+    RemoveActivityModalComponent,
+    LearnerDashboardSuggestionModalComponent
   ],
   providers: [
     {
