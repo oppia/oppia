@@ -92,12 +92,22 @@ commands:
               circleci-agent step halt
             fi
 
-  upload_screenshots:
-    description: "Upload protractor screenshots folder as an artifact"
+  upload_artifacts:
+    description: "Upload artifacts"
     steps:
       - store_artifacts:
           path: /home/circleci/protractor-screenshots/
-          destination: protractor-screenshots
+          destination: protractor-screenshots/
+      - store_artifacts:
+          path: /home/circleci/protractor-video/
+          destination: protractor-video/
+  
+  install_ffmpeg:
+    description: "Install ffmpeg for video recorder"
+    steps:
+      - run:
+          name: Install ffmpeg
+          command: sudo apt install ffmpeg
 
 jobs:
   setup_and_typescript_tests:
@@ -130,7 +140,6 @@ jobs:
             - oppia/node_modules/
             - oppia/third_party/
             - oppia_tools/
-      - upload_screenshots
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
@@ -145,8 +154,9 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - install_chrome
       - skip_for_low_risk_prs
+      - install_chrome
+      - install_ffmpeg
       - run:
           name: Run e2e library test
           command: |
@@ -160,7 +170,7 @@ jobs:
             - oppia/backend_prod_files/
             - oppia/build/
             - oppia/third_party/generated/
-      - upload_screenshots
+      - upload_artifacts
       - check_memory_usage
 
   e2e_new_structure_tests:
@@ -175,6 +185,7 @@ jobs:
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - skip_for_low_risk_prs
       - install_chrome
+      - install_ffmpeg
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
@@ -191,7 +202,7 @@ jobs:
           name: Run e2e topic and story viewer test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
-      - upload_screenshots
+      - upload_artifacts
       - check_memory_usage
 
 notify:

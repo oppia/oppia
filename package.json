@@ -91,6 +91,7 @@
     "protoc-gen-ts": "^0.3.4",
     "protractor": "^7.0.0",
     "protractor-jasmine2-screenshot-reporter": "^0.5.0",
+    "protractor-video-reporter": "^0.3.0",
     "puppeteer": "^7.0.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.4.0",
