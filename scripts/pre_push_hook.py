@@ -191,7 +191,7 @@ def git_diff_name_status(left, right, diff_filter=''):
             #
             # We extract the first char (indicating the status), and the string
             # after the last tab character.
-            file_list.append(FileDiff(line[0], line[line.rfind(b'\t') + 1:]))
+            file_list.append(FileDiff(line[0], line[line.rfind('\t') + 1:]))
         return file_list
     else:
         raise ValueError(err)
@@ -252,7 +252,7 @@ def extract_files_to_lint(file_diffs):
     """Grab only files out of a list of FileDiffs that have a ACMRT status."""
     if not file_diffs:
         return []
-    lint_files = [f.name for f in file_diffs if f.status in b'ACMRT']
+    lint_files = [f.name for f in file_diffs if f.status in 'ACMRT']
     return lint_files
 
 
@@ -263,7 +263,7 @@ def get_parent_branch_name_for_diff():
         str. The name of the remote branch.
     """
     if common.is_current_branch_a_hotfix_branch():
-        return b'release-%s' % common.get_current_release_version_number(
+        return 'release-%s' % common.get_current_release_version_number(
             common.get_current_branch_name())
     return b'develop'
 

@@ -42,7 +42,6 @@ auth_models, user_models, audit_models, suggestion_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
          models.NAMES.suggestion]))
 
-current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.

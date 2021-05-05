@@ -69,8 +69,6 @@ import feconf
 import webapp2
 from webapp2_extras import routes
 
-
-current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.

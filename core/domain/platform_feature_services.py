@@ -40,8 +40,6 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
 
-current_user_services = models.Registry.import_current_user_services()
-
 
 ALL_FEATURES_LIST = (
     platform_feature_list.DEV_FEATURES_LIST +

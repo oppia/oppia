@@ -102,7 +102,9 @@ def send_email_to_recipients(
         # sending individual emails).
         data['recipient_variables'] = recipient_variables or {}
 
-        encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
+        encoded = base64.b64encode(
+            b'api:%b' % feconf.MAILGUN_API_KEY.encode('utf-8')
+        ).strip().decode('utf-8')
         auth_str = 'Basic %s' % encoded
         header = {'Authorization': auth_str}
         server = (

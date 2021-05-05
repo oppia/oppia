@@ -231,27 +231,21 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
                     'exp_id1', 2, 'state_name4', {'algorithm_id': 'job_id4'}))
 
         # Test that state names with unicode characters get saved correctly.
-        state_name1 = u'Klüft'
+        state_name1 = 'Klüft'
         mapping_id = (
             classifier_models.StateTrainingJobsMappingModel.create(
                 'exp_id1', 2, state_name1, {'algorithm_id': 'job_id4'}))
 
-        mapping = classifier_models.StateTrainingJobsMappingModel.get(
-            mapping_id)
+        classifier_models.StateTrainingJobsMappingModel.get(mapping_id)
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % state_name1)
 
-        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name1.encode(
-            encoding='utf-8')))
-
-        state_name2 = u'टेक्स्ट'
+        state_name2 = 'टेक्स्ट'
         mapping_id = (
             classifier_models.StateTrainingJobsMappingModel.create(
                 'exp_id1', 2, state_name2, {'algorithm_id': 'job_id4'}))
 
-        mapping = classifier_models.StateTrainingJobsMappingModel.get(
-            mapping_id)
-
-        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name2.encode(
-            encoding='utf-8')))
+        classifier_models.StateTrainingJobsMappingModel.get(mapping_id)
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % state_name2)
 
     def test_get_model_from_exploration_attributes(self):
         exp_id = 'exp_id1'

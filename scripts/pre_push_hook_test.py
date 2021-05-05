@@ -111,34 +111,34 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(
                 pre_push_hook.start_subprocess_for_result('cmd'),
-                ('test\n', ''))
+                (b'test\n', b''))
 
     def test_get_remote_name_without_errors(self):
         process_for_remote = subprocess.Popen(
-            ['echo', 'origin\nupstream'], stdout=subprocess.PIPE,
+            [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_upstream_url = subprocess.Popen(
-            ['echo', 'url.oppia/oppia.git'], stdout=subprocess.PIPE,
+            [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_origin_url = subprocess.Popen(
-            ['echo', 'url.other/oppia.git'], stdout=subprocess.PIPE,
+            [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
-            if 'remote.origin.url' in cmd_tokens:
+            if b'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
-            elif 'remote.upstream.url' in cmd_tokens:
+            elif b'remote.upstream.url' in cmd_tokens:
                 return process_for_upstream_url
             else:
                 return process_for_remote
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap:
-            self.assertEqual(pre_push_hook.get_remote_name(), 'upstream')
+            self.assertEqual(pre_push_hook.get_remote_name(), b'upstream')
 
     def test_get_remote_name_with_error_in_obtaining_remote(self):
         def mock_communicate():
-            return ('test', 'Error')
+            return (b'test', b'Error')
         process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.communicate = mock_communicate
         def mock_popen(unused_cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
             return process
@@ -151,13 +151,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_communicate():
             return ('test', 'Error')
         process_for_remote = subprocess.Popen(
-            ['echo', 'origin\nupstream'], stdout=subprocess.PIPE,
+            [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_remote_url = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process_for_remote_url.communicate = mock_communicate
         def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
-            if 'config' in cmd_tokens:
+            if b'config' in cmd_tokens:
                 return process_for_remote_url
             else:
                 return process_for_remote
@@ -168,18 +168,18 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_remote_name_with_no_remote_set(self):
         process_for_remote = subprocess.Popen(
-            ['echo', 'origin\nupstream'], stdout=subprocess.PIPE,
+            [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_upstream_url = subprocess.Popen(
-            ['echo', 'url.other/oppia.git'], stdout=subprocess.PIPE,
+            [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_origin_url = subprocess.Popen(
-            ['echo', 'url.other/oppia.git'], stdout=subprocess.PIPE,
+            [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
-            if 'remote.origin.url' in cmd_tokens:
+            if b'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
-            elif 'remote.upstream.url' in cmd_tokens:
+            elif b'remote.upstream.url' in cmd_tokens:
                 return process_for_upstream_url
             else:
                 return process_for_remote
@@ -199,18 +199,18 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_remote_name_with_multiple_remotes_set(self):
         process_for_remote = subprocess.Popen(
-            ['echo', 'origin\nupstream'], stdout=subprocess.PIPE,
+            [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_upstream_url = subprocess.Popen(
-            ['echo', 'url.oppia/oppia.git'], stdout=subprocess.PIPE,
+            [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process_for_origin_url = subprocess.Popen(
-            ['echo', 'url.oppia/oppia.git'], stdout=subprocess.PIPE,
+            [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
-            if 'remote.origin.url' in cmd_tokens:
+            if b'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
-            elif 'remote.upstream.url' in cmd_tokens:
+            elif b'remote.upstream.url' in cmd_tokens:
                 return process_for_upstream_url
             else:
                 return process_for_remote
@@ -276,7 +276,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
         with subprocess_swap, git_diff_swap, get_merge_base_swap:
             self.assertEqual(
-                pre_push_hook.compare_to_remote('remote', 'local branch'),
+                pre_push_hook.compare_to_remote(b'remote', b'local branch'),
                 'Test')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -337,7 +337,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_parent_branch_name_for_diff(), 'develop')
+                pre_push_hook.get_parent_branch_name_for_diff(), b'develop')
 
     def test_get_parent_branch_name_for_diff_with_non_release_branch(self):
         def mock_get_branch():
@@ -346,7 +346,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             common, 'get_current_branch_name', mock_get_branch)
         with get_branch_swap:
             self.assertEqual(
-                pre_push_hook.get_parent_branch_name_for_diff(), 'develop')
+                pre_push_hook.get_parent_branch_name_for_diff(), b'develop')
 
     def test_collect_files_being_pushed_with_empty_ref_list(self):
         def mock_get_branch():
@@ -612,13 +612,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with check_output_swap, self.assertRaisesRegexp(
-                    SystemExit, '1'):
+                    SystemExit, '1'
+                ):
                     with self.swap_check_backend_python_libs:
                         pre_push_hook.main(args=[])
-        self.assertTrue(
-            '\nCould not change branch to branch2. This is most probably '
+        self.assertIn(
+            '\nCould not change branch to branch1. This is most probably '
             'because you are in a dirty state. Change manually to the branch '
-            'that is being linted or stash your changes.' in self.print_arr)
+            'that is being linted or stash your changes.',
+            self.print_arr
+        )
 
     def test_lint_failure(self):
         self.linter_code = 1

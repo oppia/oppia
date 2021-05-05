@@ -217,16 +217,6 @@ class _Gae(Platform):
         return gae_transaction_services
 
     @classmethod
-    def import_current_user_services(cls):
-        """Imports and returns gae_current_user_services module.
-
-        Returns:
-            module. The gae_current_user_services module.
-        """
-        from core.platform.users import gae_current_user_services
-        return gae_current_user_services
-
-    @classmethod
     def import_datastore_services(cls):
         """Imports and returns gae_datastore_services module.
 
@@ -389,15 +379,6 @@ class Registry(python_utils.OBJECT):
             module. The auth_services module.
         """
         return cls._get().import_auth_services()
-
-    @classmethod
-    def import_current_user_services(cls):
-        """Imports and returns current_user_services module.
-
-        Returns:
-            module. The current_user_services module.
-        """
-        return cls._get().import_current_user_services()
 
     @classmethod
     def import_datastore_services(cls):

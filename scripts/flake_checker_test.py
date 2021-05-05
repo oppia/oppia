@@ -37,8 +37,8 @@ class CheckIfOnCITests(test_utils.GenericTestBase):
 
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[
-                ('GITHUB_ACTIONS',),
                 ('CIRCLECI',),
+                ('GITHUB_ACTIONS',),
             ])
 
         with getenv_swap:
@@ -52,8 +52,8 @@ class CheckIfOnCITests(test_utils.GenericTestBase):
 
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[
-                ('GITHUB_ACTIONS',),
                 ('CIRCLECI',),
+                ('GITHUB_ACTIONS',),
             ])
 
         with getenv_swap:

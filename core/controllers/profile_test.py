@@ -49,7 +49,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
         self.assertIn(
-            '<profile-page></profile-page>', response.body)
+            b'<profile-page></profile-page>', response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):

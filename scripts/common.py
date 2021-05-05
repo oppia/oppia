@@ -281,7 +281,7 @@ def open_new_tab_in_browser_if_possible(url):
 def get_remote_alias(remote_url):
     """Finds the correct alias for the given remote repository URL."""
     git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v']).split(b'\n')
+        ['git', 'remote', '-v']).decode('utf-8').split('\n')
     remote_alias = None
     for line in git_remote_output:
         if remote_url in line:
@@ -297,10 +297,11 @@ def get_remote_alias(remote_url):
 def verify_local_repo_is_clean():
     """Checks that the local Git repo is clean."""
     git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split(b'\n')
+        ['git', 'status']
+    ).strip().split(b'\n')
 
-    branch_is_clean_message_1 = 'nothing to commit, working directory clean'
-    branch_is_clean_message_2 = 'nothing to commit, working tree clean'
+    branch_is_clean_message_1 = b'nothing to commit, working directory clean'
+    branch_is_clean_message_2 = b'nothing to commit, working tree clean'
     if (
             not branch_is_clean_message_1 in git_status_output and
             not branch_is_clean_message_2 in git_status_output):

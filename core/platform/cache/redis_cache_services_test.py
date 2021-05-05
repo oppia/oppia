@@ -52,11 +52,14 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         key_value_mapping = {'a1': '1', 'b1': '2', 'c1': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a1', 'b1', 'c1']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a1', 'b1', 'c1']),
+            [b'1', b'2', b'3']
+        )
         redis_cache_services.flush_cache()
         self.assertEqual(
             redis_cache_services.get_multi(['a1', 'b1', 'c1']),
-            [None, None, None])
+            [None, None, None]
+        )
 
     def test_get_multi_retrieves_cache_elements(self):
         redis_cache_services.flush_cache()
@@ -69,7 +72,9 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         key_value_mapping = {'a2': '1', 'b2': '2', 'c2': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a2', 'b2', 'c2']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a2', 'b2', 'c2']),
+            [b'1', b'2', b'3']
+        )
 
     def test_set_multi_sets_elements(self):
         redis_cache_services.flush_cache()
@@ -82,7 +87,9 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         key_value_mapping = {'a4': '1', 'b4': '2', 'c4': '3'}
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
-            redis_cache_services.get_multi(['a4', 'b4', 'c4']), ['1', '2', '3'])
+            redis_cache_services.get_multi(['a4', 'b4', 'c4']),
+            [b'1', b'2', b'3']
+        )
         return_number_of_keys_set = redis_cache_services.delete_multi(
             ['a4', 'b4', 'c4'])
         self.assertEqual(
@@ -105,7 +112,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
         self.assertEqual(
             redis_cache_services.get_multi(['a5', 'z5', 'd5']),
-            ['1', None, None])
+            [b'1', None, None])
         self.assertEqual(
             redis_cache_services.get_multi(['x5', 'b5', 'd5']),
             [None, '2', None])
@@ -116,12 +123,12 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         redis_cache_services.set_multi(key_value_mapping)
         self.assertEqual(
             redis_cache_services.get_multi(['a6', 'b6', 'c6']),
-            ['1', '2', '3'])
+            [b'1', b'2', b'3'])
         self.assertEqual(
             redis_cache_services.delete_multi(['a6', 'd6', 'e6']), 1)
         self.assertEqual(
             redis_cache_services.get_multi(['a6', 'b6', 'c6']),
-            [None, '2', '3'])
+            [None, b'2', b'3'])
 
     def test_redis_configuration_file_matches_feconf_redis_configuration(self):
         """Tests that the redis configuration file and feconf variables have
@@ -131,9 +138,9 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             os.path.join(common.CURR_DIR, 'redis.conf')))
 
         with python_utils.open_file(
-            os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
+                os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
             self.assertEqual(
-                elements[1], python_utils.convert_to_bytes(feconf.REDISPORT))
+                elements[1], str(feconf.REDISPORT))
