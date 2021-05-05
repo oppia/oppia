@@ -23,6 +23,7 @@ import { ImagesData } from 'services/image-local-storage.service';
 
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import { logging } from 'selenium-webdriver';
 
 /**
  * @fileoverview A service for handling contribution opportunities in different
@@ -30,15 +31,21 @@ import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
  */
 
 interface TranslatableObject {
+  translationHtml: string,
+  status: Status,
   text: string,
   more: boolean
 }
+
+export type Status = 'pending' | 'submitted';
 
 export class StateAndContent {
   constructor(
     private _stateName: string,
     private _contentID: string,
-    private _contentText: string
+    private _contentText: string,
+    private _status: Status,
+    private _translationHtml: string
   ) { }
 
   get stateName(): string {
@@ -64,6 +71,22 @@ export class StateAndContent {
   set contentText(newContentText: string) {
     this._contentText = newContentText;
   }
+
+  get status(): Status {
+    return this._status;
+  }
+
+  set status(newStatus: Status) {
+    this._status = newStatus;
+  }
+
+  get translationHtml(): string {
+    return this._translationHtml;
+  }
+
+  set translationHtml(newTranslationHtml: string) {
+    this._translationHtml = newTranslationHtml;
+  }
 }
 
 
@@ -72,6 +95,8 @@ export class StateAndContent {
 })
 export class TranslateTextService {
   STARTING_INDEX = -1;
+  PENDING = 'pending';
+  SUBMITTED = 'submitted';
   stateWiseContents = {};
   stateWiseContentIds = {};
   stateNamesList = [];
@@ -82,6 +107,7 @@ export class TranslateTextService {
   activeContentId;
   activeStateName: string;
   activeContentText: string;
+  activeContentStatus: Status;
 
   constructor(
     private translateTextBackedApiService:
@@ -122,6 +148,14 @@ export class TranslateTextService {
   }
 
   init(expId: string, languageCode: string, successCallback: () => void): void {
+    this.stateWiseContentIds = {};
+    this.stateNamesList = [];
+    this.stateAndContent = [];
+    this.activeIndex = this.STARTING_INDEX;
+    this.activeContentId = null;
+    this.activeStateName = null;
+    this.activeContentText = null;
+    this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.translateTextBackedApiService.getTranslatableTextsAsync(
       expId, languageCode).then((translatableTexts: TranslatableTexts) => {
@@ -138,7 +172,7 @@ export class TranslateTextService {
 
             this.stateAndContent.push(
               new StateAndContent(
-                stateName, contentId, text as string
+                stateName, contentId, text as string, this.PENDING as Status, ''
               )
             );
             stateHasText = true;
@@ -154,17 +188,33 @@ export class TranslateTextService {
     });
   }
 
+  getActiveIndex(): number {
+    return this.activeIndex;
+  }
+
   getTextToTranslate(): TranslatableObject {
+    let {
+      status = this.PENDING,
+      translationHtml = '' 
+    } = { ...this.stateAndContent[this.activeIndex] };
     return {
       text: this._getNextText(),
-      more: this._isMoreTextAvailabelForTranslation()
+      more: this._isMoreTextAvailabelForTranslation(),
+      status: status,
+      translationHtml: translationHtml
     };
   }
 
   getPreviousTextToTranslate(): TranslatableObject {
+    let {
+      status = this.PENDING,
+      translationHtml = '' 
+    } = { ...this.stateAndContent[this.activeIndex] };
     return {
       text: this._getPreviousText(),
-      more: this._isPreviousTextAvailableForTranslation()
+      more: this._isPreviousTextAvailableForTranslation(),
+      status: status,
+      translationHtml: translationHtml
     };
   }
 
@@ -180,7 +230,12 @@ export class TranslateTextService {
       languageCode,
       this.stateWiseContents[this.activeStateName][this.activeContentId],
       translationHtml,
-      imagesData).then(successCallback, errorCallback);
+      imagesData).then(() => {
+        this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
+        this.stateAndContent[this.activeIndex].translationHtml = (
+          translationHtml);
+        successCallback();
+      }, errorCallback);
   }
 }
 

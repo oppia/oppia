@@ -57,22 +57,30 @@ describe('TranslateTextService', () => {
 
       const expectedTextAndAvailability3 = {
         text: 'text3',
-        more: false
+        more: false,
+        status: 'pending',
+        translationHtml: ''
       };
 
       const expectedTextAndAvailability2 = {
         text: 'text2',
-        more: true
+        more: true,
+        status: 'pending',
+        translationHtml: ''
       };
 
       const expectedTextAndAvailability1 = {
         text: 'text1',
-        more: true
+        more: true,
+        status: 'pending',
+        translationHtml: ''
       };
 
       const expectedTextAndPreviousAvailability1 = {
         text: 'text1',
-        more: false
+        more: false,
+        status: 'pending',
+        translationHtml: ''
       };
 
       textAndAvailability = translateTextService.getTextToTranslate();
@@ -100,7 +108,9 @@ describe('TranslateTextService', () => {
       fakeAsync(() => {
         const expectedTextAndAvailability = {
           text: 'text1',
-          more: false
+          more: false,
+          status: 'pending',
+	        translationHtml: ''
         };
         const sampleStateWiseContentMapping = {
           stateName1: {contentId1: 'text1'},
@@ -125,7 +135,9 @@ describe('TranslateTextService', () => {
       fakeAsync(() => {
         const expectedTextAndAvailability = {
           text: null,
-          more: false
+          more: false,
+          status: 'pending',
+	        translationHtml: ''
         };
         const sampleStateWiseContentMapping = {
           stateName1: {contentId1: ''},
@@ -145,8 +157,8 @@ describe('TranslateTextService', () => {
 
         expect(textAndAvailability).toEqual(expectedTextAndAvailability);
 
-        const textAndPreviousAvailability =
-       translateTextService.getPreviousTextToTranslate();
+        const textAndPreviousAvailability = (
+          translateTextService.getPreviousTextToTranslate());
 
         expect(textAndAvailability).toEqual(textAndPreviousAvailability);
       }));
