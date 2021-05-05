@@ -103,24 +103,24 @@
               </image>
             </pattern>
           </defs>
-          <a (mouseover)="updateExplorationPreview(node.getExplorationId());
+          <a (mouseenter)="updateExplorationPreview(node.getExplorationId());
                            setIconHighlight(index);"
              (mouseleave)="togglePreviewCard();
                             unsetIconHighlight(index);">
-            <circle [hidden]="!((node.getExplorationId() === nextExplorationId) && (index !== activeHighlightedIconIndex))"
+            <!-- <circle [hidden]="!((node.getExplorationId() === nextExplorationId) && (index !== activeHighlightedIconIndex))"
                     cx="50"
                     cy="70"
                     r="50"
                     attr.id="{{'highlight' + index}}"
                     fill="#FF8C00"
-                    fill-opacity="0.5"/>
-            <!-- <circle [hidden]="!((index===activeHighlightedIconIndex)?true:false)"
+                    fill-opacity="0.5"/> -->
+            <circle hidden="true"
                     cx="50"
                     cy="70"
                     r="50"
                     attr.id="{{'highlight' + index}}"
                     fill="#A6DACF"
-                    fill-opacity="0.5"/> -->
+                    fill-opacity="0.5"/>
             <circle cx="50"
                     cy="70"
                     r="42"
@@ -129,7 +129,6 @@
                     stroke-width="2"/>
           </a>
         </svg>
-        {{node.getExplorationId()}}
       </a>
     </div>
 
@@ -198,13 +197,13 @@
                 <feDropShadow dx="5" dy="5" stdDeviation="0.5" flood-opacity="0.5"/>
               </filter>
             </defs>
-            <circle [hidden]="!((node.getExplorationId() === nextExplorationId) && (index !== activeHighlightedIconIndex))"
+            <!-- <circle [hidden]="!((node.getExplorationId() === nextExplorationId) && (index !== activeHighlightedIconIndex))"
                     cx="50"
                     cy="70"
                     r="50"
                     attr.id="{{'highlight' + index}}"
                     fill="#FF8C00"
-                    fill-opacity="0.5"/>
+                    fill-opacity="0.5"/> -->
             <!-- <circle [hidden]="!((index===activeHighlightedIconIndex)?true:false)"
                     cx="50"
                     cy="70"

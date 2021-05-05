@@ -125,14 +125,18 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 
   setIconHighlight(index: number): void {
+    console.log('set icon highlight');
+    console.log(index);
     this.activeHighlightedIconIndex = index;
   }
 
   unsetIconHighlight(): void {
+    console.log('mouseleave-unsetIconHighlight');
     this.activeHighlightedIconIndex = -1;
   }
 
   togglePreviewCard(): void {
+    console.log('mouseleave-togglepreviewcard');
     this.explorationCardIsShown = !this.explorationCardIsShown;
   }
 
@@ -164,6 +168,7 @@ export class CollectionPlayerPageComponent implements OnInit {
   }
 
   updateExplorationPreview(explorationId: string): void {
+    console.log('mouseover-event');
     this.explorationCardIsShown = true;
     this.currentExplorationId = explorationId;
     this.summaryToPreview = this.getCollectionNodeForExplorationId(
