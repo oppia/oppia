@@ -49,7 +49,6 @@ PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
 PIP_TOOLS_VERSION = '6.0.1'
-SIMPLE_CRYPT_VERSION = '4.1.7'
 GRPCIO_VERSION = '1.0.0'
 ENUM_VERSION = '1.1.10'
 PROTOBUF_VERSION = '3.13.0'
@@ -144,7 +143,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 300
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
 MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
@@ -657,6 +656,10 @@ def wait_for_port_to_be_in_use(port_number):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' %
             port_number)
+        python_utils.PRINT(
+            'This may be because you do not have enough available '
+            'memory. Please refer to '
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
         sys.exit(1)
 
 

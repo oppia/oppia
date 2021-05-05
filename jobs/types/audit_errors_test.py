@@ -30,8 +30,8 @@ from jobs.types import audit_errors
 from jobs.types import model_property
 import python_utils
 
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models, user_models, topic_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user, models.NAMES.topic])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -368,6 +368,22 @@ class ModelExpiringErrorTests(AuditErrorsTestBase):
                 feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
 
 
+class ModelIncorrectKeyErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = user_models.PendingDeletionRequestModel(
+            id='test'
+        )
+        incorrect_keys = ['incorrect key']
+        error = audit_errors.ModelIncorrectKeyError(model, incorrect_keys)
+
+        self.assertEqual(
+            error.message,
+            'ModelIncorrectKeyError in PendingDeletionRequestModel'
+            '(id=\'test\'): contains keys %s are not allowed' %
+            incorrect_keys)
+
+
 class ModelRelationshipErrorTests(AuditErrorsTestBase):
 
     def test_message(self):
@@ -380,3 +396,79 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
             'ModelRelationshipError in FooModel(id=\'123\'): '
             'FooModel.bar_id=\'123\' should correspond to the ID of an '
             'existing BarModel, but no such model exists')
+
+
+class ModelCanonicalNameMismatchErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = topic_models.TopicModel(
+            id='test',
+            name='name',
+            url_fragment='name-two',
+            canonical_name='canonical_name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopic_schema_version=0,
+            story_reference_schema_version=0
+        )
+        error = audit_errors.ModelCanonicalNameMismatchError(model)
+
+        self.assertEqual(
+            error.message,
+            'ModelCanonicalNameMismatchError in TopicModel(id=\'test\'): '
+            'Entity name %s in lowercase does not match canonical name %s' %
+            (model.name, model.canonical_name))
+
+
+class DraftChangeListLastUpdatedNoneErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        draft_change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }]
+        model = user_models.ExplorationUserDataModel(
+            id='123',
+            user_id='test',
+            exploration_id='exploration_id',
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=None,
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_AGO
+        )
+        error = audit_errors.DraftChangeListLastUpdatedNoneError(model)
+
+        self.assertEqual(
+            error.message,
+            'DraftChangeListLastUpdatedNoneError in ExplorationUserDataModel'
+            '(id=\'123\'): draft change list %s exists but draft change list '
+            'last updated is None' % draft_change_list)
+
+
+class DraftChangeListLastUpdatedInvalidErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        draft_change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'objective',
+            'new_value': 'the objective'
+        }]
+        last_updated = self.NOW + datetime.timedelta(days=5)
+        model = user_models.ExplorationUserDataModel(
+            id='123',
+            user_id='test',
+            exploration_id='exploration_id',
+            draft_change_list=draft_change_list,
+            draft_change_list_last_updated=last_updated,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW
+        )
+        error = audit_errors.DraftChangeListLastUpdatedInvalidError(model)
+
+        self.assertEqual(
+            error.message,
+            'DraftChangeListLastUpdatedInvalidError in '
+            'ExplorationUserDataModel(id=\'123\'): draft change list last '
+            'updated %s is greater than the time when job was run' %
+            last_updated)
