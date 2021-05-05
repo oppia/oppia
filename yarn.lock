@@ -329,6 +329,14 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
+"@ctrl/ngx-codemirror@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@ctrl/ngx-codemirror/-/ngx-codemirror-4.1.1.tgz#dfeb83835d9ead95f9bfab5219c9cbe297bd5cd2"
+  integrity sha512-zeJiFrXpuYpZGUsFHyQ6tyiadBBfZHcV/10b0tTxVm9IIYqiOBXvX+LmTyZ9bRuu+Y7txNIwBdTY/ana0UFU9g==
+  dependencies:
+    "@types/codemirror" "^0.0.99"
+    tslib "^2.0.0"
+
 "@dabh/diagnostics@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@dabh/diagnostics/-/diagnostics-2.0.2.tgz#290d08f7b381b8f94607dc8f471a12c675f9db31"
@@ -1016,6 +1024,13 @@
   resolved "https://registry.yarnpkg.com/@types/ckeditor/-/ckeditor-4.9.10.tgz#f4d252821c52c2b903b21801c8469ead756122b3"
   integrity sha512-dcOPCXM0Cr5Z0i6eF/aW5LvECrS+cdl2Gi7lU+rEUNWby0w9Yl6mBubjrs29OVAducpuZjB4mfDayE+o4/gGdQ==
 
+"@types/codemirror@0.0.99", "@types/codemirror@^0.0.99":
+  version "0.0.99"
+  resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.99.tgz#fc3fd1fe84172e76ab802dcaa309f9c9740aeab0"
+  integrity sha512-iSNLwL9ZXUDUhhljqyO9lDpxKOnye9Y2IY0vvoarapI3QLpZsx8RF8Ybic4+gne+DVsnc5ReBOQA3p4FVbsXMw==
+  dependencies:
+    "@types/tern" "*"
+
 "@types/component-emitter@^1.2.10":
   version "1.2.10"
   resolved "https://registry.yarnpkg.com/@types/component-emitter/-/component-emitter-1.2.10.tgz#ef5b1589b9f16544642e473db5ea5639107ef3ea"
@@ -1264,6 +1279,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/estree@*":
+  version "0.0.47"
+  resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.47.tgz#d7a51db20f0650efec24cd04994f523d93172ed4"
+  integrity sha512-c5ciR06jK8u9BstrmJyO97m+klJrrhCf9u3rLu3DEAJBirxRqSCvDQoYKmxuYwQI5SZChAWu+tq9oVlGRuzPAg==
+
 "@types/geojson@*":
   version "7946.0.7"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.7.tgz#c8fa532b60a0042219cdf173ca21a975ef0666ad"
@@ -1445,6 +1465,13 @@
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.7.tgz#545158342f949e8fd3bfd813224971ecddc3fac4"
   integrity sha512-0VBprVqfgFD7Ehb2vd8Lh9TG3jP98gvr8rgehQqzztZNI7o8zS8Ad4jyZneKELphpuE212D8J70LnSNQSyO6bQ==
+
+"@types/tern@*":
+  version "0.23.3"
+  resolved "https://registry.yarnpkg.com/@types/tern/-/tern-0.23.3.tgz#4b54538f04a88c9ff79de1f6f94f575a7f339460"
+  integrity sha512-imDtS4TAoTcXk0g7u4kkWqedB3E4qpjXzCpD2LU5M5NAXHzCDsypyvXSaG7mM8DKYkCRa7tFp4tS/lp/Wo7Q3w==
+  dependencies:
+    "@types/estree" "*"
 
 "@types/uglify-js@*":
   version "3.13.0"
@@ -3342,6 +3369,11 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
+
+codemirror@^5.61.0:
+  version "5.61.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.61.0.tgz#318e5b034a707207948b92ffc2862195e8fdb08e"
+  integrity sha512-D3wYH90tYY1BsKlUe0oNj2JAhQ9TepkD51auk3N7q+4uz7A/cgJ5JsWHreT0PqieW1QhOuqxQ2reCXV1YXzecg==
 
 collection-visit@^1.0.0:
   version "1.0.0"
