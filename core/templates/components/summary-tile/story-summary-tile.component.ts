@@ -25,6 +25,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
+import { StorySummary } from 'domain/story/story-summary.model';
 
 @Component({
   selector: 'oppia-story-summary-tile',
@@ -32,8 +33,8 @@ import { AppConstants } from 'app.constants';
 })
 export class StorySummaryTileComponent implements OnInit {
   @Input() classroomUrlFragment: string;
-  @Input() storySummary;
-  @Input() topicUrlFragment;
+  @Input() storySummary: StorySummary;
+  @Input() topicUrlFragment: string;
   initialCount: number;
   chaptersDisplayed: number;
   nodeCount: number;
@@ -65,7 +66,7 @@ export class StorySummaryTileComponent implements OnInit {
       });
   }
 
-  isChapterCompleted(title: string): string {
+  isChapterCompleted(title: string): boolean {
     return this.storySummary.isNodeCompleted(title);
   }
 

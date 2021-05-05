@@ -300,7 +300,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'story-editor.directive.ts',
     'story-node-editor.directive.ts',
     'story-node.model.ts',
-    'story-summary-tile.directive.ts',
+    'story-summary-tile.component.ts',
     'story-update.service.ts',
     'StoryContentsObjectFactory.ts',
     'student.ts',
