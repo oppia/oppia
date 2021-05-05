@@ -1821,7 +1821,7 @@ class Exploration(python_utils.OBJECT):
                         }
                     }
                 })
-            return states_dict
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -1860,7 +1860,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 49
+    CURRENT_EXP_SCHEMA_VERSION = 50
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1945,7 +1945,7 @@ class Exploration(python_utils.OBJECT):
         """
         exploration_dict['schema_version'] = 50
 
-        exploration_dict['states'] = cls._convert_states_v38_dict_to_v39_dict(
+        exploration_dict['states'] = cls._convert_states_v44_dict_to_v45_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 45
 
@@ -2001,6 +2001,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v48_dict_to_v49_dict(
                 exploration_dict)
             exploration_schema_version = 49
+
+        if exploration_schema_version == 49:
+            exploration_dict = cls._convert_v49_dict_to_v50_dict(
+                exploration_dict)
+            exploration_schema_version = 50
 
         return exploration_dict
 
