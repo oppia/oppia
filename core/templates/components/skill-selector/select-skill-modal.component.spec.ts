@@ -87,12 +87,6 @@ describe('Select Skill Modal', () => {
     componentInstance.skillSummaries = skillSummaries;
     componentInstance.untriagedSkillSummaries = untriagedSkillSummaries;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    ngbActiveModal = (ngbActiveModal as unknown) as
-      jasmine.SpyObj<NgbActiveModal>;
-  });
-
-  it('should be defined', () => {
-    expect(componentInstance).toBeDefined();
   });
 
   it('should close modal on save', () => {
