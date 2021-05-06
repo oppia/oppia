@@ -1481,8 +1481,9 @@ def set_email_preferences_for_exploration(
         mute_suggestion_notifications: bool. Whether the given user has muted
             suggestion emails. Defaults to None.
     """
-    exploration_user_model = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+    exploration_user_model = (
+        user_models.ExplorationUserDataModel.get_user_data_model(
+            user_id, exploration_id))
     if exploration_user_model is None:
         exploration_user_model = user_models.ExplorationUserDataModel.create(
             user_id, exploration_id)
@@ -1508,8 +1509,9 @@ def get_email_preferences_for_exploration(user_id, exploration_id):
         UserExplorationPrefs. Representing whether the user has chosen to
         receive email updates for particular exploration.
     """
-    exploration_user_model = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+    exploration_user_model = (
+        user_models.ExplorationUserDataModel.get_user_data_model(
+            user_id, exploration_id))
 
     if exploration_user_model is None:
         return user_domain.UserExplorationPrefs.create_default_prefs()

@@ -140,8 +140,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         user_query_services.archive_user_query(original_user_query.id)
 
         archived_user_query_model = (
-            user_models.UserQueryModel.get_marked_as_deleted(
-                self.USER_QUERY_1_ID))
+            user_models.UserQueryModel.get(
+                self.USER_QUERY_1_ID, include_deleted=True))
         self.assertEqual(
             archived_user_query_model.query_status,
             feconf.USER_QUERY_STATUS_ARCHIVED)

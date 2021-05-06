@@ -66,8 +66,9 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         """Updates the user rating of the exploration. Returns the old rating
         before updation.
         """
-        exp_user_data_model = user_models.ExplorationUserDataModel.get(
-            user_id, exploration_id)
+        exp_user_data_model = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                user_id, exploration_id))
         if exp_user_data_model:
             old_rating = exp_user_data_model.rating
         else:
@@ -112,8 +113,9 @@ def get_user_specific_rating_for_exploration(user_id, exploration_id):
         int or None. An integer between 1 and 5 inclusive, or None if the user
         has not previously rated the exploration.
     """
-    exp_user_data_model = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+    exp_user_data_model = (
+        user_models.ExplorationUserDataModel.get_user_data_model(
+            user_id, exploration_id))
     return exp_user_data_model.rating if exp_user_data_model else None
 
 
@@ -132,8 +134,9 @@ def get_when_exploration_rated(user_id, exploration_id):
         rated by the user, or None if the user has not previously
         rated the exploration.
     """
-    exp_user_data_model = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
+    exp_user_data_model = (
+        user_models.ExplorationUserDataModel.get_user_data_model(
+            user_id, exploration_id))
     return exp_user_data_model.rated_on if exp_user_data_model else None
 
 

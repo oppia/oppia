@@ -208,26 +208,15 @@ class BaseModel(datastore_services.Model):
         return {}
 
     @classmethod
-    def get_marked_as_deleted(cls, entity_id):
-        """Gets an entity by id including entities marked as deleted.
-
-        Args:
-            entity_id: str. The entity id.
-
-        Returns:
-            None|*. Returns entity with the given id even if it is marked as
-            deleted.
-        """
-        return cls.get_by_id(entity_id)
-
-    @classmethod
-    def get(cls, entity_id, strict=True):
+    def get(cls, entity_id, strict=True, include_deleted=False):
         """Gets an entity by id.
 
         Args:
             entity_id: str. The entity id.
             strict: bool. Whether to fail noisily if no entity with the given id
                 exists in the datastore. Default is True.
+            include_deleted: bool. Get models marked as deleted. Default is
+                False.
 
         Returns:
             None|*. None, if strict == False and no undeleted entity with the
@@ -240,6 +229,9 @@ class BaseModel(datastore_services.Model):
                 datastore.
         """
         entity = cls.get_by_id(entity_id)
+        if include_deleted:
+            return entity
+
         if entity and entity.deleted:
             entity = None
 
@@ -1186,7 +1178,7 @@ class VersionedModel(BaseModel):
         return instances
 
     @classmethod
-    def get(cls, entity_id, strict=True, version=None):
+    def get(cls, entity_id, strict=True, version=None, include_deleted=False):
         """Gets model instance.
 
         Args:
@@ -1194,13 +1186,16 @@ class VersionedModel(BaseModel):
             strict: bool. Whether to fail noisily if no entity with the given id
                 exists in the datastore. Default is True.
             version: int. Version we want to get. Default is None.
+            include_deleted: bool. Get models marked as deleted. Default is
+                False.
 
         Returns:
             VersionedModel. If version is None, get the newest version of the
             model. Otherwise, get the specified version.
         """
         if version is None:
-            return super(VersionedModel, cls).get(entity_id, strict=strict)
+            return super(VersionedModel, cls).get(
+                entity_id, strict=strict, include_deleted=include_deleted)
         else:
             return cls.get_version(entity_id, version, strict=strict)
 

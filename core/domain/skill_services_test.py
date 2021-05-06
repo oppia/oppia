@@ -839,8 +839,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_skill_marked_deleted(self):
         skill_models.SkillModel.delete_multi(
             [self.SKILL_ID], self.USER_ID, '', force_deletion=False)
-        skill_model = skill_models.SkillModel.get_marked_as_deleted(
-            self.SKILL_ID)
+        skill_model = skill_models.SkillModel.get(
+            self.SKILL_ID, include_deleted=True)
         self.assertTrue(skill_model.deleted)
 
         skill_services.delete_skill(

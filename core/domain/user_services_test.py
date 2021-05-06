@@ -474,7 +474,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # of mute_feedback_notifications and mute_suggestion_notifications
         # should match the default values.
         exploration_user_model = (
-            user_services.user_models.ExplorationUserDataModel.get(
+            user_services.user_models.ExplorationUserDataModel
+            .get_user_data_model(
                 user_id, exploration_id))
         self.assertIsNone(exploration_user_model)
         email_preferences = user_services.get_email_preferences_for_exploration(

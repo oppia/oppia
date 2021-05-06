@@ -1046,7 +1046,8 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
                 continue
             topic_id = story_model.corresponding_topic_id
             if topic_id:
-                topic = topic_models.TopicModel.get_marked_as_deleted(topic_id)
+                topic = topic_models.TopicModel.get(
+                    topic_id, include_deleted=True)
                 all_story_references = (
                     topic.canonical_story_references +
                     topic.additional_story_references)
@@ -1471,8 +1472,8 @@ class PendingDeletionRequestModelValidator(
             item: PendingDeletionRequestModel. Pending deletion request model
                 to validate.
         """
-        user_model = user_models.UserSettingsModel.get_marked_as_deleted(
-            item.id)
+        user_model = user_models.UserSettingsModel.get(
+            item.id, include_deleted=True)
         if user_model is None or not user_model.deleted:
             cls._add_error(
                 'deleted user settings',
@@ -1555,8 +1556,8 @@ class PseudonymizedUserModelValidator(
         Args:
             item: PseudonymizedUserModel. PseudonymizedUserModel to validate.
         """
-        user_model = user_models.UserSettingsModel.get_marked_as_deleted(
-            item.id)
+        user_model = user_models.UserSettingsModel.get(
+            item.id, include_deleted=True)
         if user_model is not None:
             cls.errors['deleted user settings'].append(
                 'Entity id %s: User settings model exists' % (item.id))

@@ -539,8 +539,8 @@ class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         commit_logs_should_exist = True
 
         parent_model = (
-            model_properties['parent_model_class'].get_marked_as_deleted(
-                model_id))
+            model_properties['parent_model_class'].get(
+                model_id, include_deleted=True))
         if model_class_name == 'ExplorationRightsSnapshotMetadataModel':
             if snapshot_model.commit_type in ['create', 'delete']:
                 commit_logs_should_exist = False

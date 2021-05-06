@@ -564,7 +564,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # But the model still exists in the backend.
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get_marked_as_deleted(self.EXP_0_ID))
+            exp_models.ExplorationModel.get(
+                self.EXP_0_ID, include_deleted=True))
 
         # The exploration summary is deleted, however.
         self.assertIsNone(exp_models.ExpSummaryModel.get(
@@ -627,10 +628,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # But the models still exist in the backend.
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get_marked_as_deleted(self.EXP_0_ID))
+            exp_models.ExplorationModel.get(
+                self.EXP_0_ID, include_deleted=True))
         self.assertIsNotNone(
-            exp_models.ExplorationModel.get_marked_as_deleted(
-                self.EXP_1_ID))
+            exp_models.ExplorationModel.get(
+                self.EXP_1_ID, include_deleted=True))
 
         # The exploration summaries are deleted, however.
         self.assertIsNone(exp_models.ExpSummaryModel.get(
@@ -882,13 +884,13 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The user data model has been purged from the backend.
         self.assertIsNone(
-            user_models.ExplorationUserDataModel.get(
+            user_models.ExplorationUserDataModel.get_user_data_model(
                 self.owner_id, self.EXP_0_ID))
         self.assertIsNone(
-            user_models.ExplorationUserDataModel.get(
+            user_models.ExplorationUserDataModel.get_user_data_model(
                 'other_user_id', self.EXP_0_ID))
         self.assertIsNone(
-            user_models.ExplorationUserDataModel.get(
+            user_models.ExplorationUserDataModel.get_user_data_model(
                 self.owner_id, self.EXP_1_ID))
 
     def test_deleted_explorations_are_removed_from_user_contributions(self):
@@ -4873,30 +4875,30 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID1, self.draft_change_list, '')
         exp_user_data = (
-            user_models.ExplorationUserDataModel.get_marked_as_deleted(
-                '%s.%s' % (self.USER_ID, self.EXP_ID1)))
+            user_models.ExplorationUserDataModel.get(
+                '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=True))
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
     def test_draft_version_valid_returns_true(self):
         exp_user_data = (
-            user_models.ExplorationUserDataModel.get_marked_as_deleted(
-                '%s.%s' % (self.USER_ID, self.EXP_ID1)))
+            user_models.ExplorationUserDataModel.get(
+                '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=True))
         self.assertTrue(exp_services.is_version_of_draft_valid(
             self.EXP_ID1, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_returns_false(self):
         exp_user_data = (
-            user_models.ExplorationUserDataModel.get_marked_as_deleted(
-                '%s.%s' % (self.USER_ID, self.EXP_ID2)))
+            user_models.ExplorationUserDataModel.get(
+                '%s.%s' % (self.USER_ID, self.EXP_ID2), strict=True))
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID2, exp_user_data.draft_change_list_exp_version))
 
     def test_draft_version_valid_when_no_draft_exists(self):
         exp_user_data = (
-            user_models.ExplorationUserDataModel.get_marked_as_deleted(
-                '%s.%s' % (self.USER_ID, self.EXP_ID3)))
+            user_models.ExplorationUserDataModel.get(
+                '%s.%s' % (self.USER_ID, self.EXP_ID3), strict=True))
         self.assertFalse(exp_services.is_version_of_draft_valid(
             self.EXP_ID3, exp_user_data.draft_change_list_exp_version))
 
@@ -4904,8 +4906,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exp_services.create_or_update_draft(
             self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.NEWER_DATETIME)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.USER_ID, self.EXP_ID1)
+        exp_user_data = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                self.USER_ID, self.EXP_ID1))
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID1)
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST_DICT)
@@ -4918,8 +4921,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exp_services.create_or_update_draft(
             self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.OLDER_DATETIME)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.USER_ID, self.EXP_ID1)
+        exp_user_data = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                self.USER_ID, self.EXP_ID1))
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID1)
         self.assertEqual(
             exp_user_data.draft_change_list, self.draft_change_list_dict)
@@ -4932,8 +4936,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         exp_services.create_or_update_draft(
             self.EXP_ID3, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.NEWER_DATETIME)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.USER_ID, self.EXP_ID3)
+        exp_user_data = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                self.USER_ID, self.EXP_ID3))
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID3)
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST_DICT)
@@ -4972,8 +4977,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_draft_discarded(self):
         exp_services.discard_draft(self.EXP_ID1, self.USER_ID,)
         exp_user_data = (
-            user_models.ExplorationUserDataModel.get_marked_as_deleted(
-                '%s.%s' % (self.USER_ID, self.EXP_ID1)))
+            user_models.ExplorationUserDataModel.get(
+                '%s.%s' % (self.USER_ID, self.EXP_ID1), strict=True))
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
@@ -4985,15 +4990,17 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.admin, 'exp_id', self.editor_id, rights_domain.ROLE_EDITOR)
 
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.editor_id, 'exp_id')
+        exp_user_data = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                self.editor_id, 'exp_id'))
         self.assertIsNone(exp_user_data)
 
         exp_services.create_or_update_draft(
             'exp_id', self.editor_id, self.NEW_CHANGELIST, 1,
             self.NEWER_DATETIME)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.editor_id, 'exp_id')
+        exp_user_data = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                self.editor_id, 'exp_id'))
         self.assertEqual(exp_user_data.exploration_id, 'exp_id')
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST_DICT)
@@ -5173,8 +5180,8 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
     def test_fail_to_fetch_exploration_snapshots(self):
         self.save_new_default_exploration('ID', 'owner_id')
         exp_snapshot_id = exp_models.ExplorationModel.get_snapshot_id('ID', 1)
-        exp_snapshot = exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-            exp_snapshot_id)
+        exp_snapshot = exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_snapshot_id, strict=False, include_deleted=True)
         exp_snapshot.commit_cmds[0] = {}
         exp_snapshot.update_timestamps()
         exp_models.ExplorationSnapshotMetadataModel.put(exp_snapshot)

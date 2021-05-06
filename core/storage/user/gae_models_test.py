@@ -1263,8 +1263,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_TWO)
 
     def test_get_success(self):
-        retrieved_object = user_models.ExplorationUserDataModel.get(
-            self.USER_1_ID, self.EXP_ID_ONE)
+        retrieved_object = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                self.USER_1_ID, self.EXP_ID_ONE))
 
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
@@ -1279,8 +1280,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
     def test_get_failure(self):
-        retrieved_object = user_models.ExplorationUserDataModel.get(
-            self.USER_1_ID, 'unknown_exp_id')
+        retrieved_object = (
+            user_models.ExplorationUserDataModel.get_user_data_model(
+                self.USER_1_ID, 'unknown_exp_id'))
 
         self.assertEqual(retrieved_object, None)
 

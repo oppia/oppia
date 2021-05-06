@@ -1577,8 +1577,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         self._run_job_and_verify_output(expected_output)
 
         suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get_marked_as_deleted(
-                self.EXPLORATION_THREAD_ID))
+            suggestion_models.GeneralSuggestionModel.get(
+                self.EXPLORATION_THREAD_ID, include_deleted=True))
         self.assertEqual(suggestion_model.final_reviewer_id, None)
 
     def test_job_does_not_changes_valid_models(self):

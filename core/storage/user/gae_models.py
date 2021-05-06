@@ -1399,7 +1399,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
     @classmethod
-    def get(cls, user_id, exploration_id):
+    def get_user_data_model(cls, user_id, exploration_id):
         """Gets the ExplorationUserDataModel for the given user and exploration
          ids.
 

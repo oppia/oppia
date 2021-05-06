@@ -1711,7 +1711,7 @@ def is_version_of_draft_valid(exp_id, version):
 def get_user_exploration_data(
         user_id, exploration_id, apply_draft=False, version=None):
     """Returns a description of the given exploration."""
-    exp_user_data = user_models.ExplorationUserDataModel.get(
+    exp_user_data = user_models.ExplorationUserDataModel.get_user_data_model(
         user_id, exploration_id)
     is_valid_draft_version = (
         is_version_of_draft_valid(
@@ -1797,7 +1797,8 @@ def create_or_update_draft(
             'Voice artist does not have permission to make some '
             'changes in the change list.')
 
-    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exp_user_data = user_models.ExplorationUserDataModel.get_user_data_model(
+        user_id, exp_id)
     if (exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
@@ -1832,7 +1833,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
         Exploration or None. Returns the exploration domain object with draft
         applied, or None if draft can not be applied.
     """
-    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exp_user_data = user_models.ExplorationUserDataModel.get_user_data_model(
+        user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if exp_user_data:
         if exp_user_data.draft_change_list:
@@ -1885,7 +1887,7 @@ def discard_draft(exp_id, user_id):
         user_id: str. The id of the user whose draft is to be discarded.
     """
 
-    exp_user_data = user_models.ExplorationUserDataModel.get(
+    exp_user_data = user_models.ExplorationUserDataModel.get_user_data_model(
         user_id, exp_id)
     if exp_user_data:
         exp_user_data.draft_change_list = None

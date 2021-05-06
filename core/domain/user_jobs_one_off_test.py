@@ -2226,8 +2226,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             self.user_id, 'col', '1')
 
         self.model_instance = (
-            user_models.CollectionProgressModel.get_marked_as_deleted(
-                '%s.col' % self.user_id))
+            user_models.CollectionProgressModel.get(
+                '%s.col' % self.user_id, strict=True))
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
@@ -2298,8 +2298,8 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
             '[u\'3\']"]]' % self.user_id)]
         self.assertEqual(output, expected_output)
         self.model_instance = (
-            user_models.CollectionProgressModel.get_marked_as_deleted(
-                '%s.col' % self.user_id))
+            user_models.CollectionProgressModel.get(
+                '%s.col' % self.user_id, strict=True))
         self.assertEqual(
             self.model_instance.completed_explorations, ['0', '1'])
 
@@ -3132,12 +3132,12 @@ class DeleteNonExistentExpUserDataOneOffJobTests(test_utils.GenericTestBase):
         self._run_job_and_verify_output([['SUCCESS_KEPT', 3]])
 
         self.assertIsNotNone(
-            user_models.ExplorationUserDataModel.get(
+            user_models.ExplorationUserDataModel.get_user_data_model(
                 self.USER_1_ID, self.EXP_1_ID
             )
         )
         self.assertIsNotNone(
-            user_models.ExplorationUserDataModel.get(
+            user_models.ExplorationUserDataModel.get_user_data_model(
                 self.USER_2_ID, self.EXP_1_ID
             )
         )
@@ -3151,12 +3151,12 @@ class DeleteNonExistentExpUserDataOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         self.assertIsNone(
-            user_models.ExplorationUserDataModel.get(
+            user_models.ExplorationUserDataModel.get_user_data_model(
                 self.USER_1_ID, self.EXP_1_ID
             )
         )
         self.assertIsNone(
-            user_models.ExplorationUserDataModel.get(
+            user_models.ExplorationUserDataModel.get_user_data_model(
                 self.USER_2_ID, self.EXP_1_ID
             )
         )
