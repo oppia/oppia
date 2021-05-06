@@ -37,6 +37,8 @@ class ModelIoStub(python_utils.OBJECT):
         Returns:
             PTransform. A PTransform that returns the models stored in the stub.
         """
+        stub = self
+
         class GetModels(beam.PTransform):
             """PTransform for getting the models stored in the stub."""
 
@@ -51,7 +53,7 @@ class ModelIoStub(python_utils.OBJECT):
                     PCollection. The models stored in the stub.
                 """
                 return (
-                    pcoll | beam.Create(m for m in self._models_by_id.values()))
+                    pcoll | beam.Create(m for m in stub._models_by_id.values())) # pylint: disable=protected-access
 
         return GetModels
 
