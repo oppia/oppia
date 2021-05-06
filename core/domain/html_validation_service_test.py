@@ -1293,7 +1293,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
     def test_no_convertion_of_non_interactive_image_tags(self):
         """Test that the convert_svg_diagram_tags_to_image_tags does not make
-         any changes in already existing oppia-noninteractive image tags.
+        any changes in already existing oppia-noninteractive image tags.
         """
         test_cases = [{
             'html_content': (
