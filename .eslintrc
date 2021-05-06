@@ -96,7 +96,6 @@
       ],
       "rules": {
         "oppia/e2e-action": "error",
-        "oppia/no-then-method": "error"
       }
     },
     {
