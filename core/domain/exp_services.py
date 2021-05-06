@@ -1967,20 +1967,19 @@ def regenerate_missing_stats_for_exploration(exp_id):
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
-    try:
-        snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
-            exp_id, exp_versions)
-        change_lists = [
-            [
+    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, exp_versions)
+    change_lists = []
+    for snapshot in snapshots:
+        try:
+            change_lists.append([
                 exp_domain.ExplorationChange(commit_cmd)
                 for commit_cmd in snapshot['commit_cmds']
-            ]
-            for snapshot in snapshots
-        ]
-    except utils.ValidationError:
-        raise Exception(
-            'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
-            % (exp_id, snapshot['commit_cmds']))
+            ])
+        except utils.ValidationError:
+            raise Exception(
+                'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
+                % (exp_id, snapshot['commit_cmds']))
 
     missing_exp_stats = []
     missing_state_stats = []
