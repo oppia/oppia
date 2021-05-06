@@ -396,10 +396,6 @@ def apply_change_list(exploration_id, change_list):
                         'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    if not isinstance(change.new_value, list):
-                        raise Exception(
-                            'Expected answer_groups to be a list,'
-                            ' received %s' % change.new_value)
                     new_answer_groups = [
                         state_domain.AnswerGroup.from_dict(answer_groups)
                         for answer_groups in change.new_value
