@@ -243,6 +243,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       }
     );
   }
+
   onLogoutButtonClicked(): void {
     this.windowRef.nativeWindow.localStorage.removeItem(
       'last_uploaded_audio_lang');
