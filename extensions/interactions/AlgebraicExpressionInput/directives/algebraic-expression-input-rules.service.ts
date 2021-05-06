@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service';
 import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
 import {
   AlgebraicExpressionRuleInputsWithPlaceholder,
