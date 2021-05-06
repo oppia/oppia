@@ -21,7 +21,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface EventType {
+interface KeyboardEvent {
   keyCode?: number,
   shiftKey?: boolean,
   currentTarget?
@@ -61,12 +61,12 @@ export class NavigationService {
     * @param {String} menuName - name of menu, on which
     * open/close action to be performed (category,language).
     */
-    openSubmenu(evt: EventType, menuName: string): void {
+    openSubmenu(evt: KeyboardEvent, menuName: string): void {
       // Focus on the current target before opening its submenu.
       this.activeMenuName = menuName;
     }
 
-    closeSubmenu(evt: EventType): void {
+    closeSubmenu(evt: KeyboardEvent): void {
       this.activeMenuName = '';
     }
     /**

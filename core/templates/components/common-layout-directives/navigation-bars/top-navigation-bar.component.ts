@@ -43,6 +43,12 @@ interface EventToCodes {
   shiftTab?,
 }
 
+interface KeyboardEvent {
+  keyCode?: number,
+  shiftKey?: boolean,
+  currentTarget?: string
+}
+
 @Component({
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
