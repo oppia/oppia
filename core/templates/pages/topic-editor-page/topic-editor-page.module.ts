@@ -46,12 +46,14 @@ import { SubtopicsListComponent } from
   declarations: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
+    SkillSummariesDndComponent,
     StoriesListComponent,
     SubtopicsListComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
+    SkillSummariesDndComponent,
     StoriesListComponent,
     SubtopicsListComponent,
   ],
@@ -76,6 +78,7 @@ class TopicEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { SkillSummariesDndComponent } from './subtopic-editor/skill-summaries-dnd.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

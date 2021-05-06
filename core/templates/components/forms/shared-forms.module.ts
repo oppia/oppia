@@ -18,6 +18,7 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -28,12 +29,14 @@ import { MaterialModule } from 'components/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
 import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
+import { DragAndDropComponent } from './drag-and-drop/drag-and-drop.component';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     MaterialModule,
+    DragDropModule,
     DynamicContentModule,
     NgbTooltipModule,
     NgbModalModule,
@@ -42,12 +45,15 @@ import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-
     CustomFormsComponentsModule
   ],
   declarations: [
+    DragAndDropComponent,
     SchemaBasedEditorDirective
   ],
   entryComponents: [
+    DragAndDropComponent
   ],
   exports: [
     CustomFormsComponentsModule,
+    DragAndDropComponent,
     SchemaBasedEditorDirective
   ],
 })

@@ -1,0 +1,73 @@
+<oppia-drag-and-drop [arr]="subtopicEditorCtrl.subtopic.getSkillSummaries()">
+  <ng-template #dragnode let-skillSummary let-idx="idx">
+    <div class="skill-list-item">
+      <span class="material-icons draggable-icon-indicator">drag_indicator</span>
+      <a *ngIf="!subtopicEditorCtrl.isSkillDeleted(skillSummary)"
+        [href]="subtopicEditorCtrl.getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
+        {{ skillSummary.getDescription() }}
+      </a>
+      <div class="skill-options-box">
+        <span>{{ subtopicEditorCtrl.skillQuestionCountDict[skillSummary.getId()]  }}</span>
+        <i class="fa fa-ellipsis-v" (click)="subtopicEditorCtrl.showSkillEditOptions(idx)"></i>
+      </div>
+      <div class="skill-option-box" *ngIf="subtopicEditorCtrl.selectedSkillEditOptionsIndex === idx" (mouseleave)="subtopicEditorCtrl.showSkillEditOptions(null)" (click)="subtopicEditorCtrl.showSkillEditOptions(null)">
+        <div class="skill-edit-option" (click)="subtopicEditorCtrl.removeSkillFromSubtopic(skillSummary)">
+          <i class="fa fa-trash"></i>
+          <span>Remove from subtopic</span>
+        </div>
+        <div class="skill-edit-option remove-from-topic-option" (click)="subtopicEditorCtrl.removeSkillFromTopic(skillSummary)">
+          <i class="fa fa-trash"></i>
+          <span>Remove from topic</span>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</oppia-drag-and-drop>
+<style>
+  .fa.fa-ellipsis-v {
+    cursor: pointer;
+  }
+  .skill-options-box {
+    margin-right: 14px;
+  }
+  .skill-options-box span {
+    margin-right: 42px;
+  }
+  .skill-option-box {
+    background-color: #e1dcdc;
+    border: 1px solid #000;
+    padding: 0;
+    position: absolute;
+    right: -6px;
+    width: 210px;
+    z-index: 1;
+  }
+  .skill-option-box {
+    right: 30px;
+  }
+  .skill-edit-option {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+  }
+  .remove-from-topic-option {
+    border-bottom: none;
+  }
+  .skill-list-item {
+    border-bottom: 1px solid #dbdbdb;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px 0;
+    position: relative;
+  }
+  .skill-list-item a {
+    color: inherit;
+    flex: 1;
+    overflow: hidden;
+    padding-right: 10px;
+    text-decoration: none;
+    word-wrap: break-word;
+  }
+</style>

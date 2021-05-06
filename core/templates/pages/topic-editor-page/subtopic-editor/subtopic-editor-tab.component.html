@@ -155,32 +155,7 @@
               <span>Name</span>
               <span class="number-skills-header"># of Questions</span>
             </div>
-            <div ng-repeat="skillSummary in $ctrl.subtopic.getSkillSummaries() track by $index"
-                 dnd-list="$ctrl.subtopic.getSkillSummaries()"
-                 dnd-dragstart="$ctrl.onRearrangeMoveSkillStart($index)"
-                 dnd-drop="$ctrl.onRearrangeMoveSkillFinish($index)"
-                 dnd-draggable="skillSummary"
-                 class="skill-list-item">
-              <span class="material-icons draggable-icon-indicator">drag_indicator</span>
-              <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
-                 ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                <[skillSummary.getDescription()]>
-              </a>
-              <div class="skill-options-box">
-                <span><[$ctrl.skillQuestionCountDict[skillSummary.getId()] ]></span>
-                <i class="fa fa-ellipsis-v" ng-click="$ctrl.showSkillEditOptions($index)"></i>
-              </div>
-              <div class="skill-option-box" ng-if="$ctrl.selectedSkillEditOptionsIndex === $index" ng-mouseleave="$ctrl.showSkillEditOptions(null)" ng-click="$ctrl.showSkillEditOptions(null)">
-                <div class="skill-edit-option" ng-click="$ctrl.removeSkillFromSubtopic(skillSummary)">
-                  <i class="fa fa-trash"></i>
-                  <span>Remove from subtopic</span>
-                </div>
-                <div class="skill-edit-option remove-from-topic-option" ng-click="$ctrl.removeSkillFromTopic(skillSummary)">
-                  <i class="fa fa-trash"></i>
-                  <span>Remove from topic</span>
-                </div>
-              </div>
-            </div>
+            <oppia-skill-summaries-dnd style="width: 100%;" [subtopic-editor-ctrl]="$ctrl"></oppia-skill-summaries-dnd>
           </div>
         </div>
       </md-card>
@@ -208,6 +183,9 @@
   .subtopic-content .uncategorized-skill-ids {
     font-family: Roboto, Arial, sans-serif;
     padding: 30px 55px 30px 45px;
+  }
+  .subtopic-content .oppia-subtopics-list-card.subtopic-skill-card.subtopic-item-container.oppia-mobile-collapsible-card {
+    margin-bottom: 20px;
   }
   .subtopic-content .subtopic-content-box {
     display: flex;
