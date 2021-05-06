@@ -25,7 +25,7 @@ import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-edit
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
+import { Status, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
@@ -63,7 +63,7 @@ export class TranslationModalComponent {
   moreAvailable = false;
   textToTranslate = '';
   languageDescription: string;
-  previousTranslationAvailable: boolean = false;
+  activeStatus: Status;
   HTML_SCHEMA: {
     'type': string;
     'ui_config': UiConfig;
@@ -105,6 +105,9 @@ export class TranslationModalComponent {
           this.translateTextService.getTextToTranslate());
         this.textToTranslate = textAndAvailability.text;
         this.moreAvailable = textAndAvailability.more;
+        this.activeStatus = textAndAvailability.status;
+        this.activeWrittenTranslation.html = (
+          textAndAvailability.translationHtml);
         this.loadingData = false;
       });
     this.HTML_SCHEMA = {
@@ -144,19 +147,30 @@ export class TranslationModalComponent {
     }
   }
 
+  hasPreviousTranslations(): boolean {
+    return this.translateTextService.getActiveIndex() > 0;
+  }
+
   skipActiveTranslation(): void {
     const textAndAvailability = (
       this.translateTextService.getTextToTranslate());
     this.textToTranslate = textAndAvailability.text;
     this.moreAvailable = textAndAvailability.more;
-    this.activeWrittenTranslation.html = '';
+    this.activeStatus = textAndAvailability.status;
+    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+  }
+
+  isSubmitted(): boolean {
+    return this.activeStatus === 'submitted';
   }
 
   returnToPreviousTranslation(): void {
     const textAndAvailability = (
       this.translateTextService.getPreviousTextToTranslate());
     this.textToTranslate = textAndAvailability.text;
-    this.previousTranslationAvailable = textAndAvailability.more;
+    this.moreAvailable = true;
+    this.activeStatus = textAndAvailability.status;
+    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
   }
 
   suggestTranslatedText(): void {
@@ -172,14 +186,18 @@ export class TranslationModalComponent {
         imagesData, () => {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.');
+          this.uploadingTranslation = false;
           if (this.moreAvailable) {
             const textAndAvailability = (
               this.translateTextService.getTextToTranslate());
             this.textToTranslate = textAndAvailability.text;
             this.moreAvailable = textAndAvailability.more;
+            this.activeStatus = textAndAvailability.status;
+            this.activeWrittenTranslation.html = (
+              textAndAvailability.translationHtml);
+          } else {
+            this.activeWrittenTranslation.html = '';
           }
-          this.activeWrittenTranslation.html = '';
-          this.uploadingTranslation = false;
         }, () => {
           this.contextService.resetImageSaveDestination();
           this.close();

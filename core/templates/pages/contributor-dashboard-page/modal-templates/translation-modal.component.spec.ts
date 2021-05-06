@@ -187,7 +187,11 @@ describe('Translation Modal Component', () => {
       expect(translateTextService.getPreviousTextToTranslate)
         .toHaveBeenCalled();
       expect(component.textToTranslate).toBe('text1');
-      expect(component.moreAvailable).toBeFalse();
+      // The value of moreAvailable will be set to true when the operation
+      // is viewing a previous translation. If the value is false, the
+      // 'save and close' button is shown. This should happen only on the
+      // last translation.
+      expect(component.moreAvailable).toBeTrue();
     }));
 
     it('should set the schema constant based on the active language', fakeAsync(
@@ -318,6 +322,23 @@ describe('Translation Modal Component', () => {
         JSON.stringify(expectedPayload));
       req.flush({});
       flushMicrotasks();
+    }));
+
+    it('should correctly submit a translation suggestion', fakeAsync(() => {
+      spyOn(
+        translateTextService,
+        'getPreviousTextToTranslate'
+      ).and.returnValue({
+        text: 'abc',
+        more: true,
+        status: 'submitted',
+        translationHtml: 'cba'
+      });
+      expect(component.isSubmitted()).toBeFalse();
+
+      component.returnToPreviousTranslation();
+
+      expect(component.isSubmitted()).toBeTrue();
     }));
 
     describe('when already uploading a translation', () => {
