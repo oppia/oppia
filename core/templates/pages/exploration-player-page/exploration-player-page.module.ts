@@ -42,17 +42,20 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
     HttpClientModule,
     InteractionExtensionsModule,
     NgbModalModule,
+    MaterialModule,
     SharedComponentsModule
   ],
   declarations: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    AudioBarComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    AudioBarComponent
   ],
   providers: [
     {
@@ -75,6 +78,8 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { AudioBarComponent } from './layout-directives/audio-bar.component';
+import { MaterialModule } from 'components/material.module';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

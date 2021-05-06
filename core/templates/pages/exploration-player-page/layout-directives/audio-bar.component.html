@@ -1,58 +1,75 @@
-<div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
-  <div ng-if="audioBarIsExpanded" class="audio-controls"">
+<div class="audio-header" *ngIf="isAudioBarAvailable()"
+     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
+  <div *ngIf="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
       <div class="audio-header-control-icons">
-        <a ng-click="onBackwardButtonClicked()">
-          <span class="oppia-replay-white-circle"  ng-if="progressBarIsShown">
+        <a (click)="onBackwardButtonClicked()">
+          <span class="oppia-replay-white-circle" *ngIf="progressBarIsShown">
             <i class="fas fa-undo audio-undo-icon"></i>
             <span class="oppia-five-icon">5</span>
           </span>
         </a>
-        <a ng-click="onPlayButtonClicked()"
-           uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
-           tooltip-append-to-body="true" tooltip-placement="right">
+        <a (click)="onPlayButtonClicked()"
+           [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
+           placement="right">
           <i class="fas oppia-audio-controls-button-icon" tabindex="0"
-             ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+             [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
           </i>
         </a>
-        <a ng-click="onForwardButtonClicked()">
-          <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-if="progressBarIsShown">
+        <a (click)="onForwardButtonClicked()">
+          <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" *ngIf="progressBarIsShown">
             <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
             <span class="oppia-five-icon oppia-five-icon-forward">5</span>
           </span>
         </a>
       </div>
-      <div class="slider-section" ng-if="progressBarIsShown">
-        <div ng-if="audioLoadingIndicatorIsShown">
-          <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+      <div class="slider-section" *ngIf="progressBarIsShown">
+        <div *ngIf="audioLoadingIndicatorIsShown">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         </div>
-        <div ng-if="!audioLoadingIndicatorIsShown">
-          <oppia-audio-slider [value]="AudioPlayerService.getCurrentTime()"
-                              [max]="AudioPlayerService.getAudioDuration()"
-                              (value-change)="setProgress($event)"
+        <div *ngIf="!audioLoadingIndicatorIsShown">
+          <oppia-audio-slider [value]="audioPlayerService.getCurrentTime()"
+                              [max]="audioPlayerService.getAudioDuration()"
+                              (valueChange)="setProgress($event)"
                               aria-label="audio-slider">
           </oppia-audio-slider>
         </div>
-        <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
-        <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
+        <span *ngIf="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()"
+              class="audio-controls-message">
+           {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
+        </span>
+        <span *ngIf="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()"
+              class="audio-controls-message">
+           {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
+        </span>
         <!--Filler space for message-->
         <span class="audio-controls-message">&zwnj;</span>
       </div>
       <div class="oppia-audio-header-select">
         <select class="audio-language-select protractor-test-audio-lang-select"
-                ng-model="selectedLanguage.value"
-                ng-options="o.value as o.displayed for o in languagesInExploration"
-                ng-change="onNewLanguageSelected()">
+                [(ngModel)]="selectedLanguage.value"
+                (change)="onNewLanguageSelected()">
+          <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
         </select>
       </div>
     </div>
   </div>
-  <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse"><i class="fas fa-sort-up"></i></div>
-  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()" aria-label="Audio menu expand">
+  <div class="audio-collapse-button audio-toggle-button"
+       *ngIf="audioBarIsExpanded"
+       (click)="collapseAudioBar()"
+       aria-label="Audio menu collapse">
+    <i class="fas fa-sort-up"></i>
+  </div>
+  <div class="audio-expand-button audio-toggle-button"
+       *ngIf="!audioBarIsExpanded"
+       (click)="expandAudioBar()"
+       aria-label="Audio menu expand">
     <div class="container protractor-test-audio-bar">
       <div class="row">
         <div class="col-lg-6 px-0 mt-1 ml-2">
-          <span class="audio-expand-button-text" translate="I18N_PLAYER_AUDIO_EXPAND_TEXT"></span>
+          <span class="audio-expand-button-text">
+             {{ 'I18N_PLAYER_AUDIO_EXPAND_TEXT' | translate }}
+          </span>
         </div>
         <div class="col-lg-3 col-6 px-0 mt-lg-2">
           <i class="audio-expand-icon fas fa-headphones-alt"></i>
@@ -74,30 +91,30 @@
     font-size: 1.7em;
   }
 
-  audio-bar md-progress-linear.md-default-theme .md-bar {
+  /* md-progress-linear.md-default-theme .md-bar {
     background-color: #009688;
-  }
+  } */
 
-  audio-bar md-slider {
+  /* md-slider {
     height: 5px;
   }
 
-  audio-bar md-slider.md-default-theme .md-track-fill {
+  md-slider.md-default-theme .md-track-fill {
     background-color: #009688;
   }
 
-  audio-bar md-slider.md-default-theme .md-thumb:after {
+  md-slider.md-default-theme .md-thumb:after {
     background-color: #009688;
     border-color: #009688;
   }
 
-  audio-bar md-slider .md-track-container {
+  md-slider .md-track-container {
     top: 5px;
   }
 
-  audio-bar md-slider .md-thumb-container {
+  md-slider .md-thumb-container {
     top: -17px;
-  }
+  } */
 
   .audio-header .fa-sort-up, .audio-header .fa-sort-down {
     transform: translateY(-2px);
@@ -272,7 +289,7 @@
     padding-left: 3px;
   }
 
-  audio-bar .slider-section {
+  .slider-section {
     transform: translateY(10px);
     width: 50%;
   }
@@ -299,7 +316,7 @@
     .audio-header-control-icons {
       order: 2;
     }
-    audio-bar .slider-section {
+    .slider-section {
       order: 1;
       width: 90%;
     }
@@ -320,7 +337,7 @@
       height: auto;
       padding: 20px 0;
     }
-    audio-bar .slider-section {
+    .slider-section {
       transform: translateY(4px);
     }
     .audio-collapse-button {

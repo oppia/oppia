@@ -18,7 +18,7 @@
 
 require('directives/angular-html-bind.directive.ts');
 require(
-  'pages/exploration-player-page/layout-directives/audio-bar.directive.ts');
+  'pages/exploration-player-page/layout-directives/audio-bar.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'input-response-pair.directive.ts');
