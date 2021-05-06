@@ -17,25 +17,30 @@
  * component.
  */
 
-require(
-  'interactions/NumericExpressionInput/directives/' +
-  'oppia-short-response-numeric-expression-input.component.ts');
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ShortResponseNumericExpressionInput } from
+'./oppia-short-response-numeric-expression-input.component';
 
-describe('NumericExpressionInputShortResponse', function() {
-  let ctrl = null;
+describe('ShortResponseNumericExpressionInput', function() {
+  let component: ShortResponseNumericExpressionInput;
+  let fixture: ComponentFixture<ShortResponseNumericExpressionInput>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$attrs', {
-      answer: '&quot;answer&quot;',
-    });
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaShortResponseNumericExpressionInput');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [ShortResponseNumericExpressionInput]
+      }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ShortResponseNumericExpressionInput);
+    component = fixture.componentInstance;
+    component.display_answer = '&quot;answer&quot;';
+    fixture.detectChanges();
+  });
   it('should correctly escape characters in the answer', function() {
-    ctrl.$onInit();
-    expect(ctrl.answer).toBe('answer');
+    component.ngOnInit();
+    expect(component.display_answer).toBe('answer');
   });
 });

@@ -55,7 +55,8 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'ImageClickInput',
     'MathEquationInput',
     'NumericExpressionInput',
-    'RatioExpressionInput'
+    'RatioExpressionInput',
+    'InteractiveNumericExpressionInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [
