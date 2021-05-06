@@ -33,7 +33,7 @@ angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngAudio', 'ngJoyRide', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui-leaflet',
+  'toastr', 'ui.bootstrap', 'ui-leaflet',
   'ui.sortable', 'ui.tree', uiValidate,
 ]);
 

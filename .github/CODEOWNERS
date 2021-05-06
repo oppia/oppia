@@ -51,6 +51,7 @@
 # Angular Migration team
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
+/core/templates/components/code-mirror/ @srijanreddy98 @darksun27
 /core/templates/components/material.module.ts @srijanreddy98 @darksun27
 /core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @darksun27
 /core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @darksun27
@@ -76,6 +77,7 @@
 /core/domain/classifier*.py @oppia/ml
 /proto/ @oppia/ml
 /core/templates/domain/classifier/ @oppia/ml
+/core/templates/services/classifier-data-backend-api.service*.ts @oppia/ml
 /extensions/classifiers/ @oppia/ml
 /buf.yaml @oppia/ml
 /buf.gen.yaml @oppia/ml

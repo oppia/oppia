@@ -13,30 +13,35 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the Custom Form components.
+ * @fileoverview Module for the CodeRepl interaction components.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import 'core-js/es7/reflect';
+import 'zone.js';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
+import { CodeMirrorComponent } from './codemirror.component';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { TranslatePipe } from './translate.pipe';
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
-    FormsModule,
+    CodemirrorModule,
+    FormsModule
   ],
   declarations: [
-    TranslatePipe
+    CodemirrorMergeviewComponent,
+    CodeMirrorComponent
   ],
-  entryComponents: [],
+  entryComponents: [
+    CodemirrorMergeviewComponent,
+    CodeMirrorComponent
+  ],
   exports: [
-    TranslatePipe
-  ],
+    CodemirrorMergeviewComponent,
+    CodeMirrorComponent
+  ]
 })
-
-export class TranslateModule { }
+export class CodeMirrorModule {}
