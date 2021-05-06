@@ -220,6 +220,14 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var ck = CKEDITOR.inline(
           <HTMLElement>(el[0].children[0].children[1]), ckConfig);
 
+        // Hide the editor until it is fully loaded after `instanceReady`
+        // is fired.
+        el[0].children[0].setAttribute('style', 'display: None');
+        // Show the loading text.
+        let loadingDiv = document.createElement('div');
+        loadingDiv.innerHTML = 'Loading...';
+        el[0].appendChild(loadingDiv);
+
         // A RegExp for matching rich text components.
         var componentRe = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
@@ -247,6 +255,11 @@ angular.module('oppia').directive('ckEditor4Rte', [
         };
 
         ck.on('instanceReady', function() {
+          // Show the editor now that it is fully loaded.
+          el[0].children[0].setAttribute('style', 'display: block');
+          // Remove the loading text.
+          el[0].removeChild(loadingDiv);
+
           // Set the css and icons for each toolbar button.
           names.forEach(function(name, index) {
             var icon = icons[index];
