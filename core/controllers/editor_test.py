@@ -964,7 +964,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
 
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
