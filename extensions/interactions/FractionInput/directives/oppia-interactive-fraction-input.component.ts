@@ -29,6 +29,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 
 import { FractionInputRulesService } from './fraction-input-rules.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FractionAnswer, InteractionAnswer } from 'interactions/answer-defs';
 
 @Component({
@@ -41,6 +42,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() allowImproperFractionWithValue: string = '';
   @Input() allowNonzeroIntegerPartWithValue: string = '';
   @Input() customPlaceholderWithValue: string = '';
+  @Input() labelForFocusTarget: string;
   @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
@@ -60,6 +62,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
     private fractionObjectFactory: FractionObjectFactory,
+    private focusManagerService: FocusManagerService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService
   ) {
@@ -133,6 +136,12 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswerFn, isAnswerValid);
+
+    setTimeout(
+      () => {
+        let focusLabel: string = this.labelForFocusTarget;
+        this.focusManagerService.setFocusWithoutScroll(focusLabel);
+      }, 0);
   }
 
   private getAttributesObject() {
