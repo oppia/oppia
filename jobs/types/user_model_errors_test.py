@@ -20,14 +20,12 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import pickle
 
 from core.platform import models
-from core.tests import test_utils as core_test_utils
 import feconf
-from jobs import job_utils
-from jobs.types import user_model_errors, audit_errors, audit_errors_test
-import python_utils
+from jobs.types import audit_errors
+from jobs.types import audit_errors_test
+from jobs.types import user_model_errors
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -84,7 +82,8 @@ class ModelIdRegexErrorTests(audit_errors_test.AuditErrorsTestBase):
             'match the expected regex=u\'[abc]{3}\'')
 
 
-class DraftChangeListLastUpdatedNoneErrorTests(audit_errors_test.AuditErrorsTestBase):
+class DraftChangeListLastUpdatedNoneErrorTests(
+    audit_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         draft_change_list = [{
@@ -110,7 +109,8 @@ class DraftChangeListLastUpdatedNoneErrorTests(audit_errors_test.AuditErrorsTest
             'last updated is None' % draft_change_list)
 
 
-class DraftChangeListLastUpdatedInvalidErrorTests(audit_errors_test.AuditErrorsTestBase):
+class DraftChangeListLastUpdatedInvalidErrorTests(
+    audit_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         draft_change_list = [{

@@ -25,7 +25,8 @@ from core.platform import models
 import feconf
 from jobs import job_test_utils
 from jobs.transforms import user_audits
-from jobs.types import user_model_errors, audit_errors
+from jobs.types import audit_errors
+from jobs.types import user_model_errors
 
 import apache_beam as beam
 
