@@ -116,6 +116,30 @@ class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
         ])
 
 
+class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
+
+    def test_validate_post_commit_is_invalid(self):
+        invalid_commit_status = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='invalid',
+            post_commit_is_private=False,
+            commit_cmds=[])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_status])
+            | beam.ParDo(base_model_audits.ValidatePostCommitStatus())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.InvalidCommitStatusError(invalid_commit_status),
+        ])
+
+
 class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_post_commit_is_private_when_status_is_public(self):
@@ -136,7 +160,7 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InvalidCommitStatusError(invalid_commit_status),
+            audit_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
         ])
 
     def test_validate_post_commit_is_private_when_status_is_private(self):
@@ -157,7 +181,7 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InvalidCommitStatusError(invalid_commit_status),
+            audit_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
         ])
 
 
@@ -335,4 +359,27 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             audit_errors.ModelDomainObjectValidateError(
                 model_instance2, 'The destination end is not a valid state.')
+        ])
+
+
+class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
+
+    def test_validate_commit_type(self):
+        invalid_commit_type_model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='invalid-type',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_type_model])
+            | beam.ParDo(base_model_audits.ValidateCommitType())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.InvalidCommitTypeError(invalid_commit_type_model),
         ])

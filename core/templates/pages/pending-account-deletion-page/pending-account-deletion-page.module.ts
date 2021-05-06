@@ -27,17 +27,22 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { PendingAccountDeletionPageComponent } from './pending-account-deletion-page.component';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    SharedPipesModule
   ],
   declarations: [
+    PendingAccountDeletionPageComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    PendingAccountDeletionPageComponent,
     OppiaAngularRootComponent
   ],
   providers: [

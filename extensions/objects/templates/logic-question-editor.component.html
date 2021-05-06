@@ -1,0 +1,28 @@
+<div>
+  <p>
+    Formulas the student can assume (separated by commas):<br>
+    <input type="text"
+           [trim]="false"
+           [(ngModel)]="localValue.assumptionsString"
+           placeholder="Enter a list of formulas."
+           id="logicQuestionAssumptions"
+           (keyup)="changeAssumptions()">
+  </p>
+  <p>
+    Formula the student must prove:<br>
+    <input type="text"
+           [trim]="false"
+           [(ngModel)]="localValue.targetString"
+           placeholder="Enter a formula."
+           id="logicQuestionTarget"
+           (keyup)="changeTarget()">
+  </p>
+  <div class="logic-proof-mistake-message">{{ localValue.errorMessage }}</div>
+  Default proof (optional):<br>
+  <textarea [trim]="false"
+            [(ngModel)]="localValue.proofString"
+            placeholder="If this is an example, enter a proof."
+            id="logicQuestionProof"
+            (keyup)="changeProof()">
+  </textarea>
+</div>
