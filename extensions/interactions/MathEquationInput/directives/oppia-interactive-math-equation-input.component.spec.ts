@@ -17,13 +17,11 @@
  * component.
  */
 
-import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
-import { GuppyConfigurationService } from
-  'services/guppy-configuration.service.ts';
-import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { GuppyConfigurationService } from 'services/guppy-configuration.service';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 require(
   'interactions/MathEquationInput/directives/' +

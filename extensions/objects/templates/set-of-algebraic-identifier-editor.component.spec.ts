@@ -17,7 +17,7 @@
  */
 
 import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
+  'services/guppy-initialization.service';
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.

@@ -79,7 +79,7 @@ export class MathInteractionsService {
         '" and "' + symbol2 + '".');
     }
     if (
-      errorMessage === 'Cannot read property \'parent\' of undefined.') {
+      errorMessage === 'Cannot read property \'column\' of undefined.') {
       let emptyFunctionNames = [];
       for (let functionName of this.mathFunctionNames) {
         if (expressionString.includes(functionName + '()')) {

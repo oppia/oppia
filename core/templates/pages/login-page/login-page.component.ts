@@ -26,7 +26,7 @@ import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'login-page',

@@ -20,11 +20,11 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { State } from 'domain/state/StateObjectFactory.ts';
+import { State } from 'domain/state/StateObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
-  'domain/statistics/learner-answer-details-backend-api.service.ts';
+  'domain/statistics/learner-answer-details-backend-api.service';
 import { AnswerClassificationService, InteractionRulesService } from
-  'pages/exploration-player-page/services/answer-classification.service.ts';
+  'pages/exploration-player-page/services/answer-classification.service';
 
 @Injectable({
   providedIn: 'root'

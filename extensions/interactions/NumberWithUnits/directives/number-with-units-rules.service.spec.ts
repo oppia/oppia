@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { NumberWithUnitsRulesService } from
-  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 
 describe('Number with Units rules service', () => {
   let nurs: NumberWithUnitsRulesService = null;

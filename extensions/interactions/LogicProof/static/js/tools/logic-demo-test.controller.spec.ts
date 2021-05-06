@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for logic demo test controller.
  */
 
-import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
+import logicProofStudent from 'interactions/LogicProof/static/js/student';
 import logicProofTeacher from 'interactions/LogicProof/static/js/teacher';
 import logicProofTeacher2 from
   'interactions/LogicProof/static/js/tools/teacher2';

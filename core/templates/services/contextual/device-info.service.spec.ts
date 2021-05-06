@@ -19,8 +19,8 @@
 import { TestBed } from '@angular/core/testing';
 
 import { DeviceInfoService } from
-  'services/contextual/device-info.service.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+  'services/contextual/device-info.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Device Info Service', () => {
   let dis, wrs;

@@ -27,9 +27,9 @@ import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { ExplorationIdValidationService } from
-  'domain/exploration/exploration-id-validation.service.ts';
+  'domain/exploration/exploration-id-validation.service';
 import { ExplorationSummaryBackendApiService } from
-  'domain/summary/exploration-summary-backend-api.service.ts';
+  'domain/summary/exploration-summary-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Create New Chapter Modal Controller', function() {

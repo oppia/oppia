@@ -18,8 +18,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlService } from 'services/contextual/url.service.ts';
-import { ContextService } from 'services/context.service.ts';
+import { UrlService } from 'services/contextual/url.service';
+import { ContextService } from 'services/context.service';
+
 @Component({
   selector: 'keyboard-shortcut-help-modal',
   templateUrl: './keyboard-shortcut-help-modal.component.html',

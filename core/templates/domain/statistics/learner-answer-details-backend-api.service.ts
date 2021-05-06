@@ -21,9 +21,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants.ts';
+  'domain/statistics/statistics-domain.constants';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({
   providedIn: 'root'

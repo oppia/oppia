@@ -16,8 +16,7 @@
  * @fileoverview Tests for AdminRouterService.
  */
 
-import { AdminRouterService } from
-  'pages/admin-page/services/admin-router.service.ts';
+import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 
 describe('Admin router service', () => {
   let ars: AdminRouterService;
