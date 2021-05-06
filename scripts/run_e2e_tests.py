@@ -536,17 +536,18 @@ def run_tests(args):
     start_webdriver_manager(version)
 
     # TODO(#11549): Move this to top of the file.
+    os.environ['PORTSERVER_ADDRESS'] = PORTSERVER_SOCKET_FILEPATH
     import contextlib2
     managed_dev_appserver = common.managed_dev_appserver(
         'app.yaml' if args.prod_env else 'app_dev.yaml',
         port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
-        clear_datastore=True, skip_sdk_update_check=True,
-        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
+        clear_datastore=True, skip_sdk_update_check=True)
 
     with contextlib2.ExitStack() as stack:
-        stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             stack.enter_context(common.managed_firebase_auth_emulator())
+            stack.enter_context(common.managed_elasticsearch_dev_server())
+            stack.enter_context(common.managed_cloud_datastore_emulator())
         stack.enter_context(managed_dev_appserver)
 
         python_utils.PRINT('Waiting for servers to come up...')
@@ -576,13 +577,9 @@ def run_tests(args):
             nextline = p.stdout.readline()
             if len(nextline) == 0 and p.poll() is not None:
                 break
-            if isinstance(nextline, str):
-                # This is a failsafe line in case we get non-unicode input,
-                # but the tests provide all strings as unicode.
-                nextline = nextline.decode('utf-8')  # pragma: nocover
             output_lines.append(nextline.rstrip())
             # Replaces non-ASCII characters with '?'.
-            sys.stdout.write(nextline.encode('ascii', errors='replace'))
+            sys.stdout.write(nextline.decode('utf-8', errors='replace'))
 
         return output_lines, p.returncode
 

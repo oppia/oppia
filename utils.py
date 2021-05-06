@@ -1014,7 +1014,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
+    return itertools.zip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
 
 
 def partition(iterable, predicate=bool, enumerated=False):

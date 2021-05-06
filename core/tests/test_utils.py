@@ -1243,7 +1243,7 @@ class TestBase(unittest.TestCase):
                 ', '.join(itertools.chain(
                     (repr(a) for a in args),
                     ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                for args, kwargs in itertools.izip_longest( # pylint: disable=deprecated-itertools-function
+                for args, kwargs in itertools.zip_longest( # pylint: disable=deprecated-itertools-function
                     expected_args_iter, expected_kwargs_iter, fillvalue={})
             ]
             if pretty_unused_args:
