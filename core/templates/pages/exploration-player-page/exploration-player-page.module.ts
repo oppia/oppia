@@ -21,7 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -36,6 +36,10 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { CorrectnessFooterComponent } from './layout-directives/correctness-footer.component';
+import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
+import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
+import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
+import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 
 @NgModule({
@@ -44,21 +48,30 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     HttpClientModule,
     InteractionExtensionsModule,
     NgbModalModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    NgbPopoverModule
   ],
   declarations: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     CorrectnessFooterComponent,
-    LearnerAnswerInfoCard,
+    ExplorationSuccessfullyFlaggedModalComponent,
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     CorrectnessFooterComponent,
-    LearnerAnswerInfoCard,
+    ExplorationSuccessfullyFlaggedModalComponent,
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard
   ],
   providers: [
     {
