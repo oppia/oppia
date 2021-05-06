@@ -24,16 +24,17 @@ import datetime
 from core.platform import models
 import feconf
 from jobs import job_utils
-from jobs.decorators import user_model_audit_decorators, audit_decorators
+from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
-from jobs.types import user_model_errors, audit_errors
+from jobs.types import user_model_errors
 
 import apache_beam as beam
 
 (auth_models, user_models) = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
-# this is an expection due to it's inheritance from base model audit
+
+# This is an expection due to inheritance from base model audit.
 @audit_decorators.AuditsExisting(
     auth_models.UserAuthDetailsModel,
     user_models.UserEmailPreferencesModel,
@@ -52,7 +53,7 @@ class ValidateModelWithUserId(base_model_audits.ValidateBaseModelId):
         self._pattern = feconf.USER_ID_REGEX
 
 
-@user_model_audit_decorators.AuditsExisting(
+@audit_decorators.AuditsExisting(
     user_models.PendingDeletionRequestModel
 )
 class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
@@ -84,7 +85,7 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
                 model, incorrect_keys)
 
 
-@user_model_audit_decorators.AuditsExisting(user_models.UserQueryModel)
+@audit_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateOldModelsMarkedDeleted(beam.DoFn):
     """DoFn to validate old models and mark them for deletion"""
 
@@ -104,7 +105,8 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
         if expiration_date > model.last_updated:
             yield user_model_errors.ModelExpiringError(model)
 
-# Relationship are common among models so base audit_decorator will work
+
+# Relationship are common among models so base audit decorator will work.
 @audit_decorators.RelationshipsOf(
     user_models.UserEmailPreferencesModel
 )
@@ -113,7 +115,7 @@ def user_email_preferences_model_relationships(model):
     yield model.id, [user_models.UserSettingsModel]
 
 
-@user_model_audit_decorators.AuditsExisting(
+@audit_decorators.AuditsExisting(
     user_models.ExplorationUserDataModel
 )
 class ValidateDraftChangeListLastUpdated(beam.DoFn):

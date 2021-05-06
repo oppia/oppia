@@ -14,18 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Error classes for model audits."""
+"""Error classes for user model audits."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import feconf
-from jobs import job_utils
-from jobs.types.audit_errors import BaseAuditError
-import python_utils
+from jobs.types import audit_errors
 
 
-class ModelIncorrectKeyError(BaseAuditError):
+class ModelIncorrectKeyError(audit_errors.BaseAuditError):
     """Error class for incorrect key in PendingDeletionRequestModel."""
 
     def __init__(self, model, incorrect_keys):
@@ -33,7 +31,7 @@ class ModelIncorrectKeyError(BaseAuditError):
         self.message = 'contains keys %s are not allowed' % (incorrect_keys)
 
 
-class ModelExpiringError(BaseAuditError):
+class ModelExpiringError(audit_errors.BaseAuditError):
     """Error class for models that are expiring."""
 
     def __init__(self, model):
@@ -42,7 +40,7 @@ class ModelExpiringError(BaseAuditError):
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
 
 
-class DraftChangeListLastUpdatedNoneError(BaseAuditError):
+class DraftChangeListLastUpdatedNoneError(audit_errors.BaseAuditError):
     """Error class for models with draft change list but draft change list
     last_updated is None.
     """
@@ -54,7 +52,7 @@ class DraftChangeListLastUpdatedNoneError(BaseAuditError):
             'last updated is None' % model.draft_change_list)
 
 
-class DraftChangeListLastUpdatedInvalidError(BaseAuditError):
+class DraftChangeListLastUpdatedInvalidError(audit_errors.BaseAuditError):
     """Error class for models with invalid draft change list last_updated."""
 
     def __init__(self, model):
