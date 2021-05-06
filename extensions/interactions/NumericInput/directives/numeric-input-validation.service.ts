@@ -38,6 +38,14 @@ export class NumericInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  isCustomizationArgTrue(
+    customizationArgs: NumericInputCustomizationArgs): boolean {
+      if(customizationArgs.input.value === true) {
+        return true;
+      }
+      return false;
+  }
+  
   getCustomizationArgsWarnings(
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];

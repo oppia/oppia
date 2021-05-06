@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ContentTranslationLanguageService } from "pages/exploration-player-page/services/content-translation-language.service";
+
 /**
  * @fileoverview Directive for a schema-based editor for floats.
  */
@@ -110,6 +112,18 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             } else {
               ctrl.isUserCurrentlyTyping = true;
             }
+          };
+
+          ctrl.onDownKeypress = function(evt) {
+            if (evt.keyCode === 38) {
+              if(NumericInputValidationService.isCustomizationArgTrue()
+              && ctrl.localValue < 0) {
+                ctrl.localValue = 0;
+                evt.preventDefault();
+              }
+            } /*else {
+              ctrl.isUserCurrentlyTyping = true;
+            }*/
           };
 
           ctrl.$onInit = function() {
