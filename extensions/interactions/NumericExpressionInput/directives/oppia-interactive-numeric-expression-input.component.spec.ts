@@ -19,11 +19,8 @@
 
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { NumericExpressionInputRulesService } from './numeric-expression-input-rules.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveNumericExpressionInput } from
   './oppia-interactive-numeric-expression-input.component'
@@ -101,6 +98,7 @@ fdescribe('NumericExpressionInputInteractive', () => {
   });
 
   it('should add the change handler to guppy', () => {
+    console.log('here')
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject);
     component.ngOnInit();
@@ -108,6 +106,7 @@ fdescribe('NumericExpressionInputInteractive', () => {
   });
 
   it('should not submit the answer if invalid', function() {
+    console.log(component.isCurrentAnswerValid());
     component.hasBeenTouched = true;
     // Invalid answer.
     component.value = '1/';

@@ -36,11 +36,11 @@ describe('ShortResponseNumericExpressionInput', function() {
     fixture = TestBed.createComponent(
       ShortResponseNumericExpressionInput);
     component = fixture.componentInstance;
-    component.display_answer = '&quot;answer&quot;';
+    component.answer = 'answer';
     fixture.detectChanges();
   });
   it('should correctly escape characters in the answer', function() {
     component.ngOnInit();
-    expect(component.display_answer).toBe('answer');
+    expect(component.answer).toBe('answer');
   });
 });

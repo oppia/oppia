@@ -25,8 +25,8 @@
  import { HtmlEscaperService } from 'services/html-escaper.service';
  
  @Component({
-   selector: 'oppia-response-numeric-expression-input',
-   templateUrl: './numeric-expression-input-response.component.html',
+   selector: 'oppia-short-response-numeric-expression-input',
+   templateUrl: './numeric-expression-input-short-response.component.html',
    styleUrls: []
  })
  export class ShortResponseNumericExpressionInput implements OnInit {

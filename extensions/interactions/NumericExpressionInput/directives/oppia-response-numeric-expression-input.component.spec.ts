@@ -16,29 +16,29 @@
  * @fileoverview Unit tests for the NumericExpressionInput response component.
  */
 
- import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
- import { ResponseNumericExpressionInput } from './oppia-response-numeric-expression-input.component';
- 
- describe('ResponseNumericExpressionInput', function() {
-   let component: ResponseNumericExpressionInput;
-   let fixture: ComponentFixture<ResponseNumericExpressionInput>;
- 
-   beforeEach(waitForAsync(() => {
-     TestBed.configureTestingModule(
-       {
-         declarations: [ResponseNumericExpressionInput]
-       }).compileComponents();
-   }));
- 
-   beforeEach(() => {
-     fixture = TestBed.createComponent(
-       ResponseNumericExpressionInput);
-     component = fixture.componentInstance;
-     component.display_answer = '&quot;answer&quot;';
-     fixture.detectChanges();
-   });
-   it('should correctly escape characters in the answer', function() {
-     component.ngOnInit();
-     expect(component.display_answer).toBe('answer');
-   });
- });
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ResponseNumericExpressionInput } from './oppia-response-numeric-expression-input.component';
+
+describe('ResponseNumericExpressionInput', function() {
+  let component: ResponseNumericExpressionInput;
+  let fixture: ComponentFixture<ResponseNumericExpressionInput>;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [ResponseNumericExpressionInput]
+      }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ResponseNumericExpressionInput);
+    component = fixture.componentInstance;
+    component.answer = 'answer';
+    fixture.detectChanges();
+  });
+  it('should correctly escape characters in the answer', function() {
+    component.ngOnInit();
+    expect(component.answer).toBe('answer');
+  });
+});
