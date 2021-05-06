@@ -69,6 +69,7 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 
 
 // Directives.
@@ -145,6 +146,7 @@ const toastrConfig = {
     AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CorrectnessFooterComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -190,6 +192,7 @@ const toastrConfig = {
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    CorrectnessFooterComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -236,6 +239,7 @@ const toastrConfig = {
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    CorrectnessFooterComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
