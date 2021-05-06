@@ -25,7 +25,7 @@ from core.platform import models
 import feconf
 from jobs import job_test_utils
 from jobs.transforms import user_audits
-from jobs.types import user_model_errors
+from jobs.types import user_model_errors, audit_errors
 
 import apache_beam as beam
 
@@ -48,7 +48,7 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            user_model_errors.ModelIdRegexError(
+            audit_errors.ModelIdRegexError(
                 model_with_invalid_id, feconf.USER_ID_REGEX),
         ])
 

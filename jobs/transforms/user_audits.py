@@ -24,17 +24,17 @@ import datetime
 from core.platform import models
 import feconf
 from jobs import job_utils
-from jobs.decorators import user_model_audit_decorators
+from jobs.decorators import user_model_audit_decorators, audit_decorators
 from jobs.transforms import base_model_audits
-from jobs.types import user_model_errors
+from jobs.types import user_model_errors, audit_errors
 
 import apache_beam as beam
 
 (auth_models, user_models) = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
-
-@user_model_audit_decorators.AuditsExisting(
+# this is an expection due to it's inheritance from base model audit
+@audit_decorators.AuditsExisting(
     auth_models.UserAuthDetailsModel,
     user_models.UserEmailPreferencesModel,
     user_models.UserSettingsModel,
@@ -104,8 +104,8 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
         if expiration_date > model.last_updated:
             yield user_model_errors.ModelExpiringError(model)
 
-
-@user_model_audit_decorators.RelationshipsOf(
+# Relationship are common among models so base audit_decorator will work
+@audit_decorators.RelationshipsOf(
     user_models.UserEmailPreferencesModel
 )
 def user_email_preferences_model_relationships(model):
