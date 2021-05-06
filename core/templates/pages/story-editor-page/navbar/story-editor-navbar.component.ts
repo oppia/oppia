@@ -25,14 +25,14 @@ import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
   templateUrl: './story-editor-navbar.component.html'
 })
-export class StoryEditorNavbarComponent {
+export class StoryEditorNavbarComponent implements OnInit {
   @Input() commitMessage;
   validationIssues: string[];
   prepublishValidationIssues: string | string[];

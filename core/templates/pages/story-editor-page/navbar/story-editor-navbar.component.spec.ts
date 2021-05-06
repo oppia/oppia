@@ -13,99 +13,117 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the story editor navbar directive.
+ * @fileoverview Unit tests for the story editor navbar component.
  */
 
+import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { StoryEditorStateService } from '../services/story-editor-state.service';
+import { StoryEditorNavbarComponent } from './story-editor-navbar.component';
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-describe('Story editor navbar directive', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Story editor navbar directive', () => {
+  let component: StoryEditorNavbarComponent;
+  let fixture: ComponentFixture<StoryEditorNavbarComponent>;
+  let story: Story;
+  let storyObjectFactory = null;
+  let storyEditorStateService: StoryEditorStateService;
+  let undoRedoService: UndoRedoService;
 
-  importAllAngularServices();
-  var $uibModal = null;
-  var $scope = null;
-  var ctrl = null;
-  var $rootScope = null;
-  var directive = null;
-  var story = null;
-  var WindowDimensionsService = null;
-  var StoryEditorStateService = null;
-  var StoryObjectFactory = null;
-  var UndoRedoService = null;
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $uibModal = $injector.get('$uibModal');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
-    UndoRedoService = $injector.get('UndoRedoService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
-    StoryEditorStateService = $injector.get('StoryEditorStateService');
-
-    var sampleStoryBackendObject = {
-      id: 'sample_story_id',
-      title: 'Story title',
-      description: 'Story description',
-      notes: 'Story notes',
-      version: 1,
-      corresponding_topic_id: 'topic_id',
-      url_fragment: 'story_title',
-      story_contents: {
-        initial_node_id: 'node_2',
-        nodes: [
-          {
-            id: 'node_1',
-            title: 'Title 1',
-            description: 'Description 1',
-            prerequisite_skill_ids: ['skill_1'],
-            acquired_skill_ids: ['skill_2'],
-            destination_node_ids: [],
-            outline: 'Outline',
-            exploration_id: null,
-            outline_is_finalized: false
-          }, {
-            id: 'node_2',
-            title: 'Title 2',
-            description: 'Description 2',
-            prerequisite_skill_ids: ['skill_3'],
-            acquired_skill_ids: ['skill_4'],
-            destination_node_ids: ['node_1'],
-            outline: 'Outline 2',
-            exploration_id: 'exp_1',
-            outline_is_finalized: true
-          }],
-        next_node_id: 'node_3'
-      },
-      language_code: 'en'
-    };
-    story = StoryObjectFactory.createFromBackendDict(sampleStoryBackendObject);
-    directive = $injector.get('storyEditorNavbarDirective')[0];
-
-    spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    spyOn(StoryEditorStateService, 'getSkillSummaries').and.returnValue(
-      [{id: '1', description: 'Skill description'}]);
-    spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
-    spyOn(StoryEditorStateService, 'getClassroomUrlFragment').and.returnValue(
-      'math');
-    spyOn(StoryEditorStateService, 'getTopicUrlFragment').and.returnValue(
-      'fractions');
-    spyOn(StoryEditorStateService, 'getTopicName').and.returnValue('addition');
-
-    ctrl = $injector.instantiate(directive.controller, {
-      $scope: $scope,
-      $uibModal
-    });
-    ctrl.$onInit();
-  }));
-
-  it('should init the controller', function() {
-    expect($scope.warningsAreShown).toEqual(false);
-    expect($scope.forceValidateExplorations).toEqual(true);
-    expect($scope.showNavigationOptions).toEqual(false);
-    expect($scope.showStoryEditOptions).toEqual(false);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [StoryEditorNavbarComponent],
+      providers: [
+        StoryObjectFactory,
+        StoryEditorStateService,
+        UndoRedoService,
+        EditableStoryBackendApiService,
+        AlertsService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
-  it('should return change list length', function() {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    expect($scope.getChangeListLength()).toEqual(10);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StoryEditorNavbarComponent);
+    component = fixture.componentInstance;
+    undoRedoService = TestBed.inject(UndoRedoService);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
+    story = storyObjectFactory.createFromBackendDict({
+      id: 'storyId_0',
+      title: 'Story title',
+      description: 'Story Description',
+      notes: '<p>Notes/p>',
+      story_contents: {
+        initial_node_id: 'node_1',
+        next_node_id: 'node_3',
+        nodes: [{
+          title: 'title_1',
+          description: 'description_1',
+          id: 'node_1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: 'exp_1',
+          outline_is_finalized: false,
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
+        }, {
+          title: 'title_2',
+          description: 'description_2',
+          id: 'node_2',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: 'exp_2',
+          outline_is_finalized: false,
+          thumbnail_filename: 'img2.png',
+          thumbnail_bg_color: '#a33f40'
+        }],
+      },
+      language_code: 'en',
+      story_contents_schema_version: '1',
+      version: 1,
+      corresponding_topic_id: 'topic_id'
+    });
+    spyOn(storyEditorStateService, 'getSkillSummaries').and.returnValue(
+      [{
+        id: 'abc',
+        description: 'description',
+        language_code: 'en',
+        version: 1,
+        misconception_count: 1,
+        worked_examples_count: 1,
+        skill_model_created_on: 1,
+        skill_model_last_updated: 1,
+      }]);
+    spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
+    spyOn(storyEditorStateService, 'getClassroomUrlFragment').and.returnValue(
+      'math');
+    spyOn(storyEditorStateService, 'getTopicUrlFragment').and.returnValue(
+      'fractions');
+    spyOn(storyEditorStateService, 'getTopicName').and.returnValue('addition');
+  });
+
+  it('should init the controller', () => {
+    component.ngOnInit();
+    expect(component.warningsAreShown).toEqual(false);
+    expect(component.forceValidateExplorations).toEqual(true);
+    expect(component.showNavigationOptions).toEqual(false);
+    expect(component.showStoryEditOptions).toEqual(false);
+  });
+
+  it('should return change list length', () => {
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
+    expect(component.getChangeListLength()).toEqual(10);
   });
 });

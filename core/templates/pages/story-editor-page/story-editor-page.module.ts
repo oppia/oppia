@@ -44,7 +44,8 @@ import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.
     StoryEditorNavbarBreadcrumbComponent,
     StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
-    StoryEditorNavbarComponent
+    StoryEditorNavbarComponent,
+    StoryPreviewTabComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
