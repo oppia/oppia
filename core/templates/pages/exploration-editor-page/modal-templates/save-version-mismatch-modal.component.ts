@@ -17,13 +17,13 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-save-version-mismatch-modal',
@@ -31,18 +31,16 @@ import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFact
 })
 export class SaveVersionMismatchModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-    
   MSECS_TO_REFRESH: number = 20;
   hasLostChanges: boolean;
-
-  @Input() lostChanges:any;
+  @Input() lostChanges: LostChange[];
 
   constructor(
     private windowRef: WindowRef,
-    private ngbActiveModal: NgbActiveModal,
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
-    private lostChangeObjectFactory: LostChangeObjectFactory
+    private lostChangeObjectFactory: LostChangeObjectFactory,
+    private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }
@@ -54,7 +52,8 @@ export class SaveVersionMismatchModalComponent
       // properties (such as the exploration title, category, etc.).
       this.lostChanges = this.lostChanges.map(
         this.lostChangeObjectFactory.createNew);
-      this.loggerService.error('Lost changes: ' + JSON.stringify(this.lostChanges));
+      this.loggerService.error(
+        'Lost changes: ' + JSON.stringify(this.lostChanges));
     }
   }
 

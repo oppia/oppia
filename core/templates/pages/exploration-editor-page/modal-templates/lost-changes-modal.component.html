@@ -13,10 +13,10 @@
     paste these changes before discarding them.
   </p>
 
-  <changes-in-human-readable-form lost-changes="lostChanges">
-  </changes-in-human-readable-form>
+  <oppia-changes-in-human-readable-form [lostChanges]="lostChanges">
+  </oppia-changes-in-human-readable-form>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-click="cancel()">Close</button>
+  <button class="btn btn-secondary" (click)="cancel()">Close</button>
 </div>

@@ -17,6 +17,7 @@ import { TestBed } from '@angular/core/testing';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ExplorationDataService } from '../services/exploration-data.service';
 
 /**
  * @fileoverview Unit tests for ExplorationMetadataModalController.
@@ -36,12 +37,25 @@ describe('Exploration Metadata Modal Controller', function() {
 
   importAllAngularServices();
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeList() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
-    });
   }));
 
   describe('when all metadata are filled', function() {

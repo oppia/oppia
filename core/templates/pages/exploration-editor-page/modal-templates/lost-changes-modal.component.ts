@@ -13,35 +13,42 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for lost changes modal.
+ * @fileoverview Component for lost changes modal.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
+
+import { LoggerService } from 'services/contextual/logger.service';
+import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { LoggerService } from 'services/contextual/logger.service';
-import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
-
 @Component({
-  selector: 'oppia-lost-changes-modal-controller',
+  selector: 'oppia-lost-changes-modal',
   templateUrl: './lost-changes-modal.component.html'
 })
-export class LostChangesModalControllerComponent
+export class LostChangesModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() lostChanges:any;
+  @Input() lostChanges: LostChange[];
+  hasLostChanges: boolean;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
     private loggerService: LoggerService,
-    private lostChangeObjectFactory: LostChangeObjectFactory
+    private lostChangeObjectFactory: LostChangeObjectFactory,
+    private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }
 
-  ngOnInit (): void {
+  ngOnInit(): void {
+    this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
     this.lostChanges = this.lostChanges.map(
       this.lostChangeObjectFactory.createNew);
-    this.loggerService.error('Lost changes: ' + JSON.stringify(this.lostChanges));
+    this.loggerService.error(
+      'Lost changes: ' + JSON.stringify(this.lostChanges));
+  }
+
+  cancel(): void {
+    this.ngbActiveModal.dismiss();
   }
 }

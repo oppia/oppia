@@ -180,6 +180,15 @@ class ModelExpiredError(BaseAuditError):
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
 
 
+class InvalidCommitTypeError(BaseAuditError):
+    """Error class for commit_type validation errors."""
+
+    def __init__(self, model):
+        super(InvalidCommitTypeError, self).__init__(model)
+        self.message = (
+            'Commit type %s is not allowed' % model.commit_type)
+
+
 class ModelExpiringError(BaseAuditError):
     """Error class for models that are expiring."""
 
@@ -187,6 +196,14 @@ class ModelExpiringError(BaseAuditError):
         super(ModelExpiringError, self).__init__(model)
         self.message = 'mark model as deleted when older than %s days' % (
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
+
+
+class ModelIncorrectKeyError(BaseAuditError):
+    """Error class for incorrect key in PendingDeletionRequestModel."""
+
+    def __init__(self, model, incorrect_keys):
+        super(ModelIncorrectKeyError, self).__init__(model)
+        self.message = 'contains keys %s are not allowed' % (incorrect_keys)
 
 
 class ModelRelationshipError(BaseAuditError):
@@ -213,3 +230,35 @@ class ModelRelationshipError(BaseAuditError):
             'but no such model exists' % (
                 id_property, python_utils.convert_to_bytes(target_id),
                 target_kind))
+
+
+class ModelCanonicalNameMismatchError(BaseAuditError):
+    """Error class for models that have mismatching names."""
+
+    def __init__(self, model):
+        super(ModelCanonicalNameMismatchError, self).__init__(model)
+        self.message = (
+            'Entity name %s in lowercase does not match '
+            'canonical name %s' % (model.name, model.canonical_name))
+
+
+class DraftChangeListLastUpdatedNoneError(BaseAuditError):
+    """Error class for models with draft change list but draft change list
+    last_updated is None.
+    """
+
+    def __init__(self, model):
+        super(DraftChangeListLastUpdatedNoneError, self).__init__(model)
+        self.message = (
+            'draft change list %s exists but draft change list '
+            'last updated is None' % model.draft_change_list)
+
+
+class DraftChangeListLastUpdatedInvalidError(BaseAuditError):
+    """Error class for models with invalid draft change list last_updated."""
+
+    def __init__(self, model):
+        super(DraftChangeListLastUpdatedInvalidError, self).__init__(model)
+        self.message = (
+            'draft change list last updated %s is greater than the time '
+            'when job was run' % model.draft_change_list_last_updated)

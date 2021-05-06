@@ -20,21 +20,20 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { LocalStorageService } from 'services/local-storage.service';
-import { SaveValidationFailModalComponent } from 'pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component.ts';
-import { SaveVersionMismatchModalComponent } from 'pages/exploration-editor-page/modal-templates/save-version-mismatch-modal.component';
-import { LostChangesModalControllerComponent } from 'pages/exploration-editor-page/modal-templates/lost-changes-modal.component.ts'
+import { SaveVersionMismatchModalComponent } from '../modal-templates/save-version-mismatch-modal.component';
+import { SaveValidationFailModalComponent } from '../modal-templates/save-validation-fail-modal.component';
+import { LostChangesModalComponent } from '../modal-templates/lost-changes-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutosaveInfoModalsService {
-  _isModalOpen: boolean = false;
+  private _isModalOpen: boolean = false;
 
   constructor(
-    private explorationDataService: ExplorationDataService,
     private localStorageService: LocalStorageService,
     private ngbModal: NgbModal,
   ) {}
@@ -42,9 +41,9 @@ export class AutosaveInfoModalsService {
   showNonStrictValidationFailModal(): void {
     const modelRef = this.ngbModal.open(
       SaveValidationFailModalComponent, {backdrop: true});
-    modelRef.result.then(function() {
+    modelRef.result.then(() => {
       this._isModalOpen = false;
-    }, function() {
+    }, () => {
       this._isModalOpen = false;
     });
 
@@ -55,26 +54,33 @@ export class AutosaveInfoModalsService {
     return this._isModalOpen;
   }
 
-  showVersionMismatchModal(lostChanges): void {
+  showVersionMismatchModal(lostChanges: LostChange[]): void {
     const modelRef = this.ngbModal.open(
-      SaveVersionMismatchModalComponent, {backdrop: true});
+      SaveVersionMismatchModalComponent, {
+        backdrop: 'static',
+        keyboard: false
+      });
     modelRef.componentInstance.lostChanges = lostChanges;
-    modelRef.result.then(function() {
+    modelRef.result.then(() => {
       this._isModalOpen = false;
-    }, function() {
+    }, () => {
       this._isModalOpen = false;
     });
 
     this._isModalOpen = true;
   }
 
-  showLostChangesModal(lostChanges, explorationId): void {
+  showLostChangesModal(
+      lostChanges: LostChange[], explorationId: string): void {
     const modelRef = this.ngbModal.open(
-      LostChangesModalControllerComponent, {backdrop: true});
+      LostChangesModalComponent, {
+        backdrop: 'static',
+        keyboard: false
+      });
     modelRef.componentInstance.lostChanges = lostChanges;
-    modelRef.result.then(function() {
+    modelRef.result.then(() => {
       this._isModalOpen = false;
-    }, function() {
+    }, () => {
       // When the user clicks on discard changes button, signal backend
       // to discard the draft and reload the page thereafter.
       this.localStorageService.removeExplorationDraft(explorationId);

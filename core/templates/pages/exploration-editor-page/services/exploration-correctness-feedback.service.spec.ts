@@ -16,7 +16,9 @@
  * @fileoverview Unit tests for ExplorationCorrectnessFeedbackService
  */
 
+import { TestBed } from '@angular/core/testing';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { ExplorationDataService } from './exploration-data.service';
 
 /* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
@@ -24,14 +26,23 @@ require('pages/exploration-editor-page/services/exploration-correctness-feedback
 describe('Exploration Correctness Feedback Service', function() {
   var ExplorationCorrectnessFeedbackService;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(function() {
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        autosaveChangeList: function() {}
-      });
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeList() {
+              return;
+            }
+          }
+        }
+      ]
     });
   });
+
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,64 +13,139 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SaveVersionMismatchModalController.
+ * @fileoverview Unit tests for SaveVersionMismatchModalComponent.
  */
 
-import { LostChangeObjectFactory } from
-  'domain/exploration/LostChangeObjectFactory';
-import { TestBed } from '@angular/core/testing';
-import { UtilsService } from 'services/utils.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-describe('Save Version Mismatch Modal Controller', () => {
-  let $scope = null;
-  let $log = null;
-  let logSpy = null;
-  let $timeout = null;
-  let $q = null;
-  const windowRef = new WindowRef();
-  const mockExplorationData = {
-    discardDraft: (callback) => callback()
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { SaveVersionMismatchModalComponent } from './save-version-mismatch-modal.component';
+import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
+
+@Component({
+  selector: 'oppia-changes-in-human-readable-form',
+  template: ''
+})
+class ChangesInHumanReadableFormComponentStub {
+}
+
+class MockActiveModal {
+  close(): void {
+    return;
+  }
+
+  dismiss(): void {
+    return;
+  }
+}
+
+// Mocking window object here because changing location.href causes the
+// full page to reload. Page reloads raise an error in karma.
+class MockWindowRef {
+  _window = {
+    location: {
+      _hash: '',
+      _hashChange: null,
+      get hash() {
+        return this._hash;
+      },
+      set hash(val) {
+        this._hash = val;
+        if (this._hashChange === null) {
+          return;
+        }
+        this._hashChange();
+      },
+      reload: (val) => val
+    },
+    get onhashchange() {
+      return this.location._hashChange;
+    },
+
+    set onhashchange(val) {
+      this.location._hashChange = val;
+    }
   };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
+class MockExplorationDataService {
+  discardDraft(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      resolve();
+    });
+  }
+}
+
+describe('Save Version Mismatch Modal Component', () => {
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
+  } as unknown as LostChange];
+
+  const lostChangesResponse = [{
+    utilsService: {},
+    cmd: 'add_state',
+    stateName: 'State name',
   }];
 
-  beforeEach(function() {
+  let component: SaveVersionMismatchModalComponent;
+  let fixture: ComponentFixture<SaveVersionMismatchModalComponent>;
+  let windowRef: MockWindowRef;
+  let loggerService: LoggerService;
+  let logSpy = null;
+  let explorationDataService: MockExplorationDataService;
+
+  beforeEach(waitForAsync(() => {
+    windowRef = new MockWindowRef();
+    explorationDataService = new MockExplorationDataService();
+
     TestBed.configureTestingModule({
+      declarations: [
+        SaveVersionMismatchModalComponent,
+        ChangesInHumanReadableFormComponentStub
+      ],
       providers: [
-        UtilsService
-      ]
-    });
+        LoggerService,
+        LostChangeObjectFactory,
+        {
+          provide: ExplorationDataService,
+          useValue: explorationDataService
+        },
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        { provide: WindowRef,
+          useValue: windowRef
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(SaveVersionMismatchModalComponent);
+    component = fixture.componentInstance;
+    component.lostChanges = lostChanges;
+
+    loggerService = TestBed.inject(LoggerService);
+    logSpy = spyOn(loggerService, 'error').and.callThrough();
+
+    fixture.detectChanges();
   });
 
-  beforeEach(angular.mock.module('oppia', ($provide) => {
-    $provide.value('ExplorationDataService', mockExplorationData);
-    $provide.value('LostChangeObjectFactory', TestBed.get(
-      LostChangeObjectFactory));
-    $provide.value('WindowRef', windowRef);
-  }));
-  beforeEach(angular.mock.inject(($injector, $controller) => {
-    $log = $injector.get('$log');
-    $timeout = $injector.get('$timeout');
-    $q = $injector.get('$q');
-    logSpy = spyOn($log, 'error').and.callThrough();
-
-    const $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $controller(
-      'SaveVersionMismatchModalController', {
-        $scope: $scope,
-        lostChanges: lostChanges
-      });
-  }));
-
   it('should evaluates lostChanges when controller is initialized', () => {
-    expect($scope.lostChanges[0].cmd).toBe('add_state');
-    expect($scope.lostChanges[0].stateName).toBe('State name');
+    expect(component.lostChanges[0].cmd).toBe('add_state');
+    expect(component.lostChanges[0].stateName).toBe('State name');
     expect(logSpy).toHaveBeenCalledWith(
-      'Lost changes: ' + JSON.stringify(lostChanges));
+      'Lost changes: ' + JSON.stringify(lostChangesResponse));
   });
 
   it('should remove exploration draft from local storage when modal is closed',
@@ -81,20 +156,45 @@ describe('Save Version Mismatch Modal Controller', () => {
           reload: reloadSpy
         }
       });
-      const discardDraftSpy = (
-        spyOn(mockExplorationData, 'discardDraft').and.callFake(
-          () => {
-            var deferred = $q.defer();
-            deferred.resolve('sample-csrf-token');
-            return deferred.promise;
-          }
-        ));
 
-      $scope.discardChanges();
-      $scope.$apply();
-      expect(discardDraftSpy).toHaveBeenCalled();
+      component.discardChanges();
+      fixture.detectChanges();
 
-      $timeout.flush(20);
-      expect(reloadSpy).toHaveBeenCalled();
+      waitForAsync(() => {
+        expect(explorationDataService.discardDraft).toHaveBeenCalled();
+        expect(reloadSpy).toHaveBeenCalled();
+      });
     });
+
+  it('should contain correct modal header', () => {
+    const modalHeader =
+    fixture.debugElement.nativeElement
+      .querySelector('.modal-header').innerText;
+
+    expect(modalHeader).toBe('Error Saving Exploration');
+  });
+
+  it('should contain correct modal body', () => {
+    const modalBody =
+    fixture.debugElement.nativeElement
+      .querySelector('.modal-body').children[0].innerText;
+
+    expect(modalBody).toBe(
+      'Sorry! Someone else has saved a new version of this exploration, so ' +
+      'your pending changes cannot be saved.');
+  });
+
+  it('should contain description on lost changes' +
+    'only if they exists in modal body', () => {
+    const modalBody =
+    fixture.debugElement.nativeElement
+      .querySelector('.modal-body').children[1].innerText;
+
+    component.hasLostChanges = true;
+    fixture.detectChanges();
+
+    expect(modalBody).toBe(
+      'The lost changes are displayed below. You may want to copy and ' +
+      'paste these changes before discarding them.');
+  });
 });

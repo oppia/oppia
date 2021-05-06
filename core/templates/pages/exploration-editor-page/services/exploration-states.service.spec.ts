@@ -42,7 +42,9 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
+import { ChangeListService } from './change-list.service';
+import { TestBed } from '@angular/core/testing';
+
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -53,7 +55,7 @@ describe('ExplorationStatesService', function() {
   var $q = null;
   var $rootScope = null;
   var $uibModal = null;
-  var ChangeListService = null;
+  let changeListService: ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
 
@@ -91,13 +93,25 @@ describe('ExplorationStatesService', function() {
         new WrittenTranslationObjectFactory()));
   }));
   importAllAngularServices();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        ChangeListService
+      ]
+    });
+  });
+
+  beforeEach(() => {
+    changeListService = TestBed.inject(ChangeListService);
+  });
+
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
+      _$q_, _$rootScope_, _$uibModal_, _ContextService_,
       _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
-    ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
   }));
@@ -175,7 +189,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateAddedCallback', function() {
       it('should callback when a new state is added', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(ChangeListService, 'addState');
+        spyOn(changeListService, 'addState');
 
         ExplorationStatesService.registerOnStateAddedCallback(spy);
         ExplorationStatesService.addState('Me Llamo');
@@ -189,7 +203,7 @@ describe('ExplorationStatesService', function() {
         spyOn($uibModal, 'open').and.callFake(function() {
           return {result: $q.resolve()};
         });
-        spyOn(ChangeListService, 'deleteState');
+        spyOn(changeListService, 'deleteState');
 
         var spy = jasmine.createSpy('callback');
         ExplorationStatesService.registerOnStateDeletedCallback(spy);
@@ -204,7 +218,7 @@ describe('ExplorationStatesService', function() {
     describe('.registerOnStateRenamedCallback', function() {
       it('should callback when a state is renamed', function() {
         var spy = jasmine.createSpy('callback');
-        spyOn(ChangeListService, 'renameState');
+        spyOn(changeListService, 'renameState');
 
         ExplorationStatesService.registerOnStateRenamedCallback(spy);
         ExplorationStatesService.renameState('Hola', 'Bonjour');
@@ -217,7 +231,7 @@ describe('ExplorationStatesService', function() {
       it('should callback when answer groups of a state are saved',
         function() {
           var spy = jasmine.createSpy('callback');
-          spyOn(ChangeListService, 'editStateProperty');
+          spyOn(changeListService, 'editStateProperty');
 
           ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
           ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
@@ -232,9 +246,9 @@ describe('ExplorationStatesService', function() {
     expect(
       ExplorationStatesService.getSolicitAnswerDetailsMemento(
         'Hola', 'solicit_answer_details')).toEqual(false);
-    spyOn(ChangeListService, 'editStateProperty');
+    const changeListSpy = spyOn(changeListService, 'editStateProperty');
     ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
-    expect(ChangeListService.editStateProperty).toHaveBeenCalledWith(
+    expect(changeListSpy).toHaveBeenCalledWith(
       'Hola', 'solicit_answer_details', true, false);
     expect(ExplorationStatesService.getSolicitAnswerDetailsMemento(
       'Hola', 'solicit_answer_details')).toEqual(true);

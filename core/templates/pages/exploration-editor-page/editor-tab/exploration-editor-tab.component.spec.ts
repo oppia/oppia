@@ -55,6 +55,7 @@ import { SubtitledUnicode } from
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ExplorationDataService } from '../services/exploration-data.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -82,7 +83,21 @@ describe('Exploration editor tab component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeList() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     hintObjectFactory = TestBed.get(HintObjectFactory);
@@ -122,9 +137,6 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'WrittenTranslationsObjectFactory',
       TestBed.get(WrittenTranslationsObjectFactory));
-    $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
-    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
