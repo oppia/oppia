@@ -83,7 +83,7 @@ class ModelIdRegexErrorTests(audit_errors_test.AuditErrorsTestBase):
 
 
 class DraftChangeListLastUpdatedNoneErrorTests(
-    audit_errors_test.AuditErrorsTestBase):
+        audit_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         draft_change_list = [{
@@ -110,7 +110,7 @@ class DraftChangeListLastUpdatedNoneErrorTests(
 
 
 class DraftChangeListLastUpdatedInvalidErrorTests(
-    audit_errors_test.AuditErrorsTestBase):
+        audit_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         draft_change_list = [{
