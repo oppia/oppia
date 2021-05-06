@@ -225,7 +225,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         el[0].children[0].setAttribute('style', 'display: None');
         // Show the loading text.
         let loadingDiv = document.createElement('div');
-        loadingDiv.innerHTML = 'Loading...';
+        loadingDiv.innerText = 'Loading...';
         el[0].appendChild(loadingDiv);
 
         // A RegExp for matching rich text components.
