@@ -19,7 +19,7 @@
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
 import { ContributorDashboardConstants } from
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants.ts';
+  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 
 angular.module('oppia').constant(
   'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
