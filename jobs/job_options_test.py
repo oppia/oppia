@@ -33,7 +33,7 @@ class JobOptionsTests(test_utils.TestBase):
 
     def test_overwritten_values(self):
         model_io_stub = stub_io.ModelIoStub()
-        get_models = model_io_stub.get_models
+        get_models = model_io_stub.get_models_ptransform
 
         options = job_options.JobOptions(model_getter=get_models)
 

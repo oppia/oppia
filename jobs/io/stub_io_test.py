@@ -31,9 +31,9 @@ class ModelIoStubTests(job_test_utils.PipelinedTestBase):
     def test_get_models_returns_nothing_when_stub_is_empty(self):
         stub = stub_io.ModelIoStub()
 
-        self.assert_pcoll_empty(self.pipeline | stub.get_models())
+        self.assert_pcoll_empty(self.pipeline | stub.get_models_ptransform())
 
-    def test_get_models(self):
+    def test_get_models_ptransform(self):
         stub = stub_io.ModelIoStub()
         test_models = [
             base_models.BaseModel(
@@ -46,4 +46,5 @@ class ModelIoStubTests(job_test_utils.PipelinedTestBase):
 
         stub.put_multi(test_models)
 
-        self.assert_pcoll_equal(self.pipeline | stub.get_models(), test_models)
+        self.assert_pcoll_equal(
+            self.pipeline | stub.get_models_ptransform(), test_models)
