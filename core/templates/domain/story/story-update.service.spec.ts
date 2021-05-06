@@ -21,8 +21,8 @@ import { HttpClientTestingModule } from
 import { TestBed } from '@angular/core/testing';
 
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { StoryUpdateService } from 'domain/story/story-update.service.ts';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
+import { StoryUpdateService } from 'domain/story/story-update.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 
 describe('Story update service', () => {
   let storyObjectFactory: StoryObjectFactory = null;
