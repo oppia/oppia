@@ -25,20 +25,20 @@ var ruleTester = new RuleTester();
 ruleTester.run('protractor-practices', rule, {
   valid: [{
     code:
-      `action.click(elem);
+    `action.click(elem);
     action.sleep();`,
   }, {
     code:
-      `action.click(elem);
+    `action.click(elem);
     browser.action.sleep();`,
   }, {
-    code: `a.then;`,
+    code: 'a.then;',
   }, {
-    code: `then.c;`,
+    code: 'then.c;',
   }, {
-    code: `then().d;`,
+    code: 'then().d;',
   }, {
-    code: `a.then.b;`,
+    code: 'a.then.b;',
   }],
 
   invalid: [
@@ -53,25 +53,25 @@ ruleTester.run('protractor-practices', rule, {
       }],
     },
     {
-      code: `z.then();`,
+      code: 'z.then();',
       errors: [{
         message: 'Please do not use .then(), consider async/await instead',
       }],
     },
     {
-      code: `a.b.c.then();`,
+      code: 'a.b.c.then();',
       errors: [{
         message: 'Please do not use .then(), consider async/await instead',
       }],
     },
     {
-      code: `then.then();`,
+      code: 'then.then();',
       errors: [{
         message: 'Please do not use .then(), consider async/await instead',
       }],
     },
     {
-      code: `a.then().b.then();`,
+      code: 'a.then().b.then();',
       errors: [
         {
           message: 'Please do not use .then(), consider async/await instead',
