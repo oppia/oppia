@@ -1,3 +1,4 @@
+require('dotenv').config();
 var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
@@ -321,24 +322,8 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-    var _ADD_SCREENSHOT_REPORTER = true;
 
-    if (_ADD_SCREENSHOT_REPORTER) {
-      // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
-      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots.
-        dest: '../protractor-screenshots',
-        // Function to build filenames of screenshots.
-        pathBuilder: function(currentSpec) {
-          let filename = currentSpec.fullName;
-          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
-        },
-        captureOnlyFailedSpecs: true,
-        reportFailedUrl: true,
-        preserveDirectory: true
-      }));
-    }
+    console.log(process.env);
 
     var ADD_VIDEO_REPORTER = true;
     var spw = '';
