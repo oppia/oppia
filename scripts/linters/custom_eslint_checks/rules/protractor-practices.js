@@ -36,8 +36,8 @@ module.exports = {
     },
   },
 
-  create: function (context) {
-    var checkSleepCall = function (node) {
+  create: function(context) {
+    var checkSleepCall = function(node) {
       var callee = node.callee;
       if (callee.property && callee.property.name !== 'sleep') {
         return;
@@ -53,10 +53,10 @@ module.exports = {
     };
 
     return {
-      CallExpression: function (node) {
+      CallExpression: function(node) {
         checkSleepCall(node);
       },
-      'CallExpression[callee.property.name=\'then\']': function (node) {
+      'CallExpression[callee.property.name=\'then\']': function(node) {
         context.report({
           node: node.callee.property,
           loc: node.callee.property.loc,
