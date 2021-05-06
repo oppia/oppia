@@ -71,8 +71,10 @@ export class UnitsObjectFactory {
   }
 
   isLastElementUnit(unitList: string[]): boolean {
-    return (unitList.length > 0) &&
-            this.isunit(<string> unitList.slice(-1).pop());
+    return (
+      unitList.length > 0 &&
+      this.isunit(<string> unitList.slice(-1).pop())
+    );
   }
 
   stringToLexical(units: string): string[] {
