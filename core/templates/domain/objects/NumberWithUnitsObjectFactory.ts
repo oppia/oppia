@@ -21,11 +21,11 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory.ts';
+  'domain/objects/FractionObjectFactory';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { Units, UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory.ts';
+  'domain/objects/UnitsObjectFactory';
 import { Unit, NumberWithUnitsAnswer } from
   'interactions/answer-defs';
 

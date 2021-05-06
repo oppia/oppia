@@ -41,7 +41,6 @@
     "core/templates/domain/classifier/answer-classification-result.model.ts",
     "core/templates/domain/classifier/answer-classification-result.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/collection/collection-playthrough.model.ts",
     "core/templates/domain/collection/collection-playthrough.model.spec.ts",
     "core/templates/domain/collection/collection-rights.model.ts",
@@ -76,6 +75,8 @@
     "core/templates/domain/opportunity/featured-translation-language.model.spec.ts",
     "core/templates/domain/platform_feature/client-context.model.ts",
     "core/templates/domain/platform_feature/client-context.model.spec.ts",
+    "core/templates/domain/skill/MisconceptionObjectFactory.ts",
+    "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/skill/assigned-skill.model.ts",
     "core/templates/domain/skill/assigned-skill.model.spec.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.ts",
@@ -183,5 +184,6 @@
     "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
     "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
   ],
-  "include": ["typings/*.ts"]
+  "include": ["typings/*.ts"],
+  "exclude": ["extensions/classifiers/proto"]
 }
