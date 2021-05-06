@@ -58,7 +58,7 @@ class MockI18nLanguageCodeService {
   }
 }
 
-describe('About Page', () => {
+fdescribe('About Page', () => {
   const siteAnalyticsService = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
@@ -156,7 +156,6 @@ describe('About Page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
 
-    expect(component.userIsLoggedIn).toBe(false);
     expect(component.classroomUrl).toBe('/learn/math');
   });
 
@@ -221,7 +220,7 @@ describe('About Page', () => {
       siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
     component.onClickVisitClassroomButton();
-    //component.windowRef.nativeWindow.location.href = '/learn/math';
+    component.windowRef.nativeWindow.location.href = '/learn/math';
 
     expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalledWith();
@@ -235,7 +234,6 @@ describe('About Page', () => {
       .and.callThrough();
 
     component.onClickBrowseLibraryButton();
-    //component.windowRef.nativeWindow.location.href = '/community-library';
 
     expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalledWith();
@@ -249,8 +247,6 @@ describe('About Page', () => {
       .and.callThrough();
 
     component.onClickCreateLessonButton();
-    //component.windowRef.nativeWindow.location.href =
-    //'/creator-dashboard?mode=create';
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
