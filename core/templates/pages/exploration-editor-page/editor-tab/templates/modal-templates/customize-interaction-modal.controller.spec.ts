@@ -506,7 +506,7 @@ describe('Customize Interaction Modal Controller', function() {
       expect(stateNextContentIdIndexService.displayed).toEqual(2);
     });
 
-    it('should escape speical characters in NumericExpressionInput on save',
+    it('should escape special characters in NumericExpressionInput on save',
       () => {
         stateInteractionIdService.displayed = 'NumericExpressionInput';
         stateCustomizationArgsService.displayed = {
