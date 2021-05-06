@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-from core.domain import app_feedback_report_constants
+from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
 from core.tests import test_utils
@@ -42,15 +42,15 @@ TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
 TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
     TICKET_CREATION_TIMESTAMP)
 
-PLATFORM_ANDROID = app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
-PLATFORM_WEB = app_feedback_report_constants.PLATFORM_CHOICE_WEB
+PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
+PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
 TICKET_NAME = 'ticket name'
 TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
-REPORT_TYPE_SUGGESTION = 'suggestion'
+REPORT_TYPE_SUGGESTION = constants.REPORT_TYPE.suggestion
 REPORT_TYPE_ISSUE = 'issue'
-CATEGORY_SUGGESTION_OTHER = 'other_suggestion'
-CATEGORY_ISSUE_TOPICS = 'topics_issue'
+CATEGORY_SUGGESTION_OTHER = constants.CATEGORY.other_suggestion
+CATEGORY_ISSUE_TOPICS = constants.CATEGORY.topics_issue
 ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
 COUNTRY_LOCALE_CODE_INDIA = 'in'
 ANDROID_DEVICE_MODEL = 'Pixel 4a'
@@ -461,7 +461,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def test_validation_sdk_version_lower_than_minimum_fails(self):
         self.device_system_context.sdk_version = (
-            app_feedback_report_constants.MINIMUM_ANDROID_SDK_VERSION - 1)
+            constants.MINIMUM_ANDROID_SDK_VERSION - 1)
         self._assert_validation_error(
             self.device_system_context, 'Invalid SDK version')
 
@@ -527,7 +527,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+                constants.ENTRY_POINT.navigation_drawer)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -537,7 +537,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.navigation_drawer)):
+                constants.ENTRY_POINT.navigation_drawer)):
             self.entry_point.validate()
 
 
@@ -552,7 +552,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player),
+                constants.ENTRY_POINT.lesson_player),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -565,7 +565,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.lesson_player))
+                constants.ENTRY_POINT.lesson_player))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -614,7 +614,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.revision_card),
+                constants.ENTRY_POINT.revision_card),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -626,7 +626,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.revision_card))
+                constants.ENTRY_POINT.revision_card))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -665,7 +665,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.ENTRY_POINT.crash)
+                constants.ENTRY_POINT.crash)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -675,7 +675,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.ENTRY_POINT.crash)):
+                constants.ENTRY_POINT.crash)):
             self.entry_point.validate()
 
 
@@ -694,7 +694,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
+                    constants.ENTRY_POINT.navigation_drawer
                 ),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -726,7 +726,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    app_feedback_report_constants.ENTRY_POINT.navigation_drawer
+                    constants.ENTRY_POINT.navigation_drawer
                 ),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -1036,7 +1036,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'filter_name': 'platform',
             'filter_options': (
-                app_feedback_report_constants.PLATFORM_CHOICES.sort())
+                constants.PLATFORM_CHOICES.sort())
         }
         self.assertDictEqual(
             expected_dict, self.filter.to_dict())

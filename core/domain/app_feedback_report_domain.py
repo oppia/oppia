@@ -223,10 +223,10 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """Constructs a UserSuppliedFeedback domain object.
 
         Args:
-            report_type: str. The type of feedback submitted by the user that
-                corresponds to a REPORT_TYPE enum.
-            category: str. The category that this specific report_type is
-                providing feedback on that correponds to a CATEGORY enum.
+            report_type: REPORT_TYPE. The type of feedback submitted by the user
+                as an enum.
+            category: CATEGORY. The category enum that this specific report_type
+                is providing feedback on that correponds.
             user_feedback_selected_items: list(str)|None. A list of strings that
                 represent any options selected by the user for the feedback
                 they are providing in this feedback report. None if the user did
@@ -247,8 +247,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             dict. A dict, mapping all fields of UserSuppliedFeedback instance.
         """
         return {
-            'report_type': self.report_type,
-            'category': self.category,
+            'report_type': self.report_type.name,
+            'category': self.category.name,
             'user_feedback_selected_items': self.user_feedback_selected_items,
             'user_feedback_other_text_input': (
                 self.user_feedback_other_text_input)
@@ -272,7 +272,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """Checks whether the report_type is valid.
 
         Args:
-            report_type: str. The report type to validate.
+            report_type: REPORT_TYPE. The report type enum to validate.
 
         Raises:
             ValidationError. No report_type supplied.
@@ -280,11 +280,10 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """
         if report_type is None:
             raise utils.ValidationError('No report_type supplied.')
-        if report_type not in (
-                constants.ALLOWED_REPORT_TYPES):
+        if report_type not in constants.ALLOWED_REPORT_TYPES:
             raise utils.ValidationError(
                 'Invalid report type %s, must be one of %s.' % (
-                    report_type,
+                    report_type.name,
                     constants.ALLOWED_REPORT_TYPES))
 
     @classmethod
@@ -292,7 +291,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """Checks whether the category is valid.
 
         Args:
-            category: str. The category to validate.
+            category: CATEGORY. The category enum to validate.
 
         Raises:
             ValidationError. No category supplied.
@@ -303,7 +302,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         if category not in constants.ALLOWED_CATEGORIES:
             raise utils.ValidationError(
                 'Invalid category %s, must be one of %s.' % (
-                    category, constants.ALLOWED_CATEGORIES))
+                    category.name, constants.ALLOWED_CATEGORIES))
 
     @classmethod
     def require_valid_user_feedback_items_for_category(
@@ -901,13 +900,12 @@ class EntryPoint(python_utils.OBJECT):
     """
 
     def __init__(
-            self, entry_point_name, topic_id, story_id, exploration_id,
+            self, entry_point, topic_id, story_id, exploration_id,
             subtopic_id):
         """Constructs an EntryPoint domain object.
 
         Args:
-            entry_point_name: str. The user-readable name of the entry point
-                used, corresponding to an EntryPoint enum.
+            entry_point: EntryPoint. The entry point used.
             topic_id: str. The id for the current topic if the report was sent
                 during a topic in a lesson or revision session.
             story_id: str. The id for the current story if the report was sent
@@ -917,7 +915,7 @@ class EntryPoint(python_utils.OBJECT):
             subtopic_id: int. The id for the current subtopic if the report was
                 sent during a revision session.
         """
-        self.entry_point_name = entry_point_name
+        self.entry_point_name = entry_point.name
         self.topic_id = topic_id
         self.story_id = story_id
         self.exploration_id = exploration_id
@@ -947,16 +945,18 @@ class EntryPoint(python_utils.OBJECT):
             'checks.')
 
     @classmethod
-    def require_valid_entry_point_name(cls, actual_name, expected_name):
-        """Validates this LessonPlayerEntryPoint name.
+    def require_valid_entry_point_name(cls, actual_name, expected_entry_point):
+        """Validates this EntryPoint name.
 
         Args:
             actual_name: str. The name used for this entry point object.
-            expected_name: str. The name expected for this entry point object.
+            expected_entry_point: ENTRY_POINT. The enum type that should match
+                the given entry_point_name.
 
         Raises:
             ValidationError. The name is not valid for the type.
         """
+        expected_name = expected_entry_point.name
         if actual_name is None:
             raise utils.ValidationError('No entry point name supplied.')
         if not isinstance(actual_name, python_utils.BASESTRING):
