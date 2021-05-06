@@ -55,6 +55,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "conditional-type-checks": "^1.0.5",
     "core-js": "^2.5.3",
+    "crypto-random-string": "^4.0.0",
     "css-loader": "^5.0.0",
     "dotenv": "^8.1.0",
     "dtslint": "^4.0.0",

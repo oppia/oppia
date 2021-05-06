@@ -5,6 +5,7 @@ var glob = require('glob');
 var path = require('path');
 var fs = require('fs');
 var childProcess = require('child_process');
+var cryptoRandomString = require('crypto-random-string');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
@@ -325,11 +326,12 @@ exports.config = {
 
     console.log(process.env);
 
-    var ADD_VIDEO_REPORTER = true;
     var spw = '';
-    var videoCounter = 0;
+    var randString = '';
 
-    if (ADD_VIDEO_REPORTER) {
+    // Only running video recorder on Github Actions.
+
+    if (process.env.PWD == '/home/runner/work/oppia/oppia') {
       jasmine.getEnv().addReporter({
         specStarted: function(result){
           let ffmpegArgs = [
@@ -340,9 +342,9 @@ exports.config = {
             '-i', process.env.DISPLAY,
             '-g', '300',
           ];
-          var name = videoCounter.toString() + '.mp4';
-          videoCounter++;
-          console.log(result.fullName);
+          randString = cryptoRandomString({length: 10});
+          console.log(randString);
+          var name = randString + '.mp4';
           var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
           try {
             fs.mkdirSync(dirPath, { recursive: true });
@@ -353,14 +355,22 @@ exports.config = {
           console.log(`ffmpeg args: ${ffmpegArgs}`);
           spw = childProcess.spawn('ffmpeg', ffmpegArgs);
           spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
-          spw.stderr.on('data', function(data) {console.error(`ffmpeg stderr: ${data}`)});
+          // spw.stderr.on('data', function(data) {console.error(`ffmpeg stderr: ${data}`)});
           spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
           console.log('Attached spw output handlers');
         },
-        specDone: function() {
+        specDone: function(result) {
           console.log('Killing spw');
           let success = spw.kill();
           console.log(`Killing was successful: ${success}`);
+          console.log(result.status);
+          if(result.status == 'success') {
+            try {
+              fs.unlinkSync(vidPath);
+            } catch (e) {
+              console.log('Video was not deleted, even though the suite passed');
+            }
+          }
         },
       });
     }

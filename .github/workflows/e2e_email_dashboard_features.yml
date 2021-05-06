@@ -31,12 +31,21 @@ jobs:
       - name: Install chrome
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
+      - name: Install ffmpeg
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: sudo apt install ffmpeg
       - name: Run Email Dashboard E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="emailDashboard" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1280x1024x24" python -m scripts.run_e2e_tests --suite="emailDashboard" --prod_env
       - name: Uploading protractor-screenshots as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots
           path: /home/runner/work/oppia/protractor-screenshots
+      - name: Uploading protractor-video as Artifacts
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: protractor-video
+          path: /home/runner/work/oppia/protractor-video
