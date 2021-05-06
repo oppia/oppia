@@ -39,5 +39,8 @@
     "core/tests/karma.conf.ts"
   ],
   "include": ["core", "extensions", "typings"],
-  "exclude": ["core/tests"]
+  "exclude": [
+    "core/tests",
+    "extensions/classifiers/proto"
+  ]
 }
