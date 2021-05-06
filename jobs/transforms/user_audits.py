@@ -34,7 +34,6 @@ import apache_beam as beam
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-# This is an expection due to inheritance from base model audit.
 @audit_decorators.AuditsExisting(
     auth_models.UserAuthDetailsModel,
     user_models.UserEmailPreferencesModel,
@@ -106,7 +105,6 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
             yield user_model_errors.ModelExpiringError(model)
 
 
-# Relationship are common among models so base audit decorator will work.
 @audit_decorators.RelationshipsOf(
     user_models.UserEmailPreferencesModel
 )
