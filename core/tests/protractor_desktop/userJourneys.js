@@ -32,6 +32,9 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var moderatorPage = element(by.css('.protractor-test-moderator-page'));
+var errorContainer = element(by.css('.protractor-test-error-container'));
+
 var _selectLanguage = async function(language) {
   await action.select(
     'Language Selector',
@@ -59,6 +62,8 @@ describe('Basic user journeys', function() {
       await general.checkForConsoleErrors([]);
 
       await browser.get(general.MODERATOR_URL_SUFFIX);
+      await waitFor.visibilityOf(
+        errorContainer, '401 Error page taking too long to appear.');
       await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
       await users.logout();
@@ -70,6 +75,9 @@ describe('Basic user journeys', function() {
 
       await users.login('mod@userManagement.com');
       await browser.get(general.MODERATOR_URL_SUFFIX);
+      await waitFor.pageToFullyLoad();
+      await waitFor.visibilityOf(
+        moderatorPage, 'Moderator page taking too long to appear.');
       await general.openProfileDropdown();
       await users.logout();
       await general.checkForConsoleErrors([]);
