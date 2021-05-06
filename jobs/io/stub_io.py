@@ -31,7 +31,7 @@ class ModelIoStub(python_utils.OBJECT):
         self._models_by_id = {}
 
     @property
-    def get_models(self):
+    def get_models_ptransform(self):
         """Returns a PTransform for getting the models stored in the stub.
 
         Returns:
