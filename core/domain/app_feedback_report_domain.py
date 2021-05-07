@@ -283,7 +283,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         if report_type not in constants.ALLOWED_REPORT_TYPES:
             raise utils.ValidationError(
                 'Invalid report type %s, must be one of %s.' % (
-                    report_type.name,
+                    report_type,
                     constants.ALLOWED_REPORT_TYPES))
 
     @classmethod
@@ -302,7 +302,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         if category not in constants.ALLOWED_CATEGORIES:
             raise utils.ValidationError(
                 'Invalid category %s, must be one of %s.' % (
-                    category.name, constants.ALLOWED_CATEGORIES))
+                    category, constants.ALLOWED_CATEGORIES))
 
     @classmethod
     def require_valid_user_feedback_items_for_category(
@@ -750,8 +750,8 @@ class AndroidAppContext(AppContext):
                 in the app.
             audio_language_code: str. The ISO-639 code for the audio language
                 set in the app.
-            text_size: str. The text size set by the user in the app that
-                corresponds to an ANDROID_TEXT_SIZE enum.
+            text_size: ANDROID_TEXT_SIZE. The enum type for text size set by
+                the user in the app.
             only_allows_wifi_download_and_update: bool. True if the user only
                 allows downloads and updates when connected to wifi.
             automatically_update_topics: bool. True if the user allows
@@ -785,7 +785,7 @@ class AndroidAppContext(AppContext):
             'entry_point': self.entry_point.to_dict(),
             'text_language_code': self.text_language_code,
             'audio_language_code': self.audio_language_code,
-            'text_size': self.text_size,
+            'text_size': self.text_size.name,
             'only_allows_wifi_download_and_update': (
                 self.only_allows_wifi_download_and_update
             ),
@@ -875,22 +875,19 @@ class AndroidAppContext(AppContext):
         Oppia Android.
 
         Args:
-            text_size: str. The text size set on the app, corresponding to an
-                ANDROID_TEXT_SIZE enum.
+            text_size: ANDROID_TEXT_SIZE. The enum type for the text size set by
+                the user in the app.
 
         Raises:
             ValidationError. The given text size is not valid.
         """
         if text_size is None:
             raise utils.ValidationError('No text size supplied.')
-        if not isinstance(text_size, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Text size must be a stirng, received: %r.' % text_size)
-        if text_size not in (
-                constants.ALLOWED_ANDROID_TEXT_SIZES):
+        if text_size not in constants.ALLOWED_ANDROID_TEXT_SIZES:
             raise utils.ValidationError(
                 'App text size should be one of %s, received: %s' % (
-                    constants.ALLOWED_ANDROID_TEXT_SIZES,
+                    [item.name for item in
+                    constants.ALLOWED_ANDROID_TEXT_SIZES],
                     text_size))
 
 
@@ -900,12 +897,12 @@ class EntryPoint(python_utils.OBJECT):
     """
 
     def __init__(
-            self, entry_point, topic_id, story_id, exploration_id,
-            subtopic_id):
+            self, entry_point, topic_id=None, story_id=None,
+            exploration_id=None, subtopic_id=None):
         """Constructs an EntryPoint domain object.
 
         Args:
-            entry_point: EntryPoint. The entry point used.
+            entry_point: ENTRY_POINT. The enum type for entry point used.
             topic_id: str. The id for the current topic if the report was sent
                 during a topic in a lesson or revision session.
             story_id: str. The id for the current story if the report was sent
@@ -1040,10 +1037,8 @@ class LessonPlayerEntryPoint(EntryPoint):
                 user is playing when intiating the report.
         """
         super(LessonPlayerEntryPoint, self).__init__(
-            entry_point_name=(
-                constants.ENTRY_POINT.lesson_player),
-            topic_id=topic_id, story_id=story_id, exploration_id=exploration_id,
-            subtopic_id=None)
+            constants.ENTRY_POINT.lesson_player, topic_id=topic_id,
+            story_id=story_id, exploration_id=exploration_id)
 
     def to_dict(self):
         """Returns a dict representing this LessonPlayerEntryPoint domain
@@ -1488,15 +1483,15 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
     feedback reports.
     """
 
-    def __init__(self, filter_name, filter_options):
+    def __init__(self, filter_field, filter_options):
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
-            filter_name: str. The name of the filter category, correponding to
-                a field in the AppFeedbackReport object.
+            filter_field: FILTER_FIELD_NAMES. The enum type for the filter category,
+                correponding to a field in the AppFeedbackReport object.
             filter_options: list(str). The possible values for the given filter.
         """
-        self.filter_name = filter_name
+        self.filter_field = filter_field
         self.filter_options = filter_options
 
     def to_dict(self):
@@ -1508,7 +1503,7 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             instance.
         """
         return {
-            'filter_name': self.filter_name,
+            'filter_field': self.filter_field.name,
             'filter_options': self.filter_options.sort()
         }
 
@@ -1519,14 +1514,11 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
             ValidationError. One or more attributes of the
                 AppFeedbackReportFilter are not valid.
         """
-        if not isinstance(self.filter_name, python_utils.BASESTRING):
+        if self.filter_field not in constants.ALLOWED_FILTERS:
             raise utils.ValidationError(
-                'The filter name should be a string, received: %r' % (
-                    self.filter_name))
-        if self.filter_name not in constants.ALLOWED_FILTERS:
-            raise utils.ValidationError(
-                'The filter name should be one of %s, received: %s' % (
-                    constants.ALLOWED_FILTERS, self.filter_name))
+                'The filter field should be one of %s, received: %s' % (
+                    [item.name for item in constants.ALLOWED_FILTERS],
+                    self.filter_field.name))
         if not isinstance(self.filter_options, list):
             raise utils.ValidationError(
                 'The filter options should be a list, received: %r' % (

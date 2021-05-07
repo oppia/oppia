@@ -27,6 +27,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import python_utils
 import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
@@ -60,7 +61,7 @@ ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
 LANGUAGE_LOCALE_CODE_ENGLISH = 'en'
 ANDROID_PACKAGE_VERSION_CODE = 1
 NETWORK_WIFI = 'wifi'
-ANDROID_TEXT_SIZE = 'medium_text_size'
+ANDROID_TEXT_SIZE = constants.ANDROID_TEXT_SIZE.medium_text_size
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
@@ -78,7 +79,7 @@ ANDROID_REPORT_INFO = {
     'entry_point_info': {
         'entry_point_name': ENTRY_POINT_NAVIGATION_DRAWER,
     },
-    'text_size': ANDROID_TEXT_SIZE,
+    'text_size': ANDROID_TEXT_SIZE.name,
     'only_allows_wifi_download_and_update': True,
     'automatically_update_topics': False,
     'account_is_profile_admin': False
@@ -153,8 +154,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'ticket_id': TICKET_ID,
             'scrubbed_by': None,
             'user_supplied_feedback': {
-                'report_type': REPORT_TYPE_SUGGESTION,
-                'category': CATEGORY_SUGGESTION_OTHER,
+                'report_type': REPORT_TYPE_SUGGESTION.name,
+                'category': CATEGORY_SUGGESTION_OTHER.name,
                 'user_feedback_selected_items': USER_SELECTED_ITEMS,
                 'user_feedback_other_text_input': USER_TEXT_INPUT
             },
@@ -174,7 +175,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 },
                 'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
                 'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
-                'text_size': ANDROID_TEXT_SIZE,
+                'text_size': ANDROID_TEXT_SIZE.name,
                 'only_allows_wifi_download_and_update': True,
                 'automatically_update_topics': False,
                 'account_is_profile_admin': False,
@@ -501,8 +502,8 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
         super(EntryPointDomainTests, self).setUp()
         self.entry_point = (
             app_feedback_report_domain.EntryPoint(
-                'entry_point_name', 'topic_id', 'story_id', 'exploration_id',
-                'subtopic_id'))
+                constants.ENTRY_POINT.navigation_drawer, 'topic_id', 'story_id',
+                'exploration_id', 'subtopic_id'))
 
     def test_to_dict_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -527,7 +528,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.navigation_drawer)
+                constants.ENTRY_POINT.navigation_drawer.name)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -537,7 +538,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.navigation_drawer)):
+                constants.ENTRY_POINT.navigation_drawer.name)):
             self.entry_point.validate()
 
 
@@ -552,7 +553,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.lesson_player),
+                constants.ENTRY_POINT.lesson_player.name),
             'topic_id': 'topic_id',
             'story_id': 'story_id',
             'exploration_id': 'exploration_id'
@@ -565,7 +566,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.lesson_player))
+                constants.ENTRY_POINT.lesson_player.name))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -614,7 +615,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.revision_card),
+                constants.ENTRY_POINT.revision_card.name),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -626,7 +627,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.revision_card))
+                constants.ENTRY_POINT.revision_card.name))
 
     def test_validation_invalid_topic_id_fails(self):
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -665,7 +666,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_dict = {
             'entry_point_name': (
-                constants.ENTRY_POINT.crash)
+                constants.ENTRY_POINT.crash.name)
         }
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
@@ -675,7 +676,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected entry point name %s' % (
-                constants.ENTRY_POINT.crash)):
+                constants.ENTRY_POINT.crash.name)):
             self.entry_point.validate()
 
 
@@ -694,8 +695,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    constants.ENTRY_POINT.navigation_drawer
-                ),
+                    constants.ENTRY_POINT.navigation_drawer.name),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH
@@ -726,12 +726,11 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         expected_dict = {
             'entry_point': {
                 'entry_point_name': (
-                    constants.ENTRY_POINT.navigation_drawer
-                ),
+                    constants.ENTRY_POINT.navigation_drawer.name),
             },
             'text_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
             'audio_language_code': LANGUAGE_LOCALE_CODE_ENGLISH,
-            'text_size': ANDROID_TEXT_SIZE,
+            'text_size': ANDROID_TEXT_SIZE.name,
             'only_allows_wifi_download_and_update': True,
             'automatically_update_topics': False,
             'account_is_profile_admin': False,
@@ -879,8 +878,8 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             REPORT_SUBMITTED_TIMESTAMP, [self.android_report_id])
         app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, PLATFORM_ANDROID,
-            REPORT_SUBMITTED_TIMESTAMP, 0, REPORT_TYPE_SUGGESTION,
-            CATEGORY_SUGGESTION_OTHER, ANDROID_PLATFORM_VERSION,
+            REPORT_SUBMITTED_TIMESTAMP, 0, REPORT_TYPE_SUGGESTION.name,
+            CATEGORY_SUGGESTION_OTHER.name, ANDROID_PLATFORM_VERSION,
             COUNTRY_LOCALE_CODE_INDIA, ANDROID_SDK_VERSION,
             ANDROID_DEVICE_MODEL, ENTRY_POINT_NAVIGATION_DRAWER, None, None,
             None, None, LANGUAGE_LOCALE_CODE_ENGLISH,
@@ -893,7 +892,7 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             ),
             'report_type': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
-                    REPORT_TYPE_SUGGESTION: 1})
+                    REPORT_TYPE_SUGGESTION.name: 1})
             ),
             'country_local_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
@@ -937,7 +936,7 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             'total_reports_submitted': 1,
             'daily_param_stats': {
                 'platform': {PLATFORM_ANDROID: 1},
-                'report_type': {REPORT_TYPE_SUGGESTION: 1},
+                'report_type': {REPORT_TYPE_SUGGESTION.name: 1},
                 'country_local_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
                 'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
                 'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
@@ -1030,22 +1029,23 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
     def setUp(self):
         super(AppFeedbackReportFilterDomainTests, self).setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
-            'platform', ['web', 'android'])
+            constants.FILTER_FIELD_NAMES.platform, ['web', 'android'])
 
     def test_to_dict(self):
         expected_dict = {
-            'filter_name': 'platform',
+            'filter_field': 'platform',
             'filter_options': (
                 constants.PLATFORM_CHOICES.sort())
         }
         self.assertDictEqual(
             expected_dict, self.filter.to_dict())
 
-    def test_validation_with_invalid_filter_name_fails(self):
-        self.filter.filter_name = 'invalid_filter_name'
+    def test_validation_with_invalid_filter_field_fails(self):
+        INVALID_FIELD_NAME = python_utils.create_enum('invalid_filter_field')
+        self.filter.filter_field = INVALID_FIELD_NAME.invalid_filter_field
         self._assert_validation_error(
             self.filter,
-            'The filter name should be one of ')
+            'The filter field should be one of ')
 
     def test_validation_filter_values_list_is_none_fails(self):
         self.filter.filter_options = None
