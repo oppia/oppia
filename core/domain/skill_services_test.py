@@ -148,7 +148,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertEqual(filenames, ['img2.svg', 'img.svg'])
+        self.assertItemsEqual(filenames, ['img2.svg', 'img.svg'])
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()

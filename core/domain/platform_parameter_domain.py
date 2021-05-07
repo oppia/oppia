@@ -160,7 +160,7 @@ class EvaluationContext(python_utils.OBJECT):
         if self._server_mode.value not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
                 'Invalid server mode \'%s\', must be one of %s.' % (
-                    self._server_mode, ALLOWED_SERVER_MODES))
+                    self._server_mode.value, ALLOWED_SERVER_MODES))
 
     @classmethod
     def from_dict(cls, client_context_dict, server_context_dict):

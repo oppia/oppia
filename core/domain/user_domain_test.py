@@ -1013,14 +1013,35 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': 'preferred_audio_language_code',
             'user_id': 'user_id',
         }
+        current_version_plus_one = (
+            user_domain.ModifiableUserData.CURRENT_SCHEMA_VERSION + 1)
         invalid_schema_versions = [
-            -1, 0, user_domain.ModifiableUserData.CURRENT_SCHEMA_VERSION + 1,
-            '', 'abc', '-1', '1'
+            (-1, 'Invalid version -1 received.'),
+            (0, 'Invalid version 0 received.'),
+            (
+                current_version_plus_one,
+                'Invalid version %s received.' % current_version_plus_one
+            ),
+            (
+                '',
+                '\'<\' not supported between instances of \'str\' and \'int\''
+            ),
+            (
+                'abc',
+                '\'<\' not supported between instances of \'str\' and \'int\''
+            ),
+            (
+                '-1',
+                '\'<\' not supported between instances of \'str\' and \'int\''
+            ),
+            (
+                '1',
+                '\'<\' not supported between instances of \'str\' and \'int\''
+            )
         ]
-        for version in invalid_schema_versions:
-            error_msg = 'Invalid version %s received.' % version
+        for version, expected_error in invalid_schema_versions:
             user_data_dict['schema_version'] = version
-            with self.assertRaisesRegexp(Exception, error_msg):
+            with self.assertRaisesRegexp(Exception, expected_error):
                 user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
 
     # This test should be modified to use the original class ModifiableUserData

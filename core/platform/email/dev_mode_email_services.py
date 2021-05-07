@@ -79,8 +79,7 @@ def send_email_to_recipients(
              (bcc_email,) for bcc_email in bcc[:3]])
         if len(bcc) > 3:
             bcc_email_list_str += (
-                '... Total: ' +
-                python_utils.convert_to_bytes(len(bcc)) + ' emails.')
+                '... Total: ' + str(len(bcc)) + ' emails.')
 
     msg = (
         """

@@ -46,7 +46,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                     self.returncode = 1
                 def communicate(self):
                     """Return user-prefix error as stderr."""
-                    return '', 'can\'t combine user with prefix'
+                    return b'', b'can\'t combine user with prefix'
             return Ret()
         def mock_check_call(cmd_tokens):
             self.commands.extend(cmd_tokens)

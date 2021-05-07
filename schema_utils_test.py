@@ -517,7 +517,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                         'min_value': 'value_of_wrong_type',
                     }]
                 },
-                'Could not convert unicode to float: value_of_wrong_type'
+                'Could not convert str to float: value_of_wrong_type'
             ),
             (
                 {

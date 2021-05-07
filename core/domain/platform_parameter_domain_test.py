@@ -260,7 +260,8 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             },
         )
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid server mode \'invalid\''):
+            utils.ValidationError, 'Invalid server mode \'invalid\''
+        ):
             context.validate()
 
 

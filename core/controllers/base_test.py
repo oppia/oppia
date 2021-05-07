@@ -357,8 +357,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/mock_iframed', expected_status_int=500)
 
         self.assertIn(
-            'Uh-oh! The Oppia exploration you requested may have been removed '
-            'or deleted.', response.body)
+            b'Uh-oh! The Oppia exploration you requested may have been removed '
+            b'or deleted.', response.body)
 
     def test_dev_mode_cannot_be_true_on_production(self):
         # We need to delete the existing module else the re-importing
@@ -459,8 +459,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/community-library', expected_status_int=503)
 
-        self.assertIn('b<maintenance-page>', response.body)
-        self.assertNotIn('b<library-page>', response.body)
+        self.assertIn(b'<maintenance-page>', response.body)
+        self.assertNotIn(b'<library-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
@@ -470,8 +470,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('b<library-page>', response.body)
-        self.assertNotIn('b<maintenance-page>', response.body)
+        self.assertIn(b'<library-page>', response.body)
+        self.assertNotIn(b'<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_json_response_is_rejected(self):
@@ -655,9 +655,9 @@ class EscapingTests(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
         self.assertTrue(response.body.startswith(feconf.XSSI_PREFIX))
-        self.assertIn('\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
-        self.assertNotIn('<script>', response.body)
-        self.assertNotIn('马', response.body)
+        self.assertIn(b'\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
+        self.assertNotIn(b'<script>', response.body)
+        self.assertNotIn(b'马', response.body)
 
 
 class RenderDownloadableTests(test_utils.GenericTestBase):

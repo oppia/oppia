@@ -575,9 +575,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(key, 'config::email_footer')
                 self.assertEqual(
                     value,
-                    '"You can change your email preferences via the <a href='
-                    '\\"https://www.example.com\\">Preferences</a> page. '
-                    '\\u00a9\\u00a9\\u00ae\\u00ae"')
+                    b'"You can change your email preferences via the <a href='
+                    b'\\"https://www.example.com\\">Preferences</a> page. '
+                    b'\\u00a9\\u00a9\\u00ae\\u00ae"'
+                )
 
         config_id = 'email_footer'
 
@@ -589,7 +590,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         with self.swap(
             memory_cache_services, 'set_multi',
-            mock_memory_cache_services_set_multi):
+            mock_memory_cache_services_set_multi
+        ):
             caching_services.set_multi(
                 caching_services.CACHE_NAMESPACE_CONFIG, None,
                 {

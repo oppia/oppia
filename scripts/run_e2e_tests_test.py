@@ -1589,6 +1589,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
+        @contextlib.contextmanager
         def mock_popen(unused_commands, stdout=None):  # pylint: disable=unused-argument
             def mock_communicate():
                 return

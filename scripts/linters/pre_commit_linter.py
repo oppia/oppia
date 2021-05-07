@@ -347,7 +347,7 @@ def _get_file_extensions(file_extensions_to_lint):
     return all_file_extensions_type
 
 
-def _get_filepaths_from_path(input_path, name_space):
+def _get_filepaths_from_path(input_path, name_space=None):
     """Get paths to all lintable files recursively under a path.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -376,7 +376,7 @@ def _get_filepaths_from_path(input_path, name_space):
             input_path, excluded_glob_patterns)
 
 
-def _get_filepaths_from_non_other_shard(shard, name_space):
+def _get_filepaths_from_non_other_shard(shard, name_space=None):
     """Get paths to lintable files in a shard besides the other shard.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -391,7 +391,8 @@ def _get_filepaths_from_non_other_shard(shard, name_space):
     filepaths = []
     assert shard != OTHER_SHARD_NAME
     for filepath in SHARDS[shard]:
-        filepaths.extend(_get_filepaths_from_path(filepath, name_space))
+        filepaths.extend(
+            _get_filepaths_from_path(filepath, name_space=name_space))
     if len(filepaths) != len(set(filepaths)):
         # Shards are invalid because of a duplicate file.
         for filepath in filepaths:
@@ -407,7 +408,7 @@ def _get_filepaths_from_non_other_shard(shard, name_space):
     return filepaths
 
 
-def _get_filepaths_from_other_shard(name_space):
+def _get_filepaths_from_other_shard(name_space=None):
     """Get paths to lintable files in the other shard.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -416,17 +417,19 @@ def _get_filepaths_from_other_shard(name_space):
     Returns:
         list(str). Paths to lintable files.
     """
-    all_filepaths = set(_get_filepaths_from_path(os.getcwd(), name_space))
+    all_filepaths = set(
+        _get_filepaths_from_path(os.getcwd(), name_space=name_space))
     filepaths_in_shards = set()
     for shard in SHARDS:
         if shard == OTHER_SHARD_NAME:
             continue
         filepaths_in_shards |= set(
-            _get_filepaths_from_non_other_shard(shard, name_space))
+            _get_filepaths_from_non_other_shard(shard, name_space=name_space))
     return list(all_filepaths - filepaths_in_shards)
 
 
-def _get_all_filepaths(input_path, input_filenames, input_shard, name_space):
+def _get_all_filepaths(
+        input_path, input_filenames, input_shard, name_space=None):
     """This function is used to return the filepaths which needs to be linted
     and checked.
 
@@ -441,7 +444,8 @@ def _get_all_filepaths(input_path, input_filenames, input_shard, name_space):
         list(str). The list of filepaths to be linted and checked.
     """
     if input_path:
-        all_filepaths = _get_filepaths_from_path(input_path, name_space)
+        all_filepaths = _get_filepaths_from_path(
+            input_path, name_space=name_space)
     elif input_filenames:
         valid_filepaths = []
         invalid_filepaths = []
@@ -459,9 +463,10 @@ def _get_all_filepaths(input_path, input_filenames, input_shard, name_space):
     elif input_shard:
         if input_shard != OTHER_SHARD_NAME:
             all_filepaths = _get_filepaths_from_non_other_shard(
-                input_shard, name_space)
+                input_shard, name_space=name_space)
         else:
-            all_filepaths = _get_filepaths_from_other_shard(name_space)
+            all_filepaths = _get_filepaths_from_other_shard(
+                name_space=name_space)
     else:
         all_filepaths = _get_changed_filepaths()
     all_filepaths = [
@@ -474,7 +479,7 @@ def _get_all_filepaths(input_path, input_filenames, input_shard, name_space):
     return all_filepaths
 
 
-def read_files(file_paths, name_space):
+def read_files(file_paths, name_space=None):
     """Read all files to be checked and cache them. This will spin off multiple
     threads to increase the efficiency.
     """
@@ -588,7 +593,11 @@ def main(args=None):
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(
-        parsed_args.path, parsed_args.files, parsed_args.shard, name_space)
+        parsed_args.path,
+        parsed_args.files,
+        parsed_args.shard,
+        name_space=name_space
+    )
 
     install_third_party_libs.main()
     common.fix_third_party_imports()
@@ -601,7 +610,7 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
         return
 
-    read_files(all_filepaths, name_space)
+    read_files(all_filepaths, name_space=name_space)
     files = multiprocessing.Manager().dict()
     categorize_files(all_filepaths, files)
 

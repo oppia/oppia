@@ -4243,7 +4243,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: {\'x\'})'
+                'parameter names: {\'x\'}'
             ]
         )
 
@@ -4406,7 +4406,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         written_translations.add_content_id_for_translation('feedback_1')
         written_translations.add_content_id_for_translation('feedback_2')
-        self.assertEqual(
+        self.assertItemsEqual(
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 

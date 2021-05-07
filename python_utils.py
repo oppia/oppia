@@ -513,5 +513,5 @@ def create_enum(*sequential):
                 'name': name,
                 'value': value
             }
-            _enums[name] = type(b'Enum', (), _value)
-        return type(b'Enum', (), _enums)
+            _enums[name] = type('Enum', (), _value)
+        return type('Enum', (), _enums)

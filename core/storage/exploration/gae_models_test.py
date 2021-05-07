@@ -535,7 +535,6 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         results, _, more = (
             exp_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=None))
-        self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
         with self.assertRaisesRegexp(
@@ -549,7 +548,6 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         results, _, more = (
             exp_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=max_age))
-        self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
     def test_get_multi(self):
