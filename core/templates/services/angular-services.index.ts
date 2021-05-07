@@ -347,6 +347,8 @@ import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/mo
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { NavigationBackendApiService } from 'services/navigation-backend-api.service';
+import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
+import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 
@@ -518,6 +520,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionModalForLearnerDashboardService',
     SuggestionModalForLearnerDashboardService],
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
+  ['LearnerViewRatingBackendApiService', LearnerViewRatingBackendApiService],
+  ['LearnerViewRatingService', LearnerViewRatingService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
