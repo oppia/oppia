@@ -61,18 +61,6 @@ fdescribe('NumericExpressionInputInteractive', () => {
       validateExpressionFn();
     }
   };
-  
-  let mockNumericExpressionInputRulesService = {};
-  
-  let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: (interactionId, attrs) => {
-      return {
-        placeholder: {
-          unicode: null
-        }
-      };
-    }
-  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule(

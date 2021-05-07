@@ -23,7 +23,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionCustomizationArgs, NumericExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { NumericExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -62,7 +62,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
     return {
       placeholderWithValue: this.placeholderWithValue,
       useFractionForDivisionWithValue: this.useFractionForDivisionWithValue
-    }
+    };
   }
 
   isCurrentAnswerValid(): boolean {
@@ -73,8 +73,9 @@ export class InteractiveNumericExpressionInput implements OnInit {
       // is not compatible with nerdamer or with the backend validations.
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
         this.value);
-      let answerIsValid = this.mathInteractionsService.validateNumericExpression(
-        this.value);
+      let answerIsValid = (
+        this.mathInteractionsService.validateNumericExpression(
+          this.value));
       if (answerIsValid) {
         // Explicitly inserting '*' signs wherever necessary.
         this.value = this.mathInteractionsService.insertMultiplicationSigns(
@@ -88,15 +89,12 @@ export class InteractiveNumericExpressionInput implements OnInit {
   }
 
   submitAnswer(): void {
-    console.log(this.value);
-    console.log(this.isCurrentAnswerValid());
-    if(!this.isCurrentAnswerValid()) {
+    if (!this.isCurrentAnswerValid()) {
       return;
     }
-    console.log(this.currentInteractionService);
     this.currentInteractionService.onSubmit(this.value, (
       this.numericExpressionInputRulesService
-     ) as unknown as InteractionRulesService)
+     ) as unknown as InteractionRulesService);
   }
 
   showOSK(): void {
@@ -109,7 +107,8 @@ export class InteractiveNumericExpressionInput implements OnInit {
     this.guppyConfigurationService.init();
     const { useFractionForDivision, placeholder } = (
       this.interactionAttributesExtractorService.getValuesFromAttributes(
-        'NumericExpressionInput', this._getAttributes())) as NumericExpressionInputCustomizationArgs;
+        'NumericExpressionInput', this._getAttributes()
+      )) as NumericExpressionInputCustomizationArgs;
     this.guppyConfigurationService.changeDivSymbol(useFractionForDivision);
     this.guppyInitializationService.init(
       'guppy-div-learner',
@@ -145,11 +144,11 @@ export class InteractiveNumericExpressionInput implements OnInit {
     };
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswer, isCurrentAnswerValid);
-  };
+  }
 }
 
 
 angular.module('oppia').directive(
   'oppiaInteractiveNumericExpressionInput', downgradeComponent(
     {component: InteractiveNumericExpressionInput}
-    ) as angular.IDirectiveFactory);
+  ) as angular.IDirectiveFactory);
