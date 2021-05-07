@@ -701,8 +701,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if is_corresponding_angularjs_filepath:
                     compiled_js_filepath = self._get_compiled_ts_filepath(
                         corresponding_angularjs_filepath)
-                    file_content = self.file_cache.read(
-                        compiled_js_filepath).decode('utf-8')
+                    file_content = self.file_cache.read(compiled_js_filepath)
 
                     parsed_script = (
                         _parse_js_or_ts_file(filepath, file_content))

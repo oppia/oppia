@@ -52,9 +52,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].subject, 'subject')
-            self.assertEqual(messages[0].body, 'body')
-            self.assertEqual(messages[0].html, 'html')
+            self.assertEqual(messages[0].subject, b'subject')
+            self.assertEqual(messages[0].body, b'body')
+            self.assertEqual(messages[0].html, b'html')
 
     def test_bcc_admin_flag(self):
         """Verifies that the bcc admin flag is working properly in

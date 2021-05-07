@@ -535,7 +535,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
         self.testapp_swap = self.swap(
-            self, 'testapp', webtest.TestApp(main_cron.app))
+            self, 'testapp', webtest.TestApp(main_cron.app_without_context))
 
         self.admin_ids = []
         self.suggestion_types_needing_reviewers = {}

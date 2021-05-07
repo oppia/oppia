@@ -115,7 +115,7 @@ class EmailToAdminTest(test_utils.EmailTestBase):
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
             self.assertEqual(messages[0].to, ['admin@system.com'])
             self.assertEqual(messages[0].subject, b'Dummy Subject')
-            self.assertIn('Dummy Body', messages[0].html)
+            self.assertIn(b'Dummy Body', messages[0].html)
 
 
 class DummyMailTest(test_utils.EmailTestBase):

@@ -775,9 +775,8 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
             raises=Exception('unexpected call'))
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
-            self.assertRaisesRegexp(
-                ValueError, 'uh-oh!',
-                firebase_auth_services.establish_firebase_connection)
+            with self.assertRaisesRegexp(ValueError, 'uh-oh!'):
+                firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
         self.assertEqual(init_app_counter.times_called, 0)
@@ -789,9 +788,8 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
             firebase_admin, 'initialize_app', raises=ValueError('uh-oh!'))
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
-            self.assertRaisesRegexp(
-                ValueError, 'uh-oh!',
-                firebase_auth_services.establish_firebase_connection)
+            with self.assertRaisesRegexp(ValueError, 'uh-oh!'):
+                firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
         self.assertEqual(init_app_counter.times_called, 1)

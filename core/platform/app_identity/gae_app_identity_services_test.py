@@ -19,33 +19,22 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
+import os
+
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
 
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
-    def setUp(self):
-        super(GaeAppIdentityServicesTests, self).setUp()
-        self.expected_application_id = (
-            test_utils.GenericTestBase.EXPECTED_TEST_APP_ID)
-        self.expected_bucket_name = (
-            '%s-resources' % self.expected_application_id)
-
     def test_get_application_id(self):
-        self.assertEqual(
-            gae_app_identity_services.get_application_id(),
-            self.expected_application_id)
-
-    def test_get_gcs_resource_bucket_name_prod(self):
-        # Turn off DEV_MODE.
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with self.swap(os, 'getenv', lambda _: 'some_id'):
             self.assertEqual(
-                gae_app_identity_services.get_gcs_resource_bucket_name(),
-                self.expected_bucket_name)
+                gae_app_identity_services.get_application_id(), 'some_id')
+
 
     def test_get_default_gcs_bucket_name(self):
-        self.assertEqual(
-            gae_app_identity_services.get_default_gcs_bucket_name(),
-            'app_default_bucket')
+        with self.swap(os, 'getenv', lambda _: 'some_id'):
+            self.assertEqual(
+                gae_app_identity_services.get_gcs_resource_bucket_name(),
+                'some_id-resources')

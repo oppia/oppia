@@ -135,7 +135,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn('{"title": "Preferences | Oppia"})', response.body)
+        self.assertIn(b'{"title": "Preferences | Oppia"})', response.body)
 
         self.logout()
 
@@ -1048,7 +1048,7 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
     def test_get_pending_account_deletion_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/pending-account-deletion')
-            self.assertIn('Pending Account Deletion', response.body)
+            self.assertIn(b'Pending Account Deletion', response.body)
 
     def test_get_pending_account_deletion_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):

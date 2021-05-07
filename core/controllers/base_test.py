@@ -459,8 +459,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/community-library', expected_status_int=503)
 
-        self.assertIn('<maintenance-page>', response.body)
-        self.assertNotIn('<library-page>', response.body)
+        self.assertIn('b<maintenance-page>', response.body)
+        self.assertNotIn('b<library-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
@@ -470,8 +470,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<library-page>', response.body)
-        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertIn('b<library-page>', response.body)
+        self.assertNotIn('b<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
     def test_json_response_is_rejected(self):

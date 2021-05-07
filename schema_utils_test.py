@@ -467,8 +467,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 re.escape(
-                    'Missing keys: {\'items\': {\'type\': \'float\'}, '
-                    '\'type\': \'dict\'}'
+                    'Missing keys: {\'type\': \'dict\', '
+                    '\'items\': {\'type\': \'float\'}}'
                 )
             ),
             (

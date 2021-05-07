@@ -136,7 +136,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         call_counter_b.method_decorated_by_memoize_before_classmethod()
         self.assertEqual(GoodCallCounter.count, 1)
 
-        with self.assertRaisesRegexp(TypeError, 'not a Python function'):
+        with self.assertRaisesRegexp(TypeError, 'unsupported callable'):
             class BadCallCounter(python_utils.OBJECT):  # pylint: disable=unused-variable
                 """Counts calls made to the class."""
 

@@ -348,7 +348,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with rules_registry_swap, interaction_registry_swap:
             html_list = state.get_all_html_content_strings()
 
-        self.assertEqual(
+        self.assertItemsEqual(
             html_list,
             [
                 '<p>state written_translation solution-hi</p>',
@@ -4243,7 +4243,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([\'x\'])'
+                'parameter names: {\'x\'})'
             ]
         )
 
@@ -4632,7 +4632,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state written_translations to match the listed '
                 'content ids [\'invalid_content\']')):
-            written_translations.validate([b'invalid_content'])
+            written_translations.validate(['invalid_content'])
 
     def test_get_content_ids_that_are_correctly_translated(self):
         written_translations_dict = {
@@ -4931,7 +4931,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state recorded_voiceovers to match the listed '
                 'content ids [\'invalid_content\']')):
-            recorded_voiceovers.validate([b'invalid_content'])
+            recorded_voiceovers.validate(['invalid_content'])
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):

@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
+
 from constants import constants
 from core.domain import caching_domain
 from core.domain import caching_services
@@ -489,10 +491,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c']))
 
         self.assertGreater(
-            caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_EXPLORATION,
-                '0', [exploration_id]),
-            0)
+            len(
+                caching_services.get_multi(
+                    caching_services.CACHE_NAMESPACE_EXPLORATION,
+                    '0',
+                    [exploration_id]
+                ),
+            ),
+            0
+        )
 
         self.assertTrue(
             caching_services.delete_multi(
@@ -642,8 +649,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             for key, value in id_value_mapping.items():
                 self.assertEqual(key, 'exploration:0:%s' % exploration_id)
                 self.assertEqual(
-                    value,
-                    self.json_encoded_string_representing_an_exploration)
+                    json.loads(value),
+                    json.loads(
+                        self.json_encoded_string_representing_an_exploration))
         with self.swap(
             memory_cache_services, 'set_multi',
             mock_memory_cache_services_set_multi):

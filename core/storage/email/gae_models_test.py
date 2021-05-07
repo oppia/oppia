@@ -150,7 +150,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception,
                 'Expected datetime, received Not a datetime object of type '
-                '<type \'str\'>'
+                '<class \'str\'>'
             ):
                 email_models.SentEmailModel.get_by_hash(
                     'Email Hash',

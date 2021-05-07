@@ -146,7 +146,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ]
         }
 
-        self.assertEqual(
+        self.assertItemsEqual(
             actual_output_for_ckeditor, expected_output_for_ckeditor)
 
     def test_validate_soup_for_rte(self):

@@ -238,26 +238,35 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             }]
         }]
         invalid_items_with_error_messages = [
-            ({
-                'tab_contents-with-value': [{
-                    'content': 1234, 'title': 'hello'
-                }, {
-                    'content': '<p>oppia</p>', 'title': 'Savjet 1'
-                }]
-            }, 'Expected unicode HTML string, received 1234'),
-            ({
-                'tab_content-with-value': [{
-                    'content': '<p>hello</p>', 'title': 'hello'
-                }]
-            },
-             'Missing attributes: tab_contents-with-value, Extra attributes: '
-             'tab_content-with-value'),
-            ({
-                'tab_contents-with-value': [{
-                    'content': '<p>hello</p>', 'tab-title': 'hello'
-                }]
-            },
-             r'Missing keys: \[u\'title\'\], Extra keys: \[u\'tab-title\'\]')]
+            (
+                {
+                    'tab_contents-with-value': [{
+                        'content': 1234, 'title': 'hello'
+                    }, {
+                        'content': '<p>oppia</p>', 'title': 'Savjet 1'
+                    }]
+                },
+                'Expected unicode HTML string, received 1234'
+            ),
+            (
+                {
+                    'tab_content-with-value': [{
+                        'content': '<p>hello</p>', 'title': 'hello'
+                    }]
+                },
+                 'Missing attributes: tab_contents-with-value, '
+                 'Extra attributes: tab_content-with-value'
+            ),
+            (
+                {
+                    'tab_contents-with-value': [{
+                        'content': '<p>hello</p>', 'tab-title': 'hello'
+                    }]
+                },
+                re.escape(
+                    'Missing keys: [\'title\'], Extra keys: [\'tab-title\']')
+            )
+        ]
 
         self.check_validation(
             components.Tabs, valid_items, invalid_items_with_error_messages)

@@ -2098,7 +2098,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
                 messages[0].subject,
-                'Your Oppia exploration "My Exploration" has been unpublished')
+                b'Your Oppia exploration "My Exploration" has been unpublished')
             self.assertEqual(messages[0].body.decode(), (
                 'Hi %s,\n\n'
                 '%s\n\n'

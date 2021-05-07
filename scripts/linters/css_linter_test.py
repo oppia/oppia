@@ -85,7 +85,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
     def test_perform_all_lint_checks_with_stderr(self):
         def mock_popen(unused_commands, stdout, stderr):  # pylint: disable=unused-argument
             def mock_communicate():
-                return ('True', 'True')
+                return (b'True', b'True')
             result = MockProcessClass()
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
@@ -97,7 +97,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH])
         with self.print_swap, popen_swap, self.assertRaisesRegexp(
-            Exception, 'True'):
+            Exception, 'True'
+        ):
             third_party_linter.perform_all_lint_checks()
 
     def test_perform_all_lint_checks_with_no_files(self):

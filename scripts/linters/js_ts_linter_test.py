@@ -469,7 +469,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_popen(unused_cmd, stdout, stderr):  # pylint: disable=unused-argument
             return process
         def mock_communicate(unused_self):
-            return ('Output', 'Invalid')
+            return (b'Output', b'Invalid')
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         communicate_swap = self.swap(
             subprocess.Popen, 'communicate', mock_communicate)

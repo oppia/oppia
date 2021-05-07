@@ -115,7 +115,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             [b'1', None, None])
         self.assertEqual(
             redis_cache_services.get_multi(['x5', 'b5', 'd5']),
-            [None, '2', None])
+            [None, b'2', None])
 
     def test_partial_deletes_deletes_correct_elements(self):
         redis_cache_services.flush_cache()

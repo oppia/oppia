@@ -966,6 +966,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     ],),
                 ]),
             self.swap_with_checks(
+                subprocess, 'call', mock_popen, expected_args=[
+                    ([
+                         common.REDIS_SERVER_PATH, '-m',
+                         'scripts.run_portserver',
+                         '--portserver_unix_socket_address',
+                         run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                     ],),
+                ]),
+            self.swap_with_checks(
                 flake_checker, 'report_pass', mock_report_pass,
                 expected_args=[('full',)]),
             self.swap_with_checks(

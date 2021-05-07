@@ -409,7 +409,7 @@ ACCEPTED_AUDIO_EXTENSIONS = {
 }
 
 # Prefix for data sent from the server to the client via JSON.
-XSSI_PREFIX = ')]}\'\n'
+XSSI_PREFIX = b')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 

@@ -2206,8 +2206,10 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             logging.exception(
                 'Failed to add calculation output for exploration ID %s, '
                 'version %s, state name %s, and calculation ID %s' % (
-                    exploration_id, exploration_version,
-                    state_name.encode('utf-8'), calculation_id))
+                    exploration_id, exploration_version, state_name,
+                    calculation_id
+                )
+            )
 
     @classmethod
     def get_model(

@@ -92,7 +92,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
     def test_main_with_no_files(self):
         def mock_get_all_filepaths(
-                unused_path, unused_files, unused_shard):
+                unused_path, unused_files, unused_shard, unused_name_space):
             return []
 
         all_filepath_swap = self.swap(
@@ -271,6 +271,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_html_file(self):
         with self.print_swap, self.sys_swap, self.install_swap:
             pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
+        print(self.linter_stdout)
         self.assert_same_list_elements('All Checks Passed.', self.linter_stdout)
 
     def test_get_changed_filepaths(self):

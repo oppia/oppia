@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import collections
 import os
 import random
@@ -448,8 +449,8 @@ class BuildTests(test_utils.GenericTestBase):
                 build.save_hashes_to_file(hashes)
                 with python_utils.open_file(hashes_path, 'r') as hashes_file:
                     self.assertEqual(
-                        hashes_file.read(),
-                        '{"/file.min.js": "654321", "/file.js": "123456"}\n')
+                        ast.literal_eval(hashes_file.read()),
+                        {"/file.min.js": "654321", "/file.js": "123456"})
                 os.remove(hashes_path)
 
     def test_execute_tasks(self):

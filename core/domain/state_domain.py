@@ -1665,7 +1665,7 @@ class WrittenTranslations(python_utils.OBJECT):
         Returns:
             list(str). A list of content id available for text translation.
         """
-        return list(self.translations_mapping.keys())
+        return list(sorted(self.translations_mapping.keys()))
 
     def get_translated_content(self, content_id, language_code):
         """Returns the translated content for the given content_id in the given
