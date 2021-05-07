@@ -55,7 +55,7 @@ var topicUploadButton = '.protractor-test-photo-upload-input';
 var topicPhotoSubmit = '.protractor-test-photo-upload-submit';
 var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmTopicCreationButton =
-   '.protractor-test-confirm-topic-creation-button';
+  '.protractor-test-confirm-topic-creation-button';
 var createdTopicLink = '.protractor-test-topic-name';
 
 var createStoryButtonSelector = '.protractor-test-create-story-button';
@@ -67,13 +67,13 @@ var storyUploadButton = '.protractor-test-photo-upload-input';
 var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
 var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmStoryCreationButton =
-   '.protractor-test-confirm-story-creation-button';
+  '.protractor-test-confirm-story-creation-button';
 
 var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
 var skillDescriptionField = '.protractor-test-new-skill-description-field';
 var skillOpenConceptCard = '.protractor-test-open-concept-card';
 var confirmSkillCreationButton =
-   '.protractor-test-confirm-skill-creation-button';
+  '.protractor-test-confirm-skill-creation-button';
 var skillReviewMaterialInput = '.oppia-rte';
 
 var updateFormName = '.protractor-update-form-name';
@@ -121,8 +121,8 @@ const setRole = async function(browser, page, role) {
     await page.waitForSelector(statusMessage);
     await page.waitForFunction(
       'document.querySelector(' +
-         '".protractor-test-status-message").innerText.includes(' +
-         '"successfully updated to")'
+        '".protractor-test-status-message").innerText.includes(' +
+        '"successfully updated to")'
     );
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
