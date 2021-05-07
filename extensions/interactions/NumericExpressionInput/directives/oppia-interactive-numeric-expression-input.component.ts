@@ -23,6 +23,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionCustomizationArgs, NumericExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -38,7 +39,7 @@ import { NumericExpressionInputRulesService } from './numeric-expression-input-r
 })
 export class InteractiveNumericExpressionInput implements OnInit {
   @Input() placeholderWithValue: string;
-  @Input() savedSolution: string;
+  @Input() savedSolution: InteractionAnswer;
   @Input() useFractionForDivisionWithValue: string;
 
   value: string = '';
@@ -64,8 +65,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
     }
   }
 
-  isCurrentAnswerValid() {
-    console.log('i am getting in here');
+  isCurrentAnswerValid(): boolean {
     let activeGuppyObject = (
       this.guppyInitializationService.findActiveGuppyObject());
     if (this.hasBeenTouched && activeGuppyObject === undefined) {
@@ -87,33 +87,35 @@ export class InteractiveNumericExpressionInput implements OnInit {
     return true;
   }
 
-  submitAnswer() {
+  submitAnswer(): void {
+    console.log(this.value);
+    console.log(this.isCurrentAnswerValid());
     if(!this.isCurrentAnswerValid()) {
       return;
     }
+    console.log(this.currentInteractionService);
     this.currentInteractionService.onSubmit(this.value, (
       this.numericExpressionInputRulesService
      ) as unknown as InteractionRulesService)
   }
 
-  showOSK() {
+  showOSK(): void {
     this.guppyInitializationService.setShowOSK(true);
     GuppyInitializationService.interactionType = 'NumericExpressionInput';
   }
 
   ngOnInit(): void {
-    console.log('in here');
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
     const { useFractionForDivision, placeholder } = (
       this.interactionAttributesExtractorService.getValuesFromAttributes(
-        'NumericExpressionInput', this._getAttributes()));
+        'NumericExpressionInput', this._getAttributes())) as NumericExpressionInputCustomizationArgs;
     this.guppyConfigurationService.changeDivSymbol(useFractionForDivision);
     this.guppyInitializationService.init(
       'guppy-div-learner',
-      placeholder.unicode,
+      placeholder.value.unicode,
       this.savedSolution !== undefined ?
-      this.savedSolution : ''
+      this.savedSolution as string : ''
     );
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
@@ -134,11 +136,15 @@ export class InteractiveNumericExpressionInput implements OnInit {
         }
       }
     });
-    console.log('there');
-    console.log(this.isCurrentAnswerValid);
+    const isCurrentAnswerValid = (): boolean => {
+      return this.isCurrentAnswerValid();
+    };
+
+    const submitAnswer = () => {
+      return this.submitAnswer();
+    };
     this.currentInteractionService.registerCurrentInteraction(
-      this.submitAnswer, this.isCurrentAnswerValid);
-    console.log('where');
+      submitAnswer, isCurrentAnswerValid);
   };
 }
 

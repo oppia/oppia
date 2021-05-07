@@ -55,7 +55,7 @@ fdescribe('NumericExpressionInputInteractive', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {},
+    onSubmit: (answer, rulesService) => {console.log('i am called')},
     registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
       submitAnswerFn();
       validateExpressionFn();
@@ -98,7 +98,6 @@ fdescribe('NumericExpressionInputInteractive', () => {
   });
 
   it('should add the change handler to guppy', () => {
-    console.log('here')
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject);
     component.ngOnInit();
@@ -106,12 +105,11 @@ fdescribe('NumericExpressionInputInteractive', () => {
   });
 
   it('should not submit the answer if invalid', function() {
-    console.log(component.isCurrentAnswerValid());
     component.hasBeenTouched = true;
     // Invalid answer.
     component.value = '1/';
     fixture.detectChanges();
-
+    console.log(mockCurrentInteractionService, mockCurrentInteractionService.onSubmit);
     spyOn(mockCurrentInteractionService, 'onSubmit');
     component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
@@ -119,7 +117,7 @@ fdescribe('NumericExpressionInputInteractive', () => {
       'Your answer seems to be missing a variable/number after the "/".');
   });
 
-  it('should submit the answer if valid', function() {
+  fit('should submit the answer if valid', function() {
     component.hasBeenTouched = true;
     component.value = '1+1';
     fixture.detectChanges();
