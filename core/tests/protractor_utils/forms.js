@@ -67,13 +67,13 @@ var GraphEditor = function(graphInputContainer) {
     await action.click('Add Edge Button', addEdgeButton);
     await waitFor.visibilityOf(
       vertexElement(vertexIndex1),
-      `Vertex element ${vertexIndex1} taking too long`);
+      `Vertex element ${vertexIndex1} taking too long to appear`);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
     await waitFor.visibilityOf(
-      vertexElement(
-        vertexIndex2), `Vertex element ${vertexIndex2} taking too long`);
+      vertexElement(vertexIndex2),
+      `Vertex element ${vertexIndex2} taking too long to appear`);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex2)).perform();
     await browser.actions().mouseUp().perform();
@@ -338,7 +338,7 @@ var AutocompleteDropdownEditor = function(elem) {
         .all(by.tagName('li')).map(
           async function(optionElem) {
             return await action.getText(
-              `Select2 Dropdown Option Element ${optionElem}`, optionElem);
+              'Select2 Dropdown Option Element option element', optionElem);
           }
         );
       expect(actualOptions).toEqual(expectedOptions);
@@ -382,7 +382,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
         by.css('.select2-selection__rendered')
       ).all(by.tagName('li')).map(async function(choiceElem) {
         return await action.getText(
-          `Select2 selection rendered ${choiceElem}`, choiceElem);
+          'Select2 selection rendered choice element', choiceElem);
       });
       // Remove the element corresponding to the last <li>, which actually
       // corresponds to the field for new input.
@@ -410,8 +410,8 @@ var MultiSelectEditor = function(elem) {
           '.protractor-test-search-bar-dropdown-menu span', texts[i]));
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
-        await waitFor.visibilityOf(
-          filteredElement, `${filteredElement} is taking too long to appear`);
+        await waitFor.visibilityOf(filteredElement,
+        'Filtered Element is taking too long to appear');
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         await action.click('Filtered Element', filteredElement);
@@ -453,7 +453,7 @@ var MultiSelectEditor = function(elem) {
       ).all(by.css('.protractor-test-selected'))
         .map(async function(selectedElem) {
           return await action.getText(
-            `Search bar dropdown menu ${selectedElem}`, selectedElem);
+            'Search bar dropdown menu selected element', selectedElem);
         });
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
@@ -496,7 +496,7 @@ var expectRichText = function(elem) {
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
         return await action.getText(
-          `${entry} in Array of texts in Rich Text Area`, entry);
+          'entry in Array of texts in Rich Text Area', entry);
       });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
@@ -540,7 +540,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   var _readFormattedText = async function(text, tagName) {
     await waitFor.visibilityOf(
       await arrayOfElems.get(arrayPointer),
-      `element at ${arrayPointer} is not visible`);
+      'element at array pointer in array of elements is not visible');
     expect(
       await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
@@ -574,7 +574,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     readRteComponent: async function(componentName) {
       var elem = await arrayOfElems.get(arrayPointer);
       await waitFor.visibilityOf(
-        elem, `${elem} is taking too long to appear`);
+        elem, 'element in Array of Elements is taking too long to appear');
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
       // Need to convert arguments to an actual array; we tell the component
@@ -585,7 +585,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       }
       expect(
         await action.getText(
-          `${elem} in Array of Elements in Rich Text Area`, elem)
+          'elem in Array of Elements in Rich Text Area', elem)
       ).toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
@@ -668,8 +668,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
         '().scrollTop(' + String(scrollTo) + ');');
       await waitFor.visibilityOf(
-        elem.element(by.css(
-          '.CodeMirror-linenumber')), 'code mirror linenumber is not visible');
+        elem.element(by.css('.CodeMirror-linenumber')),
+        'code mirror linenumber is not visible');
       var lineHeight = await elem.element(
         by.css('.CodeMirror-linenumber')).getAttribute('clientHeight');
       var currentScrollTop = await browser.executeScript(
