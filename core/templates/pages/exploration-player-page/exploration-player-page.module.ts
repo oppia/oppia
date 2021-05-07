@@ -58,7 +58,10 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard
+    LearnerAnswerInfoCard,
+    DisplayHintModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplaySolutionModalComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -68,7 +71,10 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard
+    LearnerAnswerInfoCard,
+    DisplayHintModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplaySolutionModalComponent
   ],
   providers: [
     {
@@ -91,6 +97,9 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { DisplayHintModalComponent } from './modals/display-hint-modal.component';
+import { DisplaySolutionInterstititalModalComponent } from './modals/display-solution-interstitial-modal.component';
+import { DisplaySolutionModalComponent } from './modals/display-solution-modal.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

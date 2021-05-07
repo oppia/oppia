@@ -13,7 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for DisplayHintModalComponent.
+ * @fileoverview Component for display solution interstitial modal.
  */
 
+import { Component } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
+@Component({
+  selector: 'oppia-display-interstitial-modal',
+  templateUrl: './display-solution-interstitial-modal.component.html'
+})
+export class DisplaySolutionInterstititalModalComponent
+  extends ConfirmOrCancelModal {
+  constructor(
+    private ngbActiveModal: NgbActiveModal
+  ) {
+    super(ngbActiveModal);
+  }
+}
