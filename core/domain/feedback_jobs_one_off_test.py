@@ -391,6 +391,40 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self.assertIsNone(model.last_nonempty_message_author_id)
 
 
+class TextMessageLengthAuditOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off Text message length limit job."""
+
+    # Text with length more than 10000.
+    TEXT = 'a' * 10001
+
+    def setUp(self):
+        super(TextMessageLengthAuditOneOffJobTests, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off.TextMessageLengthAuditOneOffJob.create_new())
+        feedback_jobs_one_off.TextMessageLengthAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+        return feedback_jobs_one_off.TextMessageLengthAuditOneOffJob.get_output(
+            job_id)
+
+    def test_description_length_limit(self):
+        """Checks description length."""
+
+        # Create a thread.
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', None, 'subject 1', self.TEXT)
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            [u'[u\'Thread Id: ' + thread_id + '\', u"Message Id: [\'0\']"]'],
+            output)
+
+
 class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
         test_utils.GenericTestBase):
     """Tests for one-off job to clean up feedback analytics model."""
