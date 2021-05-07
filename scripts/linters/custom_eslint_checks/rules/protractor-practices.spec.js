@@ -32,13 +32,13 @@ ruleTester.run('protractor-practices', rule, {
     `action.click(elem);
     browser.action.sleep();`,
   }, {
-    code: 'a.then;',
+    code: 'card.then = 3;',
   }, {
-    code: 'then.c;',
+    code: 'prevAge = then.age();',
   }, {
-    code: 'then().d;',
+    code: 'then().age;',
   }, {
-    code: 'a.then.b;',
+    code: 'sam.then.age;',
   }],
 
   invalid: [
@@ -53,33 +53,13 @@ ruleTester.run('protractor-practices', rule, {
       }],
     },
     {
-      code: 'z.then();',
+      code: 
+      `toPromise.then(function() {
+        numLessons = 3;
+      });`,
       errors: [{
         message: 'Please do not use .then(), consider async/await instead',
       }],
     },
-    {
-      code: 'a.b.c.then();',
-      errors: [{
-        message: 'Please do not use .then(), consider async/await instead',
-      }],
-    },
-    {
-      code: 'then.then();',
-      errors: [{
-        message: 'Please do not use .then(), consider async/await instead',
-      }],
-    },
-    {
-      code: 'a.then().b.then();',
-      errors: [
-        {
-          message: 'Please do not use .then(), consider async/await instead',
-        },
-        {
-          message: 'Please do not use .then(), consider async/await instead',
-        }
-      ],
-    }
   ]
 });
