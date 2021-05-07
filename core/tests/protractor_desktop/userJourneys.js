@@ -25,15 +25,13 @@ var CreatorDashboardPage =
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ModeratorPage = require('../protractor_utils/ModeratorPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-
-var moderatorPage = element(by.css('.protractor-test-moderator-page'));
-var errorContainer = element(by.css('.protractor-test-error-container'));
 
 var _selectLanguage = async function(language) {
   await action.select(
@@ -48,9 +46,11 @@ var _selectLanguage = async function(language) {
 describe('Basic user journeys', function() {
   describe('Account creation', function() {
     var libraryPage = null;
+    var moderatorPage = null;
 
     beforeAll(function() {
       libraryPage = new LibraryPage.LibraryPage();
+      moderatorPage = new ModeratorPage.ModeratorPage();
     });
 
     it('should create users', async function() {
@@ -61,9 +61,8 @@ describe('Basic user journeys', function() {
       await libraryPage.get();
       await general.checkForConsoleErrors([]);
 
-      await browser.get(general.MODERATOR_URL_SUFFIX);
-      await waitFor.visibilityOf(
-        errorContainer, '401 Error page taking too long to appear.');
+      await moderatorPage.get();
+      await general.expectErrorPage(401);
       await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
       await users.logout();
@@ -74,10 +73,8 @@ describe('Basic user journeys', function() {
         'mod@userManagement.com', 'moderatorUserManagement');
 
       await users.login('mod@userManagement.com');
-      await browser.get(general.MODERATOR_URL_SUFFIX);
-      await waitFor.pageToFullyLoad();
-      await waitFor.visibilityOf(
-        moderatorPage, 'Moderator page taking too long to appear.');
+      await moderatorPage.get();
+      await moderatorPage.expectModeratorPageToBeVisible();
       await general.openProfileDropdown();
       await users.logout();
       await general.checkForConsoleErrors([]);
