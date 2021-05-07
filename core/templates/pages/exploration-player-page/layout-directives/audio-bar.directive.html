@@ -1,4 +1,5 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
+<<<<<<< HEAD
   <div ng-if="audioBarIsExpanded" class="audio-bar-expanded" headroom>
     <div class="audio-controls" ng-class="{'audio-controls-margin': progressBarIsShown}">
       <div class="oppia-audio-header-control-buttons">
@@ -44,6 +45,41 @@
                   ng-options="o.value as o.displayed for o in languagesInExploration"
                   ng-change="onNewLanguageSelected()">
           </select>
+=======
+  <div ng-if="audioBarIsExpanded" class="audio-controls"">
+    <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
+      <div class="audio-header-control-icons">
+        <a ng-click="onBackwardButtonClicked()">
+          <span class="oppia-replay-white-circle"  ng-if="progressBarIsShown">
+            <i class="fas fa-undo audio-undo-icon"></i>
+            <span class="oppia-five-icon">5</span>
+          </span>
+        </a>
+        <a ng-click="onPlayButtonClicked()"
+           uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
+           tooltip-append-to-body="true" tooltip-placement="right">
+          <i class="fas oppia-audio-controls-button-icon" tabindex="0"
+             ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+          </i>
+        </a>
+        <a ng-click="onForwardButtonClicked()">
+          <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-if="progressBarIsShown">
+            <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
+            <span class="oppia-five-icon oppia-five-icon-forward">5</span>
+          </span>
+        </a>
+      </div>
+      <div class="slider-section" ng-if="progressBarIsShown">
+        <div ng-if="audioLoadingIndicatorIsShown">
+          <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+        </div>
+        <div ng-if="!audioLoadingIndicatorIsShown">
+          <oppia-audio-slider [value]="AudioPlayerService.getCurrentTime()"
+                              [max]="AudioPlayerService.getAudioDuration()"
+                              (value-change)="setProgress($event)"
+                              aria-label="audio-slider">
+          </oppia-audio-slider>
+>>>>>>> srijan/ng-audio
         </div>
       </div>
     </div>

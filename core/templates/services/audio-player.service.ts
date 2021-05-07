@@ -16,162 +16,235 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, Injectable, NgZone } from '@angular/core';
+import { AudioFile } from 'domain/utilities/audio-file.model';
+import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import { AssetsBackendApiService } from './assets-backend-api.service';
+import { ContextService } from './context.service';
+import { Howl } from 'howler';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { interval, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-angular.module('oppia').factory('AudioPlayerService', [
-  '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
-  'ContextService', 'ngAudio',
-  function(
-      $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
-      ContextService, ngAudio) {
-    var _currentTrackFilename = null;
-    var _currentTrack = null;
+@Injectable({
+  providedIn: 'root'
+})
+export class AudioPlayerService {
+  private _currentTrackFilename: string | null = null;
+  private _currentTrack: Howl | null = null;
+  private _lastPausePos: number | null = null;
+  private loadingTrack = false;
+  private _updateViewEventEmitter = new EventEmitter();
+  private _autoplayAudioEventEmitter = new EventEmitter();
+  private _stopIntervalSubject = new Subject();
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private audioTranslationManagerService: AudioTranslationManagerService,
+    private contextService: ContextService,
+    private ngZone: NgZone
+  ) {}
 
-    var _autoplayAudioEventEmitter = new EventEmitter();
-
-    var _load = function(
-        filename, successCallback, errorCallback) {
-      if (filename !== _currentTrackFilename) {
-        AssetsBackendApiService.loadAudio(
-          ContextService.getExplorationId(), filename)
-          .then(function(loadedAudiofile) {
-            var blobUrl = URL.createObjectURL(loadedAudiofile.data);
-            _currentTrack = ngAudio.load(blobUrl);
-            _currentTrackFilename = filename;
-
-            // Directive ngAudio doesn't seem to provide any way of detecting
-            // when native audio object has finished loading -- see
-            // https://github.com/danielstern/ngAudio/issues/139. It seems
-            // that after creating an ngAudio object, the native audio
-            // object is asynchronously loaded. So we use a timeout
-            // to grab native audio.
-            // TODO(tjiang11): Look for a better way to handle this.
-            $timeout(function() {
-              // _currentTrack could be null if the learner stops audio
-              // shortly after loading a new card or language. In such
-              // cases, we do not want to attempt setting the 'onended'
-              // property of the audio.
-              if (_currentTrack !== null &&
-                _currentTrack.audio !== undefined) {
-                _currentTrack.audio.onended = function() {
-                  _currentTrack = null;
-                  _currentTrackFilename = null;
-                  AudioTranslationManagerService
-                    .clearSecondaryAudioTranslations();
-                };
-              }
-            }, 100);
-
-            successCallback();
-          }, function(reason) {
-            errorCallback(reason);
-          });
-      }
-    };
-
-    var _play = function() {
-      if (_currentTrack) {
-        _currentTrack.play();
-      }
-    };
-
-    var _pause = function() {
-      if (_currentTrack) {
-        _currentTrack.pause();
-      }
-    };
-
-    var _stop = function() {
-      if (_currentTrack) {
-        _currentTrack.stop();
-        _currentTrackFilename = null;
-        _currentTrack = null;
-      }
-    };
-
-    var _rewind = function(seconds) {
-      if (_currentTrack) {
-        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        if (currentSeconds - seconds > 0) {
-          var rewindedProgress = (
-            (currentSeconds - seconds) / _currentTrack.duration);
-          _currentTrack.progress = rewindedProgress;
-        } else {
-          _currentTrack.progress = 0;
-        }
-      }
-    };
-
-    var _forward = function(seconds) {
-      if (_currentTrack) {
-        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        if (currentSeconds + seconds < _currentTrack.duration) {
-          var forwardedProgress = (
-            (currentSeconds + seconds) / _currentTrack.duration);
-          _currentTrack.progress = forwardedProgress;
-        }
-      }
-    };
-
-    return {
-      load: function(filename) {
-        return $q(function(resolve, reject) {
-          _load(filename, resolve, reject);
+  private _load(filename: string, successCallback, errorCallback) {
+    if (this.loadingTrack) {
+      throw new Error('Already loading a track... Please try again!');
+    }
+    if (this._currentTrackFilename === filename) {
+      return;
+    }
+    this.assetsBackendApiService.loadAudio(
+      this.contextService.getExplorationId(),
+      filename).then(
+      (loadedAudioFile: AudioFile) => {
+        this._currentTrack = new Howl({
+          src: [URL.createObjectURL(loadedAudioFile.data)],
+          format: ['mp3']
         });
-      },
-      play: function() {
-        _play();
-      },
-      pause: function() {
-        _pause();
-      },
-      stop: function() {
-        _stop();
-      },
-      rewind: function(seconds) {
-        _rewind(seconds);
-      },
-      forward: function(seconds) {
-        _forward(seconds);
-      },
-      getCurrentTime: function() {
-        if (_currentTrack) {
-          return Math.round(_currentTrack.currentTime);
-        } else {
-          return 0;
-        }
-      },
-      getAudioDuration: function() {
-        if (_currentTrack && _currentTrack.audio) {
-          return Math.round(_currentTrack.audio.duration);
-        } else {
-          return 0;
-        }
-      },
-      getProgress: function() {
-        if (!_currentTrack) {
-          return 0;
-        }
-        return _currentTrack.progress;
-      },
-      setProgress: function(progress) {
-        if (_currentTrack) {
-          _currentTrack.progress = progress;
-        }
-      },
-      isPlaying: function() {
-        return Boolean(_currentTrack && !_currentTrack.paused);
-      },
-      isTrackLoaded: function() {
-        return Boolean(_currentTrack);
-      },
-      clear: function() {
-        _currentTrack = null;
-        _currentTrackFilename = null;
-      },
-      get onAutoplayAudio() {
-        return _autoplayAudioEventEmitter;
-      }
-    };
+        this._currentTrack.on('load', () => {
+          this._currentTrackFilename = loadedAudioFile.filename;
+          this.loadingTrack = false;
+          this._lastPausePos = 0;
+          this.play();
+          successCallback();
+        });
+        this._currentTrack.on('end', () => {
+          this._currentTrack = null;
+          this._currentTrackFilename = null;
+          this._lastPausePos = null;
+          this.audioTranslationManagerService.clearSecondaryAudioTranslations();
+        });
+      }, (e) => errorCallback(e)
+    );
   }
-]);
+
+  private _play() {
+    if (!this.isPlaying()) {
+      if (this._currentTrack !== null) {
+        this._currentTrack.seek(this._lastPausePos);
+      }
+      this.ngZone.runOutsideAngular(() => {
+        interval(500).pipe(takeUntil(
+          this._stopIntervalSubject)).subscribe(() => {
+          this.ngZone.run(() => {
+            this._updateViewEventEmitter.emit();
+          });
+        });
+      });
+      this._currentTrack.play();
+    }
+  }
+
+  private _pause() {
+    if (this.isPlaying()) {
+      this._lastPausePos = this.getCurrentTime();
+      this._currentTrack.pause();
+      this._stopIntervalSubject.next();
+    }
+  }
+
+  private _stop() {
+    if (this._currentTrack) {
+      this._lastPausePos = 0;
+      this._currentTrack.stop();
+      this._stopIntervalSubject.next();
+      this._currentTrackFilename = null;
+      this._currentTrack = null;
+    }
+  }
+
+  private _rewind(seconds) {
+    if (this._currentTrack) {
+      const currentSeconds = (
+        this._currentTrack.seek());
+      if (typeof currentSeconds !== 'number') {
+        return;
+      }
+      if (currentSeconds - seconds > 0) {
+        this._currentTrack.seek(currentSeconds - seconds);
+      } else {
+        this._currentTrack.seek(0);
+      }
+    }
+  }
+
+  private _forward(seconds: number): void {
+    if (this._currentTrack) {
+      const currentSeconds = this._currentTrack.seek();
+      if (typeof currentSeconds !== 'number') {
+        return;
+      }
+      if (currentSeconds + seconds < this._currentTrack.duration()) {
+        this._currentTrack.seek(currentSeconds + seconds);
+      }
+    }
+  }
+
+  load(filename: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._load(filename, resolve, reject);
+    });
+  }
+
+  play(): void {
+    this._play();
+  }
+
+  pause(): void {
+    this._pause();
+  }
+
+  stop(): void {
+    this._stop();
+  }
+
+  rewind(seconds: number): void {
+    this._rewind(seconds);
+  }
+
+  forward(seconds: number): void {
+    this._forward(seconds);
+  }
+
+  getCurrentTime(): number {
+    if (this._currentTrack) {
+      const sec = this._currentTrack.seek();
+      if (typeof sec !== 'number') {
+        return 0;
+      }
+      return Math.floor(sec);
+    } else {
+      return 0;
+    }
+  }
+
+  setCurrentTime(val: number): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    if (val < 0) {
+      this._currentTrack.seek(0);
+      return;
+    }
+    if (val > this._currentTrack.duration()) {
+      this._currentTrack.seek(this._currentTrack.duration());
+      return;
+    }
+    this._lastPausePos = val;
+    this._currentTrack.seek(Math.floor(val));
+  }
+
+  getAudioDuration(): number {
+    if (this._currentTrack) {
+      return this._currentTrack.duration();
+    } else {
+      return 0;
+    }
+  }
+
+  getProgress(): number {
+    if (!this._currentTrack) {
+      return 0;
+    }
+    return (
+      this._currentTrack.seek() as number) / this._currentTrack.duration();
+  }
+
+  setProgress(progress: number): void {
+    if (progress < 0 || progress > 1) {
+      return;
+    }
+    if (this._currentTrack) {
+      this._currentTrack.seek(progress * this._currentTrack.duration());
+    }
+  }
+
+  isPlaying(): boolean {
+    return this._currentTrack && this._currentTrack.playing();
+  }
+
+  isTrackLoaded(): boolean {
+    return this._currentTrack !== null;
+  }
+
+  clear(): void {
+    if (this._currentTrack && this.isPlaying()) {
+      this._currentTrack.stop();
+    }
+    this._currentTrack = null;
+  }
+
+  get currentTime(): number {
+    return this.getCurrentTime();
+  }
+
+  get viewUpdate(): EventEmitter<void> {
+    return this._updateViewEventEmitter;
+  }
+
+  get onAutoplayAudio(): EventEmitter<void> {
+    return this._autoplayAudioEventEmitter;
+  }
+}
+
+angular.module('oppia').factory('AudioPlayerService', downgradeInjectable(
+  AudioPlayerService
+));

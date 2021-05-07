@@ -28,6 +28,7 @@ import { MaterialModule } from 'components/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
 import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
+import { AudioSliderComponent } from './slider/audio-slider.component';
 
 @NgModule({
   imports: [
@@ -42,12 +43,15 @@ import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-
     CustomFormsComponentsModule
   ],
   declarations: [
-    SchemaBasedEditorDirective
+    SchemaBasedEditorDirective,
+    AudioSliderComponent
   ],
   entryComponents: [
+    AudioSliderComponent
   ],
   exports: [
     CustomFormsComponentsModule,
+    AudioSliderComponent,
     SchemaBasedEditorDirective
   ],
 })
