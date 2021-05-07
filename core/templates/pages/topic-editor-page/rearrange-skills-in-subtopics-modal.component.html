@@ -5,6 +5,8 @@
     </h3>
   </div>
   <div class="modal-body subtopics">
+    <div *ngIf="showEmptyDiv" class="empty-div protractor-test-empty-div"></div>
+    <div *ngIf="!showEmptyDiv" class="empty-div protractor-test-empty-div-abs"></div>
     <div cdkDropListGroup class="subtopics-container fx-row fx-main-start fx-cross-start">
       <div class="empty-placeholder uncategorized-skills-container"></div>
       <div class="dnd-container"
@@ -28,9 +30,10 @@
               }">
           <div class="dnd-item-box protractor-test-uncategorized-skill-card-box"
                cdkDrag
+               (mousedown)="onMouseDownOnCdkDrag()"
                *ngFor="let skillSummary of uncategorizedSkillSummaries"
                (cdkDragStarted)="onMoveSkillStart(null, skillSummary)">
-            <div class="dnd-custom-placeholder" *cdkDragPlaceholder></div>
+            <div class="dnd-custom-placeholder protractor-test-dnd-placeholder" *cdkDragPlaceholder></div>
             <a class="skill-name protractor-test-uncategorized-skill-card"
                [href]="getSkillEditorUrl(skillSummary.getId())"
                target="_blank" rel="noopener">
@@ -64,8 +67,9 @@
           <div *ngFor="let skillSummary of subtopic.getSkillSummaries()"
                class="dnd-item-box protractor-test-subtopic-skill"
                cdkDrag
+               (mousedown)="onMouseDownOnCdkDrag()"
                (cdkDragStarted)="onMoveSkillStart(subtopic.getId(), skillSummary)">
-            <div class="dnd-custom-placeholder" *cdkDragPlaceholder></div>
+            <div class="dnd-custom-placeholder protractor-test-dnd-placeholder" *cdkDragPlaceholder></div>
             <a [href]="getSkillEditorUrl(skillSummary.getId())" class="skill-name protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
               {{ skillSummary.getDescription() }}
             </a>
@@ -82,6 +86,15 @@
   </div>
 </div>
 <style>
+  .rearrange-skills-modal .empty-div {
+    height: 0;
+    width: 0;
+    display: none;
+  }
+  .rearrange-skills-modal .skill-name {
+    user-select: none;
+    -webkit-user-select: none;
+  }
   .rearrange-skills-modal .modal-dialog {
     max-width: inherit;
     width: 80vw;

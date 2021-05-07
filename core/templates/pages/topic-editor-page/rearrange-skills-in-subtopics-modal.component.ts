@@ -54,7 +54,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
   editableName: string;
   errorMsg: string;
   selectedSubtopicId: number;
-
+  showEmptyDiv = false;
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private topicUpdateService: TopicUpdateService,
@@ -91,6 +91,9 @@ export class RearrangeSkillsInSubtopicsModalComponent
     );
   }
 
+  onMouseDownOnCdkDrag(): void {
+    setTimeout(() => this.showEmptyDiv = true, 2000);
+  }
   /**
    * @param {string|null} oldSubtopicId - The id of the subtopic from
    *    which the skill is to be moved, or null if the origin is the
@@ -110,6 +113,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
    *    uncategorized section.
    */
   onMoveSkillEnd(newSubtopicId: number): void {
+    setTimeout(() => this.showEmptyDiv = false, 2000);
     if (newSubtopicId === this.oldSubtopicId) {
       return;
     }

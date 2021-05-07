@@ -164,7 +164,7 @@ describe('Topic editor functionality', function() {
         await forms.toRichText('Story notes'));
     });
 
-  it('should assign a skill to, and from subtopics',
+  fit('should assign a skill to, and from subtopics',
     async function() {
       await topicsAndSkillsDashboardPage.get();
       await (

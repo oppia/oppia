@@ -21,6 +21,7 @@ var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
+const { browser, element } = require('protractor');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
@@ -113,11 +114,20 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-skill-difficulty-easy'));
   var storyTitleClassname = '.protractor-test-story-title';
 
-  var cdkDragAndDrop = async(element, destination) => {
-    await browser.actions().mouseDown(element).perform();
-    await browser.actions().mouseMove({x: 10, y: 0 }).perform();
+  var cdkDragAndDrop = async(start, destination) => {
+    await browser.actions().mouseDown(start).perform();
+    await waitFor.presenceOf(
+      element(by.css('.protractor-test-empty-div')),
+      'protractor-test-empty-div not present');
+    await browser.actions().mouseMove({x: 10, y: 20 }).perform();
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-dnd-placeholder')),
+      'Placeholder for dnd not showing up.');
     await browser.actions().mouseMove(destination).perform();
     await browser.actions().mouseUp(destination).perform();
+    await waitFor.presenceOf(
+      element(by.css('.protractor-test-empty-div-abs')),
+      'protractor-test-empty-div not hiding.');
   };
   var saveRearrangedSkillsButton = element(
     by.css('.protractor-save-rearrange-skills'));
@@ -358,7 +368,10 @@ var TopicEditorPage = function() {
       fromSubtopicIndex, toSubtopicIndex, skillDescription) {
     const assignedSkillToMove = await this.getTargetMoveSkill(
       fromSubtopicIndex, skillDescription);
-    const toSubtopicColumn = subtopicColumns.get(toSubtopicIndex);
+    const toSubtopicColumn = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-subtopic-column')[arguments[0]];
+    }, toSubtopicIndex);
     await cdkDragAndDrop(assignedSkillToMove, toSubtopicColumn);
   };
 

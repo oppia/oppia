@@ -29,6 +29,10 @@ var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
 
+var absenceOf = async function(elem, errMsg) {
+  await browser.wait(until.stalenessOf(elem), DEFAULT_WAIT_TIME_MSECS, errMsg);
+};
+
 var alertToBePresent = async function() {
   await browser.wait(
     until.alertIsPresent(), DEFAULT_WAIT_TIME_MSECS,
@@ -169,6 +173,7 @@ var fileToBeDownloaded = async function(filename) {
 };
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
+exports.absenceOf = absenceOf;
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
