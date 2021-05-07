@@ -492,4 +492,3 @@ class Registry(python_utils.OBJECT):
             module. The search_services module.
         """
         return cls._get().import_storage_services()
-

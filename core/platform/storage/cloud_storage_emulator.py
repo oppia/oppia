@@ -48,7 +48,7 @@ class Blob(python_utils.OBJECT):
 
 
 class CloudStorageEmulator(python_utils.OBJECT):
-    """"""
+    """Emulator for the storage client."""
 
     def __init__(self):
         self._blob_dict = {}
@@ -67,8 +67,6 @@ class CloudStorageEmulator(python_utils.OBJECT):
 
     def list_blobs(self, prefix):
         return [
-           value for key, value in self._blob_dict.items()
-           if key.startswith(prefix)
+            value for key, value in self._blob_dict.items()
+            if key.startswith(prefix)
         ]
-
-

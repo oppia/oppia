@@ -12,7 +12,7 @@ apache-beam[gcp]==2.22.0  # via -r requirements.in
 avro==1.9.2               # via apache-beam
 backports.functools-lru-cache==1.6.1  # via -r requirements.in, soupsieve
 beautifulsoup4==4.9.1     # via -r requirements.in
-bleach==3.1.5             # via -r requirements.in
+bleach==3.3.0             # via -r requirements.in
 cachecontrol==0.12.6      # via firebase-admin
 cachetools==3.1.1         # via apache-beam, google-auth
 callbacks==0.3.0          # via -r requirements.in

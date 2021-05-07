@@ -124,4 +124,3 @@ def listdir(_, dir_name):
         # Remove the asset path from the prefix of filename.
         files_in_dir.append(blob.name.replace(dir_name, ''))
     return files_in_dir
-
