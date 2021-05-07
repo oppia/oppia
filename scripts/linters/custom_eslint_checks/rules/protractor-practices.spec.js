@@ -53,7 +53,7 @@ ruleTester.run('protractor-practices', rule, {
       }],
     },
     {
-      code: 
+      code:
       `toPromise.then(function() {
         numLessons = 3;
       });`,
