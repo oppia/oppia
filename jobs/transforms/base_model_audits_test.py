@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
 from core.domain import change_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
@@ -486,8 +487,11 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _get_change_domain_class\(\) method is missing from the '
-            'derived class. It should be implemented in the derived class.'):
+            re.escape(
+                'The _get_change_domain_class() method is missing from the '
+                'derived class. It should be implemented in the derived class.'
+            )
+        ):
             MockValidateCommitCmdsSchema().process(invalid_commit_cmd_model)
 
     def test_validate_commit_cmds(self):
