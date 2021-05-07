@@ -539,8 +539,8 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 
   var _readFormattedText = async function(text, tagName) {
     await waitFor.visibilityOf(
-      await arrayOfElems.get(
-        arrayPointer), `element at ${arrayPointer} is not visible`);
+      await arrayOfElems.get(arrayPointer),
+      `element at ${arrayPointer} is not visible`);
     expect(
       await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
