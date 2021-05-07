@@ -321,6 +321,20 @@ class _Gae(Platform):
             from core.platform.cloud_translate import cloud_translate_services
             return cloud_translate_services
 
+    @classmethod
+    def import_storage_services(cls):
+        """Imports and returns cloud_translate_services module.
+
+        Returns:
+            module. The cloud_translate_services module.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.storage import dev_mode_storage_services
+            return dev_mode_storage_services
+        else:
+            from core.platform.storage import cloud_storage_services
+            return cloud_storage_services
+
     NAME = 'gae'
 
 
@@ -469,3 +483,13 @@ class Registry(python_utils.OBJECT):
             module. The search_services module.
         """
         return cls._get().import_search_services()
+
+    @classmethod
+    def import_storage_services(cls):
+        """Imports and returns search_services module.
+
+        Returns:
+            module. The search_services module.
+        """
+        return cls._get().import_storage_services()
+
