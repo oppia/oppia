@@ -1,5 +1,6 @@
 require('dotenv').config();
 var FirebaseAdmin = require('firebase-admin');
+var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
 var fs = require('fs');
@@ -327,6 +328,8 @@ exports.config = {
 
     var spw = '';
     var uniqueString = '';
+    // Enable this if you want success videos to be saved.
+    var allVideos = false;
 
     // Only running video recorder on Github Actions.
 
@@ -342,7 +345,6 @@ exports.config = {
             '-g', '300',
           ];
           uniqueString = randomString.generate(7);
-          console.log(uniqueString);
           var name = uniqueString + '.mp4';
           var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
           try {
@@ -363,15 +365,35 @@ exports.config = {
           let success = spw.kill();
           console.log(`Killing was successful: ${success}`);
           console.log(result.status);
-          if(result.status == 'success') {
+          if(result.status == 'passed' && !allVideos) {
             try {
               fs.unlinkSync(vidPath);
+              console.log('Video was deleted successfully.')
             } catch (e) {
               console.log('Video was not deleted, even though the suite passed');
             }
           }
         },
       });
+    }
+
+    // Screenshots will only run on CircleCI.
+
+    if (process.env.PWD == '/home/circleci/oppia') {
+      // This takes screenshots of failed tests. For more information see
+      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
+        // Directory for screenshots.
+        dest: '../protractor-screenshots',
+        // Function to build filenames of screenshots.
+        pathBuilder: function(currentSpec) {
+          let filename = currentSpec.fullName;
+          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
+        },
+        captureOnlyFailedSpecs: true,
+        reportFailedUrl: true,
+        preserveDirectory: true
+      }));
     }
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;

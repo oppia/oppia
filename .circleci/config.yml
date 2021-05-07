@@ -41,13 +41,6 @@ commands:
       - run:
           name: Install chrome
           command: python -m scripts.install_chrome_for_ci
-    
-  install_ffmpeg:
-    description: "Install ffmpeg"
-    steps:
-      - run:
-          name: Install ffmpeg
-          command: sudo apt install ffmpeg
 
   merge_target_branch:
     description: "Merge to target branch"
@@ -105,9 +98,6 @@ commands:
       - store_artifacts:
           path: /home/circleci/protractor-screenshots/
           destination: protractor-screenshots
-      - store_artifacts:
-          path: /home/circleci/protractor-video/
-          destination: protractor-video
 
 jobs:
   setup_and_typescript_tests:
@@ -156,15 +146,10 @@ jobs:
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - skip_for_low_risk_prs
       - install_chrome
-      - install_ffmpeg
       - run:
           name: Run e2e library test
           command: |
             python -m scripts.run_e2e_tests --skip-install --deparallelize_terser --suite="library" --prod_env
-      - run:
-          name: DEBUGGING List Video Files
-          command: |
-            ls /home/runner/work/oppia/protractor-video
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -189,7 +174,6 @@ jobs:
           command: pip install enum34==1.1.10 protobuf==3.13.0
       - skip_for_low_risk_prs
       - install_chrome
-      - install_ffmpeg
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
@@ -206,10 +190,6 @@ jobs:
           name: Run e2e topic and story viewer test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
-      - run:
-          name: DEBUGGING List Video Files
-          command: |
-            ls /home/runner/work/oppia/protractor-video
       - upload_screenshots
       - check_memory_usage
 
