@@ -31,12 +31,31 @@ class ModelIoStub(python_utils.OBJECT):
         self._models_by_id = {}
 
     @property
-    def get_models(self):
-        """PTransform that outputs a PCollection with all models in the stub."""
-        return beam.ptransform_fn(
-            lambda pcoll: (
-                pcoll.pipeline
-                | beam.Create(m for m in self._models_by_id.values())))
+    def get_models_ptransform(self):
+        """Returns a PTransform for getting the models stored in the stub.
+
+        Returns:
+            PTransform. A PTransform that returns the models stored in the stub.
+        """
+        stub = self
+
+        class GetModels(beam.PTransform):
+            """PTransform for getting the models stored in the stub."""
+
+            def expand(self, pcoll):
+                """Returns a PCollection of the models stored in the stub.
+
+                Args:
+                    pcoll: PCollection. Used to hook into the underlying
+                        pipeline.
+
+                Returns:
+                    PCollection. The models stored in the stub.
+                """
+                return (
+                    pcoll | beam.Create(m for m in stub._models_by_id.values())) # pylint: disable=protected-access
+
+        return GetModels
 
     def put_multi(self, models):
         """Puts multiple models into the stub.
