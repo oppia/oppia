@@ -20,7 +20,7 @@ import { EditableExplorationBackendApiService } from
   'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { HttpTestingController, HttpClientTestingModule } from

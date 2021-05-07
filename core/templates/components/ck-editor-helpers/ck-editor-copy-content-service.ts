@@ -40,8 +40,10 @@ export class CkEditorCopyContentService {
     'oppia-noninteractive-link',
     'oppia-noninteractive-math',
     'oppia-noninteractive-tabs',
-    'oppia-noninteractive-video'
+    'oppia-noninteractive-video',
+    'oppia-noninteractive-skillreview'
   ]);
+
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
   private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
 

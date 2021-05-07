@@ -17,13 +17,12 @@
  */
 
 import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory.ts';
+  'domain/objects/FractionObjectFactory';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory.ts';
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { Units, UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory.ts';
+import { Units, UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 
 describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {

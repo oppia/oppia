@@ -104,8 +104,6 @@ import { CkEditorCopyContentService } from
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
-import { CodeReplPredictionService } from
-  'interactions/CodeRepl/code-repl-prediction.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CodeReplValidationService } from
@@ -499,7 +497,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ckEditorCopyContentService: CkEditorCopyContentService;
   static classroomBackendApiService: ClassroomBackendApiService;
   static codeNormalizerService: CodeNormalizerService;
-  static codeReplPredictionService: CodeReplPredictionService;
   static codeReplRulesService: CodeReplRulesService;
   static codeReplValidationService: CodeReplValidationService;
   static collectionCreationBackendService: CollectionCreationBackendService;
@@ -780,7 +777,6 @@ private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
 private ckEditorCopyContentService: CkEditorCopyContentService,
 private classroomBackendApiService: ClassroomBackendApiService,
 private codeNormalizerService: CodeNormalizerService,
-private codeReplPredictionService: CodeReplPredictionService,
 private codeReplRulesService: CodeReplRulesService,
 private codeReplValidationService: CodeReplValidationService,
 private collectionCreationBackendService: CollectionCreationBackendService,
@@ -1085,8 +1081,6 @@ private injector: Injector
       this.classroomBackendApiService);
     OppiaAngularRootComponent.codeNormalizerService = (
       this.codeNormalizerService);
-    OppiaAngularRootComponent.codeReplPredictionService = (
-      this.codeReplPredictionService);
     OppiaAngularRootComponent.codeReplRulesService = this.codeReplRulesService;
     OppiaAngularRootComponent.codeReplValidationService = (
       this.codeReplValidationService);

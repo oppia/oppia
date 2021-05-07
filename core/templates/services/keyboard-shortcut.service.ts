@@ -22,8 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { KeyboardShortcutHelpModalComponent } from
   // eslint-disable-next-line max-len
-  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 
 @Injectable({
