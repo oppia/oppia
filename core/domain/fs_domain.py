@@ -24,8 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from google.cloud import storage
-
+storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
 
 CHANGE_LIST_SAVE = [{'cmd': 'save'}]
@@ -121,11 +120,9 @@ class GcsFileSystem(GeneralFileSystem):
     This implementation ignores versioning.
     """
 
-    def __init__(self, *args):
-        self._storage_client = storage.Client()
-        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-        self._bucket = self._storage_client.get_bucket(bucket_name)
-        super().__init__(*args)
+    def __init__(self, entity_name, entity_id):
+        self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        super(GcsFileSystem, self).__init__(entity_name, entity_id)
 
     def _get_gcs_file_url(self, filepath):
         """Returns the constructed GCS file URL.
@@ -152,9 +149,8 @@ class GcsFileSystem(GeneralFileSystem):
         Returns:
             bool. Whether the file exists in GCS.
         """
-        return self._bucket.get_blob(
-            self._get_gcs_file_url(filepath)
-        ) is not None
+        return storage_services.isfile(
+            self._bucket_name, self._get_gcs_file_url(filepath))
 
     def get(self, filepath):
         """Gets a file as an unencoded stream of raw bytes.
@@ -168,9 +164,8 @@ class GcsFileSystem(GeneralFileSystem):
             exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
-            blob = self._bucket.get_blob(self._get_gcs_file_url(filepath))
-            data = blob.download_as_bytes()
-            return FileStream(data)
+            return storage_services.get(
+                self._bucket_name, self._get_gcs_file_url(filepath))
         else:
             return None
 
@@ -183,8 +178,12 @@ class GcsFileSystem(GeneralFileSystem):
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the cloud file.
         """
-        blob = self._bucket.Blob(self._get_gcs_file_url(filepath))
-        blob.upload_from_string(raw_bytes, content_type=mimetype)
+        storage_services.commit(
+            self._bucket_name,
+            self._get_gcs_file_url(filepath),
+            raw_bytes,
+            mimetype
+        )
 
     def delete(self, filepath):
         """Deletes a file and the metadata associated with it.
@@ -193,9 +192,9 @@ class GcsFileSystem(GeneralFileSystem):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
-        blob = self._bucket.get_blob(self._get_gcs_file_url(filepath))
-        if blob is not None:
-            blob.delete()
+        if self.isfile(filepath):
+            storage_services.delete(
+                self._bucket_name, self._get_gcs_file_url(filepath))
         else:
             raise IOError('Image does not exist: %s' % filepath)
 
@@ -208,14 +207,12 @@ class GcsFileSystem(GeneralFileSystem):
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
-        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         source_file_url = (
-            '/%s/%s/%s' % (bucket_name, source_assets_path, filepath)
+            '/%s/%s/%s' % (self._bucket_name, source_assets_path, filepath)
         ).encode('utf-8')
-
-        src_blob = self._bucket.blob(source_file_url)
-        self._bucket.copy_blob(
-            src_blob, self._bucket, new_name=self._get_gcs_file_url(filepath))
+        storage_services.copy(
+            self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
+        )
 
     def listdir(self, dir_name):
         """Lists all files in a directory.
@@ -227,25 +224,10 @@ class GcsFileSystem(GeneralFileSystem):
         Returns:
             list(str). A lexicographically-sorted list of filenames.
         """
-        if dir_name.endswith('/') or dir_name.startswith('/'):
+        if dir_name.startswith('/'):
             raise IOError(
-                'The dir_name should not start with / or end with / : %s' % (
-                    dir_name))
-
-        # The trailing slash is necessary to prevent non-identical directory
-        # names with the same prefix from matching, e.g. /abcd/123.png should
-        # not match a query for files under /abc/.
-        prefix = '%s' % utils.vfs_construct_path(
-            '/', self._assets_path, dir_name)
-        if not prefix.endswith('/'):
-            prefix += '/'
-        # The prefix now ends and starts with '/'.
-        blobs = self._storage_client.list_blobs(self._bucket, prefix=prefix)
-        files_in_dir = []
-        for blob in blobs:
-            # Remove the asset path from the prefix of filename.
-            files_in_dir.append(blob.name.replace(prefix, ''))
-        return files_in_dir
+                'The dir_name should not start with / : %s' % dir_name)
+        return storage_services.listdir(self._bucket_name, dir_name)
 
 
 class AbstractFileSystem(python_utils.OBJECT):

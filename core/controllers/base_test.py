@@ -657,7 +657,7 @@ class EscapingTests(test_utils.GenericTestBase):
         self.assertTrue(response.body.startswith(feconf.XSSI_PREFIX))
         self.assertIn(b'\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
         self.assertNotIn(b'<script>', response.body)
-        self.assertNotIn(b'马', response.body)
+        self.assertNotIn('马'.encode('utf-8'), response.body)
 
 
 class RenderDownloadableTests(test_utils.GenericTestBase):

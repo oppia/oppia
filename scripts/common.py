@@ -1018,5 +1018,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
             'DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID))
         stack.enter_context(swap_env(
             'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
+        stack.enter_context(swap_env(
+            'GOOGLE_CLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
 
         yield proc
