@@ -44,7 +44,7 @@ ruleTester.run('protractor-practices', rule, {
   invalid: [
     {
       code:
-        `it('should test a feature', function() {
+      `it('should test a feature', function() {
         browser.sleep();
       });`,
       errors: [{
