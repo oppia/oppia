@@ -66,8 +66,8 @@ var GraphEditor = function(graphInputContainer) {
       by.css('.protractor-test-Add-Edge-button'));
     await action.click('Add Edge Button', addEdgeButton);
     await waitFor.visibilityOf(
-      vertexElement(
-        vertexIndex1), `Vertex element ${vertexIndex1} taking too long`);
+      vertexElement(vertexIndex1),
+      `Vertex element ${vertexIndex1} taking too long`);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
