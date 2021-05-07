@@ -1,13 +1,12 @@
 require('dotenv').config();
 var FirebaseAdmin = require('firebase-admin');
-var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
 var fs = require('fs');
 var childProcess = require('child_process');
+var randomString = require('randomstring');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
-import cryptoRandomString from 'crypto-random-string';
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -327,7 +326,7 @@ exports.config = {
     console.log(process.env);
 
     var spw = '';
-    var randString = '';
+    var uniqueString = '';
 
     // Only running video recorder on Github Actions.
 
@@ -342,9 +341,9 @@ exports.config = {
             '-i', process.env.DISPLAY,
             '-g', '300',
           ];
-          randString = cryptoRandomString({length: 10});
-          console.log(randString);
-          var name = randString + '.mp4';
+          uniqueString = randomString.generate(7);
+          console.log(uniqueString);
+          var name = uniqueString + '.mp4';
           var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
           try {
             fs.mkdirSync(dirPath, { recursive: true });
