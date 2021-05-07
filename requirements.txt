@@ -18,7 +18,7 @@ backports.functools-lru-cache==1.6.1
     # via -r requirements.in
 beautifulsoup4==4.9.3
     # via -r requirements.in
-bleach==3.1.5
+bleach==3.3.0
     # via -r requirements.in
 cachecontrol==0.12.6
     # via firebase-admin

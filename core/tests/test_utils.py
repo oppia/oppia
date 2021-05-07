@@ -2194,7 +2194,7 @@ title: Title
             self.assertTrue(200 <= json_response.status_int < 400)
 
         self.assertEqual(json_response.content_type, 'application/json')
-        self.assertTrue(json_response.body.startswith(bytes(feconf.XSSI_PREFIX, encoding='utf8')))
+        self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 

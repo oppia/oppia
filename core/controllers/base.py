@@ -370,7 +370,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
-        self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
+        self.response.write(
+            b'%s%s' % (feconf.XSSI_PREFIX, json_output.encode('utf-8')))
 
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client.
