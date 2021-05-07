@@ -5,9 +5,9 @@ var glob = require('glob');
 var path = require('path');
 var fs = require('fs');
 var childProcess = require('child_process');
-var cryptoRandomString = require('crypto-random-string');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
+import cryptoRandomString from 'crypto-random-string';
 
 var suites = {
     // The tests on Travis are run individually to parallelize
