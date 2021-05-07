@@ -122,7 +122,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'hint-and-solution-buttons.directive.ts',
     'hint-editor.directive.ts',
     'html-editor.component.ts',
-    'html-escaper.service.ts',
     'html-select.directive.ts',
     'I18nFooter.ts',
     'image-uploader.component.ts',
