@@ -21,9 +21,8 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 describe('NumberWithUnitsValidationService', () => {
