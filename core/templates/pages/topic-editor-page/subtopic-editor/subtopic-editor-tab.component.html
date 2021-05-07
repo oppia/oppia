@@ -155,7 +155,7 @@
               <span>Name</span>
               <span class="number-skills-header"># of Questions</span>
             </div>
-            <oppia-skill-summaries-dnd style="width: 100%;" [subtopic-editor-ctrl]="$ctrl"></oppia-skill-summaries-dnd>
+            <oppia-skill-summaries-dnd class="full-width" [subtopic-editor-ctrl]="$ctrl"></oppia-skill-summaries-dnd>
           </div>
         </div>
       </md-card>
@@ -178,6 +178,9 @@
   </div>
 </div>
 <style>
+  .full-width {
+    width: 100%;
+  }
   .subtopic-content .oppia-subtopics-list-card,
   .subtopic-content .skills-card,
   .subtopic-content .uncategorized-skill-ids {

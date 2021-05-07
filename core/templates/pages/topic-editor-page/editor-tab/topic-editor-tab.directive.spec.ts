@@ -18,8 +18,6 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 
@@ -183,7 +181,8 @@ describe('Topic editor tab directive', function() {
           topicEditorStateService: undefined
         },
         result: Promise.resolve()
-      }});
+      };
+    });
     $scope.reassignSkillsInSubtopics();
     expect(ngbModalSpy).toHaveBeenCalled();
   });

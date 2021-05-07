@@ -3,7 +3,7 @@
     <div class="skill-list-item">
       <span class="material-icons draggable-icon-indicator">drag_indicator</span>
       <a *ngIf="!subtopicEditorCtrl.isSkillDeleted(skillSummary)"
-        [href]="subtopicEditorCtrl.getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
+         [href]="subtopicEditorCtrl.getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
         {{ skillSummary.getDescription() }}
       </a>
       <div class="skill-options-box">
@@ -38,12 +38,9 @@
     border: 1px solid #000;
     padding: 0;
     position: absolute;
-    right: -6px;
+    right: 30px;
     width: 210px;
     z-index: 1;
-  }
-  .skill-option-box {
-    right: 30px;
   }
   .skill-edit-option {
     border-bottom: 1px solid #000;

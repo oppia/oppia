@@ -17,7 +17,7 @@
           <span *ngIf="uncategorizedSkillSummaries.length === 1" class="number-skills-text">{{ uncategorizedSkillSummaries.length }} Skill</span>
           <span *ngIf="!(uncategorizedSkillSummaries.length === 1)" class="number-skills-text">{{ uncategorizedSkillSummaries.length }} Skills</span>
         </div>
-    
+
         <div cdkDropList
              [cdkDropListData]="uncategorizedSkillSummaries"
              (cdkDropListDropped)="onMoveSkillEnd(null)"
@@ -32,7 +32,8 @@
                (cdkDragStarted)="onMoveSkillStart(null, skillSummary)">
             <div class="dnd-custom-placeholder" *cdkDragPlaceholder></div>
             <a class="skill-name protractor-test-uncategorized-skill-card"
-                [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
+               [href]="getSkillEditorUrl(skillSummary.getId())"
+               target="_blank" rel="noopener">
                 {{ skillSummary.getDescription() }}
             </a>
           </div>
@@ -41,14 +42,14 @@
           There are no unassigned skills left in the topic.
         </p>
       </div>
-    
+
       <div *ngFor="let subtopic of subtopics; let idx = index"
            class="dnd-container grey-container subtopic-container">
         <div class="subtopic-header" (click)="editNameOfSubtopicWithId(subtopic.getId())">
           <strong>{{ subtopic.getTitle() }}</strong>
           <div class="number-skills-container">
-              <span *ngIf="subtopic.getSkillSummaries().length === 1" class="number-skills-text">{{ subtopic.getSkillSummaries().length }} Skill</span>
-              <span *ngIf="!(subtopic.getSkillSummaries().length === 1)" class="number-skills-text">{{ subtopic.getSkillSummaries().length }} Skills</span>
+            <span *ngIf="subtopic.getSkillSummaries().length === 1" class="number-skills-text">{{ subtopic.getSkillSummaries().length }} Skill</span>
+            <span *ngIf="!(subtopic.getSkillSummaries().length === 1)" class="number-skills-text">{{ subtopic.getSkillSummaries().length }} Skills</span>
           </div>
         </div>
         <div *ngIf="subtopic.getId() === selectedSubtopicId">
@@ -175,48 +176,48 @@
   }
 
   .rearrange-skills-modal .dnd-container {
-    min-width: 15vw;
-    max-width: 100%;
-    margin: 0 25px 25px 0;
-    vertical-align: top;
-    padding: 20px;
     border-radius: 4px;
+    margin: 0 25px 25px 0;
+    max-width: 100%;
+    min-width: 15vw;
+    padding: 20px;
+    vertical-align: top;
   }
 
   .rearrange-skills-modal .dnd-list {
-    min-height: 30px;
     border-radius: 4px;
+    min-height: 30px;
     overflow: hidden;
   }
 
   .rearrange-skills-modal .dnd-list-border-less {
-    min-height: 60px;
     background: #ffffff00;
     border-radius: 4px;
+    min-height: 60px;
     overflow: hidden;
   }
 
   .rearrange-skills-modal .dnd-item-box {
-    padding: 10px 10px;
-    border: solid 1px #ccc;
-    color: rgba(0, 0, 0, 0.87);
-    display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box;
-    cursor: move;
     background: white;
+    border: solid 1px #ccc;
+    box-sizing: border-box;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: move;
+    display: flex;
     font-size: 14px;
+    flex-direction: row;
+    justify-content: space-between;
     margin: 5px;
+    padding: 10px 10px;
   }
 
   .rearrange-skills-modal .cdk-drag-preview {
-    box-sizing: border-box;
     border-radius: 4px;
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
                 0 8px 10px 1px rgba(0, 0, 0, 0.14),
                 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
   }
 
   .rearrange-skills-modal .cdk-drag-placeholder {
