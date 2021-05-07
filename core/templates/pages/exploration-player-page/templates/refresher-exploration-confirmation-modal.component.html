@@ -1,3 +1,21 @@
+<div class="oppia-learner-refresher-exploration-confirmation-title">Would you like a refresher?</div>
+<div class="modal-body">
+  <span class="oppia-learner-refresher-exploration-confirmation-body">
+    It looks like you're having some trouble with this question. Would you
+    like to try a short exploration to refresh your memory, and return
+    here after you've completed that?
+  </span>
+</div>
+<div class="modal-footer">
+  <button class="oppia-learner-got-it-button protractor-test-cancel-redirection-button md-button md-default-theme "
+          (click)="cancel()">No
+  </button>
+  <button class="oppia-learner-got-it-button protractor-test-confirm-redirection-button md-button md-default-theme "
+          (click)="confirmRedirect()">Yes
+  </button>
+</div>
+<span class="clearfix"></span>
+
 <style>
   .oppia-learner-refresher-exploration-confirmation-body {
     word-wrap: break-word;
@@ -12,21 +30,3 @@
     text-align: center;
   }
 </style>
-<div class="oppia-learner-refresher-exploration-confirmation-title">Would you like a refresher?</div>
-
-<div class="modal-body">
-  <span class="oppia-learner-refresher-exploration-confirmation-body">
-    It looks like you're having some trouble with this question. Would you
-    like to try a short exploration to refresh your memory, and return
-    here after you've completed that?
-  </span>
-</div>
-<div class="modal-footer">
-  <button class="oppia-learner-got-it-button protractor-test-cancel-redirection-button md-button md-default-theme "
-          ng-click="cancel()">No
-  </button>
-  <button class="oppia-learner-got-it-button protractor-test-confirm-redirection-button md-button md-default-theme "
-          ng-click="confirmRedirect()">Yes
-  </button>
-</div>
-<span class="clearfix"></span>

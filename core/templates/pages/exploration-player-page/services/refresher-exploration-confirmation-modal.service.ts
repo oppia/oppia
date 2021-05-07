@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,36 +17,37 @@
  * exploration.
  */
 
-require(
-  'pages/exploration-player-page/templates/' +
-  'refresher-exploration-confirmation-modal.controller.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { RefresherExplorationConfirmationModal } from '../templates/refresher-exploration-confirmation-modal.component';
 
-angular.module('oppia').factory(
-  'RefresherExplorationConfirmationModalService', [
-    '$uibModal', function($uibModal) {
-      return {
-        displayRedirectConfirmationModal: function(
-            refresherExplorationId, redirectConfirmationCallback) {
-          $uibModal.open({
-            template: require(
-              'pages/exploration-player-page/templates/' +
-              'refresher-exploration-confirmation-modal.template.html'),
-            backdrop: 'static',
-            resolve: {
-              redirectConfirmationCallback: function() {
-                return redirectConfirmationCallback;
-              },
-              refresherExplorationId: function() {
-                return refresherExplorationId;
-              }
-            },
-            controller: 'RefresherExplorationConfirmationModalController'
-          }).result.then(function() {}, function() {
-            // Note to developers:
-            // This callback is triggered when the Cancel button is clicked.
-            // No further action is needed.
-          });
-        }
-      };
-    }
-  ]);
+@Injectable({
+  providedIn: 'root'
+})
+export class RefresherExplorationConfirmationModalService {
+  constructor(
+    private ngbModal: NgbModal
+  ) {}
+
+  displayRedirectConfirmationModal(
+      refresherExplorationId: string,
+      redirectConfirmationCallback: () => void): void {
+    let modalRef: NgbModalRef =this.ngbModal.open(
+      RefresherExplorationConfirmationModal, {
+        backdrop: 'static'
+      });
+    modalRef.componentInstance.redirectConfirmationCallback =
+    redirectConfirmationCallback;
+    modalRef.componentInstance.refresherExplorationId = refresherExplorationId;
+
+    modalRef.result.then(() => {}, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+}
+
+angular.module('oppia').factory('RefresherExplorationConfirmationModalService',
+  downgradeInjectable(RefresherExplorationConfirmationModalService));
