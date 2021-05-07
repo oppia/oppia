@@ -348,6 +348,7 @@ import { NotificationsDashboardPageBackendApiService } from 'pages/notifications
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
+import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -596,6 +597,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
+  ['RefresherExplorationConfirmationModalService',
+    RefresherExplorationConfirmationModalService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],

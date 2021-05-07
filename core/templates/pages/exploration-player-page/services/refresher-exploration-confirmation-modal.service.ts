@@ -33,7 +33,7 @@ export class RefresherExplorationConfirmationModalService {
   displayRedirectConfirmationModal(
       refresherExplorationId: string,
       redirectConfirmationCallback: () => void): void {
-    let modalRef: NgbModalRef =this.ngbModal.open(
+    let modalRef: NgbModalRef = this.ngbModal.open(
       RefresherExplorationConfirmationModal, {
         backdrop: 'static'
       });
