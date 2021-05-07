@@ -1,4 +1,4 @@
-<oppia-drag-and-drop [arr]="subtopicEditorCtrl.subtopic.getSkillSummaries()">
+<oppia-drag-and-drop [arr]="subtopicEditorCtrl.subtopic.getSkillSummaries()" (orderChanged)="updateSkillSummaryPosition($event)">
   <ng-template #dragnode let-skillSummary let-idx="idx">
     <div class="skill-list-item">
       <span class="material-icons draggable-icon-indicator">drag_indicator</span>

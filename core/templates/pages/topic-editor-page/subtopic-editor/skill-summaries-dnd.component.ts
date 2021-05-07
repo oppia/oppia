@@ -17,7 +17,7 @@
  * editor tab component.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -25,10 +25,15 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './skill-summaries-dnd.component.html'
 })
 
-export class SkillSummariesDndComponent implements OnInit {
+export class SkillSummariesDndComponent {
   constructor() { }
   @Input() subtopicEditorCtrl;
-  ngOnInit(): void { }
+
+  updateSkillSummaryPosition(
+      event: {previousIndex: number; currentIndex: number}): void {
+    this.subtopicEditorCtrl.onRearrangeMoveSkillStart(event.previousIndex);
+    this.subtopicEditorCtrl.onRearrangeMoveSkillFinish(event.currentIndex);
+  }
 }
 
 angular.module('oppia').directive('oppiaSkillSummariesDnd', downgradeComponent({

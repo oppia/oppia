@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  * @fileoverview Wrapper component for drag-and-drop.
  */
 
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ContentChild, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { Component, ContentChild, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -25,17 +25,19 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './drag-and-drop.component.html'
 })
 
-export class DragAndDropComponent implements OnInit {
+export class DragAndDropComponent {
   @Input() arr = [];
-  @Output() orderChanged = new EventEmitter();
-  @ContentChild('dragnode', {static: false}) dragNodeTemplate; 
+  @Output() orderChanged = new EventEmitter<
+      {previousIndex: number; currentIndex: number}>();
+  @ContentChild('dragnode', {'static': false}) dragNodeTemplate;
+
   constructor() { }
 
-  ngOnInit(): void { }
-
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.arr, event.previousIndex, event.currentIndex);
-    this.orderChanged.emit(this.arr);
+  drop(event: CdkDragDrop<string[]>): void {
+    this.orderChanged.emit({
+      previousIndex: event.previousIndex,
+      currentIndex: event.currentIndex
+    });
   }
 }
 

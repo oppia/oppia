@@ -7,7 +7,7 @@
   <div class="modal-body subtopics">
     <div cdkDropListGroup class="subtopics-container fx-row fx-main-start fx-cross-start">
       <div class="empty-placeholder uncategorized-skills-container"></div>
-      <div class="example-container "
+      <div class="dnd-container"
            [ngClass]="{
             'skills-valid': !uncategorizedSkillSummaries.length,
             'skills-invalid': uncategorizedSkillSummaries.length
@@ -21,15 +21,16 @@
         <div cdkDropList
              [cdkDropListData]="uncategorizedSkillSummaries"
              (cdkDropListDropped)="onMoveSkillEnd(null)"
+             class="protractor-test-uncategorized-skills-container"
              [ngClass]="{
-               'example-list-border-less': uncategorizedSkillSummaries.length === 0,
-               'example-list': uncategorizedSkillSummaries.length !== 0
+               'dnd-list-border-less': uncategorizedSkillSummaries.length === 0,
+               'dnd-list': uncategorizedSkillSummaries.length !== 0
               }">
-          <div class="example-box"
+          <div class="dnd-item-box protractor-test-uncategorized-skill-card-box"
                cdkDrag
                *ngFor="let skillSummary of uncategorizedSkillSummaries"
                (cdkDragStarted)="onMoveSkillStart(null, skillSummary)">
-            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+            <div class="dnd-custom-placeholder" *cdkDragPlaceholder></div>
             <a class="skill-name protractor-test-uncategorized-skill-card"
                 [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
                 {{ skillSummary.getDescription() }}
@@ -42,7 +43,7 @@
       </div>
     
       <div *ngFor="let subtopic of subtopics; let idx = index"
-           class="example-container grey-container subtopic-container">
+           class="dnd-container grey-container subtopic-container">
         <div class="subtopic-header" (click)="editNameOfSubtopicWithId(subtopic.getId())">
           <strong>{{ subtopic.getTitle() }}</strong>
           <div class="number-skills-container">
@@ -55,15 +56,15 @@
           <button class="btn btn-secondary" (click)="editNameOfSubtopicWithId(null)">Cancel</button>
           <button class="btn btn-primary" (click)="updateSubtopicTitle(subtopic.getId())">Save</button>
         </div>
-        <div class="example-list protractor-test-subtopic-column"
+        <div class="dnd-list protractor-test-subtopic-column"
              cdkDropList
              [cdkDropListData]="subtopic.getSkillSummaries()"
              (cdkDropListDropped)="onMoveSkillEnd(subtopic.getId())">
           <div *ngFor="let skillSummary of subtopic.getSkillSummaries()"
-               class="example-box"
+               class="dnd-item-box protractor-test-subtopic-skill"
                cdkDrag
                (cdkDragStarted)="onMoveSkillStart(subtopic.getId(), skillSummary)">
-            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+            <div class="dnd-custom-placeholder" *cdkDragPlaceholder></div>
             <a [href]="getSkillEditorUrl(skillSummary.getId())" class="skill-name protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
               {{ skillSummary.getDescription() }}
             </a>
@@ -173,7 +174,7 @@
     min-width: 60px;
   }
 
-  .rearrange-skills-modal .example-container {
+  .rearrange-skills-modal .dnd-container {
     min-width: 15vw;
     max-width: 100%;
     margin: 0 25px 25px 0;
@@ -182,20 +183,20 @@
     border-radius: 4px;
   }
 
-  .rearrange-skills-modal .example-list {
+  .rearrange-skills-modal .dnd-list {
     min-height: 30px;
     border-radius: 4px;
     overflow: hidden;
   }
 
-  .rearrange-skills-modal .example-list-border-less {
+  .rearrange-skills-modal .dnd-list-border-less {
     min-height: 60px;
     background: #ffffff00;
     border-radius: 4px;
     overflow: hidden;
   }
 
-  .rearrange-skills-modal .example-box {
+  .rearrange-skills-modal .dnd-item-box {
     padding: 10px 10px;
     border: solid 1px #ccc;
     color: rgba(0, 0, 0, 0.87);
@@ -227,11 +228,11 @@
   }
 
 
-  .rearrange-skills-modal .example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+  .rearrange-skills-modal .dnd-list.cdk-drop-list-dragging .dnd-item-box:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 
-  .rearrange-skills-modal .example-custom-placeholder {
+  .rearrange-skills-modal .dnd-custom-placeholder {
     background: #ccc;
     border: dotted 3px #999;
     min-height: 30px;

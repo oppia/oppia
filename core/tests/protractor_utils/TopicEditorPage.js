@@ -17,7 +17,6 @@
  * in Protractor tests.
  */
 
-var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('./waitFor.js');
@@ -114,8 +113,11 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-skill-difficulty-easy'));
   var storyTitleClassname = '.protractor-test-story-title';
 
-  var dragAndDrop = async function(fromElement, toElement) {
-    await browser.executeScript(dragAndDropScript, fromElement, toElement);
+  var cdkDragAndDrop = async(element, destination) => {
+    await browser.actions().mouseDown(element).perform();
+    await browser.actions().mouseMove({x: 10, y: 0 }).perform();
+    await browser.actions().mouseMove(destination).perform();
+    await browser.actions().mouseUp(destination).perform();
   };
   var saveRearrangedSkillsButton = element(
     by.css('.protractor-save-rearrange-skills'));
@@ -318,8 +320,11 @@ var TopicEditorPage = function() {
       }
     }
     expect(uncategorizedSkillIndex).not.toEqual(-1);
-    var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
-    await dragAndDrop(toMove, target);
+    var toMove = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-uncategorized-skill-card')[arguments[0]];
+    }, uncategorizedSkillIndex);
+    await cdkDragAndDrop(toMove, target);
   };
 
   this.saveRearrangedSkills = async function() {
@@ -354,7 +359,7 @@ var TopicEditorPage = function() {
     const assignedSkillToMove = await this.getTargetMoveSkill(
       fromSubtopicIndex, skillDescription);
     const toSubtopicColumn = subtopicColumns.get(toSubtopicIndex);
-    await dragAndDrop(assignedSkillToMove, toSubtopicColumn);
+    await cdkDragAndDrop(assignedSkillToMove, toSubtopicColumn);
   };
 
   this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
@@ -383,14 +388,19 @@ var TopicEditorPage = function() {
     }
     expect(toMoveSkillIndex).not.toEqual(-1);
 
-    return assignedSkills.get(toMoveSkillIndex);
+    return await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-subtopic-column'
+      )[arguments[0]].getElementsByClassName(
+        'protractor-test-subtopic-skill')[arguments[1]];
+    }, subtopicIndex, toMoveSkillIndex);
   };
 
   this.dragSkillFromSubtopicToUncategorized = async function(
       subtopicIndex, skillDescription) {
     const assignedSkillToMove = await this.getTargetMoveSkill(
       subtopicIndex, skillDescription);
-    await dragAndDrop(assignedSkillToMove, uncategorizedSkillsContainer);
+    await cdkDragAndDrop(assignedSkillToMove, uncategorizedSkillsContainer);
   };
 
   this.navigateToTopicEditorTab = async function() {
