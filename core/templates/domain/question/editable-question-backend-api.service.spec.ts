@@ -22,7 +22,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Editable question backend API service', function() {
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
