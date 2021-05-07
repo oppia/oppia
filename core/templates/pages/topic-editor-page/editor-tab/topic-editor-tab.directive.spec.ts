@@ -18,6 +18,8 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 
@@ -27,9 +29,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
   var $scope = null;
   var $uibModalInstance = null;
   var ctrl = null;
@@ -50,7 +49,7 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
-
+  var ngbModal = {open: (content, options) => {}};
   var mockTasdReinitializedEventEmitter = null;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
@@ -62,6 +61,12 @@ describe('Topic editor tab directive', function() {
       return mockTasdReinitializedEventEmitter;
     }
   };
+
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', ngbModal);
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -171,11 +176,16 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should open the reassign modal', function() {
-    var uibModalSpy = spyOn($uibModalInstance, 'open').and.returnValue({
-      result: Promise.resolve()
-    });
+    var ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {
+          subtopicValidationService: undefined,
+          topicEditorStateService: undefined
+        },
+        result: Promise.resolve()
+      }});
     $scope.reassignSkillsInSubtopics();
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(ngbModalSpy).toHaveBeenCalled();
   });
 
   it('should call the TopicUpdateService if skill is removed from subtopic',

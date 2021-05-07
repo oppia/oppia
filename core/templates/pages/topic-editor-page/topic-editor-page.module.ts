@@ -41,11 +41,13 @@ import { SubtopicsListComponent } from
     BrowserModule,
     HttpClientModule,
     InteractionExtensionsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    DragDropModule
   ],
   declarations: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
+    RearrangeSkillsInSubtopicsModalComponent,
     SkillSummariesDndComponent,
     StoriesListComponent,
     SubtopicsListComponent
@@ -53,6 +55,7 @@ import { SubtopicsListComponent } from
   entryComponents: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
+    RearrangeSkillsInSubtopicsModalComponent,
     SkillSummariesDndComponent,
     StoriesListComponent,
     SubtopicsListComponent,
@@ -79,6 +82,8 @@ class TopicEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { SkillSummariesDndComponent } from './subtopic-editor/skill-summaries-dnd.component';
+import { RearrangeSkillsInSubtopicsModalComponent } from './rearrange-skills-in-subtopics-modal.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

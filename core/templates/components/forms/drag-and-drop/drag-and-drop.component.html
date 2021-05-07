@@ -6,8 +6,8 @@
   <div class="example-box" *ngFor="let item of arr; let idx = index" cdkDrag>
     <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
     <ng-container [ngTemplateOutlet]="dragNodeTemplate || fallback"
-                   [ngTemplateOutletContext]="{ $implicit: item, idx: idx }">
-    </ng-container> 
+                  [ngTemplateOutletContext]="{ $implicit: item, idx: idx }">
+    </ng-container>
   </div>
 </div>
 

@@ -1,0 +1,243 @@
+<div>
+  <div class="modal-header">
+    <h3>
+      Subtopics & Skills
+    </h3>
+  </div>
+  <div class="modal-body subtopics">
+    <div cdkDropListGroup class="subtopics-container fx-row fx-main-start fx-cross-start">
+      <div class="empty-placeholder uncategorized-skills-container"></div>
+      <div class="example-container "
+           [ngClass]="{
+            'skills-valid': !uncategorizedSkillSummaries.length,
+            'skills-invalid': uncategorizedSkillSummaries.length
+           }">
+        <strong>Uncategorized Skills</strong>
+        <div class="number-skills-container">
+          <span *ngIf="uncategorizedSkillSummaries.length === 1" class="number-skills-text">{{ uncategorizedSkillSummaries.length }} Skill</span>
+          <span *ngIf="!(uncategorizedSkillSummaries.length === 1)" class="number-skills-text">{{ uncategorizedSkillSummaries.length }} Skills</span>
+        </div>
+    
+        <div cdkDropList
+             [cdkDropListData]="uncategorizedSkillSummaries"
+             (cdkDropListDropped)="onMoveSkillEnd(null)"
+             [ngClass]="{
+               'example-list-border-less': uncategorizedSkillSummaries.length === 0,
+               'example-list': uncategorizedSkillSummaries.length !== 0
+              }">
+          <div class="example-box"
+               cdkDrag
+               *ngFor="let skillSummary of uncategorizedSkillSummaries"
+               (cdkDragStarted)="onMoveSkillStart(null, skillSummary)">
+            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+            <a class="skill-name protractor-test-uncategorized-skill-card"
+                [href]="getSkillEditorUrl(skillSummary.getId())" target="_blank" rel="noopener">
+                {{ skillSummary.getDescription() }}
+            </a>
+          </div>
+        </div>
+        <p class="intro-card-message protractor-test-no-uncategorized-skills" *ngIf="uncategorizedSkillSummaries.length === 0">
+          There are no unassigned skills left in the topic.
+        </p>
+      </div>
+    
+      <div *ngFor="let subtopic of subtopics; let idx = index"
+           class="example-container grey-container subtopic-container">
+        <div class="subtopic-header" (click)="editNameOfSubtopicWithId(subtopic.getId())">
+          <strong>{{ subtopic.getTitle() }}</strong>
+          <div class="number-skills-container">
+              <span *ngIf="subtopic.getSkillSummaries().length === 1" class="number-skills-text">{{ subtopic.getSkillSummaries().length }} Skill</span>
+              <span *ngIf="!(subtopic.getSkillSummaries().length === 1)" class="number-skills-text">{{ subtopic.getSkillSummaries().length }} Skills</span>
+          </div>
+        </div>
+        <div *ngIf="subtopic.getId() === selectedSubtopicId">
+          <input type="text" [(ngModel)]="editableName">
+          <button class="btn btn-secondary" (click)="editNameOfSubtopicWithId(null)">Cancel</button>
+          <button class="btn btn-primary" (click)="updateSubtopicTitle(subtopic.getId())">Save</button>
+        </div>
+        <div class="example-list protractor-test-subtopic-column"
+             cdkDropList
+             [cdkDropListData]="subtopic.getSkillSummaries()"
+             (cdkDropListDropped)="onMoveSkillEnd(subtopic.getId())">
+          <div *ngFor="let skillSummary of subtopic.getSkillSummaries()"
+               class="example-box"
+               cdkDrag
+               (cdkDragStarted)="onMoveSkillStart(subtopic.getId(), skillSummary)">
+            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+            <a [href]="getSkillEditorUrl(skillSummary.getId())" class="skill-name protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
+              {{ skillSummary.getDescription() }}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="empty-placeholder uncategorized-skills-container"></div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-save-rearrange-skills" (click)="confirm()">Save</button>
+  </div>
+</div>
+<style>
+  .rearrange-skills-modal .modal-dialog {
+    max-width: inherit;
+    width: 80vw;
+  }
+  .rearrange-skills-modal .modal-body {
+    height: 55vh;
+    padding: 40px 0 0 0;
+  }
+  .rearrange-skills-modal a {
+    color: #666;
+  }
+  .rearrange-skills-modal .subtopic-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    background-color: #eee;
+  }
+  .rearrange-skills-modal .uncategorized-skills-container {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .rearrange-skills-modal .item-container {
+    background-color: #eee;
+    border-radius: 4px;
+    max-height: 95%;
+    padding: 5px 10px;
+    width: 15vw;
+  }
+  .rearrange-skills-modal .rearrange-skills-modal {
+    display: flex;
+    height: auto;
+    margin: 6vh 10vh 0 10vh;
+  }
+  .rearrange-skills-modal .intro-card-message {
+    color: #808080;
+    font-size: 0.8em;
+    line-height: 1.846;
+    padding: 10px;
+    text-align: center;
+  }
+  .rearrange-skills-modal .subtopics-container {
+    height: 100%;
+    max-height: 350px;
+    overflow-x: auto;
+  }
+  .rearrange-skills-modal .subtopic-header {
+    text-align: left;
+  }
+  .rearrange-skills-modal .item-flex-container {
+    min-height: 200px;
+  }
+  .rearrange-skills-modal .skill-id {
+    background-color: #FFF;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: none;
+    cursor: move;
+    margin: 8px 0;
+    text-align: left;
+  }
+  .rearrange-skills-modal .skill-id:hover {
+    background-color: #e0e0e0;
+  }
+  .rearrange-skills-modal .skill-card {
+    margin-left: 12px;
+  }
+  .rearrange-skills-modal .dndPlaceholder {
+    display: none;
+  }
+  .rearrange-skills-modal .skills-valid {
+    background-color: #009C8A33;
+    border: 2px solid #009C8A;
+  }
+  .rearrange-skills-modal .skills-invalid {
+    background-color: #C55F4533;
+    border: 2px solid #C55F45;
+  }
+  .rearrange-skills-modal .dndDragover .subtopic {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    padding-bottom: 40px;
+  }
+  .rearrange-skills-modal .number-skills-container {
+    bottom: 3px;
+    position: relative;
+  }
+  .rearrange-skills-modal .number-skills-text {
+    color: #666;
+    font-size: 14px;
+  }
+  .rearrange-skills-modal .empty-placeholder {
+    height: 100%;
+    min-width: 60px;
+  }
+
+  .rearrange-skills-modal .example-container {
+    min-width: 15vw;
+    max-width: 100%;
+    margin: 0 25px 25px 0;
+    vertical-align: top;
+    padding: 20px;
+    border-radius: 4px;
+  }
+
+  .rearrange-skills-modal .example-list {
+    min-height: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .rearrange-skills-modal .example-list-border-less {
+    min-height: 60px;
+    background: #ffffff00;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .rearrange-skills-modal .example-box {
+    padding: 10px 10px;
+    border: solid 1px #ccc;
+    color: rgba(0, 0, 0, 0.87);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: move;
+    background: white;
+    font-size: 14px;
+    margin: 5px;
+  }
+
+  .rearrange-skills-modal .cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  .rearrange-skills-modal .cdk-drag-placeholder {
+    opacity: 1;
+  }
+
+  .rearrange-skills-modal .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+
+  .rearrange-skills-modal .example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .rearrange-skills-modal .example-custom-placeholder {
+    background: #ccc;
+    border: dotted 3px #999;
+    min-height: 30px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  .grey-container {
+    background: #eee;
+  }
+</style>

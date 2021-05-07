@@ -29,7 +29,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
-  'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.controller.ts');
+  'pages/topic-editor-page/rearrange-skills-in-subtopics-modal.component.ts');
+require('services/ngb-modal.service');
 require(
   'pages/topic-editor-page/modal-templates/' +
     'change-subtopic-assignment-modal.template.controller.ts');
@@ -57,6 +58,8 @@ import { Subscription } from 'rxjs';
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
 import topicConstants from 'assets/constants';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { RearrangeSkillsInSubtopicsModalComponent } from '../rearrange-skills-in-subtopics-modal.component';
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -68,8 +71,8 @@ angular.module('oppia').directive('topicEditorTab', [
       controller: [
         '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
-        'ImageUploadHelperService',
-        'PageTitleService', 'StoryCreationService',
+        'ImageUploadHelperService', 'NgbModal',
+        'PageTitleService', 'StoryCreationService', 'SubtopicValidationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
         'UndoRedoService', 'UrlInterpolationService',
@@ -80,8 +83,8 @@ angular.module('oppia').directive('topicEditorTab', [
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
-            ImageUploadHelperService,
-            PageTitleService, StoryCreationService,
+            ImageUploadHelperService, NgbModal,
+            PageTitleService, StoryCreationService, SubtopicValidationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
             UndoRedoService, UrlInterpolationService,
@@ -179,17 +182,22 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.reassignSkillsInSubtopics = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                  'rearrange-skills-in-subtopics-modal.template.html'),
-              backdrop: 'static',
-              windowClass: 'rearrange-skills-modal',
-              controller: 'RearrangeSkillsInSubtopicsModalController',
-              controllerAs: '$ctrl',
-              size: 'xl'
-            }).result.then(function() {
+            const ngbModal: NgbModal = NgbModal;
+            const modalRef = ngbModal.open(
+              RearrangeSkillsInSubtopicsModalComponent,
+              {
+                backdrop: 'static',
+                windowClass: 'rearrange-skills-modal',
+                size: 'xl'
+              }
+            );
+            const component: RearrangeSkillsInSubtopicsModalComponent = (
+              modalRef.componentInstance);
+            component.subtopicValidationService = SubtopicValidationService;
+            component.topicEditorStateService = TopicEditorStateService;
+            modalRef.result.then(function() {
               ctrl.initEditor();
+              $scope.$applyAsync();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
