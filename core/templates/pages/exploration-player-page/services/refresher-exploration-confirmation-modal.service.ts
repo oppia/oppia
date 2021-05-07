@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { RefresherExplorationConfirmationModal } from '../templates/refresher-exploration-confirmation-modal.component';
+import { RefresherExplorationConfirmationModal } from '../modals/refresher-exploration-confirmation-modal.component';
 
 @Injectable({
   providedIn: 'root'
