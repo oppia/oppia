@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,25 +16,29 @@
  * @fileoverview Unit tests for the NumericExpressionInput response component.
  */
 
-require(
-  'interactions/NumericExpressionInput/directives/' +
-  'oppia-response-numeric-expression-input.component.ts');
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ResponseNumericExpressionInput } from './oppia-response-numeric-expression-input.component';
 
-describe('NumericExpressionInputResponse', function() {
-  let ctrl = null;
+describe('ResponseNumericExpressionInput', function() {
+  let component: ResponseNumericExpressionInput;
+  let fixture: ComponentFixture<ResponseNumericExpressionInput>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$attrs', {
-      answer: '&quot;answer&quot;',
-    });
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaResponseNumericExpressionInput');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [ResponseNumericExpressionInput]
+      }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ResponseNumericExpressionInput);
+    component = fixture.componentInstance;
+    component.answer = '&quot;answer&quot;';
+    fixture.detectChanges();
+  });
   it('should correctly escape characters in the answer', function() {
-    ctrl.$onInit();
-    expect(ctrl.answer).toBe('answer');
+    component.ngOnInit();
+    expect(component.displayAnswer).toBe('answer');
   });
 });
