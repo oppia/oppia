@@ -34,11 +34,11 @@ describe('ResponseNumericExpressionInput', function() {
     fixture = TestBed.createComponent(
       ResponseNumericExpressionInput);
     component = fixture.componentInstance;
-    component.answer = 'answer';
+    component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
   it('should correctly escape characters in the answer', function() {
     component.ngOnInit();
-    expect(component.answer).toBe('answer');
+    expect(component.displayAnswer).toBe('answer');
   });
 });

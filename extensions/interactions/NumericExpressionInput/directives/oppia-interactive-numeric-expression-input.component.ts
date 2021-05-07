@@ -48,7 +48,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
 
   constructor(
     private mathInteractionsService: MathInteractionsService,
-    private currentInteractionService: CurrentInteractionService,
+    public currentInteractionService: CurrentInteractionService,
     private deviceInfoService: DeviceInfoService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
@@ -109,7 +109,8 @@ export class InteractiveNumericExpressionInput implements OnInit {
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'NumericExpressionInput', this._getAttributes()
       )) as NumericExpressionInputCustomizationArgs;
-    this.guppyConfigurationService.changeDivSymbol(useFractionForDivision);
+    this.guppyConfigurationService.changeDivSymbol(
+      (useFractionForDivision as unknown as { value: boolean }).value);
     this.guppyInitializationService.init(
       'guppy-div-learner',
       placeholder.value.unicode,

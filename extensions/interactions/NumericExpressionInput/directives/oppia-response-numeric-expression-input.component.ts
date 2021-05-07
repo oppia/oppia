@@ -31,18 +31,18 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ResponseNumericExpressionInput implements OnInit {
   @Input() answer: string;
-  display_answer: Object;
+  displayAnswer: Object = '';
 
   constructor(
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
   ngOnInit(): void {
-    this.display_answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
+    this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
   }
 }
 
 angular.module('oppia').directive(
   'oppiaResponseNumericExpressionInput', downgradeComponent(
     {component: ResponseNumericExpressionInput}
-    ) as angular.IDirectiveFactory);
+  ) as angular.IDirectiveFactory);

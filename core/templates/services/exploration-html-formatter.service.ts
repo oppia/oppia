@@ -42,7 +42,7 @@ export class ExplorationHtmlFormatterService {
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
-    'InteractiveNumericExpressionInput'
+    'NumericExpressionInput'
   ];
 
   constructor(

@@ -23,14 +23,15 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveNumericExpressionInput } from
-  './oppia-interactive-numeric-expression-input.component'
+  './oppia-interactive-numeric-expression-input.component';
 
-fdescribe('NumericExpressionInputInteractive', () => {
+describe('NumericExpressionInputInteractive', () => {
   let component: InteractiveNumericExpressionInput;
   let fixture: ComponentFixture<InteractiveNumericExpressionInput>;
   let windowRef: WindowRef;
   let guppyInitializationService: GuppyInitializationService;
   let deviceInfoService: DeviceInfoService;
+  let mockCurrentInteractionService;
   let mockGuppyObject = {
     divId: '1',
     guppyInstance: {
@@ -54,21 +55,22 @@ fdescribe('NumericExpressionInputInteractive', () => {
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
-  let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {console.log('i am called')},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+  class MockCurrentInteractionService {
+    onSubmit(answer, rulesService) {}
+    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
       submitAnswerFn();
       validateExpressionFn();
     }
-  };
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule(
       {
         declarations: [InteractiveNumericExpressionInput],
         providers: [
-          { provide: CurrentInteractionService,
-            useValue: mockCurrentInteractionService
+          {
+            provide: CurrentInteractionService,
+            useClass: MockCurrentInteractionService
           }
         ]
       }).compileComponents();
@@ -78,6 +80,7 @@ fdescribe('NumericExpressionInputInteractive', () => {
     windowRef = TestBed.inject(WindowRef);
     windowRef.nativeWindow.Guppy = MockGuppy;
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    mockCurrentInteractionService = TestBed.inject(CurrentInteractionService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     fixture = TestBed.createComponent(
       InteractiveNumericExpressionInput);
@@ -97,7 +100,6 @@ fdescribe('NumericExpressionInputInteractive', () => {
     // Invalid answer.
     component.value = '1/';
     fixture.detectChanges();
-    console.log(mockCurrentInteractionService, mockCurrentInteractionService.onSubmit);
     spyOn(mockCurrentInteractionService, 'onSubmit');
     component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
@@ -105,11 +107,9 @@ fdescribe('NumericExpressionInputInteractive', () => {
       'Your answer seems to be missing a variable/number after the "/".');
   });
 
-  fit('should submit the answer if valid', function() {
+  it('should submit the answer if valid', function() {
     component.hasBeenTouched = true;
     component.value = '1+1';
-    fixture.detectChanges();
-
     spyOn(mockCurrentInteractionService, 'onSubmit');
     component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
@@ -128,7 +128,8 @@ fdescribe('NumericExpressionInputInteractive', () => {
     component.value = '';
     fixture.detectChanges();
     expect(component.isCurrentAnswerValid()).toBeFalse();
-    expect(component.warningText).toBe('Please enter an answer before submitting.');
+    expect(
+      component.warningText).toBe('Please enter an answer before submitting.');
   });
 
   it('should set the value of showOSK to true', function() {
