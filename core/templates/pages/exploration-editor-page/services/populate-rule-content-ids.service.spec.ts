@@ -36,7 +36,7 @@ describe('Populate Rule Content Ids Service', () => {
         contentId: null,
         normalizedStrSet: []
       }
-    }
+      }
     };
     expect(rule.inputs.x.contentId).toBeNull();
     populateRuleContentIdsService.populateNullRuleContentIds(rule);

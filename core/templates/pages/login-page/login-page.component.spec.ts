@@ -343,7 +343,7 @@ describe('Login Page', () => {
         expect(windowRef.location).toBeNull();
 
         signInWithRedirectAsyncPromise.reject(
-          {code: 'auth/unknown-error', message: '?'});
+          { code: 'auth/unknown-error', message: '?' });
 
         flush();
 

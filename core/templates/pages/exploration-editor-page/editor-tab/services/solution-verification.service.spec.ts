@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
