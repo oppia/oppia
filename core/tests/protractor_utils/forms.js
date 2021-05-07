@@ -410,8 +410,8 @@ var MultiSelectEditor = function(elem) {
           '.protractor-test-search-bar-dropdown-menu span', texts[i]));
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
-        await waitFor.visibilityOf(filteredElement,
-        'Filtered Element is taking too long to appear');
+        await waitFor.visibilityOf(
+          filteredElement, 'Filtered Element is taking too long to appear');
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         await action.click('Filtered Element', filteredElement);
