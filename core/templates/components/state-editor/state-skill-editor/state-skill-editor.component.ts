@@ -23,10 +23,10 @@ import { DeleteStateSkillModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts';
-import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service.ts';
-import { AlertsService } from 'services/alerts.service.ts';
-import {WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
+import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
+import { AlertsService } from 'services/alerts.service';
+import {WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { StateLinkedSkillIdService } from '../state-editor-properties-services/state-skill.service';
 import { SkillsCategorizedByTopics } from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
