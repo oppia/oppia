@@ -48,7 +48,7 @@ TICKET_NAME = 'ticket name'
 TICKET_ID = '%s.%s.%s' % (
     'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
 REPORT_TYPE_SUGGESTION = constants.REPORT_TYPE.suggestion
-REPORT_TYPE_ISSUE = 'issue'
+REPORT_TYPE_ISSUE = constants.REPORT_TYPE.issue
 CATEGORY_SUGGESTION_OTHER = constants.CATEGORY.other_suggestion
 CATEGORY_ISSUE_TOPICS = constants.CATEGORY.topics_issue
 ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
@@ -255,8 +255,8 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_dict = {
-            'report_type': REPORT_TYPE_SUGGESTION,
-            'category': CATEGORY_SUGGESTION_OTHER,
+            'report_type': REPORT_TYPE_SUGGESTION.name,
+            'category': CATEGORY_SUGGESTION_OTHER.name,
             'user_feedback_selected_items': USER_SELECTED_ITEMS,
             'user_feedback_other_text_input': USER_TEXT_INPUT
         }
