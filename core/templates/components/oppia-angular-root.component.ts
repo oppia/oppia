@@ -265,6 +265,7 @@ import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import { MusicPhrasePlayerService } from 'interactions/MusicNotesInput/directives/music-phrase-player.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
@@ -611,6 +612,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicNotesInputRulesService: MusicNotesInputRulesService;
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
+  static ngbModal: NgbModal;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe:
     NormalizeWhitespacePunctuationAndCasePipe;
@@ -895,6 +897,7 @@ private multipleChoiceInputValidationService:
 private musicNotesInputRulesService: MusicNotesInputRulesService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
+private ngbModal: NgbModal,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe:
   NormalizeWhitespacePunctuationAndCasePipe,
@@ -1258,6 +1261,7 @@ private injector: Injector
       this.musicNotesInputValidationService);
     OppiaAngularRootComponent.musicPhrasePlayerService = (
       this.musicPhrasePlayerService);
+    OppiaAngularRootComponent.ngbModal = this.ngbModal;
     OppiaAngularRootComponent.normalizeWhitespacePipe = (
       this.normalizeWhitespacePipe);
     OppiaAngularRootComponent.normalizeWhitespacePunctuationAndCasePipe = (

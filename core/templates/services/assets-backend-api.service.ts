@@ -33,7 +33,7 @@ interface SaveAudioResponse {
   'duration_secs': number;
 }
 
-interface SaveImageResponse {
+export interface SaveImageResponse {
   'filename': string;
 }
 

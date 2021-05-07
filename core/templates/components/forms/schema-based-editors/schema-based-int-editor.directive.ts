@@ -35,7 +35,8 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
         validators: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        modalId: '<'
       },
       template: require('./schema-based-int-editor.directive.html'),
       controllerAs: '$ctrl',

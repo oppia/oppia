@@ -69,6 +69,7 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { RteHelperModalComponent } from 'services/rte-helper-modal.component';
 
 
 // Directives.
@@ -183,7 +184,8 @@ const toastrConfig = {
     UploadActivityModalComponent,
     PromoBarComponent,
     SortByPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    RteHelperModalComponent
   ],
 
   entryComponents: [
@@ -216,7 +218,8 @@ const toastrConfig = {
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    RteHelperModalComponent
   ],
 
   exports: [

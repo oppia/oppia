@@ -44,7 +44,8 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
         uiConfig: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        modalId: '<'
       },
       template: require('./schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',

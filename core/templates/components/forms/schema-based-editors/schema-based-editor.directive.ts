@@ -63,7 +63,9 @@ angular.module('oppia').directive('schemaBasedEditor', [
         localValue: '=',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        modalId: '<',
+        idx: '<'
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
@@ -104,6 +106,8 @@ export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() labelForFocusTarget: () => string;
   @Input() onInputBlur: () => void;
   @Input() onInputFocus: () => void;
+  @Input() modalId: symbol;
+  @Input() idx: number;
 
   constructor(
       elementRef: ElementRef,

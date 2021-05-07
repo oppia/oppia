@@ -28,7 +28,8 @@ angular.module('oppia').directive('schemaBasedCustomEditor', [
       scope: {},
       bindToController: {
         localValue: '=',
-        schema: '='
+        schema: '=',
+        modalId: '<'
       },
       template: require('./schema-based-custom-editor.directive.html'),
       controllerAs: '$ctrl',

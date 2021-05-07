@@ -27,7 +27,14 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ServicesConstants } from 'services/services.constants.ts';
+import { ServicesConstants } from 'services/services.constants';
+
+export interface MathExpressionContent {
+  'raw_latex': string,
+  'svg_filename': string,
+  'mathExpressionSvgIsBeingProcessed': boolean,
+  'svgFile': string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -166,10 +173,6 @@ export class SpeechSynthesisChunkerService {
         this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
-    interface MathExpressionContent {
-      'raw_latex': string,
-      'svg_filename': string
-    }
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { NgbModalRef } from "@ng-bootstrap/ng-bootstrap/modal/modal-ref";
+import { OppiaAngularRootComponent } from "components/oppia-angular-root.component";
+import { RteHelperModalComponent } from 'services/rte-helper-modal.component';
+
 /**
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
@@ -19,7 +23,6 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('services/rte-helper-modal.controller.ts');
 
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
@@ -28,14 +31,13 @@ require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
 require('app.constants.ajs.ts');
 require('services/services.constants.ajs.ts');
+require('services/ngb-modal.service.ts');
 
 angular.module('oppia').factory('RteHelperService', [
-  '$document', '$log', '$uibModal', 'HtmlEscaperService',
-  'UrlInterpolationService', 'INLINE_RTE_COMPONENTS',
-  'RTE_COMPONENT_SPECS', function(
-      $document, $log, $uibModal, HtmlEscaperService,
-      UrlInterpolationService, INLINE_RTE_COMPONENTS,
-      RTE_COMPONENT_SPECS) {
+  '$document', '$log', 'HtmlEscaperService',
+  'INLINE_RTE_COMPONENTS', 'RTE_COMPONENT_SPECS', function(
+      $document, $log, HtmlEscaperService,
+      INLINE_RTE_COMPONENTS, RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -89,21 +91,31 @@ angular.module('oppia').factory('RteHelperService', [
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/ck-editor-helpers/' +
-            'customize-rte-component-modal.template.html'),
-          backdrop: 'static',
-          resolve: {
-            customizationArgSpecs: function() {
-              return customizationArgSpecs;
-            },
-            attrsCustomizationArgsDict: function() {
-              return attrsCustomizationArgsDict;
-            }
-          },
-          controller: 'RteHelperModalController'
-        }).result.then(onSubmitCallback)['catch'](onDismissCallback);
+        let modalInstance: NgbModalRef = (
+          OppiaAngularRootComponent.ngbModal.open(
+            RteHelperModalComponent, {
+              backdrop: 'static'
+            }));
+        modalInstance.componentInstance.customizationArgSpecs = (
+          customizationArgSpecs);
+        modalInstance.componentInstance.attrsCustomizationArgsDict = (
+          attrsCustomizationArgsDict);
+        modalInstance.result.then(onSubmitCallback)['catch'](onDismissCallback);
+        // $uibModal.open({
+        //   templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        //     '/components/ck-editor-helpers/' +
+        //     'customize-rte-component-modal.template.html'),
+        //   backdrop: 'static',
+        //   resolve: {
+        //     customizationArgSpecs: function() {
+        //       return customizationArgSpecs;
+        //     },
+        //     attrsCustomizationArgsDict: function() {
+        //       return attrsCustomizationArgsDict;
+        //     }
+        //   },
+        //   controller: 'RteHelperModalController'
+        // }).result.then(onSubmitCallback)['catch'](onDismissCallback);
       }
 
     };

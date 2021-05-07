@@ -39,7 +39,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         validators: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        modalId: '<'
       },
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',

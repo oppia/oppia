@@ -106,7 +106,8 @@ angular.module('oppia').directive('objectEditor', [
               '<' + directiveName +
               '-editor get-always-editable="getAlwaysEditable()"' +
               ' get-init-args="getInitArgs()" get-is-editable=' +
-              '"getIsEditable()" get-schema="getSchema()" value="value"></' +
+              '"getIsEditable()" get-schema="getSchema()" ' +
+              'modal-id="modalId" value="value"></' +
               directiveName + '-editor>');
             $compile(element.contents())(scope);
           }

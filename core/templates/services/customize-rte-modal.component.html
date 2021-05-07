@@ -1,0 +1,33 @@
+<div class="oppia-customization-arg-form-container">
+  <div class="modal-header">
+    <h3>Customize This Component</h3>
+  </div>
+
+  <div class="modal-body">
+    <!-- Provide a sink to move the focus into while the modal loads. -->
+    <input *ngIf="modalIsLoading" type="text" [oppiaFocusOn]="tmpFocusPoint">
+    <form>
+      <div *ngFor="let customizationArgSpec of customizationArgSpecs; let idx = index" class="oppia-customization-arg-editor">
+        <strong>{{ customizationArgSpec.description }}</strong>
+        <div class="oppia-customization-arg-editor-inner">
+          <schema-based-editor [modalId]="modalId" [idx]="idx" [localValue]="tmpCustomizationArgs[idx].value" [schema]="getSchema.bind(this, customizationArgSpec.schema)">
+          </schema-based-editor>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <input type="submit" class="btn btn-secondary" value="Cancel" (click)="cancel()">
+    <input *ngIf="!currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" (click)="save()" [disabled]="isInvalid">
+    <input *ngIf="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" (click)="save()" [disabled]="isInvalid || disableSaveButtonForMathRte()">
+  </div>
+</div>
+<style>
+  .oppia-customization-arg-form-container .oppia-customization-arg-editor {
+    margin-bottom: 25px;
+  }
+  .oppia-customization-arg-form-container .oppia-customization-arg-editor-inner {
+    margin-top: 15px;
+  }
+</style>

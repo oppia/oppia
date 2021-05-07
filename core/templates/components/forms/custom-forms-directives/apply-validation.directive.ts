@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ObjectFormValidityChangeEvent } from "app-events/app-events";
+import { EventBusGroup } from "app-events/event-bus.service";
+
 /**
  * @fileoverview Directive for applying validation.
  */
@@ -27,18 +30,20 @@ interface InteractionValidator {
 interface ApplyValidationCustomScope extends ng.IScope {
   $ctrl: {
     validators: () => InteractionValidator[];
+    modalId: symbol
   }
 }
 
 /* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('applyValidation', [
-  '$filter', function($filter) {
+  '$filter', 'EventBusService', function($filter, EventBusService) {
     return {
       require: 'ngModel',
       restrict: 'A',
       scope: {},
       bindToController: {
-        validators: '&'
+        validators: '&',
+        modalId: '<'
       },
       controllerAs: '$ctrl',
       controller: [function() {}],
@@ -66,8 +71,15 @@ angular.module('oppia').directive('applyValidation', [
             }
 
             var customValidator = function(viewValue) {
-              ctrl.$setValidity(
-                frontendName, $filter(frontendName)(viewValue, filterArgs));
+              let validationResult = $filter(frontendName)(
+                viewValue, filterArgs);
+              const eventBusGroup: EventBusGroup = new EventBusGroup(
+                EventBusService);
+              eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+                value: true,
+                modalId: scope.$ctrl.modalId
+              }));
+              ctrl.$setValidity(frontendName, validationResult);
               return viewValue;
             };
 

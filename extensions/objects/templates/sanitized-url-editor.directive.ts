@@ -23,7 +23,8 @@ angular.module('oppia').directive('sanitizedUrlEditor', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        value: '='
+        value: '=',
+        modalId: '<'
       },
       template: require('./sanitized-url-editor.directive.html'),
       controllerAs: '$ctrl',
