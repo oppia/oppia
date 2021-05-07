@@ -1,16 +1,16 @@
-<div class="oppia-learner-hint-and-solution-modal-title"><[isHint ? "Hint" : "Solution"]></div>
+<div class="oppia-learner-hint-and-solution-modal-title">{{ isHint ? "Hint" : "Solution" }}</div>
 
 <div class="modal-body">
   <span>
-    <angular-html-bind ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
-                       html-data="hint.html">
+    <angular-html-bind *ngIf="isHint" class="oppia-learner-hint-and-solution-modal-body"
+                       [htmlData]="hint.html">
     </angular-html-bind>
   </span>
-  <div ng-if="!isHint">
-    <label><[shortAnswerHtml.prefix]> solution is: &nbsp; </label>
+  <div *ngIf="!isHint">
+    <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
     <span>
       <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
-                         html-data="shortAnswerHtml.answer">
+                         [htmlData]="shortAnswerHtml.answer">
       </angular-html-bind>
     </span>
     <br>
@@ -18,14 +18,14 @@
     <label>Explanation: </label>
     <span>
       <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
-                         html-data="solutionExplanationHtml">
+                         [htmlData]="solutionExplanationHtml">
       </angular-html-bind>
     </span>
   </div>
 </div>
 
 <button class="oppia-learner-got-it-button md-button md-default-theme ml-auto"
-        ng-click="closeModal()">
+        (click)="closeModal()">
   GOT IT
 </button>
 <span class="clearfix"></span>
@@ -33,7 +33,7 @@
 <style>
   .oppia-learner-hint-and-solution-modal-title {
     color: #00786D;
-    font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
+    font-family: 'Capriola', Roboto, arial, sans-serif;
     font-size: 1.75em;
     font-weight: bold;
     padding-top: 20px;
