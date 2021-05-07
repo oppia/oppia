@@ -19,11 +19,11 @@
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
   <div ng-if="$ctrl.getCodingMode()" class="oppia-coding-editor">
-    <div ui-codemirror
-         ng-model="$ctrl.localValue"
-         ui-codemirror-opts="$ctrl.codemirrorOptions"
-         ui-refresh="$ctrl.codemirrorStatus">
-    </div>
+    <oppia-codemirror [value]="$ctrl.localValue"
+                      [options]="$ctrl.codemirrorOptions"
+                      [refresh]="$ctrl.codemirrorStatus"
+                      (value-change)="$ctrl.updateLocalValue($event)">
+    </oppia-codemirror>
   </div>
 </span>
 <style>
