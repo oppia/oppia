@@ -31,14 +31,14 @@ import feconf
 
 
 def get_questions_and_skill_descriptions_by_skill_ids(
-        question_count, skill_ids, start_cursor):
+        question_count, skill_ids, offset=0):
     """Returns the questions linked to the given skill ids.
 
     Args:
         question_count: int. The number of questions to return.
         skill_ids: list(str). The ID of the skills to which the questions are
             linked.
-        start_cursor: str. The starting point from which the batch of
+        offset=0: str. The starting point from which the batch of
             questions are to be returned. This value should be urlsafe.
 
     Returns:
@@ -53,7 +53,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     question_skill_link_models, next_cursor = (
         question_models.QuestionSkillLinkModel
         .get_question_skill_links_by_skill_ids(
-            question_count, skill_ids, start_cursor))
+            question_count, skill_ids, 0))
     question_ids = []
     grouped_skill_ids = []
     grouped_skill_descriptions = []

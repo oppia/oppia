@@ -336,22 +336,24 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
 
-        question_skill_link_models, next_cursor_str = (
+        question_skill_link_models, offset = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
-                1, [skill_id_1, skill_id_2], ''
+                1, [skill_id_1, skill_id_2], 0
             )
         )
         self.assertEqual(len(question_skill_link_models), 2)
         self.assertEqual(question_skill_link_models[0].skill_id, skill_id_2)
         self.assertEqual(question_skill_link_models[1].skill_id, skill_id_1)
+        self.assertEqual(offset, 2)
 
-        question_skill_link_models_2, next_cursor_str = (
+        question_skill_link_models_2, offset = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
-                1, [skill_id_1, skill_id_2], next_cursor_str
+                1, [skill_id_1, skill_id_2], offset
             )
         )
         self.assertEqual(len(question_skill_link_models_2), 1)
         self.assertEqual(question_skill_link_models_2[0].skill_id, skill_id_1)
+        self.assertEqual(offset, 3)
 
         self.assertNotEqual(
             question_skill_link_models[0], question_skill_link_models_2[0])
@@ -389,7 +391,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         question_skill_link_models, _ = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
-                1, [skill_id_1, skill_id_2, skill_id_3, skill_id_4], ''
+                1, [skill_id_1, skill_id_2, skill_id_3, skill_id_4], 0
             )
         )
         self.assertEqual(len(question_skill_link_models), 3)
