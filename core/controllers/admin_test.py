@@ -288,7 +288,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 10, [
                     skill_summaries[0].id, skill_summaries[1].id,
-                    skill_summaries[2].id], '')
+                    skill_summaries[2].id], 0)
         )
         self.assertEqual(len(questions), 3)
         # Testing that there are 3 hindi translation opportunities
@@ -312,7 +312,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_summaries), 1)
         questions, _, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                20, [skill_summaries[0].id], '')
+                20, [skill_summaries[0].id], 0)
         )
         self.assertEqual(len(questions), 15)
         self.logout()

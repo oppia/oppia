@@ -63,7 +63,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         questions, _, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                2, ['skill_1'], ''))
+                2, ['skill_1'], 0))
 
         self.assertEqual(len(questions), 1)
         self.assertEqual(
@@ -72,7 +72,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_no_questions_with_no_skill_ids(self):
         questions, _, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                1, [], ''))
+                1, [], 0))
         self.assertEqual(len(questions), 0)
 
     def test_get_questions_with_multi_skill_ids(self):
@@ -87,7 +87,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         questions, _, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                2, ['skill_1', 'skill_2'], ''))
+                2, ['skill_1', 'skill_2'], 0))
 
         self.assertEqual(len(questions), 1)
         self.assertEqual(

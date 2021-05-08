@@ -50,10 +50,10 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     """
     if not skill_ids:
         return [], [], None
-    question_skill_link_models, next_cursor = (
+    question_skill_link_models, offset = (
         question_models.QuestionSkillLinkModel
         .get_question_skill_links_by_skill_ids(
-            question_count, skill_ids, 0))
+            question_count, skill_ids, offset))
     question_ids = []
     grouped_skill_ids = []
     grouped_skill_descriptions = []
@@ -70,7 +70,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
             [skill.description if skill else None for skill in skills])
 
     questions = get_questions_by_ids(question_ids)
-    return questions, grouped_skill_descriptions, next_cursor
+    return questions, grouped_skill_descriptions, offset
 
 
 def get_questions_by_ids(question_ids):
