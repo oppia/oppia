@@ -36,7 +36,7 @@ jobs:
         run: sudo apt install ffmpeg
       - name: Run Core Editor And Player E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="coreEditorAndPlayerFeatures" --prod_env
+        run: python -m scripts.run_e2e_tests --skip-build --skip-install --suite="coreEditorAndPlayerFeatures" --prod_env
       - name: Uploading protractor-screenshots as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
