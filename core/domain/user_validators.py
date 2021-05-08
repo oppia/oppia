@@ -104,9 +104,6 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
         """
         user_auth_details = user_services.get_auth_details_by_user_id(item.id)
 
-        if not user_auth_details:
-            return
-
         if user_auth_details.is_full_user():
             return
 
