@@ -586,6 +586,11 @@ def _save_user_settings(user_settings):
         user_settings_dict['id'] = user_settings.user_id
         user_model = user_models.UserSettingsModel(**user_settings_dict)
 
+    # TODO(#12755): The roles and banned fields of UserSettingsModel is not in
+    # use and expected to be used once it's populated with correct value.
+    # The update_roles_and_banned_fields method helps populate correct value in
+    # the new fileds. It is expected to remove update_roles_and_banned_fields
+    # call from here once the new fileds are in use.
     update_roles_and_banned_fields(user_model)
     user_model.update_timestamps()
     user_model.put()
