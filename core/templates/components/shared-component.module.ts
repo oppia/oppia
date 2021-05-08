@@ -27,7 +27,9 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+
 
 // Components.
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
@@ -49,18 +51,26 @@ import { CollectionSummaryTileComponent } from './summary-tile/collection-summar
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
-import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
+import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
-
 import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -69,15 +79,12 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
-import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
-import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
-import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { CodeMirrorModule } from './code-mirror/codemirror.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -103,8 +110,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule } from 'filters/translate.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { BaseContentComponent } from '../base-components/base-content.component';
-import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
-import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = {
@@ -140,6 +145,7 @@ const toastrConfig = {
     BrowserModule,
     CommonModule,
     CustomFormsComponentsModule,
+    CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
@@ -149,7 +155,7 @@ const toastrConfig = {
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
-    TranslateModule,
+    SharedPipesModule,
     ...firebaseAuthModules,
   ],
 
@@ -168,6 +174,7 @@ const toastrConfig = {
     AttributionGuideComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
@@ -187,6 +194,7 @@ const toastrConfig = {
     SideNavigationBarWrapperComponent,
     ResponseHeaderComponent,
     PromoBarComponent,
+    RubricsEditorComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
@@ -216,6 +224,7 @@ const toastrConfig = {
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
@@ -229,7 +238,6 @@ const toastrConfig = {
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
-    ResponseHeaderComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
@@ -237,11 +245,11 @@ const toastrConfig = {
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
     PromoBarComponent,
+    RubricsEditorComponent,
     SideNavigationBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
-    PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TopNavigationBarWrapperComponent,
@@ -251,6 +259,7 @@ const toastrConfig = {
 
   exports: [
     // Modules.
+    CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
     FormsModule,
@@ -258,7 +267,8 @@ const toastrConfig = {
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
-    TranslateModule,
+    SharedFormsModule,
+    SharedPipesModule,
     // Components, directives, and pipes.
     AlertMessageComponent,
     AttributionGuideComponent,
@@ -266,6 +276,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
@@ -275,12 +286,16 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     LimitToPipe,
     PromoBarComponent,
+    RubricsEditorComponent,
+    FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
     ResponseHeaderComponent,
+    SideNavigationBarComponent,
+    SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
