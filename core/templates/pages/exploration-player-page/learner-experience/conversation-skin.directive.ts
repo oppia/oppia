@@ -1408,6 +1408,7 @@ angular.module('oppia').directive('conversationSkin', [
               LearnerViewRatingService.onRatingUpdated.subscribe(() => {
                 $scope.userRating = LearnerViewRatingService.getUserRating();
                 AlertsService.addSuccessMessage('Rating saved!', 1000);
+                $rootScope.$applyAsync();
               })
             );
             ctrl.directiveSubscriptions.add(
