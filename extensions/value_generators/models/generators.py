@@ -41,13 +41,8 @@ class Copier(value_generators_domain.BaseValueGenerator):
         If parse_with_jinja is False, the input value is copied and returned
         without changing its type.
         """
-        if context_params is None:
-            context_params = {}
-
-        if parse_with_jinja:
-            return jinja_utils.evaluate_object(value, context_params)
-        else:
-            return copy.deepcopy(value)
+        # Jinja is no longer used in the back end of this project.
+        return copy.deepcopy(value)
 
 
 class RandomSelector(value_generators_domain.BaseValueGenerator):

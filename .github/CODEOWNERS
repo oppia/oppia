@@ -621,7 +621,6 @@
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @vojtechjelinek
-/jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
 /.lighthouserc-accessibility.js @jimbyo
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
