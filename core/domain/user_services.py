@@ -2179,8 +2179,9 @@ def update_roles_and_banned_fields(user_settings_model):
     """Updates the new roles and banned fields in the UserSettingsModel which
     are not in use but needs to kept in sync.
 
-    This function is expected to be once the roles and banned fields
-    will be in use. It is not recommended to use this function in new places.
+    TODO(#12755): Remove this function once the roles and banned field of
+    UserSettingsModel are in use. It is not recommended to use this function in
+    new places.
 
     Args:
         user_settings_model: UserSettingsModel. The models which needs update.
