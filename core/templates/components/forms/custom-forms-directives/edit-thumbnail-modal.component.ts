@@ -55,6 +55,10 @@ export class EditThumbnailModalComponent implements OnChanges {
   };
   allowedImageFormats = ['svg'];
   file: Blob;
+  tags: string[];
+  attrs: string[];
+  imgSrc: string;
+  img: HTMLImageElement;
   constructor(
     private svgSanitizerService: SvgSanitizerService,
     private modalInstance: NgbActiveModal,
@@ -95,27 +99,27 @@ export class EditThumbnailModalComponent implements OnChanges {
       let reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () =>{
-        let imgSrc = reader.result as string;
+        this.imgSrc = reader.result as string;
         this.updateBackgroundColor(this.tempBgColor);
-        let img = new Image();
+        this.img = new Image();
 
-        img.onload = () => {
+        this.img.onload = () => {
           //   Setting a default height of 300px and width of
           //   150px since most browsers use these dimensions
           //   for SVG files that do not have an explicit
           //   height and width defined.
           this.setImageDimensions(
-            img.naturalHeight || 150,
-            img.naturalWidth || 300);
+            this.img.naturalHeight || 150,
+            this.img.naturalWidth || 300);
         };
-        img.src = imgSrc;
-        this.uploadedImage = imgSrc;
+        this.img.src = this.imgSrc;
+        this.uploadedImage = this.imgSrc;
         this.invalidTagsAndAttributes = (
           this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
-            imgSrc));
-        let tags = this.invalidTagsAndAttributes.tags;
-        let attrs = this.invalidTagsAndAttributes.attrs;
-        if (tags.length > 0 || attrs.length > 0) {
+            this.imgSrc));
+        this.tags = this.invalidTagsAndAttributes.tags;
+        this.attrs = this.invalidTagsAndAttributes.attrs;
+        if (this.tags.length > 0 || this.attrs.length > 0) {
           this.reset();
         }
       };

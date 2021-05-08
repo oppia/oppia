@@ -16,6 +16,7 @@
  * @fileoverview Component for uploading images.
  */
 
+import { OnInit } from '@angular/core';
 import { OnChanges, SimpleChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -32,7 +33,7 @@ import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
   selector: 'oppia-thumbnail-uploader',
   templateUrl: './thumbnail-uploader.component.html'
 })
-export class ThumbnailUploaderComponent implements OnChanges {
+export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   @Input() disabled: boolean;
   @Input() useLocalStorage: boolean;
   @Input() allowedBgColors: string[];
@@ -48,14 +49,14 @@ export class ThumbnailUploaderComponent implements OnChanges {
   openInUploadMode: boolean;
   tempBgColor: string;
   tempImageName: string;
-  uploadedImage;
+  uploadedImage: string;
   uploadedImageMimeType: string;
   dimensions: { height: number; width: number; };
   resampledFile: Blob;
   newThumbnailDataUrl: string;
   localStorageBgcolor: string;
   imageUploadUrlTemplate: string;
-  editableThumbnailDataUrl: string = (
+  editableThumbnailDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
   transformedData: string;
@@ -74,6 +75,20 @@ export class ThumbnailUploaderComponent implements OnChanges {
       '/icons/story-image-icon.png'));
   thumbnailIsLoading = true;
 
+  ngOnInit(): void {
+    if (this.filename !== null &&
+        this.filename !== undefined &&
+        this.filename !== '') {
+      this.editableThumbnailDataUrl = (
+        this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
+          this.filename,
+          this.contextService.getEntityType(),
+          this.contextService.getEntityId()));
+    } else {
+      this.editableThumbnailDataUrl = this.placeholderImageDataUrl;
+    }
+  }
+
   // 'ngOnChanges' is required here to update the thumbnail image
   // everytime the thumbnail filename changes (eg. draft is discarded).
   // The trusted resource url for the thumbnail should not be directly
@@ -88,11 +103,12 @@ export class ThumbnailUploaderComponent implements OnChanges {
       changes.filename &&
       changes.filename.currentValue !== changes.filename.previousValue) {
       const newValue = changes.filename.currentValue;
-      this.filenameChanges(newValue);
+      const previousValue = changes.filename.previousValue;
+      this.filenameChanges(newValue, previousValue);
     }
   }
 
-  filenameChanges(newFilename: string): void {
+  filenameChanges(newFilename: string, prevFilename: string): void {
     if (newFilename) {
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService
@@ -101,9 +117,6 @@ export class ThumbnailUploaderComponent implements OnChanges {
             this.contextService.getEntityType(),
             this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
-    } else {
-      this.editableThumbnailDataUrl = this.placeholderImageDataUrl;
-      this.uploadedImage = null;
     }
     this.thumbnailIsLoading = true;
   }
