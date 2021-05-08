@@ -32,7 +32,7 @@ require(
   'pages/exploration-player-page/layout-directives/progress-nav.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'learner-answer-info-card.directive.ts');
+  'learner-answer-info-card.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'supplemental-card.directive.ts');
@@ -1407,6 +1407,7 @@ angular.module('oppia').directive('conversationSkin', [
               LearnerViewRatingService.onRatingUpdated.subscribe(() => {
                 $scope.userRating = LearnerViewRatingService.getUserRating();
                 AlertsService.addSuccessMessage('Rating saved!', 1000);
+                $rootScope.$applyAsync();
               })
             );
             ctrl.directiveSubscriptions.add(
