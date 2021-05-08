@@ -92,7 +92,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
   }
 
   onMouseDownOnCdkDrag(): void {
-    setTimeout(() => this.showEmptyDiv = true, 2000);
+    setTimeout(() => this.showEmptyDiv = true, 500);
   }
   /**
    * @param {string|null} oldSubtopicId - The id of the subtopic from
@@ -113,7 +113,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
    *    uncategorized section.
    */
   onMoveSkillEnd(newSubtopicId: number): void {
-    setTimeout(() => this.showEmptyDiv = false, 2000);
+    setTimeout(() => this.showEmptyDiv = false, 500);
     if (newSubtopicId === this.oldSubtopicId) {
       return;
     }

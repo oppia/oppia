@@ -164,7 +164,7 @@ describe('Topic editor functionality', function() {
         await forms.toRichText('Story notes'));
     });
 
-  fit('should assign a skill to, and from subtopics',
+  it('should assign a skill to, and from subtopics',
     async function() {
       await topicsAndSkillsDashboardPage.get();
       await (
@@ -230,7 +230,10 @@ describe('Topic editor functionality', function() {
     });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([
+      'drag-drop.js',
+      'Unable to preventDefault inside passive event listener invocation.'
+    ]);
     await users.logout();
   });
 });

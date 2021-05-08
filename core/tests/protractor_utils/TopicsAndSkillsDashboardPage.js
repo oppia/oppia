@@ -167,7 +167,7 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
-    expect(await assignSkillToTopicButtons.count()).toEqual(1);
+    expect(await assignSkillToTopicButtons.count()).toBeGreaterThanOrEqual(1);
     await action.click(
       'Assign skill to topic button', assignSkillToTopicButtons.first());
 
