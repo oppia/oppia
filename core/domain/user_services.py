@@ -586,7 +586,7 @@ def _save_user_settings(user_settings):
         user_settings_dict['id'] = user_settings.user_id
         user_model = user_models.UserSettingsModel(**user_settings_dict)
 
-    update_roles_and_banned_fileds(user_model)
+    update_roles_and_banned_fields(user_model)
     user_model.update_timestamps()
     user_model.put()
 
@@ -860,7 +860,7 @@ def _save_existing_users_settings(user_settings_list):
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
-        update_roles_and_banned_fileds(user_model)
+        update_roles_and_banned_fields(user_model)
 
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
@@ -2175,20 +2175,28 @@ def create_login_url(return_url):
     return '/login?%s' % python_utils.url_encode({'return_url': return_url})
 
 
-def update_roles_and_banned_fileds(user_settings_model):
-    """Updates the new roles and banned fileds in the UserSettingsModel which
+def update_roles_and_banned_fields(user_settings_model):
+    """Updates the new roles and banned fields in the UserSettingsModel which
     are not in use but needs to kept in sync.
 
-    This function is expected to be remove soon once the roles and banned fields
+    This function is expected to be once the roles and banned fields
     will be in use. It is not recommended to use this function in new places.
 
     Args:
         user_settings_model: UserSettingsModel. The models which needs update.
     """
-    if user_settings_model.role not in [
-            feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR]:
-        user_settings_model.roles = [user_settings_model.role]
-
     if user_settings_model.role == feconf.ROLE_ID_BANNED_USER:
         user_settings_model.banned = True
         user_settings_model.roles = []
+        return
+    if user_settings_model.role in [
+            feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR]:
+        user_settings_model.banned = False
+        user_settings_model.roles = [user_settings_model.role]
+        return
+
+    # Learners are not allowed to have other roles, so user with role other than
+    # exploration editor or learner should have exploration editor role.
+    user_settings_model.roles = [
+        feconf.ROLE_ID_EXPLORATION_EDITOR, user_settings_model.role]
+    user_settings_model.banned = False

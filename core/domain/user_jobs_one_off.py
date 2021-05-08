@@ -1144,7 +1144,7 @@ class UserRolesPopulationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model_instance):
-        user_services.update_roles_and_banned_fileds(model_instance)
+        user_services.update_roles_and_banned_fields(model_instance)
 
         model_instance.update_timestamps(update_last_updated_time=False)
         model_instance.put()

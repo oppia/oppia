@@ -2894,7 +2894,7 @@ class UserRolesPopulationOneOffJobTests(test_utils.GenericTestBase):
             id='user-id',
             email='email@email.com',
             normalized_username='username',
-            role='admin')
+            role=feconf.ROLE_ID_COLLECTION_EDITOR)
         model.update_timestamps()
         model.put()
 
@@ -2908,7 +2908,11 @@ class UserRolesPopulationOneOffJobTests(test_utils.GenericTestBase):
 
         new_user_model = user_models.UserSettingsModel.get('user-id')
 
-        self.assertEqual(new_user_model.roles, ['admin'])
+        self.assertEqual(
+            new_user_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR])
+        self.assertFalse(new_user_model.banned)
         self.assertEqual(
             new_user_model.last_updated, old_user_model.last_updated)
 

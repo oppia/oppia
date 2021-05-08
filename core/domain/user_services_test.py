@@ -620,7 +620,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_COLLECTION_EDITOR)
 
-    def test_update_user_role_updated_roles_and_banned_fields(self):
+    def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
+            self):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -629,7 +630,61 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
         self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+    def test_assign_ban_user_to_exp_editor_updates_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+    def test_assign_exp_editor_to_collection_editor_updates_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
         self.assertFalse(user_settings_model.banned)
 
         user_services.update_user_role(
@@ -639,17 +694,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_COLLECTION_EDITOR)
         self.assertEqual(
-            user_settings_model.roles, [feconf.ROLE_ID_COLLECTION_EDITOR])
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR])
         self.assertFalse(user_settings_model.banned)
-
-        user_services.update_user_role(user_id, feconf.ROLE_ID_BANNED_USER)
-
-        self.assertEqual(
-            user_services.get_user_role_from_id(user_id),
-            feconf.ROLE_ID_BANNED_USER)
-        self.assertEqual(
-            user_settings_model.roles, [])
-        self.assertTrue(user_settings_model.banned)
 
     def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
         non_existent_user_id = 'id_x'
