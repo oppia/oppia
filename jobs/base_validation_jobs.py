@@ -30,8 +30,9 @@ import python_utils
 
 import apache_beam as beam
 
-AUDIT_DO_FN_TYPES_BY_KIND = base_validation_registry.
-    get_audit_do_fn_types_by_kind()
+AUDIT_DO_FN_TYPES_BY_KIND = (
+    base_validation_registry.
+    get_audit_do_fn_types_by_kind())
 KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 
 # Type is: dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
