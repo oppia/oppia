@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from core.domain import value_generators_domain
-import jinja_utils
 import utils
 
 
@@ -31,7 +30,7 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value = ''
 
-    def generate_value(self, context_params, value, parse_with_jinja=False):
+    def generate_value(self, context_params, value, parse_with_jinja=False):  # pylint: disable=unused-import
         """Returns a copy of the input value.
 
         If parse_with_jinja is True, strings within the input value are treated
