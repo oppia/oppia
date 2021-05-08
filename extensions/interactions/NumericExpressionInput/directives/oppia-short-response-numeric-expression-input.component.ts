@@ -43,6 +43,6 @@ export class ShortResponseNumericExpressionInput implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaResponseNumericExpressionInput', downgradeComponent(
+  'oppiaShortResponseNumericExpressionInput', downgradeComponent(
     {component: ShortResponseNumericExpressionInput}
   ) as angular.IDirectiveFactory);

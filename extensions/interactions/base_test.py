@@ -424,6 +424,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             except Exception:
                 pass
 
+            print(interaction_dir_optional_dirs_and_files_count, interaction_dir_contents)
             self.assertEqual(
                 interaction_dir_optional_dirs_and_files_count + 5,
                 len(interaction_dir_contents)
