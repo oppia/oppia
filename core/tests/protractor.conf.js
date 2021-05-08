@@ -326,15 +326,15 @@ exports.config = {
 
     var spw = '';
     var uniqueString = '';
-    // Enable this if you want success videos to be saved.
-    var allVideos = false;
     var vidPath = '';
+    // Enable allVideos if you want success videos to be saved.
+    var allVideos = false;
 
     // Only running video recorder on Github Actions.
 
     if (process.env.PWD == '/home/runner/work/oppia/oppia') {
       jasmine.getEnv().addReporter({
-        specStarted: function(result){
+        specStarted: function(){
           let ffmpegArgs = [
             '-y',
             '-r', '30',
@@ -354,17 +354,13 @@ exports.config = {
           console.log(`Video path: ${vidPath}`);
           ffmpegArgs.push(vidPath);
           spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-          // spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
-          // spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
-          console.log('Attached spw output handlers');
+          spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
         },
         specDone: function(result) {
-          console.log('Killing spw');
-          let success = spw.kill();
-          console.log(`Killing was successful: ${success}`);
-          if(result.status == 'passed' && !allVideos && fs.existsSync(vidPath)) {
+          spw.kill();
+          if (result.status == 'passed' && !allVideos && fs.existsSync(vidPath)) {
             fs.unlinkSync(vidPath);
-            console.log('Video was deleted successfully.');
+            console.log('Video was deleted successfully (test passed).');
           }
         },
       });
