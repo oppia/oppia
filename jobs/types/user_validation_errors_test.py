@@ -60,7 +60,7 @@ class ModelIncorrectKeyErrorTests(
         )
         incorrect_keys = ['incorrect key']
         error = user_validation_errors.ModelIncorrectKeyError(
-                    model, incorrect_keys)
+            model, incorrect_keys)
 
         self.assertEqual(
             error.message,
@@ -102,8 +102,9 @@ class DraftChangeListLastUpdatedNoneErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.YEAR_AGO
         )
-        error = (user_validation_errors.
-                    DraftChangeListLastUpdatedNoneError(model))
+        error = (
+            user_validation_errors.
+            DraftChangeListLastUpdatedNoneError(model))
 
         self.assertEqual(
             error.message,
@@ -131,8 +132,9 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.NOW
         )
-        error = (user_validation_errors.
-                    DraftChangeListLastUpdatedInvalidError(model))
+        error = (
+            user_validation_errors.
+            DraftChangeListLastUpdatedInvalidError(model))
 
         self.assertEqual(
             error.message,
