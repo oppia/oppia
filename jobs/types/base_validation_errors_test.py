@@ -98,7 +98,8 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             lambda: error.message)
 
     def test_message_raises_type_error_if_reassigned_a_value(self):
-        class ErrorWithUpdateMessageMethod(base_validation_errors.BaseAuditError):
+        class ErrorWithUpdateMessageMethod(
+                base_validation_errors.BaseAuditError):
             """Subclass that tries to reassign to self.message in a method."""
 
             def __init__(self, model):
@@ -179,7 +180,8 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
         self.assertRaisesRegexp(
             NotImplementedError,
             'self.message must be assigned a value in __init__',
-            lambda: pickle.dumps(base_validation_errors.BaseAuditError(self.model)))
+            lambda: pickle.dumps(base_validation_errors.
+                BaseAuditError(self.model)))
 
     def test_pickling_sub_classes(self):
         foo_error, bar_error = FooError(self.model), BarError(self.model)

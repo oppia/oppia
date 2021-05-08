@@ -35,12 +35,14 @@ class GetAuditsByKindTests(test_utils.TestBase):
             return unique_obj
 
         get_audit_do_fn_types_by_kind_swap = self.swap(
-            validation_decorators.AuditsExisting, 'get_audit_do_fn_types_by_kind',
+            validation_decorators.AuditsExisting,
+            'get_audit_do_fn_types_by_kind',
             get_audit_do_fn_types_by_kind_mock)
 
         with get_audit_do_fn_types_by_kind_swap:
             self.assertIs(
-                base_validation_registry.get_audit_do_fn_types_by_kind(), unique_obj)
+                base_validation_registry.get_audit_do_fn_types_by_kind(),
+                unique_obj)
 
 
 class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
@@ -82,5 +84,6 @@ class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
 
         with get_all_model_kinds_referenced_by_properties_swap:
             self.assertIs(
-                base_validation_registry.get_all_model_kinds_referenced_by_properties(),
+                base_validation_registry
+                .get_all_model_kinds_referenced_by_properties(),
                 unique_obj)

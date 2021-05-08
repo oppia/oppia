@@ -71,7 +71,8 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
         output = (
             self.pipeline
             | beam.Create([model_with_invalid_id])
-            | beam.ParDo(auth_validation.ValidateUserIdByFirebaseAuthIdModelId())
+            | beam.ParDo(auth_validation.
+                ValidateUserIdByFirebaseAuthIdModelId())
         )
 
         self.assert_pcoll_equal(output, [
@@ -86,7 +87,8 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
         output = (
             self.pipeline
             | beam.Create([model_with_valid_id])
-            | beam.ParDo(auth_validation.ValidateUserIdByFirebaseAuthIdModelId())
+            | beam.ParDo(auth_validation.
+                ValidateUserIdByFirebaseAuthIdModelId())
         )
 
         self.assert_pcoll_equal(output, [])

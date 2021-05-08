@@ -75,7 +75,8 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            base_validation_errors.InconsistentTimestampsError(invalid_timestamp),
+            base_validation_errors.InconsistentTimestampsError(
+                invalid_timestamp),
         ])
 
     def test_process_reports_model_mutated_during_job_error(self):
@@ -91,7 +92,8 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            base_validation_errors.ModelMutatedDuringJobError(invalid_timestamp),
+            base_validation_errors.ModelMutatedDuringJobError(
+                invalid_timestamp),
         ])
 
 
@@ -136,7 +138,8 @@ class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            base_validation_errors.InvalidCommitStatusError(invalid_commit_status),
+            base_validation_errors.InvalidCommitStatusError(
+                invalid_commit_status),
         ])
 
 
@@ -160,7 +163,8 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            base_validation_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
+            base_validation_errors.InvalidPrivateCommitStatusError(
+                invalid_commit_status),
         ])
 
     def test_validate_post_commit_is_private_when_status_is_private(self):
@@ -181,7 +185,8 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            base_validation_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
+            base_validation_errors.InvalidPrivateCommitStatusError(
+                invalid_commit_status),
         ])
 
 
@@ -381,5 +386,6 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            base_validation_errors.InvalidCommitTypeError(invalid_commit_type_model),
+            base_validation_errors.InvalidCommitTypeError(
+                invalid_commit_type_model),
         ])
