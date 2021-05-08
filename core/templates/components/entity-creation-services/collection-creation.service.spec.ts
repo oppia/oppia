@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks, tick }
 
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
-import { LoaderService } from 'services/loader.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 

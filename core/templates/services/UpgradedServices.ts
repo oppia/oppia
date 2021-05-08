@@ -74,11 +74,11 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { ClassifierDataBackendApiService } from
+  'services/classifier-data-backend-api.service';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
-import { CodeReplPredictionService } from
-  'interactions/CodeRepl/code-repl-prediction.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CodeReplValidationService } from
@@ -797,8 +797,6 @@ export class UpgradedServices {
         upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
       upgradedServices['WindowRef']);
-    upgradedServices['StateClassifierMappingService'] =
-      new StateClassifierMappingService();
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']);
     upgradedServices['StoryContentsObjectFactory'] =
@@ -834,12 +832,6 @@ export class UpgradedServices {
         upgradedServices['WindowDimensionsService']));
     upgradedServices['PreventPageUnloadEventService'] =
         new PreventPageUnloadEventService(upgradedServices['WindowRef']);
-    upgradedServices['CodeReplPredictionService'] =
-      new CodeReplPredictionService(
-        upgradedServices['CountVectorizerService'],
-        upgradedServices['PythonProgramTokenizer'],
-        upgradedServices['SVMPredictionService'],
-        upgradedServices['WinnowingPreprocessingService']);
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
@@ -977,6 +969,10 @@ export class UpgradedServices {
         upgradedServices['ConceptCardObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['ClassifierDataBackendApiService'] =
+      new ClassifierDataBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ClassroomBackendApiService'] =
       new ClassroomBackendApiService(
         upgradedServices['UrlInterpolationService'],
@@ -1106,6 +1102,11 @@ export class UpgradedServices {
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(
         upgradedServices['AudioTranslationLanguageService']);
+    upgradedServices['StateClassifierMappingService'] =
+      new StateClassifierMappingService(
+        upgradedServices['AppService'],
+        upgradedServices['ClassifierDataBackendApiService'],
+        upgradedServices['LoggerService']);
     upgradedServices['StateInteractionStatsBackendApiService'] =
       new StateInteractionStatsBackendApiService(
         upgradedServices['HttpClient'],
@@ -1193,7 +1194,6 @@ export class UpgradedServices {
         upgradedServices['GenerateContentIdService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
-        upgradedServices['CodeReplPredictionService'],
         upgradedServices['TextInputPredictionService']);
     upgradedServices['ProfileLinkImageBackendApiService'] =
       new ProfileLinkImageBackendApiService(
