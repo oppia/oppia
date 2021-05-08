@@ -110,6 +110,9 @@ describe('Classroom page functionality', function() {
     });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([
+      'drag-drop.js',
+      'Unable to preventDefault inside passive event listener invocation.'
+    ]);
   });
 });
