@@ -530,7 +530,7 @@ def zip_longest(*args, **kwargs):
     filled-in with fillvalue.
 
     Args:
-        *args: *. Iterables that needs to be aggregated into an iterable.
+        *args: list(*). Iterables that needs to be aggregated into an iterable.
         **kwargs: dict. It contains fillvalue.
 
     Returns:
