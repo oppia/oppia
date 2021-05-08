@@ -17,7 +17,7 @@
  * audio translation in the learner view.
  */
 
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Voiceover } from 'domain/exploration/voiceover.model';
 import { Subscription } from 'rxjs';
@@ -48,6 +48,7 @@ export class AudioBarComponent {
   explorationPlayerModeIsActive;
   selectedLanguage: { value: string };
   track;
+  @ViewChild('audioHeader') audioHeader: ElementRef;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -164,7 +165,7 @@ export class AudioBarComponent {
   }
 
   updateAudioHeaderPosition(): void {
-    // var scrollTop = $(this).scrollTop();
+    console.log(this.audioHeader.nativeElement.scrollTop);
     // var audioHeader = angular.element($('.audio-header:first'));
     // if (scrollTop > lastScrollTop) {
     //   audioHeader.addClass('audio-bar-nav-up');

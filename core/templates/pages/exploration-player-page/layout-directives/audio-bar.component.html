@@ -1,5 +1,5 @@
 <div class="audio-header" *ngIf="isAudioBarAvailable()"
-     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
+     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom #audioHeader>
   <div *ngIf="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
       <div class="audio-header-control-icons">
