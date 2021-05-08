@@ -2185,6 +2185,8 @@ def update_roles_and_banned_fields(user_settings_model):
     Args:
         user_settings_model: UserSettingsModel. The models which needs update.
     """
+    # TODO(#12755): Remove this function once the roles and banned field of
+    # UserSettingsModel are in use.
     if user_settings_model.role == feconf.ROLE_ID_BANNED_USER:
         user_settings_model.banned = True
         user_settings_model.roles = []
