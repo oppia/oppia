@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the structure of roles for action
-inheritance, Actions permitted to the roles and the functions needed to
-access roles and actions.
+"""This module contains the structure of roles for action,
+actions permitted to the roles and the functions needed to access roles
+and actions.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import math
 import random
 import time
@@ -123,27 +124,27 @@ HUMAN_READABLE_ROLES = {
 }
 
 
-def _get_actions_set(*actions):
-    """Returns a set of unique actions out of the given list of actions.
+def _get_unique_actions_list(*actions):
+    """Returns a list of unique actions out of the given list of actions.
 
     Args:
         *actions: list(str). List of actions whcihcan contain duplicate items.
 
     Returns:
-        set(str). A set of unique action strings.
+        list(str). A list of unique action strings.
     """
-    return set(actions)
+    return list(set(actions))
 
 
-GUEST_ALLOWED_ACTIONS = _get_actions_set(
+_GUEST_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_PLAY_ANY_PUBLIC_ACTIVITY)
 
-LEARNER_ALLOWED_ACTIONS = _get_actions_set(
+_LEARNER_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_FLAG_EXPLORATION,
     ACTION_ACCESS_LEARNER_DASHBOARD,
-    *GUEST_ALLOWED_ACTIONS)
+    *_GUEST_ALLOWED_ACTIONS)
 
-EXPLORATION_EDITOR_ALLOWED_ACTIONS = _get_actions_set(
+_EXPLORATION_EDITOR_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_ACCESS_CREATOR_DASHBOARD,
     ACTION_CREATE_EXPLORATION,
     ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
@@ -155,13 +156,13 @@ EXPLORATION_EDITOR_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_RATE_ANY_PUBLIC_EXPLORATION,
     ACTION_SUGGEST_CHANGES,
     ACTION_SUBMIT_VOICEOVER_APPLICATION,
-    *LEARNER_ALLOWED_ACTIONS)
+    *_LEARNER_ALLOWED_ACTIONS)
 
-COLLECTION_EDITOR_ALLOWED_ACTIONS = _get_actions_set(
+_COLLECTION_EDITOR_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_CREATE_COLLECTION,
-    *EXPLORATION_EDITOR_ALLOWED_ACTIONS)
+    *_EXPLORATION_EDITOR_ALLOWED_ACTIONS)
 
-TOPIC_MANAGER_ALLOWED_ACTIONS = _get_actions_set(
+_TOPIC_MANAGER_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
     ACTION_DELETE_ANY_QUESTION,
     ACTION_EDIT_ANY_QUESTION,
@@ -172,18 +173,18 @@ TOPIC_MANAGER_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_MANAGE_QUESTION_SKILL_STATUS,
     ACTION_VISIT_ANY_QUESTION_EDITOR,
     ACTION_VISIT_ANY_TOPIC_EDITOR,
-    *COLLECTION_EDITOR_ALLOWED_ACTIONS)
+    *_COLLECTION_EDITOR_ALLOWED_ACTIONS)
 
-MODERATOR_ALLOWED_ACTIONS = _get_actions_set(
+_MODERATOR_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_ACCESS_MODERATOR_PAGE,
     ACTION_DELETE_ANY_PUBLIC_ACTIVITY,
     ACTION_EDIT_ANY_PUBLIC_ACTIVITY,
     ACTION_PLAY_ANY_PRIVATE_ACTIVITY,
     ACTION_SEND_MODERATOR_EMAILS,
     ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
-    *TOPIC_MANAGER_ALLOWED_ACTIONS)
+    *_TOPIC_MANAGER_ALLOWED_ACTIONS)
 
-ADMIN_ALLOWED_ACTIONS = _get_actions_set(
+_ADMIN_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_ACCEPT_ANY_SUGGESTION,
     ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION,
     ACTION_CHANGE_STORY_STATUS,
@@ -203,18 +204,18 @@ ADMIN_ALLOWED_ACTIONS = _get_actions_set(
     ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,
     ACTION_PUBLISH_ANY_ACTIVITY,
     ACTION_PUBLISH_OWNED_SKILL,
-    *MODERATOR_ALLOWED_ACTIONS)
+    *_MODERATOR_ALLOWED_ACTIONS)
 
 # This dict represents all the actions that belong to a particular role.
 _ROLE_ACTIONS = {
-    feconf.ROLE_ID_ADMIN: ADMIN_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_ADMIN: _ADMIN_ALLOWED_ACTIONS,
     feconf.ROLE_ID_BANNED_USER: [],
-    feconf.ROLE_ID_COLLECTION_EDITOR: COLLECTION_EDITOR_ALLOWED_ACTIONS,
-    feconf.ROLE_ID_EXPLORATION_EDITOR: EXPLORATION_EDITOR_ALLOWED_ACTIONS,
-    feconf.ROLE_ID_GUEST: GUEST_ALLOWED_ACTIONS,
-    feconf.ROLE_ID_LEARNER: LEARNER_ALLOWED_ACTIONS,
-    feconf.ROLE_ID_MODERATOR: MODERATOR_ALLOWED_ACTIONS,
-    feconf.ROLE_ID_TOPIC_MANAGER: TOPIC_MANAGER_ALLOWED_ACTIONS
+    feconf.ROLE_ID_COLLECTION_EDITOR: _COLLECTION_EDITOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_EXPLORATION_EDITOR: _EXPLORATION_EDITOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_GUEST: _GUEST_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_LEARNER: _LEARNER_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_MODERATOR: _MODERATOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_TOPIC_MANAGER: _TOPIC_MANAGER_ALLOWED_ACTIONS
 }
 
 
@@ -233,19 +234,19 @@ def get_all_actions(role):
     if role not in _ROLE_ACTIONS:
         raise Exception('Role %s does not exist.' % role)
 
-    role_actions_set = _ROLE_ACTIONS[role]
+    role_actions = _ROLE_ACTIONS[role]
 
-    return list(role_actions_set)
+    return role_actions
 
 
 def get_role_actions():
     """Returns the possible role to actions items in the application.
 
     Returns:
-        dict(str, list(str)). A dict presenting key as role and values as set of
-        actions corresponding to the given role.
+        dict(str, list(str)). A dict presenting key as role and values as list
+        of actions corresponding to the given role.
     """
-    return {role: list(actions) for role, actions in _ROLE_ACTIONS.items()}
+    return copy.deepcopy(_ROLE_ACTIONS)
 
 
 def is_valid_role(role):
