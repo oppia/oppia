@@ -92,8 +92,8 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         output = (
             self.pipeline
             | beam.Create([test_model])
-            | beam.ParDo(user_validation.
-                ValidateActivityMappingOnlyAllowedKeys())
+            | beam.ParDo(
+                user_validation.ValidateActivityMappingOnlyAllowedKeys())
         )
 
         self.assert_pcoll_equal(output, [
@@ -116,7 +116,8 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         output = (
             self.pipeline
             | beam.Create([test_model])
-            | beam.ParDo(user_validation.ValidateActivityMappingOnlyAllowedKeys())
+            | beam.ParDo(
+                user_validation.ValidateActivityMappingOnlyAllowedKeys())
         )
 
         self.assert_pcoll_equal(output, [])

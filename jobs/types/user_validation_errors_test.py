@@ -51,14 +51,16 @@ class ModelExpiringErrorTests(base_validation_errors_test.AuditErrorsTestBase):
                 feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
 
 
-class ModelIncorrectKeyErrorTests(base_validation_errors_test.AuditErrorsTestBase):
+class ModelIncorrectKeyErrorTests(
+        base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         model = user_models.PendingDeletionRequestModel(
             id='test'
         )
         incorrect_keys = ['incorrect key']
-        error = user_validation_errors.ModelIncorrectKeyError(model, incorrect_keys)
+        error = user_validation_errors.ModelIncorrectKeyError(
+                    model, incorrect_keys)
 
         self.assertEqual(
             error.message,
@@ -100,7 +102,8 @@ class DraftChangeListLastUpdatedNoneErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.YEAR_AGO
         )
-        error = user_validation_errors.DraftChangeListLastUpdatedNoneError(model)
+        error = (user_validation_errors.
+                    DraftChangeListLastUpdatedNoneError(model))
 
         self.assertEqual(
             error.message,
@@ -128,7 +131,8 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.NOW
         )
-        error = user_validation_errors.DraftChangeListLastUpdatedInvalidError(model)
+        error = (user_validation_errors.
+                    DraftChangeListLastUpdatedInvalidError(model))
 
         self.assertEqual(
             error.message,

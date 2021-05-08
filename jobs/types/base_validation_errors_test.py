@@ -180,8 +180,8 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
         self.assertRaisesRegexp(
             NotImplementedError,
             'self.message must be assigned a value in __init__',
-            lambda: pickle.dumps(base_validation_errors.
-                BaseAuditError(self.model)))
+            lambda: pickle.dumps(
+                base_validation_errors.BaseAuditError(self.model)))
 
     def test_pickling_sub_classes(self):
         foo_error, bar_error = FooError(self.model), BarError(self.model)

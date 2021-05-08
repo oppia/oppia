@@ -40,7 +40,8 @@ class ModelExpiringError(base_validation_errors.BaseAuditError):
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
 
 
-class DraftChangeListLastUpdatedNoneError(base_validation_errors.BaseAuditError):
+class DraftChangeListLastUpdatedNoneError(
+        base_validation_errors.BaseAuditError):
     """Error class for models with draft change list but draft change list
     last_updated is None.
     """
@@ -52,7 +53,8 @@ class DraftChangeListLastUpdatedNoneError(base_validation_errors.BaseAuditError)
             'last updated is None' % model.draft_change_list)
 
 
-class DraftChangeListLastUpdatedInvalidError(base_validation_errors.BaseAuditError):
+class DraftChangeListLastUpdatedInvalidError(
+        base_validation_errors.BaseAuditError):
     """Error class for models with invalid draft change list last_updated."""
 
     def __init__(self, model):
