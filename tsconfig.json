@@ -38,9 +38,19 @@
     "assets/rich_text_components_definitions.ts",
     "core/tests/karma.conf.ts"
   ],
-  "include": ["core", "extensions", "typings"],
-  "exclude": [
+  "include": [
+    "core",
+    "extensions",
+    "typings",
     "core/tests",
-    "extensions/classifiers/proto"
+    "puppeteer-login-script.js",
+    "scripts/linters",
+    "webpack.common.config.ts",
+    "webpack.common.macros.ts",
+    "webpack.dev.config.ts",
+    "webpack.dev.sourcemap.config.ts",
+    "webpack.prod.config.ts",
+    "webpack.prod.sourcemap.config.ts",
+    "webpack.terser.config.ts" 
   ]
 }
