@@ -16,7 +16,7 @@
  * @fileoverview Component for refresher exploration confirmation modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -30,8 +30,8 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 })
 export class RefresherExplorationConfirmationModal
   extends ConfirmOrCancelModal {
-  redirectionConfirmationCallback: () => void;
-  refresherEplorationId: string;
+  confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();
+  refresherExplorationId: string;
   constructor(
       private ngbActiveModal: NgbActiveModal,
       private windowRef: WindowRef,
@@ -43,7 +43,7 @@ export class RefresherExplorationConfirmationModal
   }
 
   confirmRedirect(): void {
-    this.redirectionConfirmationCallback();
+    this.confirmRedirectEventEmitter.emit();
 
     let collectionId: string = this.urlService.getUrlParams().collection_id;
     let parentIdList: string[] = this.urlService.getQueryFieldValuesAsList(
@@ -51,7 +51,7 @@ export class RefresherExplorationConfirmationModal
     let EXPLORATION_URL_TEMPLATE: string = '/explore/<exploration_id>';
     let url = this.urlInterpolationService.interpolateUrl(
       EXPLORATION_URL_TEMPLATE, {
-        exploration_id: this.refresherEplorationId
+        exploration_id: this.refresherExplorationId
       });
 
     if (collectionId) {

@@ -37,8 +37,9 @@ export class RefresherExplorationConfirmationModalService {
       RefresherExplorationConfirmationModal, {
         backdrop: 'static'
       });
-    modalRef.componentInstance.redirectConfirmationCallback =
-    redirectConfirmationCallback;
+    modalRef.componentInstance.confirmRedirectEventEmitter.subscribe(() => {
+      redirectConfirmationCallback();
+    });
     modalRef.componentInstance.refresherExplorationId = refresherExplorationId;
 
     modalRef.result.then(() => {}, () => {
