@@ -69,7 +69,7 @@ describe('Refresher Exploration Confirmation Modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(RefresherExplorationConfirmationModal);
     componentInstance = fixture.componentInstance;
-    componentInstance.refresherEplorationId = 'test_id';
+    componentInstance.refresherExplorationId = 'test_id';
     mockUrlService = (TestBed.inject(UrlService) as unknown) as
       jasmine.SpyObj<MockUrlService>;
     windowRef = (TestBed.inject(WindowRef) as unknown) as
@@ -84,7 +84,9 @@ describe('Refresher Exploration Confirmation Modal', () => {
 
   it('should confirm redirect', fakeAsync(() => {
     let callbackSpy = jasmine.createSpy();
-    componentInstance.redirectionConfirmationCallback = callbackSpy;
+    componentInstance.confirmRedirectEventEmitter.subscribe(() => {
+      callbackSpy();
+    });
     spyOn(mockUrlService, 'addField');
     spyOn(windowRef.nativeWindow, 'open');
     spyOn(ngbActiveModal, 'close');
