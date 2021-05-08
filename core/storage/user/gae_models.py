@@ -190,7 +190,12 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            # TODO(#12755): Currently, "roles" and "banned" fields are not in
+            # use and doesn't contains correct value. It is expected to export
+            # these fields once populated with correct value.
+            'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
