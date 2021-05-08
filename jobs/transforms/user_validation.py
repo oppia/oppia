@@ -24,9 +24,9 @@ import datetime
 from core.platform import models
 import feconf
 from jobs import job_utils
-from jobs.decorators import audit_decorators
-from jobs.transforms import base_model_audits
-from jobs.types import user_model_errors
+from jobs.decorators import validation_decorators
+from jobs.transforms import base_validation
+from jobs.types import user_validation_errors
 
 import apache_beam as beam
 
@@ -34,12 +34,12 @@ import apache_beam as beam
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-@audit_decorators.AuditsExisting(
+@validation_decorators.AuditsExisting(
     auth_models.UserAuthDetailsModel,
     user_models.UserEmailPreferencesModel,
     user_models.UserSettingsModel,
 )
-class ValidateModelWithUserId(base_model_audits.ValidateBaseModelId):
+class ValidateModelWithUserId(base_validation.ValidateBaseModelId):
     """Overload for models keyed by a user ID, which have a special format."""
 
     def __init__(self):
@@ -52,7 +52,7 @@ class ValidateModelWithUserId(base_model_audits.ValidateBaseModelId):
         self._pattern = feconf.USER_ID_REGEX
 
 
-@audit_decorators.AuditsExisting(
+@validation_decorators.AuditsExisting(
     user_models.PendingDeletionRequestModel
 )
 class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
@@ -80,11 +80,11 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):
         ]
 
         if incorrect_keys:
-            yield user_model_errors.ModelIncorrectKeyError(
+            yield user_validation_errors.ModelIncorrectKeyError(
                 model, incorrect_keys)
 
 
-@audit_decorators.AuditsExisting(user_models.UserQueryModel)
+@validation_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateOldModelsMarkedDeleted(beam.DoFn):
     """DoFn to validate old models and mark them for deletion"""
 
@@ -102,10 +102,10 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
             datetime.datetime.utcnow() -
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
         if expiration_date > model.last_updated:
-            yield user_model_errors.ModelExpiringError(model)
+            yield user_validation_errors.ModelExpiringError(model)
 
 
-@audit_decorators.RelationshipsOf(
+@validation_decorators.RelationshipsOf(
     user_models.UserEmailPreferencesModel
 )
 def user_email_preferences_model_relationships(model):
@@ -113,7 +113,7 @@ def user_email_preferences_model_relationships(model):
     yield model.id, [user_models.UserSettingsModel]
 
 
-@audit_decorators.AuditsExisting(
+@validation_decorators.AuditsExisting(
     user_models.ExplorationUserDataModel
 )
 class ValidateDraftChangeListLastUpdated(beam.DoFn):
@@ -136,9 +136,9 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
         model = job_utils.clone_model(input_model)
         if (model.draft_change_list and
                 not model.draft_change_list_last_updated):
-            yield user_model_errors.DraftChangeListLastUpdatedNoneError(model)
+            yield user_validation_errors.DraftChangeListLastUpdatedNoneError(model)
         current_time = datetime.datetime.utcnow()
         if (model.draft_change_list_last_updated and
                 model.draft_change_list_last_updated > current_time):
-            yield user_model_errors.DraftChangeListLastUpdatedInvalidError(
+            yield user_validation_errors.DraftChangeListLastUpdatedInvalidError(
                 model)

@@ -20,10 +20,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import feconf
-from jobs.types import audit_errors
+from jobs.types import base_validation_errors
 
 
-class ModelIncorrectKeyError(audit_errors.BaseAuditError):
+class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):
     """Error class for incorrect key in PendingDeletionRequestModel."""
 
     def __init__(self, model, incorrect_keys):
@@ -31,7 +31,7 @@ class ModelIncorrectKeyError(audit_errors.BaseAuditError):
         self.message = 'contains keys %s are not allowed' % (incorrect_keys)
 
 
-class ModelExpiringError(audit_errors.BaseAuditError):
+class ModelExpiringError(base_validation_errors.BaseAuditError):
     """Error class for models that are expiring."""
 
     def __init__(self, model):
@@ -40,7 +40,7 @@ class ModelExpiringError(audit_errors.BaseAuditError):
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
 
 
-class DraftChangeListLastUpdatedNoneError(audit_errors.BaseAuditError):
+class DraftChangeListLastUpdatedNoneError(base_validation_errors.BaseAuditError):
     """Error class for models with draft change list but draft change list
     last_updated is None.
     """
@@ -52,7 +52,7 @@ class DraftChangeListLastUpdatedNoneError(audit_errors.BaseAuditError):
             'last updated is None' % model.draft_change_list)
 
 
-class DraftChangeListLastUpdatedInvalidError(audit_errors.BaseAuditError):
+class DraftChangeListLastUpdatedInvalidError(base_validation_errors.BaseAuditError):
     """Error class for models with invalid draft change list last_updated."""
 
     def __init__(self, model):

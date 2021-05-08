@@ -213,13 +213,3 @@ class ModelRelationshipError(BaseAuditError):
             'but no such model exists' % (
                 id_property, python_utils.convert_to_bytes(target_id),
                 target_kind))
-
-
-class ModelCanonicalNameMismatchError(BaseAuditError):
-    """Error class for models that have mismatching names."""
-
-    def __init__(self, model):
-        super(ModelCanonicalNameMismatchError, self).__init__(model)
-        self.message = (
-            'Entity name %s in lowercase does not match '
-            'canonical name %s' % (model.name, model.canonical_name))

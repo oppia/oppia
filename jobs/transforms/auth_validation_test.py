@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.transforms.auth_audits."""
+"""Unit tests for jobs.transforms.auth_validation."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -22,8 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 from jobs import job_test_utils
-from jobs.transforms import auth_audits
-from jobs.types import audit_errors
+from jobs.transforms import auth_validation
+from jobs.types import base_validation_errors
 
 import apache_beam as beam
 
@@ -39,11 +39,11 @@ class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model_with_invalid_id])
-            | beam.ParDo(auth_audits.ValidateFirebaseSeedModelId())
+            | beam.ParDo(auth_validation.ValidateFirebaseSeedModelId())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelIdRegexError(
+            base_validation_errors.ModelIdRegexError(
                 model_with_invalid_id, auth_models.ONLY_FIREBASE_SEED_MODEL_ID),
         ])
 
@@ -55,7 +55,7 @@ class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model_with_valid_id])
-            | beam.ParDo(auth_audits.ValidateFirebaseSeedModelId())
+            | beam.ParDo(auth_validation.ValidateFirebaseSeedModelId())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -71,11 +71,11 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
         output = (
             self.pipeline
             | beam.Create([model_with_invalid_id])
-            | beam.ParDo(auth_audits.ValidateUserIdByFirebaseAuthIdModelId())
+            | beam.ParDo(auth_validation.ValidateUserIdByFirebaseAuthIdModelId())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelIdRegexError(
+            base_validation_errors.ModelIdRegexError(
                 model_with_invalid_id, feconf.FIREBASE_AUTH_ID_REGEX),
         ])
 
@@ -86,7 +86,7 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
         output = (
             self.pipeline
             | beam.Create([model_with_valid_id])
-            | beam.ParDo(auth_audits.ValidateUserIdByFirebaseAuthIdModelId())
+            | beam.ParDo(auth_validation.ValidateUserIdByFirebaseAuthIdModelId())
         )
 
         self.assert_pcoll_equal(output, [])

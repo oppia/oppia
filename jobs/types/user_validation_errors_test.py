@@ -23,9 +23,9 @@ import datetime
 
 from core.platform import models
 import feconf
-from jobs.types import audit_errors
-from jobs.types import audit_errors_test
-from jobs.types import user_model_errors
+from jobs.types import base_validation_errors
+from jobs.types import base_validation_errors_test
+from jobs.types import user_validation_errors
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -33,7 +33,7 @@ from jobs.types import user_model_errors
 datastore_services = models.Registry.import_datastore_services()
 
 
-class ModelExpiringErrorTests(audit_errors_test.AuditErrorsTestBase):
+class ModelExpiringErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         model = user_models.UserQueryModel(
@@ -42,7 +42,7 @@ class ModelExpiringErrorTests(audit_errors_test.AuditErrorsTestBase):
             created_on=self.YEAR_AGO,
             last_updated=self.YEAR_AGO
         )
-        error = user_model_errors.ModelExpiringError(model)
+        error = user_validation_errors.ModelExpiringError(model)
 
         self.assertEqual(
             error.message,
@@ -51,14 +51,14 @@ class ModelExpiringErrorTests(audit_errors_test.AuditErrorsTestBase):
                 feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
 
 
-class ModelIncorrectKeyErrorTests(audit_errors_test.AuditErrorsTestBase):
+class ModelIncorrectKeyErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         model = user_models.PendingDeletionRequestModel(
             id='test'
         )
         incorrect_keys = ['incorrect key']
-        error = user_model_errors.ModelIncorrectKeyError(model, incorrect_keys)
+        error = user_validation_errors.ModelIncorrectKeyError(model, incorrect_keys)
 
         self.assertEqual(
             error.message,
@@ -67,14 +67,14 @@ class ModelIncorrectKeyErrorTests(audit_errors_test.AuditErrorsTestBase):
             incorrect_keys)
 
 
-class ModelIdRegexErrorTests(audit_errors_test.AuditErrorsTestBase):
+class ModelIdRegexErrorTests(base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         model = base_models.BaseModel(
             id='?!"',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW)
-        error = audit_errors.ModelIdRegexError(model, '[abc]{3}')
+        error = base_validation_errors.ModelIdRegexError(model, '[abc]{3}')
 
         self.assertEqual(
             error.message,
@@ -83,7 +83,7 @@ class ModelIdRegexErrorTests(audit_errors_test.AuditErrorsTestBase):
 
 
 class DraftChangeListLastUpdatedNoneErrorTests(
-        audit_errors_test.AuditErrorsTestBase):
+        base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         draft_change_list = [{
@@ -100,7 +100,7 @@ class DraftChangeListLastUpdatedNoneErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.YEAR_AGO
         )
-        error = user_model_errors.DraftChangeListLastUpdatedNoneError(model)
+        error = user_validation_errors.DraftChangeListLastUpdatedNoneError(model)
 
         self.assertEqual(
             error.message,
@@ -110,7 +110,7 @@ class DraftChangeListLastUpdatedNoneErrorTests(
 
 
 class DraftChangeListLastUpdatedInvalidErrorTests(
-        audit_errors_test.AuditErrorsTestBase):
+        base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         draft_change_list = [{
@@ -128,7 +128,7 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.NOW
         )
-        error = user_model_errors.DraftChangeListLastUpdatedInvalidError(model)
+        error = user_validation_errors.DraftChangeListLastUpdatedInvalidError(model)
 
         self.assertEqual(
             error.message,

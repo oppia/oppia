@@ -23,25 +23,25 @@ import collections
 
 from jobs import base_jobs
 from jobs import job_utils
-from jobs.transforms import audits_registry
-from jobs.transforms import base_model_audits
-from jobs.types import audit_errors
+from jobs.transforms import base_validation_registry
+from jobs.transforms import base_validation
+from jobs.types import base_validation_errors
 import python_utils
 
 import apache_beam as beam
 
-AUDIT_DO_FN_TYPES_BY_KIND = audits_registry.get_audit_do_fn_types_by_kind()
+AUDIT_DO_FN_TYPES_BY_KIND = base_validation_registry.get_audit_do_fn_types_by_kind()
 KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 
 # Type is: dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
 # (ModelProperty, tuple(kind of models)), grouped by the kind of model the
 # properties belong to.
 ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR = (
-    audits_registry.get_id_referencing_properties_by_kind_of_possessor())
+    base_validation_registry.get_id_referencing_properties_by_kind_of_possessor())
 
 # Type is: set(str). All model kinds referenced by one or more properties.
 ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES = (
-    audits_registry.get_all_model_kinds_referenced_by_properties())
+    base_validation_registry.get_all_model_kinds_referenced_by_properties())
 
 
 class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
@@ -117,7 +117,7 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         audit_error_pcolls = [
             deleted_models
             | 'Apply ValidateDeletedModel on deleted models' >> (
-                beam.ParDo(base_model_audits.ValidateDeletedModel()))
+                beam.ParDo(base_validation.ValidateDeletedModel()))
         ]
 
         model_groups = python_utils.ZIP(KIND_BY_INDEX, models_of_kind_by_index)
@@ -293,6 +293,6 @@ class GetMissingModelKeyErrors(beam.PTransform):
             model_id = job_utils.get_model_id(model)
             referenced_id = python_utils.convert_to_bytes(property_value)
             for referenced_kind in referenced_kinds:
-                error = audit_errors.ModelRelationshipError(
+                error = base_validation_errors.ModelRelationshipError(
                     property_of_model, model_id, referenced_kind, referenced_id)
                 yield (ModelKey(referenced_kind, referenced_id), error)

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.transforms.user_audits."""
+"""Unit tests for jobs.transforms.user_validation."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -24,9 +24,9 @@ import datetime
 from core.platform import models
 import feconf
 from jobs import job_test_utils
-from jobs.transforms import user_audits
-from jobs.types import audit_errors
-from jobs.types import user_model_errors
+from jobs.transforms import user_validation
+from jobs.types import base_validation_errors
+from jobs.types import user_validation_errors
 
 import apache_beam as beam
 
@@ -45,11 +45,11 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model_with_invalid_id])
-            | beam.ParDo(user_audits.ValidateModelWithUserId())
+            | beam.ParDo(user_validation.ValidateModelWithUserId())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelIdRegexError(
+            base_validation_errors.ModelIdRegexError(
                 model_with_invalid_id, feconf.USER_ID_REGEX),
         ])
 
@@ -62,7 +62,7 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model_with_valid_id])
-            | beam.ParDo(user_audits.ValidateModelWithUserId())
+            | beam.ParDo(user_validation.ValidateModelWithUserId())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -92,11 +92,11 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         output = (
             self.pipeline
             | beam.Create([test_model])
-            | beam.ParDo(user_audits.ValidateActivityMappingOnlyAllowedKeys())
+            | beam.ParDo(user_validation.ValidateActivityMappingOnlyAllowedKeys())
         )
 
         self.assert_pcoll_equal(output, [
-            user_model_errors.ModelIncorrectKeyError(
+            user_validation_errors.ModelIncorrectKeyError(
                 test_model, [self.INCORRECT_KEY])
         ])
 
@@ -115,7 +115,7 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
         output = (
             self.pipeline
             | beam.Create([test_model])
-            | beam.ParDo(user_audits.ValidateActivityMappingOnlyAllowedKeys())
+            | beam.ParDo(user_validation.ValidateActivityMappingOnlyAllowedKeys())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -137,10 +137,10 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
+            | beam.ParDo(user_validation.ValidateOldModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [
-            user_model_errors.ModelExpiringError(model)
+            user_validation_errors.ModelExpiringError(model)
         ])
 
     def test_model_not_marked_as_deleted_recently(self):
@@ -153,7 +153,7 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
+            | beam.ParDo(user_validation.ValidateOldModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [])
 
@@ -182,10 +182,10 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
+            | beam.ParDo(user_validation.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [
-            user_model_errors.DraftChangeListLastUpdatedNoneError(model)
+            user_validation_errors.DraftChangeListLastUpdatedNoneError(model)
         ])
 
     def test_model_with_draft_change_list_last_updated_greater_than_now(self):
@@ -202,10 +202,10 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
+            | beam.ParDo(user_validation.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [
-            user_model_errors.DraftChangeListLastUpdatedInvalidError(model)
+            user_validation_errors.DraftChangeListLastUpdatedInvalidError(model)
         ])
 
     def test_model_with_valid_draft_change_list_last_updated(self):
@@ -222,6 +222,6 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
+            | beam.ParDo(user_validation.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [])
