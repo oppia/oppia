@@ -245,7 +245,6 @@
         "core.storage.subtopic.gae_models_test",
         "core.domain.user_domain_test",
         "core.storage.opportunity.gae_models_test",
-        "jinja_utils_test",
         "scripts.build_test",
         "scripts.install_third_party_libs_test",
         "core.storage.statistics.gae_models_test",
