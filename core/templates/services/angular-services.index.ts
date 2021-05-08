@@ -341,7 +341,6 @@ import { QuestionValidationService } from './question-validation.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
-import { ImageLocalStorageService } from './image-local-storage.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
