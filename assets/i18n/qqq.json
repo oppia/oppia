@@ -485,7 +485,7 @@
 	"I18N_PREFERENCES_PROFILE_PICTURE_DRAG": "Text displayed in the preferences page. - Text of the dialog shown to upload a profile picture when the user has uploaded an image that is too big and needs to be cropped.",
 	"I18N_PREFERENCES_PROFILE_PICTURE_ERROR": "Text displayed in the preferences page. - Error text of the dialog shown to upload a profile picture. This error is shown when the file uploaded by the user is not an image.",
 	"I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD": "Text displayed in the preferences page. - Title of the dialog shown to upload a profile picture.",
-	"I18N_PREFERENCES_REMOVE_PROFILE_PICTURE_BUTTON": "Text displayed in the preferences page. - Text of the button that confirms the action of the dialog shown to remove a profile picture.",
+	"I18N_PREFERENCES_REMOVE_PROFILE_PICTURE_BUTTON": "Text displayed in the preferences page. - Text of the Remove profile picture button in the dialog shown to remove a profile picture.",
 	"I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "Text displayed in the preferences page. - Text shown in the text entry to select the preferred language for explorations when no language is selected.",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS": "Text displayed in the preferences page. - Text shown below the text entry to select the user subject interests.",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK": "Text displayed in the preferences page. - Text shown below the text entry to select the user subject interests, explaining what the field is for.",
