@@ -330,6 +330,7 @@ exports.config = {
     var uniqueString = '';
     // Enable this if you want success videos to be saved.
     var allVideos = false;
+    var vidPath = '';
 
     // Only running video recorder on Github Actions.
 
@@ -350,7 +351,7 @@ exports.config = {
           try {
             fs.mkdirSync(dirPath, { recursive: true });
           } catch (err) {}
-          let vidPath = path.resolve(dirPath, name);
+          vidPath = path.resolve(dirPath, name);
           console.log(`Video path: ${vidPath}`);
           ffmpegArgs.push(vidPath);
           console.log(`ffmpeg args: ${ffmpegArgs}`);
@@ -365,11 +366,13 @@ exports.config = {
           let success = spw.kill();
           console.log(`Killing was successful: ${success}`);
           console.log(result.status);
-          if(result.status == 'passed' && !allVideos) {
+          console.log(fs.existsSync(vidPath));
+          if(result.status == 'passed' && !allVideos && fs.existsSync(vidPath)) {
             try {
               fs.unlinkSync(vidPath);
               console.log('Video was deleted successfully.')
             } catch (e) {
+              console.error(e);
               console.log('Video was not deleted, even though the suite passed');
             }
           }
