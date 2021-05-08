@@ -1664,6 +1664,16 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'Please use a capital letter at the beginning of comment.',
             'no-capital-letter-at-beginning',
             'Please use capital letter to begin the content of comment.'
+        ),
+        'C0019': (
+            'Please use a single space at the beginning of pylint pragmas.',
+            'no-space-before-pylint-pragma',
+            'Please use a single space at the beginning of pylint pragmas.'
+        ),
+        'C0020': (
+            'Please place comments on their own line.',
+            'invalid-trailing-comment',
+            'Please place comments on their own line.',
         )
     }
     options = ((
@@ -1737,6 +1747,24 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                 excluded_phrase_at_beginning_of_line)):
             self.add_message('invalid-punctuation-used', line=line_num)
 
+    def _check_trailing_comment(self, line, line_num):
+        """Checks if the comment is an invalid trailing comment or an acceptable
+        pylint pragma.
+
+        Args:
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
+        """
+        # Extract comment from line.
+        _, trail_comment = line.split('#')
+        # Check for pylint pragma.
+        if (re.search('pylint:', trail_comment) or
+                re.search('isort:', trail_comment)):
+            if trail_comment.startswith('pylint:'):
+                self.add_message('no-space-before-pylint-pragma', line=line_num)
+        else:
+            self.add_message('invalid-trailing-comment', line=line_num)
+
     def process_tokens(self, tokens):
         """Custom pylint checker to ensure that comments follow correct style.
 
@@ -1748,17 +1776,23 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         comments_index = -1
 
         for (token_type, _, (line_num, _), _, line) in tokens:
-            if token_type == tokenize.COMMENT and line.strip().startswith('#'):
-                line = line.strip()
+            if token_type == tokenize.COMMENT:
+                # Check format of single line comment.
+                if line.strip().startswith('#'):
+                    line = line.strip()
 
-                self._check_space_at_beginning_of_comments(line, line_num)
+                    self._check_space_at_beginning_of_comments(line, line_num)
 
-                if prev_line_num + 1 == line_num:
-                    comments_group_list[comments_index].append((line, line_num))
+                    if prev_line_num + 1 == line_num:
+                        comments_group_list[comments_index].append((
+                            line, line_num))
+                    else:
+                        comments_group_list.append([(line, line_num)])
+                        comments_index += 1
+                    prev_line_num = line_num
+                # Check if trailing comment is invalid or a pylint pragma.
                 else:
-                    comments_group_list.append([(line, line_num)])
-                    comments_index += 1
-                prev_line_num = line_num
+                    self._check_trailing_comment(line.strip(), line_num)
 
         for comments in comments_group_list:
             # Checks first line of comment.

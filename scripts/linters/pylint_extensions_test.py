@@ -2488,6 +2488,79 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_invalid_trailing_comment(self):
+        node_invalid_trailing_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# coding: utf-8
+
+                    import sys   # invalid trailing comment
+                """)
+        node_invalid_trailing_comment.file = filename
+        node_invalid_trailing_comment.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_invalid_trailing_comment))
+
+        message = testutils.Message(
+            msg_id='invalid-trailing-comment',
+            line=3)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_space_before_pylint_pragma(self):
+        node_no_space_before_pylint_pragma = astroid.scoped_nodes.Module(
+            name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# coding: utf-8
+
+                    import sys   #pylint: no space
+                """)
+        node_no_space_before_pylint_pragma.file = filename
+        node_no_space_before_pylint_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_no_space_before_pylint_pragma))
+
+        message = testutils.Message(
+            msg_id='no-space-before-pylint-pragma',
+            line=3)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_valid_pylint_pragma(self):
+        node_valid_pylint_pragma = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# coding: utf-8
+
+                    import sys   # pylint: this is fine
+                """)
+        node_valid_pylint_pragma.file = filename
+        node_valid_pylint_pragma.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_valid_pylint_pragma))
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
 
 class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 
