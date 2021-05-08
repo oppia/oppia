@@ -493,7 +493,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['IdGenerationService', IdGenerationService],
   ['ImageClickInputRulesService', ImageClickInputRulesService],
   ['ImageClickInputValidationService', ImageClickInputValidationService],
-  ['ImageLocalStorageService', ImageLocalStorpageService],
+  ['ImageLocalStorageService', ImageLocalStorageService],
   ['ImagePreloaderService', ImagePreloaderService],
   ['ImageUploadHelperService', ImageUploadHelperService],
   ['ImprovementsService', ImprovementsService],
