@@ -31,7 +31,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 
 @Component({
   selector: 'oppia-display-modal',
-  templateUrl: './hint-and-solution-modal.template.html'
+  templateUrl: './display-solution-modal.component.html'
 })
 export class DisplaySolutionModalComponent {
   COMPONENT_NAME_SOLUTION: string;

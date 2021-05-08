@@ -30,7 +30,7 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 
 @Component({
   selector: 'oppia-display-hint-modal',
-  templateUrl: './hint-and-solution-modal.template.html'
+  templateUrl: './display-hint-modal.component.html'
 })
 export class DisplayHintModalComponent {
   index: number;

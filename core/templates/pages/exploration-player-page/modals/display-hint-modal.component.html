@@ -2,24 +2,24 @@
 
 <div class="modal-body">
   <span>
-    <angular-html-bind *ngIf="isHint" class="oppia-learner-hint-and-solution-modal-body"
-                       [htmlData]="hint.html">
-    </angular-html-bind>
+    <angular-html-bind-wrapper *ngIf="isHint" class="oppia-learner-hint-and-solution-modal-body"
+                               [htmlData]="hint.html">
+    </angular-html-bind-wrapper>
   </span>
   <div *ngIf="!isHint">
     <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
     <span>
-      <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
-                         [htmlData]="shortAnswerHtml.answer">
-      </angular-html-bind>
+      <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
+                                 [htmlData]="shortAnswerHtml.answer">
+      </angular-html-bind-wrapper>
     </span>
     <br>
     <br>
     <label>Explanation: </label>
     <span>
-      <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
-                         [htmlData]="solutionExplanationHtml">
-      </angular-html-bind>
+      <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
+                                 [htmlData]="solutionExplanationHtml">
+      </angular-html-bind-wrapper>
     </span>
   </div>
 </div>
