@@ -324,8 +324,6 @@ exports.config = {
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
 
-    console.log(process.env);
-
     var spw = '';
     var uniqueString = '';
     // Enable this if you want success videos to be saved.
@@ -344,6 +342,7 @@ exports.config = {
             '-s', '1280x1024',
             '-i', process.env.DISPLAY,
             '-g', '300',
+            '-loglevel', '16',
           ];
           uniqueString = randomString.generate(7);
           var name = uniqueString + '.mp4';
@@ -354,27 +353,18 @@ exports.config = {
           vidPath = path.resolve(dirPath, name);
           console.log(`Video path: ${vidPath}`);
           ffmpegArgs.push(vidPath);
-          console.log(`ffmpeg args: ${ffmpegArgs}`);
           spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-          spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
-          // spw.stderr.on('data', function(data) {console.error(`ffmpeg stderr: ${data}`)});
-          spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
+          // spw.stdout.on('data', function(data) {console.log(`ffmpeg stdout: ${data}`)});
+          // spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
           console.log('Attached spw output handlers');
         },
         specDone: function(result) {
           console.log('Killing spw');
           let success = spw.kill();
           console.log(`Killing was successful: ${success}`);
-          console.log(result.status);
-          console.log(fs.existsSync(vidPath));
           if(result.status == 'passed' && !allVideos && fs.existsSync(vidPath)) {
-            try {
-              fs.unlinkSync(vidPath);
-              console.log('Video was deleted successfully.')
-            } catch (e) {
-              console.error(e);
-              console.log('Video was not deleted, even though the suite passed');
-            }
+            fs.unlinkSync(vidPath);
+            console.log('Video was deleted successfully.');
           }
         },
       });
