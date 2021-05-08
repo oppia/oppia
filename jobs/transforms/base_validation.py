@@ -248,8 +248,8 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                     'Invalid validation type for domain object: %s' % (
                         validation_type))
         except Exception as e:
-            yield base_validation_errors.
-                ModelDomainObjectValidateError(input_model, e)
+            yield base_validation_errors.ModelDomainObjectValidateError(
+                input_model, e)
 
 
 @validation_decorators.AuditsExisting(
