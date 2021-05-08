@@ -1,3 +1,34 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@SAEb-ai 
+U8NWXD
+/
+oppia
+forked from oppia/oppia
+1
+01.9k
+Code
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+oppia/scripts/run_e2e_tests.py /
+@U8NWXD
+U8NWXD Disable reruns and reporting to logging server
+Latest commit a9f3bbd 8 days ago
+ History
+ 16 contributors
+@U8NWXD@kevintab95@DubeySandeep@seanlip@vojtechjelinek@brianrodri@nishantwrp@kevjumba@Hudda@nithusha21@shubha-rajan@kevinlee12
+606 lines (501 sloc)  22.2 KB
+  
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
@@ -36,7 +67,7 @@ from scripts import flake_checker
 from scripts import install_third_party_libs
 
 
-MAX_RETRY_COUNT = 3
+MAX_RETRY_COUNT = 1
 RERUN_NON_FLAKY = True
 WEB_DRIVER_PORT = 4444
 OPPIA_SERVER_PORT = 8181
@@ -86,10 +117,7 @@ _PARSER = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
    bash scripts/run_e2e_tests.sh
-
 The root folder MUST be named 'oppia'.
-
-
   --suite=suite_name Performs test for different suites, here suites are the
         name of the test files present in core/tests/protractor_desktop/ and
         core/test/protractor/ dirs. e.g. for the file
@@ -215,7 +243,6 @@ def cleanup():
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
-
     Returns:
         bool. Whether there is a running Oppia instance.
     """
@@ -255,7 +282,6 @@ def run_webpack_compilation(source_maps=False):
 
 def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
-
     Args:
         parameters: list(str). A list of parameters to pass to webdriver
             manager.
@@ -275,7 +301,6 @@ def setup_and_install_dependencies(skip_install):
 def build_js_files(
         dev_mode_setting, deparallelize_terser=False, source_maps=False):
     """Build the javascript files.
-
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
             in dev mode.
@@ -310,7 +335,6 @@ def tweak_webdriver_manager():
     Windows wouldn't run on the ia32 architecture, so its help function used to
     determine download link returns null for this, which means that the
     application has no idea about where to download the correct version.
-
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L16
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/geckodriver.ts#L21
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L167
@@ -343,7 +367,6 @@ def undo_webdriver_tweak():
 
 def start_webdriver_manager(version):
     """Update and start webdriver manager.
-
     Args:
         version: str. The chromedriver version.
     """
@@ -358,10 +381,8 @@ def start_webdriver_manager(version):
 def get_parameter_for_sharding(sharding_instances):
     """Return the parameter for sharding, based on the given number of
     sharding instances.
-
     Args:
         sharding_instances: int. How many sharding instances to be running.
-
     Returns:
         list(str). A list of parameters to represent the sharding configuration.
     """
@@ -376,10 +397,8 @@ def get_parameter_for_sharding(sharding_instances):
 
 def get_parameter_for_dev_mode(dev_mode_setting):
     """Return parameter for whether the test should be running on dev_mode.
-
     Args:
         dev_mode_setting: bool. Whether the test is running on dev_mode.
-
     Returns:
         str. A string for the testing mode command line parameter.
     """
@@ -388,11 +407,9 @@ def get_parameter_for_dev_mode(dev_mode_setting):
 
 def get_parameter_for_suite(suite_name):
     """Return a parameter for which suite to run the tests for.
-
     Args:
         suite_name: str. The suite name whose tests should be run. If the value
             is `full`, all tests will run.
-
     Returns:
         list(str). A list of command line parameters for the suite.
     """
@@ -402,14 +419,12 @@ def get_parameter_for_suite(suite_name):
 def get_e2e_test_parameters(
         sharding_instances, suite_name, dev_mode_setting):
     """Return parameters for the end-2-end tests.
-
     Args:
         sharding_instances: str. Sets the number of parallel browsers to open
             while sharding.
         suite_name: str. Performs test for different suites.
         dev_mode_setting: bool. Represents whether run the related commands in
             dev mode.
-
     Returns:
         list(str). Parameters for running the tests.
     """
@@ -472,19 +487,16 @@ def get_chrome_driver_version():
 
 def start_portserver():
     """Start a portserver in a subprocess.
-
     The portserver listens at PORTSERVER_SOCKET_FILEPATH and allocates free
     ports to clients. This prevents race conditions when two clients
     request ports in quick succession. The local Google App Engine
     server that we use to serve the development version of Oppia uses
     python_portpicker, which is compatible with the portserver this
     function starts, to request ports.
-
     By "compatible" we mean that python_portpicker requests a port by
     sending a request consisting of the PID of the requesting process
     and expects a response consisting of the allocated port number. This
     is the interface provided by this portserver.
-
     Returns:
         subprocess.Popen. The Popen subprocess object.
     """
@@ -499,12 +511,10 @@ def start_portserver():
 
 def cleanup_portserver(portserver_process):
     """Shut down the portserver.
-
     We wait KILL_TIMEOUT_SECS seconds for the portserver to shut down
     after sending CTRL-C (SIGINT). The portserver is configured to shut
     down cleanly upon receiving this signal. If the server fails to shut
     down, we kill the process.
-
     Args:
         portserver_process: subprocess.Popen. The Popen subprocess
             object for the portserver.
@@ -597,21 +607,6 @@ def main(args=None):
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
         output, return_code = run_tests(parsed_args)
-        # Don't rerun off of CI.
-        if not flake_checker.check_if_on_ci():
-            python_utils.PRINT('No reruns because not running on CI.')
-            break
-        # Don't rerun passing tests.
-        if return_code == 0:
-            flake_checker.report_pass(parsed_args.suite)
-            break
-        flaky = flake_checker.is_test_output_flaky(
-            output, parsed_args.suite)
-        # Don't rerun if the test was non-flaky and we are not
-        # rerunning non-flaky tests.
-        if not flaky and not RERUN_NON_FLAKY:
-            break
-        # Prepare for rerun.
         cleanup()
 
     sys.exit(return_code)
@@ -619,3 +614,16 @@ def main(args=None):
 
 if __name__ == '__main__':  # pragma: no cover
     main()
+© 2021 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Loading complete
