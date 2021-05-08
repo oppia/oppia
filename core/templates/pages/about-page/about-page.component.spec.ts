@@ -131,7 +131,7 @@ describe('About Page', () => {
       preferred_site_language_code: null,
       username: '',
       email: '',
-      user_is_logged_in: false
+      user_is_logged_in: true
     };
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       UserInfo.createFromBackendDict(userInfoBackendDict))
@@ -139,13 +139,11 @@ describe('About Page', () => {
     component.ngOnInit();
 
     flushMicrotasks();
-    expect(component.userIsLoggedIn).toBe(false);
+    expect(component.userIsLoggedIn).toBe(true);
     spyOn(
       siteAnalyticsService, 'registerCreateLessonButtonEvent')
       .and.callThrough();
     component.onClickCreateLessonButton();
-    component.windowRef.nativeWindow.location.href =
-    '/creator-dashboard?mode=create';
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
@@ -167,65 +165,16 @@ describe('About Page', () => {
         .toHaveBeenCalledWith('Loading');
     }));
 
-  it('should set the correct value for the userIsLoggedIn property',
-    fakeAsync(() => {
-      const UserInfoObject = {
-        is_moderator: false,
-        is_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        email: 'test@test.com',
-        user_is_logged_in: false
-      };
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-        UserInfo.createFromBackendDict(UserInfoObject))
-      );
-
-      component.ngOnInit();
-      flushMicrotasks();
-
-      expect(component.userIsLoggedIn).toBe(false);
-    }));
-
-  it('should set the value for user is logged in', fakeAsync(() => {
-    const UserInfoObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: true
-    };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject))
-    );
-
-    component.ngOnInit();
-    component.userIsLoggedIn = false;
-    expect(component.userIsLoggedIn).toBe(false);
-
-    flushMicrotasks();
-
-    expect(component.userIsLoggedIn).toBe(true);
-  }));
-
   it('should activate Visit Classroom button when clicked', function() {
     spyOn(
       siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
     component.onClickVisitClassroomButton();
-    component.windowRef.nativeWindow.location.href = '/learn/math';
 
     expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalledWith();
-    expect(component.windowRef.nativeWindow.location.href)
-      .toBe('/learn/math');
+    expect(component.windowRef.nativeWindow.location.href).toBe(
+      component.classroomUrl);
   });
 
   it('should activate Browse Library button when clicked', function() {
@@ -239,18 +188,5 @@ describe('About Page', () => {
       .toHaveBeenCalledWith();
     expect(component.windowRef.nativeWindow.location.href)
       .toBe('/community-library');
-  });
-
-  it('should activate Create Lesson button when clicked', function() {
-    spyOn(
-      siteAnalyticsService, 'registerCreateLessonButtonEvent')
-      .and.callThrough();
-
-    component.onClickCreateLessonButton();
-
-    expect(siteAnalyticsService.registerCreateLessonButtonEvent)
-      .toHaveBeenCalledWith();
-    expect(component.windowRef.nativeWindow.location.href).toBe(
-      '/creator-dashboard?mode=create');
   });
 });
