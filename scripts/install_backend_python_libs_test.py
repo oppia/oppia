@@ -120,20 +120,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.open_file_swap = self.swap(
             python_utils, 'open_file', MockOpenFile)
 
-        class MockProcess(python_utils.OBJECT):
-            """Return object with required attributes."""
-
-            def __init__(self):
-                self.returncode = 0
-
-            def communicate(self):
-                """Return required method."""
-                return '', ''
-
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
-            return MockProcess()
+            return test_utils.PopenStub()
 
         self.swap_check_call = self.swap(
             subprocess, 'check_call', mock_check_call)

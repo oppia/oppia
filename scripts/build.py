@@ -669,10 +669,10 @@ def build_using_webpack(config_path):
     """
 
     python_utils.PRINT('Building webpack')
-
-    cmd = '%s --max-old-space-size=2400 %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
-    subprocess.check_call(cmd, shell=True)
+    managed_webpack_compiler = common.managed_webpack_compiler(
+        config_path=config_path, max_old_space_size=2400)
+    with managed_webpack_compiler as p:
+        p.wait()
 
 
 def hash_should_be_inserted(filepath):
