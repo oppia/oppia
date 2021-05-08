@@ -1,34 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@SAEb-ai 
-U8NWXD
-/
-oppia
-forked from oppia/oppia
-1
-01.9k
-Code
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-oppia/scripts/run_e2e_tests.py /
-@U8NWXD
-U8NWXD Disable reruns and reporting to logging server
-Latest commit a9f3bbd 8 days ago
- History
- 16 contributors
-@U8NWXD@kevintab95@DubeySandeep@seanlip@vojtechjelinek@brianrodri@nishantwrp@kevjumba@Hudda@nithusha21@shubha-rajan@kevinlee12
-606 lines (501 sloc)  22.2 KB
-  
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
@@ -614,16 +583,3 @@ def main(args=None):
 
 if __name__ == '__main__':  # pragma: no cover
     main()
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
