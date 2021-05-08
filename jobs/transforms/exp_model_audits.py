@@ -24,7 +24,7 @@ from core.platform import models
 from jobs.decorators import audit_decorators
 from jobs.transforms import base_model_audits
 
-(exp_models, ) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 @audit_decorators.AuditsExisting(

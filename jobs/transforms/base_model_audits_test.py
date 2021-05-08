@@ -448,7 +448,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'cmd-invalid\': u\'invalid_test_command\'}',
+                {'cmd-invalid': 'invalid_test_command'},
                 'Missing cmd key in change dict')
         ])
 
@@ -471,7 +471,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'cmd\': u\'invalid_test_command\'}',
+                {'cmd': 'invalid_test_command'},
                 'Command invalid_test_command is not allowed')
         ])
 

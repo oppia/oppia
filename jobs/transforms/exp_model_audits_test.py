@@ -78,7 +78,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'invalid\': u\'data\'}',
+                {'invalid': 'data'},
                 'Missing cmd key in change dict')
         ])
 
@@ -105,7 +105,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'cmd\': u\'invalid\'}',
+                {'cmd': 'invalid'},
                 'Command invalid is not allowed')
         ])
 
@@ -136,8 +136,11 @@ class ValidateExplorationCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'cmd\': u\'edit_state_property\', u\'old_value\': '
-                'u\'old_value\', u\'property_name\': u\'content\'}',
+                {
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content',
+                    'old_value': 'old_value'
+                },
                 'The following required attributes are missing: '
                 'new_value, state_name')
         ])
@@ -170,9 +173,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'new_state_name\': u\'new_state_name\', u\'cmd\': '
-                'u\'rename_state\', u\'invalid\': u\'invalid\', '
-                'u\'old_state_name\': u\'old_state_name\'}',
+                {
+                    'cmd': 'rename_state',
+                    'old_state_name': 'old_state_name',
+                    'new_state_name': 'new_state_name',
+                    'invalid': 'invalid'
+                },
                 'The following extra attributes are present: invalid')
         ])
 
@@ -204,9 +210,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'new_value\': u\'new_value\', u\'cmd\': '
-                'u\'edit_exploration_property\', u\'old_value\': '
-                'u\'old_value\', u\'property_name\': u\'invalid\'}',
+                {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'invalid',
+                    'old_value': 'old_value',
+                    'new_value': 'new_value',
+                },
                 'Value for property_name in cmd edit_exploration_property: '
                 'invalid is not allowed')
         ])
@@ -240,10 +249,13 @@ class ValidateExplorationCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [
             audit_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'new_value\': u\'new_value\', u\'cmd\': '
-                'u\'edit_state_property\', u\'old_value\': u\'old_value\', '
-                'u\'state_name\': u\'state_name\', '
-                'u\'property_name\': u\'invalid\'}',
+                {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'state_name',
+                    'property_name': 'invalid',
+                    'old_value': 'old_value',
+                    'new_value': 'new_value',
+                },
                 'Value for property_name in cmd edit_state_property: '
                 'invalid is not allowed')
         ])
