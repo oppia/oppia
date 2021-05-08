@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
-from jobs.types import base_validation_errors
 from jobs.types import base_validation_errors_test
 from jobs.types import topic_validation_errors
 
@@ -30,7 +29,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class ModelCanonicalNameMismatchErrorTests(
-        base_validation_errors.AuditErrorsTestBase):
+        base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         model = topic_models.TopicModel(

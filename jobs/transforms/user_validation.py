@@ -136,8 +136,8 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
         model = job_utils.clone_model(input_model)
         if (model.draft_change_list and
                 not model.draft_change_list_last_updated):
-            yield user_validation_errors.
-                DraftChangeListLastUpdatedNoneError(model)
+            yield user_validation_errors.DraftChangeListLastUpdatedNoneError(
+                model)
         current_time = datetime.datetime.utcnow()
         if (model.draft_change_list_last_updated and
                 model.draft_change_list_last_updated > current_time):
