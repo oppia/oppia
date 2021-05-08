@@ -41,7 +41,6 @@
     "core/templates/domain/classifier/answer-classification-result.model.ts",
     "core/templates/domain/classifier/answer-classification-result.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/collection/collection-node.model.ts",
     "core/templates/domain/collection/collection-node.model.spec.ts",
     "core/templates/domain/collection/collection-playthrough.model.ts",
