@@ -18,7 +18,7 @@
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { EventEmitter, Injectable, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
@@ -146,11 +146,12 @@ describe('Rearrange Skills In Subtopic Modal Controller', () => {
     expect(component.oldSubtopicId).toEqual(1);
   });
 
-  it('should call TopicUpdateService when skill is moved', () => {
+  it('should call TopicUpdateService when skill is moved', waitForAsync(() => {
     var moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
     component.onMoveSkillEnd(1);
+    component.onMouseDownOnCdkDrag();
     expect(moveSkillSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should call TopicUpdateService when skill is removed from subtopic',
     () => {
@@ -160,12 +161,12 @@ describe('Rearrange Skills In Subtopic Modal Controller', () => {
     });
 
   it('should not call TopicUpdateService when skill is moved to same subtopic',
-    () => {
+    waitForAsync(() => {
       var removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
       component.oldSubtopicId = null;
       component.onMoveSkillEnd(null);
       expect(removeSkillSpy).not.toHaveBeenCalled();
-    });
+    }));
 
   it('should not call TopicUpdateService if subtopic name validation fails',
     () => {
