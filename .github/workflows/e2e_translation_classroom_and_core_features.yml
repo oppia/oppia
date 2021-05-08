@@ -34,12 +34,6 @@ jobs:
       - name: Install ffmpeg
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: sudo apt install ffmpeg
-      - name: Run Exploration Translation Tab E2E Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env
-      - name: Run Classroom Page E2E Test
-        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="classroomPage" --prod_env
       - name: Run Core Editor And Player E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="coreEditorAndPlayerFeatures" --prod_env
