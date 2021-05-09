@@ -39,10 +39,12 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-from core.storage import suggesstion_models
+from core.platform import models
 import feconf
 import utils
 
+(suggestion_models,) = models.Registry.import_models([
+    models.NAMES.suggestion])
 
 def _redirect_based_on_return_type(
         handler, redirection_url, expected_return_type):
@@ -2991,7 +2993,7 @@ def can_update_suggestion(handler):
             raise self.PageNotFoundException
 
         if suggestion.suggestion_type not in (
-            suggesstion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
+            suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
             raise self.InvalidInputException(
                 'Invalid suggestion type')
 
