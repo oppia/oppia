@@ -80,15 +80,15 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
             json_response = self.get_json(
-                '%s/%s,%s?offset=' % (
+                '%s/%s,%s?cursor=' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,
                     self.skill_id, self.skill_id_2
                 ))
             question_summary_dicts = json_response['question_summary_dicts']
             self.assertEqual(len(question_summary_dicts), 2)
-            offset = json_response['offset']
+            offset = json_response['next_start_cursor']
             json_response = self.get_json(
-                '%s/%s,%s?offset=%s' % (
+                '%s/%s,%s?cursor=%s' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,
                     self.skill_id, self.skill_id_2,
                     offset
