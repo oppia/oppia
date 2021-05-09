@@ -11,10 +11,10 @@
             </span>
           </a>
           <a (click)="onPlayButtonClicked()"
-            [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
-            placement="right">
+             [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
+             placement="right">
             <i class="fas oppia-audio-controls-button-icon" tabindex="0"
-              [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
             </i>
           </a>
           <a (click)="onForwardButtonClicked()">
@@ -56,10 +56,10 @@
       </div>
     </div>
     <div class="audio-collapse-button audio-toggle-button"
-        ng-if="audioBarIsExpanded"
-        ng-click="collapseAudioBar()"
-        aria-label="Audio menu collapse"
-        ng-class="{'audio-controls-margin': progressBarIsShown}">
+         ng-if="audioBarIsExpanded"
+         ng-click="collapseAudioBar()"
+         aria-label="Audio menu collapse"
+         ng-class="{'audio-controls-margin': progressBarIsShown}">
       <i class="fas fa-sort-up"></i>
     </div>
   </div>
