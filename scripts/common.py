@@ -847,11 +847,18 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
             if proc.is_running() else 'Process(pid=%d)' % (proc.pid,))
 
         procs_still_alive = []
+        # There is a race condition here where the process might have
+        # terminated after we check proc.is_running() but before we call
+        # proc.terminate() or proc.kill(). The try-except handles this
+        # case. See https://psutil.readthedocs.io/en/latest/#exceptions.
         for proc in procs_to_kill:
             if proc.is_running():
                 procs_still_alive.append(proc)
                 logging.info('Terminating %s...' % get_debug_info(proc))
-                proc.terminate()
+                try:
+                    proc.terminate()
+                except psutil.Error:
+                    pass
             else:
                 logging.info('%s has ended.' % get_debug_info(proc))
 
@@ -861,7 +868,10 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
             logging.info('%s has ended.' % get_debug_info(proc))
         for proc in procs_still_alive:
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
-            proc.kill()
+            try:
+                proc.kill()
+            except psutil.Error:
+                pass
 
 
 @contextlib.contextmanager
