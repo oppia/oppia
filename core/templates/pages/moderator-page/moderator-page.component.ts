@@ -29,8 +29,6 @@ import { ActivityIdTypeDict, CommitMessage,
   ExplorationDict, ModeratorPageBackendApiService }
   from './services/moderator-page-backend-api.service';
 
-require('base-components/base-content.directive.ts');
-
 @Component({
   selector: 'oppia-moderator-page',
   templateUrl: './moderator-page.component.html'

@@ -107,7 +107,6 @@ import { CustomFormsComponentsModule } from './forms/custom-forms-directives/cus
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule } from 'filters/translate.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { BaseContentComponent } from '../base-components/base-content.component';
 
@@ -192,7 +191,6 @@ const toastrConfig = {
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SideNavigationBarWrapperComponent,
-    ResponseHeaderComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SharingLinksComponent,
@@ -293,7 +291,6 @@ const toastrConfig = {
     SharingLinksComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
-    ResponseHeaderComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
