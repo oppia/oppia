@@ -297,7 +297,7 @@ describe('Permissions for private explorations', function() {
 
     await users.login('eve@privileges.com');
     await general.openEditor(explorationId, false);
-    await general.expect404Error();
+    await general.expectErrorPage(404);
     await users.logout();
   });
 
@@ -332,7 +332,7 @@ describe('Permissions for private explorations', function() {
 
     await users.login('guestUser@oppia.tests');
     await general.openEditor(explorationId, false);
-    await general.expect404Error();
+    await general.expectErrorPage(404);
     await users.logout();
   });
 
