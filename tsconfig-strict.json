@@ -41,7 +41,6 @@
     "core/templates/domain/classifier/answer-classification-result.model.ts",
     "core/templates/domain/classifier/answer-classification-result.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/collection/collection-playthrough.model.ts",
     "core/templates/domain/collection/collection-playthrough.model.spec.ts",
     "core/templates/domain/collection/collection-rights.model.ts",
@@ -183,5 +182,6 @@
     "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
     "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
   ],
-  "include": ["typings/*.ts"]
+  "include": ["typings/*.ts"],
+  "exclude": ["extensions/classifiers/proto"]
 }
