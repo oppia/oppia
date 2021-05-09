@@ -981,9 +981,6 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
     Yields:
         psutil.Process. The emulator process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     emulator_hostport = '%s:%d' % (
         feconf.CLOUD_DATASTORE_EMULATOR_HOST,
         feconf.CLOUD_DATASTORE_EMULATOR_PORT)
@@ -995,7 +992,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--no-store-on-disk', '--consistency=1.0', '--quiet',
     ]
 
-    with contextlib2.ExitStack() as stack:
+    with python_utils.exit_stack() as stack:
         data_dir_exists = os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
         if clear_datastore and data_dir_exists:
             # Replace it with an empty directory.

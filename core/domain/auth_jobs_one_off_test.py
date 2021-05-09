@@ -34,7 +34,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-import contextlib2
 import firebase_admin.auth
 
 auth_models, user_models = (
@@ -50,7 +49,7 @@ class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
 
     def setUp(self):
         super(FirebaseOneOffJobTestBase, self).setUp()
-        self.exit_stack = contextlib2.ExitStack()
+        self.exit_stack = python_utils.exit_stack()
         self.firebase_sdk_stub = (
             firebase_auth_services_test.FirebaseAdminSdkStub())
 

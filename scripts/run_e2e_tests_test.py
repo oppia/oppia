@@ -38,8 +38,6 @@ from scripts import flake_checker
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 
-import contextlib2
-
 
 CHROME_DRIVER_VERSION = '77.0.3865.40'
 
@@ -926,13 +924,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -972,7 +970,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.exit_stack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1045,13 +1043,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1081,7 +1079,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         ]
         args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.exit_stack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1445,13 +1443,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1492,7 +1490,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.exit_stack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1619,13 +1617,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1666,7 +1664,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.exit_stack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1744,13 +1742,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=contextlib2.nullcontext()),
+                value=python_utils.null_context()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1790,7 +1788,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.exit_stack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 

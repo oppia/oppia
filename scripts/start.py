@@ -150,8 +150,6 @@ def main(args=None):
 
     common.start_redis_server()
 
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
     managed_dev_appserver = common.managed_dev_appserver(
         app_yaml_filepath, clear_datastore=not parsed_args.save_datastore,
         enable_console=parsed_args.enable_console,
@@ -159,7 +157,7 @@ def main(args=None):
         automatic_restart=not parsed_args.no_auto_restart,
         skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
 
-    with contextlib2.ExitStack() as stack:
+    with python_utils.exit_stack() as stack:
         python_utils.PRINT('Starting ElasticSearch development server.')
         stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
