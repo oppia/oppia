@@ -114,6 +114,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-layout.service.ts',
     'graph-property-editor.component.ts',
     'graph-viz.component.ts',
+    'headroom.directive.ts',
     'hint-and-solution-buttons.directive.ts',
     'hint-editor.directive.ts',
     'html-editor.component.ts',
