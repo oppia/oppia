@@ -36,12 +36,12 @@ jobs:
         run: sudo apt install ffmpeg
       - name: Run Additional Editor E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1280x1024x24" python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env
       - name: Run Additional Player E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1280x1024x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
       - name: Uploading protractor-video as Artifacts
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-video

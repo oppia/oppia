@@ -324,17 +324,17 @@ exports.config = {
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
 
-    var spw = '';
-    var uniqueString = '';
+    var spw = null;
     var vidPath = '';
-    // Enable allVideos if you want success videos to be saved.
-    var allVideos = false;
+    // Enable ALLVIDEOS if you want success videos to be saved.
+    const ALLVIDEOS = false;
 
-    // Only running video recorder on Github Actions.
+    // Only running video recorder on Github Actions, since running it on
+    // CicleCI causes RAM issues (meaning very high flakiness).
 
-    if (process.env.PWD == '/home/runner/work/oppia/oppia') {
+    if (process.env.GITHUB_ACTIONS) {
       jasmine.getEnv().addReporter({
-        specStarted: function(){
+        specStarted: function(result){
           let ffmpegArgs = [
             '-y',
             '-r', '30',
@@ -344,31 +344,34 @@ exports.config = {
             '-g', '300',
             '-loglevel', '16',
           ];
-          uniqueString = randomString.generate(7);
+          const uniqueString = randomString.generate(7);
           var name = uniqueString + '.mp4';
           var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
           try {
             fs.mkdirSync(dirPath, { recursive: true });
           } catch (err) {}
           vidPath = path.resolve(dirPath, name);
-          console.log(`Video path: ${vidPath}`);
+          console.log('Test name: ' + result.fullName + ' has video path ' + vidPath);
           ffmpegArgs.push(vidPath);
           spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-          spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
+          spw.on('message', (message) => {console.log(`ffmpeg stdout: ${message}`)});
+          spw.on('error', (errorMessage) => {console.error(`ffmpeg stderr: ${errorMessage}`)});
+          spw.on('close', (code) => {console.log(`ffmpeg exited with code ${code}`)});
         },
         specDone: function(result) {
           spw.kill();
-          if (result.status == 'passed' && !allVideos && fs.existsSync(vidPath)) {
+          if (result.status == 'passed' && !ALLVIDEOS && fs.existsSync(vidPath)) {
             fs.unlinkSync(vidPath);
-            console.log('Video was deleted successfully (test passed).');
+            console.log(`Video for test: ${result.fullName} was deleted successfully (test passed).`);
           }
         },
       });
     }
 
-    // Screenshots will only run on CircleCI.
+    // Screenshots will only run on CircleCI, since we don't have videos here.
+    // We don't need these on Github Actions since we have videos. 
 
-    if (process.env.PWD == '/home/circleci/oppia') {
+    if (process.env.CIRCLECI) {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
