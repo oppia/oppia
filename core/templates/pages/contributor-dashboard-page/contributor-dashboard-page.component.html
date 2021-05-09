@@ -12,7 +12,7 @@
         </li>
       </ul>
     </div>
-    <div ng-class="{'oppia-fade-in': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
+    <div ng-class="{'oppia-translate-y': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
       <div class="oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -70,7 +70,7 @@
         </div>
       </div>
     </div>
-    <div ng-class="{'oppia-fade-in': !$ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': $ctrl.defaultHeaderVisible}">
+    <div ng-class="{'oppia-translate-y': !$ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': $ctrl.defaultHeaderVisible}">
       <div class="collapsed-oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -346,10 +346,10 @@
   .oppia-contributor-dashboard-collapsible-header {
     display: none;
   }
-  .oppia-fade-in {
-      -webkit-animation: fade-in 0.5s ease-out alternate;
-      -moz-animation: fade-in 0.5s ease-out alternate;
-      animation: fade-in 0.5s ease-out alternate;
+  .oppia-translate-y {
+      -webkit-animation: translate-y 0.5s ease-out alternate;
+      -moz-animation: translate-y 0.5s ease-out alternate;
+      animation: translate-y 0.5s ease-out alternate;
   }
   .oppia-language-selector {
     padding-bottom: 10px;
@@ -357,15 +357,15 @@
   .oppia-collapsed-language-selector {
     padding-bottom: 15px;
   }
-  @-webkit-keyframes fade-in {
+  @-webkit-keyframes translate-y {
     from { transform: translateY(-100%); }
     to { transform: translateY(0); }
   }
-  @-moz-keyframes fade-in {
+  @-moz-keyframes translate-y {
     from { transform: translateY(-100%); }
     to { transform: translateY(0); }
   }
-  @keyframes fade-in {
+  @keyframes translate-y {
       from { transform: translateY(-100%); }
       to { transform: translateY(0); }
   }
