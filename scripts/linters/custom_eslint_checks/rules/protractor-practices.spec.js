@@ -31,6 +31,14 @@ ruleTester.run('protractor-practices', rule, {
     code:
     `action.click(elem);
     browser.action.sleep();`,
+  }, {
+    code: 'card.then = 3;',
+  }, {
+    code: 'prevAge = then.age();',
+  }, {
+    code: 'then().age;',
+  }, {
+    code: 'sam.then.age;',
   }],
 
   invalid: [
@@ -42,6 +50,15 @@ ruleTester.run('protractor-practices', rule, {
       errors: [{
         message: 'Please do not use browser.sleep() in protractor files',
         type: 'CallExpression',
+      }],
+    },
+    {
+      code:
+      `toPromise.then(function() {
+        numLessons = 3;
+      });`,
+      errors: [{
+        message: 'Please do not use .then(), consider async/await instead',
       }],
     },
   ]
