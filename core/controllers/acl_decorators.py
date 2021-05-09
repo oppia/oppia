@@ -39,6 +39,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.storage import suggesstion_models
 import feconf
 import utils
 
@@ -2944,7 +2945,8 @@ def can_update_suggestion(handler):
     Returns:
         function. The newly decorated function that has common checks and
         permissions specified by passed in decorator. This function is allowed
-        to be called for users who have the rights to accept suggestions.
+        to be called for users who have the rights to update the given 
+        suggestion.
 
     Raises:
         NotLoggedInException. The user is not logged in.
@@ -2988,19 +2990,17 @@ def can_update_suggestion(handler):
         if suggestion is None:
             raise self.PageNotFoundException
 
-        if ((suggestion.suggestion_type !=
-             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT) and
-                (suggestion.suggestion_type !=
-                 feconf.SUGGESTION_TYPE_ADD_QUESTION)):
+        if suggestion.suggestion_type not in (
+            suggesstion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
             raise self.InvalidInputException(
                 'Invalid suggestion type')
+
+        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+            return handler(self, suggestion_id, **kwargs)
 
         if suggestion.author_id == self.user_id:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You are not allowed to update suggestions that you created.')
-
-        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
-            return handler(self, suggestion_id, **kwargs)
 
         if suggestion.suggestion_type == (
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):

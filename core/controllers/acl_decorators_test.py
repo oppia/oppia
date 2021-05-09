@@ -3542,8 +3542,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     admin_email = 'admin@example.com'
     author_username = 'author'
     author_email = 'author@example.com'
-    reviewer_01_email = 'reviewer1@example.com'
-    reviewer_02_email = 'reviewer2@example.com'
+    hi_language_reviewer = 'reviewer1@example.com'
+    en_language_reviewer = 'reviewer2@example.com'
     username = 'user'
     user_email = 'user@example.com'
     TARGET_TYPE = 'exploration'
@@ -3576,22 +3576,22 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.signup(self.author_email, self.author_username)
         self.signup(self.user_email, self.username)
         self.signup(self.admin_email, self.admin_username)
-        self.signup(self.reviewer_01_email, 'reviewer1')
-        self.signup(self.reviewer_02_email, 'reviewer2')
+        self.signup(self.hi_language_reviewer, 'reviewer1')
+        self.signup(self.en_language_reviewer, 'reviewer2')
         self.author_id = self.get_user_id_from_email(self.author_email)
         self.admin_id = self.get_user_id_from_email(self.admin_email)
-        self.reviewer_01_id = self.get_user_id_from_email(
-            self.reviewer_01_email)
-        self.reviewer_02_id = self.get_user_id_from_email(
-            self.reviewer_02_email)
+        self.hi_language_reviewer_id = self.get_user_id_from_email(
+            self.hi_language_reviewer)
+        self.en_language_reviewer_id = self.get_user_id_from_email(
+            self.en_language_reviewer)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.author = user_services.get_user_actions_info(self.author_id)
         user_services.update_user_role(self.admin_id, feconf.ROLE_ID_ADMIN)
         user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_01_id, 'hi')
+            self.hi_language_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
-            self.reviewer_02_id, 'en')
-        user_services.allow_user_to_review_question(self.reviewer_01_id)
+            self.en_language_reviewer_id, 'en')
+        user_services.allow_user_to_review_question(self.hi_language_reviewer_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -3671,7 +3671,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.invalid_suggestion_id = invalid_suggestion.suggestion_id
         self.logout()
 
-    def test_author_cannot_update_suggestion(self):
+    def test_authors_cannot_update_suggestion_that_they_created(self):
         self.login(self.author_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3682,7 +3682,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'You are not allowed to update suggestions that you created.')
         self.logout()
 
-    def test_admin_can_update_translation_suggestion(self):
+    def test_admin_can_update_any_given_translation_suggestion(self):
         self.login(self.admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -3691,7 +3691,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             response['suggestion_id'], self.translation_suggestion_id)
         self.logout()
 
-    def test_admin_can_update_question_suggestion(self):
+    def test_admin_can_update_any_given_question_suggestion(self):
         self.login(self.admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
@@ -3699,7 +3699,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_reviewer_can_update_translation_suggestion(self):
-        self.login(self.reviewer_01_email)
+        self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id)
@@ -3708,7 +3708,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_reviewer_can_update_question_suggestion(self):
-        self.login(self.reviewer_01_email)
+        self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
         self.assertEqual(
@@ -3716,7 +3716,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_invalid_suggestions_cannot_be_updated(self):
-        self.login(self.reviewer_01_email)
+        self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.invalid_suggestion_id,
@@ -3725,7 +3725,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             response['error'], 'Invalid suggestion type')
         self.logout()
 
-    def test_guest_cannot_update_suggestion(self):
+    def test_guest_cannot_update_any_suggestion(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id,
@@ -3734,8 +3734,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             response['error'],
             'You must be logged in to access this resource.')
 
-    def test_reviewers_without_permission_cannot_update_suggestion(self):
-        self.login(self.reviewer_02_email)
+    def test_reviewers_without_permission_cannot_update_any_suggestion(self):
+        self.login(self.en_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id,
@@ -3745,7 +3745,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestions_with_invalid_suggestion_id_cannot_be_updated(self):
-        self.login(self.reviewer_01_email)
+        self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % 'suggestion-id',
@@ -3755,8 +3755,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'It must contain 3 parts separated by \'.\'')
         self.logout()
 
-    def test_non_existent_suggestion_cannot_be_updated(self):
-        self.login(self.reviewer_01_email)
+    def test_non_existent_suggestions_cannot_be_updated(self):
+        self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % 'exploration.exp1.' +

@@ -29,6 +29,7 @@ from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
+from core.domain import state_domain
 from core.domain import suggestion_services
 import feconf
 import utils
@@ -376,8 +377,44 @@ class SuggestionListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class UpdateSuggestionHandler(base.BaseHandler):
-    """"Handles update operations relating to suggestions."""
+class UpdateTranslationSuggestionHandler(base.BaseHandler):
+    """"Handles update operations relating to translation suggestions."""
+
+    @acl_decorators.can_update_suggestion
+    def put(self, suggestion_id):
+        """Handles PUT requests.
+
+        Raises:
+            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The 'translation_html' parameter is missing.
+            InvalidInputException. The 'translation_html' parameter should be a
+             string.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.is_handled:
+            raise self.InvalidInputException(
+                'The suggestion with id %s has been accepted or rejected'
+                % (suggestion_id)
+            )
+
+        if self.payload.get('translation_html') is None:
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' is missing.'
+            )
+
+        if type(self.payload.get('translation_html')) != unicode:
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' should be a string.'
+            )
+
+        suggestion_services.update_translation_suggestion(
+            suggestion_id, self.payload.get('translation_html'))
+
+        self.render_json(self.values)
+
+
+class UpdateQuestionSuggestionHandler(base.BaseHandler):
+    """"Handles update operations relating to question suggestions."""
 
     @acl_decorators.can_update_suggestion
     def put(self, suggestion_id):
@@ -394,16 +431,29 @@ class UpdateSuggestionHandler(base.BaseHandler):
                 % (suggestion_id)
             )
 
-        if self.payload.get('change') is None:
+        if self.payload.get('skill_difficulty') is None:
             raise self.InvalidInputException(
-                'The parameter \'change\' is missing.'
+                'The parameter \'skill_difficulty\' is missing.'
             )
 
-        new_change = self.payload.get('change')
-        change_cls = type(suggestion.change)
-        change_object = change_cls(new_change)
+        if type(self.payload.get('skill_difficulty')) != float:
+            raise self.InvalidInputException(
+                'The parameter \'skill_difficulty\' should be a decimal.'
+            )
 
-        suggestion_services.update_suggestion(
-            suggestion_id, change_object)
+        if self.payload.get('question_state_data') is None:
+            raise self.InvalidInputException(
+                'The parameter \'question_state_data\' is missing.'
+            )
+
+        question_state_data_obj = state_domain.State.from_dict(
+            self.payload.get('question_state_data'))
+
+        question_state_data_obj.validate(None, False)
+
+        suggestion_services.update_question_suggestion(
+            suggestion_id,
+            self.payload.get('skill_difficulty'),
+            self.payload.get('question_state_data'))
 
         self.render_json(self.values)

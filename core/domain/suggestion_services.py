@@ -1278,3 +1278,33 @@ def update_suggestion(suggestion_id, change):
     suggestion.pre_update_validate(change)
     suggestion.change = change
     _update_suggestion(suggestion)
+
+
+def update_translation_suggestion(suggestion_id, translation_html):
+    """Updates the translation_html of a suggestion with the given
+    suggestion_id.
+
+    Args:
+        suggestion_id: str. The id of the suggestion to be updated.
+        translation_html: str. The new translation_html string.
+    """
+    suggestion = get_suggestion_by_id(suggestion_id)
+    suggestion.change.translation_html = html_cleaner.clean(translation_html)
+    _update_suggestion(suggestion)
+
+
+def update_question_suggestion(
+    suggestion_id, skill_difficulty, question_state_data):
+    """Updates skill_difficulty and question_state_data of a suggestion with
+    the given suggestion_id.
+
+    Args:
+        suggestion_id: str. The id of the suggestion to be updated.
+        skill_difficulty: double. The difficulty level of the question.
+        question_state_data: obj. Details of the question.
+    """
+    suggestion = get_suggestion_by_id(suggestion_id)
+    suggestion.change.question_dict['question_state_data'] = question_state_data
+    suggestion.change.skill_difficulty = skill_difficulty
+
+    _update_suggestion(suggestion)

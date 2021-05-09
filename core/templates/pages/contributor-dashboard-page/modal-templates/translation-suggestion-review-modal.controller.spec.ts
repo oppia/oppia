@@ -306,6 +306,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       'should update translation when the update button is clicked',
       function() {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
+        $scope.editedContent.html = '<p>In Hindi</p>';
         $scope.activeSuggestion.change = {
           cmd: 'add_translation',
           state_name: 'State 3',
@@ -316,7 +317,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         };
         spyOn(contributionAndReviewService, 'updateTranslationSuggestionAsync')
           .and.callFake((
-              suggestionId, updatedTranslation,
+              suggestionId, translationHtml,
               successCallback, errorCallback) => {
             successCallback();
           });
@@ -325,7 +326,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
         expect(contributionAndReviewService.updateTranslationSuggestionAsync)
           .toHaveBeenCalledWith(
-            'suggestion_1', $scope.activeSuggestion.change,
+            'suggestion_1', $scope.editedContent.html,
             jasmine.any(Function),
             jasmine.any(Function));
       });
