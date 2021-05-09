@@ -798,7 +798,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def test_update_translation_suggestion_to_change_translation_html(self):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
-                'exploration1', self.author_id, ['state 1'],['TextInput'],
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
                 category='Algebra'))
         old_content = state_domain.SubtitledHtml(
             'content', '<p>old content html</p>').to_dict()
@@ -818,13 +818,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'exploration1', self.target_version_at_submission,
             self.author_id, add_translation_change_dict, 'test description')
-        
+
         suggestion_services.update_translation_suggestion(
             suggestion.suggestion_id, '<p>Updated translation</p>'
         )
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
-        
+
         self.assertEqual(
             updated_suggestion.change.translation_html,
             '<p>Updated translation</p>')
@@ -861,7 +861,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
-        
+
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
         question_state_data['content'][
@@ -877,7 +877,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id)
         new_question_state_data = updated_suggestion.change.question_dict[
             'question_state_data']
-        
+
         self.assertEqual(
             new_question_state_data['content'][
                 'html'],
@@ -911,6 +911,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
+        question_state_data = suggestion.change.question_dict[
+            'question_state_data']
 
         suggestion_services.update_question_suggestion(
             suggestion.suggestion_id,

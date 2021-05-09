@@ -378,7 +378,7 @@ class SuggestionListHandler(base.BaseHandler):
 
 
 class UpdateTranslationSuggestionHandler(base.BaseHandler):
-    """"Handles update operations relating to translation suggestions."""
+    """Handles update operations relating to translation suggestions."""
 
     @acl_decorators.can_update_suggestion
     def put(self, suggestion_id):
@@ -388,7 +388,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
             InvalidInputException. The suggestion is already handled.
             InvalidInputException. The 'translation_html' parameter is missing.
             InvalidInputException. The 'translation_html' parameter should be a
-             string.
+                string.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.is_handled:
@@ -402,7 +402,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
                 'The parameter \'translation_html\' is missing.'
             )
 
-        if type(self.payload.get('translation_html')) != unicode:
+        if isinstance(self.payload.get('translation_html')) != unicode:
             raise self.InvalidInputException(
                 'The parameter \'translation_html\' should be a string.'
             )
@@ -414,7 +414,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
 
 
 class UpdateQuestionSuggestionHandler(base.BaseHandler):
-    """"Handles update operations relating to question suggestions."""
+    """Handles update operations relating to question suggestions."""
 
     @acl_decorators.can_update_suggestion
     def put(self, suggestion_id):
@@ -436,7 +436,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 'The parameter \'skill_difficulty\' is missing.'
             )
 
-        if type(self.payload.get('skill_difficulty')) != float:
+        if isinstance(self.payload.get('skill_difficulty')) != float:
             raise self.InvalidInputException(
                 'The parameter \'skill_difficulty\' should be a decimal.'
             )

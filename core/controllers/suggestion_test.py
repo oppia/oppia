@@ -939,7 +939,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id)
         new_question_state_data = updated_suggestion.change.question_dict[
             'question_state_data']
-        
+
         self.assertEqual(
             new_question_state_data['content'][
                 'html'],
@@ -1168,7 +1168,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'The suggestion with id %s has been accepted or rejected' % suggestion.suggestion_id)
+            'The suggestion with id %s has been accepted or rejected' % (
+                suggestion.suggestion_id))
         self.logout()
 
 

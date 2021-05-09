@@ -46,6 +46,7 @@ import utils
 (suggestion_models,) = models.Registry.import_models([
     models.NAMES.suggestion])
 
+
 def _redirect_based_on_return_type(
         handler, redirection_url, expected_return_type):
     """Redirects to the provided URL if the handler type is not JSON.

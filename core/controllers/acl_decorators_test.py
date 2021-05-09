@@ -3591,7 +3591,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             self.hi_language_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
             self.en_language_reviewer_id, 'en')
-        user_services.allow_user_to_review_question(self.hi_language_reviewer_id)
+        user_services.allow_user_to_review_question(
+            self.hi_language_reviewer_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
             debug=feconf.DEBUG,
