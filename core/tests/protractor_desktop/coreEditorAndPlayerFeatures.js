@@ -84,6 +84,89 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   });
 
+  it('should allow selecting correct feedback from the response editor ' +
+     'after the interaction is created', async function() {
+    await workflow.createExploration(true);
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(explorationTitle);
+    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.navigateToMainTab();
+
+    await explorationEditorMainTab.setStateName('First');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'Select the right option.'));
+
+    // Create interaction first.
+    await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      await forms.toRichText('Correct!'),
+      await forms.toRichText('Wrong!')
+    ]);
+    await explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', await forms.toRichText('Good!'),
+      'End', true, 'Equals', 'Correct!');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    // Turn on correctness feedback.
+    await enableCorrectnessFeedbackSetting();
+
+    // Go back to mark the solution as correct.
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.moveToState('First');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await explorationEditorMainTab.expectTickMarkIsDisplayed();
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    await testEnableCorrectnessInPlayerPage();
+  });
+
+  it('should allow selecting correct feedback from the response editor ' +
+     'during set the interaction', async function() {
+    await workflow.createExploration(false);
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle(explorationTitle);
+    await explorationEditorSettingsTab.setCategory('Algorithm');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.navigateToMainTab();
+
+    // Turn on correctness feedback first.
+    await enableCorrectnessFeedbackSetting();
+
+    // Go to main tab to create interactions.
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.setStateName('First');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
+      'Select the right option.'));
+
+    // Create interaction without closing the add response modal. Set
+    // correctness in the modal.
+    await explorationEditorMainTab.setInteractionWithoutCloseAddResponse(
+      'TextInput');
+    responseEditor = await explorationEditorMainTab.getResponseEditor('pop');
+    await responseEditor.markAsCorrect();
+
+    // Set the response for this interaction and close it.
+    await explorationEditorMainTab.setResponse(
+      'TextInput', await forms.toRichText('Correct!'),
+      'End', true, 'Equals', ['One']);
+
+    await explorationEditorMainTab.expectTickMarkIsDisplayed();
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
+    await explorationEditorMainTab.moveToState('End');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    await testEnableCorrectnessInPlayerPage();
+  });
+
   it('should allow selecting correct feedback from the default response editor',
     async function() {
       await workflow.createExploration(false);
