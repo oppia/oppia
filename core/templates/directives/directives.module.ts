@@ -26,6 +26,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FocusOnDirective } from './focus-on.directive';
 import { MathJaxDirective } from './mathjax.directive';
 import { NgInitDirective } from './ng-init.directive';
+import { HeadroomDirective } from './headroom.directive';
 
 @NgModule({
   imports: [
@@ -35,12 +36,14 @@ import { NgInitDirective } from './ng-init.directive';
   ],
   declarations: [
     FocusOnDirective,
+    HeadroomDirective,
     MathJaxDirective,
     NgInitDirective
   ],
   entryComponents: [],
   exports: [
     FocusOnDirective,
+    HeadroomDirective,
     MathJaxDirective,
     NgInitDirective
   ],

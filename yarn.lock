@@ -320,6 +320,13 @@
     "@types/codemirror" "^0.0.99"
     tslib "^2.0.0"
 
+"@ctrl/ngx-headroom@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@ctrl/ngx-headroom/-/ngx-headroom-4.0.0.tgz#eb64ace2c59d1df535a65afa8f42e93c2151b153"
+  integrity sha512-62R4ZaV++jc5UwYiVTOfsYf6sHV1Qg9oSbmpmwpXbJ4R584qkoOlV4ZbsfHBMMw41V4uBtiourkKTHCnMogaSQ==
+  dependencies:
+    tslib "^2.0.0"
+
 "@dabh/diagnostics@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@dabh/diagnostics/-/diagnostics-2.0.2.tgz#290d08f7b381b8f94607dc8f471a12c675f9db31"
@@ -1017,7 +1024,7 @@
   resolved "https://registry.yarnpkg.com/@types/ckeditor/-/ckeditor-4.9.10.tgz#f4d252821c52c2b903b21801c8469ead756122b3"
   integrity sha512-dcOPCXM0Cr5Z0i6eF/aW5LvECrS+cdl2Gi7lU+rEUNWby0w9Yl6mBubjrs29OVAducpuZjB4mfDayE+o4/gGdQ==
 
-"@types/codemirror@0.0.99", "@types/codemirror@^0.0.99":
+"@types/codemirror@^0.0.99":
   version "0.0.99"
   resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.99.tgz#fc3fd1fe84172e76ab802dcaa309f9c9740aeab0"
   integrity sha512-iSNLwL9ZXUDUhhljqyO9lDpxKOnye9Y2IY0vvoarapI3QLpZsx8RF8Ybic4+gne+DVsnc5ReBOQA3p4FVbsXMw==
@@ -6549,6 +6556,11 @@ he@1.2.0, he@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
+
+headroom.js@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/headroom.js/-/headroom.js-0.12.0.tgz#e09b466b18d22457f2023fb946ff620e47a5c205"
+  integrity sha512-iXnAafUm3FdzfJ91uixLws2hkKI1jC8bAKK/pt7XYr8Ie1jO7xbK48Ycpl9tUPyBgkzuj1p/PhJS0fy4E/5anA==
 
 hmac-drbg@^1.0.1:
   version "1.0.1"

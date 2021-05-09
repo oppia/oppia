@@ -1,5 +1,5 @@
 <div class="audio-header" *ngIf="isAudioBarAvailable()"
-     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom #audioHeader>
+     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div *ngIf="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
       <div class="audio-header-control-icons">
@@ -36,11 +36,11 @@
         </div>
         <span *ngIf="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()"
               class="audio-controls-message">
-           {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
+          {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
         </span>
         <span *ngIf="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()"
               class="audio-controls-message">
-           {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
+          {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
         </span>
         <!--Filler space for message-->
         <span class="audio-controls-message">&zwnj;</span>
@@ -68,7 +68,7 @@
       <div class="row">
         <div class="col-lg-6 px-0 mt-1 ml-2">
           <span class="audio-expand-button-text">
-             {{ 'I18N_PLAYER_AUDIO_EXPAND_TEXT' | translate }}
+            {{ 'I18N_PLAYER_AUDIO_EXPAND_TEXT' | translate }}
           </span>
         </div>
         <div class="col-lg-3 col-6 px-0 mt-lg-2">
@@ -81,6 +81,7 @@
     </div>
   </div>
 </div>
+
 
 <style>
   .fa-play-circle:before {
