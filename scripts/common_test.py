@@ -785,11 +785,11 @@ class ManagedProcessTests(test_utils.TestBase):
             super(ManagedProcessTests, self).tearDown()
 
     @contextlib.contextmanager
-    def swap_popen(self, clean_shutdown=True, num_children=0, outputs=()):
+    def swap_popen(self, unresponsive=False, num_children=0, outputs=()):
         """Returns values for inspecting and mocking calls to psutil.Popen.
 
         Args:
-            clean_shutdown: bool. Whether the processes created by the mock will
+            unresponsive: bool. Whether the processes created by the mock will
                 stall when asked to terminate.
             num_children: int. The number of child processes the process created
                 by the mock should create. Children inherit the same termination
@@ -824,7 +824,7 @@ class ManagedProcessTests(test_utils.TestBase):
             parent_pid = 1
             child_procs = [
                 scripts_test_utils.PopenStub(
-                    pid=pid, clean_shutdown=clean_shutdown)
+                    pid=pid, unresponsive=unresponsive)
                 for pid in python_utils.RANGE(
                     parent_pid + 1, parent_pid + 1 + num_children)
             ]
@@ -832,7 +832,7 @@ class ManagedProcessTests(test_utils.TestBase):
             stdout = ''.join('%s\n' % o for o in outputs)
 
             return scripts_test_utils.PopenStub(
-                pid=parent_pid, stdout=stdout, clean_shutdown=clean_shutdown,
+                pid=parent_pid, stdout=stdout, unresponsive=unresponsive,
                 child_procs=child_procs)
 
         with self.swap(psutil, 'Popen', mock_popen):
@@ -955,7 +955,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_reports_killed_processes_as_warnings(self):
         self.exit_stack.enter_context(self.swap_popen(
-            clean_shutdown=False))
+            unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(common.managed_process(
@@ -982,7 +982,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_kills_child_processes(self):
         self.exit_stack.enter_context(self.swap_popen(
-            num_children=3, clean_shutdown=False))
+            num_children=3, unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(common.managed_process(
@@ -1014,7 +1014,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_respects_processes_that_are_killed_after_delay(self):
         self.exit_stack.enter_context(self.swap_popen(
-            clean_shutdown=False))
+            unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(common.managed_process(
