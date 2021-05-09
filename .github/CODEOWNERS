@@ -262,6 +262,7 @@
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
 /core/templates/directives/directives.module.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/directives/headroom.directive.ts @srijanreddy98
 /core/templates/directives/ng-init.directive.ts @srijanreddy98
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
