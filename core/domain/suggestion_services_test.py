@@ -772,29 +772,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
 
-    def test_update_suggestion_to_change_suggestion(self):
-        self.mock_create_suggestion(self.target_id)
-        updated_change_content = state_domain.SubtitledHtml(
-            'content', '<p>resubmit change content html</p>').to_dict()
-        updated_change = exp_domain.ExplorationChange(
-            {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'state_1',
-                'new_value': updated_change_content,
-                'old_value': self.change['new_value']
-            }
-        )
-
-        suggestion_services.update_suggestion(
-            self.suggestion_id, updated_change)
-
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
-        self.assertEqual(
-            updated_suggestion.change.new_value['html'],
-            updated_change_content['html'])
-
     def test_update_translation_suggestion_to_change_translation_html(self):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
@@ -924,6 +901,61 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_suggestion.change.skill_difficulty,
             0.6)
+
+    def test_update_question_suggestion_raises_invalid_suggestion_exception(
+        self):
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        edit_state_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State A',
+            'new_value': 'TextInput'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'exploration',
+            'exploration1', 1,
+            self.author_id,
+            edit_state_change_dict, '')
+        question_state_data = self._create_valid_question_data(
+            'default_state').to_dict()
+        expected_exception_regexp = 'Expected suggestion type is %s.' % (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+
+        with self.assertRaisesRegexp(
+            Exception, expected_exception_regexp):
+                suggestion_services.update_question_suggestion(
+                    suggestion.suggestion_id,
+                    0.6,
+                    question_state_data)
+
+    def test_update_translation_suggestion_raises_invalid_suggestion_exception(
+        self):
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        edit_state_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State A',
+            'new_value': 'TextInput'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'exploration',
+            'exploration1', 1,
+            self.author_id,
+            edit_state_change_dict, '')
+
+        expected_exception_regexp = 'Expected suggestion type is %s.' % (
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+
+        with self.assertRaisesRegexp(
+            Exception, expected_exception_regexp):
+                suggestion_services.update_translation_suggestion(
+                    suggestion.suggestion_id, '<p>Updated Translation</p>')
 
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):

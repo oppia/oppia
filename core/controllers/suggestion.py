@@ -402,7 +402,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
                 'The parameter \'translation_html\' is missing.'
             )
 
-        if isinstance(self.payload.get('translation_html')) != unicode:
+        if not isinstance(self.payload.get('translation_html'), basestring):
             raise self.InvalidInputException(
                 'The parameter \'translation_html\' should be a string.'
             )
@@ -436,7 +436,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
                 'The parameter \'skill_difficulty\' is missing.'
             )
 
-        if isinstance(self.payload.get('skill_difficulty')) != float:
+        if not isinstance(self.payload.get('skill_difficulty'), float):
             raise self.InvalidInputException(
                 'The parameter \'skill_difficulty\' should be a decimal.'
             )

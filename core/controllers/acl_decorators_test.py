@@ -3557,12 +3557,6 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         'state_name': 'State 1',
         'translation_html': '<p>Translation for content.</p>'
     }
-    edit_state_change_dict = {
-        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-        'state_name': 'State A',
-        'new_value': 'TextInput'
-    }
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -3646,12 +3640,6 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             self.change_dict, '')
 
         suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, self.TARGET_TYPE,
-            self.exploration_id, self.target_version_id,
-            self.author_id,
-            self.edit_state_change_dict, '')
-
-        suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL,
             'skill_123', feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -3664,12 +3652,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         question_suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', 'skill_123')])[0]
-        invalid_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[1]
         self.translation_suggestion_id = translation_suggestion.suggestion_id
         self.question_suggestion_id = question_suggestion.suggestion_id
-        self.invalid_suggestion_id = invalid_suggestion.suggestion_id
         self.logout()
 
     def test_authors_cannot_update_suggestion_that_they_created(self):
@@ -3714,16 +3698,6 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
         self.assertEqual(
             response['suggestion_id'], self.question_suggestion_id)
-        self.logout()
-
-    def test_invalid_suggestions_cannot_be_updated(self):
-        self.login(self.hi_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock/%s' % self.invalid_suggestion_id,
-                expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Invalid suggestion type')
         self.logout()
 
     def test_guest_cannot_update_any_suggestion(self):
