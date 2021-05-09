@@ -213,6 +213,7 @@
         "jobs.transforms.user_validation_test",
         "jobs.types.base_validation_errors_test",
         "jobs.types.model_property_test",
+        "jobs.types.topic_validation_errors_test",
         "jobs.types.user_validation_errors_test"
     ],
     "10": [
