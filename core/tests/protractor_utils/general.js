@@ -135,14 +135,14 @@ var moveToEditor = async function(welcomeModalIsShown) {
   await openEditor(explorationId, welcomeModalIsShown);
 };
 
-var expect404Error = async function() {
+var expectErrorPage = async function(errorNum) {
   var errorContainer = element(
     by.css('.protractor-test-error-container'));
   await waitFor.visibilityOf(
     errorContainer,
     'Protractor test error container taking too long to appear');
   expect(await errorContainer.getText()).
-    toMatch('Error 404');
+    toMatch(`Error ${errorNum}`);
 };
 
 // Checks no untranslated values are shown in the page.
@@ -158,11 +158,14 @@ var ensurePageHasNoTranslationIds = async function() {
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+  var REGEX_NGB_TOOLTIP_ATTR = new RegExp(
+    'tooltip="I18N_|tooltip="\'I18N_', 'g');
   var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
   var REGEX_NG_TOP_NAV_VISIBILITY = (
     new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g'));
   expect(
     promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+      .replace(REGEX_NGB_TOOLTIP_ATTR, '')
       .replace(REGEX_NG_VARIABLE, '')
       .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
 };
@@ -261,7 +264,7 @@ exports.openEditor = openEditor;
 exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
-exports.expect404Error = expect404Error;
+exports.expectErrorPage = expectErrorPage;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 exports.dragAndDrop = dragAndDrop;
 

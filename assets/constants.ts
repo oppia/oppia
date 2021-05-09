@@ -5533,6 +5533,7 @@ export default {
       }
     },
     "solicit_answer_details": false,
+    "card_is_checkpoint": false,
     "written_translations": {
       "translations_mapping": {
         "content": {},
@@ -5687,9 +5688,10 @@ export default {
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
-  // The bucket name is set to None-resources to enable it to be used
-  // in prod mode when the resource bucket name is not allowed to be null.
-  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+  // The bucket name is set to app_default_bucket which is used to store files
+  // in GCS when local development server is running. This should be changed
+  // in prod appropriately.
+  "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
@@ -5804,6 +5806,30 @@ export default {
         }]
       },
       "default_value": null
+    },
+    {
+      "backend_id": "created_collection",
+      "backend_attr": "created_collection",
+      "description": "Has created collection",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
+    },
+    {
+      "backend_id": "used_logic_proof_interaction",
+      "backend_attr": "used_logic_proof_interaction",
+      "description": "Has used LogicProof interaction in any exploration",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
     }
   ],
 

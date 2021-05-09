@@ -27,26 +27,32 @@ jobs:
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
+      - id: check-risk
+        name: Check if PR is low-risk
+        uses: ./.github/actions/check-if-pr-is-low-risk
       - name: Install chrome
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: python -m scripts.install_chrome_for_ci
       - name: Run e2e File Upload Features Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="fileUploadFeatures" --prod_env
       - name: Run e2e Play Voiceovers Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers" --prod_env
       - name: Run e2e File Upload Extensions Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions" --prod_env
       - name: Run e2e Contributor Dashboard Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
-      - name: Run e2e Feature Gating Test
+      - name: Run e2e Publication Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="publication"  --skip-install --skip-build --server_log_level="info" --prod_env
+      - name: Run e2e Feature Gating Test
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="featureGating"
       - name: Uploading protractor-screenshots as Artifacts
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false && always()
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots
