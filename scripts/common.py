@@ -114,7 +114,6 @@ FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 FIREBASE_PATH = os.path.join(
     NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
-WEBPACK_PATH = os.path.join(NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js')
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
@@ -1121,7 +1120,7 @@ def managed_webpack_compiler(
             WEBPACK_DEV_SOURCE_MAPS_CONFIG if use_source_maps else
             WEBPACK_DEV_CONFIG)
 
-    compiler_args = [NODE_BIN_PATH, WEBPACK_PATH, '--config', config_path]
+    compiler_args = [NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config', config_path]
     if max_old_space_size:
         # NOTE: --max-old-space-size is a flag for Node.js, not the Webpack
         # compiler, so we insert it immediately after NODE_BIN_PATH.

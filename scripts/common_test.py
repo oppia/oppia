@@ -36,6 +36,7 @@ import time
 import constants
 from core.tests import test_utils
 import python_utils
+from scripts import scripts_test_utils
 
 import contextlib2
 import mock
@@ -822,14 +823,15 @@ class ManagedProcessTests(test_utils.TestBase):
 
             parent_pid = 1
             child_procs = [
-                test_utils.PopenStub(pid=pid, clean_shutdown=clean_shutdown)
+                scripts_test_utils.PopenStub(
+                    pid=pid, clean_shutdown=clean_shutdown)
                 for pid in python_utils.RANGE(
                     parent_pid + 1, parent_pid + 1 + num_children)
             ]
 
             stdout = ''.join('%s\n' % o for o in outputs)
 
-            return test_utils.PopenStub(
+            return scripts_test_utils.PopenStub(
                 pid=parent_pid, stdout=stdout, clean_shutdown=clean_shutdown,
                 child_procs=child_procs)
 
@@ -1171,7 +1173,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap_to_always_return(
-            subprocess, 'call', value=test_utils.PopenStub()))
+            subprocess, 'call', value=scripts_test_utils.PopenStub()))
         self.exit_stack.enter_context(self.swap(
             shutil, 'rmtree', mock_os_remove_files))
         self.exit_stack.enter_context(self.swap(
@@ -1200,17 +1202,27 @@ class ManagedProcessTests(test_utils.TestBase):
                 common.managed_redis_server()))
 
     def test_managed_redis_server(self):
-        def is_redis_dump_path(path, *_, **__):
-            """Returns whether the input path is the REDIS_DUMP_PATH."""
-            return path == common.REDIS_DUMP_PATH
+        original_os_remove = os.remove
+        original_os_path_exists = os.path.exists
+
+        @test_utils.CallCounter
+        def mock_os_remove(path):
+            if path == common.REDIS_DUMP_PATH:
+                return
+            original_os_remove(path)
+
+        def mock_os_path_exists(path):
+            if path == common.REDIS_DUMP_PATH:
+                return
+            original_os_path_exists(path)
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap_to_always_return(
             common, 'wait_for_port_to_be_in_use'))
-        self.exit_stack.enter_context(self.swap_conditionally(
-            os.path, 'exists', condition=is_redis_dump_path))
-        self.exit_stack.enter_context(self.swap_conditionally(
-            os, 'remove', condition=is_redis_dump_path))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'exists', mock_os_path_exists))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os, 'remove', mock_os_remove, called=False))
 
         self.exit_stack.enter_context(common.managed_redis_server())
         self.exit_stack.close()
@@ -1222,24 +1234,27 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 
     def test_managed_redis_server_deletes_redis_dump_when_it_exists(self):
-        def is_redis_dump_path(path, *_, **__):
-            """Returns whether the input path is the REDIS_DUMP_PATH."""
-            return path == common.REDIS_DUMP_PATH
+        original_os_remove = os.remove
+        original_os_path_exists = os.path.exists
 
         @test_utils.CallCounter
-        def mock_os_remove(unused_path):
-            pass
+        def mock_os_remove(path):
+            if path == common.REDIS_DUMP_PATH:
+                return
+            original_os_remove(path)
+
+        def mock_os_path_exists(path):
+            if path == common.REDIS_DUMP_PATH:
+                return True
+            original_os_path_exists(path)
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(self.swap_to_always_return(
             common, 'wait_for_port_to_be_in_use'))
-        self.exit_stack.enter_context(self.swap_conditionally(
-            os.path, 'exists', new_function=lambda _: True,
-            condition=is_redis_dump_path))
-        mock_os_remove = test_utils.CallCounter(lambda *_, **__: None)
-        self.exit_stack.enter_context(self.swap_conditionally(
-            os, 'remove', new_function=mock_os_remove,
-            condition=is_redis_dump_path))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'exists', mock_os_path_exists))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os, 'remove', mock_os_remove))
 
         self.exit_stack.enter_context(common.managed_redis_server())
         self.exit_stack.close()
@@ -1367,7 +1382,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].program_args,
             '%s %s --config config.json' % (
-                common.NODE_BIN_PATH, common.WEBPACK_PATH))
+                common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH))
 
     def test_managed_webpack_compiler_uses_prod_source_maps_config(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
@@ -1381,7 +1396,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].program_args,
             '%s %s --config %s' % (
-                common.NODE_BIN_PATH, common.WEBPACK_PATH,
+                common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH,
                 common.WEBPACK_PROD_SOURCE_MAPS_CONFIG))
 
     def test_managed_webpack_compiler_uses_prod_config(self):
@@ -1396,7 +1411,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].program_args,
             '%s %s --config %s' % (
-                common.NODE_BIN_PATH, common.WEBPACK_PATH,
+                common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH,
                 common.WEBPACK_PROD_CONFIG))
 
     def test_managed_webpack_compiler_uses_dev_source_maps_config(self):
@@ -1411,7 +1426,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].program_args,
             '%s %s --config %s' % (
-                common.NODE_BIN_PATH, common.WEBPACK_PATH,
+                common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH,
                 common.WEBPACK_DEV_SOURCE_MAPS_CONFIG))
 
     def test_managed_webpack_compiler_uses_dev_config(self):
@@ -1426,7 +1441,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].program_args,
             '%s %s --config %s' % (
-                common.NODE_BIN_PATH, common.WEBPACK_PATH,
+                common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH,
                 common.WEBPACK_DEV_CONFIG))
 
     def test_managed_webpack_compiler_with_max_old_space_size(self):

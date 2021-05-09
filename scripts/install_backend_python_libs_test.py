@@ -31,6 +31,7 @@ from core.tests import test_utils
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
+from scripts import scripts_test_utils
 
 import pkg_resources
 
@@ -123,7 +124,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
-            return test_utils.PopenStub()
+            return scripts_test_utils.PopenStub()
 
         self.swap_check_call = self.swap(
             subprocess, 'check_call', mock_check_call)

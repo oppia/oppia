@@ -23,6 +23,7 @@ import os
 import subprocess
 
 from core.tests import test_utils
+from scripts import scripts_test_utils
 
 from . import css_linter
 
@@ -72,7 +73,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_perform_all_lint_checks_with_stderr(self):
         def mock_popen(unused_commands, stdout, stderr):  # pylint: disable=unused-argument
-            return test_utils.PopenStub(stdout='True', stderr='True')
+            return scripts_test_utils.PopenStub(stdout='True', stderr='True')
 
         popen_swap = self.swap_with_checks(subprocess, 'Popen', mock_popen)
 

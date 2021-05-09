@@ -108,7 +108,7 @@ def alert_on_exit():
         time.sleep(5)
 
 
-def notify_successful_shutdown():
+def notify_about_successful_shutdown():
     """Notifies developers that the servers have shutdown gracefully."""
     python_utils.PRINT(
         '\n\n'
@@ -142,7 +142,7 @@ def main(args=None):
     # the "latter" context (context managers exit in reverse-order).
     with contextlib2.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
-        stack.callback(notify_successful_shutdown)
+        stack.callback(notify_about_successful_shutdown)
 
         build_args = []
         if parsed_args.prod_env:

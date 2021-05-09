@@ -77,7 +77,7 @@ _PARSER.add_argument(
          'name of the test files present in core/tests/protractor_desktop/ and '
          'core/test/protractor/ dirs. e.g. for the file '
          'core/tests/protractor/accessibility.js use --suite=accessibility. '
-         'For performing a full test, no argument is required. ')
+         'For performing a full test, no argument is required.')
 _PARSER.add_argument(
     '--chrome_driver_version',
     help='Uses the specified version of the chrome driver')
@@ -208,8 +208,6 @@ def run_tests(args):
                 source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
-        python_utils.PRINT('Waiting for servers to come up...')
-
         stack.enter_context(common.managed_redis_server())
         stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
@@ -234,7 +232,6 @@ def run_tests(args):
             sharding_instances=args.sharding_instances,
             stdout=subprocess.PIPE))
 
-        # Wait for the servers to come up.
         python_utils.PRINT(
             'Servers have come up.\n'
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
@@ -277,8 +274,8 @@ def main(args=None):
                 flake_checker.report_pass(parsed_args.suite)
                 break
 
-            test_is_flaky = (
-                flake_checker.is_test_output_flaky(output, parsed_args.suite))
+            test_is_flaky = flake_checker.is_test_output_flaky(
+                output, parsed_args.suite)
             if not test_is_flaky and not RERUN_NON_FLAKY:
                 # Don't rerun if the test was non-flaky and we are not rerunning
                 # non-flaky tests.
