@@ -46,6 +46,9 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
         for role_name in self.ACTIONS:
             self.assertTrue(isinstance(self.ACTIONS[role_name], list))
 
+    def test_action_allocated_to_all_allowed_roles(self):
+        self.assertEqual(self.ACTIONS.keys(), feconf.ALLOWED_USER_ROLES)
+
     def test_every_dict_entry_is_string(self):
         """Test that all keys and values(elements in lists) in PARENT_ROLES
         and ROLE_ACTIONS are string.

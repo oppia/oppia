@@ -123,7 +123,8 @@ class UserSettingsModel(base_models.BaseModel):
     # TODO(#12755): Currently, "roles" and "banned" fields are not in use. These
     # new fields will be used once their values are populated.
     # A list of roles assigned to the user.
-    roles = datastore_services.StringProperty(repeated=True, indexed=True)
+    roles = datastore_services.StringProperty(
+        repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
 
