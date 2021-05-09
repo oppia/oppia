@@ -248,7 +248,9 @@ describe('Chapter editor functionality', function() {
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithm', 'Learn more about oppia', 'English'];
   var dummySkills = [];
-  var allowedErrors = [];
+  var allowedErrors = [
+    'drag-drop.js',
+    'Unable to preventDefault inside passive event listener invocation.'];
   var topicName = 'Topic 0';
   var topicUrlFragment = 'topic-zero';
   var userEmail = 'creator@chapterTest.com';
