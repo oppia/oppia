@@ -320,13 +320,6 @@
     "@types/codemirror" "^0.0.99"
     tslib "^2.0.0"
 
-"@ctrl/ngx-headroom@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@ctrl/ngx-headroom/-/ngx-headroom-4.0.0.tgz#eb64ace2c59d1df535a65afa8f42e93c2151b153"
-  integrity sha512-62R4ZaV++jc5UwYiVTOfsYf6sHV1Qg9oSbmpmwpXbJ4R584qkoOlV4ZbsfHBMMw41V4uBtiourkKTHCnMogaSQ==
-  dependencies:
-    tslib "^2.0.0"
-
 "@dabh/diagnostics@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@dabh/diagnostics/-/diagnostics-2.0.2.tgz#290d08f7b381b8f94607dc8f471a12c675f9db31"
