@@ -30,7 +30,6 @@ import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/t
 describe('Rte Helper Service', function() {
   var RteHelperService = null;
   var $log = null;
-  var $rootScope = null;
   var mockNgbModalRef = {
     componentInstance: {
       customizationArgSpecs: null,
@@ -61,7 +60,6 @@ describe('Rte Helper Service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     RteHelperService = $injector.get('RteHelperService');
     $log = $injector.get('$log');
-    $rootScope = $injector.get('$rootScope');
   }));
 
   it('should get rich text components', function() {
@@ -348,11 +346,11 @@ describe('Rte Helper Service', function() {
   it('should open customization modal', function() {
     var modalSpy = spyOn(
       OppiaAngularRootComponent.ngbModal, 'open').and.callFake(() => {
-        return <NgbModalRef> {
-          componentInstance: mockNgbModalRef,
-          result: Promise.resolve('success')
-        };
-      });
+      return <NgbModalRef> {
+        componentInstance: mockNgbModalRef,
+        result: Promise.resolve('success')
+      };
+    });
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(

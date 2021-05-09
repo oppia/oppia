@@ -30,7 +30,6 @@ import { RteHelperModalComponent } from './rte-helper-modal.component';
 
 describe('Rte Helper Modal Controller', function() {
   let changeDetectorRef = null;
-  let contextService = null;
   let fixture = null;
   let component = null;
 
@@ -61,7 +60,6 @@ describe('Rte Helper Modal Controller', function() {
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
       OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
-      contextService = OppiaAngularRootComponent.contextService;
     }));
 
     beforeEach(() => {
@@ -153,7 +151,6 @@ describe('Rte Helper Modal Controller', function() {
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
       OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
-      contextService = OppiaAngularRootComponent.contextService;
     }));
 
     beforeEach(() => {
@@ -193,7 +190,7 @@ describe('Rte Helper Modal Controller', function() {
       }];
       expect(component.disableSaveButtonForMathRte()).toBe(true);
       component.tmpCustomizationArgs[0]
-      .value.mathExpressionSvgIsBeingProcessed = false;
+        .value.mathExpressionSvgIsBeingProcessed = false;
       expect(component.disableSaveButtonForMathRte()).toBe(false);
       var response = {
         filename: 'mathImage.svg'
@@ -290,7 +287,7 @@ describe('Rte Helper Modal Controller', function() {
         spyOn(
           component.contextService,
           'getImageSaveDestination').and.returnValue(
-            AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+          AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
         spyOn(
           component.imageUploadHelperService,
           'convertImageDataToImageFile').and.returnValue(imageFile);
@@ -329,7 +326,8 @@ describe('Rte Helper Modal Controller', function() {
           ],
           schemas: [NO_ERRORS_SCHEMA]
         }).compileComponents();
-        OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
+        OppiaAngularRootComponent.contextService = TestBed.inject(
+          ContextService);
       }));
 
       beforeEach(() => {

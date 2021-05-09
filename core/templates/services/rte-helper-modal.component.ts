@@ -100,7 +100,7 @@ export class RteHelperModalComponent implements OnInit {
     // TODO(sll): Make this switch to the first input field in the
     // modal instead.
     this.modalIsLoading = true;
-    const that = this
+    const that = this;
     this.focusManagerService.setFocus('tmpFocusPoint');
     setTimeout(() => {
       that.modalIsLoading = false;
