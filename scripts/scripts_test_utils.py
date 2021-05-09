@@ -39,17 +39,17 @@ class PopenStub(python_utils.OBJECT):
         terminate_count: int. Number of times terminate() has been called.
         kill_count: int. Number of times kill() has been called.
         alive: bool. Whether the process should be considered to be alive.
-        accept_signal: bool. Whether to raise OSError in send_signal().
-        accept_terminate: bool. Whether to raise OSError in terminate().
-        accept_kill: bool. Whether to raise OSError in kill().
-        clean_shutdown: bool. Whether the process will end normally.
+        reject_signal: bool. Whether to raise OSError in send_signal().
+        reject_terminate: bool. Whether to raise OSError in terminate().
+        reject_kill: bool. Whether to raise OSError in kill().
+        unresponsive: bool. Whether the process will end normally.
         returncode: int. The return code of the process.
     """
 
     def __init__(
             self, pid=1, name='process', stdout='', stderr='',
-            accept_signal=True, accept_terminate=True, accept_kill=True,
-            clean_shutdown=True, return_code=0, child_procs=None):
+            reject_signal=False, reject_terminate=False, reject_kill=False,
+            unresponsive=False, return_code=0, child_procs=None):
         """Initializes a new PopenStub instance.
 
         Args:
@@ -58,14 +58,15 @@ class PopenStub(python_utils.OBJECT):
             stdout: str. The text written to standard output by the process.
             stderr: str. The text written to error output by the process.
             return_code: int. The return code of the process.
-            accept_signal: bool. Whether to raise OSError in send_signal().
-            accept_terminate: bool. Whether to raise OSError in terminate().
-            accept_kill: bool. Whether to raise OSError in kill().
-            clean_shutdown: bool. Whether the process will end normally.
+            reject_signal: bool. Whether to raise OSError in send_signal().
+            reject_terminate: bool. Whether to raise OSError in terminate().
+            reject_kill: bool. Whether to raise OSError in kill().
+            unresponsive: bool. Whether the process will end normally.
             child_procs: list(PopenStub)|None. Processes "owned" by the stub, or
                 None if there aren't any.
         """
         self.pid = pid
+        self.stdin = python_utils.string_io()
         self.stdout = python_utils.string_io(buffer_value=stdout)
         self.stderr = python_utils.string_io(buffer_value=stderr)
         self.poll_count = 0
@@ -73,10 +74,10 @@ class PopenStub(python_utils.OBJECT):
         self.terminate_count = 0
         self.kill_count = 0
         self.alive = True
-        self.accept_signal = accept_signal
-        self.accept_terminate = accept_terminate
-        self.accept_kill = accept_kill
-        self.clean_shutdown = clean_shutdown
+        self.reject_signal = reject_signal
+        self.reject_terminate = reject_terminate
+        self.reject_kill = reject_kill
+        self.unresponsive = unresponsive
 
         self._name = name
         self._child_procs = tuple(child_procs) if child_procs else ()
@@ -99,6 +100,15 @@ class PopenStub(python_utils.OBJECT):
             return_code: int. The return code to assign to the process.
         """
         self._return_code = return_code
+
+    def is_running(self):
+        """Returns whether the process is running.
+
+        Returns:
+            bool. The value of self.alive, which mocks whether the process is
+            still alive.
+        """
+        return self.alive
 
     def name(self):
         """Returns the name of the process.
@@ -131,32 +141,38 @@ class PopenStub(python_utils.OBJECT):
         Mocks the process being terminated.
         """
         self.terminate_count += 1
-        if not self.accept_terminate:
-            raise OSError()
-        if not self.clean_shutdown:
+        if self.reject_terminate:
+            raise OSError('rejected')
+        if self.unresponsive:
             return
         self._exit(return_code=1)
 
     def kill(self):
         """Increment kill_count.
 
-        NOTE: kill() does not respect self.clean_shutdown.
+        NOTE: kill() does not respect self.unresponsive.
 
         Mocks the process being killed.
         """
         self.kill_count += 1
-        if not self.accept_kill:
-            raise OSError()
+        if self.reject_kill:
+            raise OSError('rejected')
         self._exit(return_code=1)
 
-    def is_running(self):
-        """Returns whether the process is running.
+    def send_signal(self, signal_number):
+        """Append signal to self.signals_received.
 
-        Returns:
-            bool. The value of self.alive, which mocks whether the process is
-            still alive.
+        Mocks receiving a process signal. If a SIGINT signal is received (e.g.
+        from ctrl-C) and self.unresponsive is True, then we call self._exit().
+
+        Args:
+            signal_number: int. The number of the received signal.
         """
-        return self.alive
+        self.signals_received.append(signal_number)
+        if self.reject_signal:
+            raise OSError('rejected')
+        if signal_number == signal.SIGINT and not self.unresponsive:
+            self._exit(return_code=1)
 
     def poll(self):
         """Increment poll_count.
@@ -169,21 +185,6 @@ class PopenStub(python_utils.OBJECT):
         """
         self.poll_count += 1
         return None if self.alive else self._return_code
-
-    def send_signal(self, signal_number):
-        """Append signal to self.signals_received.
-
-        Mocks receiving a process signal. If a SIGINT signal is received (e.g.
-        from ctrl-C) and self.clean_shutdown is True, then we call self._exit().
-
-        Args:
-            signal_number: int. The number of the received signal.
-        """
-        self.signals_received.append(signal_number)
-        if not self.accept_signal:
-            raise OSError()
-        if signal_number == signal.SIGINT and self.clean_shutdown:
-            self._exit(return_code=1)
 
     def wait(self, timeout=None): # pylint: disable=unused-argument
         """Wait for the process completion.
@@ -199,18 +200,18 @@ class PopenStub(python_utils.OBJECT):
         if not self.alive:
             return
 
-        if self.clean_shutdown:
+        if not self.unresponsive:
             self._exit()
         elif timeout is not None:
             raise psutil.TimeoutExpired(timeout)
         else:
-            raise Exception('PopenStub has entered an infinite loop')
+            raise RuntimeError('PopenStub has entered an infinite loop')
 
-    def communicate(self, input=None): # pylint: disable=unused-argument, redefined-builtin
+    def communicate(self, input=''): # pylint: disable=unused-argument, redefined-builtin
         """Mocks an interaction with the process.
 
         Args:
-            input: str|None. Unused because the process isn't real.
+            input: str. Input string to write to the process's stdin.
 
         Returns:
             tuple(str, str). The stdout and stderr of the process, respectively.
@@ -218,11 +219,12 @@ class PopenStub(python_utils.OBJECT):
         if not self.alive:
             return self.stdout.getvalue(), self.stderr.getvalue()
 
-        if self.clean_shutdown:
+        if not self.unresponsive:
+            self.stdin.write(input)
             self._exit()
             return self.stdout.getvalue(), self.stderr.getvalue()
         else:
-            raise Exception('PopenStub has entered an infinite loop')
+            raise RuntimeError('PopenStub has entered an infinite loop')
 
     def _exit(self, return_code=None):
         """Simulates the end of the process.
