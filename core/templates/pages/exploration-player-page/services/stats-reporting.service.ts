@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -38,7 +38,8 @@ export class StatsReportingService {
       private playthroughService: PlaythroughService,
       private siteAnalyticsService: SiteAnalyticsService,
       private statsReportingBackendApiService: StatsReportingBackendApiService,
-      private urlService: UrlService
+      private urlService: UrlService,
+      private ngZone: NgZone
   ) {
     StatsReportingService.editorPreviewMode = (
       this.contextService.isInExplorationEditorPage());
@@ -98,7 +99,13 @@ export class StatsReportingService {
   private startStatsTimer(): void {
     if (!StatsReportingService.editorPreviewMode &&
       !StatsReportingService.questionPlayerMode) {
-      setInterval(() => this.postStatsToBackend(), 300000);
+      this.ngZone.runOutsideAngular(() => {
+        setInterval(() => {
+          this.ngZone.run(() => {
+            this.postStatsToBackend();
+          });
+        }, 300000);
+      });
     }
   }
 
