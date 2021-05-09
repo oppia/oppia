@@ -38,7 +38,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         question_count: int. The number of questions to return.
         skill_ids: list(str). The ID of the skills to which the questions are
             linked.
-        offset=0: str. The starting point from which the batch of
+        offset: str. The starting point from which the batch of
             questions are to be returned. This value should be urlsafe.
 
     Returns:
