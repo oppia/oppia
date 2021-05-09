@@ -1,8 +1,11 @@
+require('dotenv').config();
 var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
-var VideoReporter = require('protractor-video-reporter');
 var glob = require('glob');
 var path = require('path');
+var fs = require('fs');
+var childProcess = require('child_process');
+var randomString = require('randomstring');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
@@ -320,9 +323,52 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-    var _ADD_SCREENSHOT_REPORTER = true;
 
-    if (_ADD_SCREENSHOT_REPORTER) {
+    var spw = '';
+    var uniqueString = '';
+    var vidPath = '';
+    // Enable allVideos if you want success videos to be saved.
+    var allVideos = false;
+
+    // Only running video recorder on Github Actions.
+
+    if (process.env.PWD == '/home/runner/work/oppia/oppia') {
+      jasmine.getEnv().addReporter({
+        specStarted: function(){
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1280x1024',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-loglevel', '16',
+          ];
+          uniqueString = randomString.generate(7);
+          var name = uniqueString + '.mp4';
+          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          vidPath = path.resolve(dirPath, name);
+          console.log(`Video path: ${vidPath}`);
+          ffmpegArgs.push(vidPath);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.on('close', function(code){console.log(`ffmpeg exited with code ${code}`)});
+        },
+        specDone: function(result) {
+          spw.kill();
+          if (result.status == 'passed' && !allVideos && fs.existsSync(vidPath)) {
+            fs.unlinkSync(vidPath);
+            console.log('Video was deleted successfully (test passed).');
+          }
+        },
+      });
+    }
+
+    // Screenshots will only run on CircleCI.
+
+    if (process.env.PWD == '/home/circleci/oppia') {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
@@ -339,27 +385,6 @@ exports.config = {
       }));
     }
 
-    // Adding a video reporter. For more information see
-    // https://www.npmjs.com/package/protractor-video-reporter
-
-    var ffmpegArguments = [
-      '-y',
-      '-r', '30',
-      '-f', 'x11grab',
-      '-s', '1366x768',
-      '-i', process.env.DISPLAY,
-      '-g', '300',
-      '-vcodec', 'qtrle',
-    ]
-
-    jasmine.getEnv().addReporter(new VideoReporter({
-      baseDirectory: path.resolve(__dirname, '../../../protractor-video'),
-      singleVideo: false,
-      singleVideoPath: 'uuid',
-      saveSuccessVideos: true,
-      ffmpegArgs: ffmpegArguments
-    }));
-    
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'pretty',
