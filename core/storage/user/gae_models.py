@@ -121,7 +121,7 @@ class UserSettingsModel(base_models.BaseModel):
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
     # TODO(#12755): Currently, "roles" and "banned" fields are not in use. These
-    # new fileds will be used once their values are populated.
+    # new fields will be used once their values are populated.
     # A list of roles assigned to the user.
     roles = datastore_services.StringProperty(repeated=True, indexed=True)
     # Flag to indicate whether the user is banned.

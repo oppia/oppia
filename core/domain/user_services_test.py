@@ -699,6 +699,40 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.ROLE_ID_COLLECTION_EDITOR])
         self.assertFalse(user_settings_model.banned)
 
+    def test_profile_user_settings_have_correct_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings_model.pin = '12346'
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        profile_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        modifiable_user_data = user_domain.ModifiableUserData.from_raw_dict(
+            profile_user_data_dict)
+        profile_user_id = user_services.create_new_profiles(
+            auth_id, user_email, [modifiable_user_data])[0].user_id
+        profile_user_settings_model = user_models.UserSettingsModel.get_by_id(
+            profile_user_id)
+
+        self.assertEqual(
+            profile_user_settings_model.role, feconf.ROLE_ID_LEARNER)
+        self.assertEqual(
+            profile_user_settings_model.roles, [feconf.ROLE_ID_LEARNER])
+        self.assertFalse(profile_user_settings_model.banned)
+
     def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
         non_existent_user_id = 'id_x'
         error_msg = 'Parent user not found.'

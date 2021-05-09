@@ -590,7 +590,7 @@ def _save_user_settings(user_settings):
     # use and expected to be used once it's populated with correct value.
     # The update_roles_and_banned_fields ensures that the new fields always
     # contain correct values. It is expected to remove
-    # update_roles_and_banned_fields from here once the new fileds are in use.
+    # update_roles_and_banned_fields from here once the new fields are in use.
     update_roles_and_banned_fields(user_model)
     user_model.update_timestamps()
     user_model.put()
