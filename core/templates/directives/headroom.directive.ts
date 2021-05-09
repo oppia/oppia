@@ -17,7 +17,6 @@
  */
 
 import { Directive, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
-
 import Headroom from 'headroom.js';
 
 @Directive({
