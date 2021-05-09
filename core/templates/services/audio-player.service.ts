@@ -248,7 +248,7 @@ export class AudioPlayerService {
     return this._updateViewEventEmitter;
   }
 
-  get onAutoplayAudio(): EventEmitter<void> {
+  get onAutoplayAudio(): EventEmitter<AudioParams> {
     return this._autoplayAudioEventEmitter;
   }
 }

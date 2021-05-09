@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Headroom Directive
+ * @fileoverview Headroom Directive (not associated with reusable
+ * components.)
+ * NB: Reusable component directives should go in the components/ folder.
  */
 
 import { Directive, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
@@ -29,7 +31,7 @@ export class HeadroomDirective implements OnDestroy {
   @Output() offsetChange?: number;
   @Input() classes?: Classes;
   @Output() classesChange: EventEmitter<Classes> = new EventEmitter();
-  @Input() scroller?;
+  @Input() scroller?: ElementRef;
   headroom: Headroom;
 
   constructor(
@@ -38,8 +40,8 @@ export class HeadroomDirective implements OnDestroy {
     let headroomOptions: HeadroomOptions = {
       tolerance: this.tolerance ? this.tolerance : Headroom.options.tolerance,
       offset: this.offset ? this.offset : Headroom.options.offset,
-      scroller: this.scroller ? document.querySelector(this.scroller) :
-      Headroom.options.scroller,
+      scroller: this.scroller ? document.querySelector(
+        this.scroller.nativeElement) : Headroom.options.scroller,
       classes: this.classes ? this.classes : Headroom.options.classes,
     };
 
