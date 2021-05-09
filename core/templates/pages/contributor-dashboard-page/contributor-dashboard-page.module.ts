@@ -40,7 +40,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { TranslationModalComponent } from './modal-templates/translation-modal.component';
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 
 @NgModule({
@@ -49,8 +48,7 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
-    NgbModalModule,
-    SharedFormsModule
+    NgbModalModule
   ],
   declarations: [
     OppiaAngularRootComponent,
