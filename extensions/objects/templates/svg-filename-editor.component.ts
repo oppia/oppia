@@ -16,26 +16,24 @@
  * @fileoverview Component for svg filename editor.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { fabric } from 'fabric';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import Picker from 'vanilla-picker';
+import { SvgFileFetcherBackendApiService } from './svg-file-fetcher-backend-api.service';
 import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
 
-interface Dimensions {
+export interface Dimensions {
   height: number;
   width: number;
 }
@@ -183,14 +181,12 @@ export class SvgFilenameEditorComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
-    private csrfTokenService: CsrfTokenService,
     private deviceInfoService: DeviceInfoService,
-    private httpClient: HttpClient,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
     private imageUploadHelperService: ImageUploadHelperService,
-    private svgSanitizerService: SvgSanitizerService,
-    private urlInterpolationService: UrlInterpolationService) { }
+    private svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService,
+    private svgSanitizerService: SvgSanitizerService) { }
 
   ngOnInit(): void {
     const domReady = new Promise((resolve, reject) => {
@@ -291,11 +287,13 @@ export class SvgFilenameEditorComponent implements OnInit {
       };
       this.diagramWidth = dimensions.width;
       this.diagramHeight = dimensions.height;
-      this.httpClient.get(this.data.savedSvgUrl as string, {
-        responseType: 'text'}).subscribe(
+      this.svgFileFetcherBackendApiService.fetchSvg(
+        this.data.savedSvgUrl as string
+      ).subscribe(
         response => {
           this.savedSvgDiagram = response;
-        });
+        }
+      );
     }
   }
 
@@ -303,47 +301,8 @@ export class SvgFilenameEditorComponent implements OnInit {
       dimensions: Dimensions,
       resampledFile: Blob
   ): Promise<{filename: string}> {
-    return new Promise((resolve, reject) => {
-      let form = new FormData();
-      form.append('image', resampledFile);
-      form.append('payload', JSON.stringify({
-        filename: this.imageUploadHelperService.generateImageFilename(
-          dimensions.height, dimensions.width, 'svg')
-      })
-      );
-      var imageUploadUrlTemplate = (
-        '/createhandler/imageupload/<entity_type>/<entity_id>');
-      this.csrfTokenService.getTokenAsync().then((token) => {
-        form.append('csrf_token', token);
-        $.ajax({
-          url: this.urlInterpolationService.interpolateUrl(
-            imageUploadUrlTemplate, {
-              entity_type: this.entityType,
-              entity_id: this.entityId
-            }
-          ),
-          data: form,
-          processData: false,
-          contentType: false,
-          type: 'POST',
-          dataType: 'text'
-        }).done((data: string) => {
-          // Remove the XSSI prefix.
-          const transformedData = data.substring(5);
-          const parsedResponse = JSON.parse(transformedData);
-          if (resolve) {
-            resolve(parsedResponse);
-          }
-        }).fail((data) => {
-          // Remove the XSSI prefix.
-          const transformedData = data.responseText.substring(5);
-          const parsedResponse = JSON.parse(transformedData);
-          if (reject) {
-            reject(parsedResponse);
-          }
-        });
-      });
-    });
+    return this.svgFileFetcherBackendApiService.postSvgFile(
+      resampledFile, dimensions, this.entityType, this.entityId).toPromise();
   }
 
   saveImageToLocalStorage(
@@ -465,8 +424,7 @@ export class SvgFilenameEditorComponent implements OnInit {
         }, (parsedResponse) => {
           this.loadingIndicatorIsShown = false;
           this.alertsService.addWarning(
-            parsedResponse.error || 'Error communicating with server.');
-          // $scope.$applyAsync();
+            parsedResponse.error.error || 'Error communicating with server.');
         });
       }
     }
@@ -477,10 +435,10 @@ export class SvgFilenameEditorComponent implements OnInit {
   }
 
   createCustomToSVG(
-      toSVG: () => string, selector: string, id: string
+      toSVG: () => string, selector: string, id: string, ctx: unknown
   ): () => string {
     return (): string => {
-      const svgString = toSVG.call(this);
+      const svgString = toSVG.call(ctx);
       const domParser = new DOMParser();
       const doc = domParser.parseFromString(svgString, 'image/svg+xml');
       const parentG = doc.querySelector(selector);
@@ -506,7 +464,7 @@ export class SvgFilenameEditorComponent implements OnInit {
         groupedObjects.push([]);
       }
       obj.toSVG = this.createCustomToSVG(
-        obj.toSVG, obj.type, (obj as unknown as {id: string}).id);
+        obj.toSVG, obj.type, (obj as unknown as {id: string}).id, obj);
       groupedObjects[groupId].push(obj);
     }
     return groupedObjects;
@@ -987,7 +945,7 @@ export class SvgFilenameEditorComponent implements OnInit {
       id: 'group' + this.groupCount
     });
     arc.toSVG = this.createCustomToSVG(
-      arc.toSVG, 'path', (arc as unknown as {id: string}).id);
+      arc.toSVG, 'path', (arc as unknown as {id: string}).id, arc);
     const p1 = new PolyPoint (height + center.x, center.y + halfChord);
     const p2 = new PolyPoint (height + center.x, center.y - halfChord);
     const tri = new fabric.Polygon([center, p1, p2, center], {
@@ -999,7 +957,7 @@ export class SvgFilenameEditorComponent implements OnInit {
       id: 'group' + this.groupCount
     });
     tri.toSVG = this.createCustomToSVG(
-      tri.toSVG, tri.type, (tri as unknown as {id: string}).id);
+      tri.toSVG, tri.type, (tri as unknown as {id: string}).id, tri);
     const rotationAngle = (startAngle + halfAngle) * radiansToDegrees;
     const slice = new fabric.Group([arc, tri], {
       originX: 'center',
@@ -1122,7 +1080,7 @@ export class SvgFilenameEditorComponent implements OnInit {
           id: 'group' + this.groupCount
         });
         obj.toSVG = this.createCustomToSVG(
-          obj.toSVG, obj.type, obj.id);
+          obj.toSVG, obj.type, obj.id, obj);
       });
       this.canvas.add(new fabric.Group(objects));
       this.groupCount += 1;

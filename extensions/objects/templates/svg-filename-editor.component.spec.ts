@@ -16,13 +16,11 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
 import { PolyPoint, SvgFilenameEditorComponent } from './svg-filename-editor.component';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
@@ -33,6 +31,8 @@ import { ContextService } from 'services/context.service';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SvgFileFetcherBackendApiService } from './svg-file-fetcher-backend-api.service';
+import { of } from 'rxjs';
 
 var initializeMockDocument = (svgFilenameCtrl: SvgFilenameEditorComponent) => {
   var mockDocument = document.createElement('div');
@@ -61,8 +61,9 @@ var initializeMockDocument = (svgFilenameCtrl: SvgFilenameEditorComponent) => {
   document.getElementsByTagName('body')[0].appendChild(mockDocument);
 };
 
-fdescribe('SvgFilenameEditor', () => {
+describe('SvgFilenameEditor', () => {
   var alertSpy = null;
+  let svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService;
   var contextService = null;
   var csrfService = null;
   let fixture: ComponentFixture<SvgFilenameEditorComponent>;
@@ -154,6 +155,9 @@ fdescribe('SvgFilenameEditor', () => {
   var mockSvgSanitizerService = {
     getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) => {
       return { tags: [], attrs: [] };
+    },
+    getTrustedSvgResourceUrl: (data) => {
+      return data;
     }
   };
 
@@ -233,6 +237,8 @@ fdescribe('SvgFilenameEditor', () => {
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });
+    svgFileFetcherBackendApiService = (
+      TestBed.inject(SvgFileFetcherBackendApiService));
     // This throws "Argument of type 'mockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". This is because
     // 'HTMLImageElement' has around 250 more properties. We have only defined
@@ -263,6 +269,9 @@ fdescribe('SvgFilenameEditor', () => {
   }));
 
   it('should update diagram size', () => {
+    spyOnProperty(document, 'readyState').and.returnValue('loading');
+    component.ngOnInit();
+    component.continueDiagramEditing();
     var WIDTH = 100;
     var HEIGHT = 100;
     component.diagramWidth = WIDTH;
@@ -554,64 +563,39 @@ fdescribe('SvgFilenameEditor', () => {
     expect(component.canvas.getObjects()[1].get('scaleY')).toBe(1);
   });
 
-  it('should save svg file created by the editor', () => {
-    component.createText();
-
-    // The responseText contains a XSSI Prefix, which is represented by )]}'
-    // string. That's why double quotes is being used here. It's not
-    // possible to use \' instead of ' so the XSSI Prefix won't be
-    // evaluated correctly.
-    /* eslint-disable-next-line quotes */
-    var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
-
-    // This throws "Argument of type '() => Promise<any, any, any>' is not
-    // assignable to parameter of type '{ (url: string, ...):
-    // jqXHR<any>; ...}'.". We need to suppress this error because we need
-    // to mock $.ajax to this function purposes.
-    // @ts-expect-error
-    spyOn($, 'ajax').and.callFake(() => {
-      return new Promise((resolve, reject) => {
-        resolve(responseText);
+  it('should save svg file created by the editor', waitForAsync(
+    fakeAsync(() => {
+      component.createText();
+      spyOn(svgFileFetcherBackendApiService, 'postSvgFile').and.callFake(() => {
+        return of({filename: 'imageFile1.svg'});
       });
-    });
-    component.saveSvgFile();
-
-    fixture.detectChanges();
-    expect(component.data.savedSvgFileName).toBe('imageFile1.svg');
-    expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
-    expect(component.validate()).toBe(true);
-  });
+      component.saveSvgFile();
+      tick(1);
+      fixture.detectChanges();
+      tick(1);
+      expect(component.data.savedSvgFileName).toBe('imageFile1.svg');
+      expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
+      expect(component.validate()).toBe(true);
+    })));
 
   it('should not save svg file when no diagram is created', () => {
     component.saveSvgFile();
     expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
   });
 
-  it('should handle rejection when saving an svg file fails', () => {
-    component.createRect();
-    var errorMessage = 'Error on saving svg file';
-    // This throws "Argument of type '() => Promise<any, any, any>' is not
-    // assignable to parameter of type '{ (url: string, ...):
-    // jqXHR<any>; ...}'.". We need to suppress this error because we need
-    // to mock $.ajax to this function purposes.
-    // @ts-expect-error
-    spyOn($, 'ajax').and.callFake(() => {
-      return new Promise((resolve, reject) => {
-        reject({
-          // Variable responseText contains a XSSI Prefix, which is represented
-          // by )]}' string. That's why double quotes is being used here. It's
-          // not possible to use \' instead of ' so the XSSI Prefix won't be
-          // evaluated correctly.
-          /* eslint-disable-next-line quotes */
-          responseText: ")]}'\n{ \"error\": \"" + errorMessage + "\" }"
-        });
+  it('should handle rejection when saving an svg file fails', waitForAsync(
+    fakeAsync(() => {
+      component.createRect();
+      var errorMessage = 'Image exceeds file size limit of 100 KB.';
+      spyOn(component, 'postSvgToServer').and.callFake(() => {
+        return Promise.reject({error: {error: errorMessage}});
       });
-    });
-    component.saveSvgFile();
-
-    fixture.detectChanges();
-    expect(alertSpy).toHaveBeenCalledWith(errorMessage);
-  });
+      component.saveSvgFile();
+      tick(1);
+      fixture.detectChanges();
+      tick(1);
+      expect(alertSpy).toHaveBeenCalledWith(errorMessage);
+    })));
 
   it('should allow user to continue editing the diagram', () => {
     component.savedSvgDiagram = 'saved';
@@ -621,108 +605,26 @@ fdescribe('SvgFilenameEditor', () => {
       return '<path></path>';
     };
     var customToSVG = component.createCustomToSVG(
-      mocktoSVG as unknown as () => string, 'path', 'group1');
+      mocktoSVG as unknown as () => string, 'path', 'group1', component);
     expect(customToSVG()).toBe('<path id="group1"/>');
     expect(component.diagramStatus).toBe('editing');
   });
 });
 
 
-describe('SvgFilenameEditor initialized with value attribute',
-  () => {
-    var svgFilenameCtrl = null;
-    var $httpBackend = null;
-    var contextService = null;
-    var samplesvg = (
-      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+describe('SvgFilenameEditor initialized with value attribute', () => {
+  var component: SvgFilenameEditorComponent;
+  var contextService = null;
+  var samplesvg = (
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
       'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
       ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
       'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
-    var mockAssetsBackendApiService = {
-      getImageUrlForPreview: (contentType, contentId, filepath) => {
-        return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
-      }
-    };
-    var mockImagePreloaderService = {
-      getDimensionsOfImage: () => {
-        return {
-          width: 450,
-          height: 350
-        };
-      }
-    };
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
-      $provide.value('ImagePreloaderService', mockImagePreloaderService);
-      $provide.value('ImageUploadHelperService', {});
-      $provide.value('SvgSanitizerService', {});
-    }));
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $httpBackend = $injector.get('$httpBackend');
-      contextService = $injector.get('ContextService');
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-      spyOn(contextService, 'getEntityId').and.returnValue('1');
-
-      svgFilenameCtrl = $componentController('svgFilenameEditor', null, {
-        value: 'svgimageFilename1.svg'
-      });
-      initializeMockDocument(svgFilenameCtrl);
-    }));
-
-    it('should load the svg file', () => {
-      svgFilenameCtrl.$onInit();
-      $httpBackend.expect(
-        'GET', '/imageurl_exploration_1_svgimageFilename1.svg'
-      ).respond(samplesvg);
-      $httpBackend.flush();
-      expect(svgFilenameCtrl.diagramStatus).toBe('saved');
-      expect(svgFilenameCtrl.savedSvgDiagram).toBe(samplesvg);
-    });
-  }
-);
-
-describe('SvgFilenameEditor with image save destination as ' +
-  'local storage', () => {
-  var contextService = null;
-  var svgFilenameCtrl = null;
-  var samplesvg = (
-    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
-    'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
-    ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
-    'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
-  var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
-
-  var mockilss = {
-    getObjectUrlForImage: (filename) => {
-      return dataUrl;
-    },
-    saveImage: (filename, imageData) => {
-      return 'Image file save.';
-    },
-    deleteImage: (filename) => {
-      return 'Image file is deleted.';
-    },
-    isInStorage: (filename) => {
-      return true;
+  var mockAssetsBackendApiService = {
+    getImageUrlForPreview: (contentType, contentId, filepath) => {
+      return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
     }
   };
-
-  var mockImageUploadHelperService = {
-    convertImageDataToImageFile: (svgDataUri) => {
-      return new Blob();
-    },
-    generateImageFilename: (height, widht, extension) => {
-      return height + '_' + widht + '.' + extension;
-    }
-  };
-
-  var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) => {
-      return { tags: [], attrs: [] };
-    }
-  };
-
   var mockImagePreloaderService = {
     getDimensionsOfImage: () => {
       return {
@@ -731,8 +633,100 @@ describe('SvgFilenameEditor with image save destination as ' +
       };
     }
   };
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [SvgFilenameEditorComponent],
+      providers: [
+        {
+          provide: AssetsBackendApiService,
+          useValue: mockAssetsBackendApiService
+        },
+        {
+          provide: ImagePreloaderService,
+          useValue: mockImagePreloaderService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    component = TestBed.createComponent(
+      SvgFilenameEditorComponent).componentInstance;
+    component.value = 'svgimageFilename1.svg';
+    contextService = TestBed.inject(ContextService);
+    const svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService = (
+      TestBed.inject(SvgFileFetcherBackendApiService));
+    spyOn(svgFileFetcherBackendApiService, 'fetchSvg').and.returnValue(
+      of(samplesvg));
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('1');
+    initializeMockDocument(component);
+  }));
 
-  class mockReaderObject {
+  it('should load the svg file', waitForAsync(fakeAsync(() => {
+    component.ngOnInit();
+    tick(10);
+    expect(component.diagramStatus).toBe('saved');
+    expect(component.savedSvgDiagram).toBe(samplesvg);
+  })));
+}
+);
+
+describe(
+  'SvgFilenameEditor with image save destination as local storage',
+  () => {
+    var contextService = null;
+    let fixture: ComponentFixture<SvgFilenameEditorComponent>;
+    var component: SvgFilenameEditorComponent = null;
+    var samplesvg = (
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+    'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
+    ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
+    'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
+    var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
+
+    var mockilss = {
+      getObjectUrlForImage: (filename) => {
+        return dataUrl;
+      },
+      saveImage: (filename, imageData) => {
+        return 'Image file save.';
+      },
+      deleteImage: (filename) => {
+        return 'Image file is deleted.';
+      },
+      isInStorage: (filename) => {
+        return true;
+      }
+    };
+
+    var mockImageUploadHelperService = {
+      convertImageDataToImageFile: (svgDataUri) => {
+        return new Blob();
+      },
+      generateImageFilename: (height, widht, extension) => {
+        return height + '_' + widht + '.' + extension;
+      }
+    };
+
+    var mockSvgSanitizerService = {
+      getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) => {
+        return { tags: [], attrs: [] };
+      },
+      getTrustedSvgResourceUrl: (data) => {
+        return data;
+      }
+    };
+
+    var mockImagePreloaderService = {
+      getDimensionsOfImage: () => {
+        return {
+          width: 450,
+          height: 350
+        };
+      }
+    };
+
+    class mockReaderObject {
     result = null;
     onload = null;
     constructor() {
@@ -744,9 +738,9 @@ describe('SvgFilenameEditor with image save destination as ' +
       this.onload();
       return 'The file is loaded';
     }
-  }
+    }
 
-  class mockImageObject {
+    class mockImageObject {
     source = null;
     onload = null;
     constructor() {
@@ -757,80 +751,108 @@ describe('SvgFilenameEditor with image save destination as ' +
     set src(url) {
       this.onload();
     }
-  }
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AssetsBackendApiService', {});
-    $provide.value('ImageLocalStorageService', mockilss);
-    $provide.value('ImagePreloaderService', mockImagePreloaderService);
-    $provide.value('ImageUploadHelperService', mockImageUploadHelperService);
-    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    contextService = $injector.get('ContextService');
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-
-    // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockImageObject'.
-    // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new mockImageObject());
-    // This throws "Argument of type 'mockReaderObject' is not assignable
-    // to parameter of type 'FileReader'.". This is because
-    // 'FileReader' has around 15 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
-
-    svgFilenameCtrl = $componentController('svgFilenameEditor');
-    initializeMockDocument(svgFilenameCtrl);
-    svgFilenameCtrl.$onInit();
-    svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
-    svgFilenameCtrl.initializeMouseEvents();
-  }));
-
-  it('should save svg file to local storage created by the svg editor',
-    () => {
-      svgFilenameCtrl.createRect();
-      svgFilenameCtrl.saveSvgFile();
-      expect(svgFilenameCtrl.data.savedSvgFileName).toBe('350_450.svg');
-      expect(svgFilenameCtrl.data.savedSvgUrl.toString()).toBe(dataUrl);
-      expect(svgFilenameCtrl.validate()).toBe(true);
     }
-  );
 
-  it('should allow user to continue editing the diagram and delete the ' +
+    beforeEach(waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        declarations: [SvgFilenameEditorComponent],
+        providers: [
+          {
+            provide: AssetsBackendApiService,
+            useValue: {}
+          },
+          {
+            provide: ImageLocalStorageService,
+            useValue: mockilss
+          },
+          {
+            provide: ImagePreloaderService,
+            useValue: mockImagePreloaderService
+          },
+          {
+            provide: ImageUploadHelperService,
+            useValue: mockImageUploadHelperService
+          },
+          {
+            provide: SvgSanitizerService,
+            useValue: mockSvgSanitizerService
+          }
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
+      }).compileComponents();
+      contextService = TestBed.inject(ContextService);
+      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+
+      // This throws "Argument of type 'mockImageObject' is not assignable to
+      // parameter of type 'HTMLImageElement'.". This is because
+      // 'HTMLImageElement' has around 250 more properties. We have only defined
+      // the properties we need in 'mockImageObject'.
+      // @ts-expect-error
+      spyOn(window, 'Image').and.returnValue(new mockImageObject());
+      // This throws "Argument of type 'mockReaderObject' is not assignable
+      // to parameter of type 'FileReader'.". This is because
+      // 'FileReader' has around 15 more properties. We have only defined
+      // the properties we need in 'mockReaderObject'.
+      // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+      fixture = TestBed.createComponent(SvgFilenameEditorComponent);
+      component = fixture.componentInstance;
+      initializeMockDocument(component);
+      component.ngOnInit();
+      component.canvas = new fabric.Canvas(component.canvasID);
+      component.initializeMouseEvents();
+    }));
+
+
+    it('should save svg file to local storage created by the svg editor',
+      () => {
+        component.createRect();
+        component.saveSvgFile();
+        expect(component.data.savedSvgFileName).toBe('350_450.svg');
+        expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
+        expect(component.validate()).toBe(true);
+      }
+    );
+
+    it('should allow user to continue editing the diagram and delete the ' +
     'image from local storage', () => {
-    svgFilenameCtrl.data.savedSvgFileName = 'image.svg';
-    svgFilenameCtrl.savedSvgDiagram = 'saved';
-    svgFilenameCtrl.savedSvgDiagram = samplesvg;
-    svgFilenameCtrl.continueDiagramEditing();
-    expect(svgFilenameCtrl.diagramStatus).toBe('editing');
+      component.data.savedSvgFileName = 'image.svg';
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      expect(component.diagramStatus).toBe('editing');
+    });
   });
-});
 
 
 describe('should fail svg tag validation', () => {
-  var svgFilenameCtrl = null;
+  let fixture: ComponentFixture<SvgFilenameEditorComponent>;
+  var component: SvgFilenameEditorComponent;
   var mockSvgSanitizerService = {
     getInvalidSvgTagsAndAttrsFromDataUri: (dataURI) => {
       return { tags: ['script'], attrs: [] };
+    },
+    getTrustedSvgResourceUrl: (data) => {
+      return data;
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AssetsBackendApiService', {});
-    $provide.value('ImageLocalStorageService', {});
-    $provide.value('ImagePreloaderService', {});
-    $provide.value('ImageUploadHelperService', {});
-    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    svgFilenameCtrl = $componentController('svgFilenameEditor');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [SvgFilenameEditorComponent],
+      providers: [
+        {
+          provide: SvgSanitizerService,
+          useValue: mockSvgSanitizerService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    fixture = TestBed.createComponent(SvgFilenameEditorComponent);
+    component = fixture.componentInstance;
   }));
 
   it('should fail svg validation', () => {
@@ -840,30 +862,36 @@ describe('should fail svg tag validation', () => {
       ', 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
       '<script src="evil.com"></script></svg>');
     expect(() => {
-      svgFilenameCtrl.isSvgTagValid(invalidSvgTag);
+      component.isSvgTagValid(invalidSvgTag);
     }).toThrowError('Invalid tags in svg:script');
   });
 });
 
 describe('should fail svg attribute validation', () => {
-  var svgFilenameCtrl = null;
+  var component: SvgFilenameEditorComponent;
   var mockSvgSanitizerService = {
     getInvalidSvgTagsAndAttrsFromDataUri: (dataURI) => {
       return { tags: [], attrs: ['widht'] };
+    },
+    getTrustedSvgResourceUrl: (data) => {
+      return data;
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AssetsBackendApiService', {});
-    $provide.value('ImageLocalStorageService', {});
-    $provide.value('ImagePreloaderService', {});
-    $provide.value('ImageUploadHelperService', {});
-    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [SvgFilenameEditorComponent],
+      providers: [{
+        provide: SvgSanitizerService,
+        useValue: mockSvgSanitizerService
+      }],
+      schemas: [NO_ERRORS_SCHEMA]
+    });
+    component = TestBed.createComponent(
+      SvgFilenameEditorComponent).componentInstance;
   }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    svgFilenameCtrl = $componentController('svgFilenameEditor');
-  }));
+
 
   it('should fail svg validation', () => {
     var invalidWidthAttribute = (
@@ -872,7 +900,7 @@ describe('should fail svg attribute validation', () => {
       '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
       '</svg>');
     expect(() => {
-      svgFilenameCtrl.isSvgTagValid(invalidWidthAttribute);
+      component.isSvgTagValid(invalidWidthAttribute);
     }).toThrowError('Invalid attributes in svg:widht');
   });
 });
