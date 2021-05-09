@@ -102,25 +102,35 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_sleep.times_called, common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
     def test_run_webpack_compilation_success(self):
+        old_os_path_isdir = os.path.isdir
+        def mock_os_path_isdir(path):
+            if path == 'webpack_bundles':
+                return True
+            return old_os_path_isdir(path)
+
         # The webpack compilation processes will be called 4 times as mock_isdir
         # will return true after 4 calls.
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'managed_webpack_compiler', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, called=False))
-        self.exit_stack.enter_context(self.swap_conditionally(
-            os.path, 'isdir', new_function=lambda _: True,
-            condition=lambda p: p == 'webpack_bundles'))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
 
         run_e2e_tests.run_webpack_compilation()
 
     def test_run_webpack_compilation_failed(self):
+        old_os_path_isdir = os.path.isdir
+        def mock_os_path_isdir(path):
+            if path == 'webpack_bundles':
+                return False
+            return old_os_path_isdir(path)
+
         # The webpack compilation processes will be called five times.
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'managed_webpack_compiler', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_conditionally(
-            os.path, 'isdir', new_function=lambda _: False,
-            condition=lambda p: p == 'webpack_bundles'))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
 
@@ -140,14 +150,19 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         run_e2e_tests.install_third_party_libraries(True)
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self):
+        old_os_path_isdir = os.path.isdir
+        def mock_os_path_isdir(path):
+            if path == 'webpack_bundles':
+                return True
+            return old_os_path_isdir(path)
+
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'managed_webpack_compiler', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
-        self.exit_stack.enter_context(self.swap_conditionally(
-            os.path, 'isdir', new_function=lambda _: True,
-            condition=lambda p: p == 'webpack_bundles'))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'isdir', mock_os_path_isdir))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, called=False))
 

@@ -1077,45 +1077,6 @@ class TestBase(unittest.TestCase):
             setattr(obj, attr, original)
 
     @contextlib.contextmanager
-    def swap_conditionally(
-            self, obj, attr, new_function=lambda *_, **__: None,
-            condition=None):
-        """Swap the obj.attr function to return a value when a condition is met.
-
-        When the condition is not met, then the original function will be called
-        instead.
-
-        This function can be used when the target being swapped is used by
-        unrelated code. For example, os.path.exists() is used extensively by
-        psutil to manage processes. If we swap it to _always_ return True or
-        False, then the process management will result in errors.
-
-        Args:
-            obj: *. The object whose attribute will be swapped.
-            attr: str. The attribute of the object to swap.
-            new_function: callable. The function called when the condition
-                returns True. By default, the replacement function accepts any
-                arguments and returns None.
-            condition: callable|None. A predicate function which returns True or
-                False depending on the arguments passed to the original
-                function. When None, the original function is always called.
-
-        Yields:
-            callable. The function object which has been swapped in.
-        """
-        original_function = getattr(obj, attr)
-        def function_that_conditionally_uses_swap(*args, **kwargs):
-            """Calls the input function if the condition is True, otherwise it
-            calls the original function.
-            """
-            chosen_function = (
-                new_function if condition and condition(*args, **kwargs) else
-                original_function)
-            return chosen_function(*args, **kwargs)
-        with self.swap(obj, attr, function_that_conditionally_uses_swap):
-            yield function_that_conditionally_uses_swap
-
-    @contextlib.contextmanager
     def swap_to_always_return(self, obj, attr, value=None):
         """Swap obj.attr with a function that always returns the given value."""
         def function_that_always_returns(*unused_args, **unused_kwargs):
