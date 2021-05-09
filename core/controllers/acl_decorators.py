@@ -2944,7 +2944,7 @@ def can_update_suggestion(handler):
     Returns:
         function. The newly decorated function that has common checks and
         permissions specified by passed in decorator. This function is allowed
-        to be called for users who have the rights to update the given 
+        to be called for users who have the rights to update the given
         suggestion.
 
     Raises:

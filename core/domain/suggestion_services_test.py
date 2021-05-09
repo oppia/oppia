@@ -903,11 +903,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             0.6)
 
     def test_update_question_suggestion_raises_invalid_suggestion_exception(
-        self):
-        exploration = (
-            self.save_new_linear_exp_with_state_names_and_interactions(
-                'exploration1', self.author_id, ['state 1'], ['TextInput'],
-                category='Algebra'))
+            self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'exploration1', self.author_id, ['state 1'], ['TextInput'],
+            category='Algebra')
         edit_state_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -922,21 +921,20 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data(
             'default_state').to_dict()
         expected_exception_regexp = 'Expected suggestion type is %s.' % (
-                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+            feconf.SUGGESTION_TYPE_ADD_QUESTION)
 
         with self.assertRaisesRegexp(
             Exception, expected_exception_regexp):
-                suggestion_services.update_question_suggestion(
-                    suggestion.suggestion_id,
-                    0.6,
-                    question_state_data)
+            suggestion_services.update_question_suggestion(
+                suggestion.suggestion_id,
+                0.6,
+                question_state_data)
 
     def test_update_translation_suggestion_raises_invalid_suggestion_exception(
-        self):
-        exploration = (
-            self.save_new_linear_exp_with_state_names_and_interactions(
-                'exploration1', self.author_id, ['state 1'], ['TextInput'],
-                category='Algebra'))
+            self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'exploration1', self.author_id, ['state 1'], ['TextInput'],
+            category='Algebra')
         edit_state_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -954,8 +952,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, expected_exception_regexp):
-                suggestion_services.update_translation_suggestion(
-                    suggestion.suggestion_id, '<p>Updated Translation</p>')
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id, '<p>Updated Translation</p>')
 
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):

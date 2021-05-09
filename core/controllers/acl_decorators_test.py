@@ -26,7 +26,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_domain

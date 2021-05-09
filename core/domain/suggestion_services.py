@@ -1286,8 +1286,8 @@ def update_translation_suggestion(suggestion_id, translation_html):
     _update_suggestion(suggestion)
 
 
-def update_question_suggestion(
-    suggestion_id, skill_difficulty, question_state_data):
+def update_question_suggestion(suggestion_id, skill_difficulty,
+        question_state_data):
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
 
