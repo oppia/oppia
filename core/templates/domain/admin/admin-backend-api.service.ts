@@ -51,7 +51,7 @@ interface UserRolesBackendResponse {
 }
 
 interface RoleToActionsBackendResponse {
-  [role: string]: [actions: string[]];
+  [role: string]: string[];
 }
 
 interface ConfigPropertiesBackendResponse {
