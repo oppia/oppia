@@ -7,7 +7,7 @@
     <md-list>
       <md-list-item class="pl-0" ng-repeat="explanation in rubric.getExplanations()">
         <div class="oppia-skill-description-label">Skill description:</div>
-        <angular-html-bind class="explanations" html-data="explanation">
+        <angular-html-bind class="oppia-skill-description-text" html-data="explanation">
         </angular-html-bind>
         <div ng-if="explanation === '' || explanation === '<p></p>'">
           <span class="oppia-placeholder"> This rubric has not yet been specified </span>
@@ -29,7 +29,7 @@
     width: 9rem;
   }
 
-  .explanations {
+  .oppia-skill-description-text {
     padding-top: 2.4rem;
   }
 </style>
