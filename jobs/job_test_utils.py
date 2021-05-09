@@ -151,7 +151,7 @@ class JobTestBase(PipelinedTestBase):
         super(JobTestBase, self).__init__(*args, **kwargs)
         self.model_io_stub = stub_io.ModelIoStub()
         self.pipeline.options.view_as(job_options.JobOptions).model_getter = (
-            self.model_io_stub.get_models)
+            self.model_io_stub.get_models_ptransform)
 
     def tearDown(self):
         self.model_io_stub.clear()
