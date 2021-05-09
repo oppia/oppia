@@ -1,7 +1,8 @@
 <div class="audio-header" *ngIf="isAudioBarAvailable()"
-     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
-  <div *ngIf="audioBarIsExpanded" class="audio-controls">
-    <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
+     [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}">
+  <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
+  <div class="audio-controls" ng-class="{'audio-controls-margin': progressBarIsShown}">
+    <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
         <a (click)="onBackwardButtonClicked()">
           <span class="oppia-replay-white-circle" *ngIf="progressBarIsShown">
@@ -51,13 +52,22 @@
                 (change)="onNewLanguageSelected()">
           <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
         </select>
+        </div>
       </div>
+    </div>
+    <div class="audio-collapse-button audio-toggle-button"
+         ng-if="audioBarIsExpanded"
+         ng-click="collapseAudioBar()"
+         aria-label="Audio menu collapse"
+         ng-class="{'audio-controls-margin': progressBarIsShown}">
+      <i class="fas fa-sort-up"></i>
     </div>
   </div>
   <div class="audio-collapse-button audio-toggle-button"
-       *ngIf="audioBarIsExpanded"
-       (click)="collapseAudioBar()"
-       aria-label="Audio menu collapse">
+       ng-if="audioBarIsExpanded"
+       ng-click="collapseAudioBar()"
+       aria-label="Audio menu collapse"
+       ng-class="{'audio-controls-margin': progressBarIsShown}">
     <i class="fas fa-sort-up"></i>
   </div>
   <div class="audio-expand-button audio-toggle-button"
@@ -136,6 +146,7 @@
     height: 10px;
     position: absolute;
     top: 44px;
+    transition: top 200ms linear;
     width: 30px;
   }
 
@@ -216,6 +227,7 @@
     height: 44px;
     justify-content: center;
     padding: 0 4px;
+    transition: margin-top 200ms linear;
     width: 100%;
   }
 
@@ -256,7 +268,6 @@
     position: fixed;
     text-align: center;
     top: 126px;
-    transition: margin-top 0.2s ease-in-out;
     width: 100%;
     z-index: 100;
   }
@@ -268,12 +279,12 @@
   @media(max-width: 768px) {
     .audio-header {
       top: 3.5em;
+      transition: top 200ms linear;
     }
 
     .audio-header.headroom--unpinned {
-      margin-top: 32px;
       top: 0;
-      }
+    }
   }
   .audio-language-select {
     border-radius: 9px;
@@ -328,7 +339,9 @@
   @media screen and (max-width: 550px) {
     .audio-controls {
       height: auto;
+      margin-top: -1px;
       padding: 20px 0;
+      padding-right: 20px;
     }
     .slider-section {
       transform: translateY(4px);
