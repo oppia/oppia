@@ -32,6 +32,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
 import feconf
+import python_utils
 import utils
 
 
@@ -403,8 +404,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
             )
 
         if not isinstance(
-            self.payload.get('translation_html'),
-            python_utils.BASESTRING):
+                self.payload.get('translation_html'), python_utils.BASESTRING):
             raise self.InvalidInputException(
                 'The parameter \'translation_html\' should be a string.'
             )
