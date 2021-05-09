@@ -76,7 +76,7 @@ angular.module('oppia').directive('applyValidation', [
               const eventBusGroup: EventBusGroup = new EventBusGroup(
                 EventBusService);
               eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-                value: true,
+                value: validationResult,
                 modalId: scope.$ctrl.modalId
               }));
               ctrl.$setValidity(frontendName, validationResult);

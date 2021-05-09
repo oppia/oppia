@@ -20,6 +20,18 @@
 // RteHelperService.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { RteHelperModalComponent } from './rte-helper-modal.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+}
 
 describe('Rte Helper Service', function() {
   var RteHelperService = null;
@@ -27,6 +39,12 @@ describe('Rte Helper Service', function() {
   var $uibModal = null;
   var $log = null;
   var $rootScope = null;
+  var mockNgbModalRef = {
+    componentInstance: {
+      customizationArgSpecs: null,
+      attrsCustomizationArgsDict: null
+    }
+  };
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -35,6 +53,19 @@ describe('Rte Helper Service', function() {
       $provide.value(key, value);
     }
   }));
+  beforeEach(async() => {
+    TestBed.configureTestingModule({
+      declarations: [RteHelperModalComponent],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [RteHelperModalComponent],
+      }
+    }).compileComponents();
+  });
+  beforeEach(async() => {
+    OppiaAngularRootComponent.ngbModal = TestBed.inject(NgbModal);
+  })
   beforeEach(angular.mock.inject(function($injector) {
     RteHelperService = $injector.get('RteHelperService');
     $q = $injector.get('$q');
@@ -325,38 +356,51 @@ describe('Rte Helper Service', function() {
   });
 
   it('should open customization modal', function() {
-    var uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
+    var modalSpy = spyOn(
+      OppiaAngularRootComponent.ngbModal, 'open').and.callFake(() => {
+        return <NgbModalRef>(
+          {
+            componentInstance: mockNgbModalRef,
+            result: Promise.resolve('success')
+          });
+      });
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(
       {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
 
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should open customization modal', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
-    });
+  it('should open customization modal', fakeAsync(() => {
+    spyOn(
+      OppiaAngularRootComponent.ngbModal, 'open').and.returnValue(
+        <NgbModalRef>(
+          {
+            componentInstance: mockNgbModalRef,
+            result: Promise.resolve('success')
+          }));
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(
       {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
-    $rootScope.$apply();
-
+    flushMicrotasks();
     expect(submitCallBackSpy).toHaveBeenCalled();
-  });
+  }));
 
-  it('should open customization modal', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+  it('should open customization modal', fakeAsync(() => {
+    spyOn(
+      OppiaAngularRootComponent.ngbModal, 'open').and.returnValue(
+        <NgbModalRef>(
+          {
+            componentInstance: mockNgbModalRef,
+            result: Promise.reject('failed')
+          }));
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     RteHelperService.openCustomizationModal(
       {}, {}, submitCallBackSpy, dismissCallBackSpy, function() {});
-    $rootScope.$apply();
-
+    flushMicrotasks();
     expect(dismissCallBackSpy).toHaveBeenCalled();
-  });
+  }));
 });

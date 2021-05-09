@@ -27,7 +27,8 @@ angular.module('oppia').directive('skillSelectorEditor', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        value: '='
+        value: '=',
+        modalId: '<'
       },
       template: require('./skill-selector-editor.directive.html'),
       controllerAs: '$ctrl',

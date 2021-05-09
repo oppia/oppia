@@ -19,8 +19,8 @@
 
   <div class="modal-footer">
     <input type="submit" class="btn btn-secondary" value="Cancel" (click)="cancel()">
-    <input *ngIf="!currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" (click)="save()" [disabled]="isInvalid">
-    <input *ngIf="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" (click)="save()" [disabled]="isInvalid || disableSaveButtonForMathRte()">
+    <input *ngIf="!currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" (click)="save()" [disabled]="!isValid">
+    <input *ngIf="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" (click)="save()" [disabled]="!isValid || disableSaveButtonForMathRte()">
   </div>
 </div>
 <style>

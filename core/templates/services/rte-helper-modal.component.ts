@@ -58,7 +58,7 @@ export class RteHelperModalComponent implements OnInit {
     name: string,
     value: Object | MathExpressionContent
   }[];
-  isInvalid: boolean;
+  isValid: boolean;
   eventBusGroup: EventBusGroup;
   modalId = Symbol();
 
@@ -82,6 +82,7 @@ export class RteHelperModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isValid = true;
     const eventBusGroup: EventBusGroup = new EventBusGroup(
       this.eventBusService);
     this.eventBusGroup = eventBusGroup;
@@ -89,7 +90,7 @@ export class RteHelperModalComponent implements OnInit {
       ObjectFormValidityChangeEvent,
       event => {
         if (event.message.modalId === this.modalId) {
-          this.isInvalid = event.message.value;
+          this.isValid = event.message.value;
         }
       });
     // Without this code, the focus will remain in the background RTE
@@ -99,8 +100,11 @@ export class RteHelperModalComponent implements OnInit {
     // TODO(sll): Make this switch to the first input field in the
     // modal instead.
     this.modalIsLoading = true;
+    const that = this
     this.focusManagerService.setFocus('tmpFocusPoint');
-    setTimeout(() => this.modalIsLoading = false);
+    setTimeout(() => {
+      that.modalIsLoading = false;
+    }, 150);
 
     this.currentRteIsMathExpressionEditor = false;
     this.tmpCustomizationArgs = [];

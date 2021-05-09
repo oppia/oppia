@@ -101,23 +101,7 @@ angular.module('oppia').factory('RteHelperService', [
         modalInstance.componentInstance.attrsCustomizationArgsDict = (
           attrsCustomizationArgsDict);
         modalInstance.result.then(onSubmitCallback)['catch'](onDismissCallback);
-        // $uibModal.open({
-        //   templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        //     '/components/ck-editor-helpers/' +
-        //     'customize-rte-component-modal.template.html'),
-        //   backdrop: 'static',
-        //   resolve: {
-        //     customizationArgSpecs: function() {
-        //       return customizationArgSpecs;
-        //     },
-        //     attrsCustomizationArgsDict: function() {
-        //       return attrsCustomizationArgsDict;
-        //     }
-        //   },
-        //   controller: 'RteHelperModalController'
-        // }).result.then(onSubmitCallback)['catch'](onDismissCallback);
       }
-
     };
   }
 ]);

@@ -45,6 +45,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -167,7 +169,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     private imagePreloaderService: ImagePreloaderService,
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private eventBusService: EventBusService
   ) {}
 
   ngOnInit(): void {
@@ -561,6 +564,12 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     const isValid = data.mode === this.MODE_SAVED &&
       data.metadata.savedImageFilename &&
       data.metadata.savedImageFilename.length > 0;
+    const eventBusGroup: EventBusGroup = new EventBusGroup(
+      this.eventBusService);
+    eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+      value: isValid,
+      modalId: this.modalId
+    }));
     return isValid;
   }
 

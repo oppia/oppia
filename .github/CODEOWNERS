@@ -563,7 +563,7 @@
 /core/templates/services/external-rte-save.service*.ts @srijanreddy98
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681
-/core/templates/services/rte-helper-modal.controller*.ts @aks681
+/core/templates/services/rte-helper-modal.component*.ts @aks681
 /core/domain/image_validation_services*.py @DubeySandeep
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @vojtechjelinek

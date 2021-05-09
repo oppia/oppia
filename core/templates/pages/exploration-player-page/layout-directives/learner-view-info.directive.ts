@@ -41,6 +41,8 @@ require('services/date-time-format.service.ts');
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { Subscription } from 'rxjs';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { StatsReportingService } from '../services/stats-reporting.service';
 
 angular.module('oppia').directive('learnerViewInfo', [
   function() {
@@ -52,14 +54,14 @@ angular.module('oppia').directive('learnerViewInfo', [
       controller: [
         '$log', '$rootScope', '$uibModal', 'ContextService',
         'LearnerViewInfoBackendApiService',
-        'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-        'UrlService',
+        'ReadOnlyExplorationBackendApiService', 'SiteAnalyticsService',
+        'StatsReportingService', 'UrlInterpolationService', 'UrlService',
         'TOPIC_VIEWER_STORY_URL_TEMPLATE',
         function(
             $log, $rootScope, $uibModal, ContextService,
             LearnerViewInfoBackendApiService,
-            ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-            UrlService,
+            ReadOnlyExplorationBackendApiService, SiteAnalyticsService,
+            StatsReportingService, UrlInterpolationService, UrlService,
             TOPIC_VIEWER_STORY_URL_TEMPLATE
         ) {
           var ctrl = this;
@@ -152,6 +154,9 @@ angular.module('oppia').directive('learnerViewInfo', [
                   ctrl.storyPlaythroughObject = storyDataDict;
                   var topicName = ctrl.storyPlaythroughObject.topicName;
                   ctrl.topicName = topicName;
+                  StatsReportingService.setTopicName(ctrl.topicName);
+                  SiteAnalyticsService.registerCuratedLessonStarted(
+                    ctrl.topicName, explorationId);
                 });
             }
           };

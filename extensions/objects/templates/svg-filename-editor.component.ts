@@ -28,28 +28,32 @@ require('services/csrf-token.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/svg-sanitizer.service.ts');
+require('app-events/event-bus.service');
 
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { EventBusGroup } from 'app-events/event-bus.service';
 import { fabric } from 'fabric';
 import Picker from 'vanilla-picker';
 
 angular.module('oppia').component('svgFilenameEditor', {
   template: require('./svg-filename-editor.component.html'),
   bindings: {
-    value: '='
+    value: '=',
+    modalId: '<'
   },
   controller: [
     '$http', '$q', '$sce', '$scope', 'AlertsService',
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
-    'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
-    'ImageUploadHelperService', 'SvgSanitizerService',
+    'DeviceInfoService', 'EventBusService', 'ImageLocalStorageService',
+    'ImagePreloaderService', 'ImageUploadHelperService', 'SvgSanitizerService',
     'UrlInterpolationService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     'MAX_SVG_DIAGRAM_HEIGHT', 'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT',
     'MIN_SVG_DIAGRAM_WIDTH',
     function(
         $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
-        DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
-        ImageUploadHelperService, SvgSanitizerService,
+        DeviceInfoService, EventBusService, ImageLocalStorageService,
+        ImagePreloaderService, ImageUploadHelperService, SvgSanitizerService,
         UrlInterpolationService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE,
         MAX_SVG_DIAGRAM_HEIGHT, MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT,
         MIN_SVG_DIAGRAM_WIDTH) {
@@ -548,9 +552,16 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.validate = function() {
-        return (
+        let isValid = (
           ctrl.isDiagramSaved() && ctrl.data.savedSvgFileName &&
           ctrl.data.savedSvgFileName.length > 0);
+        const eventBusGroup: EventBusGroup = new EventBusGroup(
+          EventBusService);
+        eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+          value: isValid,
+          modalId: ctrl.modalId
+        }));
+        return isValid;
       };
 
       var getSize = function() {
