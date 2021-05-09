@@ -1024,7 +1024,7 @@
   resolved "https://registry.yarnpkg.com/@types/ckeditor/-/ckeditor-4.9.10.tgz#f4d252821c52c2b903b21801c8469ead756122b3"
   integrity sha512-dcOPCXM0Cr5Z0i6eF/aW5LvECrS+cdl2Gi7lU+rEUNWby0w9Yl6mBubjrs29OVAducpuZjB4mfDayE+o4/gGdQ==
 
-"@types/codemirror@0.0.99", "@types/codemirror@^0.0.99":
+"@types/codemirror@^0.0.99":
   version "0.0.99"
   resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.99.tgz#fc3fd1fe84172e76ab802dcaa309f9c9740aeab0"
   integrity sha512-iSNLwL9ZXUDUhhljqyO9lDpxKOnye9Y2IY0vvoarapI3QLpZsx8RF8Ybic4+gne+DVsnc5ReBOQA3p4FVbsXMw==
@@ -1296,6 +1296,11 @@
   dependencies:
     "@types/minimatch" "*"
     "@types/node" "*"
+
+"@types/google-protobuf@^3.7.4":
+  version "3.15.2"
+  resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.15.2.tgz#70753e948cabeb416d71299dc35c3f562a10fb0f"
+  integrity sha512-ubeqvw7sl6CdgeiIilsXB2jIFoD/D0F+/LIEp7xEBEXRNtDJcf05FRINybsJtL7GlkWOUVn6gJs2W9OF+xI6lg==
 
 "@types/google.visualization@^0.0.55":
   version "0.0.55"
@@ -6377,6 +6382,11 @@ google-p12-pem@^3.0.3:
   dependencies:
     node-forge "^0.10.0"
 
+google-protobuf@^3.13.0:
+  version "3.16.0"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.16.0.tgz#87c61829a8aec7d9244dcbed9464e1d0fcbed8ae"
+  integrity sha512-gBY66yYL1wbQMU2r1POkXSXkm035Ni0wFv3vx0K9IEUsJLP9G5rAcFVn0xUXfZneRu6MmDjaw93pt/DE56VOyw==
+
 got@^9.6.0:
   version "9.6.0"
   resolved "https://registry.yarnpkg.com/got/-/got-9.6.0.tgz#edf45e7d67f99545705de1f7bbeeeb121765ed85"
@@ -10509,6 +10519,11 @@ protobufjs@^6.10.0, protobufjs@^6.10.2, protobufjs@^6.8.6:
     "@types/long" "^4.0.1"
     "@types/node" ">=13.7.0"
     long "^4.0.0"
+
+protoc-gen-ts@^0.3.4:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/protoc-gen-ts/-/protoc-gen-ts-0.3.5.tgz#81057f55d048c8cf7d305aa8a253d4a50292a1cd"
+  integrity sha512-Q/jVJ5QUUzgwin7b/aoN+MCyOQnM/p3BEnBytkxuhl5orbf0Zs7rjd4NTmpuPcoHrx4mhmTXYOXc23cMhDKdnw==
 
 protractor-jasmine2-screenshot-reporter@^0.5.0:
   version "0.5.0"
