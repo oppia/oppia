@@ -25,6 +25,13 @@ import { Howl } from 'howler';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+
+export interface AudioParams {
+  audioTranslations: BindableVoiceovers,
+  html: string,
+  componentName: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +42,8 @@ export class AudioPlayerService {
   private _lastPausePos: number | null = null;
   private loadingTrack = false;
   private _updateViewEventEmitter = new EventEmitter();
-  private _autoplayAudioEventEmitter = new EventEmitter();
+  private _autoplayAudioEventEmitter: EventEmitter<AudioParams> = (
+    new EventEmitter());
   private _stopIntervalSubject = new Subject();
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
