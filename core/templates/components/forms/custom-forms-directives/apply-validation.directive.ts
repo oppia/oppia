@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ObjectFormValidityChangeEvent } from "app-events/app-events";
-import { EventBusGroup } from "app-events/event-bus.service";
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { EventBusGroup } from 'app-events/event-bus.service';
 
 /**
  * @fileoverview Directive for applying validation.

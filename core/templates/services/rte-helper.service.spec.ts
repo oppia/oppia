@@ -27,16 +27,8 @@ import { RteHelperModalComponent } from './rte-helper-modal.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 
-class MockActiveModal {
-  dismiss(): void {
-    return;
-  }
-}
-
 describe('Rte Helper Service', function() {
   var RteHelperService = null;
-  var $q = null;
-  var $uibModal = null;
   var $log = null;
   var $rootScope = null;
   var mockNgbModalRef = {
@@ -65,11 +57,9 @@ describe('Rte Helper Service', function() {
   });
   beforeEach(async() => {
     OppiaAngularRootComponent.ngbModal = TestBed.inject(NgbModal);
-  })
+  });
   beforeEach(angular.mock.inject(function($injector) {
     RteHelperService = $injector.get('RteHelperService');
-    $q = $injector.get('$q');
-    $uibModal = $injector.get('$uibModal');
     $log = $injector.get('$log');
     $rootScope = $injector.get('$rootScope');
   }));
@@ -358,11 +348,10 @@ describe('Rte Helper Service', function() {
   it('should open customization modal', function() {
     var modalSpy = spyOn(
       OppiaAngularRootComponent.ngbModal, 'open').and.callFake(() => {
-        return <NgbModalRef>(
-          {
-            componentInstance: mockNgbModalRef,
-            result: Promise.resolve('success')
-          });
+        return <NgbModalRef> {
+          componentInstance: mockNgbModalRef,
+          result: Promise.resolve('success')
+        };
       });
     var submitCallBackSpy = jasmine.createSpy('submit');
     var dismissCallBackSpy = jasmine.createSpy('dismiss');

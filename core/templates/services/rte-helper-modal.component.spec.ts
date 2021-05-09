@@ -63,7 +63,7 @@ describe('Rte Helper Modal Controller', function() {
       OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
       contextService = OppiaAngularRootComponent.contextService;
     }));
-  
+
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
@@ -155,7 +155,7 @@ describe('Rte Helper Modal Controller', function() {
       OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
       contextService = OppiaAngularRootComponent.contextService;
     }));
-  
+
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
@@ -192,8 +192,8 @@ describe('Rte Helper Modal Controller', function() {
         }
       }];
       expect(component.disableSaveButtonForMathRte()).toBe(true);
-      component.tmpCustomizationArgs[0].value.mathExpressionSvgIsBeingProcessed = (
-        false);
+      component.tmpCustomizationArgs[0]
+      .value.mathExpressionSvgIsBeingProcessed = false;
       expect(component.disableSaveButtonForMathRte()).toBe(false);
       var response = {
         filename: 'mathImage.svg'
@@ -216,27 +216,28 @@ describe('Rte Helper Modal Controller', function() {
     }));
 
     it('should cancel the modal when saving of math SVG fails',
-       fakeAsync(() => {
-      spyOn(component.ngbActiveModal, 'dismiss');
-      component.tmpCustomizationArgs = [{
-        name: 'math_content',
-        value: {
-          raw_latex: 'x^2',
-          svgFile: 'Svg Data',
-          svg_filename: 'mathImage.svg'
-        }
-      }];
-      var imageFile = new Blob();
-      spyOn(
-        component.assetsBackendApiService,
-        'saveMathExpresionImage').and.returnValue(Promise.reject({}));
-      spyOn(
-        component.imageUploadHelperService,
-        'convertImageDataToImageFile').and.returnValue(imageFile);
-      component.save();
-      flushMicrotasks();
-      expect(component.ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
-    }));
+      fakeAsync(() => {
+        spyOn(component.ngbActiveModal, 'dismiss');
+        component.tmpCustomizationArgs = [{
+          name: 'math_content',
+          value: {
+            raw_latex: 'x^2',
+            svgFile: 'Svg Data',
+            svg_filename: 'mathImage.svg'
+          }
+        }];
+        var imageFile = new Blob();
+        spyOn(
+          component.assetsBackendApiService,
+          'saveMathExpresionImage').and.returnValue(Promise.reject({}));
+        spyOn(
+          component.imageUploadHelperService,
+          'convertImageDataToImageFile').and.returnValue(imageFile);
+        component.save();
+        flushMicrotasks();
+        expect(component.ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+      })
+    );
 
     it('should cancel the modal when math SVG exceeds 100 KB', function() {
       spyOn(component.ngbActiveModal, 'dismiss');
@@ -312,7 +313,7 @@ describe('Rte Helper Modal Controller', function() {
         name: 'video_id',
         default_value: 'https://www.youtube.com'
       }];
-  
+
       beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
           imports: [
@@ -329,15 +330,14 @@ describe('Rte Helper Modal Controller', function() {
           schemas: [NO_ERRORS_SCHEMA]
         }).compileComponents();
         OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
-        contextService = OppiaAngularRootComponent.contextService;
       }));
-    
+
       beforeEach(() => {
         fixture = TestBed.createComponent(RteHelperModalComponent);
         component = fixture.componentInstance;
         component.customizationArgSpecs = customizationArgSpecs;
         component.attrsCustomizationArgsDict = {
-            heading: {}
+          heading: {}
         };
         component.ngOnInit();
       });

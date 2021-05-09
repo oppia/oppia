@@ -224,7 +224,7 @@
 # Forms pages.
 /core/templates/components/forms/ @kevintab95
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @srijanreddy98
-/core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
+/core/templates/components/ck-editor-helpers/customize-rte-modal.component.html @DubeySandeep
 /core/templates/services/schema-default-value.service*.ts @kevintab95
 /core/templates/services/schema-form-submitted.service*.ts @kevintab95
 /core/templates/services/schema-undefined-last-element.service*.ts @kevintab95

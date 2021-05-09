@@ -41,8 +41,6 @@ require('services/date-time-format.service.ts');
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { Subscription } from 'rxjs';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StatsReportingService } from '../services/stats-reporting.service';
 
 angular.module('oppia').directive('learnerViewInfo', [
   function() {

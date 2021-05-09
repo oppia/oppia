@@ -37,7 +37,7 @@ interface CustomizationArgsSpecs {
   name: string,
   description: string,
   schema: Object,
-  default_value: Object | MathExpressionContent
+  'default_value': Object | MathExpressionContent
 }
 
 interface AttrsCustomizationArgsDict {
@@ -149,7 +149,7 @@ export class RteHelperModalComponent implements OnInit {
     if (!this.currentRteIsMathExpressionEditor) {
       return false;
     } else {
-      let value = <MathExpressionContent>this.tmpCustomizationArgs[0].value;
+      let value = <MathExpressionContent> this.tmpCustomizationArgs[0].value;
       return value.mathExpressionSvgIsBeingProcessed;
     }
   }
@@ -169,7 +169,7 @@ export class RteHelperModalComponent implements OnInit {
       // The tmpCustomizationArgs is guranteed to have only one element for
       // the case of math rich text component.
       let mathExpressionContentValue = (
-        <MathExpressionContent>this.tmpCustomizationArgs[0].value);
+        <MathExpressionContent> this.tmpCustomizationArgs[0].value);
       let svgFile = mathExpressionContentValue.svgFile;
       let svgFileName = mathExpressionContentValue.svg_filename;
       let rawLatex = mathExpressionContentValue.raw_latex;
@@ -197,7 +197,7 @@ export class RteHelperModalComponent implements OnInit {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
         this.imageLocalStorageService.saveImage(svgFileName, svgFile);
         let mathExpressionContentValue = (
-          <MathExpressionContent>this.tmpCustomizationArgs[0].value);
+          <MathExpressionContent> this.tmpCustomizationArgs[0].value);
         let mathContentDict = {
           raw_latex: mathExpressionContentValue.raw_latex,
           svg_filename: svgFileName
@@ -209,23 +209,23 @@ export class RteHelperModalComponent implements OnInit {
       }
 
       this.assetsBackendApiService.saveMathExpresionImage(
-          resampledFile, svgFileName, this.contextService.getEntityType(),
-          this.contextService.getEntityId()).then(
-          (response: SaveImageResponse) => {
-            let mathExpressionContentValue = (
-              <MathExpressionContent>this.tmpCustomizationArgs[0].value);
-            let mathContentDict = {
-              raw_latex: mathExpressionContentValue.raw_latex,
-              svg_filename: response.filename
-            };
-            let caName = this.tmpCustomizationArgs[0].name;
-            customizationArgsDict[caName] = mathContentDict;
-            this.ngbActiveModal.close(customizationArgsDict);
-          }, (error: string) => {
-            this.alertsService.addWarning(
-              error || 'Error communicating with server.');
-            this.ngbActiveModal.dismiss('cancel');
-          });
+        resampledFile, svgFileName, this.contextService.getEntityType(),
+        this.contextService.getEntityId()).then(
+        (response: SaveImageResponse) => {
+          let mathExpressionContentValue = (
+            <MathExpressionContent> this.tmpCustomizationArgs[0].value);
+          let mathContentDict = {
+            raw_latex: mathExpressionContentValue.raw_latex,
+            svg_filename: response.filename
+          };
+          let caName = this.tmpCustomizationArgs[0].name;
+          customizationArgsDict[caName] = mathContentDict;
+          this.ngbActiveModal.close(customizationArgsDict);
+        }, (error: string) => {
+          this.alertsService.addWarning(
+            error || 'Error communicating with server.');
+          this.ngbActiveModal.dismiss('cancel');
+        });
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         let caName = this.tmpCustomizationArgs[i].name;
@@ -242,7 +242,7 @@ export class RteHelperModalComponent implements OnInit {
     }
   }
 
-  getSchema(schema: Object) {
+  getSchema(schema: Object): Object {
     return schema;
   }
 }
