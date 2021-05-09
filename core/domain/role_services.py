@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the structure of roles for action,
+"""This module contains the structure of roles and actions,
 actions permitted to the roles and the functions needed to access roles
 and actions.
 """
