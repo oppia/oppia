@@ -352,7 +352,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_count: int. The number of questions to be returned.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
-            start_cursor: str. The starting point from which the batch of
+            offset: str. The starting point from which the batch of
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
