@@ -23,6 +23,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AlgebraicExpressionEditorComponent } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
@@ -36,7 +37,7 @@ import { GraphInputInteractionModule } from 'interactions/GraphInput/graph-input
 import { GraphEditorComponent } from './templates/graph-editor.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { HtmlEditorComponent } from './templates/html-editor.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
 import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
 import { IntEditorComponent } from './templates/int-editor.component';
@@ -53,6 +54,7 @@ import { MathExpressionContentEditorComponent } from './templates/math-expressio
 import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
 import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
 import { NumberWithUnitsEditorComponent } from './templates/number-with-units-editor.component';
+import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.component';
 
 
 @NgModule({
@@ -65,7 +67,9 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     GraphInputInteractionModule,
     DynamicContentModule,
     DirectivesModule,
+    MatProgressSpinnerModule,
     NgbModalModule,
+    NgbTooltipModule,
     NgxTrimDirectiveModule
   ],
   declarations: [
@@ -92,7 +96,8 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    SetOfUnicodeStringEditorComponent,
+    SvgFilenameEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -118,7 +123,8 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    SetOfUnicodeStringEditorComponent,
+    SvgFilenameEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -144,7 +150,8 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    SetOfUnicodeStringEditorComponent,
+    SvgFilenameEditorComponent
   ],
 })
 
