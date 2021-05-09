@@ -77,9 +77,9 @@
     </div>
     <div class="vertical-toolbar">
       <div>
-        <button class="icon-tool toolbar-button thin-button"
-                (click)="togglePencilDrawing()" [disabled]="!isPencilEnabled()""
-                placement="left" ngbTooltip="Pencil">
+        <button class="icon-tool toolbar-button thin-button" [ngClass]="{'disabled' : !isPencilEnabled()}"
+                (click)="togglePencilDrawing()"
+                placement="left" ngbTooltip="Pencil" [disabled]="!isPencilEnabled()">
           <i class="fas fa-pencil-alt"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
