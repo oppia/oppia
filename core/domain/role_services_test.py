@@ -32,10 +32,11 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
         role_actions = role_services.get_role_actions()
 
         self.assertTrue(isinstance(role_actions, dict))
-        for role_name, alloted_actions in role_actions.items():
+        for role_name, allotted_actions in role_actions.items():
             self.assertTrue(isinstance(role_name, python_utils.UNICODE))
-            self.assertTrue(isinstance(alloted_actions, list))
-            for action_name in alloted_actions:
+            self.assertTrue(isinstance(allotted_actions, list))
+            self.assertEqual(len(set(allotted_actions)), len(allotted_actions))
+            for action_name in allotted_actions:
                 self.assertTrue(
                     isinstance(action_name, python_utils.UNICODE))
 

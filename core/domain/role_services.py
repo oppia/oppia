@@ -253,10 +253,10 @@ def is_valid_role(role):
     """Validates whether the given role is valid.
 
     Args:
-        role: str. The given role to validate.
+        role: str. The role to validate.
 
     Returns:
-        boolean. Whether the given role is valid or not.
+        bool. Whether the given role is valid or not.
     """
     return role in _ROLE_ACTIONS
 
