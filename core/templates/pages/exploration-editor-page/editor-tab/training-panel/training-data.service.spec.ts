@@ -67,7 +67,7 @@ describe('TrainingDataService', function() {
 
   beforeEach(function() {
     angular.mock.module('oppia');
-    });
+  });
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     siis = $injector.get('StateInteractionIdService');
