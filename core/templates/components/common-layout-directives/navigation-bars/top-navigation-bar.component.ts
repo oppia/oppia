@@ -34,7 +34,7 @@ import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NavigationBackendApiService } from 'services/navigation-backend-api.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 interface EventToCodes {
@@ -63,7 +63,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   userIsLoggedIn: boolean;
   username: string;
   currentUrl: string;
-  LABEL_FOR_CLEARING_FOCUS: string;
   logoutUrl: string;
   userMenuIsShown: boolean;
   inClassroomPage: boolean;
@@ -72,16 +71,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ACTION_CLOSE: string;
   KEYBOARD_EVENT_TO_KEY_CODES: {
     enter: {
-        shiftKeyIsPressed: false;
-        keyCode: 13;
+        shiftKeyIsPressed: boolean;
+        keyCode: number;
         };
     tab: {
-        shiftKeyIsPressed: false;
-        keyCode: 9;
+        shiftKeyIsPressed: boolean;
+        keyCode: number;
         };
     shiftTab: {
-      shiftKeyIsPressed: true;
-      keyCode: 9;
+      shiftKeyIsPressed: boolean;
+      keyCode: number;
       };
     };
   windowIsNarrow: boolean = false;
@@ -122,7 +121,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
-    private navigationBackendApiService: NavigationBackendApiService,
+    private userBackendApiService: UserBackendApiService,
     private focusManagerService: FocusManagerService
   ) {}
 
@@ -179,7 +178,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       }
 
       if (this.userIsLoggedIn) {
-        this.navigationBackendApiService.showUnseenNotifications();
+        this.userBackendApiService.showUnseenNotifications();
       }
     });
 

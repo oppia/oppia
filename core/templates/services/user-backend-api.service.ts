@@ -20,6 +20,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
+import { WindowRef } from './contextual/window-ref.service';
+import { Title } from '@angular/platform-browser';
 
 interface SubscriptionSummary {
   'creator_picture_data_url': string;
@@ -52,18 +54,25 @@ export interface UserContributionRightsDataBackendDict {
   'can_review_questions': boolean;
 }
 
+interface UnseenNotifications {
+  'num_unseen_notifications': number
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private windowRef: WindowRef,
+    private titleService: Title) {}
 
   private USER_INFO_URL = '/userinfohandler';
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
+  numUnseenNotifications: string | number;
 
   async getUserInfoAsync(): Promise<UserInfo> {
     return this.http.get<UserInfoBackendDict>(
@@ -107,6 +116,22 @@ export class UserBackendApiService {
     Promise<UserContributionRightsDataBackendDict> {
     return this.http.get<UserContributionRightsDataBackendDict>(
       this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
+  }
+
+  showUnseenNotifications(): void {
+    this.http.get<UnseenNotifications>(
+      '/notificationshandler').toPromise().then(
+      (response: UnseenNotifications) => {
+        if (this.windowRef.nativeWindow.location.pathname !== '/') {
+          this.numUnseenNotifications =
+               response.num_unseen_notifications;
+          if (this.numUnseenNotifications > 0) {
+            this.titleService.setTitle(
+              '(' + this.numUnseenNotifications + ') ' +
+                  this.titleService.getTitle());
+          }
+        }
+      });
   }
 }
 

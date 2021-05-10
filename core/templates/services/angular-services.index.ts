@@ -346,7 +346,6 @@ import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page
 import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
-import { NavigationBackendApiService } from 'services/navigation-backend-api.service';
 import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
 import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
@@ -542,7 +541,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MusicNotesInputRulesService', MusicNotesInputRulesService],
   ['MusicNotesInputValidationService', MusicNotesInputValidationService],
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
-  ['NavigationBackendApiService', NavigationBackendApiService],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],

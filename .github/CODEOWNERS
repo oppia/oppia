@@ -386,7 +386,6 @@
 /core/templates/components/common-layout-directives/navigation-bars/ @aks681
 /core/templates/services/bottom-navbar-status.service*.ts @aks681
 /core/templates/services/navigation.service*.ts @aks681
-/core/templates/services/navigation-backend-api.service*.ts @aks681
 /core/templates/services/sidebar-status.service*.ts @aks681
 
 
