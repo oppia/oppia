@@ -63,6 +63,7 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
     this.activeRole = this.roles[0];
   }
 }
+
 angular.module('oppia').directive(
   'oppiaRolesAndActionsVisualizer', downgradeComponent(
     { component: RolesAndActionsVisualizerComponent }));
