@@ -198,6 +198,8 @@ export class TranslationModalComponent {
           } else {
             this.activeWrittenTranslation.html = '';
           }
+          this.activeWrittenTranslation.html = '';
+          this.uploadingTranslation = false;
         }, () => {
           this.contextService.resetImageSaveDestination();
           this.close();

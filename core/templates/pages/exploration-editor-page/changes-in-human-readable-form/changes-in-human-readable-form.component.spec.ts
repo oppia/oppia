@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,157 +13,127 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ChangesInHumanReadableForm directive.
+ * @fileoverview Unit tests for ChangesInHumanReadableForm Component.
 */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 
-// This function is a helper to clean the compiled html for each test, in
-// order to make a cleaner assertion.
-var cleanCompiledHtml = function(html) {
-  return html
-    // AngularJS uses comments in some directives in order to figure out
-    // where the last element was placed in relation.
-    // Ref: https://github.com/angular/angular.js/issues/8722.
-    .replace(/<!---->/g, '')
-    // Removes all ng-content elements.
-    .replace(/<(ng-content|\/ng-content).*>/g, '')
-    // Removes all ng-repeat directives that is not the last attribute
-    // described in an element.
-    .replace(/(ng-repeat=".*"\s)/g, '')
-    // Removes all ng-repeat directives that is the last attribute
-    // described in an element.
-    .replace(/\sng-repeat=".*"/g, '')
-    // Removes all ng-if directives that is not the last attribute
-    // described in an element.
-    .replace(/(ng-if=".*"\s)/g, '')
-    // Removes all ng-if directives that is the last attribute
-    // described in an element.
-    .replace(/\sng-if=".*"/g, '')
-    // Removes all ng-show directives that is not the last attribute
-    // described in an element.
-    .replace(/ng-show=".*"\s/g, '')
-    // Removes all ng-show directives that is the last attribute
-    // described in an element.
-    .replace(/\sng-show=".*"/g, '')
-    // Removes all ng-switch directives that is the last attribute
-    // described in an element.
-    .replace(/ng-switch=".*"\s/, '')
-    // Removes all ng-switch directives that is the last attribute
-    // described in an element.
-    .replace(/\sng-switch=".*"/, '')
-    // Removes all ng-switch-when directives that is not the last attribute
-    // described in an element.
-    .replace(/ng-switch-when=".*"\s/, '')
-    // Removes all ng-switch-when directives that is the last attribute
-    // described in an element.
-    .replace(/\sng-switch-when=".*"/, '')
-    // Removes all ng-bind-html directives that is not the last attribute
-    // described in an element.
-    .replace(/ng-bind-html=".*"\s/, '')
-    // Removes all ng-bind-html directives that is the last attribute
-    // described in an element.
-    .replace(/\sng-bind-html=".*"/, '')
-    // Removes all indentation spaces.
-    .replace(/\s{2,}/g, '')
-    // Removes all line breaks.
-    .replace(/\n/g, '');
-};
+import { LostChangeBackendDict, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
+import { OutcomeBackendDict, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form.component';
 
-describe('Changes in Human Readable Form Directive', function() {
-  var $compile = null;
-  var scope = null;
-  var LostChangeObjectFactory = null;
-  var OutcomeObjectFactory = null;
+describe('Changes in Human Readable Form Directive', () => {
+  let component: ChangesInHumanReadableFormComponent;
+  let fixture: ComponentFixture<ChangesInHumanReadableFormComponent>;
+  let lostChangeObjectFactory: LostChangeObjectFactory;
+  let outcomeObjectFactory: OutcomeObjectFactory;
 
-  beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector, $rootScope, _$compile_) {
-    $compile = _$compile_;
-    scope = $rootScope.$new();
-    LostChangeObjectFactory = $injector.get('LostChangeObjectFactory');
-    OutcomeObjectFactory = $injector.get('OutcomeObjectFactory');
+  // This is a helper function to clean the compiled html
+  // for each test, in order to make a cleaner assertion.
+  const removeComments = (HTML) => {
+    return HTML
+      .toString()
+      // Removes Unecessary white spaces and new lines.
+      .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')
+      // Removes Comments.
+      .replace(/<\!--.*?-->/g, '')
+      // Removes marker.
+      .replace(/::marker/, '');
+  };
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        FormsModule,
+      ],
+      declarations: [
+        ChangesInHumanReadableFormComponent
+      ],
+      providers: [
+        LostChangeObjectFactory,
+        OutcomeObjectFactory
+      ]
+    }).compileComponents();
   }));
 
-  it('should make human readable when adding a state', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  beforeEach(waitForAsync(() => {
+    lostChangeObjectFactory = TestBed.inject(LostChangeObjectFactory);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+
+    fixture = TestBed.createComponent(ChangesInHumanReadableFormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  }));
+
+  it('should make human readable when adding a state', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'add_state',
       state_name: 'State name',
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<span>Added state: ' + scope.lostChanges[0].stateName + '</span>' +
+      '<span> Added state: ' + component.lostChanges[0].stateName + ' </span>' +
       '</li>' +
       '</ul>' +
       '</div>'
     );
   });
 
-  it('should make human readable when renaming a state', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  it('should make human readable when renaming a state', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'rename_state',
       old_state_name: 'Old state name',
       new_state_name: 'New state name'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<span>Renamed state: ' + scope.lostChanges[0].oldStateName +
-      ' to ' + scope.lostChanges[0].newStateName + '</span>' +
+      '<span> Renamed state: ' + component.lostChanges[0].oldStateName +
+      ' to ' + component.lostChanges[0].newStateName + ' </span>' +
       '</li>' +
       '</ul>' +
       '</div>'
     );
   });
 
-  it('should make human readable when deleting a state', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  it('should make human readable when deleting a state', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'delete_state',
       state_name: 'Deleted state name'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<span>Deleted state: ' + scope.lostChanges[0].stateName + '</span>' +
+      '<span> Deleted state: ' +
+      component.lostChanges[0].stateName +
+      ' </span>' +
       '</li>' +
       '</ul>' +
       '</div>'
@@ -171,8 +141,8 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property content',
-    function() {
-      scope.lostChanges = [LostChangeObjectFactory.createNew({
+    () => {
+      component.lostChanges = [lostChangeObjectFactory.createNew({
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: {
@@ -184,23 +154,23 @@ describe('Changes in Human Readable Form Directive', function() {
         property_name: 'content'
       })];
 
-      var element = angular.element(
-        '<changes-in-human-readable-form lost-changes="lostChanges">' +
-        '</changes-in-human-readable-form>');
-      var elementCompiled = $compile(element)(scope);
-      scope.$digest();
+      fixture.detectChanges();
 
-      var html = cleanCompiledHtml(elementCompiled.html());
-      expect(html).toBe(
+      let html = fixture.debugElement.nativeElement
+        .querySelector('.oppia-lost-changes').outerHTML;
+
+      let result = removeComments(html);
+      expect(result).toBe(
         '<div class="oppia-lost-changes">' +
         '<ul>' +
         '<li>' +
-        '<div>' +
-        'Edits to state: ' + scope.lostChanges[0].stateName +
-        '<div>' +
+        '<div> ' +
+        'Edits to state: ' + component.lostChanges[0].stateName +
+        ' <div>' +
         '<div class="state-edit-desc">' +
         '<strong>Edited content: </strong>' +
-        '<div class="content">' + scope.lostChanges[0].newValue.html +
+        // eslint-disable-next-line dot-notation
+        '<div class="content">' + component.lostChanges[0].newValue['html'] +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -212,8 +182,8 @@ describe('Changes in Human Readable Form Directive', function() {
     });
 
   it('should make human readable when editing a state with property' +
-  ' widget_id and exploration ended', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' widget_id and exploration ended', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'EndExploration',
@@ -221,21 +191,20 @@ describe('Changes in Human Readable Form Directive', function() {
       property_name: 'widget_id'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      'Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div class="state-edit-desc">' +
-      '<span>Ended Exploration</span>' +
+      ' Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div class="state-edit-desc">' +
+      '<span> Ended Exploration </span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -245,8 +214,8 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-    ' widget_id and an interaction is added', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+    ' widget_id and an interaction is added', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'Exploration',
@@ -254,23 +223,23 @@ describe('Changes in Human Readable Form Directive', function() {
       property_name: 'widget_id'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      'Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div class="state-edit-desc">' +
+      ' Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div class="state-edit-desc">' +
       '<span>' +
-      '<strong>Added Interaction: </strong>' + scope.lostChanges[0].newValue +
-      '</span>' +
+      '<strong>Added Interaction: </strong> ' +
+      component.lostChanges[0].newValue +
+      ' </span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -280,8 +249,8 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-    ' widget_id and an interaction is deleted', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+    ' widget_id and an interaction is deleted', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: null,
@@ -289,24 +258,23 @@ describe('Changes in Human Readable Form Directive', function() {
       property_name: 'widget_id'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      'Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div class="state-edit-desc">' +
+      ' Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div class="state-edit-desc">' +
       '<span>' +
-      '<strong>Deleted Interaction: </strong>' +
-      scope.lostChanges[0].oldValue +
-      '</span>' +
+      '<strong>Deleted Interaction: </strong> ' +
+      component.lostChanges[0].oldValue +
+      ' </span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -316,8 +284,8 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' widget_customization_args and an interaction is added', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' widget_customization_args and an interaction is added', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
@@ -325,23 +293,22 @@ describe('Changes in Human Readable Form Directive', function() {
       },
       old_value: {},
       property_name: 'widget_customization_args'
-    })];
+    } as unknown as LostChangeBackendDict)];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      'Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div class="state-edit-desc">' +
-      '<span>Added Interaction Customizations</span>' +
+      ' Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div class="state-edit-desc">' +
+      '<span> Added Interaction Customizations </span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -351,8 +318,8 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' widget_customization_args and an interaction is removed', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' widget_customization_args and an interaction is removed', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {},
@@ -360,23 +327,22 @@ describe('Changes in Human Readable Form Directive', function() {
         property1: true
       },
       property_name: 'widget_customization_args'
-    })];
+    } as unknown as LostChangeBackendDict)];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      'Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div class="state-edit-desc">' +
-      '<span>Removed Interaction Customizations</span>' +
+      ' Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div class="state-edit-desc">' +
+      '<span> Removed Interaction Customizations </span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -386,8 +352,8 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' widget_customization_args and an interaction is edited', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' widget_customization_args and an interaction is edited', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
@@ -397,23 +363,22 @@ describe('Changes in Human Readable Form Directive', function() {
         property1: true
       },
       property_name: 'widget_customization_args'
-    })];
+    } as unknown as LostChangeBackendDict)];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      'Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div class="state-edit-desc">' +
-      '<span>Edited Interaction Customizations</span>' +
+      ' Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div class="state-edit-desc">' +
+      '<span> Edited Interaction Customizations </span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -423,18 +388,18 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' answer_groups and a change is added', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' answer_groups and a change is added', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        }),
+        } as unknown as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -443,38 +408,41 @@ describe('Changes in Human Readable Form Directive', function() {
           }
         }]
       },
-      old_value: {},
       property_name: 'answer_groups'
-    })];
+    } as unknown as LostChangeBackendDict)];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div>Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div>' +
+      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div>' +
       '<div class="state-edit-desc answer-group">' +
       '<strong>Added answer group: </strong>' +
       '<p class="sub-edit"><i>Destination: </i>' +
-      scope.lostChanges[0].newValue.outcome.dest + '</p>' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].dest + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
-      '<div class="feedback">' +
-      scope.lostChanges[0].newValue.outcome.feedback.html +
-      '</div>' +
+      '<div class="feedback"> ' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].feedback.html +
+      ' </div>' +
       '</div>' +
       '<div class="sub-edit"><i>Rules: </i>' +
       '<ol class="rules-list">' +
       '<li>' +
-      '<p>Type: ' + scope.lostChanges[0].newValue.rules[0].type + '</p>' +
-      '<p>Value:<span> </span>' +
-      Object.keys(scope.lostChanges[0].newValue.rules[0].inputs).toString() +
+      '<p>Type: ' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['rules'][0].type +
+      '</p>' +
+      '<p>Value: <span></span>' +
+      ' input1,  input2 ' +
       '</p>' +
       '</li>' +
       '</ol>' +
@@ -489,18 +457,18 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' answer_groups and a change is edited', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' answer_groups and a change is edited', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        }),
+        } as unknown as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -510,13 +478,13 @@ describe('Changes in Human Readable Form Directive', function() {
         }]
       },
       old_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        }),
+        } as unknown as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -526,36 +494,40 @@ describe('Changes in Human Readable Form Directive', function() {
         }]
       },
       property_name: 'answer_groups'
-    })];
+    } as unknown as LostChangeBackendDict)];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div>Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div>' +
+      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div>' +
       '<div class="state-edit-desc answer-group">' +
       '<strong>Edited answer group: </strong>' +
-      '<p class="sub-edit"><i>Destination: </i>' +
-      scope.lostChanges[0].newValue.outcome.dest + '</p>' +
+      '<p class="sub-edit"><i>Destination: </i> ' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].dest + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
-      '<div class="feedback">' +
-      scope.lostChanges[0].newValue.outcome.feedback.html +
-      '</div>' +
+      '<div class="feedback"> ' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['outcome'].feedback.html +
+      ' </div>' +
       '</div>' +
       '<div class="sub-edit"><i>Rules: </i>' +
       '<ol class="rules-list">' +
       '<li>' +
-      '<p>Type: ' + scope.lostChanges[0].newValue.rules[0].type + '</p>' +
-      '<p>Value:<span> </span>' +
-      Object.keys(scope.lostChanges[0].newValue.rules[0].inputs).toString() +
+      '<p>Type: ' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['rules'][0].type +
+      '</p>' +
+      '<p>Value: <span></span>' +
+      ' input1,  input2 ' +
       '</p>' +
       '</li>' +
       '</ol>' +
@@ -570,19 +542,19 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' answer_groups and a change is deleted', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' answer_groups and a change is deleted', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {},
       old_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        }),
+        } as unknown as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -594,21 +566,20 @@ describe('Changes in Human Readable Form Directive', function() {
       property_name: 'answer_groups'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div>Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div>' +
+      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div>' +
       '<div class="state-edit-desc">' +
-      'Deleted answer group' +
+      ' Deleted answer group ' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -619,42 +590,43 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' default_outcome and a change is added', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' default_outcome and a change is added', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: OutcomeObjectFactory.createFromBackendDict({
+      new_value: outcomeObjectFactory.createFromBackendDict({
         dest: 'outcome 2',
         feedback: {
           content_id: 'feedback_2',
           html: 'Html'
         },
-      }),
+      } as unknown as OutcomeBackendDict),
       old_value: {},
       property_name: 'default_outcome'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div>Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div>' +
+      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div>' +
       '<div class="state-edit-desc default-outcome">' +
-      'Added default outcome:' +
+      ' Added default outcome: ' +
       '<p class="sub-edit"><i>Destination: </i>' +
-      scope.lostChanges[0].newValue.dest + '</p>' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['dest'] + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
-      '<div class="feedback">' +
-      scope.lostChanges[0].newValue.feedback.html +
-      '</div>' +
+      '<div class="feedback"> ' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['feedback'].html +
+      ' </div>' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -666,48 +638,49 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' default_outcome and a change is edited', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' default_outcome and a change is edited', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: OutcomeObjectFactory.createFromBackendDict({
+      new_value: outcomeObjectFactory.createFromBackendDict({
         dest: 'outcome 2',
         feedback: {
           content_id: 'feedback_2',
           html: 'Html'
         },
-      }),
-      old_value: OutcomeObjectFactory.createFromBackendDict({
+      } as unknown as OutcomeBackendDict),
+      old_value: outcomeObjectFactory.createFromBackendDict({
         dest: 'outcome 1',
         feedback: {
           content_id: 'feedback_2',
           html: 'Html'
         },
-      }),
+      } as unknown as OutcomeBackendDict),
       property_name: 'default_outcome'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div>Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div>' +
+      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div>' +
       '<div class="state-edit-desc default-outcome">' +
-      'Edited default outcome:' +
+      ' Edited default outcome: ' +
       '<p class="sub-edit"><i>Destination: </i>' +
-      scope.lostChanges[0].newValue.dest + '</p>' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['dest'] + ' </p>' +
       '<div class="sub-edit"><i>Feedback: </i>' +
-      '<div class="feedback">' +
-      scope.lostChanges[0].newValue.feedback.html +
-      '</div>' +
+      '<div class="feedback"> ' +
+      // eslint-disable-next-line dot-notation
+      component.lostChanges[0].newValue['feedback'].html +
+      ' </div>' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -719,19 +692,19 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property' +
-  ' default_outcome and a change is deleted', function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
+  ' default_outcome and a change is deleted', () => {
+    component.lostChanges = [lostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {},
       old_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
-        }),
+        } as unknown as OutcomeBackendDict),
         rules: [{
           type: 'Type1',
           inputs: {
@@ -743,21 +716,20 @@ describe('Changes in Human Readable Form Directive', function() {
       property_name: 'default_outcome'
     })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
+    fixture.detectChanges();
 
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
+    let html = fixture.debugElement.nativeElement
+      .querySelector('.oppia-lost-changes').outerHTML;
+
+    let result = removeComments(html);
+    expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div>Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div>' +
+      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      ' <div>' +
       '<div class="state-edit-desc">' +
-      'Deleted default outcome' +
+      ' Deleted default outcome ' +
       '</div>' +
       '</div>' +
       '</div>' +

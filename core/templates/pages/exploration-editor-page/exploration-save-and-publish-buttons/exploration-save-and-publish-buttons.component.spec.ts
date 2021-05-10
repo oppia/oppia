@@ -50,12 +50,14 @@ import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ChangeListService } from '../services/change-list.service';
+import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 describe('Exploration save and publish buttons component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var changeListService = null;
+  let changeListService: ChangeListService = null;
   var contextService = null;
   var explorationRightsService = null;
   var explorationSaveService = null;
@@ -71,9 +73,13 @@ describe('Exploration save and publish buttons component', function() {
 
   beforeEach(function() {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        ChangeListService
+      ]
     });
 
+    changeListService = TestBed.inject(ChangeListService);
     contextService = TestBed.get(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     editabilityService = TestBed.get(EditabilityService);
@@ -117,7 +123,6 @@ describe('Exploration save and publish buttons component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
-    changeListService = $injector.get('ChangeListService');
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
@@ -240,7 +245,8 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should count changes made in an exploration', function() {
-    spyOn(changeListService, 'getChangeList').and.returnValue([{}, {}]);
+    spyOn(changeListService, 'getChangeList').and.returnValue(
+      [{}, {}] as ExplorationChange[]);
     expect($scope.getChangeListLength()).toBe(2);
   });
 

@@ -4,6 +4,7 @@
     <oppia-codemirror (on-load)="$ctrl.codeEditor($event)"
                       [read-only]="!$ctrl.interactionIsActive">
     </oppia-codemirror>
+    <textarea ng-trim="false" rows="10"></textarea>
   </div>
   <button class="btn btn-secondary" ng-click="$ctrl.showHelp()" ng-disabled="!$ctrl.interactionIsActive" translate="I18N_INTERACTIONS_LOGIC_PROOF_POSSIBLE_LINES"></button>
   <p class="logic-proof-error-message"> <[$ctrl.errorMessage]>  </p>

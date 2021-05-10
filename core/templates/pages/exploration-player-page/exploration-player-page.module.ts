@@ -61,6 +61,7 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
+    LearnerAnswerInfoCard
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,

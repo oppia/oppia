@@ -27,6 +27,7 @@ import { WindowDimensionsService } from
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ChangeListService } from '../services/change-list.service';
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -56,7 +57,7 @@ describe('Editor Navigation Component', function() {
   var explorationRightsService = null;
   var editabilityService = null;
   var explorationSaveService = null;
-  var changeListService = null;
+  let changeListService: ChangeListService = null;
   var explorationId = 'exp1';
   var userInfo = {
     isLoggedIn: () => true
@@ -65,7 +66,10 @@ describe('Editor Navigation Component', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        ChangeListService
+      ]
     });
   });
 
@@ -74,6 +78,7 @@ describe('Editor Navigation Component', function() {
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     userService = TestBed.get(UserService);
+    changeListService = TestBed.inject(ChangeListService);
   });
 
   describe('when screen is large', function() {
@@ -85,7 +90,6 @@ describe('Editor Navigation Component', function() {
       $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
       contextService = $injector.get('ContextService');
       explorationRightsService = $injector.get('ExplorationRightsService');
-      changeListService = $injector.get('ChangeListService');
       explorationSaveService = $injector.get('ExplorationSaveService');
       editabilityService = $injector.get('EditabilityService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
