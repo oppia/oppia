@@ -17,12 +17,12 @@
       </angular-html-bind>
     </div>
     <br>
-    <continue-button ng-if="helpCardHasContinueButton"
-                     focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                     is-learn-again-button="isLearnAgainButton()"
-                     ng-click="onClickContinueButton()"
-                     class="d-inline-block">
-    </continue-button>
+    <oppia-continue-button ng-if="helpCardHasContinueButton"
+                           [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
+                           [is-learn-again-button]="isLearnAgainButton()"
+                           (click-continue-button)="onClickContinueButton()"
+                           class="d-inline-block">
+    </oppia-continue-button>
   </div>
 
   <!--This CSS class is essential for auto-scrolling in Drag and drop interaction to work
