@@ -22,14 +22,15 @@
   }
 </style>
 
-<div class="$ctrl.interactive-map-container">
-  <div ng-style="$ctrl.overlayStyle">
-    <leaflet id="interactiveMap"
-             class="oppia-interactive-map"
-             defaults="$ctrl.mapOptions.defaults"
-             event-broadcast="$ctrl.mapOptions.events"
-             lf-center="$ctrl.mapOptions.center"
-             markers="$ctrl.mapMarkers">
-    </leaflet>
+<div class="interactive-map-container">
+  <div leaflet
+      id="interactiveMap"
+      class="oppia-interactive-map"
+      [leafletOptions]="mapOptions"
+      (leafletClick)="leafletClick($event)"
+      (leafletMouseOut)="leafletMouseOut()"
+      (leafletMouseOver)="leafletMouseOver()">
+    <div *ngIf="mapMarkers" [leafletLayer]="mapMarkers"></div>
   </div>
 </div>
+
