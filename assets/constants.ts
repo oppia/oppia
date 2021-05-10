@@ -4937,43 +4937,56 @@ export default {
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "id",
-    "text": "Bahasa Indonesia"
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
   }, {
     "id": "en",
-    "text": "English"
+    "text": "English",
+    "direction": "ltr"
   }, {
     "id": "es",
-    "text": "Español"
+    "text": "Español",
+    "direction": "ltr"
   }, {
     "id": "fr",
-    "text": "français (French)"
+    "text": "français (French)",
+    "direction": "ltr"
   }, {
     "id": "pt-br",
-    "text": "Português (Brasil)"
+    "text": "Português (Brasil)",
+    "direction": "ltr"
   }, {
     "id": "ar",
-    "text": "العربية"
+    "text": "العربية",
+    "direction": "rtl"
   }, {
     "id": "kab",
-    "text": "Taqbaylit (Kabyle)"
+    "text": "Taqbaylit (Kabyle)",
+    "direction": "ltr"
   }, {
     "id": "vi",
-    "text": "Tiếng Việt"
+    "text": "Tiếng Việt",
+    "direction": "ltr"
   }, {
     "id": "tr",
-    "text": "Türkçe (Turkish)"
+    "text": "Türkçe (Turkish)",
+    "direction": "ltr"
   }, {
     "id": "hi",
-    "text": "हिन्दी"
+    "text": "हिन्दी",
+    "direction": "ltr"
   }, {
     "id": "bn",
-    "text": "বাংলা"
+    "text": "বাংলা",
+    "direction": "ltr"
   }, {
     "id": "zh-hans",
-    "text": "中文(简体)"
+    "text": "中文(简体)",
+    "direction": "ltr"
   }, {
     "id": "zh-hant",
-    "text": "中文(繁體)"
+    "text": "中文(繁體)",
+    "direction": "ltr"
   }],
 
   // List of supported audio languages in which we have audio and translations
