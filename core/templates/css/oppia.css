@@ -4400,3 +4400,12 @@ div.oppia-issues-learner-action {
 .practice-tab-mat-checkbox .mat-checkbox-label {
   font-weight: normal;
 }
+
+/*
+  TODO(#12768): Remove the .forced-modal-stack style once the
+  rte-component-modal is migrated to Angular. Currently, this style is used for
+  correctly stacking AngularJS modal on top of Angular modal.
+*/
+.forced-modal-stack {
+  z-index: 1035 !important;
+}

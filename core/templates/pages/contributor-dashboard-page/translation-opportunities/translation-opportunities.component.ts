@@ -89,7 +89,13 @@ export class TranslationOpportunitiesComponent {
       TranslationModalComponent, {
         size: 'lg',
         backdrop: 'static',
-        injector: this.injector
+        injector: this.injector,
+        // TODO(#12768): Remove the backdropClass & windowClass once the
+        // rte-component-modal is migrated to Angular. Currently, the custom
+        // class is used for correctly stacking AngularJS modal on top of
+        // Angular modal.
+        backdropClass: 'forced-modal-stack',
+        windowClass: 'forced-modal-stack'
       });
     modalRef.componentInstance.opportunity = opportunity;
   }
