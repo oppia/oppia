@@ -19,165 +19,164 @@
 import { EventEmitter, NgZone } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+angular.module('oppia').factory('ngZone', downgradeInjectable(NgZone));
 
+angular.module('oppia').factory('AudioPlayerService', [
+  '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
+  'ContextService', 'ngAudio', 'ngZone',
+  function(
+      $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
+      ContextService, ngAudio, ngZone) {
+    var _currentTrackFilename = null;
+    var _currentTrack = null;
 
-angular.module('oppia').factory('ngZone', downgradeInjectable(NgZone))
-  .factory('AudioPlayerService', [
-    '$q', '$timeout', 'AssetsBackendApiService',
-    'AudioTranslationManagerService', 'ContextService', 'ngAudio', 'ngZone',
-    function(
-        $q, $timeout, AssetsBackendApiService,
-        AudioTranslationManagerService, ContextService, ngAudio, ngZone) {
-      var _currentTrackFilename = null;
-      var _currentTrack = null;
+    var _autoplayAudioEventEmitter = new EventEmitter();
 
-      var _autoplayAudioEventEmitter = new EventEmitter();
-
-      var _load = function(
-          filename, successCallback, errorCallback) {
-        if (filename !== _currentTrackFilename) {
-          AssetsBackendApiService.loadAudio(
-            ContextService.getExplorationId(), filename)
-            .then(function(loadedAudiofile) {
-              var blobUrl = URL.createObjectURL(loadedAudiofile.data);
-              ngZone.runOutsideAngular(() => {
-                _currentTrack = ngAudio.load(blobUrl);
-              });
-              _currentTrackFilename = filename;
-
-              // Directive ngAudio doesn't seem to provide any way of detecting
-              // when native audio object has finished loading -- see
-              // https://github.com/danielstern/ngAudio/issues/139. It seems
-              // that after creating an ngAudio object, the native audio
-              // object is asynchronously loaded. So we use a timeout
-              // to grab native audio.
-              // TODO(tjiang11): Look for a better way to handle this.
-              $timeout(function() {
-                // _currentTrack could be null if the learner stops audio
-                // shortly after loading a new card or language. In such
-                // cases, we do not want to attempt setting the 'onended'
-                // property of the audio.
-                if (_currentTrack !== null &&
-                  _currentTrack.audio !== undefined) {
-                  _currentTrack.audio.onended = function() {
-                    _currentTrack = null;
-                    _currentTrackFilename = null;
-                    AudioTranslationManagerService
-                      .clearSecondaryAudioTranslations();
-                  };
-                }
-              }, 100);
-
-              successCallback();
-            }, function(reason) {
-              errorCallback(reason);
+    var _load = function(
+        filename, successCallback, errorCallback) {
+      if (filename !== _currentTrackFilename) {
+        AssetsBackendApiService.loadAudio(
+          ContextService.getExplorationId(), filename)
+          .then(function(loadedAudiofile) {
+            var blobUrl = URL.createObjectURL(loadedAudiofile.data);
+            ngZone.runOutsideAngular(() => {
+              _currentTrack = ngAudio.load(blobUrl);
             });
-        }
-      };
+            _currentTrackFilename = filename;
 
-      var _play = function() {
-        if (_currentTrack) {
-          _currentTrack.play();
-        }
-      };
+            // Directive ngAudio doesn't seem to provide any way of detecting
+            // when native audio object has finished loading -- see
+            // https://github.com/danielstern/ngAudio/issues/139. It seems
+            // that after creating an ngAudio object, the native audio
+            // object is asynchronously loaded. So we use a timeout
+            // to grab native audio.
+            // TODO(tjiang11): Look for a better way to handle this.
+            $timeout(function() {
+              // _currentTrack could be null if the learner stops audio
+              // shortly after loading a new card or language. In such
+              // cases, we do not want to attempt setting the 'onended'
+              // property of the audio.
+              if (_currentTrack !== null &&
+                _currentTrack.audio !== undefined) {
+                _currentTrack.audio.onended = function() {
+                  _currentTrack = null;
+                  _currentTrackFilename = null;
+                  AudioTranslationManagerService
+                    .clearSecondaryAudioTranslations();
+                };
+              }
+            }, 100);
 
-      var _pause = function() {
-        if (_currentTrack) {
-          _currentTrack.pause();
-        }
-      };
-
-      var _stop = function() {
-        if (_currentTrack) {
-          _currentTrack.stop();
-          _currentTrackFilename = null;
-          _currentTrack = null;
-        }
-      };
-
-      var _rewind = function(seconds) {
-        if (_currentTrack) {
-          var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-          if (currentSeconds - seconds > 0) {
-            var rewindedProgress = (
-              (currentSeconds - seconds) / _currentTrack.duration);
-            _currentTrack.progress = rewindedProgress;
-          } else {
-            _currentTrack.progress = 0;
-          }
-        }
-      };
-
-      var _forward = function(seconds) {
-        if (_currentTrack) {
-          var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-          if (currentSeconds + seconds < _currentTrack.duration) {
-            var forwardedProgress = (
-              (currentSeconds + seconds) / _currentTrack.duration);
-            _currentTrack.progress = forwardedProgress;
-          }
-        }
-      };
-
-      return {
-        load: function(filename) {
-          return $q(function(resolve, reject) {
-            _load(filename, resolve, reject);
+            successCallback();
+          }, function(reason) {
+            errorCallback(reason);
           });
-        },
-        play: function() {
-          _play();
-        },
-        pause: function() {
-          _pause();
-        },
-        stop: function() {
-          _stop();
-        },
-        rewind: function(seconds) {
-          _rewind(seconds);
-        },
-        forward: function(seconds) {
-          _forward(seconds);
-        },
-        getCurrentTime: function() {
-          if (_currentTrack) {
-            return Math.round(_currentTrack.currentTime);
-          } else {
-            return 0;
-          }
-        },
-        getAudioDuration: function() {
-          if (_currentTrack && _currentTrack.audio) {
-            return Math.round(_currentTrack.audio.duration);
-          } else {
-            return 0;
-          }
-        },
-        getProgress: function() {
-          if (!_currentTrack) {
-            return 0;
-          }
-          return _currentTrack.progress;
-        },
-        setProgress: function(progress) {
-          if (_currentTrack) {
-            _currentTrack.progress = progress;
-          }
-        },
-        isPlaying: function() {
-          return Boolean(_currentTrack && !_currentTrack.paused);
-        },
-        isTrackLoaded: function() {
-          return Boolean(_currentTrack);
-        },
-        clear: function() {
-          _currentTrack = null;
-          _currentTrackFilename = null;
-        },
-        get onAutoplayAudio() {
-          return _autoplayAudioEventEmitter;
+      }
+    };
+
+    var _play = function() {
+      if (_currentTrack) {
+        _currentTrack.play();
+      }
+    };
+
+    var _pause = function() {
+      if (_currentTrack) {
+        _currentTrack.pause();
+      }
+    };
+
+    var _stop = function() {
+      if (_currentTrack) {
+        _currentTrack.stop();
+        _currentTrackFilename = null;
+        _currentTrack = null;
+      }
+    };
+
+    var _rewind = function(seconds) {
+      if (_currentTrack) {
+        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
+        if (currentSeconds - seconds > 0) {
+          var rewindedProgress = (
+            (currentSeconds - seconds) / _currentTrack.duration);
+          _currentTrack.progress = rewindedProgress;
+        } else {
+          _currentTrack.progress = 0;
         }
-      };
-    }
-  ]);
+      }
+    };
+
+    var _forward = function(seconds) {
+      if (_currentTrack) {
+        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
+        if (currentSeconds + seconds < _currentTrack.duration) {
+          var forwardedProgress = (
+            (currentSeconds + seconds) / _currentTrack.duration);
+          _currentTrack.progress = forwardedProgress;
+        }
+      }
+    };
+
+    return {
+      load: function(filename) {
+        return $q(function(resolve, reject) {
+          _load(filename, resolve, reject);
+        });
+      },
+      play: function() {
+        _play();
+      },
+      pause: function() {
+        _pause();
+      },
+      stop: function() {
+        _stop();
+      },
+      rewind: function(seconds) {
+        _rewind(seconds);
+      },
+      forward: function(seconds) {
+        _forward(seconds);
+      },
+      getCurrentTime: function() {
+        if (_currentTrack) {
+          return Math.round(_currentTrack.currentTime);
+        } else {
+          return 0;
+        }
+      },
+      getAudioDuration: function() {
+        if (_currentTrack && _currentTrack.audio) {
+          return Math.round(_currentTrack.audio.duration);
+        } else {
+          return 0;
+        }
+      },
+      getProgress: function() {
+        if (!_currentTrack) {
+          return 0;
+        }
+        return _currentTrack.progress;
+      },
+      setProgress: function(progress) {
+        if (_currentTrack) {
+          _currentTrack.progress = progress;
+        }
+      },
+      isPlaying: function() {
+        return Boolean(_currentTrack && !_currentTrack.paused);
+      },
+      isTrackLoaded: function() {
+        return Boolean(_currentTrack);
+      },
+      clear: function() {
+        _currentTrack = null;
+        _currentTrackFilename = null;
+      },
+      get onAutoplayAudio() {
+        return _autoplayAudioEventEmitter;
+      }
+    };
+  }
+]);
