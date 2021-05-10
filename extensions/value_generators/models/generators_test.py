@@ -28,13 +28,11 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
 
     def test_copier(self):
         generator = generators.Copier()
-        self.assertEqual(generator.generate_value({}, **{'value': 'a'}), 'a')
+        self.assertEqual(generator.generate_value(None, **{'value': 'a'}), 'a')
+        self.assertEqual(generator.generate_value(None, **{'value': 'a'}), 'a')
+        self.assertEqual(generator.generate_value(None, **{'value': 'a'}), 'a')
         self.assertEqual(generator.generate_value(
-            {}, **{'value': 'a'}), 'a')
-        self.assertEqual(generator.generate_value(
-            None, **{'value': 'a'}), 'a')
-        self.assertEqual(generator.generate_value(
-            {}, **{'value': '{{a}}'}), '{{a}}')
+            None, **{'value': '{{a}}'}), '{{a}}')
         self.assertIn(
             'init-args="initArgs" value="customizationArgs.value"',
             generator.get_html_template())
@@ -42,7 +40,7 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
     def test_random_selector(self):
         generator = generators.RandomSelector()
         self.assertIn(generator.generate_value(
-            {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
+            None, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
         self.assertIn(
             'schema="$ctrl.SCHEMA" '
             'local-value="$ctrl.customizationArgs.list_of_values"',
