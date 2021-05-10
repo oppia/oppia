@@ -67,50 +67,6 @@ describe('TrainingDataService', function() {
 
   beforeEach(function() {
     angular.mock.module('oppia');
-
-  //   mockExplorationData = {
-  //     explorationId: 0,
-  //     autosaveChangeList: function() {}
-  //   };
-  //   angular.mock.module(function($provide) {
-  //     $provide.value('ExplorationDataService', [mockExplorationData][0]);
-  //   });
-
-  //   spyOn(mockExplorationData, 'autosaveChangeList');
-  //   // Set a global value for INTERACTION_SPECS that will be used by all the
-  //   // descendant dependencies.
-  //   angular.mock.module(function($provide) {
-  //     $provide.value('AngularNameService', new AngularNameService());
-  //     $provide.value(
-  //       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-  //         new OutcomeObjectFactory(),
-  //         new RuleObjectFactory()));
-  //     $provide.value('FractionObjectFactory', new FractionObjectFactory());
-  //     $provide.value(
-  //       'HintObjectFactory', new HintObjectFactory());
-  //     $provide.value(
-  //       'OutcomeObjectFactory', new OutcomeObjectFactory());
-  //     $provide.value(
-  //       'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-  //     $provide.value(
-  //       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-  //         new ParamChangeObjectFactory()));
-  //     $provide.value('RuleObjectFactory', new RuleObjectFactory());
-  //     $provide.value('SolutionValidityService', new SolutionValidityService());
-  //     $provide.value(
-  //       'StateClassifierMappingService', new StateClassifierMappingService());
-  //     $provide.value(
-  //       'StateEditorService', new StateEditorService(
-  //         new SolutionValidityService()));
-  //     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-  //     $provide.value(
-  //       'WrittenTranslationObjectFactory',
-  //       new WrittenTranslationObjectFactory());
-  //     $provide.value(
-  //       'WrittenTranslationsObjectFactory',
-  //       new WrittenTranslationsObjectFactory(
-  //         new WrittenTranslationObjectFactory()));
-  //   });
     });
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
