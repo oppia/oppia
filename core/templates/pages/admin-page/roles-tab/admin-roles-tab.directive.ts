@@ -16,8 +16,6 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
-require('pages/admin-page/roles-tab/roles-and-actions-visualizer.directive.ts');
-
 require('domain/admin/admin-backend-api.service');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');

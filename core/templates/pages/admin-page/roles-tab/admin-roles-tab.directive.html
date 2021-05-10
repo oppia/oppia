@@ -291,7 +291,7 @@
     <div class="col-md-4">
       <md-card class="oppia-page-card oppia-long-text" ng-if="$ctrl.roleToActions !== null">
         <legend class="text-center">Roles</legend>
-        <roles-and-actions-visualizer role-to-actions="$ctrl.roleToActions"></roles-and-actions-visualizer>
+        <oppia-roles-and-actions-visualizer [role-to-actions]="$ctrl.roleToActions"></oppia-roles-and-actions-visualizer>
       </md-card>
     </div>
   </div>
