@@ -16,14 +16,17 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NgZone } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+angular.module('oppia').factory('ngZone', downgradeInjectable(NgZone));
 
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
-  'ContextService', 'ngAudio',
+  'ContextService', 'ngAudio', 'ngZone',
   function(
       $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
-      ContextService, ngAudio) {
+      ContextService, ngAudio, ngZone) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
@@ -36,7 +39,9 @@ angular.module('oppia').factory('AudioPlayerService', [
           ContextService.getExplorationId(), filename)
           .then(function(loadedAudiofile) {
             var blobUrl = URL.createObjectURL(loadedAudiofile.data);
-            _currentTrack = ngAudio.load(blobUrl);
+            ngZone.runOutsideAngular(() => {
+              _currentTrack = ngAudio.load(blobUrl);
+            });
             _currentTrackFilename = filename;
 
             // Directive ngAudio doesn't seem to provide any way of detecting
