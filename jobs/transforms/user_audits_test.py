@@ -67,6 +67,59 @@ class ValidateModelWithUserIdTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
 
+class ValidateActivityMappingOnlyAllowedKeysTests(
+        job_test_utils.PipelinedTestBase):
+
+    NOW = datetime.datetime.utcnow()
+    USER_ID = 'test_id'
+    EMAIL_ID = 'a@a.com'
+    INCORRECT_KEY = 'audit'
+    ROLE = 'ADMIN'
+
+    def test_process_with_incorrect_keys(self):
+        test_model = user_models.PendingDeletionRequestModel(
+            id=self.USER_ID,
+            email=self.EMAIL_ID,
+            created_on=self.NOW,
+            last_updated=self.NOW,
+            role=self.ROLE,
+            pseudonymizable_entity_mappings={
+                models.NAMES.audit.value: {'key': 'value'}
+            }
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([test_model])
+            | beam.ParDo(user_audits.ValidateActivityMappingOnlyAllowedKeys())
+        )
+
+        self.assert_pcoll_equal(output, [
+            audit_errors.ModelIncorrectKeyError(
+                test_model, [self.INCORRECT_KEY])
+        ])
+
+    def test_process_with_correct_keys(self):
+        test_model = user_models.PendingDeletionRequestModel(
+            id=self.USER_ID,
+            email=self.EMAIL_ID,
+            created_on=self.NOW,
+            last_updated=self.NOW,
+            role=self.ROLE,
+            pseudonymizable_entity_mappings={
+                models.NAMES.collection.value: {'key': 'value'}
+            }
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([test_model])
+            | beam.ParDo(user_audits.ValidateActivityMappingOnlyAllowedKeys())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+
 class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
@@ -100,5 +153,74 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(user_audits.ValidateOldModelsMarkedDeleted())
+        )
+        self.assert_pcoll_equal(output, [])
+
+
+class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
+
+    NOW = datetime.datetime.utcnow()
+    VALID_USER_ID = 'test_user'
+    VALID_EXPLORATION_ID = 'exploration_id'
+    VALID_DRAFT_CHANGE_LIST = [{
+        'cmd': 'edit_exploration_property',
+        'property_name': 'objective',
+        'new_value': 'the objective'
+    }]
+
+    def test_model_with_draft_change_list_but_no_last_updated(self):
+        model = user_models.ExplorationUserDataModel(
+            id='123',
+            user_id=self.VALID_USER_ID,
+            exploration_id=self.VALID_EXPLORATION_ID,
+            draft_change_list=self.VALID_DRAFT_CHANGE_LIST,
+            draft_change_list_last_updated=None,
+            created_on=self.NOW,
+            last_updated=self.NOW
+        )
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
+        )
+        self.assert_pcoll_equal(output, [
+            audit_errors.DraftChangeListLastUpdatedNoneError(model)
+        ])
+
+    def test_model_with_draft_change_list_last_updated_greater_than_now(self):
+        model = user_models.ExplorationUserDataModel(
+            id='123',
+            user_id=self.VALID_USER_ID,
+            exploration_id=self.VALID_EXPLORATION_ID,
+            draft_change_list=self.VALID_DRAFT_CHANGE_LIST,
+            draft_change_list_last_updated=(
+                self.NOW + datetime.timedelta(days=5)),
+            created_on=self.NOW,
+            last_updated=self.NOW
+        )
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
+        )
+        self.assert_pcoll_equal(output, [
+            audit_errors.DraftChangeListLastUpdatedInvalidError(model)
+        ])
+
+    def test_model_with_valid_draft_change_list_last_updated(self):
+        model = user_models.ExplorationUserDataModel(
+            id='123',
+            user_id=self.VALID_USER_ID,
+            exploration_id=self.VALID_EXPLORATION_ID,
+            draft_change_list=self.VALID_DRAFT_CHANGE_LIST,
+            draft_change_list_last_updated=(
+                self.NOW - datetime.timedelta(days=2)),
+            created_on=self.NOW - datetime.timedelta(days=3),
+            last_updated=self.NOW - datetime.timedelta(days=2)
+        )
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_audits.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [])
