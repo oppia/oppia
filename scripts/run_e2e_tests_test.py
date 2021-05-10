@@ -30,6 +30,7 @@ from scripts import flake_checker
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 from scripts import scripts_test_utils
+from scripts import servers
 
 import contextlib2
 
@@ -111,7 +112,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         # The webpack compilation processes will be called 4 times as mock_isdir
         # will return true after 4 calls.
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webpack_compiler', mock_managed_process))
+            servers, 'managed_webpack_compiler', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, called=False))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -128,7 +129,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         # The webpack compilation processes will be called five times.
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webpack_compiler', mock_managed_process))
+            servers, 'managed_webpack_compiler', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             os.path, 'isdir', mock_os_path_isdir))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -157,7 +158,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return old_os_path_isdir(path)
 
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webpack_compiler', mock_managed_process))
+            servers, 'managed_webpack_compiler', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'main', lambda *_, **__: None,
             expected_kwargs=[{'args': []}]))
@@ -171,7 +172,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_build_js_files_in_dev_mode_with_exception_raised(self):
         return_code = 2
         self.exit_stack.enter_context(self.swap_to_always_raise(
-            common, 'managed_webpack_compiler',
+            servers, 'managed_webpack_compiler',
             error=subprocess.CalledProcessError(return_code, [])))
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'main', lambda *_, **__: None,
@@ -239,19 +240,19 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_elasticsearch_dev_server', mock_managed_process))
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_firebase_auth_emulator', mock_managed_process))
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_dev_appserver', mock_managed_process))
+            servers, 'managed_dev_appserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_redis_server', mock_managed_process))
+            servers, 'managed_redis_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_portserver', mock_managed_process))
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webdriver_server', mock_managed_process))
+            servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_protractor_server', mock_managed_process,
+            servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
                 {
                     'dev_mode': True,
@@ -286,17 +287,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_elasticsearch_dev_server', mock_managed_process))
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_firebase_auth_emulator', mock_managed_process))
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_dev_appserver', mock_managed_process))
+            servers, 'managed_dev_appserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_redis_server', mock_managed_process))
+            servers, 'managed_redis_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webdriver_server', mock_managed_process))
+            servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_protractor_server', mock_managed_protractor_server,
+            servers, 'managed_protractor_server', mock_managed_protractor_server,
             expected_kwargs=[
                 {
                     'dev_mode': True,
@@ -317,7 +318,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return 'sample\noutput', 1
 
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_portserver', mock_managed_process))
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -420,22 +421,22 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             build, 'set_constants_to_default', lambda: None))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_elasticsearch_dev_server', mock_managed_process))
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_firebase_auth_emulator', mock_managed_process))
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_dev_appserver', mock_managed_process))
+            servers, 'managed_dev_appserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_redis_server', mock_managed_process))
+            servers, 'managed_redis_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webpack_compiler', mock_managed_process,
+            servers, 'managed_webpack_compiler', mock_managed_process,
             called=False))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_portserver', mock_managed_process))
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webdriver_server', mock_managed_process))
+            servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_protractor_server', mock_managed_process,
+            servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
                 {
                     'dev_mode': True,
@@ -465,19 +466,19 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_elasticsearch_dev_server', mock_managed_process))
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_firebase_auth_emulator', mock_managed_process))
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_dev_appserver', mock_managed_process))
+            servers, 'managed_dev_appserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_redis_server', mock_managed_process))
+            servers, 'managed_redis_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_portserver', mock_managed_process))
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webdriver_server', mock_managed_process))
+            servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_protractor_server', mock_managed_process,
+            servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
                 {
                     'dev_mode': True,
@@ -507,20 +508,20 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'build_js_files', lambda *_, **__: None,
             expected_args=[(True,)]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_elasticsearch_dev_server', mock_managed_process))
+            servers, 'managed_elasticsearch_dev_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_firebase_auth_emulator', mock_managed_process))
+            servers, 'managed_firebase_auth_emulator', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_dev_appserver', mock_managed_process))
+            servers, 'managed_dev_appserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_redis_server', mock_managed_process))
+            servers, 'managed_redis_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_portserver', mock_managed_process))
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_webdriver_server', mock_managed_process,
+            servers, 'managed_webdriver_server', mock_managed_process,
             expected_kwargs=[{'chrome_version': CHROME_DRIVER_VERSION}]))
         self.exit_stack.enter_context(self.swap_with_checks(
-            common, 'managed_protractor_server', mock_managed_process,
+            servers, 'managed_protractor_server', mock_managed_process,
             expected_kwargs=[
                 {
                     'dev_mode': True,

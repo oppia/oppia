@@ -32,6 +32,7 @@ install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -154,21 +155,21 @@ def main(args=None):
         build.main(args=build_args)
         stack.callback(build.set_constants_to_default)
 
-        stack.enter_context(common.managed_redis_server())
-        stack.enter_context(common.managed_elasticsearch_dev_server())
+        stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(servers.managed_elasticsearch_dev_server())
 
         if constants.EMULATOR_MODE:
-            stack.enter_context(common.managed_firebase_auth_emulator(
+            stack.enter_context(servers.managed_firebase_auth_emulator(
                 recover_users=parsed_args.save_datastore))
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
-            stack.enter_context(common.managed_webpack_compiler(
+            stack.enter_context(servers.managed_webpack_compiler(
                 use_prod_env=False, use_source_maps=parsed_args.source_maps,
                 watch_mode=True))
 
         app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
-        dev_appserver = stack.enter_context(common.managed_dev_appserver(
+        dev_appserver = stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
             clear_datastore=not parsed_args.save_datastore,
             enable_console=parsed_args.enable_console,
@@ -179,7 +180,7 @@ def main(args=None):
 
         managed_web_browser = (
             None if parsed_args.no_browser else
-            common.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
+            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
 
         if managed_web_browser is None:
             common.print_each_string_after_two_new_lines([

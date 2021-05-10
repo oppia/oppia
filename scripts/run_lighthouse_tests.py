@@ -27,6 +27,7 @@ from constants import constants
 import python_utils
 from scripts import build
 from scripts import common
+from scripts import servers
 
 
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
@@ -80,7 +81,7 @@ def run_webpack_compilation():
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
         try:
-            with common.managed_webpack_compiler() as proc:
+            with servers.managed_webpack_compiler() as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
@@ -166,13 +167,13 @@ def main(args=None):
             '"ENABLE_ACCOUNT_DELETION": .*',
             '"ENABLE_ACCOUNT_DELETION": true,'))
 
-        stack.enter_context(common.managed_redis_server())
-        stack.enter_context(common.managed_elasticsearch_dev_server())
+        stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(servers.managed_elasticsearch_dev_server())
 
         if constants.EMULATOR_MODE:
-            stack.enter_context(common.managed_firebase_auth_emulator())
+            stack.enter_context(servers.managed_firebase_auth_emulator())
 
-        stack.enter_context(common.managed_dev_appserver(
+        stack.enter_context(servers.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode],
             port=GOOGLE_APP_ENGINE_PORT,
             clear_datastore=True,

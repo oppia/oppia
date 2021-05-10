@@ -28,6 +28,7 @@ from scripts import build
 from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
+from scripts import servers
 
 MAX_RETRY_COUNT = 3
 RERUN_NON_FLAKY = True
@@ -136,7 +137,7 @@ def run_webpack_compilation(source_maps=False):
     for _ in python_utils.RANGE(max_tries):
         try:
             managed_webpack_compiler = (
-                common.managed_webpack_compiler(use_source_maps=source_maps))
+                servers.managed_webpack_compiler(use_source_maps=source_maps))
             with managed_webpack_compiler as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
@@ -208,13 +209,13 @@ def run_tests(args):
                 source_maps=args.source_maps)
         stack.callback(build.set_constants_to_default)
 
-        stack.enter_context(common.managed_redis_server())
-        stack.enter_context(common.managed_elasticsearch_dev_server())
+        stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(servers.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
-            stack.enter_context(common.managed_firebase_auth_emulator())
+            stack.enter_context(servers.managed_firebase_auth_emulator())
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
-        stack.enter_context(common.managed_dev_appserver(
+        stack.enter_context(servers.managed_dev_appserver(
             app_yaml_path,
             port=GOOGLE_APP_ENGINE_PORT,
             log_level=args.server_log_level,
@@ -222,10 +223,10 @@ def run_tests(args):
             skip_sdk_update_check=True,
             env={'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH}))
 
-        stack.enter_context(common.managed_webdriver_server(
+        stack.enter_context(servers.managed_webdriver_server(
             chrome_version=args.chrome_driver_version))
 
-        proc = stack.enter_context(common.managed_protractor_server(
+        proc = stack.enter_context(servers.managed_protractor_server(
             suite_name=args.suite,
             dev_mode=dev_mode,
             debug_mode=args.debug_mode,
@@ -258,7 +259,7 @@ def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    with common.managed_portserver():
+    with servers.managed_portserver():
         for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
             python_utils.PRINT('***Attempt %d.***' % attempt_num)
 

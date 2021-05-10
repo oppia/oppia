@@ -113,7 +113,8 @@
         "core.domain.email_validators_test",
         "core.domain.exploration_validators_test",
         "scripts.check_if_pr_is_low_risk_test",
-        "scripts.scripts_test_utils_test"
+        "scripts.scripts_test_utils_test",
+        "scripts.servers_test"
     ],
     "5": [
         "core.domain.suggestion_validators_test",

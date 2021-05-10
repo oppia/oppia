@@ -26,6 +26,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 from scripts import common
+from scripts import servers
 
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
@@ -34,7 +35,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
     @classmethod
     def setUpClass(cls):
         super(RedisCacheServicesUnitTests, cls).setUpClass()
-        cls._managed_redis_server = common.managed_redis_server()
+        cls._managed_redis_server = servers.managed_redis_server()
         cls._managed_redis_server.__enter__()
 
     @classmethod
