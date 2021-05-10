@@ -20,7 +20,6 @@ import { EventEmitter, NgZone } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 
-
 angular.module('oppia').factory('ngZone', downgradeInjectable(NgZone))
   .factory('AudioPlayerService', [
     '$q', '$timeout', 'AssetsBackendApiService',
