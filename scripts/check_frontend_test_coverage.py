@@ -132,7 +132,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'learner-answer-info-card.component.ts',
     'learner-answer-info.service.ts',
     'learner-local-nav.component.ts',
-    'learner-view-info.directive.ts',
+    'learner-view-info.component.ts',
     'learner-view-rating.service.ts',
     'list-of-sets-of-translatable-html-content-ids-editor.component.ts',
     'list-of-tabs-editor.component.ts',
