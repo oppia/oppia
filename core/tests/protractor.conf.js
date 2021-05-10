@@ -339,10 +339,10 @@ exports.config = {
             '-y',
             '-r', '30',
             '-f', 'x11grab',
-            '-s', '1280x1024',
+            '-s', '1285x1000',
             '-i', process.env.DISPLAY,
             '-g', '300',
-            '-loglevel', '16',
+            '-loglevel', '24',
           ];
           const uniqueString = randomString.generate(7);
           var name = uniqueString + '.mp4';
