@@ -16,13 +16,12 @@
  * @fileoverview Directive for the skill selector editor.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { AppConstants } from 'app.constants';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillBackendDict } from 'domain/skill/SkillObjectFactory';
 import { ContextService } from 'services/context.service';
 
@@ -40,8 +39,8 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   eventBusGroup: EventBusGroup;
   constructor(
     private contextService: ContextService,
-    private httpClient: HttpClient,
-    private eventBusService: EventBusService
+    private eventBusService: EventBusService,
+    private skillBackendApiService: SkillBackendApiService
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
@@ -80,9 +79,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
         value: false
       }));
     }
-    this.httpClient.get<{skills: SkillBackendDict[]}>(
-      SkillDomainConstants.FETCH_SKILLS_URL_TEMPLATE
-    ).subscribe(
+    this.skillBackendApiService.fetchAllSkills().subscribe(
       (response) => {
         this.skills = response.skills;
         this.filterSkills('');
