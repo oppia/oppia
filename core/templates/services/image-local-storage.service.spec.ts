@@ -81,10 +81,10 @@ describe('ImageLocalStorageService', () => {
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
     expect(
       imageLocalStorageService.getRawImageData(imageFilename)).toEqual(
-        sampleImageData);
+      sampleImageData);
     expect(
       imageLocalStorageService.getRawImageData('invalidFilename')).toEqual(
-        null);
+      null);
   });
 
   it('should return correctly check whether file exist in storage', () => {
