@@ -429,9 +429,18 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register finish curated lesson event', () => {
-    sas.registerCuratedLessonCompleted('123');
+    sas.registerCuratedLessonStarted('Fractions', '123');
 
-    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
+      event_category: 'CuratedLessonStarted',
+      event_label: '123'
+    });
+  });
+
+  it('should register finish curated lesson event', () => {
+    sas.registerCuratedLessonCompleted('Fractions', '123');
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
       event_category: 'CuratedLessonCompleted',
       event_label: '123'
     });
@@ -559,11 +568,12 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register active classroom lesson usage', () => {
-    sas.registerClassroomLessonActiveUse();
+    let explorationId = '123';
+    sas.registerClassroomLessonActiveUse('Fractions', explorationId);
 
-    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
       event_category: 'ClassroomActiveUserStartAndSawCards',
-      event_label: ''
+      event_label: explorationId
     });
   });
 
