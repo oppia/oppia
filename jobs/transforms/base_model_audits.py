@@ -255,8 +255,8 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
 class BaseValidateCommitCmdsSchema(beam.DoFn):
     """DoFn to validate schema of commit commands in commit_cmds dict.
 
-    Decorators are not required here as _get_change_domain_class is implemented
-    in exp_model_audits
+    Decorators are not required here as _get_change_domain_class is not
+    implemented. This class is used as a parent class in other places.
     """
 
     def _get_change_domain_class(self, unused_item):

@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
+
 from core.domain import change_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
