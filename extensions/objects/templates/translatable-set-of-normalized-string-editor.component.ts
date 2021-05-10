@@ -15,29 +15,49 @@
 /**
  * @fileoverview Directive for translatable set of normalized string editor.
  */
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+@Component({
+  selector: 'translatable-set-of-normalized-string-editor',
+  templateUrl: './translatable-set-of-normalized-string-editor.component.html'
+})
+export class TranslatableSetOfNormalizedStringEditorComponent {
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  schema: {
+    type: string;
+    items: { type: string; };
+    validators: { id: string; }[];
+  } = {
+    type: 'list',
+    items: {
+      type: 'unicode'
+    },
+    validators: [{
+      id: 'is_uniquified'
+    }]
+  };
 
-angular.module('oppia').component('translatableSetOfNormalizedStringEditor', {
-  bindings: {
-    value: '='
-  },
-  // eslint-disable-next-line max-len
-  template: require(
-    './translatable-set-of-normalized-string-editor.component.html'),
-  controller: [function() {
-    var ctrl = this;
-    ctrl.$onInit = function() {
-      ctrl.SCHEMA = {
-        type: 'list',
-        items: {
-          type: 'unicode'
-        },
-        validators: [{
-          id: 'is_uniquified'
-        }]
-      };
-    };
-  }]
-});
+  constructor() { }
+
+  updateValue(val: string): void {
+    this.value.normalizedStrSet = val;
+    this.value = {...this.value};
+    this.valueChanged.emit(this.value);
+  }
+
+  getSchema(): {
+    type: string;
+    items: { type: string; };
+    validators: { id: string; }[];
+    } {
+    return this.schema;
+  }
+}
+
+angular.module('oppia').directive(
+  'translatableSetOfNormalizedStringEditor',
+  downgradeComponent({
+    component: TranslatableSetOfNormalizedStringEditorComponent
+  }) as angular.IDirectiveFactory);

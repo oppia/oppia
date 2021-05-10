@@ -18,24 +18,28 @@
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-describe('TranslatableSetOfUnicodeStringEditor', function() {
-  var ctrl = null;
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TranslatableSetOfUnicodeStringEditorComponent } from './translatable-set-of-unicode-string-editor.component';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('translatableSetOfUnicodeStringEditor');
+
+// TODO(#11014): Add more extensive front end tests for object editors that rely
+// on schema editors.
+describe('TranslatableSetOfUnicodeStringEditor', () => {
+  let component: TranslatableSetOfUnicodeStringEditorComponent;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [TranslatableSetOfUnicodeStringEditorComponent]
+    }).compileComponents();
+    component = TestBed.createComponent(
+      TranslatableSetOfUnicodeStringEditorComponent
+    ).componentInstance;
   }));
 
-  it('should initialize the schema', function() {
-    ctrl.$onInit();
-    expect(ctrl.SCHEMA).toEqual({
-      type: 'list',
-      items: {
-        type: 'unicode'
-      },
-      validators: [{
-        id: 'is_uniquified'
-      }]
-    });
+  it('should initialize the schema', () => {
+    component.getSchema();
+    component.value = {};
+    component.updateValue('abc');
+    expect(component.value.unicodeStrSet).toBe('abc');
   });
 });

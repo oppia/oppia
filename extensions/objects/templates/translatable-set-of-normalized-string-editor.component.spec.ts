@@ -17,26 +17,27 @@
  * editor.
  */
 
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TranslatableSetOfNormalizedStringEditorComponent } from './translatable-set-of-normalized-string-editor.component';
+
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-describe('TranslatableSetOfNormalizedStringEditor', function() {
-  var ctrl = null;
+describe('TranslatableSetOfNormalizedStringEditor', () => {
+  let component: TranslatableSetOfNormalizedStringEditorComponent;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('translatableSetOfNormalizedStringEditor');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [TranslatableSetOfNormalizedStringEditorComponent]
+    }).compileComponents();
+    component = TestBed.createComponent(
+      TranslatableSetOfNormalizedStringEditorComponent
+    ).componentInstance;
   }));
 
-  it('should initialize the schema', function() {
-    ctrl.$onInit();
-    expect(ctrl.SCHEMA).toEqual({
-      type: 'list',
-      items: {
-        type: 'unicode'
-      },
-      validators: [{
-        id: 'is_uniquified'
-      }]
-    });
+  it('should initialize the schema', () => {
+    component.getSchema();
+    component.value = {};
+    component.updateValue('abc');
+    expect(component.value.normalizedStrSet).toBe('abc');
   });
 });
