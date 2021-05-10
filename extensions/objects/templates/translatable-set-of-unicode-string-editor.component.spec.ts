@@ -18,6 +18,7 @@
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { TranslatableSetOfUnicodeStringEditorComponent } from './translatable-set-of-unicode-string-editor.component';
 
@@ -29,7 +30,8 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TranslatableSetOfUnicodeStringEditorComponent]
+      declarations: [TranslatableSetOfUnicodeStringEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     component = TestBed.createComponent(
       TranslatableSetOfUnicodeStringEditorComponent

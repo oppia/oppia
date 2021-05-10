@@ -17,6 +17,7 @@
  * editor.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { TranslatableSetOfNormalizedStringEditorComponent } from './translatable-set-of-normalized-string-editor.component';
 
@@ -27,7 +28,8 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TranslatableSetOfNormalizedStringEditorComponent]
+      declarations: [TranslatableSetOfNormalizedStringEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     component = TestBed.createComponent(
       TranslatableSetOfNormalizedStringEditorComponent
