@@ -74,7 +74,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection.model.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
-    'continue-button.directive.ts',
     'contribution-and-review.service.ts',
     'contribution-opportunities-backend-api.service.ts',
     'contribution-opportunities.service.ts',
