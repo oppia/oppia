@@ -81,6 +81,7 @@ describe('NumericExpressionEditor', () => {
   it('should not show warnings if the editor is active', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject);
+    component.currentValue = undefined;
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
