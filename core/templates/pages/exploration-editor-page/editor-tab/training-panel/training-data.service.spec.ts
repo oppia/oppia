@@ -111,7 +111,7 @@ describe('TrainingDataService', function() {
   //       new WrittenTranslationsObjectFactory(
   //         new WrittenTranslationObjectFactory()));
   //   });
-  // });
+    });
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     siis = $injector.get('StateInteractionIdService');
