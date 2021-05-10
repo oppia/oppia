@@ -32,16 +32,23 @@ export class ContextService {
   constructor(
     private urlService: UrlService) {}
 
+  // Entity context needs to be a static variable since multiple instances of
+  // the ContextService class accesses the same class variable.
+  // Eg: In the translation modal, a custom entity context was defined, and this
+  // was accessed in the filepath component when the copy service was called.
+  // Without the static declaration, the latter call returned undefined.
+  static customEntityContext = null;
+  static imageSaveDestination: string = (
+    AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+
   pageContext = null;
   explorationId = null;
   explorationIsLinkedToStory = false;
   questionPlayerIsManuallySet = false;
   questionId = null;
   editorContext = null;
-  customEntityContext = null;
   // Depending on this value, new images can be either saved in the localStorage
   // or uploaded directly to the datastore.
-  imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -153,17 +160,17 @@ export class ContextService {
   // correct context for some case. eg: Viewing a skill's concept card on
   // any page via the RTE.
   setCustomEntityContext(entityType: string, entityId: string): void {
-    this.customEntityContext = new EntityContext(
+    ContextService.customEntityContext = new EntityContext(
       entityId, entityType);
   }
 
   removeCustomEntityContext(): void {
-    this.customEntityContext = null;
+    ContextService.customEntityContext = null;
   }
 
   getEntityId(): string {
-    if (this.customEntityContext !== null) {
-      return this.customEntityContext.getId();
+    if (ContextService.customEntityContext !== null) {
+      return ContextService.customEntityContext.getId();
     }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
@@ -180,8 +187,8 @@ export class ContextService {
 
   // Add constants for entity type.
   getEntityType(): string {
-    if (this.customEntityContext !== null) {
-      return this.customEntityContext.getType();
+    if (ContextService.customEntityContext !== null) {
+      return ContextService.customEntityContext.getType();
     }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
@@ -283,16 +290,17 @@ export class ContextService {
 
   // Sets the current context to save images to the server.
   resetImageSaveDestination(): void {
-    this.imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+    ContextService.imageSaveDestination = (
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
   }
 
   setImageSaveDestinationToLocalStorage(): void {
-    this.imageSaveDestination = (
+    ContextService.imageSaveDestination = (
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
   }
 
   getImageSaveDestination(): string {
-    return this.imageSaveDestination;
+    return ContextService.imageSaveDestination;
   }
 }
 
