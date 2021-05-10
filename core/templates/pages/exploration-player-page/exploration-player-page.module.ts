@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
@@ -47,6 +48,7 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     BrowserModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    MatButtonModule,
     NgbModalModule,
     SharedComponentsModule,
     NgbPopoverModule
@@ -55,6 +57,7 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
+    LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
