@@ -120,8 +120,7 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
-    # TODO(#12755): Currently, "roles" and "banned" fields are not in use. These
-    # new fields will be used once their values are populated.
+    # Currently, "roles" and "banned" fields are not in use.
     # A list of roles assigned to the user.
     roles = datastore_services.StringProperty(
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
@@ -192,9 +191,9 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # TODO(#12755): Currently, "roles" and "banned" fields are not in
-            # use and doesn't contains correct value. It is expected to export
-            # these fields once populated with correct value.
+
+            # TODO(#12755): Change export policy for roles and banned fields to
+            # "EXPORTED" once the fields are populated in the datastore.
             'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

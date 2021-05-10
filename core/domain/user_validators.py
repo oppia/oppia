@@ -96,8 +96,8 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
                     item.id, item.first_contribution_msec))
 
     @classmethod
-    def _validate_profile_user_role_is_learner(cls, item):
-        """Validates the role of a profile user is learner.
+    def _validate_that_profile_users_have_role_of_learner(cls, item):
+        """Validates that the profile users have learner role.
 
         Args:
             item: datastore_services.Model. UserSettingsModel to validate.
@@ -117,7 +117,7 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_time_fields_of_user_actions,
-            cls._validate_profile_user_role_is_learner]
+            cls._validate_that_profile_users_have_role_of_learner]
 
 
 class CompletedActivitiesModelValidator(
