@@ -21,10 +21,10 @@ require('./ng-zone.service');
 
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
-  'ContextService', 'ngAudio', 'NgZone',
+  'ContextService', 'NgZone', 'ngAudio',
   function(
       $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
-      ContextService, ngAudio, NgZone) {
+      ContextService, NgZone, ngAudio) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
