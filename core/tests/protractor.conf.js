@@ -342,7 +342,7 @@ exports.config = {
             '-s', '1285x1000',
             '-i', process.env.DISPLAY,
             '-g', '300',
-            '-loglevel', '24',
+            '-loglevel', '16',
           ];
           const uniqueString = randomString.generate(7);
           var name = uniqueString + '.mp4';
