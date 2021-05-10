@@ -29,8 +29,6 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
     def test_copier(self):
         generator = generators.Copier()
         self.assertEqual(generator.generate_value(None, **{'value': 'a'}), 'a')
-        self.assertEqual(generator.generate_value(None, **{'value': 'a'}), 'a')
-        self.assertEqual(generator.generate_value(None, **{'value': 'a'}), 'a')
         self.assertEqual(generator.generate_value(
             None, **{'value': '{{a}}'}), '{{a}}')
         self.assertIn(
