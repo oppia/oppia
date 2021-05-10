@@ -146,6 +146,11 @@ describe('Audio translation bar directive', function() {
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
     $provide.value('UserService', TestBed.get(UserService));
+    $provide.value('NgZone', function() {
+      this.runOutsideAngular = function(callback) {
+        callback();
+      };
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
