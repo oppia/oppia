@@ -62,6 +62,7 @@ export class StatsReportingService {
   static nextExpId: string = null;
   static previousStateName: string = null;
   static nextStateName: string = null;
+  static topicName: string = null;
   private static editorPreviewMode: boolean = null;
   private static questionPlayerMode: boolean = null;
   private MINIMUM_NUMBER_OF_VISITED_STATES = 3;
@@ -129,6 +130,10 @@ export class StatsReportingService {
     });
 
     this.refreshAggregatedStats();
+  }
+
+  setTopicName(newTopicName: string): void {
+    StatsReportingService.topicName = newTopicName;
   }
 
   initSession(
@@ -313,7 +318,8 @@ export class StatsReportingService {
     if (numberOfStatesVisited === this.MINIMUM_NUMBER_OF_VISITED_STATES) {
       let urlParams = this.urlService.getUrlParams();
       if (urlParams.hasOwnProperty('classroom_url_fragment')) {
-        this.siteAnalyticsService.registerClassroomLessonActiveUse();
+        this.siteAnalyticsService.registerClassroomLessonActiveUse(
+          StatsReportingService.topicName, StatsReportingService.explorationId);
       }
       this.siteAnalyticsService.registerLessonActiveUse();
     }
@@ -374,7 +380,7 @@ export class StatsReportingService {
     let urlParams = this.urlService.getUrlParams();
     if (urlParams.hasOwnProperty('classroom_url_fragment')) {
       this.siteAnalyticsService.registerCuratedLessonCompleted(
-        StatsReportingService.explorationId);
+        StatsReportingService.topicName, StatsReportingService.explorationId);
     }
 
     this.postStatsToBackend();
