@@ -30,8 +30,6 @@ import feconf
 import python_utils
 from scripts import common
 
-import psutil
-
 
 @contextlib.contextmanager
 def managed_process(
@@ -60,6 +58,11 @@ def managed_process(
     Yields:
         psutil.Process. The process managed by the context manager.
     """
+    # TODO(#11549): Move this to top of the file.
+    if common.PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, common.PSUTIL_DIR)
+    import psutil
+
     get_debug_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
         if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid,))
